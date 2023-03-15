@@ -1,0 +1,1 @@
+ALTER TABLE inventory.purchase_order_items ADD COLUMN receiving_report uuid default null;

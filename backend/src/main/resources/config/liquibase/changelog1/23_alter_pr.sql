@@ -1,0 +1,1 @@
+ALTER TABLE inventory.purchase_request ADD COLUMN requested_office uuid default null;

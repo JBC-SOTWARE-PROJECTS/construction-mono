@@ -1,0 +1,1 @@
+ALTER TABLE inventory.stock_issue ADD COLUMN project uuid default null;

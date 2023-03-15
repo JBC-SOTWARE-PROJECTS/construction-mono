@@ -1,0 +1,1 @@
+ALTER TABLE projects.project_costs ADD COLUMN status bool default false;

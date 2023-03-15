@@ -1,0 +1,1 @@
+ALTER TABLE billing.jobs ADD COLUMN job_description varchar(500) default null;

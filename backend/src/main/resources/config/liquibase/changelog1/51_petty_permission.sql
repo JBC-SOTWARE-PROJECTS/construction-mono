@@ -1,0 +1,1 @@
+INSERT INTO public.t_permission ("name", description) VALUES('create_petty_cash', 'Permission to Add Petty Cash');

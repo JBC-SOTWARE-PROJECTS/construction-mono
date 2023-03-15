@@ -1,0 +1,1 @@
+ALTER TABLE cashier.petty_cash ADD COLUMN date_trans timestamp DEFAULT now();

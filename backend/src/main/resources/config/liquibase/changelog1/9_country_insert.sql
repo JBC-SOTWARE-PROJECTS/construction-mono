@@ -1,0 +1,1 @@
+INSERT INTO public.country (id, name) VALUES('b6c17700-374d-498f-97a8-fa443b642427', 'PHILIPPINES');

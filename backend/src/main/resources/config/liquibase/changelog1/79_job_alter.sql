@@ -1,0 +1,1 @@
+ALTER TABLE billing.jobs ADD COLUMN other_findings varchar(1000) default null;

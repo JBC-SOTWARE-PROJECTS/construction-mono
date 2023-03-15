@@ -1,0 +1,1 @@
+ALTER TABLE billing.jobs ADD COLUMN body_color varchar default null;

@@ -1,0 +1,1 @@
+ALTER TABLE inventory.purchase_order add column is_voided bool default false;

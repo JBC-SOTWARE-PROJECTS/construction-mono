@@ -1,0 +1,1 @@
+ALTER TABLE billing.billing ADD COLUMN project uuid default null;
