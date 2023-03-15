@@ -104,7 +104,7 @@ export const poType = [
 
 export const ISSUE_TYPE = [
   { label: "EXPENSE", value: "EXPENSE" },
-  // { label: 'ISSUE', value: 'ISSUE' },
+  { label: 'ISSUE', value: 'ISSUE' },
 ];
 
 export const SERVICE_TYPE = [

@@ -32,7 +32,11 @@ const GET_RECORDS = gql`
       id
       dateTransact
       description
+      refNo
+      unit
+      totalCost
       cost
+      qty
       status
       lastModifiedBy
     }
@@ -124,6 +128,7 @@ const ProjectCost = ({ id, parentRef = () => {} }) => {
     {
       title: "Description",
       dataIndex: "description",
+      width: "30%",
       key: "description",
       render: (text, record) => {
         if (record.status) {
@@ -138,7 +143,25 @@ const ProjectCost = ({ id, parentRef = () => {} }) => {
       },
     },
     {
-      title: "Cost",
+      title: "Qty/Unit",
+      dataIndex: "qty",
+      key: "qty",
+      render: (qty, record) => {
+        if (record.status) {
+          return (
+            <span>{`${numeral(qty).format("0,0.00")} [${record.unit}]`}</span>
+          );
+        } else {
+          return (
+            <Text delete type="danger">
+              {`${numeral(qty).format("0,0.00")} [${record.unit}]`}
+            </Text>
+          );
+        }
+      },
+    },
+    {
+      title: "Unit Price",
       dataIndex: "cost",
       key: "cost",
       render: (cost, record) => {
@@ -154,11 +177,19 @@ const ProjectCost = ({ id, parentRef = () => {} }) => {
       },
     },
     {
-      title: "User",
-      dataIndex: "lastModifiedBy",
-      key: "lastModifiedBy",
-      render: (lastModifiedBy) => {
-        return <Tag color="magenta">{lastModifiedBy}</Tag>;
+      title: "Total",
+      dataIndex: "totalCost",
+      key: "totalCost",
+      render: (totalCost, record) => {
+        if (record.status) {
+          return <span>{numeral(totalCost).format("0,0.00")}</span>;
+        } else {
+          return (
+            <Text delete type="danger">
+              {numeral(totalCost).format("0,0.00")}
+            </Text>
+          );
+        }
       },
     },
     {
@@ -166,7 +197,12 @@ const ProjectCost = ({ id, parentRef = () => {} }) => {
       dataIndex: "action",
       key: "action",
       render: (text, record) => (
-        <Button type="danger" size="small" onClick={() => confirm(record)} disabled={!record.status}>
+        <Button
+          type="danger"
+          size="small"
+          onClick={() => confirm(record)}
+          disabled={!record.status}
+        >
           Cancel
         </Button>
       ),

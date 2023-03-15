@@ -132,7 +132,7 @@ const ProjectDetails = ({ account, id }) => {
               destroyInactiveTabPane={true}
               activeKey={active}
             >
-              <TabPane tab="Project Cost Details" key="cost">
+              <TabPane tab="Bill of Quantities" key="cost">
                 <ProjectCost id={id} parentRef={() => refetch()} />
               </TabPane>
               <TabPane tab="Project Updates" key="updates">

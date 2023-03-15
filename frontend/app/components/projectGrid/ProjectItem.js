@@ -76,7 +76,7 @@ const ProjectItem = ({ product, grid, onEdit = () => {} }) => {
         <Button variant="raised" onClick={onEdit}>
           <IntlMessages id="project.editInfo" />
         </Button>
-        <Button type="primary" onClick={() => router.push(`/billing/projects/manage/${id}`)} >
+        <Button type="primary" onClick={() => router.push(`/projects/project-list/manage/${id}`)} >
           <IntlMessages id="project.updates" />
         </Button>
       </div>

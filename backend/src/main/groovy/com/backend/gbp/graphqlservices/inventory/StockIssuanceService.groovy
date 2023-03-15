@@ -137,25 +137,27 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
                 stockIssueItemsService.updateStiItemStatus(it.id, status)
             }
             //delete materials
-            if(upsert.project){
-                projectMaterialService.deleteMaterials(upsert.id)
-            }
-        }else{ //post
-            if(upsert.project){
-                //save materials
-                def items = stockIssueItemsService.stiItemByParent(id)
-                items.each {
-                    projectMaterialService.upsertMaterialsAuto(
-                            upsert.project,
-                            upsert.id,
-                            upsert.issueNo,
-                            it.item,
-                            it.issueQty,
-                            it.unitCost,
-                    )
-                }
-            }
+//            if(upsert.project){
+//                projectMaterialService.deleteMaterials(upsert.id)
+//            }
         }
+
+//        else{ //post
+//            if(upsert.project){
+//                //save materials
+//                def items = stockIssueItemsService.stiItemByParent(id)
+//                items.each {
+//                    projectMaterialService.upsertMaterialsAuto(
+//                            upsert.project,
+//                            upsert.id,
+//                            upsert.issueNo,
+//                            it.item,
+//                            it.issueQty,
+//                            it.unitCost,
+//                    )
+//                }
+//            }
+//        }
 
         save(upsert)
     }

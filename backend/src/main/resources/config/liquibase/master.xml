@@ -191,5 +191,11 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog2/05_alter_billing.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog2/alter_project_cost.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog2/add_roles_new.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog2/alter_project_cost_2.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
