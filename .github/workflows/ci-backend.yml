@@ -17,9 +17,13 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-    - name: docker build nodejs
+    - name: build jar-file 
+      run: |
+       sudo /opt/gradle/bin/gradle build
+    - name: docker build 
       run: |
        docker build -f backend/Dockerfile ./backend -t acemcbmis/private-backend-demo:0.0.1
     - name: docker push
       run: |
         docker push acemcbmis/private-backend-demo:0.0.1
+
