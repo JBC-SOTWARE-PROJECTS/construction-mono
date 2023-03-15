@@ -305,14 +305,13 @@ const SidebarContent = ({ account }) => {
                   id="sidebar.gas-slip" /></span></a></Link>
               </Menu.Item>
             </MenuItemGroup> */}
-            {/* Billing & Finances */}
             <MenuItemGroup
-              key="billing-finances"
+              key="project-management"
               className="gx-menu-group"
-              title={<IntlMessages id="sidebar.billing-finances" />}
+              title={<IntlMessages id="sidebar.project-management" />}
             >
-              <Menu.Item key="billing/customer">
-                <Link href="/billing/customer">
+             <Menu.Item key="projects/customer">
+                <Link href="/projects/customer">
                   <a>
                     <i className="icon icon-avatar" />
                     <span>
@@ -321,6 +320,24 @@ const SidebarContent = ({ account }) => {
                   </a>
                 </Link>
               </Menu.Item>
+              <Menu.Item key="projects/project-list">
+                <Link href="/projects/project-list">
+                  <a>
+                    <i className="icon icon-product-list" />
+                    <span>
+                      <IntlMessages id="sidebar.projects" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
+            </MenuItemGroup>
+            {/* Billing & Finances */}
+            <MenuItemGroup
+              key="billing-finances"
+              className="gx-menu-group"
+              title={<IntlMessages id="sidebar.billing-finances" />}
+            >
+              
               {/* <Menu.Item key="billing/jobs">
                 <Link href="/billing/jobs">
                   <a>
@@ -331,16 +348,7 @@ const SidebarContent = ({ account }) => {
                   </a>
                 </Link>
               </Menu.Item> */}
-              <Menu.Item key="billing/projects">
-                <Link href="/billing/projects">
-                  <a>
-                    <i className="icon icon-product-list" />
-                    <span>
-                      <IntlMessages id="sidebar.projects" />
-                    </span>
-                  </a>
-                </Link>
-              </Menu.Item>
+              
               <Menu.Item key="billing/billingaccounts">
                 <Link href="/billing/billingaccounts">
                   <a>

@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { Col, Row, Button } from "antd";
+import { Col, Row, Button, Form } from "antd";
 import MyForm from "../../../util/customForms/myForm";
 import FormInput from "../../../util/customForms/formInput";
 import CModal from "../../../app/components/common/CModal";
@@ -19,6 +18,8 @@ const UPSERT_RECORD = gql`
 
 const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
   const [formError, setFormError] = useState({});
+  const [form] = Form.useForm();
+
   {
     /* error = { errorTitle: "", errorMsg: ""}*/
   }
@@ -55,6 +56,23 @@ const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
     }
   };
 
+  const calculateTotal = (el, value) => {
+    const { getFieldValue, setFieldValue } = form;
+    if (el === "qty") {
+      let cost = getFieldValue("cost");
+      if (cost) {
+        let total = cost * value;
+        setFieldValue("totalcost", total);
+      }
+    } else {
+      let qty = getFieldValue("qty");
+      if (qty) {
+        let total = qty * value;
+        setFieldValue("totalcost", total);
+      }
+    }
+  };
+
   return (
     <CModal
       width={"40%"}
@@ -76,6 +94,7 @@ const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
       ]}
     >
       <MyForm
+        form={form}
         name="miscForm"
         id="miscForm"
         error={formError}
@@ -94,11 +113,61 @@ const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
           </Col>
           <Col span={24}>
             <FormInput
-              description={"Cost"}
+              description={"Reference Number"}
+              rules={[{ required: true, message: "This Field is required" }]}
+              name="refNo"
+              placeholder="Reference Number e.g A.1.1(6)"
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              description={"Category"}
+              name="category"
+              type="autocomplete"
+              options={[]}
+              initialValue={props?.brand}
+              placeholder="Category"
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              description={"Qty"}
+              rules={[{ required: true, message: "This Field is required" }]}
+              type="number"
+              name="qty"
+              placeholder="Quantity"
+              onChange={(e) => calculateTotal("qty", e)}
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              description={"Unit"}
+              rules={[{ required: true, message: "This Field is required" }]}
+              name="unit"
+              placeholder="Unit (e.g Month, each, lot)"
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              description={"Unit Price"}
               rules={[{ required: true, message: "This Field is required" }]}
               type="number"
               name="cost"
-              placeholder="Cost"
+              placeholder="Unit Price"
+              onChange={(e) => calculateTotal("cost", e)}
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              description={"Total Cost"}
+              type="number"
+              name="totalcost"
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+              placeholder="Total"
+              disabled={true}
             />
           </Col>
         </Row>

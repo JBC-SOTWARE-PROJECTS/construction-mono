@@ -7,4 +7,9 @@ class BrandDto {
     String brand
 }
 
+@TupleConstructor
+class CategoryDto {
+    String category
+}
+
 

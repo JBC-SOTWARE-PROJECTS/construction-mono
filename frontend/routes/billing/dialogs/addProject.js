@@ -105,8 +105,6 @@ const AddPrjectForm = ({ visible, hide, ...props }) => {
       payload.image = imageFile
     }
 
-    console.log("payload => ", payload)
-
     upsertRecord({
       variables: {
         id: props?.id,

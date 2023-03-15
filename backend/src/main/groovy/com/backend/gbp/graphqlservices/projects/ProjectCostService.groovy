@@ -1,19 +1,17 @@
 package com.backend.gbp.graphqlservices.projects
 
 import com.backend.gbp.domain.projects.ProjectCost
-import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.rest.InventoryResource
+import com.backend.gbp.rest.dto.CategoryDto
 import com.backend.gbp.services.GeneratorService
-import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
-import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -33,6 +31,9 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     @Autowired
     GeneratorService generatorService
 
+    @Autowired
+    InventoryResource inventoryResource
+
 
     @GraphQLQuery(name = "pCostById")
     ProjectCost pCostById(
@@ -49,7 +50,7 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     BigDecimal getTotals(
             @GraphQLArgument(name = "id") UUID id
     ){
-        String query = '''Select coalesce(round(sum(j.cost),2), 0) from ProjectCost j where 
+        String query = '''Select coalesce(round(sum(j.cost * j.qty),2), 0) from ProjectCost j where 
         j.project.id = :id and j.status = true'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
@@ -66,6 +67,11 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
         params.put('filter', filter)
         params.put('id', id)
         createQuery(query, params).resultList.sort { it.dateTransact }.reverse()
+    }
+
+    @GraphQLQuery(name = "getCategoryProjects")
+    List<CategoryDto> getCategoryProjects() {
+        inventoryResource.getCategoryProjects().sort{it.category}
     }
 
 
