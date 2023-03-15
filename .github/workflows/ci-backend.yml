@@ -10,21 +10,17 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: self-hosted
-
     steps:
       - uses: actions/checkout@v2
       - name: Welcome Message
         run:  echo CICD Test Runner
-
-
-
+        with:
+          path : backend
       - name: Build Docker
         run: |
-           
             PROJ_VERSION=$(sudo /opt/gradle/bin/gradle properties --no-daemon --console=plain -q | grep "^version:" | awk '{printf $2}')
             echo "Project is ${PROJ_VERSION}"
             sudo /opt/gradle/bin/gradle build
