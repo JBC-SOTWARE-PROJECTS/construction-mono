@@ -12,4 +12,10 @@ class CategoryDto {
     String category
 }
 
+@TupleConstructor
+class UnitDto {
+    String unit
+}
+
+
 

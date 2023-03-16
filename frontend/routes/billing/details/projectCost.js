@@ -7,7 +7,6 @@ import {
   message,
   Button,
   Typography,
-  Tag,
   Modal,
 } from "antd";
 import { useMutation, useQuery } from "@apollo/react-hooks";
@@ -35,6 +34,7 @@ const GET_RECORDS = gql`
       refNo
       unit
       totalCost
+      category
       cost
       qty
       status

@@ -46,6 +46,10 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	String description
 
 	@GraphQLQuery
+	@Column(name = "category")
+	String category
+
+	@GraphQLQuery
 	@Column(name = "qty")
 	BigDecimal qty
 

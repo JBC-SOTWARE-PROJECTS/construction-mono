@@ -3,7 +3,7 @@ import { Col, Row, Button, Form } from "antd";
 import MyForm from "../../../util/customForms/myForm";
 import FormInput from "../../../util/customForms/formInput";
 import CModal from "../../../app/components/common/CModal";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import _ from "lodash";
 import moment from "moment";
@@ -16,10 +16,21 @@ const UPSERT_RECORD = gql`
   }
 `;
 
+const GET_CATEGORY = gql`
+  {
+    category: getCategoryProjects {
+      value: category
+    }
+    units: getUnitProjects {
+      value: unit
+    }
+  }
+`;
+
 const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
   const [formError, setFormError] = useState({});
   const [form] = Form.useForm();
-
+  const { data } = useQuery(GET_CATEGORY);
   {
     /* error = { errorTitle: "", errorMsg: ""}*/
   }
@@ -40,6 +51,8 @@ const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
     let payload = _.clone(data);
     payload.project = props?.project;
     payload.dateTransact = moment();
+    payload.category = _.trim(data.category);
+    payload.unit = _.trim(data.unit);
     payload.status = true;
     if (Number(data?.cost) <= 0) {
       setFormError({
@@ -124,8 +137,7 @@ const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
               description={"Category"}
               name="category"
               type="autocomplete"
-              options={[]}
-              initialValue={props?.brand}
+              options={_.get(data, "category", [])}
               placeholder="Category"
             />
           </Col>
@@ -142,8 +154,9 @@ const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
           <Col span={24}>
             <FormInput
               description={"Unit"}
-              rules={[{ required: true, message: "This Field is required" }]}
               name="unit"
+              type="autocomplete"
+              options={_.get(data, "units", [])}
               placeholder="Unit (e.g Month, each, lot)"
             />
           </Col>

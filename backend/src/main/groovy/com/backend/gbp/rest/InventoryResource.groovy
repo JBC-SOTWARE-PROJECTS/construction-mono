@@ -111,6 +111,13 @@ class InventoryResource {
 		return category
 	}
 
+	List<UnitDto> getUnitProjects() {
+
+		String sql = "select distinct(i.unit) from projects.project_costs i;"
+		List<UnitDto> units = jdbcTemplate.query(sql, new BeanPropertyRowMapper(UnitDto.class))
+		return units
+	}
+
 	@RequestMapping(method = [RequestMethod.POST], value = ["/api/getPlateNo"])
 	List<PlateNumberDto> getPlateNo() {
 

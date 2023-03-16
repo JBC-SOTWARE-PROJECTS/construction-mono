@@ -4,6 +4,7 @@ import com.backend.gbp.domain.projects.ProjectCost
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.CategoryDto
+import com.backend.gbp.rest.dto.UnitDto
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -72,6 +73,11 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     @GraphQLQuery(name = "getCategoryProjects")
     List<CategoryDto> getCategoryProjects() {
         inventoryResource.getCategoryProjects().sort{it.category}
+    }
+
+    @GraphQLQuery(name = "getUnitProjects")
+    List<UnitDto> getUnitProjects() {
+        inventoryResource.getUnitProjects().sort{it.unit}
     }
 
 
