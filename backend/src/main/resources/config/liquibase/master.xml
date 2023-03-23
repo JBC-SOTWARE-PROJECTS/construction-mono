@@ -198,4 +198,11 @@
     <include file="classpath:config/liquibase/changelog2/alter_project_cost_2.sql"
              relativeToChangelogFile="false"/>
 
+    <include file="classpath:config/liquibase/changelog3/01_project_updates_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/02_project_updates_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/03_project_updates_add_new_table.sql"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

@@ -1,0 +1,1 @@
+ALTER TABLE projects.project_updates ALTER COLUMN completed_date DROP DEFAULT;

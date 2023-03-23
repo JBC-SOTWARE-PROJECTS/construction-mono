@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Col, Row, Button } from "antd";
 import MyForm from "../../../util/customForms/myForm";
 import FormInput from "../../../util/customForms/formInput";
@@ -7,22 +7,20 @@ import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import _ from "lodash";
 import moment from "moment";
-import FormSelect from "../../../util/customForms/formSelect";
-import { JOB_STATUS } from "../../../shared/constant";
+import { AccountContext } from "../../../app/components/accessControl/AccountContext";
 
 const UPSERT_RECORD = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
-    upsert: upsertProjectUpdates(id: $id, fields: $fields) {
+    upsert: upsertProjectNotes(id: $id, fields: $fields) {
       id
     }
   }
 `;
 
-const AddProjectCostForm = ({ visible, hide, ...props }) => {
-  const [formError, setFormError] = useState({});
+const AddProjectUpdatesNotes = ({ visible, hide, ...props }) => {
+  const account = useContext(AccountContext);
   /* error = { errorTitle: "", errorMsg: ""}*/
   //======================= =================== =================================================//
-
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
     UPSERT_RECORD,
     {
@@ -30,9 +28,9 @@ const AddProjectCostForm = ({ visible, hide, ...props }) => {
       onCompleted: (data) => {
         if (!_.isEmpty(data?.upsert?.id)) {
           if (props.id) {
-            hide("Project Milestone Updated");
+            hide("Project Remarks/Notes Updated");
           } else {
-            hide("Project Milestone Added");
+            hide("Project Remarks/Notes Added");
           }
         }
       },
@@ -41,8 +39,9 @@ const AddProjectCostForm = ({ visible, hide, ...props }) => {
 
   const onSubmit = (data) => {
     let payload = _.clone(data);
-    payload.project = props?.project;
     if (!props.id) {
+      payload.projectUpdates = { id: props.parent?.id };
+      payload.user = { id: account.id };
       payload.dateTransact = moment();
     }
     upsertRecord({
@@ -56,7 +55,7 @@ const AddProjectCostForm = ({ visible, hide, ...props }) => {
   return (
     <CModal
       width={"40%"}
-      title="ADD PROJECT MILESTONES"
+      title="Projects Remarks/Notes"
       visible={visible}
       footer={[
         <Button key="back" onClick={() => hide()} type="danger">
@@ -76,50 +75,19 @@ const AddProjectCostForm = ({ visible, hide, ...props }) => {
       <MyForm
         name="miscForm"
         id="miscForm"
-        error={formError}
         onFinish={onSubmit}
         className="form-card"
       >
         <Row>
           <Col span={24}>
             <FormInput
-              description={"Description"}
+              description={"Remarks/Notes"}
               rules={[{ required: true, message: "This Field is required" }]}
-              initialValue={props?.description}
-              name="description"
+              initialValue={props?.remarks}
+              name="remarks"
               type="textarea"
-              placeholder="Description"
-            />
-          </Col>
-          <Col span={24}>
-            <FormInput
-              description={"Start Date"}
-              rules={[{ required: true, message: "This Field is required" }]}
-              initialValue={moment(props?.startDate)}
-              name="startDate"
-              type="datepicker"
-              placeholder="Estimate Project End Date"
-            />
-          </Col>
-          <Col span={24}>
-            <FormInput
-              description={"Estimate End Date (Duration of Work)"}
-              rules={[{ required: true, message: "This Field is required" }]}
-              initialValue={moment(props?.estimateEndDate)}
-              name="estimateEndDate"
-              type="datepicker"
-              placeholder="Estimate Project End Date"
-            />
-          </Col>
-          <Col span={24}>
-            <FormSelect
-              initialValue={props?.status}
-              description={"Status"}
-              rules={[{ required: true, message: "This Field is required" }]}
-              name="status"
-              field="status"
-              placeholder="Select Status"
-              list={JOB_STATUS}
+              placeholder="Remarks/Notes"
+              rows={8}
             />
           </Col>
         </Row>
@@ -128,4 +96,4 @@ const AddProjectCostForm = ({ visible, hide, ...props }) => {
   );
 };
 
-export default AddProjectCostForm;
+export default AddProjectUpdatesNotes;

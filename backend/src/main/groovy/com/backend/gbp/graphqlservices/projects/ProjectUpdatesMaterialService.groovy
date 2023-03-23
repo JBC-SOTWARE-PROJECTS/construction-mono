@@ -1,7 +1,7 @@
 package com.backend.gbp.graphqlservices.projects
 
 import com.backend.gbp.domain.inventory.Item
-import com.backend.gbp.domain.projects.ProjectMaterials
+import com.backend.gbp.domain.projects.ProjectUpdatesMaterials
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.services.GeneratorService
@@ -13,7 +13,6 @@ import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import org.xmlsoap.schemas.soap.encoding.Int
 
 import javax.transaction.Transactional
 import java.time.Instant
@@ -21,10 +20,10 @@ import java.time.Instant
 @Component
 @GraphQLApi
 @TypeChecked
-class ProjectMaterialService extends AbstractDaoService<ProjectMaterials> {
+class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMaterials> {
 
-    ProjectMaterialService() {
-        super(ProjectMaterials.class)
+    ProjectUpdatesMaterialService() {
+        super(ProjectUpdatesMaterials.class)
     }
 
     @Autowired
@@ -35,7 +34,7 @@ class ProjectMaterialService extends AbstractDaoService<ProjectMaterials> {
 
 
     @GraphQLQuery(name = "pMaterialById")
-    ProjectMaterials pMaterialById(
+    ProjectUpdatesMaterials pMaterialById(
             @GraphQLArgument(name = "id") UUID id
     ) {
         if(id){
@@ -49,7 +48,7 @@ class ProjectMaterialService extends AbstractDaoService<ProjectMaterials> {
     BigDecimal getTotalMaterials(
             @GraphQLArgument(name = "id") UUID id
     ){
-        String query = '''Select coalesce(round(sum(j.cost * j.qty),2), 0) from ProjectMaterials j where 
+        String query = '''Select coalesce(round(sum(j.cost * j.qty),2), 0) from ProjectUpdatesMaterials j where 
         j.project.id = :id'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
@@ -57,11 +56,11 @@ class ProjectMaterialService extends AbstractDaoService<ProjectMaterials> {
     }
 
     @GraphQLQuery(name = "pMaterialByList")
-    List<ProjectMaterials> pMaterialByList(
+    List<ProjectUpdatesMaterials> pMaterialByList(
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "id") UUID id
     ) {
-        String query = '''Select e from ProjectMaterials e where lower(e.item.descLong) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
+        String query = '''Select e from ProjectUpdatesMaterials e where lower(e.item.descLong) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
         params.put('id', id)
@@ -69,10 +68,10 @@ class ProjectMaterialService extends AbstractDaoService<ProjectMaterials> {
     }
 
     @GraphQLQuery(name = "getMaterialsByRefId")
-    List<ProjectMaterials> getMaterialsByRefId(
+    List<ProjectUpdatesMaterials> getMaterialsByRefId(
             @GraphQLArgument(name = "id") UUID id
     ) {
-        String query = '''Select e from ProjectMaterials e where refId = :id'''
+        String query = '''Select e from ProjectUpdatesMaterials e where refId = :id'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
         createQuery(query, params).resultList.sort { it.dateTransact }.reverse()
@@ -82,42 +81,21 @@ class ProjectMaterialService extends AbstractDaoService<ProjectMaterials> {
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertProjectMaterials")
     @Transactional
-    ProjectMaterials upsertProjectMaterials(
+    ProjectUpdatesMaterials upsertProjectMaterials(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
-        upsertFromMap(id, fields, { ProjectMaterials entity, boolean forInsert ->
+        upsertFromMap(id, fields, { ProjectUpdatesMaterials entity, boolean forInsert ->
             if(forInsert){
                 //conditions here before save
             }
         })
     }
 
-    @GraphQLMutation(name = "upsertMaterialsAuto")
-    @Transactional
-    ProjectMaterials upsertMaterialsAuto(
-            @GraphQLArgument(name = "project") Projects project,
-            @GraphQLArgument(name = "refId") UUID refId,
-            @GraphQLArgument(name = "refNo") String refNo,
-            @GraphQLArgument(name = "item") Item item,
-            @GraphQLArgument(name = "qty") Integer qty,
-            @GraphQLArgument(name = "cost") BigDecimal cost
-
-    ) {
-        def upsert = new ProjectMaterials()
-        upsert.project = project
-        upsert.dateTransact = Instant.now()
-        upsert.refId = refId
-        upsert.refNo = refNo
-        upsert.item = item
-        upsert.qty = qty
-        upsert.cost = cost
-        save(upsert)
-    }
 
     @GraphQLMutation(name = "deleteMaterials")
     @Transactional
-    List<ProjectMaterials> deleteMaterials(
+    List<ProjectUpdatesMaterials> deleteMaterials(
             @GraphQLArgument(name = "refId") UUID refId
     ) {
         def list = this.getMaterialsByRefId(refId)

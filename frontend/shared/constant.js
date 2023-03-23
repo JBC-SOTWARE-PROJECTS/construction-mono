@@ -52,13 +52,10 @@ export const CUS_TYPE = [
 ];
 
 export const JOB_STATUS = [
-  { label: "ONGOING", value: "ONGOING" },
-  { label: "PENDING", value: "PENDING" },
-  { label: "FOR PAINTING", value: "FOR PAINTING" },
-  { label: "FOR ORDER PARTS", value: "FOR ORDER PARTS" },
-  { label: "COMPLETED", value: "COMPLETED" },
-  { label: "DUGTA", value: "DUGTA" },
-  { label: "CANCELLED", value: "CANCELLED" },
+  { label: "Ongoing", value: "Ongoing" },
+  { label: "Completed", value: "Completed" },
+  { label: "Pending", value: "Pending" },
+  { label: "Cancelled", value: "Cancelled" },
 ];
 
 export const SORT_BY = [
@@ -104,7 +101,7 @@ export const poType = [
 
 export const ISSUE_TYPE = [
   { label: "EXPENSE", value: "EXPENSE" },
-  { label: 'ISSUE', value: 'ISSUE' },
+  { label: "ISSUE", value: "ISSUE" },
 ];
 
 export const SERVICE_TYPE = [
@@ -270,6 +267,15 @@ export const createObj = (e, type) => {
       qty: 1,
       wcost: wcost,
       isNew: true,
+    };
+  } else if (type === "PROJECT") {
+    obj = {
+      id: e?.id,
+      item: e?.item,
+      uou: e?.item?.unit_of_usage?.unitDescription,
+      qty: 1,
+      cost: wcost,
+      subTotal: wcost * 1,
     };
   }
   return obj;

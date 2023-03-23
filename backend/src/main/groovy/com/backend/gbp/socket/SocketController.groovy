@@ -14,23 +14,23 @@ class SocketController {
 	
 	//socket receiver from the frontend '/app/ws'
 	
-	@Autowired
-	ObjectMapper objectMapper
-	
-	@MessageMapping("/ws")
-	@SendTo("/channel/hello")
-	protected String hello(String world) {
-		return "Hello Message From Backend, ${world}!"
-	}
-	
-	@MessageMapping("/ws/{topic}")
-	@SendTo("/channel/messages")
-	Message send(@DestinationVariable("topic") String topic,
-	             Map<String, Object> message) throws Exception {
-		def msg
-		msg = objectMapper.convertValue(message, Message.class)
-		msg.topic = topic
-		//do something with the payload
-		return msg
-	}
+//	@Autowired
+//	ObjectMapper objectMapper
+//
+//	@MessageMapping("/ws")
+//	@SendTo("/channel/hello")
+//	protected String hello(String world) {
+//		return "Hello Message From Backend, ${world}!"
+//	}
+//
+//	@MessageMapping("/ws/{topic}")
+//	@SendTo("/channel/messages")
+//	Message send(@DestinationVariable("topic") String topic,
+//	             Map<String, Object> message) throws Exception {
+//		def msg
+//		msg = objectMapper.convertValue(message, Message.class)
+//		msg.topic = topic
+//		//do something with the payload
+//		return msg
+//	}
 }

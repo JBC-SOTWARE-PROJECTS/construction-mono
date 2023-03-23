@@ -165,7 +165,7 @@ const AddPrjectForm = ({ visible, hide, ...props }) => {
           </Col>
           <Col {...col3}>
             <FormInput
-              description={"Estimate Project End Date (Duration of Work)"}
+              description={"Estimate Proj. End Date"}
               rules={[{ required: true, message: "This Field is required" }]}
               initialValue={moment(props?.projectEnded)}
               name="projectEnded"
@@ -212,7 +212,7 @@ const AddPrjectForm = ({ visible, hide, ...props }) => {
               initialValue={props?.status}
               name="status"
               field="status"
-              placeholder="Type of Repair"
+              placeholder="Select Status"
               list={_.get(data, "status")}
             />
           </Col>

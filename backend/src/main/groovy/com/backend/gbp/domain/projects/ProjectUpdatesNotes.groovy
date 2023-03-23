@@ -1,6 +1,8 @@
 package com.backend.gbp.domain.projects
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -13,10 +15,10 @@ import javax.persistence.*
 import java.time.Instant
 
 @Entity
-@Table(schema = "projects", name = "project_updates")
-@SQLDelete(sql = "UPDATE projects.project_updates SET deleted = true WHERE id = ?")
+@Table(schema = "projects", name = "projects_updates_notes")
+@SQLDelete(sql = "UPDATE projects.projects_updates_materials SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class ProjectUpdates extends AbstractAuditingEntity implements Serializable {
+class ProjectUpdatesNotes extends AbstractAuditingEntity implements Serializable {
 	
 	@GraphQLQuery
 	@Id
@@ -29,31 +31,21 @@ class ProjectUpdates extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "project", referencedColumnName = "id")
-	Projects project
+	@JoinColumn(name = "project_updates", referencedColumnName = "id")
+	ProjectUpdates projectUpdates
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_id", referencedColumnName = "id")
+	Employee user
 
 	@GraphQLQuery
 	@Column(name = "date_transact")
 	Instant dateTransact
 
 	@GraphQLQuery
-	@Column(name = "start_date")
-	Instant startDate
-
-	@GraphQLQuery
-	@Column(name = "estimate_end_date")
-	Instant estimateEndDate
-
-	@GraphQLQuery
-	@Column(name = "completed_date")
-	Instant completedDate
-
-	@GraphQLQuery
-	@Column(name = "description")
-	String description
-
-	@GraphQLQuery
-	@Column(name = "status")
-	String status
+	@Column(name = "remarks")
+	String remarks
 
 }
