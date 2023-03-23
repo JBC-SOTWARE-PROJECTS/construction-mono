@@ -173,7 +173,17 @@ const ProjectUpdatesContent = ({
             renderItem={(item) => (
               <List.Item
                 actions={[
-                  <Button key="list-loadmore-edit" size="small" type="primary">
+                  <Button
+                    onClick={() =>
+                      showModalNotes({
+                        show: true,
+                        myProps: { ...item, parent: obj, project: projectId },
+                      })
+                    }
+                    key="list-loadmore-edit"
+                    size="small"
+                    type="primary"
+                  >
                     Edit
                   </Button>,
                 ]}
