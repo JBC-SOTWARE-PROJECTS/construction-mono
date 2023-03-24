@@ -18,13 +18,10 @@ const GET_RECORDS = gql`
       id
       dateTrans
       billNo
-      job {
+      project {
         id
-        jobNo
-        repair {
-          id
-          description
-        }
+        projectCode
+        description
       }
       customer {
         id
@@ -147,7 +144,7 @@ const ViewBillingContent = ({ account, id, type }) => {
           <Skeleton active />
         ) : (
           <>
-            {type === "JOB" && (
+            {type === "PROJECT" && (
               <BillingHeader
                 record={_.get(data, "b")}
                 onLocked={(e) => onLocked(e)}
@@ -201,6 +198,7 @@ const ViewBillingContent = ({ account, id, type }) => {
               transType={type}
               locked={_.get(data, "b.locked")}
               status={_.get(data, "b.status")}
+              isProject={!_.isEmpty(_.get(data, "b.project.id"))}
               isGovernment={
                 _.get(data, "b.customer.customerType") == "GOVERNMENT"
                   ? true

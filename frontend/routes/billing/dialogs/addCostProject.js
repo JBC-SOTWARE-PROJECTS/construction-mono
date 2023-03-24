@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Col, Row, Button, Form } from "antd";
+import { Col, Row, Button, Form, message } from "antd";
 import MyForm from "../../../util/customForms/myForm";
 import FormInput from "../../../util/customForms/formInput";
 import CModal from "../../../app/components/common/CModal";
@@ -11,7 +11,9 @@ import moment from "moment";
 const UPSERT_RECORD = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     upsert: upsertProjectCost(id: $id, fields: $fields) {
-      id
+      payload
+      success
+      message
     }
   }
 `;
@@ -40,8 +42,10 @@ const AddProjectUpdateForms = ({ visible, hide, ...props }) => {
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        if (!_.isEmpty(data?.upsert?.id)) {
-          hide("Project Cost Added");
+        if (data?.upsert?.success) {
+          hide(data?.upsert?.message);
+        }else{
+          message.error(data?.upsert?.message)
         }
       },
     }

@@ -22,7 +22,7 @@ const BillingView = ({ account }) => {
         <title>Construction IMS Billing Accounts</title>
       </Head>
       <AccessManager roles={["ROLE_BILLING", "ROLE_ADMIN"]}>
-        <ViewBilling account={account} id={billId} type="JOB" />
+        <ViewBilling account={account} id={billId} type="PROJECT" />
       </AccessManager>
     </React.Fragment>
   );
