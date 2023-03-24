@@ -60,25 +60,25 @@ class PublicResource {
         }
         return forRet
     }
-    @RequestMapping(value = "/testCompare" )
-    List<String> testCompareTo(HttpServletRequest request) {
-        String input = "Bayocboc"
-        String comparison1 = "BAYOCBOC GREGG"
-        String comparison2 = "BAYOCBOK GREGG"
-        String comparison3 = "limaad"
-        String comparison4 = "elopre"
-        String comparison5 = "baayocbocz"
-        String comparison6 = "baayocboc"
-        String comparison7 = "bayocbo"
-        String comparison8 = "boyocboc"
-        println input.compareToIgnoreCase(comparison1)
-        println input.compareToIgnoreCase(comparison2)
-        println input.compareToIgnoreCase(comparison3)
-        println input.compareToIgnoreCase(comparison4)
-        println input.compareToIgnoreCase(comparison5)
-        println input.compareToIgnoreCase(comparison6)
-        println input.compareToIgnoreCase(comparison7)
-        println input.compareToIgnoreCase(comparison8)
-    }
+//    @RequestMapping(value = "/testCompare" )
+//    List<String> testCompareTo(HttpServletRequest request) {
+//        String input = "Bayocboc"
+//        String comparison1 = "BAYOCBOC GREGG"
+//        String comparison2 = "BAYOCBOK GREGG"
+//        String comparison3 = "limaad"
+//        String comparison4 = "elopre"
+//        String comparison5 = "baayocbocz"
+//        String comparison6 = "baayocboc"
+//        String comparison7 = "bayocbo"
+//        String comparison8 = "boyocboc"
+//        println input.compareToIgnoreCase(comparison1)
+//        println input.compareToIgnoreCase(comparison2)
+//        println input.compareToIgnoreCase(comparison3)
+//        println input.compareToIgnoreCase(comparison4)
+//        println input.compareToIgnoreCase(comparison5)
+//        println input.compareToIgnoreCase(comparison6)
+//        println input.compareToIgnoreCase(comparison7)
+//        println input.compareToIgnoreCase(comparison8)
+//    }
 
 }

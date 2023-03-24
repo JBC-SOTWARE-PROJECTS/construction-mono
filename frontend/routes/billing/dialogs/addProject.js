@@ -27,6 +27,7 @@ const GET_RECORDS = gql`
     status: jobStatusActive {
       value: description
       label: description
+      disabledEditing
     }
   }
 `;
@@ -97,12 +98,16 @@ const AddPrjectForm = ({ visible, hide, ...props }) => {
 
   //======================= =================== =================================================//
 
-  const onSubmit = (data) => {
-    let payload = _.clone(data);
-    payload.customer = { id: data?.customer };
-    payload.location = { id: data?.location };
-    if(!_.isEmpty(imageFile)){
-      payload.image = imageFile
+  const onSubmit = (values) => {
+    let payload = _.clone(values);
+    let status = _.get(data, "status", []);
+    let objStatus = _.find(status, { value: values?.status });
+    payload.customer = { id: values?.customer };
+    payload.location = { id: values?.location };
+    payload.disabledEditing = objStatus.disabledEditing;
+
+    if (!_.isEmpty(imageFile)) {
+      payload.image = imageFile;
     }
 
     upsertRecord({
@@ -165,7 +170,7 @@ const AddPrjectForm = ({ visible, hide, ...props }) => {
           </Col>
           <Col {...col3}>
             <FormInput
-              description={"Estimate Project End Date (Duration of Work)"}
+              description={"Estimate Proj. End Date"}
               rules={[{ required: true, message: "This Field is required" }]}
               initialValue={moment(props?.projectEnded)}
               name="projectEnded"
@@ -212,7 +217,7 @@ const AddPrjectForm = ({ visible, hide, ...props }) => {
               initialValue={props?.status}
               name="status"
               field="status"
-              placeholder="Type of Repair"
+              placeholder="Select Status"
               list={_.get(data, "status")}
             />
           </Col>

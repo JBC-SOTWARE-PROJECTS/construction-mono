@@ -16,6 +16,19 @@ Version        : 1.0
   margin: 0;
 }
 
+.margin-y-0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.padding-0 {
+  padding: 0;
+}
+
 .margin-r-10 {
   margin-right: 10px;
 }
@@ -88,7 +101,6 @@ Version        : 1.0
   margin-bottom: 20px;
 }
 
-
 .w-20 {
   width: 20%;
 }
@@ -99,6 +111,10 @@ Version        : 1.0
 
 .font-bold {
   font-weight: bold;
+}
+
+.font-semibold {
+  font-weight: 500 !important;
 }
 
 .list-none {
@@ -142,4 +158,28 @@ Version        : 1.0
 .ant-radio-inner::after {
   margin-top: 0px !important;
   margin-left: 0px !important;
+}
+
+/*  */
+.project-loadmore-list {
+  min-height: 350px !important;
+}
+
+.opacity-60 {
+  opacity: 0.7 !important;
+}
+
+.flex-box-wrap {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.flex-box-wrap-end {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  width: 100% !important;
 }

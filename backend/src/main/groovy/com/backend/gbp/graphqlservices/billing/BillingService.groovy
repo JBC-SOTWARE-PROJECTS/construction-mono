@@ -5,6 +5,7 @@ import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.billing.Job
 import com.backend.gbp.domain.billing.JobItems
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.projects.ProjectCostService
@@ -98,6 +99,20 @@ class BillingService extends AbstractDaoService<Billing> {
         }
     }
 
+    @GraphQLQuery(name = "billingByProject")
+    Billing billingByProject(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        if(id){
+            String query = '''select q from Billing q where q.project.id = :id AND q.status = true'''
+            Map<String, Object> params = new HashMap<>()
+            params.put('id', id)
+            createQuery(query, params).resultList.first()
+        }else{
+            null
+        }
+    }
+
     @GraphQLQuery(name = "balance", description = "balance")
     BigDecimal balance(@GraphQLContext Billing billing) {
         return billingItemService.getBalance(billing.id)
@@ -170,6 +185,44 @@ class BillingService extends AbstractDaoService<Billing> {
 		return result
 	}
 
+    @GraphQLQuery(name = "billingByFiltersPageProjects")
+    Page<Billing> billingByFiltersPageProjects(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "status") Boolean status,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+
+        String query = '''select q from Billing q where  
+           (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
+           lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
+           lower(q.project.projectCode) like lower(concat('%',:filter,'%')) OR
+           lower(q.project.description) like lower(concat('%',:filter,'%'))) 
+           AND q.otcName is null'''
+
+        String countQuery = '''Select count(q) from Billing q where  
+           (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
+           lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
+           lower(q.project.projectCode) like lower(concat('%',:filter,'%')) OR
+           lower(q.project.description) like lower(concat('%',:filter,'%')))
+           AND q.otcName is null'''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+
+        if (status) {
+            query += ''' and (q.status = :status)'''
+            countQuery += ''' and (q.status = :status)'''
+            params.put("status", status)
+        }
+
+
+        query += ''' ORDER BY q.billNo DESC'''
+
+        Page<Billing> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
     @GraphQLQuery(name = "billingOTCByFiltersPage")
     Page<Billing> billingOTCByFiltersPage(
             @GraphQLArgument(name = "filter") String filter,
@@ -181,12 +234,12 @@ class BillingService extends AbstractDaoService<Billing> {
         String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.otcName) like lower(concat('%',:filter,'%')))
-           AND q.job is null'''
+           AND q.project is null'''
 
         String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.otcName) like lower(concat('%',:filter,'%')))
-           AND q.job is null'''
+           AND q.project is null'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
@@ -313,19 +366,10 @@ class BillingService extends AbstractDaoService<Billing> {
 
             //add billing items after save billing
             costItems.each {
-                def recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
-                    StringUtils.leftPad(no.toString(), 6, "0")
-                }
                 //save billing items
-                billingItemService.upsertBillingItemByProject(it, recordNo, billing)
-
-
-                //update job items
-                //jobItemService.updateBilled(true, it.id)
+                billingItemService.upsertBillingItemByProject(it, billing)
 
             }
-            //update job parent
-//            jobService.updateJobBilled(jobId)
 
         } catch (Exception e) {
             throw new Exception("Something was Wrong : " + e)
@@ -369,6 +413,32 @@ class BillingService extends AbstractDaoService<Billing> {
             bill.locked = true
             bill.lockedBy = employee.fullName
             save(bill)
+        }
+        return bill
+    }
+
+    //create billing from project
+    @Transactional
+    @GraphQLMutation(name = "createBillingProject")
+    Billing createBillingProject(
+            @GraphQLArgument(name = "project") Projects project
+    ) {
+
+        Billing bill = new Billing()
+        try {
+            //add billing first
+            bill.dateTrans = Instant.now()
+            bill.billNo = generatorService.getNextValue(GeneratorType.BILLING_NO) { Long no ->
+                StringUtils.leftPad(no.toString(), 6, "0")
+            }
+            bill.project = project
+            bill.customer = project.customer
+            bill.locked = false
+            bill.status = true
+            save(bill)
+
+        } catch (Exception e) {
+            throw new Exception("Something was Wrong : " + e)
         }
         return bill
     }

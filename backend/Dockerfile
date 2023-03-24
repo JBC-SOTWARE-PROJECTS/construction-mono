@@ -14,4 +14,4 @@ ADD fonts  /usr/java/jdk1.8.0_181-amd64/jre/lib/fonts
 RUN chmod a+w /app
 
 EXPOSE 5827
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Djava.awt.headless=true","-jar","/app/BACKEND.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Djava.awt.headless=true","-jar","/app/BACKEND.jar", "--spring.profiles.active=prod"]

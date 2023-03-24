@@ -244,20 +244,21 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
     @GraphQLMutation(name = "upsertBillingItemByProject")
     BillingItem upsertBillingItemByProject(
             @GraphQLArgument(name = "it") ProjectCost it,
-            @GraphQLArgument(name = "recordNo") String recordNo,
             @GraphQLArgument(name = "billing") Billing billing
     ) {
         BillingItem item = new BillingItem()
 
         item.transDate = Instant.now()
         item.billing = billing
-        item.recordNo = recordNo
+        item.recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
+            StringUtils.leftPad(no.toString(), 6, "0")
+        }
 
         item.description = it.description
-        item.qty = 1
+        item.qty = it.qty
         item.debit = it.cost
         item.credit = BigDecimal.ZERO
-        item.subTotal = it.cost
+        item.subTotal = it.qty * it.cost
         item.itemType = "SERVICE"
         item.outputTax = BigDecimal.ZERO
         item.wcost = BigDecimal.ZERO
@@ -344,25 +345,6 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
                 def recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
                     StringUtils.leftPad(no.toString(), 6, "0")
                 }
-                def serviceId = UUID.fromString(it.serviceCategory)
-                def jobItem = null
-
-                //add job order first
-                if(billObject.job){
-                    jobItem = jobItemService.upsertJobItemFormBilling(
-                            serviceId,
-                            "SERVICE",
-                            it.description,
-                            it.qty,
-                            it.amount,
-                            it.subTotal,
-                            it.outputTax,
-                            it.wcost,
-                            null,
-                            billObject.job
-                    )
-                }
-
                 //end add job order
 
                 //insert
@@ -409,26 +391,6 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
                 def recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
                     StringUtils.leftPad(no.toString(), 6, "0")
                 }
-
-                def jobItem = null
-                //add job order first
-                if(billObject.job){
-                    jobItem = jobItemService.upsertJobItemFormBilling(
-                            null,
-                            "ITEM",
-                            it.description,
-                            it.qty,
-                            it.amount,
-                            it.subTotal,
-                            it.outputTax,
-                            it.wcost,
-                            itemObject.id,
-                            billObject.job
-                    )
-                }
-
-                //end add job order
-
 
                 //insert
                 item.transDate = Instant.now()

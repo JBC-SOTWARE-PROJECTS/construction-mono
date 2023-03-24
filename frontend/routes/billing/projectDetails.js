@@ -45,6 +45,7 @@ const GET_RECORDS = gql`
       remarks
       totals
       status
+      disabledEditing
     }
   }
 `;
@@ -133,13 +134,33 @@ const ProjectDetails = ({ account, id }) => {
               activeKey={active}
             >
               <TabPane tab="Bill of Quantities" key="cost">
-                <ProjectCost id={id} parentRef={() => refetch()} />
+                {active === "cost" && (
+                  <ProjectCost
+                    id={id}
+                    parentRef={() => refetch()}
+                    disabledEditing={_.get(
+                      data,
+                      "project.disabledEditing",
+                      false
+                    )}
+                  />
+                )}
               </TabPane>
-              <TabPane tab="Project Updates" key="updates">
-                <ProjectUpdates id={id} />
+              <TabPane tab="Project Milestones" key="milestones">
+                {active === "milestones" && (
+                  <ProjectUpdates
+                    id={id}
+                    officeId={_.get(data, "project.location.id")}
+                    disabledEditing={_.get(
+                      data,
+                      "project.disabledEditing",
+                      false
+                    )}
+                  />
+                )}
               </TabPane>
               <TabPane tab="Project Materials Used" key="materials">
-                <ProjectMaterials id={id} />
+                {active === "materials" && <ProjectMaterials id={id} />}
               </TabPane>
             </Tabs>
           </Col>

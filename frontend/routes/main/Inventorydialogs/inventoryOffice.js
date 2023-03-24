@@ -13,13 +13,15 @@ const { Search } = Input;
 const GET_RECORDS = gql`
   query (
     $filter: String
+    $office: UUID
     $groupId: UUID
     $category: [UUID]
     $page: Int
     $size: Int
   ) {
-    list: inventoryListPageable(
+    list: inventoryListPageableByDep(
       filter: $filter
+      office: $office
       group: $groupId
       category: $category
       page: $page
@@ -52,7 +54,7 @@ const GET_RECORDS = gql`
   }
 `;
 
-const InventoryByOfficeModal = ({ visible, hide, ...props }) => {
+const InventoryByOfficeIdModal = ({ visible, hide, ...props }) => {
   const [state, setState] = useState({
     filter: "",
     page: 0,
@@ -63,6 +65,7 @@ const InventoryByOfficeModal = ({ visible, hide, ...props }) => {
   const { loading, data } = useQuery(GET_RECORDS, {
     variables: {
       filter: state.filter,
+      office: props?.officeId,
       groupId: null,
       category: [],
       page: state.page,
@@ -196,4 +199,4 @@ const InventoryByOfficeModal = ({ visible, hide, ...props }) => {
   );
 };
 
-export default InventoryByOfficeModal;
+export default InventoryByOfficeIdModal;

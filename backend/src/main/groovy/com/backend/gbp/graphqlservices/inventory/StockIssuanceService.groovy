@@ -1,12 +1,10 @@
 package com.backend.gbp.graphqlservices.inventory
 
 import com.backend.gbp.domain.inventory.Item
-import com.backend.gbp.domain.inventory.ReturnSupplier
 import com.backend.gbp.domain.inventory.StockIssue
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
-import com.backend.gbp.graphqlservices.projects.ProjectMaterialService
+import com.backend.gbp.graphqlservices.projects.ProjectUpdatesMaterialService
 import com.backend.gbp.rest.dto.PurchaseIssuanceDto
-import com.backend.gbp.rest.dto.PurchaseRtsDto
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -44,7 +42,7 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
     InventoryLedgerService inventoryLedgerService
 
     @Autowired
-    ProjectMaterialService projectMaterialService
+    ProjectUpdatesMaterialService projectMaterialService
 
 
     @GraphQLQuery(name = "stiById")

@@ -29,6 +29,7 @@ const GET_RECORDS = gql`
       id
       code
       description
+      disabledEditing
       is_active
     }
   }

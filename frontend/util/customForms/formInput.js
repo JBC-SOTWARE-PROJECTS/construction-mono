@@ -16,6 +16,7 @@ const FormInput = (
     onSelect = () => {},
     parser,
     options = [],
+    rows = 4,
     ...props
   },
   ref
@@ -39,7 +40,7 @@ const FormInput = (
           ref={ref}
           disabled={disabled}
           readOnly={readOnly}
-          rows={4}
+          rows={rows}
         />
       );
     } else if (type === "number") {

@@ -66,6 +66,7 @@ const TableItems = ({
   locked,
   status,
   isGovernment,
+  isProject,
 }) => {
   const [filter, setFilter] = useState("");
 
@@ -301,7 +302,7 @@ const TableItems = ({
               icon={<PlusCircleOutlined />}
               type="primary"
               block
-              disabled={locked || !status}
+              disabled={locked || !status || isProject}
               onClick={() =>
                 showModal({
                   show: true,
@@ -322,7 +323,7 @@ const TableItems = ({
               icon={<PlusCircleOutlined />}
               type="primary"
               block
-              disabled={locked || !status}
+              disabled={locked || !status || isProject}
               onClick={() =>
                 showServiceModal({
                   show: true,

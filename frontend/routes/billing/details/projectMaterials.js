@@ -26,7 +26,6 @@ const GET_RECORDS = gql`
     list: pMaterialByList(filter: $filter, id: $id) {
       id
       dateTransact
-      refNo
       item {
         id
         itemCode

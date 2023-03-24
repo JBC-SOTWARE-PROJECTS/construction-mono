@@ -65,15 +65,15 @@ const BillingHeader = ({
         <Descriptions.Item label="Billing No">
           {record?.billNo}
         </Descriptions.Item>
-        <Descriptions.Item label="Job No">
-          {record?.job?.jobNo}
+        <Descriptions.Item label="Project No">
+          {record?.project?.projectCode}
         </Descriptions.Item>
-        <Descriptions.Item label="Transaction Date">
+        <Descriptions.Item label="Transaction Date"  span={2}>
           {moment(record?.dateTrans).format("MM/DD/YYYY h:mm:ss A")}
         </Descriptions.Item>
-        <Descriptions.Item label="Repair Type">
+        {/* <Descriptions.Item label="Repair Type">
           {record?.job?.repair?.description}
-        </Descriptions.Item>
+        </Descriptions.Item> */}
         {/*  */}
         <Descriptions.Item label="Customer Information" span={4}>
           <span style={{ paddingRight: 60 }}>Customer Name</span>{" "}

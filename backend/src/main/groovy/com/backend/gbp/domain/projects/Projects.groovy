@@ -74,4 +74,8 @@ class Projects extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "status")
 	String status
 
+	@GraphQLQuery
+	@Column(name = "disabled_editing")
+	Boolean disabledEditing
+
 }

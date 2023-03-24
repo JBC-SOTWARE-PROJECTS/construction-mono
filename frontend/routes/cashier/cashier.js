@@ -41,15 +41,10 @@ const GET_RECORDS = gql`
           id
           fullName
         }
-        job {
+        project {
           id
-          jobNo
-          plateNo
+          projectCode
           description
-          insurance {
-            id
-            description
-          }
         }
         otcName
         locked
@@ -120,9 +115,9 @@ const BillingContent = ({ account }) => {
       ),
     },
     {
-      title: "Plate #",
-      key: "job.plateNo",
-      render: (txt, record) => <span key={txt}>{record?.job?.plateNo}</span>,
+      title: "Project #",
+      key: "project.projectCode",
+      render: (txt, record) => <span key={txt}>{record?.project?.projectCode}</span>,
     },
     {
       title: "Customer",
@@ -137,10 +132,10 @@ const BillingContent = ({ account }) => {
       ),
     },
     {
-      title: "Insurance",
-      key: "job.insurance",
+      title: "Project Description",
+      key: "project.description",
       render: (txt, record) => (
-        <span key={txt}>{record?.job?.insurance?.description}</span>
+        <span key={txt}>{record?.project?.description}</span>
       ),
     },
 

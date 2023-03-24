@@ -16,6 +16,7 @@ import { gql } from "apollo-boost";
 import { col4 } from "../../shared/constant";
 import moment from "moment";
 import numeral from "numeral";
+import { useRouter } from "next/router";
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -23,7 +24,7 @@ const { Text } = Typography;
 //graphQL Queries
 const GET_RECORDS = gql`
   query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
-    list: billingByFiltersPage(
+    list: billingByFiltersPageProjects(
       filter: $filter
       status: $status
       page: $page
@@ -54,7 +55,6 @@ const GET_RECORDS = gql`
     }
   }
 `;
-
 
 const BillingContent = ({ account }) => {
   const [state, setState] = useState({
@@ -103,9 +103,11 @@ const BillingContent = ({ account }) => {
           key={txt}
           type="link"
           size="small"
-          onClick={() => jobModal(record.job?.id, true)}
+          onClick={() =>
+            window.open(`/projects/project-list/manage/${record.project?.id}`)
+          }
         >
-          {record?.job?.jobNo}
+          {record?.project?.projectCode}
         </Button>
       ),
     },
@@ -121,7 +123,7 @@ const BillingContent = ({ account }) => {
     {
       title: "Description",
       key: "job.description",
-      render: (txt, record) => <span>{record?.job?.description}</span>,
+      render: (txt, record) => <span>{record?.project?.description}</span>,
     },
     {
       title: "Transaction Date",

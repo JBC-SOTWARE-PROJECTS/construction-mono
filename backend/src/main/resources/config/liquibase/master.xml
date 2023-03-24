@@ -198,4 +198,19 @@
     <include file="classpath:config/liquibase/changelog2/alter_project_cost_2.sql"
              relativeToChangelogFile="false"/>
 
+    <include file="classpath:config/liquibase/changelog3/01_project_updates_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/02_project_updates_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/03_project_updates_add_new_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/04_alter_project_materials_ref_id.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/05_alter_billing_item.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/06_alter_project_status.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/07_alter_project_table.sql"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

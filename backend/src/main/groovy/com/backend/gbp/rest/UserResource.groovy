@@ -55,61 +55,61 @@ class UserResource {
 
     }
 
-    @RequestMapping("/checkExpiry")
-    String checkExpiry() {
-        try{
-            Jedis jedis = new Jedis(host,port);
-            Long expiryDurationMinutes = getExpiryLimitMinutes()
-            Long expiryDurationMilliseconds = expiryDurationMinutes*60000
-            Long lastActivity = jedis.get(SecurityUtils.currentLogin()) as Long;
-            Long millisElapsed = System.currentTimeMillis()-lastActivity
-            Long millisRemaining = expiryDurationMilliseconds - millisElapsed
-            // println "REMAINING MINUTES : "+ millisRemaining/60000
-            if(millisRemaining<0){
-                SecurityContextHolder.clearContext()
-                simpMessagingTemplate.convertAndSendToUser(SecurityUtils.currentLogin(), "/channel/lastActivity", "LOGOUT")
-                return "NOT LOGGED IN"
-            }
-            if(millisRemaining<61000)
-            {
-                simpMessagingTemplate.convertAndSendToUser(SecurityUtils.currentLogin(), "/channel/lastActivity", "WARN")
-                return "WARN"
-            }
-            return "REMAINING MINUTES : "+ millisRemaining/60000
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace()
-            // println "NOT LOGGED IN"
-            return "NOT LOGGED IN"
-            // e.printStackTrace()
-        }
+//    @RequestMapping("/checkExpiry")
+//    String checkExpiry() {
+//        try{
+//            Jedis jedis = new Jedis(host,port);
+//            Long expiryDurationMinutes = getExpiryLimitMinutes()
+//            Long expiryDurationMilliseconds = expiryDurationMinutes*60000
+//            Long lastActivity = jedis.get(SecurityUtils.currentLogin()) as Long;
+//            Long millisElapsed = System.currentTimeMillis()-lastActivity
+//            Long millisRemaining = expiryDurationMilliseconds - millisElapsed
+//            // println "REMAINING MINUTES : "+ millisRemaining/60000
+//            if(millisRemaining<0){
+//                SecurityContextHolder.clearContext()
+//                simpMessagingTemplate.convertAndSendToUser(SecurityUtils.currentLogin(), "/channel/lastActivity", "LOGOUT")
+//                return "NOT LOGGED IN"
+//            }
+//            if(millisRemaining<61000)
+//            {
+//                simpMessagingTemplate.convertAndSendToUser(SecurityUtils.currentLogin(), "/channel/lastActivity", "WARN")
+//                return "WARN"
+//            }
+//            return "REMAINING MINUTES : "+ millisRemaining/60000
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace()
+//            // println "NOT LOGGED IN"
+//            return "NOT LOGGED IN"
+//            // e.printStackTrace()
+//        }
+//
+//    }
 
-    }
-
-    @RequestMapping("/refreshExpiry")
-    String refreshExpiry() {
-        return "OK"
-    }
-
-    Long getExpiryLimitMinutes() {
-        Jedis jedis = new Jedis(host,port);
-
-        Long loginExpiryLimitMinutes = jedis.get("loginExpiryLimit") as Long;
-        if(loginExpiryLimitMinutes==null || loginExpiryLimitMinutes.intValue()==0)
-        {
-
-            try{
-                String query = """select login_inactive_duration from hospital_configuration.login_configuration where id = '8b9125ea-0895-467d-80c8-b88221cc1895'"""
-                Long dbLoginExpiryLimitMinutes = jdbcTemplate.queryForObject(query,Long) as Long
-                jedis.set("loginExpiryLimit", dbLoginExpiryLimitMinutes.toString());
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace()
-            }
-        }
-        else
-            return loginExpiryLimitMinutes
-    }
+//    @RequestMapping("/refreshExpiry")
+//    String refreshExpiry() {
+//        return "OK"
+//    }
+//
+//    Long getExpiryLimitMinutes() {
+//        Jedis jedis = new Jedis(host,port);
+//
+//        Long loginExpiryLimitMinutes = jedis.get("loginExpiryLimit") as Long;
+//        if(loginExpiryLimitMinutes==null || loginExpiryLimitMinutes.intValue()==0)
+//        {
+//
+//            try{
+//                String query = """select login_inactive_duration from hospital_configuration.login_configuration where id = '8b9125ea-0895-467d-80c8-b88221cc1895'"""
+//                Long dbLoginExpiryLimitMinutes = jdbcTemplate.queryForObject(query,Long) as Long
+//                jedis.set("loginExpiryLimit", dbLoginExpiryLimitMinutes.toString());
+//            }
+//            catch (Exception e)
+//            {
+//                e.printStackTrace()
+//            }
+//        }
+//        else
+//            return loginExpiryLimitMinutes
+//    }
 }

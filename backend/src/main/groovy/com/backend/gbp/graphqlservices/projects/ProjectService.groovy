@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.projects
 import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.billing.BillingService
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -18,8 +19,6 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
-import java.time.Instant
-
 
 @Component
 @GraphQLApi
@@ -40,7 +39,10 @@ class ProjectService extends AbstractDaoService<Projects> {
     ProjectCostService projectCostService
 
     @Autowired
-    ProjectMaterialService projectMaterialService
+    ProjectUpdatesMaterialService projectMaterialService
+
+    @Autowired
+    BillingService billingService
 
     //context
     @GraphQLQuery(name = "totals", description = "totals")
@@ -136,13 +138,18 @@ class ProjectService extends AbstractDaoService<Projects> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
-        upsertFromMap(id, fields, { Projects entity, boolean forInsert ->
+        def project = upsertFromMap(id, fields, { Projects entity, boolean forInsert ->
             if(forInsert){
                 entity.projectCode = generatorService.getNextValue(GeneratorType.PROJECT_CODE, {
                     return "PROJ-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
             }
         })
+
+        //create billing
+        billingService.createBillingProject(project)
+        //return
+        return project
     }
 
 }

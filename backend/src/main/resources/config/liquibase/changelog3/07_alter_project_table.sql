@@ -1,0 +1,1 @@
+ALTER TABLE projects.projects ADD COLUMN disabled_editing bool default false;

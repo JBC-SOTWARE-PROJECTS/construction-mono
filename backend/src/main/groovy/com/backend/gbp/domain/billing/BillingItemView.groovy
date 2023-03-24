@@ -48,7 +48,7 @@ class BillingItemView implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "qty")
-	Integer qty
+	BigDecimal qty
 
 	@GraphQLQuery
 	@Column(name = "debit")

@@ -1,28 +1,15 @@
 import React, { useState } from "react";
-import {
-  Table,
-  Col,
-  Row,
-  Input,
-  message,
-  Button,
-  Typography,
-  Tag,
-  Modal,
-} from "antd";
-import { useMutation, useQuery } from "@apollo/react-hooks";
+import { Col, Row, Input, message, Button, Space, Spin, Empty } from "antd";
+import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
-import {
-  PlusCircleOutlined,
-} from "@ant-design/icons";
+import { PlusCircleOutlined } from "@ant-design/icons";
 import { colSearch, colButton } from "../../../shared/constant";
 import _ from "lodash";
-import moment from "moment";
 import { dialogHook } from "../../../util/customhooks";
 import AddProjectUpdatesForm from "../dialogs/addProjectUpdates";
+import ProjectUpdatesContent from "./projectUpdatesContent";
 
 const { Search } = Input;
-const { Text } = Typography;
 //graphQL Queries
 const GET_RECORDS = gql`
   query ($filter: String, $id: UUID) {
@@ -31,20 +18,45 @@ const GET_RECORDS = gql`
       dateTransact
       description
       status
+      startDate
+      estimateEndDate
+      completedDate
       lastModifiedBy
+      notes {
+        id
+        user {
+          id
+          fullName
+        }
+        dateTransact
+        remarks
+      }
+      materials {
+        id
+        descLong
+        qty
+        uou
+        cost
+        subTotal
+        lastModifiedBy
+      }
     }
   }
 `;
 
-const ProjectUpdates = ({ id }) => {
+const ProjectUpdates = ({ id, officeId, disabledEditing }) => {
   const [filter, setFilter] = useState("");
+  const [list, setList] = useState([]);
   //query
-  const { loading, data, refetch } = useQuery(GET_RECORDS, {
+  const { loading, refetch } = useQuery(GET_RECORDS, {
     variables: {
       filter: filter,
       id: id,
     },
-    fetchPolicy: "network-only",
+    onCompleted: (data) => {
+      const { list } = data;
+      setList(list);
+    },
   });
 
   const [modal, showModal] = dialogHook(AddProjectUpdatesForm, (result) => {
@@ -54,86 +66,12 @@ const ProjectUpdates = ({ id }) => {
     refetch();
   });
 
-  const columns = [
-    {
-      title: "Date of Transaction",
-      dataIndex: "dateTransact",
-      key: "dateTransact",
-      render: (text, record) => {
-        if (record.status) {
-          return <span>{moment(text).format("MM-DD-YYYY h:mm a")}</span>;
-        } else {
-          return (
-            <Text delete type="danger">
-              {moment(text).format("MM-DD-YYYY h:mm a")}
-            </Text>
-          );
-        }
-      },
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      width: "60%",
-      render: (text, record) => {
-        if (record.status) {
-          return <span>{text}</span>;
-        } else {
-          return (
-            <Text delete type="danger">
-              {text}
-            </Text>
-          );
-        }
-      },
-    },
-    {
-      title: "status",
-      dataIndex: "status",
-      key: "status",
-      render: (status, record) => {
-        if (record.status) {
-          return <Tag color="blue">{status}</Tag>;
-        } else {
-          return (
-            <Text delete>
-              <Tag>{cost}</Tag>
-            </Text>
-          );
-        }
-      },
-    },
-    {
-      title: "User",
-      dataIndex: "lastModifiedBy",
-      key: "lastModifiedBy",
-      render: (lastModifiedBy) => {
-        return <Tag color="magenta">{lastModifiedBy}</Tag>;
-      },
-    },
-    {
-      title: "#",
-      dataIndex: "action",
-      key: "action",
-      render: (text, record) => (
-        <Button
-          type="primary"
-          size="small"
-          onClick={() => showModal({ show: true, myProps: { ...record, project: id } })}
-        >
-          Edit
-        </Button>
-      ),
-    },
-  ];
-
   return (
     <div className="pd-10">
       <Row>
         <Col {...colSearch}>
           <Search
-            placeholder="Search Project Updates"
+            placeholder="Search Project Milestone"
             onSearch={(e) => setFilter(e)}
             enterButton
           />
@@ -144,19 +82,49 @@ const ProjectUpdates = ({ id }) => {
             type="primary"
             block
             onClick={() => showModal({ show: true, myProps: { project: id } })}
+            disabled={disabledEditing}
           >
             New
           </Button>
         </Col>
         <Col span={24}>
-          <Table
-            loading={loading}
-            className="gx-table-responsive"
-            columns={columns}
-            dataSource={_.get(data, "list")}
-            rowKey={(record) => record.id}
-            size="small"
-          />
+          <Spin spinning={loading}>
+            {_.isEmpty(list) ? (
+              <Empty />
+            ) : (
+              <Space direction="vertical" style={{ width: "100%" }}>
+                {list.map((obj, index) => {
+                  let color = "blue";
+                  if (obj.status === "Completed") {
+                    color = "green";
+                  } else if (obj.status === "Pending") {
+                    color = "orange";
+                  } else if (obj.status === "Cancelled") {
+                    color = "red";
+                  }
+                  return (
+                    <ProjectUpdatesContent
+                      key={index}
+                      obj={obj}
+                      color={color}
+                      loading={loading}
+                      projectId={id}
+                      officeId={officeId}
+                      parentRefresh={refetch}
+                      disabledEditing={obj.status === "Completed"}
+                      disabledFromParent={disabledEditing}
+                      onEditMilestone={() => {
+                        showModal({
+                          show: true,
+                          myProps: { ...obj, project: id },
+                        });
+                      }}
+                    />
+                  );
+                })}
+              </Space>
+            )}
+          </Spin>
         </Col>
       </Row>
       {modal}
