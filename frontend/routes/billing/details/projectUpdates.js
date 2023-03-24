@@ -1,32 +1,15 @@
 import React, { useState } from "react";
-import {
-  Table,
-  Col,
-  Row,
-  Input,
-  message,
-  Button,
-  Typography,
-  Tag,
-  Space,
-  Collapse,
-  Divider,
-  Spin,
-} from "antd";
+import { Col, Row, Input, message, Button, Space, Spin, Empty } from "antd";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { colSearch, colButton } from "../../../shared/constant";
 import _ from "lodash";
-import moment from "moment";
 import { dialogHook } from "../../../util/customhooks";
 import AddProjectUpdatesForm from "../dialogs/addProjectUpdates";
-import ProjectMilestone from "../dialogs/addProjectMilestone";
 import ProjectUpdatesContent from "./projectUpdatesContent";
 
 const { Search } = Input;
-const { Text } = Typography;
-const { Panel } = Collapse;
 //graphQL Queries
 const GET_RECORDS = gql`
   query ($filter: String, $id: UUID) {
@@ -48,11 +31,20 @@ const GET_RECORDS = gql`
         dateTransact
         remarks
       }
+      materials {
+        id
+        descLong
+        qty
+        uou
+        cost
+        subTotal
+        lastModifiedBy
+      }
     }
   }
 `;
 
-const ProjectUpdates = ({ id }) => {
+const ProjectUpdates = ({ id, officeId }) => {
   const [filter, setFilter] = useState("");
   const [list, setList] = useState([]);
   //query
@@ -73,16 +65,6 @@ const ProjectUpdates = ({ id }) => {
     }
     refetch();
   });
-
-  const [modalUpdates, showModalUpdates] = dialogHook(
-    ProjectMilestone,
-    (result) => {
-      if (result) {
-        message.success(result);
-      }
-      refetch();
-    }
-  );
 
   return (
     <div className="pd-10">
@@ -106,39 +88,43 @@ const ProjectUpdates = ({ id }) => {
         </Col>
         <Col span={24}>
           <Spin spinning={loading}>
-            <Space direction="vertical" style={{ width: "100%" }}>
-              {list.map((obj, index) => {
-                let color = "blue";
-                if (obj.status === "Completed") {
-                  color = "green";
-                } else if (obj.status === "Pending") {
-                  color = "orange";
-                } else if (obj.status === "Cancelled") {
-                  color = "red";
-                }
-                return (
-                  <ProjectUpdatesContent
-                    key={index}
-                    obj={obj}
-                    color={color}
-                    loading={loading}
-                    projectId={id}
-                    parentRefresh={refetch}
-                    onEditMilestone={() => {
-                      showModal({
-                        show: true,
-                        myProps: { ...obj, project: id },
-                      });
-                    }}
-                  />
-                );
-              })}
-            </Space>
+            {_.isEmpty(list) ? (
+              <Empty />
+            ) : (
+              <Space direction="vertical" style={{ width: "100%" }}>
+                {list.map((obj, index) => {
+                  let color = "blue";
+                  if (obj.status === "Completed") {
+                    color = "green";
+                  } else if (obj.status === "Pending") {
+                    color = "orange";
+                  } else if (obj.status === "Cancelled") {
+                    color = "red";
+                  }
+                  return (
+                    <ProjectUpdatesContent
+                      key={index}
+                      obj={obj}
+                      color={color}
+                      loading={loading}
+                      projectId={id}
+                      officeId={officeId}
+                      parentRefresh={refetch}
+                      onEditMilestone={() => {
+                        showModal({
+                          show: true,
+                          myProps: { ...obj, project: id },
+                        });
+                      }}
+                    />
+                  );
+                })}
+              </Space>
+            )}
           </Spin>
         </Col>
       </Row>
       {modal}
-      {modalUpdates}
     </div>
   );
 };

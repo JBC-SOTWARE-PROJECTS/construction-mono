@@ -176,3 +176,10 @@ Version        : 1.0
   align-items: center !important;
   width: 100% !important;
 }
+
+.flex-box-wrap-end {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  width: 100% !important;
+}

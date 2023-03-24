@@ -4,9 +4,11 @@ import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.inventory.BeginningBalance
 import com.backend.gbp.domain.inventory.DocumentTypes
 import com.backend.gbp.domain.inventory.InventoryLedger
+import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.inventory.PODeliveryMonitoring
 import com.backend.gbp.domain.inventory.PurchaseOrderItems
 import com.backend.gbp.domain.inventory.QuantityAdjustment
+import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.domain.services.ServiceItems
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.services.ServiceItemsService
@@ -493,6 +495,43 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			save(upsert)
 		}
 		return upsert
+	}
+
+	@Transactional
+	@GraphQLMutation(name = "expenseItemFromProjects")
+	InventoryLedger expenseItemFromProjects(
+			@GraphQLArgument(name = "it") Projects it,
+			@GraphQLArgument(name = "item") Item item,
+			@GraphQLArgument(name = "qty") Integer qty,
+			@GraphQLArgument(name = "cost") BigDecimal cost
+	) {
+		def upsert = new InventoryLedger()
+
+		//insert 0f3c2b76-445a-4f78-a256-21656bd62872 -- EXPENSE DOC TYPES
+		upsert.sourceOffice = it.location
+		upsert.destinationOffice = it.location
+		upsert.documentTypes = documentTypeRepository.findById(UUID.fromString("0f3c2b76-445a-4f78-a256-21656bd62872")).get()
+		upsert.item = item
+		upsert.referenceNo = it.projectCode
+		upsert.ledgerDate = Instant.now()
+		upsert.ledgerQtyIn = 0
+		upsert.ledgerQtyOut = qty
+		upsert.ledgerPhysical = 0
+		upsert.ledgerUnitCost = cost
+		upsert.isInclude = true
+		save(upsert)
+
+		return upsert
+	}
+
+	@Transactional
+	@GraphQLMutation(name = "voidLedgerById")
+	InventoryLedger voidLedgerById(
+			@GraphQLArgument(name = "id") UUID id
+	) {
+		def one = findOne(id)
+		delete(one)
+		return one
 	}
 
 }

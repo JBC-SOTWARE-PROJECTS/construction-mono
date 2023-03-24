@@ -138,7 +138,7 @@ const ProjectDetails = ({ account, id }) => {
                 )}
               </TabPane>
               <TabPane tab="Project Milestones" key="milestones">
-                {active === "milestones" && <ProjectUpdates id={id} />}
+                {active === "milestones" && <ProjectUpdates id={id} officeId={_.get(data, "project.location.id")} />}
               </TabPane>
               <TabPane tab="Project Materials Used" key="materials">
                 {active === "materials" && <ProjectMaterials id={id} />}

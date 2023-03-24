@@ -2,8 +2,10 @@ package com.backend.gbp.graphqlservices.projects
 
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.projects.ProjectUpdatesMaterials
-import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
+import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.rest.dto.MaterialsDto
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -31,6 +33,15 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
 
     @Autowired
     GeneratorService generatorService
+
+    @Autowired
+    ProjectUpdatesService projectUpdatesService
+
+    @Autowired
+    ProjectService projectService
+
+    @Autowired
+    InventoryLedgerService inventoryLedgerService
 
 
     @GraphQLQuery(name = "pMaterialById")
@@ -67,11 +78,11 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         createQuery(query, params).resultList.sort { it.dateTransact }.reverse()
     }
 
-    @GraphQLQuery(name = "getMaterialsByRefId")
-    List<ProjectUpdatesMaterials> getMaterialsByRefId(
+    @GraphQLQuery(name = "getProjectMaterialsByMilestone")
+    List<ProjectUpdatesMaterials> getProjectMaterialsByMilestone(
             @GraphQLArgument(name = "id") UUID id
     ) {
-        String query = '''Select e from ProjectUpdatesMaterials e where refId = :id'''
+        String query = '''Select e from ProjectUpdatesMaterials e where e.projectUpdates.id = :id'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
         createQuery(query, params).resultList.sort { it.dateTransact }.reverse()
@@ -92,17 +103,50 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         })
     }
 
-
-    @GraphQLMutation(name = "deleteMaterials")
+    @GraphQLMutation(name = "upsertManyMaterials")
     @Transactional
-    List<ProjectUpdatesMaterials> deleteMaterials(
-            @GraphQLArgument(name = "refId") UUID refId
+    GraphQLRetVal<Boolean> upsertManyMaterials(
+            @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+            @GraphQLArgument(name = "projectId") UUID projectId,
+            @GraphQLArgument(name = "projectUpdatesId") UUID projectUpdatesId
     ) {
-        def list = this.getMaterialsByRefId(refId)
-        list.each {entity ->
-            delete(entity)
+        if(items){
+            def toBeInsert = items as ArrayList<MaterialsDto>
+            def proj = projectService.projectById(projectId)
+            def pUpdates = projectUpdatesService.pUpdatesById(projectUpdatesId)
+
+            toBeInsert.each {
+                def item = objectMapper.convertValue(it.item, Item.class)
+                //minus inventory
+                def inv = inventoryLedgerService.expenseItemFromProjects(proj, item, it.qty, it.cost)
+                //insert materials
+                ProjectUpdatesMaterials n = new ProjectUpdatesMaterials()
+                n.project = proj
+                n.projectUpdates = pUpdates
+                n.dateTransact = Instant.now()
+                n.item = item
+                n.qty = it.qty
+                n.cost = it.cost
+                n.stockCardRefId = inv.id
+                save(n)
+            }
         }
-        return list
+
+        return new GraphQLRetVal<Boolean>(true,true,"Materials Added Successfully")
+    }
+
+
+    @GraphQLMutation(name = "removedMaterial")
+    @Transactional
+    ProjectUpdatesMaterials removedMaterial(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def one = findOne(id)
+        //delete inventory
+        inventoryLedgerService.voidLedgerById(one.stockCardRefId)
+        //delete
+        delete(one)
+        return one
     }
 
 }

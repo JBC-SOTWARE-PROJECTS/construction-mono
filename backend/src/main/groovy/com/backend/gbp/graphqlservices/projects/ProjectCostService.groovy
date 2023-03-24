@@ -2,6 +2,9 @@ package com.backend.gbp.graphqlservices.projects
 
 import com.backend.gbp.domain.projects.ProjectCost
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.billing.BillingItemService
+import com.backend.gbp.graphqlservices.billing.BillingService
+import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.CategoryDto
 import com.backend.gbp.rest.dto.UnitDto
@@ -34,6 +37,15 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
 
     @Autowired
     InventoryResource inventoryResource
+
+    @Autowired
+    BillingService billingService
+
+    @Autowired
+    BillingItemService billingItemService
+
+    @Autowired
+    ProjectService projectService
 
 
     @GraphQLQuery(name = "pCostById")
@@ -84,15 +96,36 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertProjectCost")
     @Transactional
-    ProjectCost upsertProjectCost(
+    GraphQLRetVal<Boolean> upsertProjectCost(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
-        upsertFromMap(id, fields, { ProjectCost entity, boolean forInsert ->
-            if(forInsert){
-                //conditions here before save
+        def projectId = UUID.fromString(fields['project'].toString())
+
+        if(projectId){
+            def project = projectService.projectById(projectId)
+            def billing = billingService.billingByProject(project.id)
+            //add to billing
+            if(billing){
+                if(billing.locked){
+                    return new GraphQLRetVal<Boolean>(false, false, "Billing is locked. Please unlocked to charge additional items/service.")
+                }else{
+                    def costing = upsertFromMap(id, fields, { ProjectCost entity, boolean forInsert ->
+                        if(forInsert){
+                            //conditions here before save
+                        }
+                    })
+                    billingItemService.upsertBillingItemByProject(costing, billing)
+                }
+
             }
-        })
+            return new GraphQLRetVal<Boolean>(true, true, "Project Cost added successfully")
+        }else{
+            return new GraphQLRetVal<Boolean>(false, false, "Project ID is missing")
+        }
+
+
+
     }
 
     @GraphQLMutation(name = "updateStatusCost")

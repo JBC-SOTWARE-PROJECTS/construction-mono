@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.projects
 import com.backend.gbp.domain.inventory.Inventory
 import com.backend.gbp.domain.projects.ProjectCost
 import com.backend.gbp.domain.projects.ProjectUpdates
+import com.backend.gbp.domain.projects.ProjectUpdatesMaterials
 import com.backend.gbp.domain.projects.ProjectUpdatesNotes
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.services.GeneratorService
@@ -37,12 +38,21 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
     @Autowired
     ProjectUpdatesNotesService projectUpdatesNotesService
 
+    @Autowired
+    ProjectUpdatesMaterialService projectUpdatesMaterialService
+
 
     //context
     @GraphQLQuery(name = "notes")
     List<ProjectUpdatesNotes> notes(@GraphQLContext ProjectUpdates projectUpdates) {
         def id = projectUpdates.id
         return projectUpdatesNotesService.pUpdatesNotesList(id)
+    }
+
+    @GraphQLQuery(name = "materials")
+    List<ProjectUpdatesMaterials> materials(@GraphQLContext ProjectUpdates projectUpdates) {
+        def id = projectUpdates.id
+        return projectUpdatesMaterialService.getProjectMaterialsByMilestone(id)
     }
 
 

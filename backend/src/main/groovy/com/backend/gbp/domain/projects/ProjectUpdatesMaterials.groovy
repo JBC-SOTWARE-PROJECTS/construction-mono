@@ -57,6 +57,10 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 	@Column(name = "cost")
 	BigDecimal cost
 
+	@GraphQLQuery
+	@Column(name = "ref_id")
+	UUID stockCardRefId
+
 	@Transient
 	BigDecimal getSubTotal() {
 		return cost * qty
@@ -65,6 +69,11 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 	@Transient
 	String getUou() {
 		return item.unit_of_usage.unitDescription
+	}
+
+	@Transient
+	String getDescLong() {
+		return item.descLong
 	}
 
 }

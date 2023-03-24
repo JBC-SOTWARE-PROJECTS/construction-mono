@@ -109,9 +109,6 @@ class InventoryService extends AbstractDaoService<Inventory> {
 		query += ''' ORDER BY inv.descLong ASC'''
 
 		Page<Inventory> result = getPageable(query, countQuery, page, size, params)
-//		Instant end = Instant.now();
-//		Duration timeElapsed = Duration.between(start, end);
-//		println('time => '+timeElapsed)
 		return result
 	}
 
@@ -124,7 +121,7 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-		Instant start = Instant.now();
+
 		String query = '''Select inv from Inventory inv where
 						lower(concat(inv.descLong,inv.sku)) like lower(concat('%',:filter,'%'))
 						and inv.officeId=:officeid and
@@ -154,9 +151,6 @@ class InventoryService extends AbstractDaoService<Inventory> {
 		query += ''' ORDER BY inv.descLong ASC'''
 
 		Page<Inventory> result = getPageable(query, countQuery, page, size, params)
-//		Instant end = Instant.now();
-//		Duration timeElapsed = Duration.between(start, end);
-//		println('time => '+timeElapsed)
 		return result
 	}
 
@@ -185,9 +179,6 @@ class InventoryService extends AbstractDaoService<Inventory> {
 		query += ''' ORDER BY inv.descLong ASC'''
 
 		Page<Inventory> result = getPageable(query, countQuery, page, size, params)
-//		Instant end = Instant.now();
-//		Duration timeElapsed = Duration.between(start, end);
-//		println('time => '+timeElapsed)
 		return result
 	}
 

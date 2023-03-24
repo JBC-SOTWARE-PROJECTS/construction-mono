@@ -1,0 +1,1 @@
+ALTER TABLE projects.projects_updates_materials ADD COLUMN ref_id uuid default null;

@@ -12,21 +12,67 @@ import {
 import { DeleteFilled, PlusCircleOutlined } from "@ant-design/icons";
 import CModal from "../../../app/components/common/CModal";
 import _ from "lodash";
-import InventoryByOfficeModal from "../../main/Inventorydialogs/inventory";
 import { dialogHook } from "../../../util/customhooks";
 import ColTitlePopUp from "../../../app/components/common/ColTitlePopUp";
 import numeral from "numeral";
 import update from "immutability-helper";
+import { useMutation } from "@apollo/react-hooks";
+import { gql } from "apollo-boost";
+import InventoryByOfficeIdModal from "../../main/Inventorydialogs/inventoryOffice";
 
-const ProjectMilestone = ({ visible, hide, parent, project, ...props }) => {
+const UPSERT_RECORD = gql`
+  mutation (
+    $items: [Map_String_ObjectScalar]
+    $projectId: UUID
+    $projectUpdatesId: UUID
+  ) {
+    upsert: upsertManyMaterials(
+      items: $items
+      projectId: $projectId
+      projectUpdatesId: $projectUpdatesId
+    ) {
+      payload
+      success
+      message
+    }
+  }
+`;
+
+const ProjectMaterialsModal = ({
+  visible,
+  hide,
+  parent,
+  project,
+  ...props
+}) => {
   const [items, setItems] = useState([]);
   const [editable, setEditable] = useState({});
 
-  const onSubmit = (data) => {
-    console.log("data => ", data);
+  const [upsertRecord, { loading: upsertLoading }] = useMutation(
+    UPSERT_RECORD,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (data?.upsert?.success) {
+          hide(data?.upsert?.message);
+        }
+      },
+    }
+  );
+
+  const onSubmit = () => {
+    if (items) {
+      upsertRecord({
+        variables: {
+          items: items,
+          projectId: project,
+          projectUpdatesId: parent.id,
+        },
+      });
+    }
   };
 
-  const [modal, showModal] = dialogHook(InventoryByOfficeModal, (result) => {
+  const [modal, showModal] = dialogHook(InventoryByOfficeIdModal, (result) => {
     // item form
     if (!_.isEmpty(result)) {
       // validate here
@@ -46,10 +92,10 @@ const ProjectMilestone = ({ visible, hide, parent, project, ...props }) => {
     let data = update(payload, {
       [index]: {
         [element]: {
-          $set: newValue || 0,
+          $set: Number(newValue) || 0,
         },
         subTotal: {
-          $set: newValue * record.cost,
+          $set: Number(newValue) * record.cost,
         },
       },
     });
@@ -152,8 +198,8 @@ const ProjectMilestone = ({ visible, hide, parent, project, ...props }) => {
           key="submit"
           onClick={onSubmit}
           type="primary"
-          // loading={upsertLoading}
-          disabled={props.billed}
+          loading={upsertLoading}
+          disabled={_.isEmpty(items)}
         >
           Submit
         </Button>,
@@ -174,9 +220,11 @@ const ProjectMilestone = ({ visible, hide, parent, project, ...props }) => {
               type="primary"
               size="small"
               onClick={() => {
-                showModal({ show: true, myProps: { type: "PROJECT" } });
+                showModal({
+                  show: true,
+                  myProps: { type: "PROJECT", officeId: props?.officeId },
+                });
               }}
-              // disabled={props?.billed || props?.completed}
             >
               Add Materials/Item
             </Button>
@@ -184,7 +232,7 @@ const ProjectMilestone = ({ visible, hide, parent, project, ...props }) => {
         </Col>
         <Col span={24}>
           <Table
-            // loading={loading || removeLoading}
+            loading={upsertLoading}
             className="gx-table-responsive"
             columns={columns}
             dataSource={items}
@@ -201,4 +249,4 @@ const ProjectMilestone = ({ visible, hide, parent, project, ...props }) => {
   );
 };
 
-export default ProjectMilestone;
+export default ProjectMaterialsModal;

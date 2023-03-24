@@ -3,22 +3,34 @@ import {
   Table,
   message,
   Button,
-  Typography,
   Tag,
   Collapse,
   Divider,
   List,
   Skeleton,
+  Modal,
+  Statistic,
 } from "antd";
 import _ from "lodash";
 import moment from "moment";
 import { dialogHook } from "../../../util/customhooks";
-import ProjectMilestone from "../dialogs/addProjectMilestone";
+import ProjectMaterialsModal from "../dialogs/addProjectMaterials";
 import AddProjectUpdatesNotes from "../dialogs/addProjectUpdatesNotes";
+import numeral from "numeral";
+import { DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { gql } from "apollo-boost";
+import { useMutation } from "@apollo/react-hooks";
 
-const { Text } = Typography;
 const { Panel } = Collapse;
+const { confirm } = Modal;
 //graphQL Queries
+const DELETE_RECORD = gql`
+  mutation ($id: UUID) {
+    upsert: removedMaterial(id: $id) {
+      id
+    }
+  }
+`;
 
 const ProjectUpdatesContent = ({
   obj,
@@ -26,10 +38,11 @@ const ProjectUpdatesContent = ({
   loading,
   onEditMilestone = () => {},
   projectId,
+  officeId,
   parentRefresh = () => {},
 }) => {
   const [modalMaterials, showModalmaterials] = dialogHook(
-    ProjectMilestone,
+    ProjectMaterialsModal,
     (result) => {
       if (result) {
         message.success(result);
@@ -48,54 +61,53 @@ const ProjectUpdatesContent = ({
     }
   );
 
+  const [upsertRecord] = useMutation(DELETE_RECORD, {
+    ignoreResults: false,
+    onCompleted: (data) => {
+      if (data?.upsert?.id) {
+        message.success("Item/Material successfully deleted");
+        parentRefresh();
+      }
+    },
+  });
+
+  const confirmDelete = (descLong, id) => {
+    confirm({
+      title: `Do you want to delete these item ${descLong}?`,
+      icon: <ExclamationCircleOutlined />,
+      content: "Please click OK to proceed.",
+      onOk() {
+        upsertRecord({
+          variables: {
+            id: id,
+          },
+        });
+      },
+      onCancel() {},
+    });
+  };
+
   const columns = [
     {
       title: "Date of Transaction",
       dataIndex: "dateTransact",
       key: "dateTransact",
-      render: (text, record) => {
-        if (record.status) {
-          return <span>{moment(text).format("MM-DD-YYYY h:mm a")}</span>;
-        } else {
-          return (
-            <Text delete type="danger">
-              {moment(text).format("MM-DD-YYYY h:mm a")}
-            </Text>
-          );
-        }
+      render: (text) => {
+        return <span>{moment(text).format("MM-DD-YYYY h:mm a")}</span>;
       },
     },
     {
       title: "Description",
-      dataIndex: "description",
-      key: "description",
+      dataIndex: "descLong",
+      key: "descLong",
       width: "60%",
-      render: (text, record) => {
-        if (record.status) {
-          return <span>{text}</span>;
-        } else {
-          return (
-            <Text delete type="danger">
-              {text}
-            </Text>
-          );
-        }
-      },
     },
     {
       title: "Qty (Unit)",
-      dataIndex: "unit",
-      key: "unit",
-      render: (status, record) => {
-        if (record.status) {
-          return <Tag color="blue">{status}</Tag>;
-        } else {
-          return (
-            <Text delete>
-              <Tag>{cost}</Tag>
-            </Text>
-          );
-        }
+      dataIndex: "qty",
+      key: "qty",
+      render: (text, record) => {
+        return <span>{`${numeral(text).format("0,0")} [${record.uou}]`}</span>;
       },
     },
     {
@@ -112,13 +124,11 @@ const ProjectUpdatesContent = ({
       key: "action",
       render: (text, record) => (
         <Button
-          type="primary"
+          type="danger"
           size="small"
-          // onClick={() =>
-          //   showModal({ show: true, myProps: { ...record, project: id } })
-          // }
+          onClick={() => confirmDelete(record.descLong, record.id)}
         >
-          Edit
+          <DeleteOutlined />
         </Button>
       ),
     },
@@ -149,7 +159,7 @@ const ProjectUpdatesContent = ({
           }
           key={obj.id}
         >
-          <div className="w-full">
+          <div className="flex-box-wrap-end">
             <Button
               size="small"
               className="margin-y-0"
@@ -168,7 +178,6 @@ const ProjectUpdatesContent = ({
           <List
             loading={false}
             itemLayout="horizontal"
-            // loadMore={loadMore}
             dataSource={obj.notes}
             renderItem={(item) => (
               <List.Item
@@ -202,7 +211,13 @@ const ProjectUpdatesContent = ({
             )}
           />
           <Divider>Materials Used</Divider>
-          <div className="w-full">
+          <div className="flex-box-wrap">
+            <Statistic
+              title="Total Materials (Php)"
+              valueStyle={{ color: "#cf1322" }}
+              value={_.sumBy(obj.materials, "subTotal", 0)}
+              precision={2}
+            />
             <Button
               size="small"
               className="margin-y-0"
@@ -210,7 +225,11 @@ const ProjectUpdatesContent = ({
               onClick={() =>
                 showModalmaterials({
                   show: true,
-                  myProps: { parent: obj, project: projectId },
+                  myProps: {
+                    parent: obj,
+                    project: projectId,
+                    officeId: officeId,
+                  },
                 })
               }
             >
@@ -221,7 +240,7 @@ const ProjectUpdatesContent = ({
             loading={loading}
             className="gx-table-responsive"
             columns={columns}
-            dataSource={[]}
+            dataSource={obj.materials}
             rowKey={(record) => record.id}
             size="small"
           />

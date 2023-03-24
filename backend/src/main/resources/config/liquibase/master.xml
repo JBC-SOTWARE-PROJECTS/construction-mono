@@ -204,5 +204,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog3/03_project_updates_add_new_table.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/04_alter_project_materials_ref_id.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/05_alter_billing_item.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
