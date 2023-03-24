@@ -51,7 +51,7 @@ const UPSERT_RECORD = gql`
   }
 `;
 
-const ProjectCost = ({ id, parentRef = () => {} }) => {
+const ProjectCost = ({ id, parentRef = () => {}, disabledEditing }) => {
   const [filter, setFilter] = useState("");
   //query
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
@@ -201,7 +201,7 @@ const ProjectCost = ({ id, parentRef = () => {} }) => {
           type="danger"
           size="small"
           onClick={() => confirm(record)}
-          disabled={!record.status}
+          disabled={!record.status || disabledEditing}
         >
           Cancel
         </Button>
@@ -225,6 +225,7 @@ const ProjectCost = ({ id, parentRef = () => {} }) => {
             type="primary"
             block
             onClick={() => showModal({ show: true, myProps: { project: id } })}
+            disabled={disabledEditing}
           >
             New
           </Button>

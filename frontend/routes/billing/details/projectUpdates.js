@@ -44,7 +44,7 @@ const GET_RECORDS = gql`
   }
 `;
 
-const ProjectUpdates = ({ id, officeId }) => {
+const ProjectUpdates = ({ id, officeId, disabledEditing }) => {
   const [filter, setFilter] = useState("");
   const [list, setList] = useState([]);
   //query
@@ -82,6 +82,7 @@ const ProjectUpdates = ({ id, officeId }) => {
             type="primary"
             block
             onClick={() => showModal({ show: true, myProps: { project: id } })}
+            disabled={disabledEditing}
           >
             New
           </Button>
@@ -110,6 +111,8 @@ const ProjectUpdates = ({ id, officeId }) => {
                       projectId={id}
                       officeId={officeId}
                       parentRefresh={refetch}
+                      disabledEditing={obj.status === "Completed"}
+                      disabledFromParent={disabledEditing}
                       onEditMilestone={() => {
                         showModal({
                           show: true,

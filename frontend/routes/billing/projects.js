@@ -61,6 +61,7 @@ const GET_RECORDS = gql`
         remarks
         totals
         totalsMaterials
+        disabledEditing
         status
         
       }

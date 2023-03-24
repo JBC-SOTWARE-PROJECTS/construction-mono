@@ -302,7 +302,7 @@ const TableItems = ({
               icon={<PlusCircleOutlined />}
               type="primary"
               block
-              disabled={locked || !status}
+              disabled={locked || !status || isProject}
               onClick={() =>
                 showModal({
                   show: true,

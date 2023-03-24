@@ -137,11 +137,11 @@ class BillingReportResource {
 		//header here
 		parameters.put("soaref", "Billing Statement Ref. # : ${bill.dateTrans.atZone(ZoneId.systemDefault()).format(yearFormat)}-${bill.billNo}".toString())
 		parameters.put("bill_no", bill?.billNo ?: "")
-		parameters.put("job_no", bill?.job?.jobNo ?: "")
+		parameters.put("job_no", bill?.project?.projectCode ?: "")
 		parameters.put("date_transaction", bill.dateTrans.atZone(ZoneId.systemDefault()).format(dateFormat) ?: "")
-		parameters.put("repair_type", bill?.job?.repair?.description ?: "")
-		parameters.put("trans_type", bill?.job ? "JOB ORDER" : "OTC" )
-		parameters.put("job_desc", bill?.job ? bill?.job?.description : "OTC Transaction" )
+
+		parameters.put("trans_type", bill?.project ? "PROJECT" : "OTC" )
+		parameters.put("job_desc", bill?.job ? bill?.project?.description : "OTC Transaction" )
 		parameters.put("customer", bill?.customer?.fullName ?: bill.otcName)
 		parameters.put("address", bill?.customer?.address ?: "")
 		parameters.put("prepared", employee.fullName ?: "")

@@ -182,6 +182,7 @@ const ViewBillingContent = ({ account, id, type }) => {
               transType={type}
               locked={_.get(data, "b.locked")}
               status={_.get(data, "b.status")}
+              isProject={!_.isEmpty(_.get(data, "b.project.id"))}
               isGovernment={
                 _.get(data, "b.customer.customerType") == "GOVERNMENT"
                   ? true

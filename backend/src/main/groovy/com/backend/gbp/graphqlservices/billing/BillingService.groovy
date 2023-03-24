@@ -234,12 +234,12 @@ class BillingService extends AbstractDaoService<Billing> {
         String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.otcName) like lower(concat('%',:filter,'%')))
-           AND q.job is null'''
+           AND q.project is null'''
 
         String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.otcName) like lower(concat('%',:filter,'%')))
-           AND q.job is null'''
+           AND q.project is null'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)

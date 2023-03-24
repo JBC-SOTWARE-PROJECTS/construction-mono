@@ -106,13 +106,10 @@
 				<reportElement x="569" y="129" width="1" height="27" uuid="59246dc4-293c-4110-97a8-13bef5add7f2"/>
 			</line>
 			<line>
-				<reportElement x="81" y="128" width="1" height="27" uuid="e47c1c0d-4f59-457a-94bd-fdf39510db13"/>
+				<reportElement x="124" y="128" width="1" height="27" uuid="e47c1c0d-4f59-457a-94bd-fdf39510db13"/>
 			</line>
 			<line>
-				<reportElement x="171" y="129" width="1" height="27" uuid="d1c1a7da-532a-4243-a021-2030f0201675"/>
-			</line>
-			<line>
-				<reportElement x="302" y="129" width="1" height="27" uuid="fd00b276-d522-4ccf-af85-5b6309a6c90e"/>
+				<reportElement x="254" y="129" width="1" height="27" uuid="d1c1a7da-532a-4243-a021-2030f0201675"/>
 			</line>
 			<staticText>
 				<reportElement x="4" y="130" width="28" height="13" uuid="bbf7f436-7063-4030-985a-fcba510e3ac8">
@@ -124,7 +121,7 @@
 				<text><![CDATA[Bill No #]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="86" y="131" width="36" height="12" uuid="fb431948-aa95-401c-b0c3-1f93fff5ef4e">
+				<reportElement x="130" y="131" width="36" height="12" uuid="fb431948-aa95-401c-b0c3-1f93fff5ef4e">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -133,7 +130,7 @@
 				<text><![CDATA[Job #]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="177" y="131" width="80" height="12" uuid="ad0bfe74-8edc-4e18-99a7-0b6077717ca2">
+				<reportElement x="260" y="131" width="80" height="12" uuid="ad0bfe74-8edc-4e18-99a7-0b6077717ca2">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -170,15 +167,6 @@
 				<reportElement x="0" y="13" width="65" height="60" uuid="ab8924bd-67cd-411f-a086-3d0746bd5b02"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
-			<staticText>
-				<reportElement x="309" y="131" width="80" height="12" uuid="218f68ed-fce4-4bd1-8439-614014ffd2a5">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font fontName="DejaVu Sans" size="8"/>
-				</textElement>
-				<text><![CDATA[Repair Type]]></text>
-			</staticText>
 			<line>
 				<reportElement x="431" y="128" width="1" height="27" uuid="8c15ee41-c8aa-41a2-ae2d-4d7a8be2791c"/>
 			</line>
@@ -192,32 +180,25 @@
 				<text><![CDATA[Transaction Type]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="4" y="143" width="77" height="13" uuid="1763f93c-c995-44d1-9bc1-d7876a4cc4bb"/>
+				<reportElement x="4" y="143" width="120" height="13" uuid="1763f93c-c995-44d1-9bc1-d7876a4cc4bb"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{bill_no}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="86" y="143" width="85" height="13" uuid="2db38cd8-b856-4841-a15a-7e96034c65a5"/>
+				<reportElement x="130" y="143" width="124" height="13" uuid="2db38cd8-b856-4841-a15a-7e96034c65a5"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{job_no}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="177" y="143" width="125" height="13" uuid="3a89c709-fe68-4a63-afc1-5492b5765887"/>
+				<reportElement x="260" y="143" width="125" height="13" uuid="3a89c709-fe68-4a63-afc1-5492b5765887"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{date_transaction}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="309" y="143" width="122" height="13" uuid="d348fb31-8d02-4cc6-9ec6-55b20300d251"/>
-				<textElement>
-					<font fontName="DejaVu Sans" size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{repair_type}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="436" y="143" width="132" height="13" uuid="7b9da462-a1cb-4db5-afc7-9282c23e9c50"/>

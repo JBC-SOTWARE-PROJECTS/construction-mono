@@ -95,6 +95,15 @@ const JobStatusForm = ({ visible, hide, ...props }) => {
               field="status"
             />
           </Col>
+          <Col span={24}>
+            <FormCheckbox
+              description={"Disable Editing when used"}
+              name="disabledEditing"
+              valuePropName="checked"
+              initialValue={props?.disabledEditing}
+              field="disabledEditing"
+            />
+          </Col>
         </Row>
       </MyForm>
     </CModal>

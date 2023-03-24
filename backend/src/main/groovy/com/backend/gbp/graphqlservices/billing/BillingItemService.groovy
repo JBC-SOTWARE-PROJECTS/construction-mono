@@ -345,25 +345,6 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
                 def recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
                     StringUtils.leftPad(no.toString(), 6, "0")
                 }
-                def serviceId = UUID.fromString(it.serviceCategory)
-                def jobItem = null
-
-                //add job order first
-                if(billObject.job){
-                    jobItem = jobItemService.upsertJobItemFormBilling(
-                            serviceId,
-                            "SERVICE",
-                            it.description,
-                            it.qty,
-                            it.amount,
-                            it.subTotal,
-                            it.outputTax,
-                            it.wcost,
-                            null,
-                            billObject.job
-                    )
-                }
-
                 //end add job order
 
                 //insert

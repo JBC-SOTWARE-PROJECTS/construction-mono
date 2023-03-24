@@ -1,0 +1,1 @@
+ALTER TABLE billing.job_status ADD COLUMN disabled_editing bool default false;

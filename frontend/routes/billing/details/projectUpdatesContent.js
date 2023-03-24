@@ -40,6 +40,8 @@ const ProjectUpdatesContent = ({
   projectId,
   officeId,
   parentRefresh = () => {},
+  disabledEditing = false,
+  disabledFromParent,
 }) => {
   const [modalMaterials, showModalmaterials] = dialogHook(
     ProjectMaterialsModal,
@@ -126,6 +128,7 @@ const ProjectUpdatesContent = ({
         <Button
           type="danger"
           size="small"
+          disabled={disabledEditing || disabledFromParent}
           onClick={() => confirmDelete(record.descLong, record.id)}
         >
           <DeleteOutlined />
@@ -148,18 +151,30 @@ const ProjectUpdatesContent = ({
               <Tag color={color} className="margin-y-0">
                 {obj.status}
               </Tag>
-              <Tag
-                color="#2db7f5"
-                className="margin-y-0 cursor-pointer"
-                onClick={onEditMilestone}
-              >
-                Edit
-              </Tag>
+              {!disabledFromParent && (
+                <Tag
+                  color="#2db7f5"
+                  className="margin-y-0 cursor-pointer"
+                  onClick={onEditMilestone}
+                >
+                  Edit
+                </Tag>
+              )}
             </span>
           }
           key={obj.id}
         >
-          <div className="flex-box-wrap-end">
+          <div className="flex-box-wrap">
+            <div>
+              <p className="margin-0">
+                <span className="font-bold">Start Date:</span>{" "}
+                {moment(obj.startDate).format("MMMM DD, YYYY")}
+              </p>
+              <p className="margin-0">
+                <span className="font-bold">Estimate Date End:</span>{" "}
+                {moment(obj.estimateEndDate).format("MMMM DD, YYYY")}
+              </p>
+            </div>
             <Button
               size="small"
               className="margin-y-0"
@@ -170,6 +185,7 @@ const ProjectUpdatesContent = ({
                   myProps: { parent: obj, project: projectId },
                 })
               }
+              disabled={disabledEditing || disabledFromParent}
             >
               Add Remarks/Notes
             </Button>
@@ -192,6 +208,7 @@ const ProjectUpdatesContent = ({
                     key="list-loadmore-edit"
                     size="small"
                     type="primary"
+                    disabled={disabledEditing || disabledFromParent}
                   >
                     Edit
                   </Button>,
@@ -222,6 +239,7 @@ const ProjectUpdatesContent = ({
               size="small"
               className="margin-y-0"
               type="primary"
+              disabled={disabledEditing || disabledFromParent}
               onClick={() =>
                 showModalmaterials({
                   show: true,

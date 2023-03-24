@@ -3,21 +3,21 @@ import { Col, Row, Button } from "antd";
 import MyForm from "../../../util/customForms/myForm";
 import FormInput from "../../../util/customForms/formInput";
 import CModal from "../../../app/components/common/CModal";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import FormSelect from "../../../util/customForms/formSelect";
+// import FormSelect from "../../../util/customForms/formSelect";
 import { AccountContext } from "../../../app/components/accessControl/AccountContext";
 
-const GET_RECORDS = gql`
-  {
-    category: serviceCategoryActive {
-      value: id
-      label: description
-    }
-  }
-`;
+// const GET_RECORDS = gql`
+//   {
+//     category: serviceCategoryActive {
+//       value: id
+//       label: description
+//     }
+//   }
+// `;
 
 const UPSERT_RECORD = gql`
   mutation ($items: [Map_String_ObjectScalar], $billing: UUID, $type: String) {
@@ -33,7 +33,7 @@ const AddServiceBillingForm = ({ visible, hide, ...props }) => {
   {
     /* error = { errorTitle: "", errorMsg: ""}*/
   }
-  const { loading, data } = useQuery(GET_RECORDS);
+  // const { loading, data } = useQuery(GET_RECORDS);
 
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
     UPSERT_RECORD,
@@ -58,7 +58,7 @@ const AddServiceBillingForm = ({ visible, hide, ...props }) => {
         id: uuidv4(),
         item: null,
         service: null,
-        serviceCategory: data?.serviceCategory,
+        // serviceCategory: data?.serviceCategory,
         description: data.descriptions,
         qty: 1,
         amount: data?.cost,
@@ -115,7 +115,7 @@ const AddServiceBillingForm = ({ visible, hide, ...props }) => {
               placeholder="Description"
             />
           </Col>
-          <Col span={24}>
+          {/* <Col span={24}>
             <FormSelect
               loading={loading}
               description={"Service Category"}
@@ -125,7 +125,7 @@ const AddServiceBillingForm = ({ visible, hide, ...props }) => {
               placeholder="Select Category"
               list={_.get(data, "category", [])}
             />
-          </Col>
+          </Col> */}
           <Col span={24}>
             <FormInput
               description={"Cost"}
