@@ -434,9 +434,6 @@ const IssuanceForm = ({ visible, hide, ...props }) => {
                 <FormSelect
                   loading={projectLoading}
                   description={"Project"}
-                  rules={[
-                    { required: true, message: "This Field is required" },
-                  ]}
                   initialValue={props?.project?.id}
                   name="project"
                   field="project"

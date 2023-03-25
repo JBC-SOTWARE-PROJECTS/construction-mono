@@ -134,8 +134,13 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def proj = findOne(id)
-        proj.status = false
-        save(proj)
+        delete(proj)
+
+        if(id){
+            billingItemService.deleteBillingItem(id)
+        }
+
+        return  proj
     }
 
 }

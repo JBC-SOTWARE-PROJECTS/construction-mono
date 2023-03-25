@@ -88,6 +88,16 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         createQuery(query, params).resultList.sort { it.description }
     }
 
+    @GraphQLQuery(name = "billingByRef")
+    BillingItem billingByRef(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        String query = '''Select e from BillingItem e where e.refId = :id'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('id', id)
+        createQuery(query, params).resultList.find()
+    }
+
     @GraphQLQuery(name = "billingItemByParentType")
     List<BillingItem> billingItemByParentType(
             @GraphQLArgument(name = "filter") String filter,
@@ -531,6 +541,16 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         params.put('end', end)
         params.put('type', ['PAYMENTS'])
         getSum(query, params)
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "deleteBillingItem")
+    BillingItem deleteBillingItem(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def item = this.billingByRef(id)
+        delete(item)
+        return item
     }
 
 

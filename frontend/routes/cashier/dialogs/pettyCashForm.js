@@ -29,15 +29,41 @@ const TYPE = gql`
   }
 `;
 
+const GET_CONSTANT = gql`
+  {
+    projects: projectList {
+      value: id
+      label: description
+    }
+  }
+`;
+
+
 const PettyCashForm = ({ visible, hide, ...props }) => {
   const [formError, setFormError] = useState({});
-
+  const [projects, setProjects] = useState([])
   const { loading, data } = useQuery(TYPE, {
     fetchPolicy: "network-only",
   });
   {
     /* error = { errorTitle: "", errorMsg: ""}*/
   }
+
+  const { loading: projectLoading } = useQuery(
+    GET_CONSTANT,
+    {
+      variables: {
+        id: location,
+      },
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.projects)) {
+          setProjects(data?.projects);
+        }else{
+            setProjects([]);
+        }
+      },
+    }
+  );
 
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
     UPSERT_RECORD,
@@ -152,6 +178,20 @@ const PettyCashForm = ({ visible, hide, ...props }) => {
               disabled={props?.isPosted || props?.isVoid}
             />
           </Col>
+          {props?.cashType === "CASH_OUT" && (
+            <Col span={24}>
+              <FormSelect
+                description={"Project"}
+                loading={projectLoading}
+                initialValue={props?.project?.id}
+                name="project"
+                field="project"
+                placeholder="Select Project"
+                list={projects}
+                disabled={props?.isPosted || props?.isVoid}
+              />
+            </Col>
+          )}
           <Col span={24}>
             <FormSelect
               description={"Received By"}
