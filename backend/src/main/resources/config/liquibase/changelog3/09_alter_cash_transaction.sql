@@ -1,0 +1,1 @@
+ALTER TABLE cashier.petty_cash ADD COLUMN project uuid default null;

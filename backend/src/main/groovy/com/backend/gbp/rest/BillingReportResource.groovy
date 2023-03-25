@@ -141,7 +141,7 @@ class BillingReportResource {
 		parameters.put("date_transaction", bill.dateTrans.atZone(ZoneId.systemDefault()).format(dateFormat) ?: "")
 
 		parameters.put("trans_type", bill?.project ? "PROJECT" : "OTC" )
-		parameters.put("job_desc", bill?.job ? bill?.project?.description : "OTC Transaction" )
+		parameters.put("job_desc", bill?.project ? bill?.project?.description : "OTC Transaction" )
 		parameters.put("customer", bill?.customer?.fullName ?: bill.otcName)
 		parameters.put("address", bill?.customer?.address ?: "")
 		parameters.put("prepared", employee.fullName ?: "")

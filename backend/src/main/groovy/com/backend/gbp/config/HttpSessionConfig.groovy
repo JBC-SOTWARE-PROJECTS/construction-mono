@@ -14,6 +14,9 @@ class HttpSessionConfig {
 	
 	@Value('${redis.port}')
 	Integer port = 6379
+
+	@Value('${redis.port}')
+	String password
 	
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "openshift")
 	@Bean
@@ -29,7 +32,7 @@ class HttpSessionConfig {
 	LettuceConnectionFactory connectionFactoryDocker() {
 
 		def factory = new LettuceConnectionFactory(host, port)
-		//factory.password = "password"
+		factory.password = password
 		return factory
 	}
 	

@@ -78,6 +78,11 @@ class ProjectService extends AbstractDaoService<Projects> {
         createQuery(query, params).resultList.sort { it.projectCode }
     }
 
+    @GraphQLQuery(name = "projectList")
+    List<Projects> projectList() {
+        findAll()
+    }
+
     @GraphQLQuery(name = "projectByOffice")
     List<Projects> projectByOffice(
             @GraphQLArgument(name = "id") UUID id
@@ -146,8 +151,10 @@ class ProjectService extends AbstractDaoService<Projects> {
             }
         })
 
-        //create billing
-        billingService.createBillingProject(project)
+        //create billing if id is misssing
+        if(!id){
+            billingService.createBillingProject(project)
+        }
         //return
         return project
     }

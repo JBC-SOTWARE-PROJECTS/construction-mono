@@ -4,6 +4,7 @@ import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -52,6 +53,12 @@ class PettyCash extends AbstractAuditingEntity implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shiftid", referencedColumnName = "id")
 	Shift shift
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project", referencedColumnName = "id")
+	Projects project
 
 	@GraphQLQuery
 	@Column(name = "remarks", columnDefinition = 'varchar')
