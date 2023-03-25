@@ -39,7 +39,7 @@ class HttpSessionConfig {
 	
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "dev")
 	@Bean
-	LettuceConnectionFactory connectionFactory() {
-		return new LettuceConnectionFactory()
+	RedisStandaloneConfiguration connectionFactory() {
+		return new RedisStandaloneConfiguration()
 	}
 }
