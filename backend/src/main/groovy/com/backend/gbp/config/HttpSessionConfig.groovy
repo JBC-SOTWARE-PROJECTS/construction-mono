@@ -3,6 +3,7 @@ package com.backend.gbp.config
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession
 
@@ -15,7 +16,7 @@ class HttpSessionConfig {
 	@Value('${redis.port}')
 	Integer port = 6379
 
-	@Value('${redis.port}')
+	@Value('${redis.password}')
 	String password
 	
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "openshift")
@@ -29,9 +30,9 @@ class HttpSessionConfig {
 
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "docker")
 	@Bean
-	LettuceConnectionFactory connectionFactoryDocker() {
+	RedisStandaloneConfiguration connectionFactoryDocker() {
 
-		def factory = new LettuceConnectionFactory(host, port)
+		def factory = new RedisStandaloneConfiguration(host, port)
 		factory.password = password
 		return factory
 	}
