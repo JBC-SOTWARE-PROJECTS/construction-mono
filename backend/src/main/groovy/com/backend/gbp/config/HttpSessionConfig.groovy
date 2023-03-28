@@ -31,11 +31,10 @@ class HttpSessionConfig {
 
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "docker")
 	@Bean
-	JedisConnectionFactory redisConnectionFactory() {
+	LettuceConnectionFactory connectionFactoryDocker() {
 
-		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-		// config.setPassword(password)
-		return new JedisConnectionFactory(config);
+		def factory = new LettuceConnectionFactory(host, port)
+		return factory
 	}
 
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "secured")
