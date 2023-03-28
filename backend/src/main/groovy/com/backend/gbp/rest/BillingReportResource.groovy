@@ -1194,6 +1194,13 @@ class BillingReportResource {
 		}
 
 		parameters.put('code', itemList.code)
+		if(itemList?.project){
+			String proj = "[${itemList?.project?.projectCode}] " + itemList?.project?.description
+			parameters.put('project', proj)
+		}else{
+			parameters.put('project', "")
+		}
+
 		parameters.put('date', dateFormat.format(itemList.dateTrans))
 		parameters.put('prepared', employee.fullName)
 		parameters.put('received', itemList.receivedBy?.fullName)
@@ -1254,6 +1261,53 @@ class BillingReportResource {
 							item.remarks
 					)
 			}
+
+			LinkedMultiValueMap<String, String> extHeaders = new LinkedMultiValueMap<>()
+			extHeaders.add("Content-Disposition", "inline;filename=Charge-Item-Report.csv")
+
+			return new ResponseEntity(String.valueOf(buffer).getBytes(), extHeaders, HttpStatus.OK)
+		}
+		catch (e) {
+			throw e
+		}
+
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = ["/cashTransaction"])
+	ResponseEntity<AnyDocument.Any> downloadCashTransaction(
+			@RequestParam(required = false) String shift,
+			@RequestParam(required = false) String type,
+			@RequestParam(required = false) String project
+	) {
+		UUID shiftId = shift ? UUID.fromString(shift) : null
+		UUID projectId = project ? UUID.fromString(project) : null
+
+		def itemList = pettyCashService.pettyCashList('', shiftId, type, projectId)
+		StringBuffer buffer = new StringBuffer()
+
+		DateTimeFormatter formatter =
+				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
+		CSVPrinter csvPrinter = new CSVPrinter(buffer, CSVFormat.POSTGRESQL_CSV
+				.withHeader("REFERENCE NO", "DATE", "SHIFT", "CASH TYPE", "DESCRIPTION", "EXPENSE TYPE", "AMOUNT", "PROJECT", "REMARKS"))
+
+		try {
+			if(itemList){
+				itemList.each {
+					item ->
+						csvPrinter.printRecord(
+								item.code,
+								formatter.format(item.dateTrans),
+								item.shift?.id || "",
+								item.cashType,
+								item.remarks,
+								item.pettyType?.description || "",
+								item.amount,
+								item.project?.description || "",
+								item.notes
+						)
+				}
+			}
+
 
 			LinkedMultiValueMap<String, String> extHeaders = new LinkedMultiValueMap<>()
 			extHeaders.add("Content-Disposition", "inline;filename=Charge-Item-Report.csv")

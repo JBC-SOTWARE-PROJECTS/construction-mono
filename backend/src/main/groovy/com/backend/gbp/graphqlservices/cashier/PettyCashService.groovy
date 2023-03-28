@@ -55,7 +55,8 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
     List<PettyCash> pettyCashList(
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "shift") UUID shift,
-            @GraphQLArgument(name = "cashType") String cashType
+            @GraphQLArgument(name = "cashType") String cashType,
+            @GraphQLArgument(name = "project") UUID project
     ) {
         String query = '''Select e from PettyCash e where 
                           lower(concat(e.code,e.remarks)) like lower(concat('%',:filter,'%'))'''
@@ -69,6 +70,10 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
             query += ''' and (e.cashType = :cashType)'''
             params.put("cashType", cashType)
         }
+        if (project) {
+            query += ''' and (e.project.id = :project)'''
+            params.put("project", project)
+        }
         createQuery(query, params).resultList.sort { it.code }
     }
 
@@ -80,6 +85,20 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
                           e.shift.id = :shift and e.isPosted = true'''
         Map<String, Object> params = new HashMap<>()
         params.put("shift", shift)
+        createQuery(query, params).resultList.sort { it.code }
+    }
+
+    @GraphQLQuery(name = "pettyCashListByProject")
+    List<PettyCash> pettyCashListByProject(
+            @GraphQLArgument(name = "project") UUID project,
+            @GraphQLArgument(name = "filter") String filter
+    ) {
+        String query = '''Select e from PettyCash e where 
+                          lower(concat(e.code,e.remarks)) like lower(concat('%',:filter,'%'))
+                          and e.project.id = :project and e.isPosted = true'''
+        Map<String, Object> params = new HashMap<>()
+        params.put("project", project)
+        params.put("filter", filter)
         createQuery(query, params).resultList.sort { it.code }
     }
 
@@ -117,6 +136,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
         getSum(query, params)
     }
 
+
     @GraphQLQuery(name = "totalCashIn")
     BigDecimal totalCashIn(
             @GraphQLArgument(name = "start") String start,
@@ -129,6 +149,17 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
         params.put('start', start)
         params.put('end', end)
         params.put('type', 'CASH_IN')
+        getSum(query, params)
+    }
+
+    @GraphQLQuery(name = "totalExpenseProject")
+    BigDecimal totalExpenseProject(
+            @GraphQLArgument(name = "project") UUID project
+    ) {
+        String query = '''Select sum(e.amount) from PettyCash e where
+                     e.project.id = :project and e.isPosted = true'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('project', project)
         getSum(query, params)
     }
 

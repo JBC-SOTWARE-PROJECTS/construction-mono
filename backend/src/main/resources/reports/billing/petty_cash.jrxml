@@ -172,11 +172,12 @@
 	<parameter name="date" class="java.lang.String"/>
 	<parameter name="prepared" class="java.lang.String"/>
 	<parameter name="received" class="java.lang.String"/>
+	<parameter name="project" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
 	<title>
-		<band height="52" splitType="Stretch">
+		<band height="63" splitType="Stretch">
 			<staticText>
 				<reportElement x="1" y="0" width="570" height="20" uuid="57aed2b1-4f4e-40a3-a6ad-54dae8dd4c5a">
 					<property name="local_mesure_unitheight" value="pixel"/>
@@ -206,6 +207,20 @@
 					<font fontName="DejaVu Sans" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="47" width="100" height="16" uuid="41eaea39-bc92-4918-b322-78a178ada68a"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Project]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="101" y="47" width="469" height="16" uuid="c2d44a3f-1fb1-44cd-9902-0c631e84668c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{project}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
