@@ -183,3 +183,10 @@ Version        : 1.0
   align-items: center !important;
   width: 100% !important;
 }
+
+.flex-box-wrap-center {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}

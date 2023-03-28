@@ -9,6 +9,7 @@ import {
   Divider,
   Spin,
   Empty,
+  Pagination,
 } from "antd";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
@@ -61,9 +62,9 @@ const GET_RECORDS = gql`
         remarks
         totals
         totalsMaterials
+        totalExpenses
         disabledEditing
         status
-        
       }
       size
       totalElements
@@ -89,7 +90,15 @@ const GET_CONSTANT = gql`
   }
 `;
 
-const ProjectItemData = ({ data = [], loading = false, onEdit = () => {} }) => {
+const ProjectItemData = ({
+  data = [],
+  loading = false,
+  onEdit = () => {},
+  setState = () => {},
+  pageSize,
+  total,
+  defaultCurrent,
+}) => {
   if (_.isEmpty(data)) {
     return (
       <Row>
@@ -104,9 +113,26 @@ const ProjectItemData = ({ data = [], loading = false, onEdit = () => {} }) => {
         <Row>
           {data.map((project, index) => (
             <Col key={index} xl={8} md={12} sm={24} xs={24}>
-              <ProjectItem key={index} grid product={project} onEdit={() => onEdit(project)} />
+              <ProjectItem
+                key={index}
+                grid
+                product={project}
+                onEdit={() => onEdit(project)}
+              />
             </Col>
           ))}
+          <Col span={24}>
+            <div className="flex-box-wrap-center">
+              <Pagination
+                pageSize={pageSize}
+                total={total}
+                defaultCurrent={defaultCurrent}
+                onChange={(page) => {
+                  setState({ ...state, page: page - 1 });
+                }}
+              />
+            </div>
+          </Col>
         </Row>
       </Spin>
     );
@@ -141,8 +167,6 @@ const Projects = ({ account }) => {
     }
     refetch();
   });
-
-  console.log('data', data)
 
   return (
     <Card
@@ -213,8 +237,12 @@ const Projects = ({ account }) => {
       <Divider />
       <ProjectItemData
         data={_.get(data, "list.content", [])}
-        loading={loading}
+        loading={loading || loadingFilter}
+        pageSize={_.get(data, "list.size", 0)}
+        total={_.get(data, "list.totalElements", 0)}
+        defaultCurrent={_.get(data, "list.number", 0) + 1}
         onEdit={(props) => showModal({ show: true, myProps: props })}
+        setState={setState}
       />
       {modal}
     </Card>

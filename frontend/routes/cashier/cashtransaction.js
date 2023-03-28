@@ -15,6 +15,7 @@ import {
   Modal,
   Alert,
   Statistic,
+  Skeleton,
 } from "antd";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
@@ -22,20 +23,26 @@ import {
   PlusCircleOutlined,
   ExclamationCircleOutlined,
   PrinterOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import { dialogHook } from "../../util/customhooks";
 import PettyCashForm from "./dialogs/pettyCashForm";
-import { getUrlPrefix } from "../../shared/global";
+import { get, getUrlPrefix } from "../../shared/global";
 import numeral from "numeral";
 import moment from "moment";
 import _ from "lodash";
-import { col4 } from "../../shared/constant";
+import { col3, col4 } from "../../shared/constant";
 import FilterSelect from "../../util/customForms/filterSelect";
 
 //graphQL Queries
 const GET_RECORDS = gql`
-  query ($filter: String, $shift: UUID, $cashType: String) {
-    list: pettyCashList(filter: $filter, shift: $shift, cashType: $cashType) {
+  query ($filter: String, $shift: UUID, $cashType: String, $project: UUID) {
+    list: pettyCashList(
+      filter: $filter
+      shift: $shift
+      cashType: $cashType
+      project: $project
+    ) {
       id
       code
       dateTrans
@@ -50,6 +57,11 @@ const GET_RECORDS = gql`
       shift {
         id
         shiftNo
+      }
+      project {
+        id
+        projectCode
+        description
       }
       cashType
       remarks
@@ -79,6 +91,15 @@ const GET_DATA = gql`
   }
 `;
 
+const GET_PROJECTS = gql`
+  {
+    projects: projectList {
+      value: id
+      label: description
+    }
+  }
+`;
+
 const { confirm } = Modal;
 const { Search } = Input;
 const { Text } = Typography;
@@ -92,16 +113,27 @@ const UPSERT_RECORD = gql`
   }
 `;
 
+const UPSERT_RECORD_SHIFT = gql`
+  mutation {
+    upsert: addShift {
+      id
+    }
+  }
+`;
+
 const CashTransactionContent = ({ account }) => {
   const [filter, setFilter] = useState("");
   const [shift, setShift] = useState(null);
   const [cashType, setCashType] = useState(null);
+  const [project, setProject] = useState(null);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   //query
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     variables: {
       filter: filter,
       shift: shift,
       cashType: cashType,
+      project: project,
     },
     fetchPolicy: "network-only",
   });
@@ -114,6 +146,10 @@ const CashTransactionContent = ({ account }) => {
         setShift(shift.id);
       }
     },
+  });
+
+  const { data: projList } = useQuery(GET_PROJECTS, {
+    fetchPolicy: "network-only",
   });
 
   const [modal, showModal] = dialogHook(PettyCashForm, (result) => {
@@ -135,7 +171,28 @@ const CashTransactionContent = ({ account }) => {
       },
     }
   );
+
+  const [upsertRecordShift, { loading: upsertLoadingShift }] = useMutation(
+    UPSERT_RECORD_SHIFT,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.upsert?.id)) {
+          refetch();
+        }
+      },
+      onError: (data) => {
+        if (data) {
+          message.error("No Terminal Assign in this account");
+        }
+      },
+    }
+  );
   // ===================================================//
+  const createShift = () => {
+    upsertRecordShift();
+  };
+
   const _approve = (id, status, message) => {
     confirm({
       title: `Do you want ${message} this Cash Transaction?`,
@@ -194,6 +251,12 @@ const CashTransactionContent = ({ account }) => {
   const renderExpandableRow = (record) => {
     return (
       <div className="w-full">
+        {record.project && (
+          <p>
+            Project:{" "}
+            {`[${record.project?.projectCode}] ${record.project?.description}`}
+          </p>
+        )}
         <p>Remarks/Notes:</p>
         <pre className="pl-20">{record.notes}</pre>
       </div>
@@ -294,6 +357,34 @@ const CashTransactionContent = ({ account }) => {
     },
   ];
 
+  const downloadCsv = () => {
+    setDownloadLoading(true);
+    get(`/reports/billing/print/cashTransaction`, {
+      params: {
+        shift: shift,
+        type: cashType,
+        project: project,
+      },
+    })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `cash-trasaction.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setDownloadLoading(false);
+      })
+      .catch((err) => {
+        message.error({
+          title: "Error generating report",
+          content: err.message,
+        });
+        setDownloadLoading(false);
+      });
+  };
+
   return (
     <Card
       title="Cash Transaction"
@@ -347,12 +438,13 @@ const CashTransactionContent = ({ account }) => {
           <Button
             size="small"
             type="primary"
-            icon={<PrinterOutlined />}
+            icon={<DownloadOutlined />}
+            loading={downloadLoading}
             className="margin-0"
-            onClick={() => console.log("print")}
+            onClick={downloadCsv}
             disabled={_.isEmpty(_.get(data, "list"))}
           >
-            Print Cash Transaction
+            Download CSV
           </Button>
         </>
       }
@@ -372,22 +464,35 @@ const CashTransactionContent = ({ account }) => {
           </Col>
         ) : (
           <Col span={24}>
-            <Alert
-              message="Error"
-              description="No Active Shift Found. Start Shift to Procceed"
-              type="error"
-              showIcon
-            />
+            {loading || listLoading ? (
+              <Skeleton active />
+            ) : (
+              <>
+                <Alert
+                  message="Error"
+                  description="No Active Shift Found. Start Shift to Procceed"
+                  type="error"
+                  showIcon
+                />
+                <Button
+                  type="primary"
+                  loading={upsertLoadingShift}
+                  onClick={createShift}
+                >
+                  Create Shift
+                </Button>
+              </>
+            )}
           </Col>
         )}
-        <Col span={12}>
+        <Col span={24}>
           <Search
             placeholder="Search Cash Transaction"
             onSearch={(e) => setFilter(e)}
             enterButton
           />
         </Col>
-        <Col {...col4}>
+        <Col {...col3}>
           <FilterSelect
             allowClear
             field="type"
@@ -402,7 +507,7 @@ const CashTransactionContent = ({ account }) => {
             ]}
           />
         </Col>
-        <Col {...col4}>
+        <Col {...col3}>
           {!listLoading && (
             <FilterSelect
               allowClear
@@ -417,6 +522,18 @@ const CashTransactionContent = ({ account }) => {
             />
           )}
         </Col>
+        <Col {...col3}>
+          <FilterSelect
+            allowClear
+            field="projects"
+            placeholder="Filter By Project"
+            onChange={(e) => {
+              setProject(e ? e : null);
+            }}
+            list={_.get(projList, "projects")}
+          />
+        </Col>
+        <Divider />
         <Col span={12}>
           <Statistic
             title="Total Cash In (Php)"

@@ -4,6 +4,7 @@ import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.billing.BillingService
+import com.backend.gbp.graphqlservices.cashier.PettyCashService
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -44,6 +45,9 @@ class ProjectService extends AbstractDaoService<Projects> {
     @Autowired
     BillingService billingService
 
+    @Autowired
+    PettyCashService pettyCashService
+
     //context
     @GraphQLQuery(name = "totals", description = "totals")
     BigDecimal totals(@GraphQLContext Projects projects) {
@@ -55,6 +59,10 @@ class ProjectService extends AbstractDaoService<Projects> {
         return projectMaterialService.getTotalMaterials(projects.id)
     }
 
+    @GraphQLQuery(name = "totalExpenses", description = "totalExpenses")
+    BigDecimal totalExpenses(@GraphQLContext Projects projects) {
+        return pettyCashService.totalExpenseProject(projects.id)
+    }
 
     @GraphQLQuery(name = "projectById")
     Projects projectById(
