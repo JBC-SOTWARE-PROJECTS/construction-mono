@@ -18,7 +18,8 @@ const ProjectItem = ({ product, grid, onEdit = () => {} }) => {
     location,
     customer,
     totals,
-    totalsMaterials
+    totalsMaterials,
+    totalExpenses
   } = product;
 
   return (
@@ -66,8 +67,13 @@ const ProjectItem = ({ product, grid, onEdit = () => {} }) => {
             </h4>
           </div>
           <div className="ant-row-flex">
-            <h4 className="gx-text-danger">
+            <h4 className="gx-text-warning">
               Total Materials Used: {numeral(totalsMaterials).format("0,0.00")}{" "}
+            </h4>
+          </div>
+          <div className="ant-row-flex">
+            <h4 className="gx-text-danger">
+              Total Expenses: {numeral(totalExpenses).format("0,0.00")}{" "}
             </h4>
           </div>
         </div>

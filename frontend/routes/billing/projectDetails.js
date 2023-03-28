@@ -19,6 +19,7 @@ import _ from "lodash";
 import ProjectCost from "./details/projectCost";
 import ProjectUpdates from "./details/projectUpdates";
 import ProjectMaterials from "./details/projectMaterials";
+import ProjectExpenses from "./details/projectExpenses";
 
 const { Text } = Typography;
 const { TabPane } = Tabs;
@@ -161,6 +162,9 @@ const ProjectDetails = ({ account, id }) => {
               </TabPane>
               <TabPane tab="Project Materials Used" key="materials">
                 {active === "materials" && <ProjectMaterials id={id} />}
+              </TabPane>
+              <TabPane tab="Project Expenses" key="expenses">
+                {active === "expenses" && <ProjectExpenses id={id} />}
               </TabPane>
             </Tabs>
           </Col>

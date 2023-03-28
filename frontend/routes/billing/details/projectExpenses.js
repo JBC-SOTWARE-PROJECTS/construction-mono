@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Table,
-  Col,
-  Row,
-  Input,
-  Tag,
-  Statistic,
-} from "antd";
+import { Table, Col, Row, Input, Tag, Statistic } from "antd";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { colSearch, colButton } from "../../../shared/constant";
@@ -17,39 +10,38 @@ import numeral from "numeral";
 const { Search } = Input;
 //graphQL Queries
 const GET_RECORDS = gql`
-  query ($filter: String, $id: UUID) {
-    list: pMaterialByList(filter: $filter, id: $id) {
-      id
-      dateTransact
-      item {
+  query ($project: UUID, $filter: String) {
+    list: pettyCashListByProject(project: $project, filter: $filter) {
+      code
+      dateTrans
+      pettyType {
         id
-        itemCode
-        descLong
-        brand
-        item_group {
-          id
-          itemDescription
-        }
-        item_category {
-          id
-          categoryDescription
-        }
+        description
       }
-      qty
-      cost
-      subTotal
+      shift {
+        id
+        shiftNo
+      }
+      remarks
+      notes
+      amount
+      receivedBy {
+        id
+        fullName
+      }
+      receivedFrom
       lastModifiedBy
     }
   }
 `;
 
-const ProjectMaterials = ({ id }) => {
+const ProjectExpenses = ({ id }) => {
   const [filter, setFilter] = useState("");
   //query
   const { loading, data } = useQuery(GET_RECORDS, {
     variables: {
       filter: filter,
-      id: id,
+      project: id,
     },
     fetchPolicy: "network-only",
   });
@@ -57,50 +49,48 @@ const ProjectMaterials = ({ id }) => {
   const columns = [
     {
       title: "Date of Transaction",
-      dataIndex: "dateTransact",
-      key: "dateTransact",
-      render: (text, record) => {
+      dataIndex: "dateTrans",
+      key: "dateTrans",
+      render: (text) => {
         return <span>{moment(text).format("MM-DD-YYYY h:mm a")}</span>;
       },
     },
     {
       title: "Description",
-      dataIndex: "description",
-      key: "description",
+      dataIndex: "remarks",
+      key: "remarks",
+    },
+    {
+      title: "Expense Type",
+      dataIndex: "pettyType",
+      key: "pettyType",
       render: (text, record) => {
-        return <span>{record.item?.descLong}</span>;
+        return <span>{record?.pettyType?.description}</span>;
       },
     },
     {
-      title: "Qty",
-      dataIndex: "qty",
-      key: "qty",
-      render: (qty) => {
-        return <span>{numeral(qty).format("0,0")}</span>;
+      title: "Shift",
+      dataIndex: "shiftNo",
+      key: "shiftNo",
+      render: (text, record) => {
+        return <span>{record?.shift?.shiftNo}</span>;
       },
     },
     {
-      title: "Cost",
-      dataIndex: "cost",
-      key: "cost",
-      render: (cost) => {
-        return <span>{numeral(cost).format("0,0.00")}</span>;
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+      render: (amount) => {
+        return <span>{numeral(amount).format("0,0.00")}</span>;
       },
     },
+
     {
-      title: "Sub Total",
-      dataIndex: "subTotal",
-      key: "subTotal",
-      render: (subTotal) => {
-        return <span>{numeral(subTotal).format("0,0.00")}</span>;
-      },
-    },
-    {
-      title: "User",
-      dataIndex: "lastModifiedBy",
-      key: "lastModifiedBy",
-      render: (lastModifiedBy) => {
-        return <Tag color="magenta">{lastModifiedBy}</Tag>;
+      title: "Received By",
+      dataIndex: "receivedBy",
+      key: "receivedBy",
+      render: (text, record) => {
+        return <span>{record?.receivedBy?.fullName}</span>;
       },
     },
   ];
@@ -117,9 +107,9 @@ const ProjectMaterials = ({ id }) => {
         </Col>
         <Col {...colButton}>
           <Statistic
-            title="Total Materials (Php)"
+            title="Total Expenses (Php)"
             valueStyle={{ color: "#cf1322" }}
-            value={_.sumBy(_.get(data, "list"), "subTotal")}
+            value={_.sumBy(_.get(data, "list"), "amount")}
             precision={2}
           />
         </Col>
@@ -138,4 +128,4 @@ const ProjectMaterials = ({ id }) => {
   );
 };
 
-export default ProjectMaterials;
+export default ProjectExpenses;
