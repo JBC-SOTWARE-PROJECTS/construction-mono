@@ -109,6 +109,12 @@ export const SERVICE_TYPE = [
   { label: "BUNDLE", value: "BUNDLE" },
 ];
 
+export const ASSET_STATUS = [
+  { label: "On Service", value: "ON_SERVICE" },
+  { label: "On Repair", value: "ON_REPAIR" },
+  { label: "On Maintenance", value: "ON_MAINTENANCE" },
+];
+
 export const typeLabel = (value) => {
   let result = "N/A";
   if (value == "discountRate") {

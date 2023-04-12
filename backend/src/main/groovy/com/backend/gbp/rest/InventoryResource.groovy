@@ -573,6 +573,10 @@ class InventoryResource {
 
 	}
 
-
+	List<DashboardDto> projectCountByStatus() {
+		String sql = "select p.status, count(p) as value from projects.projects p group by p.status;"
+		List<DashboardDto> items = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DashboardDto.class))
+		return items
+	}
 
 }

@@ -310,7 +310,7 @@ const SidebarContent = ({ account }) => {
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.project-management" />}
             >
-             <Menu.Item key="projects/customer">
+              <Menu.Item key="projects/customer">
                 <Link href="/projects/customer">
                   <a>
                     <i className="icon icon-avatar" />
@@ -331,13 +331,39 @@ const SidebarContent = ({ account }) => {
                 </Link>
               </Menu.Item>
             </MenuItemGroup>
+            {/* Asset */}
+            <MenuItemGroup
+              key="project-management"
+              className="gx-menu-group"
+              title={<IntlMessages id="sidebar.asset-management" />}
+            >
+              <Menu.Item key="assets">
+                <Link href="/assets">
+                  <a>
+                    <i className="icon icon-company" />
+                    <span>
+                      <IntlMessages id="sidebar.assetmanage" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="assets/gasoline">
+                <Link href="/assets/gasoline">
+                  <a>
+                    <i className="icon icon-anchor" />
+                    <span>
+                      <IntlMessages id="sidebar.gas-slip" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
+            </MenuItemGroup>
             {/* Billing & Finances */}
             <MenuItemGroup
               key="billing-finances"
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.billing-finances" />}
             >
-              
               {/* <Menu.Item key="billing/jobs">
                 <Link href="/billing/jobs">
                   <a>
@@ -348,7 +374,7 @@ const SidebarContent = ({ account }) => {
                   </a>
                 </Link>
               </Menu.Item> */}
-              
+
               <Menu.Item key="billing/billingaccounts">
                 <Link href="/billing/billingaccounts">
                   <a>

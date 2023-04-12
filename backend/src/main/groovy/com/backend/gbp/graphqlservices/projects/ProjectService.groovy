@@ -5,6 +5,8 @@ import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.billing.BillingService
 import com.backend.gbp.graphqlservices.cashier.PettyCashService
+import com.backend.gbp.rest.InventoryResource
+import com.backend.gbp.rest.dto.DashboardDto
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -47,6 +49,9 @@ class ProjectService extends AbstractDaoService<Projects> {
 
     @Autowired
     PettyCashService pettyCashService
+
+    @Autowired
+    InventoryResource inventoryResource
 
     //context
     @GraphQLQuery(name = "totals", description = "totals")
@@ -142,6 +147,11 @@ class ProjectService extends AbstractDaoService<Projects> {
 
         Page<Projects> result = getPageable(query, countQuery, page, size, params)
         return result
+    }
+
+    @GraphQLQuery(name = "projectByStatusCount")
+    List<DashboardDto> projectByStatusCount() {
+        return inventoryResource.projectCountByStatus()
     }
 
     // ============== Mutation =======================//
