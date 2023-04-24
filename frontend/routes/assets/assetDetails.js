@@ -79,7 +79,7 @@ const ProjectDetails = ({ account, id }) => {
               destroyInactiveTabPane={true}
               activeKey={active}
             >
-              <TabPane tab="Trip History" key="trips"></TabPane>
+              <TabPane tab="Job Orders" key="jobs"></TabPane>
               <TabPane tab="Gasoline Consumption" key="gasoline">
                 {/* {active === "materials" && <ProjectMaterials id={id} />} */}
               </TabPane>

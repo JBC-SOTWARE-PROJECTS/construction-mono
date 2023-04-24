@@ -59,5 +59,9 @@ class Customer extends AbstractAuditingEntity implements Serializable {
 	@UpperCase
 	String contactPersonNum
 
+	@GraphQLQuery
+	@Column(name = "is_assets_customer")
+	Boolean isAssetsCustomer
+
 
 }

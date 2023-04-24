@@ -6,7 +6,7 @@ import numeral from "numeral";
 import { useRouter } from "next/router";
 
 const ProjectItem = ({ product, grid, onEdit = () => {} }) => {
-  const router = useRouter()
+  const router = useRouter();
   const {
     id,
     image,
@@ -19,7 +19,7 @@ const ProjectItem = ({ product, grid, onEdit = () => {} }) => {
     customer,
     totals,
     totalsMaterials,
-    totalExpenses
+    totalExpenses,
   } = product;
 
   return (
@@ -28,13 +28,15 @@ const ProjectItem = ({ product, grid, onEdit = () => {} }) => {
         grid ? "gx-product-vertical" : "gx-product-horizontal"
       }`}
     >
-      <div className="gx-product-image">
-        <div className="gx-grid-thumb-equal">
-          <span className="gx-link gx-grid-thumb-cover">
-            <img alt="CIMS Project Image" src={image} />
-          </span>
+      {image && (
+        <div className="gx-product-image">
+          <div className="gx-grid-thumb-equal">
+            <span className="gx-link gx-grid-thumb-cover">
+              <img alt="CIMS Project Image" src={image} />
+            </span>
+          </div>
         </div>
-      </div>
+      )}
       <div className="gx-product-body">
         <div className="ant-row-flex">
           <h3 className="gx-product-title">
@@ -82,7 +84,10 @@ const ProjectItem = ({ product, grid, onEdit = () => {} }) => {
         <Button variant="raised" onClick={onEdit}>
           <IntlMessages id="project.editInfo" />
         </Button>
-        <Button type="primary" onClick={() => router.push(`/projects/project-list/manage/${id}`)} >
+        <Button
+          type="primary"
+          onClick={() => router.push(`/projects/project-list/manage/${id}`)}
+        >
           <IntlMessages id="project.updates" />
         </Button>
       </div>

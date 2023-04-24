@@ -15,7 +15,7 @@ import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { dialogHook } from "../../util/customhooks";
-import CustomerForm from "./dialogs/customerForm";
+import CustomerForm from "../billing/dialogs/customerForm";
 
 const { Search } = Input;
 const options = ["Edit"];
@@ -23,7 +23,7 @@ const options = ["Edit"];
 //graphQL Queries
 const GET_RECORDS = gql`
   query ($filter: String) {
-    list: customerList(filter: $filter) {
+    list: customerListAssets(filter: $filter) {
       id
       fullName
       customerType
@@ -32,6 +32,7 @@ const GET_RECORDS = gql`
       emailAdd
       contactPerson
       contactPersonNum
+      isAssetsCustomer
     }
   }
 `;
@@ -120,7 +121,9 @@ const CustomerContent = ({ account }) => {
           type="primary"
           icon={<PlusCircleOutlined />}
           className="margin-0"
-          onClick={() => showModal({ show: true, myProps: null })}
+          onClick={() =>
+            showModal({ show: true, myProps: { isAssetsCustomer: true } })
+          }
         >
           Add New Customer
         </Button>

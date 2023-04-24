@@ -1,0 +1,1 @@
+ALTER TABLE billing.customer ADD COLUMN is_assets_customer bool default false;

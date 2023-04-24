@@ -333,30 +333,74 @@ const SidebarContent = ({ account }) => {
             </MenuItemGroup>
             {/* Asset */}
             <MenuItemGroup
-              key="project-management"
+              key="asset-management"
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.asset-management" />}
             >
-              <Menu.Item key="assets">
-                <Link href="/assets">
+              <Menu.Item key="assets/customer">
+                <Link href="/assets/customer">
+                  <a>
+                    <i className="icon icon-avatar" />
+                    <span>
+                      <IntlMessages id="sidebar.customer" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="assets/manage">
+                <Link href="/assets/manage">
                   <a>
                     <i className="icon icon-company" />
                     <span>
-                      <IntlMessages id="sidebar.assetmanage" />
+                      <IntlMessages id="sidebar.asset.manage" />
                     </span>
                   </a>
                 </Link>
               </Menu.Item>
-              <Menu.Item key="assets/gasoline">
-                <Link href="/assets/gasoline">
+              <Menu.Item key="assets/job-order">
+                <Link href="/assets/job-order">
                   <a>
-                    <i className="icon icon-anchor" />
+                    <i className="icon icon-product-list" />
                     <span>
-                      <IntlMessages id="sidebar.gas-slip" />
+                      <IntlMessages id="sidebar.asset.joborder" />
                     </span>
                   </a>
                 </Link>
               </Menu.Item>
+              <SubMenu
+                key="gasoline"
+                popupClassName={getNavStyleSubMenuClass(navStyle)}
+                title={
+                  <span>
+                    <i className="icon icon-hotel-booking" />
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas-monitoring" />
+                    </span>
+                  </span>
+                }
+              >
+                <Menu.Item key="assets/gasoline/type">
+                  <Link href="/assets/gasoline/type">
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas.type" />
+                    </span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="assets/gasoline/po">
+                  <Link href="/assets/gasoline/po">
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas.po" />
+                    </span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="assets/gasoline/ledger">
+                  <Link href="/assets/gasoline/ledger">
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas.ledger" />
+                    </span>
+                  </Link>
+                </Menu.Item>
+              </SubMenu>
             </MenuItemGroup>
             {/* Billing & Finances */}
             <MenuItemGroup

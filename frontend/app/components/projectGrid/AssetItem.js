@@ -5,7 +5,8 @@ import { useRouter } from "next/router";
 
 const AssetItem = ({ product, grid, onEdit = () => {} }) => {
   const router = useRouter();
-  const { id, image, assetCode, description, status, brand, model, plateNo } = product;
+  const { id, image, assetCode, description, status, brand, model, plateNo } =
+    product;
 
   return (
     <div
@@ -13,13 +14,15 @@ const AssetItem = ({ product, grid, onEdit = () => {} }) => {
         grid ? "gx-product-vertical" : "gx-product-horizontal"
       }`}
     >
-      <div className="gx-product-image">
-        <div className="gx-grid-thumb-equal">
-          <span className="gx-link gx-grid-thumb-cover">
-            <img alt="CIMS Project Image" src={image} />
-          </span>
+      {image && (
+        <div className="gx-product-image">
+          <div className="gx-grid-thumb-equal">
+            <span className="gx-link gx-grid-thumb-cover">
+              <img alt="CIMS Project Image" src={image} />
+            </span>
+          </div>
         </div>
-      </div>
+      )}
       <div className="gx-product-body">
         <div className="ant-row-flex">
           <h3 className="gx-product-title">
@@ -33,7 +36,7 @@ const AssetItem = ({ product, grid, onEdit = () => {} }) => {
           Equipment Brand: <span className="font-bold">{brand}</span>
           <br />
           Equipment Model: <span className="font-bold">{model}</span>
-          <br/>
+          <br />
           Equipment Plat No: <span className="font-bold">{plateNo}</span>
         </p>
       </div>
