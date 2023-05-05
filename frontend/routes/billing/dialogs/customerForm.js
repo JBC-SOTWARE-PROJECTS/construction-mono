@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Col, Row, Button, Divider, Form, Skeleton } from "antd";
+import { Col, Row, Button } from "antd";
 import MyForm from "../../../util/customForms/myForm";
 import FormInput from "../../../util/customForms/formInput";
 import FormSelect from "../../../util/customForms/formSelect";
 import CModal from "../../../app/components/common/CModal";
-import FormCheckbox from "../../../util/customForms/formCheckbox";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { col2, CUS_TYPE } from "../../../shared/constant";
 import _ from "lodash";
