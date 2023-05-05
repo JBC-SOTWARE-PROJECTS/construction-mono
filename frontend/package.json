@@ -1,5 +1,5 @@
 {
-  "name": "wieldt-nextjs",
+  "name": "construction-front",
   "version": "0.0.3",
   "scripts": {
     "dev": "next dev -p 6060",
