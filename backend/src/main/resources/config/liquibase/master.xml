@@ -220,5 +220,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog3/11_alter_customer.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/12_asset_job_order.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

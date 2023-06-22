@@ -21,36 +21,32 @@ import numeral from "numeral";
 import _ from "lodash";
 import moment from "moment";
 import update from "immutability-helper";
-// import AddItemsJobForm from "./addItemsJobForm";
-// import AddServiceJobForm from "./addServiceJobForm";
+import AddJobCharges from "./addJobCharges";
 
 const GET_RECORDS = gql`
   query ($id: UUID) {
-    customer: customerAll {
-      value: id
-      label: fullName
-      type: customerType
-    }
-    items: jobItemByParent(id: $id) {
+    items: jobOrderItemByParent(id: $id) {
       id
-      type
-      descriptions
-      item {
+      jobOrder {
         id
-        descLong
+        description
       }
+      dateTrans
+      code
+      description
+      type
       qty
+      unit
       cost
       subTotal
-      outputTax
-      billed
+      active
     }
   }
 `;
 
 const UPSERT_RECORD = gql`
   mutation ($items: [Map_String_ObjectScalar], $id: UUID) {
-    upsert: upsertJobItemsByParent(items: $items, id: $id) {
+    upsert: upsertJobOrderItems(items: $items, id: $id) {
       id
     }
   }
@@ -85,7 +81,6 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        console.log("upsert", data);
         if (!_.isEmpty(data?.upsert?.id)) {
           if (props?.id) {
             hide("Job Order Information Updated");
@@ -110,34 +105,21 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
     }
   );
 
-  // const [modal, showModal] = dialogHook(AddItemsJobForm, (result) => {
-  //   // item form
-  //   if (!_.isEmpty(result)) {
-  //     // validate here
-  //     if (_.isEmpty(items)) {
-  //       setItems(result);
-  //     } else {
-  //       //append
-  //       setItems([...items, ...result]);
-  //     }
-  //   }
-  // });
-
-  // const [modalService, showModalService] = dialogHook(
-  //   AddServiceJobForm,
-  //   (result) => {
-  //     // item form
-  //     if (!_.isEmpty(result)) {
-  //       // validate here
-  //       if (_.isEmpty(items)) {
-  //         setItems(result);
-  //       } else {
-  //         //append
-  //         setItems([...items, ...result]);
-  //       }
-  //     }
-  //   }
-  // );
+  const [modalCharges, showModalCharges] = dialogHook(
+    AddJobCharges,
+    (result) => {
+      // item form
+      if (!_.isEmpty(result)) {
+        // validate here
+        if (_.isEmpty(items)) {
+          setItems(result);
+        } else {
+          //append
+          setItems([...items, ...result]);
+        }
+      }
+    }
+  );
 
   //======================= =================== =================================================//
 
@@ -203,25 +185,11 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
     }
   };
 
-  const selectItems = () => {
-    if (props?.id) {
-      if (props?.customer?.customerType === 2) {
-        showModal({ show: true, myProps: { isGovernment: true, list: items } });
-      } else {
-        showModal({
-          show: true,
-          myProps: { isGovernment: false, list: items },
-        });
-      }
-    }
-    //
-  };
-
   const selectService = () => {
     if (props?.id) {
-      showModalService({
+      showModalCharges({
         show: true,
-        myProps: {},
+        myProps: { jobId: props?.id },
       });
     }
     //
@@ -230,8 +198,8 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
   const columns = [
     {
       title: "Description",
-      dataIndex: "descriptions",
-      key: "descriptions",
+      dataIndex: "description",
+      key: "description",
       width: 700,
       render: (text) => (
         <span>
@@ -285,7 +253,9 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
             style={{ width: 150 }}
           />
         ) : (
-          <span>{numeral(record.qty).format("0,0")}</span>
+          <span>
+            {numeral(record.qty).format("0,0")} {record?.unit}
+          </span>
         );
       },
     },
@@ -384,31 +354,19 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
               </li>
               <li className="w-full flex">
                 <div className="font-bold w-35">Job Number :</div>
-                <div>{props?.jobNo}</div>
+                <div>{props?.code}</div>
               </li>
               <li className="w-full flex">
                 <div className="font-bold w-35">Date of Transaction :</div>
                 <div>{moment(props?.dateTrans).format("MMMM DD, YYYY")}</div>
               </li>
               <li className="w-full flex">
-                <div className="font-bold w-35">Due Date :</div>
-                <div>{moment(props?.deadline).format("MMMM DD, YYYY")}</div>
-              </li>
-              <li className="w-full flex">
                 <div className="font-bold w-35">Job Description:</div>
                 <div>{props?.description}</div>
               </li>
               <li className="w-full flex">
-                <div className="font-bold w-35">Assign Office :</div>
-                <div>{props?.office?.officeDescription}</div>
-              </li>
-              <li className="w-full flex">
-                <div className="font-bold w-35">Repair Type :</div>
-                <div>{props?.repair?.description}</div>
-              </li>
-              <li className="w-full flex">
-                <div className="font-bold w-35">Issurance :</div>
-                <div>{props?.insurance?.description}</div>
+                <div className="font-bold w-35">Remarks/Notes :</div>
+                <div>{props?.remarks}</div>
               </li>
             </ul>
           </div>
@@ -417,36 +375,26 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
           <div className="w-full">
             <ul className="w-full list-none">
               <li className="w-full flex">
-                <div className="font-bold w-35">Plate Number :</div>
-                <div>{props?.plateNo}</div>
+                <div className="font-bold w-35">Work Duration Start :</div>
+                <div>
+                  {moment(props?.durationStart).format("MMMM DD, YYYY")}
+                </div>
               </li>
               <li className="w-full flex">
-                <div className="font-bold w-35">Engine Number :</div>
-                <div>{props?.engineNo}</div>
+                <div className="font-bold w-35">Work Duration End :</div>
+                <div>{moment(props?.durationEnd).format("MMMM DD, YYYY")}</div>
               </li>
               <li className="w-full flex">
-                <div className="font-bold w-35">Chassis Number:</div>
-                <div>{props?.chassisNo}</div>
+                <div className="font-bold w-35">Asset (Heavy Equipment):</div>
+                <div>{props?.assets?.description}</div>
               </li>
               <li className="w-full flex">
-                <div className="font-bold w-35">Body Color :</div>
-                <div>{props?.bodyColor}</div>
+                <div className="font-bold w-35">Project :</div>
+                <div>{props?.project?.description}</div>
               </li>
               <li className="w-full flex">
-                <div className="font-bold w-35">Year Model :</div>
-                <div>{props?.yearModel}</div>
-              </li>
-              <li className="w-full flex">
-                <div className="font-bold w-35">Series Number :</div>
-                <div>{props?.series}</div>
-              </li>
-              <li className="w-full flex">
-                <div className="font-bold w-35">Make (Brand) :</div>
-                <div>{props?.make}</div>
-              </li>
-              <li className="w-full flex">
-                <div className="font-bold w-35">Remarks/Notes :</div>
-                <div>{props?.remarks}</div>
+                <div className="font-bold w-35">Status :</div>
+                <div>{props?.status}</div>
               </li>
               <li className="w-full flex">
                 <div className="font-bold w-35">Total Cost :</div>
@@ -464,19 +412,10 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
               icon={<PlusCircleOutlined />}
               type="primary"
               size="small"
-              onClick={selectItems}
-              disabled={props?.billed || props?.completed}
-            >
-              Add Items/Parts
-            </Button>
-            <Button
-              icon={<PlusCircleOutlined />}
-              type="primary"
-              size="small"
               onClick={selectService}
               disabled={props?.billed || props?.completed}
             >
-              Add Service
+              Add Charges
             </Button>
           </div>
         </Col>
@@ -495,7 +434,7 @@ const JobOrderForm = ({ visible, hide, ...props }) => {
         </Col>
       </Row>
       {/* {modal} */}
-      {/* {modalService} */}
+      {modalCharges}
     </CModal>
   );
 };

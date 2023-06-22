@@ -97,7 +97,8 @@ enum GeneratorType {
 	PETTY_CASH,
 	JOB_STATUS,
 	PROJECT_CODE,
-	ASSET_CODE
+	ASSET_CODE,
+	JOB_ITEM_REC
 
 }
 

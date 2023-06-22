@@ -54,6 +54,14 @@ class CustomerService extends AbstractDaoService<Customer> {
         findAll().sort{it.fullName}
     }
 
+    @GraphQLQuery(name = "customerAssets")
+    List<Customer> customerAssets() {
+        String query = '''Select e from Customer e where e.isAssetsCustomer = :asset'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('asset', true)
+        createQuery(query, params).resultList.sort { it.fullName }
+    }
+
 
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertCustomer")

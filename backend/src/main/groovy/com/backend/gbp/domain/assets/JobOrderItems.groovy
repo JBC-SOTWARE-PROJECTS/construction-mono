@@ -1,13 +1,9 @@
 package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
-import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.billing.Customer
-import com.backend.gbp.domain.billing.Insurances
-import com.backend.gbp.domain.billing.RepairType
 import com.backend.gbp.domain.projects.Projects
-import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -20,10 +16,10 @@ import javax.persistence.*
 import java.time.Instant
 
 @Entity
-@Table(schema = "asset", name = "job_order")
-@SQLDelete(sql = "UPDATE asset.job_order SET deleted = true WHERE id = ?")
+@Table(schema = "asset", name = "job_order_items")
+@SQLDelete(sql = "UPDATE asset.job_order_items SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class JobOrder extends AbstractAuditingEntity implements Serializable{
+class JobOrderItems extends AbstractAuditingEntity implements Serializable{
 
 	@GraphQLQuery
 	@Id
@@ -32,6 +28,12 @@ class JobOrder extends AbstractAuditingEntity implements Serializable{
 	@Column(name = "id", columnDefinition = "uuid")
 	@Type(type = "pg-uuid")
 	UUID id
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "job_order", referencedColumnName = "id")
+	JobOrder jobOrder
 
 	@GraphQLQuery
 	@Column(name = "date_transact")
@@ -47,38 +49,32 @@ class JobOrder extends AbstractAuditingEntity implements Serializable{
 	String description
 
 	@GraphQLQuery
-	@Column(name = "duration_start")
-	Instant durationStart
+	@Column(name = "type")
+	String type
 
 	@GraphQLQuery
-	@Column(name = "duration_end")
-	Instant durationEnd
+	@Column(name = "qty")
+	BigDecimal qty
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "customer", referencedColumnName = "id")
-    Customer customer
+	@Column(name = "unit")
+	String unit
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "project", referencedColumnName = "id")
-	Projects project
+	@Column(name = "cost")
+	BigDecimal cost
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "asset", referencedColumnName = "id")
-	Assets assets
+	@Column(name = "sub_total")
+	BigDecimal subTotal
 
 	@GraphQLQuery
-	@Column(name = "remarks")
-	String remarks
+	@Column(name = "total")
+	BigDecimal total
 
 	@GraphQLQuery
-	@Column(name = "status")
-	String status
+	@Column(name = "active")
+	Boolean active
 
 
 

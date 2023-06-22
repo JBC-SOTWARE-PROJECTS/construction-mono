@@ -21,4 +21,18 @@ class JobItemsDto {
     Boolean isNew
 }
 
+@TupleConstructor
+class JobOrderItemsDto {
+    String id
+    String description
+    String type
+    BigDecimal qty
+    String unit
+    BigDecimal cost
+    BigDecimal subTotal
+    BigDecimal total
+    Boolean active
+    Boolean isNew
+}
+
 

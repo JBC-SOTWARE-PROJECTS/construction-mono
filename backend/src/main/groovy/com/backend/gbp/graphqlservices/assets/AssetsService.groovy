@@ -58,6 +58,11 @@ class AssetsService extends AbstractDaoService<Assets> {
         params.put('filter', filter)
         createQuery(query, params).resultList.sort { it.assetCode }
     }
+    @GraphQLQuery(name = "findAllAssets")
+    List<Assets> findAllAssets() {
+        findAll()
+    }
+
 
     @GraphQLQuery(name = "assetListPageable")
     Page<Assets> assetListPageable(
