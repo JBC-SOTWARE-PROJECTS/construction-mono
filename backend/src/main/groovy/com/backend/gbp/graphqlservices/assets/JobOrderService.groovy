@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.assets
 
 import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.assets.JobOrder
+import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.projects.ProjectCostService
 import com.backend.gbp.services.GeneratorService
@@ -9,6 +10,7 @@ import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
+import io.leangen.graphql.annotations.GraphQLContext
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
@@ -34,7 +36,15 @@ class JobOrderService extends AbstractDaoService<JobOrder> {
     @Autowired
     GeneratorService generatorService
 
+    @Autowired
+    JobOrderItemService jobOrderItemService
 
+    //start
+    @GraphQLQuery(name = "totals", description = "totals")
+    BigDecimal balance(@GraphQLContext JobOrder jobOrder) {
+        return jobOrderItemService.getTotals(jobOrder.id)
+    }
+    //end
 
     @GraphQLQuery(name = "jobOrderById")
     JobOrder jobOrderById(

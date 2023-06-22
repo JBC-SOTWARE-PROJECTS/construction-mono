@@ -71,6 +71,9 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 	Page<ReceivingReport> recByFiltersPage(
 			@GraphQLArgument(name = "filter") String filter,
 			@GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "start") String start,
+            @GraphQLArgument(name = "end") String end,
+            @GraphQLArgument(name = "supplier") UUID supplier,
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
@@ -79,19 +82,31 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 		String query = '''Select r from ReceivingReport r where
 						(lower(r.rrNo) like lower(concat('%',:filter,'%')) or
 						lower(r.receivedRefNo) like lower(concat('%',:filter,'%')))
-						and r.receivedOffice.id = :office'''
+						and r.receivedOffice.id = :office and
+						to_date(to_char(r.receiveDate, 'YYYY-MM-DD'),'YYYY-MM-DD')
+             	        between to_date(:startDate,'YYYY-MM-DD') and  to_date(:endDate,'YYYY-MM-DD') '''
 
 		String countQuery = '''Select count(r) from ReceivingReport r where
 						(lower(r.rrNo) like lower(concat('%',:filter,'%')) or
 						lower(r.receivedRefNo) like lower(concat('%',:filter,'%')))
-						and r.receivedOffice.id = :office'''
+						and r.receivedOffice.id = :office and
+						to_date(to_char(r.receiveDate, 'YYYY-MM-DD'),'YYYY-MM-DD')
+             	        between to_date(:startDate,'YYYY-MM-DD') and  to_date(:endDate,'YYYY-MM-DD') '''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
         params.put('office', office)
+        params.put('startDate', start)
+        params.put('endDate', end)
+
+        if(supplier){
+            query += ''' and (r.supplier.id = :supplier)'''
+            countQuery += ''' and (r.supplier.id = :supplier)'''
+            params.put('supplier', supplier)
+        }
 
 
-		query += ''' ORDER BY r.rrNo DESC'''
+        query += ''' ORDER BY r.rrNo DESC'''
 
 		Page<ReceivingReport> result = getPageable(query, countQuery, page, size, params)
 		return result

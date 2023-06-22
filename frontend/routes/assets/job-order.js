@@ -85,6 +85,7 @@ const GET_RECORDS = gql`
           description
         }
         remarks
+        totals
         status
       }
       size
@@ -293,8 +294,8 @@ const JobOrders = ({ account }) => {
     },
     {
       title: "Total Cost",
-      dataIndex: "totalCost",
-      key: "totalCost",
+      dataIndex: "totals",
+      key: "totals",
       fixed: "right",
       width: 150,
       render: (totalCost) => (

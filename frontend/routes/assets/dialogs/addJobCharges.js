@@ -3,15 +3,20 @@ import { Col, Row, Button } from "antd";
 import MyForm from "../../../util/customForms/myForm";
 import FormInput from "../../../util/customForms/formInput";
 import CModal from "../../../app/components/common/CModal";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import { v4 as uuidv4 } from "uuid";
 import { gql } from "apollo-boost";
 import _ from "lodash";
 
-const UPSERT_RECORD = gql`
-  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
-    upsert: upsertJobOrderItems(id: $id, fields: $fields) {
-      id
+const RECORDS = gql`
+  {
+    unitTypes: jobTypeUnits {
+      types {
+        value: j_type
+      }
+      units {
+        value: unit
+      }
     }
   }
 `;
@@ -19,21 +24,7 @@ const UPSERT_RECORD = gql`
 const AddJobCharges = ({ visible, hide, ...props }) => {
   const [formError, setFormError] = useState({});
 
-  const [upsertRecord, { loading: upsertLoading }] = useMutation(
-    UPSERT_RECORD,
-    {
-      ignoreResults: false,
-      onCompleted: (data) => {
-        if (!_.isEmpty(data?.upsert?.id)) {
-          if (props?.id) {
-            hide("Job Order Information Updated");
-          } else {
-            hide("Job Order Information Added");
-          }
-        }
-      },
-    }
-  );
+  const { data } = useQuery(RECORDS);
 
   const addCharges = (data) => {
     if (Number(data.qty) <= 0) {
@@ -56,7 +47,6 @@ const AddJobCharges = ({ visible, hide, ...props }) => {
     payload.total = Number(data.qty) * Number(data.cost);
     payload.active = true;
     payload.isNew = true;
-    console.log("payload => ", payload)
     hide([payload]);
   };
 
@@ -69,13 +59,7 @@ const AddJobCharges = ({ visible, hide, ...props }) => {
         <Button key="back" onClick={() => hide()} type="danger">
           Return
         </Button>,
-        <Button
-          form="jobCharges"
-          loading={upsertLoading}
-          key="submit"
-          htmlType="submit"
-          type="primary"
-        >
+        <Button form="jobCharges" key="submit" htmlType="submit" type="primary">
           Add Charges
         </Button>,
       ]}
@@ -103,6 +87,8 @@ const AddJobCharges = ({ visible, hide, ...props }) => {
               rules={[{ required: true, message: "This Field is required" }]}
               name="type"
               placeholder="Type"
+              type="autocomplete"
+              options={_.get(data, "unitTypes.types", [])}
             />
           </Col>
           <Col span={24}>
@@ -120,6 +106,8 @@ const AddJobCharges = ({ visible, hide, ...props }) => {
               rules={[{ required: true, message: "This Field is required" }]}
               name="unit"
               placeholder="Unit"
+              type="autocomplete"
+              options={_.get(data, "unitTypes.unit", [])}
             />
           </Col>
           <Col span={24}>

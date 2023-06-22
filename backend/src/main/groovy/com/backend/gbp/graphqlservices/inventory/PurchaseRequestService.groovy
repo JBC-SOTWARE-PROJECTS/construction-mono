@@ -57,6 +57,8 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
 	Page<PurchaseRequest> prByFiltersPage(
 			@GraphQLArgument(name = "filter") String filter,
 			@GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "start") String start,
+            @GraphQLArgument(name = "end") String end,
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
@@ -64,16 +66,21 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
 
 		String query = '''Select pr from PurchaseRequest pr where
 						(lower(pr.prNo) like lower(concat('%',:filter,'%')))
-						and pr.requestingOffice.id = :office'''
+						and pr.requestingOffice.id = :office and
+						to_date(to_char(pr.prDateRequested, 'YYYY-MM-DD'),'YYYY-MM-DD')
+             	        between to_date(:startDate,'YYYY-MM-DD') and  to_date(:endDate,'YYYY-MM-DD')'''
 
 		String countQuery = '''Select count(pr) from PurchaseRequest pr where
 						(lower(pr.prNo) like lower(concat('%',:filter,'%')))
-						and pr.requestingOffice.id = :office'''
+						and pr.requestingOffice.id = :office and
+						to_date(to_char(pr.prDateRequested, 'YYYY-MM-DD'),'YYYY-MM-DD')
+             	        between to_date(:startDate,'YYYY-MM-DD') and  to_date(:endDate,'YYYY-MM-DD')'''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
         params.put('office', office)
-
+        params.put('startDate', start)
+        params.put('endDate', end)
 
 		query += ''' ORDER BY pr.prNo DESC'''
 

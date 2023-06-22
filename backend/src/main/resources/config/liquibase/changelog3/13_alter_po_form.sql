@@ -1,0 +1,1 @@
+ALTER TABLE inventory.purchase_order ADD COLUMN project uuid default null;

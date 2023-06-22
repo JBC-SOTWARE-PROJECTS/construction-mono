@@ -214,8 +214,9 @@
 	<field name="date" class="java.lang.String"/>
 	<field name="supplier" class="java.lang.String"/>
 	<field name="fullname" class="java.lang.String"/>
+	<field name="project" class="java.lang.String"/>
 	<title>
-		<band height="99" splitType="Stretch">
+		<band height="114" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="75" width="750" height="20" uuid="57aed2b1-4f4e-40a3-a6ad-54dae8dd4c5a">
 					<property name="local_mesure_unitheight" value="pixel"/>
@@ -339,6 +340,23 @@
 					<font fontName="DejaVu Sans" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{company_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="99" width="64" height="12" uuid="4e8d0e46-cf66-4975-9234-228db1ea4e7f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box rightPadding="4"/>
+				<textElement textAlignment="Left">
+					<font fontName="DejaVu Sans" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Project	:]]></text>
+			</staticText>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="65" y="99" width="684" height="12" uuid="c21c1319-5231-4078-889e-af91d4201829"/>
+				<textElement>
+					<font fontName="DejaVu Sans" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{project}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

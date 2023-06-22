@@ -4,6 +4,8 @@ package com.backend.gbp.graphqlservices.assets
 import com.backend.gbp.domain.assets.JobOrder
 import com.backend.gbp.domain.assets.JobOrderItems
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.rest.InventoryResource
+import com.backend.gbp.rest.dto.ItemJobsDto
 import com.backend.gbp.rest.dto.JobItemsDto
 import com.backend.gbp.rest.dto.JobOrderItemsDto
 import com.backend.gbp.services.GeneratorService
@@ -40,7 +42,8 @@ class JobOrderItemService extends AbstractDaoService<JobOrderItems> {
     @Autowired
     JobOrderService jobOrderService
 
-
+    @Autowired
+    InventoryResource inventoryResource
 
     @GraphQLQuery(name = "jobOrderItemById")
     JobOrderItems jobOrderItemById(
@@ -64,7 +67,21 @@ class JobOrderItemService extends AbstractDaoService<JobOrderItems> {
         createQuery(query, params).resultList.sort { it.code }
     }
 
+    @GraphQLQuery(name = "jobTypeUnits")
+    ItemJobsDto jobTypeUnits() {
+        return inventoryResource.getJobOrderDistinct()
+    }
 
+    @GraphQLQuery(name = "getTotals")
+    BigDecimal getTotals(
+            @GraphQLArgument(name = "id") UUID id
+    ){
+        String query = '''Select coalesce(round(sum(j.subTotal),2), 0) from JobOrderItems j where 
+        j.jobOrder.id = :id AND j.active = true'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('id', id)
+        getSum(query, params)
+    }
 
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertJobOrderItems")
