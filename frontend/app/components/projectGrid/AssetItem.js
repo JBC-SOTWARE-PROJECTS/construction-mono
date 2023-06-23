@@ -14,15 +14,13 @@ const AssetItem = ({ product, grid, onEdit = () => {} }) => {
         grid ? "gx-product-vertical" : "gx-product-horizontal"
       }`}
     >
-      {image && (
-        <div className="gx-product-image">
-          <div className="gx-grid-thumb-equal">
-            <span className="gx-link gx-grid-thumb-cover">
-              <img alt="CIMS Project Image" src={image} />
-            </span>
-          </div>
+      <div className="gx-product-image">
+        <div className="gx-grid-thumb-equal">
+          <span className="gx-link gx-grid-thumb-cover">
+            <img alt="CIMS Project Image" src={_.isEmpty(image) ? '/images/asset-banner.jpg' : image} />
+          </span>
         </div>
-      )}
+      </div>
       <div className="gx-product-body">
         <div className="ant-row-flex">
           <h3 className="gx-product-title">
