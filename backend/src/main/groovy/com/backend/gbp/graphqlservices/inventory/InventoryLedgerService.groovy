@@ -526,7 +526,6 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 
 			//delete material direct expense
 			if(it.documentTypes.documentCode.equalsIgnoreCase("EX")){
-				println("id => " + it.id)
 				projectMaterialService.removedMaterialDirectExpense(it.id)
 			}
 
