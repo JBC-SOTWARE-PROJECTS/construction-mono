@@ -5,6 +5,8 @@ import { gql } from "apollo-boost";
 import { useLocalStorage } from "../../util/customhooks";
 import _ from "lodash";
 import { ASSET_STATUS } from "../../shared/constant";
+import AssetJobOrders from "./details/assetJobOrder";
+import AssetRepairHistory from "./details/repairHistory";
 
 const { TabPane } = Tabs;
 //graphQL Queries
@@ -22,9 +24,8 @@ const GET_RECORDS = gql`
   }
 `;
 
-
 const ProjectDetails = ({ account, id }) => {
-  const [active, setActive] = useLocalStorage("projectsTab", "cost");
+  const [active, setActive] = useLocalStorage("assetTab", "cost");
 
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     variables: {
@@ -65,8 +66,13 @@ const ProjectDetails = ({ account, id }) => {
                 </li>
                 <li className="w-full flex">
                   <div className="font-bold w-35">Status :</div>
-                  <div>{_.find(ASSET_STATUS, ['value', data?.asset?.status])?.label}</div>
-                </li> 
+                  <div>
+                    {
+                      _.find(ASSET_STATUS, ["value", data?.asset?.status])
+                        ?.label
+                    }
+                  </div>
+                </li>
               </ul>
             </div>
           </Col>
@@ -79,12 +85,14 @@ const ProjectDetails = ({ account, id }) => {
               destroyInactiveTabPane={true}
               activeKey={active}
             >
-              <TabPane tab="Job Orders" key="jobs"></TabPane>
+              <TabPane tab="Job Orders" key="jobs">
+                {active === "jobs" && <AssetJobOrders id={id} />}
+              </TabPane>
               <TabPane tab="Gasoline Consumption" key="gasoline">
-                {/* {active === "materials" && <ProjectMaterials id={id} />} */}
+                {/* {active === "gasoline" && <AssetJobOrders id={id} />} */}
               </TabPane>
               <TabPane tab="Repair History" key="repair">
-                {/* {active === "expenses" && <ProjectExpenses id={id} />} */}
+                {active === "repair" && <AssetRepairHistory id={id} />}
               </TabPane>
             </Tabs>
           </Col>

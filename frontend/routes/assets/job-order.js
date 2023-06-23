@@ -32,7 +32,7 @@ import FilterSelect from "../../util/customForms/filterSelect";
 import moment from "moment";
 import numeral from "numeral";
 import JobOrderForm from "./dialogs/jobForm";
-// import UpdateJobStatusForm from "./dialogs/updateJobForm";
+import UpdateJobStatusForm from "./dialogs/updateJobForm";
 import AddJobOrderForm from "./dialogs/addJobOrder";
 
 const { Search } = Input;
@@ -96,6 +96,22 @@ const GET_RECORDS = gql`
       value: id
       label: fullName
     }
+    jobStatus: jobStatusActive {
+      value: description
+      label: description
+    }
+    project: projectList {
+      value: id
+      label: description
+    }
+  }
+`;
+
+const UPSERT_RECORD = gql`
+  mutation ($status: String, $id: UUID) {
+    upsert: updateJobAssetStatus(status: $status, id: $id) {
+      id
+    }
   }
 `;
 
@@ -145,20 +161,33 @@ const JobOrders = ({ account }) => {
     refetch();
   });
 
-  // const [updateStatus, showUpdateModal] = dialogHook(
-  //   UpdateJobStatusForm,
-  //   (result) => {
-  //     // item form
-  //     if (result) {
-  //       upsertRecord({
-  //         variables: {
-  //           status: result?.status,
-  //           id: result?.id,
-  //         },
-  //       });
-  //     }
-  //   }
-  // );
+  const [updateStatus, showUpdateModal] = dialogHook(
+    UpdateJobStatusForm,
+    (result) => {
+      // item form
+      if (result) {
+        upsertRecord({
+          variables: {
+            status: result?.status,
+            id: result?.id,
+          },
+        });
+      }
+    }
+  );
+
+  const [upsertRecord, { loading: upsertLoading }] = useMutation(
+    UPSERT_RECORD,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.upsert?.id)) {
+          message.success("Job Order Information Updated");
+          refetch();
+        }
+      },
+    }
+  );
 
   //======================= =================== =================================================//
   const pushToBilling = (id) => {
@@ -314,6 +343,8 @@ const JobOrders = ({ account }) => {
           color = "green";
         } else if (record.status === "CANCELLED") {
           color = "red";
+        }else if (record.status === "PENDING") {
+          color = "magenta";
         }
         return (
           <span>
@@ -354,17 +385,15 @@ const JobOrders = ({ account }) => {
       title="Job Order List"
       size="small"
       extra={
-        <span>
-          <Button
-            size="small"
-            type="primary"
-            icon={<PlusCircleOutlined />}
-            className="margin-0"
-            onClick={() => showModal({ show: true, myProps: null })}
-          >
-            New Job Order
-          </Button>
-        </span>
+        <Button
+          size="small"
+          type="primary"
+          icon={<PlusCircleOutlined />}
+          className="margin-0"
+          onClick={() => showModal({ show: true, myProps: null })}
+        >
+          New Job Order
+        </Button>
       }
     >
       <Row>
@@ -398,7 +427,7 @@ const JobOrders = ({ account }) => {
             onChange={(e) => {
               setState({ ...state, status: e });
             }}
-            list={JOB_STATUS}
+            list={_.get(data, "jobStatus", [])}
           />
         </Col>
         <Col {...col3}>
@@ -407,9 +436,9 @@ const JobOrders = ({ account }) => {
             field="office"
             placeholder="Filter By Project"
             onChange={(e) => {
-              setState({ ...state, office: e });
+              setState({ ...state, project: e });
             }}
-            list={_.get(data, "office", [])}
+            list={_.get(data, "project", [])}
           />
         </Col>
         <Col span={24}>
@@ -440,7 +469,7 @@ const JobOrders = ({ account }) => {
         <Col span={24}>
           <Divider />
           <Table
-            loading={loading}
+            loading={loading || upsertLoading}
             className="gx-table-responsive"
             columns={columns}
             dataSource={_.get(data, "list.content", [])}
@@ -461,7 +490,7 @@ const JobOrders = ({ account }) => {
         </Col>
       </Row>
       {modal}
-      {/* {updateStatus} */}
+      {updateStatus}
       {jobDetails}
     </Card>
   );

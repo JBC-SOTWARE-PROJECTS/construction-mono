@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.assets
 import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.assets.JobOrder
 import com.backend.gbp.domain.billing.Billing
+import com.backend.gbp.domain.billing.Job
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.projects.ProjectCostService
 import com.backend.gbp.services.GeneratorService
@@ -65,6 +66,24 @@ class JobOrderService extends AbstractDaoService<JobOrder> {
         String query = '''Select e from JobOrder e where lower(concat(e.code,e.description)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        createQuery(query, params).resultList.sort { it.code }
+    }
+
+    @GraphQLQuery(name = "jobOrderByAssetList")
+    List<JobOrder> jobOrderByAssetList(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "start") String start,
+            @GraphQLArgument(name = "end") String end
+    ) {
+        String query = '''Select e from JobOrder e where lower(concat(e.code,e.description)) like lower(concat('%',:filter,'%'))
+            and e.assets.id = :asset and to_date(to_char(e.dateTrans, 'YYYY-MM-DD'),'YYYY-MM-DD')
+             	        between to_date(:startDate,'YYYY-MM-DD') and  to_date(:endDate,'YYYY-MM-DD')'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        params.put('asset', id)
+        params.put('startDate', start)
+        params.put('endDate', end)
         createQuery(query, params).resultList.sort { it.code }
     }
 
@@ -133,8 +152,8 @@ class JobOrderService extends AbstractDaoService<JobOrder> {
         }
 
         if (project) {
-            query += ''' and (p.projects.id = :project)'''
-            countQuery += ''' and (p.projects.id = :project)'''
+            query += ''' and (p.project.id = :project)'''
+            countQuery += ''' and (p.project.id = :project)'''
             params.put("project", project)
         }
 
@@ -165,6 +184,17 @@ class JobOrderService extends AbstractDaoService<JobOrder> {
                 })
             }
         })
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "updateJobAssetStatus")
+    JobOrder updateJobAssetStatus(
+            @GraphQLArgument(name = "status") String status,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def upsert = findOne(id)
+        upsert.status = status
+        save(upsert)
     }
 
 }
