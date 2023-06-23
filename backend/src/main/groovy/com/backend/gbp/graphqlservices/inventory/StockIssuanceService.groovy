@@ -128,34 +128,17 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
         if(!status){
             upsert.isCancel = status
             //ledger void
-            inventoryLedgerService.voidLedgerByRef(upsert.issueNo)
+            if(upsert.issueType.equalsIgnoreCase("EXPENSE")){
+                inventoryLedgerService.voidLedgerByRefExpense(upsert.issueNo)
+            }else{
+                inventoryLedgerService.voidLedgerByRef(upsert.issueNo)
+            }
             //rts items
             def stiItems = stockIssueItemsService.stiItemByParent(id)
             stiItems.each {
                 stockIssueItemsService.updateStiItemStatus(it.id, status)
             }
-            //delete materials
-//            if(upsert.project){
-//                projectMaterialService.deleteMaterials(upsert.id)
-//            }
         }
-
-//        else{ //post
-//            if(upsert.project){
-//                //save materials
-//                def items = stockIssueItemsService.stiItemByParent(id)
-//                items.each {
-//                    projectMaterialService.upsertMaterialsAuto(
-//                            upsert.project,
-//                            upsert.id,
-//                            upsert.issueNo,
-//                            it.item,
-//                            it.issueQty,
-//                            it.unitCost,
-//                    )
-//                }
-//            }
-//        }
 
         save(upsert)
     }
