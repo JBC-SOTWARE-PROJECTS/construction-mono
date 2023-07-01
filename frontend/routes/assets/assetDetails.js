@@ -92,7 +92,7 @@ const ProjectDetails = ({ account, id }) => {
                 {/* {active === "gasoline" && <AssetJobOrders id={id} />} */}
               </TabPane>
               <TabPane tab="Repair History" key="repair">
-                {active === "repair" && <AssetRepairHistory id={id} />}
+                {/* {active === "repair" && <AssetRepairHistory id={id} />} */}
               </TabPane>
             </Tabs>
           </Col>
