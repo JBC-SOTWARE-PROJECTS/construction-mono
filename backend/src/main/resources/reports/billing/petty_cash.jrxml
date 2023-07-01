@@ -173,6 +173,7 @@
 	<parameter name="prepared" class="java.lang.String"/>
 	<parameter name="received" class="java.lang.String"/>
 	<parameter name="project" class="java.lang.String"/>
+	<parameter name="remarks" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -341,7 +342,7 @@
 				<textElement>
 					<font fontName="DejaVu Sans" size="10" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Remarks : "+ $F{remarks}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Remarks : "+ $P{remarks}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
