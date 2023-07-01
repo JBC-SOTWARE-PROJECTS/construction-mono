@@ -1204,6 +1204,8 @@ class BillingReportResource {
 		parameters.put('date', dateFormat.format(itemList.dateTrans))
 		parameters.put('prepared', employee.fullName)
 		parameters.put('received', itemList.receivedBy?.fullName)
+		parameters.put('remarks', itemList.notes)
+
 
 		//printing
 		try {

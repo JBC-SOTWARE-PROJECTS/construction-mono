@@ -225,7 +225,7 @@
 		</band>
 	</title>
 	<detail>
-		<band height="108">
+		<band height="109">
 			<componentElement>
 				<reportElement x="1" y="3" width="570" height="102" uuid="577e49e9-a65c-4355-a200-a7a9e8f8fe50">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -294,29 +294,29 @@
 				</jr:table>
 			</componentElement>
 		</band>
-		<band height="50">
+		<band height="143">
 			<staticText>
-				<reportElement x="0" y="4" width="100" height="10" uuid="210c6e8c-2fba-4b3d-8428-b4363c1b17d8"/>
+				<reportElement x="0" y="96" width="100" height="10" uuid="210c6e8c-2fba-4b3d-8428-b4363c1b17d8"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
 				<text><![CDATA[Prepared by: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="315" y="4" width="100" height="10" uuid="46856abc-84c0-4334-b52c-6c7ac4517871"/>
+				<reportElement x="315" y="96" width="100" height="10" uuid="46856abc-84c0-4334-b52c-6c7ac4517871"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
 				<text><![CDATA[Received by:]]></text>
 			</staticText>
 			<line>
-				<reportElement x="0" y="44" width="167" height="1" uuid="c836b60e-62ff-44ea-8b4b-c1a38bf8ca4a"/>
+				<reportElement x="0" y="136" width="167" height="1" uuid="c836b60e-62ff-44ea-8b4b-c1a38bf8ca4a"/>
 			</line>
 			<line>
-				<reportElement x="315" y="42" width="176" height="1" uuid="02440a04-229d-4038-999f-6527e60f24c1"/>
+				<reportElement x="315" y="134" width="176" height="1" uuid="02440a04-229d-4038-999f-6527e60f24c1"/>
 			</line>
 			<textField>
-				<reportElement x="0" y="31" width="166" height="13" uuid="c7658dd8-7bf7-4b87-830d-057634f259fb">
+				<reportElement x="0" y="123" width="166" height="13" uuid="c7658dd8-7bf7-4b87-830d-057634f259fb">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -325,13 +325,23 @@
 				<textFieldExpression><![CDATA[$P{prepared}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="315" y="29" width="176" height="13" uuid="aaa781bf-e918-468e-9a6f-8da90b99c915">
+				<reportElement x="315" y="121" width="176" height="13" uuid="aaa781bf-e918-468e-9a6f-8da90b99c915">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="9"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{received}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Column header" x="1" y="7" width="554" height="73" forecolor="#000000" uuid="e033f10b-50f3-436b-85dd-c16acb670c24"/>
+				<box padding="5">
+					<pen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Remarks : "+ $F{remarks}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
