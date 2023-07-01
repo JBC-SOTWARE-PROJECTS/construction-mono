@@ -310,7 +310,7 @@ const SidebarContent = ({ account }) => {
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.project-management" />}
             >
-             <Menu.Item key="projects/customer">
+              <Menu.Item key="projects/customer">
                 <Link href="/projects/customer">
                   <a>
                     <i className="icon icon-avatar" />
@@ -331,13 +331,83 @@ const SidebarContent = ({ account }) => {
                 </Link>
               </Menu.Item>
             </MenuItemGroup>
+            {/* Asset */}
+            <MenuItemGroup
+              key="asset-management"
+              className="gx-menu-group"
+              title={<IntlMessages id="sidebar.asset-management" />}
+            >
+              <Menu.Item key="assets/customer">
+                <Link href="/assets/customer">
+                  <a>
+                    <i className="icon icon-avatar" />
+                    <span>
+                      <IntlMessages id="sidebar.customer" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="assets/manage">
+                <Link href="/assets/manage">
+                  <a>
+                    <i className="icon icon-company" />
+                    <span>
+                      <IntlMessages id="sidebar.asset.manage" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="assets/job-order">
+                <Link href="/assets/job-order">
+                  <a>
+                    <i className="icon icon-product-list" />
+                    <span>
+                      <IntlMessages id="sidebar.asset.joborder" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
+              <SubMenu
+                key="gasoline"
+                popupClassName={getNavStyleSubMenuClass(navStyle)}
+                title={
+                  <span>
+                    <i className="icon icon-hotel-booking" />
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas-monitoring" />
+                    </span>
+                  </span>
+                }
+              >
+                <Menu.Item key="assets/gasoline/type">
+                  <Link href="/assets/gasoline/type">
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas.type" />
+                    </span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="assets/gasoline/po">
+                  <Link href="/assets/gasoline/po">
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas.po" />
+                    </span>
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key="assets/gasoline/ledger">
+                  <Link href="/assets/gasoline/ledger">
+                    <span>
+                      <IntlMessages id="sidebar.asset.gas.ledger" />
+                    </span>
+                  </Link>
+                </Menu.Item>
+              </SubMenu>
+            </MenuItemGroup>
             {/* Billing & Finances */}
             <MenuItemGroup
               key="billing-finances"
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.billing-finances" />}
             >
-              
               {/* <Menu.Item key="billing/jobs">
                 <Link href="/billing/jobs">
                   <a>
@@ -348,7 +418,7 @@ const SidebarContent = ({ account }) => {
                   </a>
                 </Link>
               </Menu.Item> */}
-              
+
               <Menu.Item key="billing/billingaccounts">
                 <Link href="/billing/billingaccounts">
                   <a>

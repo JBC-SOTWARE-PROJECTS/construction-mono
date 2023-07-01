@@ -1,0 +1,1 @@
+ALTER TABLE inventory.purchase_request ADD COLUMN remarks varchar default null;

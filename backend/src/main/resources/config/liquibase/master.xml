@@ -216,5 +216,17 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog3/09_alter_cash_transaction.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/10_create_asset.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/11_alter_customer.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/12_asset_job_order.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/13_alter_po_form.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/14_alter_pr_dr_form.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/15_alter_pr_po_form.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

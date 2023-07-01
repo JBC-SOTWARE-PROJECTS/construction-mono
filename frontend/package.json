@@ -1,6 +1,6 @@
 {
-  "name": "construction-front",
-  "version": "0.0.3",
+  "name": "wieldt-nextjs",
+  "version": "0.0.2",
   "scripts": {
     "dev": "next dev -p 6060",
     "build": "next build",

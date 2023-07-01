@@ -228,7 +228,11 @@ const CashTransactionContent = ({ account }) => {
     <Menu
       onClick={(e) => {
         if (e.key === "Edit") {
-          showModal({ show: true, myProps: record });
+          let title = "CASH IN TRANSACTION";
+          if (record.cashType === "CASH_OUT") {
+            title = "CASH OUT TRANSACTION";
+          }
+          showModal({ show: true, myProps: { ...record, title } });
         } else if (e.key === "Post") {
           _approve(record?.id, true, "post");
         } else if (e.key === "Void") {

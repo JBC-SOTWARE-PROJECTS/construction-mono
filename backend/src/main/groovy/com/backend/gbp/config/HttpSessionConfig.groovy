@@ -39,11 +39,11 @@ class HttpSessionConfig {
 
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "secured")
 	@Bean
-	JedisConnectionFactory redisConnectionFactoryPassword() {
+	LettuceConnectionFactory redisConnectionFactoryPassword() {
 
 		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-		config.setPassword(password)
-		return new JedisConnectionFactory(config);
+		config.password = password
+		return new LettuceConnectionFactory(config);
 	}
 	
 	@ConditionalOnProperty(name = ["redis.deployment"], havingValue = "dev")

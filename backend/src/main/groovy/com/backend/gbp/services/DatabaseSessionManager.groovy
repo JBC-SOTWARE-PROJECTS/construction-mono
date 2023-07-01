@@ -27,3 +27,4 @@ class DatabaseSessionManager {
         EntityManagerFactoryUtils.closeEntityManager(emHolder.getEntityManager())
     }
 }
+ 

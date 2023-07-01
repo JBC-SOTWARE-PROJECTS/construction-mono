@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.projects
 
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.projects.ProjectUpdatesMaterials
+import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
@@ -88,6 +89,16 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         createQuery(query, params).resultList.sort { it.dateTransact }.reverse()
     }
 
+    @GraphQLQuery(name = "getMaterialByRefStockCard")
+    ProjectUpdatesMaterials getMaterialByRefStockCard(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        String query = '''Select e from ProjectUpdatesMaterials e where e.stockCardRefId = :id'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('id', id)
+        createQuery(query, params).resultList.find()
+    }
+
 
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertProjectMaterials")
@@ -147,6 +158,42 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         //delete
         delete(one)
         return one
+    }
+
+    @GraphQLMutation(name = "directExpenseMaterials")
+    @Transactional
+    GraphQLRetVal<Boolean> directExpenseMaterials(
+            @GraphQLArgument(name = "item") Item item,
+            @GraphQLArgument(name = "project") Projects project,
+            @GraphQLArgument(name = "qty") Integer qty,
+            @GraphQLArgument(name = "cost") BigDecimal cost,
+            @GraphQLArgument(name = "refId") UUID refId
+    ) {
+        //insert materials
+        ProjectUpdatesMaterials n = new ProjectUpdatesMaterials()
+        n.project = project
+        n.projectUpdates = null
+        n.dateTransact = Instant.now()
+        n.item = item
+        n.qty = qty
+        n.cost = cost
+        n.stockCardRefId = refId
+        save(n)
+
+        return new GraphQLRetVal<Boolean>(true,true,"Materials Added Successfully")
+    }
+
+    @GraphQLMutation(name = "removedMaterialDirectExpense")
+    @Transactional
+    ProjectUpdatesMaterials removedMaterialDirectExpense(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def one = this.getMaterialByRefStockCard(id)
+        if(one.id){
+            delete(one)
+            return one
+        }
+        return null
     }
 
 }

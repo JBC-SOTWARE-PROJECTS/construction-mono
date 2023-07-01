@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.projects.Projects
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
@@ -49,6 +50,11 @@ class ReceivingReport extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "user_fullname", columnDefinition = "varchar")
 	String userFullname
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project", referencedColumnName = "id")
+	Projects project
 	
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)

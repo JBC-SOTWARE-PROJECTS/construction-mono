@@ -52,18 +52,15 @@ export const CUS_TYPE = [
 ];
 
 export const JOB_STATUS = [
-  { label: "Ongoing", value: "Ongoing" },
-  { label: "Completed", value: "Completed" },
-  { label: "Pending", value: "Pending" },
-  { label: "Cancelled", value: "Cancelled" },
+  { label: "ONGOING", value: "ONGOING" },
+  { label: "COMPLETED", value: "COMPLETED" },
+  { label: "PENDING", value: "PENDING" },
+  { label: "CANCELLED", value: "CANCELLED" },
 ];
 
 export const SORT_BY = [
-  { label: "JOB ORDER NO", value: "jobNo" },
+  { label: "JOB ORDER NO", value: "code" },
   { label: "TRANSACTION DATE", value: "dateTrans" },
-  { label: "DUE DATE", value: "deadline" },
-  { label: "REPAIR TYPE", value: "repair.description" },
-  { label: "INSURANCE", value: "insurance.description" },
 ];
 
 export const SORT_TYPE = [
@@ -107,6 +104,12 @@ export const ISSUE_TYPE = [
 export const SERVICE_TYPE = [
   { label: "SINGLE", value: "SINGLE" },
   { label: "BUNDLE", value: "BUNDLE" },
+];
+
+export const ASSET_STATUS = [
+  { label: "On Service", value: "ON_SERVICE" },
+  { label: "On Repair", value: "ON_REPAIR" },
+  { label: "On Maintenance", value: "ON_MAINTENANCE" },
 ];
 
 export const typeLabel = (value) => {

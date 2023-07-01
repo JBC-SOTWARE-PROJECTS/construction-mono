@@ -128,6 +128,8 @@ class InventoryReportResource {
                 supplier: purchaseOrder?.supplier?.supplierFullname,
 				office: purchaseOrder?.office?.officeDescription,
                 terms: purchaseOrder?.paymentTerms?.paymentDesc,
+				project: purchaseOrder?.project?.description ?: "",
+				location: purchaseOrder?.project?.location?.fullAddress ?: "",
                 fullname: emp?.fullName
 
         )
@@ -304,7 +306,9 @@ class InventoryReportResource {
 				prNo: purchaseRequest?.prNo,
 				date: dateFormat.format(purchaseRequest?.prDateRequested),
 				supplier: purchaseRequest?.supplier?.supplierFullname ? purchaseRequest?.supplier?.supplierFullname : '',
-				fullname: purchaseRequest?.userFullname
+				fullname: purchaseRequest?.userFullname,
+				project: purchaseRequest?.project?.description ?: "",
+				location: purchaseRequest?.project?.location?.fullAddress ?: "",
 
 		)
 		def gson = new Gson()
@@ -445,8 +449,8 @@ class InventoryReportResource {
 				poNo: receiving?.purchaseOrder?.poNumber ? receiving?.purchaseOrder?.poNumber : '',
 				refNo: receiving.receivedRefNo,
 				supplier: receiving?.supplier?.supplierFullname,
-				remarks: receiving?.receivedRemarks ? receiving?.receivedRemarks : ''
-//				grossAmount: receiving.grossAmount,
+				remarks: receiving?.receivedRemarks ? receiving?.receivedRemarks : '',
+				project: receiving?.project?.description ?: "",
 //				totalDiscount: receiving.totalDiscount,
 //				netDiscount: receiving.netDiscount,
 //				amount: receiving.amount,

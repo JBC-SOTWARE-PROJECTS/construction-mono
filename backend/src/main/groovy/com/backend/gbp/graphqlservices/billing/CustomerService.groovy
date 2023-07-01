@@ -32,7 +32,18 @@ class CustomerService extends AbstractDaoService<Customer> {
             @GraphQLArgument(name = "filter") String filter
     ) {
         String query = '''Select e from Customer e where 
-                          lower(concat(e.fullName)) like lower(concat('%',:filter,'%'))'''
+                          lower(concat(e.fullName)) like lower(concat('%',:filter,'%')) and (e.isAssetsCustomer = false or e.isAssetsCustomer is null)'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        createQuery(query, params).resultList.sort { it.fullName }
+    }
+
+    @GraphQLQuery(name = "customerListAssets")
+    List<Customer> customerListAssets(
+            @GraphQLArgument(name = "filter") String filter
+    ) {
+        String query = '''Select e from Customer e where 
+                          lower(concat(e.fullName)) like lower(concat('%',:filter,'%')) and e.isAssetsCustomer = true'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
         createQuery(query, params).resultList.sort { it.fullName }
@@ -41,6 +52,14 @@ class CustomerService extends AbstractDaoService<Customer> {
     @GraphQLQuery(name = "customerAll")
     List<Customer> customerAll() {
         findAll().sort{it.fullName}
+    }
+
+    @GraphQLQuery(name = "customerAssets")
+    List<Customer> customerAssets() {
+        String query = '''Select e from Customer e where e.isAssetsCustomer = :asset'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('asset', true)
+        createQuery(query, params).resultList.sort { it.fullName }
     }
 
 

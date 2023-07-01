@@ -11,6 +11,7 @@ import com.backend.gbp.domain.inventory.QuantityAdjustment
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.domain.services.ServiceItems
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.projects.ProjectUpdatesMaterialService
 import com.backend.gbp.graphqlservices.services.ServiceItemsService
 import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.UserRepository
@@ -110,6 +111,9 @@ class InventoryLedgerService extends AbstractDaoService<InventoryLedger> {
 
 	@Autowired
 	ServiceItemsService serviceItemsService
+
+	@Autowired
+	ProjectUpdatesMaterialService projectMaterialService
 
 	@GraphQLQuery(name = "getLedgerByRef")
 	List<InventoryLedger> getLedgerByRef(
@@ -300,17 +304,19 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 	) {
 		def upsert = new InventoryLedger()
 		def postItems = items as ArrayList<PostDto>
+		def parent = stockIssuanceService.stiById(parentId)
 		postItems.each {
 			it ->
 				//insert
 				upsert = new InventoryLedger()
 				def source = objectMapper.convertValue(it.source, Office.class)
 				def dest = objectMapper.convertValue(it.destination, Office.class)
-
+				def item = itemService.itemById(UUID.fromString(it.itemId))
+				def doctype = documentTypeRepository.findById(UUID.fromString(it.typeId)).get()
 				upsert.sourceOffice = source
 				upsert.destinationOffice = dest
-				upsert.documentTypes = documentTypeRepository.findById(UUID.fromString(it.typeId)).get()
-				upsert.item = itemService.itemById(UUID.fromString(it.itemId))
+				upsert.documentTypes = doctype
+				upsert.item = item
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
 				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("STI") ? it.qty : 0
@@ -318,14 +324,26 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 				upsert.ledgerPhysical = 0
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
-				save(upsert)
+				def afterSave = save(upsert)
 
 				//update issuance Item
 				stockIssueItemsService.updateStiItemStatus(UUID.fromString(it.id), true)
 
+				//insert direct to materials expense in project
+				if(doctype.documentCode.equalsIgnoreCase("EX")){
+					if(parent.project){
+						projectMaterialService.directExpenseMaterials(item,
+								parent.project,
+								it.qty,
+								it.unitcost,
+								afterSave.id)
+					}
+				}
+
 		}
 		//update parent
 		stockIssuanceService.updateSTIStatus(true, parentId)
+
 		return upsert
 	}
 
@@ -491,8 +509,28 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 		def upsert = new InventoryLedger()
 		items.each {
 			upsert = it
-			upsert.isInclude = false
-			save(upsert)
+			delete(upsert)
+		}
+		return upsert
+	}
+
+	@Transactional
+	@GraphQLMutation(name = "voidLedgerByRefExpense")
+	InventoryLedger voidLedgerByRefExpense(
+			@GraphQLArgument(name = "ref") String ref
+	) {
+		def items = this.getLedgerByRef(ref)
+		def upsert = new InventoryLedger()
+		items.each {
+			upsert = it
+
+			//delete material direct expense
+			if(it.documentTypes.documentCode.equalsIgnoreCase("EX")){
+				projectMaterialService.removedMaterialDirectExpense(it.id)
+			}
+
+
+			delete(upsert)
 		}
 		return upsert
 	}

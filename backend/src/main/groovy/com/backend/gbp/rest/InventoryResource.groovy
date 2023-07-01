@@ -118,6 +118,18 @@ class InventoryResource {
 		return units
 	}
 
+	ItemJobsDto getJobOrderDistinct() {
+		String typeSql = '''select distinct(upper(joi."type")) as j_type  from asset.job_order_items joi;'''
+		String unitSql = '''select distinct(upper(joi.unit)) as j_type  from asset.job_order_items joi;'''
+		List<JobItemType> type = jdbcTemplate.query(typeSql, new BeanPropertyRowMapper(JobItemType.class))
+		List<JobItemUnit> unit = jdbcTemplate.query(unitSql, new BeanPropertyRowMapper(JobItemUnit.class))
+		def newData = new ItemJobsDto(
+				types: type,
+				units: unit
+		)
+		return newData
+	}
+
 	@RequestMapping(method = [RequestMethod.POST], value = ["/api/getPlateNo"])
 	List<PlateNumberDto> getPlateNo() {
 
@@ -573,6 +585,10 @@ class InventoryResource {
 
 	}
 
-
+	List<DashboardDto> projectCountByStatus() {
+		String sql = "select p.status, count(p) as value from projects.projects p group by p.status;"
+		List<DashboardDto> items = jdbcTemplate.query(sql, new BeanPropertyRowMapper(DashboardDto.class))
+		return items
+	}
 
 }

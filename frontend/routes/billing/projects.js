@@ -15,12 +15,12 @@ import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import ProjectItem from "../../app/components/projectGrid/ProjectItem";
-import "./index.css";
 import AddPrjectForm from "./dialogs/addProject";
 import { dialogHook } from "../../util/customhooks";
 import { col3 } from "../../shared/constant";
 import FilterSelect from "../../util/customForms/filterSelect";
 import _ from "lodash";
+import "./index.css";
 
 const { Search } = Input;
 //graphQL Queries

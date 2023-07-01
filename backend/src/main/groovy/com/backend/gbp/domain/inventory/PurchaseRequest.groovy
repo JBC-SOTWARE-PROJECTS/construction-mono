@@ -2,6 +2,7 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -39,6 +40,11 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "pr_date_needed")
 	Instant prDateNeeded
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project", referencedColumnName = "id")
+	Projects project
 	
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -77,5 +83,9 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "user_fullname", columnDefinition = "varchar")
 	String userFullname
+
+	@GraphQLQuery
+	@Column(name = "remarks", columnDefinition = "varchar")
+	String remarks
 	
 }

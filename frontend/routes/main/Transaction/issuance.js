@@ -205,6 +205,14 @@ const IssuanceContent = ({ account }) => {
       title: "Type",
       dataIndex: "issueType",
       key: "issueType",
+      render: (text) => {
+        let color = text === "ISSUE" ? "blue" : "magenta";
+        return (
+          <Tag color={color} key={color}>
+            {text}
+          </Tag>
+        );
+      },
     },
     {
       title: "Status",
