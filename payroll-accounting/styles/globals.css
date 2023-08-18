@@ -1,0 +1,208 @@
+/* start global css */
+
+:root {
+  --max-width: 1100px;
+  --border-radius: 12px;
+  --font-mono: "Lato", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: "Lato", sans-serif;
+}
+/* 
+a {
+  color: inherit;
+  text-decoration: none;
+} */
+
+.teal {
+  color: #399b53 !important;
+}
+
+/* end global css */
+
+/* ant d overrides */
+.ant-form-item-explain-error {
+  font-size: 12px !important;
+}
+
+.ant-menu-item-group-list
+  .my-prefix-base-menu-inline-item-title-collapsed
+  .my-prefix-base-menu-inline-item-icon {
+  margin-bottom: auto;
+  margin-top: 4px;
+}
+
+div.my-prefix-sider-logo + div::-webkit-scrollbar {
+  width: 8px !important;
+  height: 10px !important;
+}
+div.my-prefix-sider-logo + div::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+div.my-prefix-sider-logo + div::-webkit-scrollbar-thumb {
+  background-color: #d1d1d1;
+  border-radius: 10px;
+}
+
+.ant-badge-count-sm {
+  font-size: 10px !important;
+}
+
+.ant-pro-page-container-children-container {
+  padding-block: 0px !important;
+}
+
+.ant-pro-card-tabs .ant-tabs-right > .ant-tabs-nav .ant-tabs-nav-list {
+  padding-block-start: 0px !important;
+}
+
+.ant-pro-card-tabs .ant-tabs-left > .ant-tabs-nav .ant-tabs-nav-list {
+  padding-block-start: 0px;
+}
+
+.ant-pro-card-tabs .ant-tabs-top > .ant-tabs-nav .ant-tabs-nav-list {
+  margin-block-start: 0px;
+  padding-inline-start: 0px;
+}
+
+.ant-table-thead tr td.ant-table-row-expand-icon-cell {
+  background-color: #399b53 !important;
+}
+
+.ant-pro-form-login-page-title {
+  font-family: "League Spartan", sans-serif;
+}
+
+.ant-segmented-item-selected {
+  color: #fff !important;
+}
+
+.ant-btn-primary {
+  background-color: #399b53 !important;
+}
+
+th.ant-table-cell {
+  background: #399b53 !important;
+  color: #fff !important;
+}
+/* end ant d overrides */
+/* hide header menus */
+.my-prefix-top-nav-header-base-menu {
+  display: none;
+}
+/* end hide header menus */
+
+.btn-no-design {
+  background: none;
+  color: blue;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+.notification-badge sup.ant-badge-count-sm {
+  transform: translate(70%, -70%) !important;
+}
+
+/* select header className */
+.select-header {
+  width: 100%;
+
+  @media only screen and (min-width: 838px) {
+    width: 300px;
+  }
+}
+
+.select-header-reapplication {
+  width: 100%;
+
+  @media only screen and (min-width: 838px) {
+    width: 400px;
+  }
+}
+
+.filter-label {
+  font-weight: 700;
+  font-size: 14px;
+}
+.display-block {
+  display: block;
+}
+.filter-form.ant-form-vertical .ant-form-item-label {
+  padding: 0 0 2px !important;
+  font-weight: 700;
+}
+/* end: select header className */
+
+.custom-title {
+  font-family: "League Spartan", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+}
+
+.w-full {
+  width: 100% !important;
+}
+
+.mb-10 {
+  margin-bottom: 40px;
+}
+
+.mb-5 {
+  margin-bottom: 20px;
+}
+
+.mb-2-5 {
+  margin-bottom: 10px !important;
+}
+
+.margin-0 {
+  margin: 0 !important;
+}
+
+.my-5 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.font-bold {
+  font-weight: bold !important;
+}
+
+.dev-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dev-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.currency-red {
+  color: red;
+}
+
+.select-option-loading {
+  min-height: 50px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
