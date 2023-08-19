@@ -7,11 +7,14 @@ import {
 import { Input, Button } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import CompanyTable from "@/components/administrative/company/companyTable";
-import { AccountsPayable } from "@/graphql/gql/graphql";
+import { CompanySettings } from "@/graphql/gql/graphql";
+import ConfirmationPasswordHook from "@/hooks/promptPassword";
+import { useDialog } from "@/hooks";
 
 const { Search } = Input;
 
 export default function CompanyComponent() {
+  const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [state, setState] = useState({
     filter: "",
     status: true,
@@ -34,6 +37,12 @@ export default function CompanyComponent() {
 
   console.log("state => ", state);
 
+  const onShowPassword = () => {
+    showPasswordConfirmation(() => {
+      alert("asdasdasd");
+    });
+  };
+
   return (
     <PageContainer
       title="Company List Management Hub"
@@ -54,14 +63,18 @@ export default function CompanyComponent() {
               onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
               className="select-header"
             />
-            <Button type="primary" icon={<PlusCircleOutlined />}>
+            <Button
+              type="primary"
+              icon={<PlusCircleOutlined />}
+              onClick={onShowPassword}
+            >
               Create New
             </Button>
           </ProFormGroup>
         }
       >
         <CompanyTable
-          dataSource={[] as AccountsPayable[]}
+          dataSource={[] as CompanySettings[]}
           loading={false}
           totalElements={1 as number}
           handleOpen={(record) => console.log("record => ", record)}

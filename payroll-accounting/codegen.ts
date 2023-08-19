@@ -3,9 +3,9 @@ import { CodegenConfig } from '@graphql-codegen/cli'
 const config: CodegenConfig = {
   schema: [
     {
-      'http://localhost:8080/graphql': {
+      'http://localhost:5827/graphql': {
         headers: {
-          Cookie: 'SESSION=MjFjOGE1MDUtMWFkMi00YTE2LThiZTctZTExYmZiYzAwMWE3',
+          Cookie: 'SESSION=NzA1YTViYjgtMzgyYi00NWQ0LTg3ZGMtNzcxYzlmMWRmZjFl',
         },
       },
     },

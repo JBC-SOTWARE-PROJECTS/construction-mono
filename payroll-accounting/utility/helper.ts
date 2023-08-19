@@ -48,7 +48,7 @@ export const requiredField = [
 ];
 
 export const NumberFormater = (value: any) => {
-  return numeral(value).format("0,0.00");
+  return numeral(value).format("0,0.00"); // 10,000.00
 };
 
 export const DateFormatter = (value: string) => {
@@ -58,12 +58,6 @@ export const DateFormatter = (value: string) => {
 export const DateFormatterWithTime = (value: string) => {
   return dayjs(value).format("YYYY-MM-DD hh:mm:ss A");
 };
-
-///SOA
-const apiUrlPrefix = "https://srv-hismk2-demo.acemcbohol.ph";
-export function getUrlPrefix() {
-  return apiUrlPrefix;
-}
 
 export const NumberInString = (amount: number) => {
   const toWords = new ToWords({
