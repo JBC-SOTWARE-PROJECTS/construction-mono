@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import numeral from "numeral";
 import { useState } from "react";
 import { ToWords } from "to-words";
@@ -40,6 +40,13 @@ export const useLocalStorage = (key: string, initialValue: any) => {
   return [storedValue, setValue];
 };
 
+export const requiredField = [
+  {
+    required: true,
+    message: "This field is required!",
+  },
+];
+
 export const NumberFormater = (value: any) => {
   return numeral(value).format("0,0.00");
 };
@@ -51,6 +58,12 @@ export const DateFormatter = (value: string) => {
 export const DateFormatterWithTime = (value: string) => {
   return dayjs(value).format("YYYY-MM-DD hh:mm:ss A");
 };
+
+///SOA
+const apiUrlPrefix = "https://srv-hismk2-demo.acemcbohol.ph";
+export function getUrlPrefix() {
+  return apiUrlPrefix;
+}
 
 export const NumberInString = (amount: number) => {
   const toWords = new ToWords({
@@ -73,4 +86,16 @@ export const NumberInString = (amount: number) => {
     },
   });
   return toWords.convert(amount, { currency: true });
+};
+
+export const dateToString = (date: Dayjs) => {
+  const instantFormat = "YYYY-MM-DDTHH:mm:sss";
+  const startOfDay = dayjs(date).startOf("day");
+  return `${startOfDay.format(instantFormat)}Z`;
+};
+
+export const dateEndToString = (date: Dayjs) => {
+  const instantFormat = "YYYY-MM-DDTHH:mm:sss";
+  const startOfDay = dayjs(date).endOf("day");
+  return `${startOfDay.format(instantFormat)}Z`;
 };
