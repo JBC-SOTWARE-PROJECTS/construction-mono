@@ -1,5 +1,4 @@
 import { TDiverseTradeMenu } from "@/utility/interfaces";
-import { AppstoreOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import React from "react";
 
@@ -19,7 +18,7 @@ export default function MenuCard({ menus }: IProps) {
             onClick={() => router.push(menu.path ?? "/")}
           >
             <div className="menu-icon">{menu.icon}</div>
-            <div className="ml-4">
+            <div className="menu-item-left-container">
               <p className="menu-item-title">{menu.title}</p>
               <p className="menu-item-description">{menu.subtitle}</p>
             </div>

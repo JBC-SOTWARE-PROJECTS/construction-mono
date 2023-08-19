@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import numeral from "numeral";
 import { useState } from "react";
 import { ToWords } from "to-words";
@@ -40,8 +40,15 @@ export const useLocalStorage = (key: string, initialValue: any) => {
   return [storedValue, setValue];
 };
 
+export const requiredField = [
+  {
+    required: true,
+    message: "This field is required!",
+  },
+];
+
 export const NumberFormater = (value: any) => {
-  return numeral(value).format("0,0.00");
+  return numeral(value).format("0,0.00"); // 10,000.00
 };
 
 export const DateFormatter = (value: string) => {
@@ -73,4 +80,16 @@ export const NumberInString = (amount: number) => {
     },
   });
   return toWords.convert(amount, { currency: true });
+};
+
+export const dateToString = (date: Dayjs) => {
+  const instantFormat = "YYYY-MM-DDTHH:mm:sss";
+  const startOfDay = dayjs(date).startOf("day");
+  return `${startOfDay.format(instantFormat)}Z`;
+};
+
+export const dateEndToString = (date: Dayjs) => {
+  const instantFormat = "YYYY-MM-DDTHH:mm:sss";
+  const startOfDay = dayjs(date).endOf("day");
+  return `${startOfDay.format(instantFormat)}Z`;
 };

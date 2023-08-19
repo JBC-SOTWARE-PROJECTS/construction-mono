@@ -96,6 +96,12 @@ th.ant-table-cell {
   background: #399b53 !important;
   color: #fff !important;
 }
+
+.ant-page-header-wide,
+.ant-pro-grid-content-wide {
+  max-width: 100% !important;
+  margin: 0 !important;
+}
 /* end ant d overrides */
 /* hide header menus */
 .my-prefix-top-nav-header-base-menu {
@@ -277,4 +283,9 @@ th.ant-table-cell {
 .diverse-trade-icon {
   color: white;
   font-size: 24px;
+}
+
+.menu-item-left-container {
+  margin-left: 16px;
+  width: calc(100% - 58px);
 }

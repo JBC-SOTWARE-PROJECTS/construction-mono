@@ -20,8 +20,17 @@ export default function MainMenu({ account }: IPageProps) {
         icon={<img src={logo.src} className="diverse-trade" />}
       />
       <Divider orientation="left">Inventory Module</Divider>
+      <div className="w-full">
+        <MenuCard menus={[]} />
+      </div>
       <Divider orientation="left">Accounting Module</Divider>
+      <div className="w-full">
+        <MenuCard menus={[]} />
+      </div>
       <Divider orientation="left">Payroll Module</Divider>
+      <div className="w-full">
+        <MenuCard menus={[]} />
+      </div>
       <Divider orientation="left">Administrative Module</Divider>
       <div className="w-full">
         <MenuCard menus={administrativeMenu} />

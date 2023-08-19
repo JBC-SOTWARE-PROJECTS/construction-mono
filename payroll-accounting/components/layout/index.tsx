@@ -242,7 +242,7 @@ const DiverseTradeLayout = (props: IProps) => {
                 </div>
               );
             }}
-            onMenuHeaderClick={(e) => console.log(e)}
+            onMenuHeaderClick={() => router.push("/")}
             menuItemRender={(item, dom) => (
               <div
                 onClick={() => {
