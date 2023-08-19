@@ -52,3 +52,10 @@ export type TOffice = {
   id: string;
   officeDescription: string;
 };
+
+export type TDiverseTradeMenu = {
+  title?: string;
+  subtitle?: string;
+  icon?: JSX.Element;
+  path?: string;
+};

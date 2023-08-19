@@ -1,6 +1,9 @@
 import { IPageProps } from "@/utility/interfaces";
 import { Alert, Divider } from "antd";
 import React from "react";
+import logo from "@/public/images/DTLogo.png";
+import MenuCard from "@/components/menuCard";
+import administrativeMenu from "@/components/sidebar/admininstrative";
 
 export default function MainMenu({ account }: IPageProps) {
   return (
@@ -12,13 +15,17 @@ export default function MainMenu({ account }: IPageProps) {
         and we're committed to making your experience here at DiverseTrade Suite 
         truly exceptional. As you navigate through this session, remember that you're 
         current company is ${account.office.officeDescription}`}
-        type="info"
+        type="success"
         showIcon
+        icon={<img src={logo.src} className="diverse-trade" />}
       />
       <Divider orientation="left">Inventory Module</Divider>
       <Divider orientation="left">Accounting Module</Divider>
       <Divider orientation="left">Payroll Module</Divider>
       <Divider orientation="left">Administrative Module</Divider>
+      <div className="w-full">
+        <MenuCard menus={administrativeMenu} />
+      </div>
     </div>
   );
 }
