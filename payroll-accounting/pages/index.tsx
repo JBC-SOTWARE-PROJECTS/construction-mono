@@ -1,6 +1,9 @@
-import React from 'react'
-import { IPageProps } from '@/utility/interfaces'
+import React from "react";
+import asyncComponent from "@/utility/asyncComponent";
+import { IPageProps } from "@/utility/interfaces";
+
+const MainMenu = asyncComponent(() => import("../routes/menu/main"));
 
 export default function index({ account }: IPageProps) {
-  return <h1>Welcome {account.fullName}</h1>
+  return <MainMenu account={account} />;
 }
