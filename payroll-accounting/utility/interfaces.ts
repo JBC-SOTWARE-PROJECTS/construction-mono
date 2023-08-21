@@ -32,8 +32,8 @@ type TPosition = {
 };
 
 type TUser = {
-  access: string;
-  roles: string;
+  access: string[];
+  roles: string[];
   password: string;
   login: string;
   activated: boolean;
