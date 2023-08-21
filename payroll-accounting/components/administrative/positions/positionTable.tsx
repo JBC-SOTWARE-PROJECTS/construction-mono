@@ -1,56 +1,38 @@
-import { Office } from "@/graphql/gql/graphql";
+import { Position } from "@/graphql/gql/graphql";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import { Row, Col, Table, Pagination, Button, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 
 interface IProps {
-  dataSource: Office[];
+  dataSource: Position[];
   loading: boolean;
   totalElements: number;
-  handleOpen: (record: Office) => void;
+  handleOpen: (record: Position) => void;
   changePage: (page: number) => void;
 }
 
-export default function OfficeTable({
+export default function PositionTable({
   dataSource,
   loading,
   totalElements = 1,
   handleOpen,
   changePage,
 }: IProps) {
-  const columns: ColumnsType<Office> = [
+  const columns: ColumnsType<Position> = [
     {
-      title: "Company Code",
-      dataIndex: "companyCode",
-      key: "companyCode",
+      title: "Position Code",
+      dataIndex: "code",
+      key: "code",
     },
     {
-      title: "Company Name",
-      dataIndex: "companyName",
-      key: "companyName",
-    },
-    {
-      title: "Company Vat Rate",
-      dataIndex: "vatRate",
-      key: "vatRate",
-    },
-    {
-      title: "Hide in Selection",
-      dataIndex: "hideInSelection",
-      key: "hideInSelection",
-      align: "center",
-      render: (text) => {
-        let color = "blue";
-        if (text) {
-          color = "green";
-        }
-        return <Tag color={color}>{text ? "Yes" : "No"}</Tag>;
-      },
+      title: "Position Name",
+      dataIndex: "description",
+      key: "description",
     },
     {
       title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
+      dataIndex: "status",
+      key: "status",
       align: "center",
       fixed: "right",
       width: 90,
@@ -62,7 +44,6 @@ export default function OfficeTable({
         return <Tag color={color}>{text ? "Active" : "Inactive"}</Tag>;
       },
     },
-
     {
       title: "#",
       key: "action",
@@ -101,6 +82,7 @@ export default function OfficeTable({
               }}
             />
           )}
+          scroll={{ x: 1400 }}
         />
       </Col>
     </Row>

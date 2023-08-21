@@ -13,6 +13,7 @@ export interface IUserEmployee {
   user: TUser;
   position: TPosition;
   office: TOffice;
+  currentCompany: TCompany;
 }
 
 export interface OptionsValue {
@@ -51,6 +52,12 @@ export type TEmployee = {
 export type TOffice = {
   id: string;
   officeDescription: string;
+};
+
+export type TCompany = {
+  id: string;
+  companyCode: string;
+  companyName: string;
 };
 
 export type TDiverseTradeMenu = {

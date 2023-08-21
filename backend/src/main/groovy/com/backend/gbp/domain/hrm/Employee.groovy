@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.hrm
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.Position
 import com.backend.gbp.domain.types.JaversResolvable
@@ -38,6 +39,11 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "position", referencedColumnName = "id")
 	Position position
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "current_company", referencedColumnName = "id")
+	CompanySettings currentCompany
 
 	@GraphQLQuery
 	@Column(name = "emp_no", columnDefinition = "varchar")

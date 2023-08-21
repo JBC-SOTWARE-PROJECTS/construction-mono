@@ -63,7 +63,6 @@ const DiverseTradeLayout = (props: IProps) => {
     dayjs.locale("en"); // Set the locale for dayjs
     dayjs.extend(timezone);
     dayjs.extend(relativeTime);
-    dayjs.tz.setDefault("Asia/Manila");
   }, []);
 
   if (typeof document === "undefined") {
@@ -136,10 +135,6 @@ const DiverseTradeLayout = (props: IProps) => {
               },
             ]}
             {...defaultProps}
-            menuDataRender={(e) => {
-              console.log("eee => ", e);
-              return e;
-            }}
             location={{
               pathname,
             }}

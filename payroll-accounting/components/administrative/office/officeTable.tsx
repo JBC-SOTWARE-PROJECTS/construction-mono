@@ -1,56 +1,51 @@
-import { CompanySettings } from "@/graphql/gql/graphql";
+import { Office } from "@/graphql/gql/graphql";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import { Row, Col, Table, Pagination, Button, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 
 interface IProps {
-  dataSource: CompanySettings[];
+  dataSource: Office[];
   loading: boolean;
   totalElements: number;
-  handleOpen: (record: CompanySettings) => void;
+  handleOpen: (record: Office) => void;
   changePage: (page: number) => void;
 }
 
-export default function CompanyTable({
+export default function OfficeTable({
   dataSource,
   loading,
   totalElements = 1,
   handleOpen,
   changePage,
 }: IProps) {
-  const columns: ColumnsType<CompanySettings> = [
+  const columns: ColumnsType<Office> = [
     {
-      title: "Company Code",
-      dataIndex: "companyCode",
-      key: "companyCode",
+      title: "Office Code",
+      dataIndex: "officeCode",
+      key: "officeCode",
+    },
+    {
+      title: "Office Name",
+      dataIndex: "officeDescription",
+      key: "officeDescription",
     },
     {
       title: "Company Name",
-      dataIndex: "companyName",
-      key: "companyName",
-    },
-    {
-      title: "Company Vat Rate",
-      dataIndex: "vatRate",
-      key: "vatRate",
-    },
-    {
-      title: "Hide in Selection",
-      dataIndex: "hideInSelection",
-      key: "hideInSelection",
-      align: "center",
-      render: (text) => {
-        let color = "blue";
-        if (text) {
-          color = "green";
-        }
-        return <Tag color={color}>{text ? "Yes" : "No"}</Tag>;
+      dataIndex: "company.companyName",
+      key: "company.companyName",
+      render: (text, record) => {
+        return <span key={text}>{record.company?.companyName}</span>;
       },
     },
     {
+      title: "Office Type",
+      dataIndex: "officeType",
+      key: "officeType",
+    },
+    {
       title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
+      dataIndex: "status",
+      key: "status",
       align: "center",
       fixed: "right",
       width: 90,
@@ -62,7 +57,6 @@ export default function CompanyTable({
         return <Tag color={color}>{text ? "Active" : "Inactive"}</Tag>;
       },
     },
-
     {
       title: "#",
       key: "action",

@@ -27,3 +27,11 @@ export const UPSER_COMPANY_RECORD = gql`
     }
   }
 `;
+
+export const CHANGE_COMPANY = gql`
+  mutation ($id: UUID, $company: UUID) {
+    changeCompany(id: $id, company: $company) {
+      id
+    }
+  }
+`;
