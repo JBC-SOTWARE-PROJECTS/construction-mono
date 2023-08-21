@@ -1,4 +1,10 @@
-export { default as PageHeader } from './pageHeader'
-export { default as FormInput } from './formInput/formInput'
-export { default as FormSelect } from './formSelect/formSelect'
-export { default as FormSearch } from './formSearch'
+export { default as PageHeader } from "./pageHeader";
+export { default as FormInput } from "./formInput/formInput";
+export { default as FormSelect } from "./formSelect/formSelect";
+export { default as FormSearch } from "./formSearch";
+export { default as FormCheckBox } from "./formCheckBox/formCheckBox";
+export { default as FormButton } from "./formButton/formButton";
+export { default as FormDebounceSelect } from "./formDebounceSelect/formDebounceSelect";
+export { default as FormInputNumber } from "./formInputNumber/formInputNumber";
+export { default as FormSwitch } from "./formSwitch/formSwitch";
+export { default as FormTextArea } from "./formTextArea/formTextArea";

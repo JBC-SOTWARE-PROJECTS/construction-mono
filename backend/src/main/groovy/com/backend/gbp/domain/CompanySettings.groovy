@@ -1,6 +1,7 @@
 package com.backend.gbp.domain
 
-
+import com.backend.gbp.domain.annotations.UpperCase
+import com.sun.org.apache.xpath.internal.operations.Bool
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.Formula
@@ -24,6 +25,11 @@ class CompanySettings implements Serializable {
 	UUID id
 
 	@GraphQLQuery
+	@Column(name = "com_code", columnDefinition = "varchar")
+	String companyCode
+
+	@UpperCase
+	@GraphQLQuery
 	@Column(name = "com_name", columnDefinition = "varchar")
 	String companyName
 
@@ -38,5 +44,13 @@ class CompanySettings implements Serializable {
 	@GraphQLQuery
 	@Column(name = "gov_markup", columnDefinition = "varchar")
 	BigDecimal govMarkup
+
+	@GraphQLQuery
+	@Column(name = "is_active", columnDefinition = "bool")
+	Boolean isActive
+
+	@GraphQLQuery
+	@Column(name = "hide_in_selection", columnDefinition = "bool")
+	Boolean hideInSelection
 
 }

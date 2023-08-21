@@ -1,24 +1,24 @@
-import { CompanySettings } from "@/graphql/gql/graphql";
+import { Office } from "@/graphql/gql/graphql";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import { Row, Col, Table, Pagination, Button, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 
 interface IProps {
-  dataSource: CompanySettings[];
+  dataSource: Office[];
   loading: boolean;
   totalElements: number;
-  handleOpen: (record: CompanySettings) => void;
+  handleOpen: (record: Office) => void;
   changePage: (page: number) => void;
 }
 
-export default function CompanyTable({
+export default function OfficeTable({
   dataSource,
   loading,
   totalElements = 1,
   handleOpen,
   changePage,
 }: IProps) {
-  const columns: ColumnsType<CompanySettings> = [
+  const columns: ColumnsType<Office> = [
     {
       title: "Company Code",
       dataIndex: "companyCode",
