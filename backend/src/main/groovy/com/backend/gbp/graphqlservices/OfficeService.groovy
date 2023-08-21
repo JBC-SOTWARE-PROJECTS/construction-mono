@@ -64,10 +64,16 @@ class OfficeService {
     @GraphQLQuery(name = "officePage", description = "Search Offices")
     Page<Office> officePage(
             @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "company") UUID company = null,
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
-        officeRepository.officePage(filter, new PageRequest(page, size, Sort.Direction.ASC, "officeCode"))
+        if(company){
+            officeRepository.officeCompanyPage(filter, company, new PageRequest(page, size, Sort.Direction.ASC, "officeCode"))
+        }else{
+            officeRepository.officePage(filter, new PageRequest(page, size, Sort.Direction.ASC, "officeCode"))
+        }
+
     }
 
     @GraphQLQuery(name = "officeById", description = "Get Office By Id")

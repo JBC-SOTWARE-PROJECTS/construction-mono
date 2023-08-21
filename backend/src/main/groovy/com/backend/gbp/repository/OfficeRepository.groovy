@@ -34,4 +34,13 @@ interface OfficeRepository extends JpaRepository<Office, UUID> {
 						lower(o.officeDescription) like lower(concat('%',:filter,'%')))'''
 	)
 	Page<Office> officePage(@Param("filter") String filter, Pageable pageable)
+
+	@Query(
+			value = '''Select o from Office o where (lower(o.officeCode) like lower(concat('%',:filter,'%')) or 
+						lower(o.officeDescription) like lower(concat('%',:filter,'%'))) and o.company.id = :company''',
+			countQuery = '''Select count(o) from Office o where (lower(o.officeCode) like lower(concat('%',:filter,'%')) or 
+						lower(o.officeDescription) like lower(concat('%',:filter,'%'))) and o.company.id = :company'''
+	)
+	Page<Office> officeCompanyPage(@Param("filter") String filter,@Param("company") UUID company, Pageable pageable)
+
 }

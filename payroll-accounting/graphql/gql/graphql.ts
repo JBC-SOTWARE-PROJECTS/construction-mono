@@ -2386,6 +2386,25 @@ export type Page_Office = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_Position = {
+  __typename?: 'Page_Position';
+  content?: Maybe<Array<Maybe<Position>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_Projects = {
   __typename?: 'Page_Projects';
   content?: Maybe<Array<Maybe<Projects>>>;
@@ -3339,6 +3358,8 @@ export type Query = {
   positionById?: Maybe<Position>;
   /** Get All Positions */
   positionList?: Maybe<Array<Maybe<Position>>>;
+  /** Search Positions */
+  positionPage?: Maybe<Page_Position>;
   prByFiltersPage?: Maybe<Page_PurchaseRequest>;
   prById?: Maybe<PurchaseRequest>;
   prItemById?: Maybe<PurchaseRequestItem>;
@@ -4194,6 +4215,7 @@ export type QueryOfficeListByItemArgs = {
 
 /** Query root */
 export type QueryOfficePageArgs = {
+  company?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
@@ -4393,6 +4415,14 @@ export type QueryPositionByFilterArgs = {
 /** Query root */
 export type QueryPositionByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPositionPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

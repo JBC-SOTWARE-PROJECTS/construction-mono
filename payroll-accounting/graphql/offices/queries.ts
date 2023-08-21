@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_OFFICE_RECORDS = gql`
-  query ($filter: String!, $size: Int, $page: Int) {
-    officePage(filter: $filter, size: $size, page: $page) {
+  query ($filter: String!, $company: UUID, $size: Int, $page: Int) {
+    officePage(filter: $filter, company: $company, size: $size, page: $page) {
       content {
         id
         company {
