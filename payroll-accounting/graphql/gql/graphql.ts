@@ -221,9 +221,12 @@ export type City = {
 
 export type CompanySettings = {
   __typename?: 'CompanySettings';
+  companyCode?: Maybe<Scalars['String']['output']>;
   companyName?: Maybe<Scalars['String']['output']>;
   govMarkup?: Maybe<Scalars['BigDecimal']['output']>;
+  hideInSelection?: Maybe<Scalars['Boolean']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
+  isActive?: Maybe<Scalars['Boolean']['output']>;
   markup?: Maybe<Scalars['BigDecimal']['output']>;
   vatRate?: Maybe<Scalars['BigDecimal']['output']>;
 };
@@ -1648,6 +1651,7 @@ export type MutationUpsertChargeInvoiceArgs = {
 /** Mutation root */
 export type MutationUpsertCompanyArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -2216,6 +2220,25 @@ export type Page_Assets = {
 export type Page_Billing = {
   __typename?: 'Page_Billing';
   content?: Maybe<Array<Maybe<Billing>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_CompanySettings = {
+  __typename?: 'Page_CompanySettings';
+  content?: Maybe<Array<Maybe<CompanySettings>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -3113,6 +3136,8 @@ export type Query = {
   cityByProvince?: Maybe<Array<Maybe<City>>>;
   cityFilter?: Maybe<Array<Maybe<City>>>;
   comById?: Maybe<CompanySettings>;
+  companyList?: Maybe<Array<Maybe<CompanySettings>>>;
+  companyPage?: Maybe<Page_CompanySettings>;
   counters?: Maybe<Array<Maybe<Counter>>>;
   /** Search all countries */
   countries?: Maybe<Array<Maybe<Country>>>;
@@ -3571,6 +3596,26 @@ export type QueryCityByProvinceArgs = {
 /** Query root */
 export type QueryCityFilterArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryComByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryCompanyListArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryCompanyPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

@@ -229,4 +229,7 @@
     <include file="classpath:config/liquibase/changelog3/15_alter_pr_po_form.sql"
              relativeToChangelogFile="false"/>
 
+    <include file="classpath:config/liquibase/changelog4/01_wilson_company_settings.sql"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

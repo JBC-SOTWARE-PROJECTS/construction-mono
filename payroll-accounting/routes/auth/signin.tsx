@@ -111,8 +111,8 @@ export default function SingIn() {
                     }}
                   >
                     By Signing In, you can access all information and documents.
-                    Please be advice that you should carry this information with
-                    outmost confidentiality.
+                    Please be advised that you should carry this information
+                    with outmost confidentiality.
                   </p>
                 </Space>
               </div>
