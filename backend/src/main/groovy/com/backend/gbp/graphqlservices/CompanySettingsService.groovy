@@ -64,6 +64,14 @@ class CompanySettingsService extends AbstractDaoService<CompanySettings> {
         createQuery(query, params).resultList.sort { it.companyName }
     }
 
+    @GraphQLQuery(name = "companyListSelection")
+    List<CompanySettings> companyListSelection() {
+        String query = '''Select e from CompanySettings e where e.hideInSelection = :status or  e.hideInSelection is null'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('status', false)
+        createQuery(query, params).resultList.sort { it.companyName }
+    }
+
     @GraphQLQuery(name = "companyPage")
     Page<CompanySettings> companyPage(
             @GraphQLArgument(name = "filter") String filter,

@@ -22,6 +22,11 @@ export const GET_ACCOUNT = gql`
         id
         officeDescription
       }
+      currentCompany {
+        id
+        companyCode
+        companyName
+      }
     }
   }
 `;

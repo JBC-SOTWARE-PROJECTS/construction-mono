@@ -329,6 +329,7 @@ export type Employee = {
   country?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
+  currentCompany?: Maybe<CompanySettings>;
   dob?: Maybe<Scalars['LocalDateTime']['output']>;
   emailAddress?: Maybe<Scalars['String']['output']>;
   emergencyContactAddress?: Maybe<Scalars['String']['output']>;
@@ -375,6 +376,7 @@ export type EmployeeInput = {
   cityMunicipality?: InputMaybe<Scalars['String']['input']>;
   civilStatus?: InputMaybe<Scalars['String']['input']>;
   country?: InputMaybe<Scalars['String']['input']>;
+  currentCompany?: InputMaybe<CompanySettingsInput>;
   dob?: InputMaybe<Scalars['LocalDateTime']['input']>;
   emailAddress?: InputMaybe<Scalars['String']['input']>;
   emergencyContactAddress?: InputMaybe<Scalars['String']['input']>;
@@ -1005,6 +1007,7 @@ export type Mutation = {
   beginningBalanceInsert?: Maybe<BeginningBalance>;
   /** Cancel Item */
   cancelItem?: Maybe<BillingItem>;
+  changeCompany?: Maybe<Employee>;
   changePassword?: Maybe<Scalars['String']['output']>;
   closeBilling?: Maybe<Billing>;
   /** close shift */
@@ -1220,6 +1223,13 @@ export type MutationBeginningBalanceInsertArgs = {
 export type MutationCancelItemArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   office?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationChangeCompanyArgs = {
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -3192,6 +3202,7 @@ export type Query = {
   cityFilter?: Maybe<Array<Maybe<City>>>;
   comById?: Maybe<CompanySettings>;
   companyList?: Maybe<Array<Maybe<CompanySettings>>>;
+  companyListSelection?: Maybe<Array<Maybe<CompanySettings>>>;
   companyPage?: Maybe<Page_CompanySettings>;
   counters?: Maybe<Array<Maybe<Counter>>>;
   /** Search all countries */
