@@ -231,6 +231,17 @@ export type CompanySettings = {
   vatRate?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
+export type CompanySettingsInput = {
+  companyCode?: InputMaybe<Scalars['String']['input']>;
+  companyName?: InputMaybe<Scalars['String']['input']>;
+  govMarkup?: InputMaybe<Scalars['BigDecimal']['input']>;
+  hideInSelection?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  markup?: InputMaybe<Scalars['BigDecimal']['input']>;
+  vatRate?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
 export type Counter = {
   __typename?: 'Counter';
   name?: Maybe<Scalars['String']['output']>;
@@ -2099,6 +2110,8 @@ export enum NullHandling {
 
 export type Office = {
   __typename?: 'Office';
+  cityId?: Maybe<Scalars['UUID']['output']>;
+  company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   emailAdd?: Maybe<Scalars['String']['output']>;
@@ -2116,11 +2129,14 @@ export type Office = {
   officeType?: Maybe<Scalars['String']['output']>;
   officeZipcode?: Maybe<Scalars['String']['output']>;
   phoneNo?: Maybe<Scalars['String']['output']>;
+  provinceId?: Maybe<Scalars['UUID']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
   telNo?: Maybe<Scalars['String']['output']>;
 };
 
 export type OfficeInput = {
+  cityId?: InputMaybe<Scalars['UUID']['input']>;
+  company?: InputMaybe<CompanySettingsInput>;
   createdDate?: InputMaybe<Scalars['Instant']['input']>;
   emailAdd?: InputMaybe<Scalars['String']['input']>;
   fullAddress?: InputMaybe<Scalars['String']['input']>;
@@ -2135,6 +2151,7 @@ export type OfficeInput = {
   officeType?: InputMaybe<Scalars['String']['input']>;
   officeZipcode?: InputMaybe<Scalars['String']['input']>;
   phoneNo?: InputMaybe<Scalars['String']['input']>;
+  provinceId?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
   telNo?: InputMaybe<Scalars['String']['input']>;
 };
@@ -2334,6 +2351,25 @@ export type Page_JobOrder = {
 export type Page_MaterialProduction = {
   __typename?: 'Page_MaterialProduction';
   content?: Maybe<Array<Maybe<MaterialProduction>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_Office = {
+  __typename?: 'Page_Office';
+  content?: Maybe<Array<Maybe<Office>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -3254,6 +3290,8 @@ export type Query = {
   /** Search Offices */
   officeListByFilter?: Maybe<Array<Maybe<Office>>>;
   officeListByItem?: Maybe<Array<Maybe<OfficeItem>>>;
+  /** Search Offices */
+  officePage?: Maybe<Page_Office>;
   /** Get All Offices */
   officesList?: Maybe<Array<Maybe<Office>>>;
   onHandReport?: Maybe<Array<Maybe<OnHandReport>>>;
@@ -4151,6 +4189,14 @@ export type QueryOfficeListByFilterArgs = {
 /** Query root */
 export type QueryOfficeListByItemArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryOfficePageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

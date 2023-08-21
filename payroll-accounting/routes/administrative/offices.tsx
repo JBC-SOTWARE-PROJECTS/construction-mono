@@ -4,28 +4,30 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, message } from "antd";
+import { Input, Button, message, Row, Col, Select } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
-import CompanyTable from "@/components/administrative/company/companyTable";
-import { CompanySettings, Office, Query } from "@/graphql/gql/graphql";
+import { Office, Query } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
-import { GET_COMPANY_RECORDS } from "@/graphql/company/queries";
-import UpsertCompanyModal from "@/components/administrative/company/dialogs/upsertCompanyModal";
-import OfficeTable from "@/components/administrative/office/companyTable";
+import { GET_OFFICE_RECORDS } from "@/graphql/offices/queries";
+import UpsertOfficeModal from "@/components/administrative/office/dialogs/upsertOfficeModal";
+import OfficeTable from "@/components/administrative/office/officeTable";
+import { useCompany } from "@/hooks/administrative";
 
 const { Search } = Input;
 
 export default function OfficeComponent() {
-  const modal = useDialog(UpsertCompanyModal);
+  const modal = useDialog(UpsertOfficeModal);
+  const [company, setCompany] = useState(null);
   const [state, setState] = useState({
     filter: "",
     status: true,
     page: 0,
     size: 10,
   });
-
-  const { data, loading, refetch } = useQuery<Query>(GET_COMPANY_RECORDS, {
+  // ====================== queries =====================================
+  const companies = useCompany();
+  const { data, loading, refetch } = useQuery<Query>(GET_OFFICE_RECORDS, {
     variables: {
       filter: state.filter,
       page: state.page,
@@ -38,9 +40,9 @@ export default function OfficeComponent() {
     modal({ record: record }, (result: any) => {
       if (result) {
         if (record?.id) {
-          message.success("Company successfully added");
+          message.success("Office successfully added");
         } else {
-          message.success("Company successfully updated");
+          message.success("Office successfully updated");
         }
         refetch();
       }
@@ -61,11 +63,10 @@ export default function OfficeComponent() {
         headerBordered
         extra={
           <ProFormGroup>
-            <Search
-              size="middle"
-              placeholder="Search here.."
-              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-              className="select-header"
+            <Select
+              options={companies}
+              placeholder="Filter Company"
+              className="select-header-list"
             />
             <Button
               type="primary"
@@ -77,13 +78,27 @@ export default function OfficeComponent() {
           </ProFormGroup>
         }
       >
-        <OfficeTable
-          dataSource={data?.companyPage?.content as Office[]}
-          loading={loading}
-          totalElements={data?.companyPage?.totalElements as number}
-          handleOpen={(record) => onUpsertRecord(record)}
-          changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
-        />
+        <Row gutter={[8, 8]}>
+          <Col span={24}>
+            <Search
+              size="middle"
+              placeholder="Search here.."
+              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+              className="w-full"
+            />
+          </Col>
+          <Col span={24}>
+            <OfficeTable
+              dataSource={data?.officePage?.content as Office[]}
+              loading={loading}
+              totalElements={data?.officePage?.totalElements as number}
+              handleOpen={(record) => onUpsertRecord(record)}
+              changePage={(page) =>
+                setState((prev) => ({ ...prev, page: page }))
+              }
+            />
+          </Col>
+        </Row>
       </ProCard>
     </PageContainer>
   );

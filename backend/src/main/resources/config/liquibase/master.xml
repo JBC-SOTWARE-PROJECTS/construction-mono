@@ -231,5 +231,9 @@
 
     <include file="classpath:config/liquibase/changelog4/01_wilson_company_settings.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/02_wilson_alter_office_added_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/03_wilson_alter_office_address.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

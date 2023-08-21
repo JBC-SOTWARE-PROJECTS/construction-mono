@@ -9,3 +9,9 @@ export const AP_TRANSCTION_CATEGORY = [
   { label: "DEBIT MEMO", value: "DM" },
   { label: "DEBIT ADVICE", value: "DA" },
 ];
+
+export const OFFICETYPE = [
+  { label: "MAIN OFFICE", value: "MAIN" },
+  { label: "BRANCH OFFICE", value: "BRANCH" },
+  { label: "SATELITE OFFICE", value: "SATELITE" },
+];

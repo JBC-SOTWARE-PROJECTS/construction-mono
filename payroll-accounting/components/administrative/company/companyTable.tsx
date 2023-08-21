@@ -101,6 +101,7 @@ export default function CompanyTable({
               }}
             />
           )}
+          scroll={{ x: 1400 }}
         />
       </Col>
     </Row>

@@ -20,37 +20,32 @@ export default function OfficeTable({
 }: IProps) {
   const columns: ColumnsType<Office> = [
     {
-      title: "Company Code",
-      dataIndex: "companyCode",
-      key: "companyCode",
+      title: "Office Code",
+      dataIndex: "officeCode",
+      key: "officeCode",
+    },
+    {
+      title: "Office Name",
+      dataIndex: "officeDescription",
+      key: "officeDescription",
     },
     {
       title: "Company Name",
-      dataIndex: "companyName",
-      key: "companyName",
-    },
-    {
-      title: "Company Vat Rate",
-      dataIndex: "vatRate",
-      key: "vatRate",
-    },
-    {
-      title: "Hide in Selection",
-      dataIndex: "hideInSelection",
-      key: "hideInSelection",
-      align: "center",
-      render: (text) => {
-        let color = "blue";
-        if (text) {
-          color = "green";
-        }
-        return <Tag color={color}>{text ? "Yes" : "No"}</Tag>;
+      dataIndex: "company.companyName",
+      key: "company.companyName",
+      render: (text, record) => {
+        return <span key={text}>{record.company?.companyName}</span>;
       },
     },
     {
+      title: "Office Type",
+      dataIndex: "officeType",
+      key: "officeType",
+    },
+    {
       title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
+      dataIndex: "status",
+      key: "status",
       align: "center",
       fixed: "right",
       width: 90,
@@ -62,7 +57,6 @@ export default function OfficeTable({
         return <Tag color={color}>{text ? "Active" : "Inactive"}</Tag>;
       },
     },
-
     {
       title: "#",
       key: "action",
@@ -101,6 +95,7 @@ export default function OfficeTable({
               }}
             />
           )}
+          scroll={{ x: 1400 }}
         />
       </Col>
     </Row>

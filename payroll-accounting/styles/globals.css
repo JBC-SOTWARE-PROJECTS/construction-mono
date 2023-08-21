@@ -144,6 +144,14 @@ th.ant-table-cell {
   }
 }
 
+.select-header-list {
+  width: 100%;
+
+  @media only screen and (min-width: 838px) {
+    width: 400px;
+  }
+}
+
 .filter-label {
   font-weight: 700;
   font-size: 14px;
