@@ -52,3 +52,9 @@ export const col3 = {
   sm: 24,
   xs: 24,
 };
+
+export const OFFICETYPE = [
+  { label: "MAIN OFFICE", value: "MAIN" },
+  { label: "BRANCH OFFICE", value: "BRANCH" },
+  { label: "SATELITE OFFICE", value: "SATELITE" },
+];

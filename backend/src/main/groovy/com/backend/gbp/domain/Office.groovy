@@ -5,6 +5,8 @@ import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.Formula
 import org.hibernate.annotations.GenericGenerator
+import org.hibernate.annotations.NotFound
+import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
@@ -22,6 +24,11 @@ class Office extends AbstractAuditingEntity {
 	@Column(name = "id", columnDefinition = "uuid")
 	@Type(type = "pg-uuid")
 	UUID id
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "company", referencedColumnName = "id")
+	CompanySettings company
 
 	@GraphQLQuery
 	@Column(name = "office_code", columnDefinition = "varchar")
@@ -53,8 +60,16 @@ class Office extends AbstractAuditingEntity {
 	String officeCountry
 
 	@GraphQLQuery
+	@Column(name = "province_id", columnDefinition = "uuid")
+	UUID provinceId
+
+	@GraphQLQuery
 	@Column(name = "office_province", columnDefinition = "varchar")
 	String officeProvince
+
+	@GraphQLQuery
+	@Column(name = "city_id", columnDefinition = "uuid")
+	UUID cityId
 
 	@GraphQLQuery
 	@Column(name = "office_municipality", columnDefinition = "varchar")

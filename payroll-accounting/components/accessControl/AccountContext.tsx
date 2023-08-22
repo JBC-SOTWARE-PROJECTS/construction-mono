@@ -21,6 +21,11 @@ export const NULLACCOUNT: IUserEmployee = {
     id: "",
     officeDescription: "",
   },
+  currentCompany: {
+    id: "",
+    companyCode: "",
+    companyName: "",
+  },
 };
 
 export const AccountContext = createContext(NULLACCOUNT);

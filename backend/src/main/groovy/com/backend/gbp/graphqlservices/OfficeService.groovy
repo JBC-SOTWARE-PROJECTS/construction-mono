@@ -13,6 +13,10 @@ import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -57,6 +61,21 @@ class OfficeService {
 
     }
 
+    @GraphQLQuery(name = "officePage", description = "Search Offices")
+    Page<Office> officePage(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "company") UUID company = null,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+        if(company){
+            officeRepository.officeCompanyPage(filter, company, new PageRequest(page, size, Sort.Direction.ASC, "officeCode"))
+        }else{
+            officeRepository.officePage(filter, new PageRequest(page, size, Sort.Direction.ASC, "officeCode"))
+        }
+
+    }
+
     @GraphQLQuery(name = "officeById", description = "Get Office By Id")
     Office findById(@GraphQLArgument(name = "id") UUID id) {
         return id ? officeRepository.findById(id).get() : null
@@ -80,11 +99,14 @@ class OfficeService {
                 StringUtils.leftPad(no.toString(), 6, "0")
             }
         }
+        op.company = obj.company
         op.officeDescription = obj.officeDescription
         op.officeType = obj.officeType
         op.telNo = obj.telNo
         op.phoneNo = obj.phoneNo
         op.emailAdd = obj.emailAdd
+        op.provinceId = obj.provinceId
+        op.cityId = obj.cityId
         op.officeCountry = obj.officeCountry
         op.officeProvince = obj.officeProvince
         op.officeMunicipality = obj.officeMunicipality

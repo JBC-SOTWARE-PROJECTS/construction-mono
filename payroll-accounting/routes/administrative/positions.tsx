@@ -4,21 +4,19 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, message, Row, Col, Select } from "antd";
+import { Input, Button, message, Row, Col } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
-import { Office, Query } from "@/graphql/gql/graphql";
+import { Position, Query } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
-import { GET_OFFICE_RECORDS } from "@/graphql/offices/queries";
-import UpsertOfficeModal from "@/components/administrative/office/dialogs/upsertOfficeModal";
-import OfficeTable from "@/components/administrative/office/officeTable";
-import { useCompany } from "@/hooks/administrative";
+import { GET_POSITION_RECORDS } from "@/graphql/positions/queries";
+import UpsertPositionModal from "@/components/administrative/positions/dialogs/upsertPositionModal";
+import PositionTable from "@/components/administrative/positions/positionTable";
 
 const { Search } = Input;
 
 export default function OfficeComponent() {
-  const modal = useDialog(UpsertOfficeModal);
-  const [company, setCompany] = useState(null);
+  const modal = useDialog(UpsertPositionModal);
   const [state, setState] = useState({
     filter: "",
     status: true,
@@ -26,24 +24,22 @@ export default function OfficeComponent() {
     size: 10,
   });
   // ====================== queries =====================================
-  const companies = useCompany();
-  const { data, loading, refetch } = useQuery<Query>(GET_OFFICE_RECORDS, {
+  const { data, loading, refetch } = useQuery<Query>(GET_POSITION_RECORDS, {
     variables: {
       filter: state.filter,
-      company: company,
       page: state.page,
       size: state.size,
     },
     fetchPolicy: "cache-and-network",
   });
 
-  const onUpsertRecord = (record?: Office) => {
+  const onUpsertRecord = (record?: Position) => {
     modal({ record: record }, (result: any) => {
       if (result) {
         if (record?.id) {
-          message.success("Office successfully added");
+          message.success("Position successfully added");
         } else {
-          message.success("Office successfully updated");
+          message.success("Position successfully updated");
         }
         refetch();
       }
@@ -52,11 +48,11 @@ export default function OfficeComponent() {
 
   return (
     <PageContainer
-      title="Office Configuration Hub"
-      content="Seamlessly manage and configure your list of offices."
+      title="Job Designation Optimization"
+      content="Optimize your position list for coherent job designations."
     >
       <ProCard
-        title="Office List"
+        title="Position List"
         headStyle={{
           flexWrap: "wrap",
         }}
@@ -64,12 +60,11 @@ export default function OfficeComponent() {
         headerBordered
         extra={
           <ProFormGroup>
-            <Select
-              allowClear
-              options={companies}
-              placeholder="Filter Company"
-              onChange={(e) => setCompany(e)}
-              className="select-header-list"
+            <Search
+              size="middle"
+              placeholder="Search here.."
+              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+              className="select-header"
             />
             <Button
               type="primary"
@@ -83,18 +78,10 @@ export default function OfficeComponent() {
       >
         <Row gutter={[8, 8]}>
           <Col span={24}>
-            <Search
-              size="middle"
-              placeholder="Search here.."
-              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-              className="w-full"
-            />
-          </Col>
-          <Col span={24}>
-            <OfficeTable
-              dataSource={data?.officePage?.content as Office[]}
+            <PositionTable
+              dataSource={data?.positionPage?.content as Position[]}
               loading={loading}
-              totalElements={data?.officePage?.totalElements as number}
+              totalElements={data?.positionPage?.totalElements as number}
               handleOpen={(record) => onUpsertRecord(record)}
               changePage={(page) =>
                 setState((prev) => ({ ...prev, page: page }))

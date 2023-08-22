@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanySettings } from "@/graphql/gql/graphql";
+import { Position } from "@/graphql/gql/graphql";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { SaveOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
@@ -14,22 +14,22 @@ import {
   message,
 } from "antd";
 import _ from "lodash";
-import { UPSER_COMPANY_RECORD } from "@/graphql/company/queries";
+import { UPSER_POSITION_RECORD } from "@/graphql/positions/queries";
 import { requiredField } from "@/utility/helper";
-import { FormCheckBox, FormInput, FormInputNumber } from "@/components/common";
+import { FormCheckBox, FormInput } from "@/components/common";
 
 interface IProps {
   hide: (hideProps: any) => void;
-  record?: CompanySettings | null | undefined;
+  record?: Position | null | undefined;
 }
 
-export default function UpsertCompanyModal(props: IProps) {
+export default function UpsertPositionModal(props: IProps) {
   const { hide, record } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   // ===================== Queries ==============================
 
   const [upsert, { loading: upsertLoading }] = useMutation(
-    UPSER_COMPANY_RECORD,
+    UPSER_POSITION_RECORD,
     {
       ignoreResults: false,
       onCompleted: (data) => {
@@ -67,7 +67,7 @@ export default function UpsertCompanyModal(props: IProps) {
         <Typography.Title level={4}>
           <Space align="center">{`${
             record?.id ? "Edit" : "Add"
-          } Company`}</Space>
+          } Position / Job Title`}</Space>
         </Typography.Title>
       }
       destroyOnClose={true}
@@ -97,59 +97,26 @@ export default function UpsertCompanyModal(props: IProps) {
         onFinish={onSubmit}
         onFinishFailed={onFinishFailed}
         initialValues={{
-          companyName: record?.companyName,
-          vatRate: record?.vatRate,
-          markup: record?.markup,
-          isActive: record?.isActive ?? false,
-          hideInSelection: record?.hideInSelection ?? false,
+          description: record?.description,
+          status: record?.status ?? false,
         }}
       >
         <Row>
           <Col span={24}>
             <FormInput
-              name="companyName"
+              name="description"
               rules={requiredField}
-              label="Company Name / Business Name"
+              label="Position Name / Job Title"
               propsinput={{
-                placeholder: "Company Name / Business Name",
-              }}
-            />
-          </Col>
-          <Col span={24}>
-            <FormInputNumber
-              label="Vat Rate (Multiplier)"
-              name="vatRate"
-              rules={requiredField}
-              propsinputnumber={{
-                placeholder: "Vat Rate (e.g 0.12)",
-              }}
-            />
-          </Col>
-          <Col span={24}>
-            <FormInputNumber
-              label="Markup (Multiplier)"
-              name="markup"
-              rules={requiredField}
-              propsinputnumber={{
-                placeholder: "Markup (e.g 0.5)",
+                placeholder: "Position Name / Job Title",
               }}
             />
           </Col>
           <Col span={24}>
             <FormCheckBox
-              name="isActive"
+              name="status"
               valuePropName="checked"
               checkBoxLabel="Set as Active"
-              propscheckbox={{
-                defaultChecked: false,
-              }}
-            />
-          </Col>
-          <Col span={24}>
-            <FormCheckBox
-              name="hideInSelection"
-              valuePropName="checked"
-              checkBoxLabel="Hide in Company Selection"
               propscheckbox={{
                 defaultChecked: false,
               }}
