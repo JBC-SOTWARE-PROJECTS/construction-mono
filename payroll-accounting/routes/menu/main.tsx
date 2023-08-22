@@ -4,6 +4,8 @@ import React from "react";
 import logo from "@/public/images/DTLogo.png";
 import MenuCard from "@/components/menuCard";
 import administrativeMenu from "@/components/sidebar/admininstrative";
+import payroll from "@/components/sidebar/payroll";
+
 import _ from "lodash";
 import { useDialog } from "@/hooks";
 import ChangeCompanyModal from "@/components/companyChanger/companyChanger";
@@ -59,7 +61,7 @@ export default function MainMenu({ account }: IPageProps) {
       </div>
       <Divider orientation="left">Payroll Module</Divider>
       <div className="w-full">
-        <MenuCard menus={[]} />
+        <MenuCard menus={payroll} />
       </div>
       <Divider orientation="left">Administrative Module</Divider>
       <div className="w-full">
