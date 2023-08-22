@@ -231,5 +231,7 @@
 
     <include file="classpath:config/liquibase/changelog4/01_wilson_company_settings.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/02_dons_add_add_schema_and_table.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

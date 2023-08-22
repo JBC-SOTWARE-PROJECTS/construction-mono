@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -522,6 +523,32 @@ export type EndorsementInput = {
   windowsRH?: InputMaybe<Scalars['Boolean']['input']>;
   wiperLH?: InputMaybe<Scalars['Boolean']['input']>;
   wiperRH?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type Fiscal = {
+  __typename?: 'Fiscal';
+  active?: Maybe<Scalars['Boolean']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  fiscalId?: Maybe<Scalars['String']['output']>;
+  fromDate?: Maybe<Scalars['LocalDate']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  lockApril?: Maybe<Scalars['Boolean']['output']>;
+  lockAugust?: Maybe<Scalars['Boolean']['output']>;
+  lockDecember?: Maybe<Scalars['Boolean']['output']>;
+  lockFebruary?: Maybe<Scalars['Boolean']['output']>;
+  lockJanuary?: Maybe<Scalars['Boolean']['output']>;
+  lockJuly?: Maybe<Scalars['Boolean']['output']>;
+  lockJune?: Maybe<Scalars['Boolean']['output']>;
+  lockMarch?: Maybe<Scalars['Boolean']['output']>;
+  lockMay?: Maybe<Scalars['Boolean']['output']>;
+  lockNovember?: Maybe<Scalars['Boolean']['output']>;
+  lockOctober?: Maybe<Scalars['Boolean']['output']>;
+  lockSeptember?: Maybe<Scalars['Boolean']['output']>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  toDate?: Maybe<Scalars['LocalDate']['output']>;
 };
 
 export type Generic = {
@@ -1065,6 +1092,7 @@ export type Mutation = {
   upsertCompany?: Maybe<CompanySettings>;
   upsertCustomer?: Maybe<Customer>;
   upsertEmployee?: Maybe<Employee>;
+  upsertFiscal?: Maybe<Fiscal>;
   upsertGenerics?: Maybe<Generic>;
   upsertGroupPolicy?: Maybe<GroupPolicy>;
   upsertInsurance?: Maybe<Insurances>;
@@ -1674,6 +1702,13 @@ export type MutationUpsertEmployeeArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertFiscalArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertGenericsArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -2239,6 +2274,25 @@ export type Page_Billing = {
 export type Page_CompanySettings = {
   __typename?: 'Page_CompanySettings';
   content?: Maybe<Array<Maybe<CompanySettings>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_Fiscal = {
+  __typename?: 'Page_Fiscal';
+  content?: Maybe<Array<Maybe<Fiscal>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -3161,10 +3215,14 @@ export type Query = {
   findAllAssets?: Maybe<Array<Maybe<Assets>>>;
   findByItemOffice?: Maybe<OfficeItem>;
   findDuplicate?: Maybe<SupplierItem>;
+  /** Find Fiscal By id */
+  findFiscalActive?: Maybe<Fiscal>;
   /** find Adjustment Type */
   findOneAdjustmentType?: Maybe<QuantityAdjustmentType>;
   /** find signature by id */
   findOneSignature?: Maybe<Signature>;
+  fiscalById?: Maybe<Fiscal>;
+  fiscals?: Maybe<Page_Fiscal>;
   genericActive?: Maybe<Array<Maybe<Generic>>>;
   genericList?: Maybe<Array<Maybe<Generic>>>;
   getAllAmounts?: Maybe<Scalars['BigDecimal']['output']>;
@@ -3688,6 +3746,20 @@ export type QueryFindOneAdjustmentTypeArgs = {
 /** Query root */
 export type QueryFindOneSignatureArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryFiscalByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryFiscalsArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -5385,3 +5457,22 @@ export type UserInput = {
   resetDate?: InputMaybe<Scalars['LocalDateTime']['input']>;
   resetKey?: InputMaybe<Scalars['String']['input']>;
 };
+
+export type UpdateItemMutationVariables = Exact<{
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+}>;
+
+
+export type UpdateItemMutation = { __typename?: 'Mutation', upsertFiscal?: { __typename?: 'Fiscal', id?: any | null } | null };
+
+export type ChangePasswordMutationVariables = Exact<{
+  username?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ChangePasswordMutation = { __typename?: 'Mutation', newPassword?: string | null };
+
+
+export const UpdateItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fields"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Map_String_ObjectScalar"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upsertFiscal"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"fields"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fields"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateItemMutation, UpdateItemMutationVariables>;
+export const ChangePasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"newPassword"},"name":{"kind":"Name","value":"changePassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}]}]}}]} as unknown as DocumentNode<ChangePasswordMutation, ChangePasswordMutationVariables>;
