@@ -1,6 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 ./shared
-./idea
+
 # dependencies
 /node_modules
 /.pnp
@@ -12,7 +12,9 @@
 # next.js
 /.next/
 /out/
-
+/.idea/
+/.idea
+.idea
 # production
 /build
 
