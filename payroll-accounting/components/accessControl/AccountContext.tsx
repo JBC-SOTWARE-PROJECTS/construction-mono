@@ -7,8 +7,8 @@ export const NULLACCOUNT: IUserEmployee = {
   initialName: "",
   gender: "",
   user: {
-    access: "",
-    roles: "",
+    access: [],
+    roles: [],
     password: "",
     login: "",
     activated: true,

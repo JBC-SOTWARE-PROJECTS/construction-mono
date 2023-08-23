@@ -2,12 +2,12 @@ import React from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import AccessManager from "@/components/accessControl/AccessManager";
-import CircularProgress from "@/components/circularProgress";
 import { IPageProps } from "@/utility/interfaces";
+import asyncComponent from "@/utility/asyncComponent";
 
-const Employee = dynamic(() => import("@/routes/administrative/Employees"), {
-  loading: () => <CircularProgress />,
-});
+const Employee = asyncComponent(
+  () => import("@/routes/administrative/Employees")
+);
 
 const Employees = ({ account }: IPageProps) => (
   <React.Fragment>

@@ -10,7 +10,7 @@ interface ScheduleTypeRepository extends JpaRepository<Schedule, UUID> {
     @Query(value = "Select s from Schedule s order by s.dateTimeStartRaw")
     List<Schedule> getOneSchedule(@Param("id")UUID id)
 
-    @Query(value = "Select s from Schedule s order by s.dateTimeStartRaw")
-    List<Schedule> getAllSchedules()
+    @Query(value = "Select s from Schedule s where s.company.id = :companyId order by s.dateTimeStartRaw")
+    List<Schedule> getAllSchedules(@Param("companyId")UUID companyId)
 
 }

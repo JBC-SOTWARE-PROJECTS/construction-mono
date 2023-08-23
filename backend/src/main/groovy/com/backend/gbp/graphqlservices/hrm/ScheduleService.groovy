@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.hrm
 import com.backend.gbp.domain.hrm.Schedule
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.ScheduleTypeRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -40,7 +41,7 @@ class ScheduleService {
     @GraphQLQuery(name = "getScheduleTypes", description = "get all schedule type config")
     List<Schedule> getScheduleTypes(
     ) {
-        return scheduleTypeRepository.findAll()
+        return scheduleTypeRepository.getAllSchedules(SecurityUtils.currentCompanyId())
     }
 
     //================================Query================================\\
@@ -55,10 +56,12 @@ class ScheduleService {
         if (id) {
             Schedule schedule = scheduleTypeRepository.findById(id).get()
             schedule = objectMapper.updateValue(schedule, fields)
+            schedule.company = SecurityUtils.currentCompany()
             scheduleTypeRepository.save(schedule)
             return new GraphQLRetVal<Schedule>(schedule, true, "Successfully updated department schedule.")
         } else {
             Schedule schedule = objectMapper.convertValue(fields, Schedule)
+            schedule.company = SecurityUtils.currentCompany()
             scheduleTypeRepository.save(schedule)
             return new GraphQLRetVal<Schedule>(schedule, true, "Successfully created department schedule")
         }
