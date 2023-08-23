@@ -58,3 +58,7 @@ export const OFFICETYPE = [
   { label: "BRANCH OFFICE", value: "BRANCH" },
   { label: "SATELITE OFFICE", value: "SATELITE" },
 ];
+
+export const REST_DAY_SCHEDULE_LABEL = "R";
+export const REST_DAY_SCHEDULE_TITLE = "Rest Day";
+export const REST_DAY_SCHEDULE_COLOR = "#95a5a6";

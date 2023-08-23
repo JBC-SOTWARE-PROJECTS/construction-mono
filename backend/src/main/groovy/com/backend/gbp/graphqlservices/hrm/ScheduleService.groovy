@@ -37,24 +37,21 @@ class ScheduleService {
 //        else return departmentRepository.getOneDepartmentSchedule(id)
 //    }
 
-    @GraphQLQuery(name = "getOneDepartmentSchedule", description = "get one department schedule config")
-    List<Schedule> getOneDepartmentSchedule(
-            @GraphQLArgument(name = "id") UUID id
+    @GraphQLQuery(name = "getScheduleTypes", description = "get all schedule type config")
+    List<Schedule> getScheduleTypes(
     ) {
-        return scheduleTypeRepository.getOneSchedule(id)
+        return scheduleTypeRepository.findAll()
     }
 
     //================================Query================================\\
 
     //===============================Mutation==============================\\
 
-    @GraphQLMutation(name = "upsertDepartementSchedule", description = "create or update department schedule config.")
-    GraphQLRetVal<Schedule> upsertDepartementSchedule(
+    @GraphQLMutation(name = "upsertScheduleType", description = "create or update schedule config.")
+    GraphQLRetVal<Schedule> upsertScheduleType(
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "department_id") UUID department_id,
             @GraphQLArgument(name = "fields") Map<String, Object> fields
     ) {
-        if (!department_id) return new GraphQLRetVal<Schedule>(null, false, "Failed to create department schedule.")
         if (id) {
             Schedule schedule = scheduleTypeRepository.findById(id).get()
             schedule = objectMapper.updateValue(schedule, fields)
