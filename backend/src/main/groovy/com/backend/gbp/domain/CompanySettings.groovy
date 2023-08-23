@@ -1,10 +1,8 @@
 package com.backend.gbp.domain
 
 import com.backend.gbp.domain.annotations.UpperCase
-import com.sun.org.apache.xpath.internal.operations.Bool
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLQuery
-import org.hibernate.annotations.Formula
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
 
@@ -52,5 +50,9 @@ class CompanySettings implements Serializable {
 	@GraphQLQuery
 	@Column(name = "hide_in_selection", columnDefinition = "bool")
 	Boolean hideInSelection
+
+	@GraphQLQuery
+	@Column(name = "logo", columnDefinition = "varchar")
+	String logoFileName
 
 }

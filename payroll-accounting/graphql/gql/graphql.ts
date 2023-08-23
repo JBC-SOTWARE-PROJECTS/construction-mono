@@ -230,6 +230,7 @@ export type CompanySettings = {
   hideInSelection?: Maybe<Scalars['Boolean']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
+  logoFileName?: Maybe<Scalars['String']['output']>;
   markup?: Maybe<Scalars['BigDecimal']['output']>;
   vatRate?: Maybe<Scalars['BigDecimal']['output']>;
 };
@@ -241,6 +242,7 @@ export type CompanySettingsInput = {
   hideInSelection?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  logoFileName?: InputMaybe<Scalars['String']['input']>;
   markup?: InputMaybe<Scalars['BigDecimal']['input']>;
   vatRate?: InputMaybe<Scalars['BigDecimal']['input']>;
 };
