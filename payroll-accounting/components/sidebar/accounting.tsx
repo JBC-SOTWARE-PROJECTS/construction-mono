@@ -11,7 +11,7 @@ const accountingMenu: TDiverseTradeMenu[] = [
     title: 'Billing',
     subtitle: 'Seamlessly manage and configure your list of offices.',
     icon: <HomeOutlined className='diverse-trade-icon' />,
-    path: '/accounting/billing',
+    path: '/accounting/billing/folios',
   },
   {
     title: 'Cashiering',

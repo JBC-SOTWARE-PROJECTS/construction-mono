@@ -27,7 +27,7 @@ export default function AccountingSetupSideBar({
 
   return (
     <Layout>
-      <Sider
+      {/* <Sider
         style={{
           marginTop: '56px',
           height: '100vh',
@@ -53,12 +53,12 @@ export default function AccountingSetupSideBar({
           style={{ height: '100%', borderRight: 0 }}
           items={accountingSetupMenuItems}
         />
-      </Sider>
-      <Layout className='site-layout' style={{ marginLeft: 200 }}>
-        <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
-          {children}
-        </Content>
-      </Layout>
+      </Sider> */}
+      {/* <Layout className='site-layout' style={{ marginLeft: 200 }}> */}
+      <Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
+        {children}
+      </Content>
+      {/* </Layout> */}
     </Layout>
   )
 }
