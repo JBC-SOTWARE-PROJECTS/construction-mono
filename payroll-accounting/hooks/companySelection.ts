@@ -7,6 +7,7 @@ const GET_COMPANY = gql`
       id
       companyCode
       companyName
+      logoFileName
     }
   }
 `;
