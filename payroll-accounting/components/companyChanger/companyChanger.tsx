@@ -79,6 +79,7 @@ export default function ChangeCompanyModal(props: IProps) {
           >
             {(companyList || []).map((obj, index) => (
               <CheckCard
+                avatar={`/images/${obj?.logoFileName}`}
                 key={index}
                 title={obj.companyName}
                 description={obj.companyCode}
