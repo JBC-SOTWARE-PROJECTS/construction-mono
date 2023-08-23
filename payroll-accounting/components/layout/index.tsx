@@ -44,6 +44,7 @@ const DiverseTradeLayout = (props: IProps) => {
   const routerSplit = router.pathname.split('/')
   const modulePath = routerSplit[1]
   const subModulePath = routerSplit[2]
+
   const { layout, sidebar } = useSidebarMenuSelection(modulePath, subModulePath)
   const settings: Partial<ProSettings> | undefined = {
     fixSiderbar: true,
