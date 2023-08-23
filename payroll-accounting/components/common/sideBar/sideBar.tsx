@@ -1,30 +1,19 @@
-import React, { useState } from "react";
-import { Layout, Menu } from "antd";
+import { UserOutlined } from "@ant-design/icons";
+import { Layout, Menu, MenuProps } from "antd";
 import { useRouter } from "next/router";
-
+import { ReactNode } from "react";
 const { Sider, Content } = Layout;
 
-interface SidebarMenuItem {
-  path: string;
-  icon: React.ReactNode;
-  label: string;
-  content: React.ReactNode;
+interface SideBarI {
+  children: ReactNode;
+  menuItems: MenuProps["items"];
 }
 
-interface SidebarProps {
-  menuItems?: SidebarMenuItem[];
-}
+export default function SideBar({ children, menuItems }: SideBarI) {
+  const { route, push } = useRouter();
 
-const Sidebar: React.FC<SidebarProps> = ({ menuItems = [] }) => {
-  const { asPath, push } = useRouter();
-  const [selectedContent, setSelectedContent] =
-    useState<React.ReactNode | null>(null);
-
-  const onClick = (e: any) => {
-    const selectedMenuItem = menuItems.find((item) => item.path === e.key);
-    if (selectedMenuItem) {
-      setSelectedContent(selectedMenuItem.content);
-    }
+  const onClick: MenuProps["onClick"] = (e) => {
+    push(e.key);
   };
 
   return (
@@ -40,28 +29,27 @@ const Sidebar: React.FC<SidebarProps> = ({ menuItems = [] }) => {
         }}
         breakpoint="lg"
         collapsedWidth="0"
+        onBreakpoint={(broken) => {
+          console.log(broken);
+        }}
+        onCollapse={(collapsed, type) => {
+          console.log(collapsed, type);
+        }}
       >
         <Menu
           mode="inline"
           onClick={onClick}
-          defaultSelectedKeys={[asPath]}
+          defaultSelectedKeys={[route]}
           defaultOpenKeys={["sub1"]}
           style={{ height: "100%", borderRight: 0 }}
-        >
-          {menuItems.map((item) => (
-            <Menu.Item key={item.path} icon={item.icon}>
-              {item.label}
-            </Menu.Item>
-          ))}
-        </Menu>
+          items={menuItems}
+        />
       </Sider>
       <Layout className="site-layout" style={{ marginLeft: 200 }}>
         <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
-          {selectedContent}
+          {children}
         </Content>
       </Layout>
     </Layout>
   );
-};
-
-export default Sidebar;
+}

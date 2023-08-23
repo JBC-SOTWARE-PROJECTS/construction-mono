@@ -239,5 +239,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/02_dons_add_add_schema_and_table.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/05_michael_work_schedule_type_tables.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/06_michael_work_schedule_type_config_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
