@@ -8,12 +8,6 @@ import {
 
 const accountingMenu: TDiverseTradeMenu[] = [
   {
-    title: 'Accounting Setup',
-    subtitle: 'Streamline and manage your list of companies effortlessly.',
-    icon: <AppstoreAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/accounting-setup/accounting-period',
-  },
-  {
     title: 'Billing',
     subtitle: 'Seamlessly manage and configure your list of offices.',
     icon: <HomeOutlined className='diverse-trade-icon' />,
@@ -54,6 +48,12 @@ const accountingMenu: TDiverseTradeMenu[] = [
     subtitle: 'Effortlessly manage and maintain your list of employees.',
     icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
     path: '/accounting/employees',
+  },
+  {
+    title: 'Accounting Setup',
+    subtitle: 'Streamline and manage your list of companies effortlessly.',
+    icon: <AppstoreAddOutlined className='diverse-trade-icon' />,
+    path: '/accounting/accounting-setup/accounting-period',
   },
   {
     title: 'Financial Reports',
