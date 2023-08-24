@@ -54,6 +54,6 @@ export default function UseSidebarMenuSelection(
       })
   }, [module, subModule])
 
-  if (sidebar) return { layout: 'side', sidebar }
+  if (sidebar) return { layout: 'mix', sidebar }
   else return { layout: 'top', sidebar: defaultSidebar }
 }
