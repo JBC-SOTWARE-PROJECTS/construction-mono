@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { IPageProps } from '@/utility/interfaces'
 import { Alert, Button, Divider } from 'antd'
 import React from 'react'
@@ -33,11 +34,11 @@ export default function MainMenu({ account }: IPageProps) {
         message={`Welcome back ${account.fullName}! 🎉`}
         description={
           <p>
-            We're delighted to see you again and have the opportunity to
+            {`We're delighted to see you again and have the opportunity to
             continue supporting you. Your engagement is what drives us, and
             we're committed to making your experience here at DiverseTrade Suite
             truly exceptional. As you navigate through this session, remember
-            that you're current company is{' '}
+            that you're current company is`}
             <span className='font-bold'>
               {account.currentCompany?.companyName || 'N/A'}
             </span>
@@ -50,6 +51,7 @@ export default function MainMenu({ account }: IPageProps) {
         }
         type='success'
         showIcon
+        // eslint-disable-next-line jsx-a11y/alt-text
         icon={<img src={logo.src} className='diverse-trade' />}
       />
       <Divider orientation='left'>Inventory Module</Divider>

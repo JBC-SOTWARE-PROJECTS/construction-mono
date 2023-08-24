@@ -43,7 +43,9 @@ export default function CreateAccountingPeriod(props: CreateAccountingPeriodI) {
     ...record,
     fiscalRange: [dayjs(record?.fromDate), dayjs(record?.toDate)],
     fiscalMonths: [
-      ...options.map(({ value }) => (record[value] ? value : null)),
+      ...(record
+        ? options.map(({ value }) => (record[value] ? value : null))
+        : []),
     ],
   }
 
@@ -68,7 +70,6 @@ export default function CreateAccountingPeriod(props: CreateAccountingPeriodI) {
       remarks: remarks ?? '',
       active,
     }
-    console.log(values, 'values')
 
     if ((fiscalMonths ?? []).length > 0) {
       options.map(

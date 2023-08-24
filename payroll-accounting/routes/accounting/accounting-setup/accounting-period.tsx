@@ -110,6 +110,7 @@ export default function AccountingPeriod() {
         <Space direction='vertical' style={{ width: '100%' }}>
           <Input.Search placeholder='Search here' />
           <Table
+            rowKey='id'
             dataSource={data?.fiscal?.content ?? []}
             columns={columns}
             size='small'
