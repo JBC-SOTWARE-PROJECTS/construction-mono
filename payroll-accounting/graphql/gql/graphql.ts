@@ -595,6 +595,14 @@ export type GraphQlRetVal_Boolean = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlRetVal_SalaryRateMultiplier = {
+  __typename?: 'GraphQLRetVal_SalaryRateMultiplier';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<SalaryRateMultiplier>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlRetVal_Schedule = {
   __typename?: 'GraphQLRetVal_Schedule';
   message?: Maybe<Scalars['String']['output']>;
@@ -1125,6 +1133,8 @@ export type Mutation = {
   updateReorder?: Maybe<OfficeItem>;
   updateRtsItemStatus?: Maybe<ReturnSupplierItem>;
   updateSTIStatus?: Maybe<StockIssue>;
+  /** Update the salary rate multiplier */
+  updateSalaryRateMultiplier?: Maybe<GraphQlRetVal_SalaryRateMultiplier>;
   updateStatusCost?: Maybe<ProjectCost>;
   updateStiItemStatus?: Maybe<StockIssueItems>;
   upsertAddress?: Maybe<GraphQlRetVal_Boolean>;
@@ -1136,8 +1146,6 @@ export type Mutation = {
   upsertChargeInvoice?: Maybe<ChargeInvoice>;
   upsertCompany?: Maybe<CompanySettings>;
   upsertCustomer?: Maybe<Customer>;
-  /** create or update department schedule config. */
-  upsertDepartementSchedule?: Maybe<GraphQlRetVal_Schedule>;
   upsertEmployee?: Maybe<Employee>;
   upsertFiscal?: Maybe<Fiscal>;
   upsertGenerics?: Maybe<Generic>;
@@ -1182,6 +1190,8 @@ export type Mutation = {
   upsertRtsItem?: Maybe<ReturnSupplierItem>;
   upsertSTI?: Maybe<StockIssue>;
   upsertScheduleLock?: Maybe<GraphQlRetVal_ScheduleLock>;
+  /** create or update schedule config. */
+  upsertScheduleType?: Maybe<GraphQlRetVal_Schedule>;
   upsertService?: Maybe<ServiceManagement>;
   upsertServiceCategory?: Maybe<ServiceCategory>;
   upsertServiceItem?: Maybe<ServiceItems>;
@@ -1679,6 +1689,12 @@ export type MutationUpdateStiStatusArgs = {
 
 
 /** Mutation root */
+export type MutationUpdateSalaryRateMultiplierArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpdateStatusCostArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -1752,14 +1768,6 @@ export type MutationUpsertCompanyArgs = {
 
 /** Mutation root */
 export type MutationUpsertCustomerArgs = {
-  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Mutation root */
-export type MutationUpsertDepartementScheduleArgs = {
-  department_id?: InputMaybe<Scalars['UUID']['input']>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -2094,6 +2102,13 @@ export type MutationUpsertStiArgs = {
 /** Mutation root */
 export type MutationUpsertScheduleLockArgs = {
   fields: Scalars['Map_String_ObjectScalar']['input'];
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertScheduleTypeArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -3369,15 +3384,17 @@ export type Query = {
   getLegerByDoc?: Maybe<Array<Maybe<InventoryLedger>>>;
   getMaterialByRefStockCard?: Maybe<ProjectUpdatesMaterials>;
   getOnHandByItem?: Maybe<Inventory>;
-  /** get one department schedule config */
-  getOneDepartmentSchedule?: Maybe<Array<Maybe<Schedule>>>;
   getPOMonitoringByPoItemFilter?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
   getPOMonitoringByRec?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
   getPlateNo?: Maybe<Array<Maybe<PlateNumberDto>>>;
   getPrItemByPoId?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getPrItemInPO?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getProjectMaterialsByMilestone?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
+  /** Get the values of salary rate multiplier. */
+  getSalaryRateMultiplier?: Maybe<SalaryRateMultiplier>;
   getScheduleLock?: Maybe<Scalars['Map_String_ScheduleLockScalar']['output']>;
+  /** get all schedule type config */
+  getScheduleTypes?: Maybe<Array<Maybe<Schedule>>>;
   getSrrByDateRange?: Maybe<Array<Maybe<ReceivingReport>>>;
   /** List of receiving report list per date range */
   getSrrItemByDateRange?: Maybe<Array<Maybe<ReceivingReportItem>>>;
@@ -3992,12 +4009,6 @@ export type QueryGetMaterialByRefStockCardArgs = {
 export type QueryGetOnHandByItemArgs = {
   itemId?: InputMaybe<Scalars['UUID']['input']>;
   office?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Query root */
-export type QueryGetOneDepartmentScheduleArgs = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -5205,6 +5216,32 @@ export type ReturnSupplierItem = {
   uou?: Maybe<Scalars['String']['output']>;
 };
 
+export type SalaryRateMultiplier = {
+  __typename?: 'SalaryRateMultiplier';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  doubleHoliday?: Maybe<Scalars['Float']['output']>;
+  doubleHolidayAndRestDay?: Maybe<Scalars['Float']['output']>;
+  doubleHolidayAndRestDayOvertime?: Maybe<Scalars['Float']['output']>;
+  doubleHolidayOvertime?: Maybe<Scalars['Float']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  nightDifferential?: Maybe<Scalars['Float']['output']>;
+  regular?: Maybe<Scalars['Float']['output']>;
+  regularHoliday?: Maybe<Scalars['Float']['output']>;
+  regularHolidayAndRestDay?: Maybe<Scalars['Float']['output']>;
+  regularHolidayAndRestDayOvertime?: Maybe<Scalars['Float']['output']>;
+  regularHolidayOvertime?: Maybe<Scalars['Float']['output']>;
+  regularOvertime?: Maybe<Scalars['Float']['output']>;
+  restday?: Maybe<Scalars['Float']['output']>;
+  restdayOvertime?: Maybe<Scalars['Float']['output']>;
+  specialHoliday?: Maybe<Scalars['Float']['output']>;
+  specialHolidayAndRestDay?: Maybe<Scalars['Float']['output']>;
+  specialHolidayAndRestDayOvertime?: Maybe<Scalars['Float']['output']>;
+  specialHolidayOvertime?: Maybe<Scalars['Float']['output']>;
+};
+
 export type SalesChartsDto = {
   __typename?: 'SalesChartsDto';
   apr?: Maybe<Scalars['BigDecimal']['output']>;
@@ -5242,6 +5279,7 @@ export type SalesReportDto = {
 export type Schedule = {
   __typename?: 'Schedule';
   color?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   dateTimeEnd?: Maybe<Scalars['String']['output']>;

@@ -35,3 +35,57 @@ export const CHANGE_COMPANY = gql`
     }
   }
 `;
+
+export const GET_SALARY_RATE_MULTIPLIER = gql`
+  query {
+    salarRateMultiplier: getSalaryRateMultiplier {
+      id
+      regular
+      restday
+      specialHoliday
+      specialHolidayAndRestDay
+      regularHoliday
+      regularHolidayAndRestDay
+      doubleHoliday
+      doubleHolidayAndRestDay
+      regularOvertime
+      restdayOvertime
+      specialHolidayOvertime
+      specialHolidayAndRestDayOvertime
+      regularHolidayOvertime
+      regularHolidayAndRestDayOvertime
+      doubleHolidayOvertime
+      doubleHolidayAndRestDayOvertime
+      nightDifferential
+    }
+  }
+`;
+
+export const SAVE_SALARY_RATE_MULTIPLIER = gql`
+  mutation ($fields: Map_String_ObjectScalar) {
+    data: updateSalaryRateMultiplier(fields: $fields) {
+      payload {
+        id
+        regular
+        restday
+        specialHoliday
+        specialHolidayAndRestDay
+        regularHoliday
+        regularHolidayAndRestDay
+        doubleHoliday
+        doubleHolidayAndRestDay
+        regularOvertime
+        restdayOvertime
+        specialHolidayOvertime
+        specialHolidayAndRestDayOvertime
+        regularHolidayOvertime
+        regularHolidayAndRestDayOvertime
+        doubleHolidayOvertime
+        doubleHolidayAndRestDayOvertime
+        nightDifferential
+      }
+      success
+      message
+    }
+  }
+`;
