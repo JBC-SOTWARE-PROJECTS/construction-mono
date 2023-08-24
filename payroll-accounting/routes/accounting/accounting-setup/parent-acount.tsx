@@ -1,4 +1,5 @@
 import CreateAccountingPeriod from '@/components/accounting/accounting-setup/createAccountingPeriod'
+import CreateParentAccount from '@/components/accounting/accounting-setup/createParentAccount'
 import AccountingSetupSideBar from '@/components/accounting/commons/sidebar'
 import { Fiscal } from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
@@ -37,7 +38,7 @@ const GET_FISCAL = gql`
   }
 `
 
-export default function AccountingPeriod() {
+export default function ParentAccount() {
   const { data, loading, refetch } = useQuery(GET_FISCAL, {
     variables: {
       filter: '',
@@ -46,7 +47,7 @@ export default function AccountingPeriod() {
     },
   })
 
-  const createDialog = useDialog(CreateAccountingPeriod)
+  const createDialog = useDialog(CreateParentAccount)
 
   const onHandleClickCreateEdit = (record?: Fiscal) => {
     createDialog({ record }, () => refetch())

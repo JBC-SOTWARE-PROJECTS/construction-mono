@@ -5,16 +5,16 @@ const AccountingSetupMenu = {
     path: '/',
     routes: [
       {
-        path: '/accounting/accounting-setup',
-        name: 'Accounting Setup',
+        path: '/accounting/accounts-receivable',
+        name: 'Account Receivable',
         routes: [
           {
-            path: '/accounting/accounting-setup/accounting-period',
-            name: 'Accounting Period',
+            path: '/accounting/accounts-receivable/invoice',
+            name: 'Invoice',
           },
           {
-            path: '/accounting/accounting-setup/parent-account',
-            name: 'Parent Account',
+            path: '/accounting/accounting-setup/mother-account',
+            name: 'Credit Note',
           },
         ],
       },

@@ -243,5 +243,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/06_michael_work_schedule_type_config_roles_and_permissions.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/07_dons_add_parent_account.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
