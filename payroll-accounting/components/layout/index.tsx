@@ -54,6 +54,7 @@ const DiverseTradeLayout = (props: IProps) => {
     contentWidth: 'Fixed',
     colorPrimary: '#2F54EB',
     fixedHeader: true,
+    siderMenuType: 'group',
     footerRender: false,
   }
 

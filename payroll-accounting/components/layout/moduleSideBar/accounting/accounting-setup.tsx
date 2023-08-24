@@ -5,12 +5,18 @@ const AccountingSetupMenu = {
     path: '/',
     routes: [
       {
-        path: '/accounting/accounting-setup/accounting-period',
-        name: 'Accounting Period',
-      },
-      {
-        path: '/accounting/accounting-setup/mother-account',
-        name: 'Mother Account',
+        path: '/accounting/accounting-setup',
+        name: 'Accounting Setup',
+        routes: [
+          {
+            path: '/accounting/accounting-setup/accounting-period',
+            name: 'Accounting Period',
+          },
+          {
+            path: '/accounting/accounting-setup/mother-account',
+            name: 'Mother Account',
+          },
+        ],
       },
     ],
   },
