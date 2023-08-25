@@ -26,14 +26,14 @@ import {
   GET_SALARY_RATE_MULTIPLIER,
   SAVE_SALARY_RATE_MULTIPLIER,
 } from "@/graphql/company/queries";
-import { result } from "lodash";
+import _ from "lodash";
 
 function SalaryRateConfig() {
   const [form] = Form.useForm();
   const { data, loading } = useQuery(GET_SALARY_RATE_MULTIPLIER, {
     onCompleted: (result) => {
       let { salarRateMultiplier } = result || {};
-      form.resetFields({ ...salarRateMultiplier });
+      form.setFieldsValue(salarRateMultiplier);
     },
   });
 
@@ -90,38 +90,11 @@ function SalaryRateConfig() {
             }
           >
             <Form
+              form={form}
               name="upsertForm"
               layout="vertical"
               onFinish={onSubmit}
               onFinishFailed={onFinishFailed}
-              initialValues={{
-                regular: data?.salarRateMultiplier?.regular,
-                restday: data?.salarRateMultiplier?.restday,
-                specialHoliday: data?.salarRateMultiplier?.specialHoliday,
-                specialHolidayAndRestDay:
-                  data?.salarRateMultiplier?.specialHolidayAndRestDay,
-                regularHoliday: data?.salarRateMultiplier?.regularHoliday,
-                regularHolidayAndRestDay:
-                  data?.salarRateMultiplier?.regularHolidayAndRestDay,
-                doubleHoliday: data?.salarRateMultiplier?.doubleHoliday,
-                doubleHolidayAndRestDay:
-                  data?.salarRateMultiplier?.doubleHolidayAndRestDay,
-                regularOvertime: data?.salarRateMultiplier?.regularOvertime,
-                restdayOvertime: data?.salarRateMultiplier?.restdayOvertime,
-                specialHolidayOvertime:
-                  data?.salarRateMultiplier?.specialHolidayOvertime,
-                specialHolidayAndRestDayOvertime:
-                  data?.salarRateMultiplier?.specialHolidayAndRestDayOvertime,
-                regularHolidayOvertime:
-                  data?.salarRateMultiplier?.regularHolidayOvertime,
-                regularHolidayAndRestDayOvertime:
-                  data?.salarRateMultiplier?.regularHolidayAndRestDayOvertime,
-                doubleHolidayOvertime:
-                  data?.salarRateMultiplier?.doubleHolidayOvertime,
-                doubleHolidayAndRestDayOvertime:
-                  data?.salarRateMultiplier?.doubleHolidayAndRestDayOvertime,
-                nightDifferential: data?.salarRateMultiplier?.nightDifferential,
-              }}
             >
               <Row gutter={[12, 12]}>
                 <Col span={12}>
@@ -131,7 +104,7 @@ function SalaryRateConfig() {
                         Scheduled Work Multiplier
                       </Typography.Title>
                       <Divider />
-                      <Row gutter={[10, 12]} key={name + ""}>
+                      <Row gutter={[10, 12]}>
                         {ScheduledWorkFields.map(({ title, name }) => {
                           return (
                             <>
@@ -178,7 +151,7 @@ function SalaryRateConfig() {
                         Overtime Work Multiplier
                       </Typography.Title>
                       <Divider />
-                      <Row gutter={[10, 12]} key={name + "_overtime"}>
+                      <Row gutter={[10, 12]}>
                         {ScheduledWorkFields.map(({ title, name }) => {
                           return (
                             <>
