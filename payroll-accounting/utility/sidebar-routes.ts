@@ -6,4 +6,9 @@ export const payrollConfigurations: MenuProps["items"] = [
     icon: "",
     label: "Schedule Type Setup",
   },
+  {
+    key: "/payroll/configurations/salary-rate-config",
+    icon: "",
+    label: "Salary Rate Config",
+  },
 ];
