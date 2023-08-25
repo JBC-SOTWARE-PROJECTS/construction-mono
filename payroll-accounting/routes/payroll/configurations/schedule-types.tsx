@@ -1,11 +1,9 @@
-import { Sidebar } from "@/components/common";
 import CustomButton from "@/components/common/CustomButton";
 import UpsertScheduleType from "@/components/payroll/configurations/UpsertScheduleType";
 import { Schedule } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
 import { IPageProps } from "@/utility/interfaces";
-import { payrollConfigurations } from "@/utility/sidebar-routes";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -119,35 +117,33 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
   };
 
   return (
-    <Sidebar menuItems={payrollConfigurations}>
-      <PageContainer title="Configurations">
-        <ProCard
-          title="Work Schedule Setup"
-          headStyle={{
-            flexWrap: "wrap",
-          }}
-          extra={
-            <ProFormGroup>
-              <CustomButton
-                type="primary"
-                icon={<PlusCircleOutlined />}
-                onClick={() => {
-                  showDialog({}, closeCallBack);
-                }}
-                allowedPermissions={["add_edit_schedule_type"]}
-              >
-                Create New
-              </CustomButton>
-            </ProFormGroup>
-          }
-        >
-          <Head>
-            <title>Work Schedule Setup</title>
-          </Head>
+    <PageContainer title="Configurations">
+      <ProCard
+        title="Work Schedule Setup"
+        headStyle={{
+          flexWrap: "wrap",
+        }}
+        extra={
+          <ProFormGroup>
+            <CustomButton
+              type="primary"
+              icon={<PlusCircleOutlined />}
+              onClick={() => {
+                showDialog({}, closeCallBack);
+              }}
+              allowedPermissions={["add_edit_schedule_type"]}
+            >
+              Create New
+            </CustomButton>
+          </ProFormGroup>
+        }
+      >
+        <Head>
+          <title>Work Schedule Setup</title>
+        </Head>
 
-          <Table columns={columns} dataSource={schedules} />
-        </ProCard>
-      </PageContainer>
-    </Sidebar>
+        <Table columns={columns} dataSource={schedules} />
+      </ProCard>
+    </PageContainer>
   );
 }
