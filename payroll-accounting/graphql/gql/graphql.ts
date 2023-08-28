@@ -419,6 +419,32 @@ export type EmployeeInput = {
   zipCode?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type EmployeeSchedule = {
+  __typename?: 'EmployeeSchedule';
+  color?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dateTimeEnd?: Maybe<Scalars['Instant']['output']>;
+  dateTimeStart?: Maybe<Scalars['Instant']['output']>;
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  employee?: Maybe<Employee>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isCustom?: Maybe<Scalars['Boolean']['output']>;
+  isLeave?: Maybe<Scalars['Boolean']['output']>;
+  isOvertime?: Maybe<Scalars['Boolean']['output']>;
+  isRestDay?: Maybe<Scalars['Boolean']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  locked?: Maybe<Scalars['Boolean']['output']>;
+  mealBreakEnd?: Maybe<Scalars['Instant']['output']>;
+  mealBreakStart?: Maybe<Scalars['Instant']['output']>;
+  request?: Maybe<Scalars['UUID']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  withPay?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type Endorsement = {
   __typename?: 'Endorsement';
   aircon?: Maybe<Scalars['String']['output']>;
@@ -591,6 +617,14 @@ export type GraphQlRetVal_Boolean = {
   __typename?: 'GraphQLRetVal_Boolean';
   message?: Maybe<Scalars['String']['output']>;
   payload?: Maybe<Scalars['Boolean']['output']>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlRetVal_EmployeeSchedule = {
+  __typename?: 'GraphQLRetVal_EmployeeSchedule';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<EmployeeSchedule>;
   returnId?: Maybe<Scalars['UUID']['output']>;
   success: Scalars['Boolean']['output'];
 };
@@ -1136,9 +1170,9 @@ export type Mutation = {
   upsertChargeInvoice?: Maybe<ChargeInvoice>;
   upsertCompany?: Maybe<CompanySettings>;
   upsertCustomer?: Maybe<Customer>;
-  /** create or update department schedule config. */
-  upsertDepartementSchedule?: Maybe<GraphQlRetVal_Schedule>;
   upsertEmployee?: Maybe<Employee>;
+  /** create or update schedule config. */
+  upsertEmployeeSchedule?: Maybe<GraphQlRetVal_EmployeeSchedule>;
   upsertFiscal?: Maybe<Fiscal>;
   upsertGenerics?: Maybe<Generic>;
   upsertGroupPolicy?: Maybe<GroupPolicy>;
@@ -1182,6 +1216,8 @@ export type Mutation = {
   upsertRtsItem?: Maybe<ReturnSupplierItem>;
   upsertSTI?: Maybe<StockIssue>;
   upsertScheduleLock?: Maybe<GraphQlRetVal_ScheduleLock>;
+  /** create or update schedule config. */
+  upsertScheduleType?: Maybe<GraphQlRetVal_Schedule>;
   upsertService?: Maybe<ServiceManagement>;
   upsertServiceCategory?: Maybe<ServiceCategory>;
   upsertServiceItem?: Maybe<ServiceItems>;
@@ -1758,14 +1794,6 @@ export type MutationUpsertCustomerArgs = {
 
 
 /** Mutation root */
-export type MutationUpsertDepartementScheduleArgs = {
-  department_id?: InputMaybe<Scalars['UUID']['input']>;
-  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Mutation root */
 export type MutationUpsertEmployeeArgs = {
   authorities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
@@ -1773,6 +1801,14 @@ export type MutationUpsertEmployeeArgs = {
   officeId?: InputMaybe<Scalars['UUID']['input']>;
   permissions?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   position?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertEmployeeScheduleArgs = {
+  empId?: InputMaybe<Scalars['UUID']['input']>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -2094,6 +2130,13 @@ export type MutationUpsertStiArgs = {
 /** Mutation root */
 export type MutationUpsertScheduleLockArgs = {
   fields: Scalars['Map_String_ObjectScalar']['input'];
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertScheduleTypeArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -3369,8 +3412,6 @@ export type Query = {
   getLegerByDoc?: Maybe<Array<Maybe<InventoryLedger>>>;
   getMaterialByRefStockCard?: Maybe<ProjectUpdatesMaterials>;
   getOnHandByItem?: Maybe<Inventory>;
-  /** get one department schedule config */
-  getOneDepartmentSchedule?: Maybe<Array<Maybe<Schedule>>>;
   getPOMonitoringByPoItemFilter?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
   getPOMonitoringByRec?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
   getPlateNo?: Maybe<Array<Maybe<PlateNumberDto>>>;
@@ -3378,6 +3419,8 @@ export type Query = {
   getPrItemInPO?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getProjectMaterialsByMilestone?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
   getScheduleLock?: Maybe<Scalars['Map_String_ScheduleLockScalar']['output']>;
+  /** get all schedule type config */
+  getScheduleTypes?: Maybe<Array<Maybe<Schedule>>>;
   getSrrByDateRange?: Maybe<Array<Maybe<ReceivingReport>>>;
   /** List of receiving report list per date range */
   getSrrItemByDateRange?: Maybe<Array<Maybe<ReceivingReportItem>>>;
@@ -3992,12 +4035,6 @@ export type QueryGetMaterialByRefStockCardArgs = {
 export type QueryGetOnHandByItemArgs = {
   itemId?: InputMaybe<Scalars['UUID']['input']>;
   office?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Query root */
-export type QueryGetOneDepartmentScheduleArgs = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -5242,6 +5279,7 @@ export type SalesReportDto = {
 export type Schedule = {
   __typename?: 'Schedule';
   color?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   dateTimeEnd?: Maybe<Scalars['String']['output']>;

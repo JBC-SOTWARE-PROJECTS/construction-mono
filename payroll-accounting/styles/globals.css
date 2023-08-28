@@ -301,3 +301,19 @@ th.ant-table-cell {
   margin-left: 16px;
   width: calc(100% - 58px);
 }
+
+.test_custom_calender table tbody tr {
+  font-size: 2rem !important;
+  height: 70px !important;
+}
+.test_custom_calender table thead tr {
+  font-size: 2rem !important;
+  height: 70px !important;
+}
+
+/* .test_custom_calender,
+th {
+  font-size: 2rem;
+  font-weight: bolder;
+  height: 50px;
+} */
