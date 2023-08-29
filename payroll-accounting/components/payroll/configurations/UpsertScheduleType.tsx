@@ -27,7 +27,7 @@ const colSpan2 = {
 const ADD_DEPARTMENT_SCHEDULE = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     data: upsertScheduleType(id: $id, fields: $fields) {
-      payload {
+      response {
         id
       }
       success
@@ -63,6 +63,8 @@ function UpsertScheduleType(props: IProps) {
       },
     }
   );
+
+  function myFunc() {}
 
   const onSubmit = (values: any) => {
     let payload = { ...values };

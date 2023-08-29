@@ -19,7 +19,7 @@ const administrativeMenu: TDiverseTradeMenu[] = [
     path: "/payroll/attendance/upload-biometric",
   },
   {
-    title: "Work Schedule",
+    title: "Employee Work Schedule",
     subtitle: "View and manage employee work schedule",
     icon: <CalendarOutlined className="diverse-trade-icon" />,
     path: "/payroll/employee-schedule",

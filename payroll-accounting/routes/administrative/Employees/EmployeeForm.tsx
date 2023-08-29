@@ -164,7 +164,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
     },
     fetchPolicy: "network-only",
     onCompleted: (res) => {
-      debugger;
       setState({
         ...state,
         city: res.data.cityMunicipality,
@@ -287,7 +286,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
   };
 
   const handleChangeAddress = (value: any, address: string) => {
-    debugger;
     let obj = _.find(_.get(addressData, address), ["value", value]);
     if (obj) setState({ ...state, [address]: obj.id });
   };

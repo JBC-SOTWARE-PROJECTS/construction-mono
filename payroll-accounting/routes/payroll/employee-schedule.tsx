@@ -1,7 +1,8 @@
 import CustomButton from "@/components/common/CustomButton";
 import ScheduleCell from "@/components/payroll/employee-schedule/ScheduleCell";
-import { EmployeeSchedule } from "@/graphql/gql/graphql";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
+import useGetEmployeeSchedule from "@/hooks/employee-schedule/useGetEmployeeSchedule";
+import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 import { IPageProps } from "@/utility/interfaces";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import {
@@ -9,9 +10,9 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { MenuProps, Table } from "antd";
-import { ColumnsType } from "antd/es/table";
+import { DatePicker, Table } from "antd";
 import dayjs from "dayjs";
+import { startCase, toLower } from "lodash";
 import Head from "next/head";
 import { useState } from "react";
 
@@ -33,34 +34,21 @@ const initialState: IState = {
   position: null,
 };
 
-const dummayData = [
-  {
-    fullName: "John Michael Hinacay",
-    // 08_01_2023
-  },
-];
-
-const items: MenuProps["items"] = [
-  {
-    label: "1st menu item",
-    key: "1",
-  },
-  {
-    label: "2nd menu item",
-    key: "2",
-  },
-  {
-    label: "3rd menu item",
-    key: "3",
-  },
-];
-
 export default function ScheduleTypeSetup({ account }: IPageProps) {
-  const [schedules, loading] = useGetScheduleTypes();
   const [dates, setDates] = useState([
     dayjs().startOf("month"),
     dayjs().endOf("month"),
   ]);
+
+  const [schedules, loadingSchedules] = useGetScheduleTypes();
+  const { upsertEmployeeSchedule, loadingUpsert } = useUpsertEmployeeSchedule(
+    () => {
+      refetchEmployes();
+    }
+  );
+  const [employees, loadingEmployees, refetchEmployes] = useGetEmployeeSchedule(
+    { startDate: dates[0], endDate: dates[1] }
+  );
 
   const additionalColumns = () => {
     const start = dates[0];
@@ -69,30 +57,51 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
     let newColumns = [];
 
     while (currentDate.isBefore(end) || currentDate.isSame(end)) {
+      const date = currentDate.clone();
       newColumns.push({
         title: currentDate.format("MMM DD, YYYY (ddd)"),
-        dataIndex: currentDate.format("MM_dd_yyyy"),
-        key: currentDate.format("MM_dd_yyyy"),
+        dataIndex: ["schedule", currentDate.format("MM_DD_YYYY")],
+        key: currentDate.format("MM_DD_YYYY"),
         width: 150,
-        render: (val: string, { id }: EmployeeSchedule) => {
-          return <ScheduleCell schedules={schedules} employeeId={id} />;
+        render: (val: any, { id }: any) => {
+          return (
+            <ScheduleCell
+              currentDate={date}
+              schedules={schedules}
+              employeeSchedule={val}
+              employeeId={id}
+              upsertEmpSchedule={upsertEmployeeSchedule}
+            />
+          );
         },
       });
+
       currentDate = currentDate.add(1, "day");
     }
-
     return newColumns;
   };
 
-  let columns: ColumnsType<EmployeeSchedule> = [
+  let columns = [
     {
       title: <></>,
       dataIndex: "fullName",
       key: "fullName",
       width: 300,
+      render: (val: string) => {
+        return startCase(toLower(val));
+      },
     },
     ...additionalColumns(),
   ];
+
+  const handleDateChange = (dates: any) => {
+    try {
+      setDates([dayjs(dates[0]).startOf("day"), dayjs(dates[1]).endOf("day")]);
+    } catch {
+      setDates([dayjs().startOf("month"), dayjs().endOf("month")]);
+    }
+  };
+
   return (
     <PageContainer title="Employee Schedule Management">
       <ProCard
@@ -102,6 +111,11 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
         }}
         extra={
           <ProFormGroup>
+            <DatePicker.RangePicker
+              onChange={(dates: any) => {
+                handleDateChange(dates);
+              }}
+            />
             <CustomButton
               type="primary"
               icon={<PlusCircleOutlined />}
@@ -118,9 +132,10 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
         <Table
           rowKey="id"
           size="small"
-          dataSource={dummayData}
+          dataSource={employees}
           columns={columns}
           pagination={false}
+          loading={loadingEmployees || loadingSchedules || loadingUpsert}
           scroll={{ x: 1600, y: "calc(100vh - 330px)" }}
         />
       </ProCard>

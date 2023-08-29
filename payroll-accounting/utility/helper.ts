@@ -93,3 +93,10 @@ export const dateEndToString = (date: Dayjs) => {
   const startOfDay = dayjs(date).endOf("day");
   return `${startOfDay.format(instantFormat)}Z`;
 };
+
+export function transformDate(currentDate: dayjs.Dayjs, referenceDate: string) {
+  const hour = dayjs(referenceDate).get("h");
+  const minute = dayjs(referenceDate).get("m");
+  const transformedDate = currentDate.set("hour", hour).set("minute", minute);
+  return transformedDate;
+}
