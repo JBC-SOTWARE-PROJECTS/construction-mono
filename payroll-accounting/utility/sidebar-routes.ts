@@ -11,4 +11,9 @@ export const payrollConfigurations: MenuProps["items"] = [
     icon: "",
     label: "Salary Rate Config",
   },
+  {
+    key: "/payroll/configurations/contribution-management",
+    icon: "",
+    label: "Contribution Management",
+  },
 ];
