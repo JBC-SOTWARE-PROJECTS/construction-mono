@@ -28,11 +28,49 @@ export type Scalars = {
   Map_String_ObjectScalar: { input: any; output: any; }
   /** Built-in scalar for map-like structures */
   Map_String_ScheduleLockScalar: { input: any; output: any; }
+  /** Built-in scalar for map-like structures */
+  Map_String_StringScalar: { input: any; output: any; }
   /** Unrepresentable type */
   UNREPRESENTABLE: { input: any; output: any; }
   /** UUID String */
   UUID: { input: any; output: any; }
 };
+
+export enum AccountCategory {
+  Asset = 'ASSET',
+  CostOfSale = 'COST_OF_SALE',
+  Equity = 'EQUITY',
+  Expense = 'EXPENSE',
+  GainAndLoss = 'GAIN_AND_LOSS',
+  Liability = 'LIABILITY',
+  OtherComprehensiveIncome = 'OTHER_COMPREHENSIVE_INCOME',
+  Revenue = 'REVENUE'
+}
+
+export enum AccountType {
+  AdditionalPaidInCapital = 'ADDITIONAL_PAID_IN_CAPITAL',
+  ChangesInFairValue = 'CHANGES_IN_FAIR_VALUE',
+  CommonStock = 'COMMON_STOCK',
+  CurrencyTranslationAdjustments = 'CURRENCY_TRANSLATION_ADJUSTMENTS',
+  CurrentAssets = 'CURRENT_ASSETS',
+  CurrentLiabilities = 'CURRENT_LIABILITIES',
+  DepreciationAmortization = 'DEPRECIATION_AMORTIZATION',
+  DirectCosts = 'DIRECT_COSTS',
+  GainOnSaleOfAssets = 'GAIN_ON_SALE_OF_ASSETS',
+  IntercompanyReceivablesPayables = 'INTERCOMPANY_RECEIVABLES_PAYABLES',
+  InterestExpenses = 'INTEREST_EXPENSES',
+  InterestIncome = 'INTEREST_INCOME',
+  LossOnImpairment = 'LOSS_ON_IMPAIRMENT',
+  NonCurrentAsset = 'NON_CURRENT_ASSET',
+  NonCurrentLiability = 'NON_CURRENT_LIABILITY',
+  OperatingExpenses = 'OPERATING_EXPENSES',
+  OtherExpenses = 'OTHER_EXPENSES',
+  OtherRevenue = 'OTHER_REVENUE',
+  RentalIncome = 'RENTAL_INCOME',
+  RetainedEarnings = 'RETAINED_EARNINGS',
+  SalesRevenue = 'SALES_REVENUE',
+  Taxes = 'TAXES'
+}
 
 export type Assets = {
   __typename?: 'Assets';
@@ -213,6 +251,17 @@ export type ChargeItemsDto = {
   unitCost?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
+export type ChartOfAccountGenerate = {
+  __typename?: 'ChartOfAccountGenerate';
+  accountType?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  fromGenerator?: Maybe<Scalars['Boolean']['output']>;
+  motherAccount?: Maybe<CoaComponentContainer>;
+  subAccount?: Maybe<CoaComponentContainer>;
+  subSubAccount?: Maybe<CoaComponentContainer>;
+};
+
 export type City = {
   __typename?: 'City';
   cityName?: Maybe<Scalars['String']['output']>;
@@ -220,6 +269,15 @@ export type City = {
   name?: Maybe<Scalars['String']['output']>;
   province?: Maybe<Province>;
   region?: Maybe<Region>;
+};
+
+export type CoaComponentContainer = {
+  __typename?: 'CoaComponentContainer';
+  code?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  normalSide?: Maybe<Scalars['String']['output']>;
 };
 
 export type CompanySettings = {
@@ -545,6 +603,7 @@ export type EndorsementInput = {
 export type Fiscal = {
   __typename?: 'Fiscal';
   active?: Maybe<Scalars['Boolean']['output']>;
+  company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   fiscalId?: Maybe<Scalars['String']['output']>;
@@ -995,6 +1054,11 @@ export type JobStatus = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
 };
 
+export enum JournalPlacement {
+  Credit = 'CREDIT',
+  Debit = 'DEBIT'
+}
+
 export type MaterialProduction = {
   __typename?: 'MaterialProduction';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -1064,6 +1128,8 @@ export type Mutation = {
   cancelItem?: Maybe<BillingItem>;
   changeCompany?: Maybe<Employee>;
   changePassword?: Maybe<Scalars['String']['output']>;
+  /** insert chartsOfAccounts */
+  chartsOfAccounts?: Maybe<ParentAccount>;
   clearSchedule?: Maybe<GraphQlRetVal_String>;
   closeBilling?: Maybe<Billing>;
   /** close shift */
@@ -1136,8 +1202,6 @@ export type Mutation = {
   upsertChargeInvoice?: Maybe<ChargeInvoice>;
   upsertCompany?: Maybe<CompanySettings>;
   upsertCustomer?: Maybe<Customer>;
-  /** create or update department schedule config. */
-  upsertDepartementSchedule?: Maybe<GraphQlRetVal_Schedule>;
   upsertEmployee?: Maybe<Employee>;
   upsertFiscal?: Maybe<Fiscal>;
   upsertGenerics?: Maybe<Generic>;
@@ -1182,12 +1246,15 @@ export type Mutation = {
   upsertRtsItem?: Maybe<ReturnSupplierItem>;
   upsertSTI?: Maybe<StockIssue>;
   upsertScheduleLock?: Maybe<GraphQlRetVal_ScheduleLock>;
+  /** create or update schedule config. */
+  upsertScheduleType?: Maybe<GraphQlRetVal_Schedule>;
   upsertService?: Maybe<ServiceManagement>;
   upsertServiceCategory?: Maybe<ServiceCategory>;
   upsertServiceItem?: Maybe<ServiceItems>;
   /** Insert/Update Signature */
   upsertSignature?: Maybe<Signature>;
   upsertStiItem?: Maybe<StockIssueItems>;
+  upsertSubAccount?: Maybe<SubAccountSetup>;
   upsertSupplier?: Maybe<Supplier>;
   upsertSupplierItem?: Maybe<SupplierItem>;
   upsertSupplierType?: Maybe<SupplierType>;
@@ -1298,6 +1365,13 @@ export type MutationChangeCompanyArgs = {
 /** Mutation root */
 export type MutationChangePasswordArgs = {
   username?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationChartsOfAccountsArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -1758,14 +1832,6 @@ export type MutationUpsertCustomerArgs = {
 
 
 /** Mutation root */
-export type MutationUpsertDepartementScheduleArgs = {
-  department_id?: InputMaybe<Scalars['UUID']['input']>;
-  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Mutation root */
 export type MutationUpsertEmployeeArgs = {
   authorities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
@@ -2099,6 +2165,13 @@ export type MutationUpsertScheduleLockArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertScheduleTypeArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertServiceArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -2131,6 +2204,13 @@ export type MutationUpsertStiItemArgs = {
   dto?: InputMaybe<PurchaseIssuanceDtoInput>;
   item?: InputMaybe<ItemInput>;
   pr?: InputMaybe<StockIssueInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertSubAccountArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -2193,6 +2273,11 @@ export type MutationVoidLedgerByRefExpenseArgs = {
 export type MutationVoidOrArgs = {
   paymentId?: InputMaybe<Scalars['UUID']['input']>;
 };
+
+export enum NormalSide {
+  Credit = 'CREDIT',
+  Debit = 'DEBIT'
+}
 
 export type Notification = {
   __typename?: 'Notification';
@@ -2511,6 +2596,25 @@ export type Page_Office = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_ParentAccount = {
+  __typename?: 'Page_ParentAccount';
+  content?: Maybe<Array<Maybe<ParentAccount>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_Position = {
   __typename?: 'Page_Position';
   content?: Maybe<Array<Maybe<Position>>>;
@@ -2687,6 +2791,27 @@ export type Pagination = {
   pageNumber: Scalars['Int']['output'];
   pageSize: Scalars['Int']['output'];
   sort?: Maybe<Sort>;
+};
+
+export type ParentAccount = {
+  __typename?: 'ParentAccount';
+  accountCategory?: Maybe<AccountCategory>;
+  accountName?: Maybe<Scalars['String']['output']>;
+  accountTrace?: Maybe<Scalars['String']['output']>;
+  accountType?: Maybe<AccountType>;
+  code?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dateCreated?: Maybe<Scalars['Instant']['output']>;
+  deprecated?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isContra?: Maybe<Scalars['Boolean']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  normalSide?: Maybe<NormalSide>;
+  tags?: Maybe<Scalars['String']['output']>;
 };
 
 export type Payment = {
@@ -3279,6 +3404,8 @@ export type Query = {
   ItemExpense?: Maybe<Array<Maybe<StockIssueItems>>>;
   /** Get User by login */
   account?: Maybe<Employee>;
+  /** List of charts of Accounts */
+  accountBalancesCoaList?: Maybe<Array<Maybe<ChartOfAccountGenerate>>>;
   /** Get All Offices Active */
   activeOffices?: Maybe<Array<Maybe<Office>>>;
   /** Search Positions Active */
@@ -3315,6 +3442,8 @@ export type Query = {
   checkBalancesByPO?: Maybe<Array<Maybe<PurchaseOrderItemsMonitoring>>>;
   cityByProvince?: Maybe<Array<Maybe<City>>>;
   cityFilter?: Maybe<Array<Maybe<City>>>;
+  /** List of charts of Accounts */
+  coaList?: Maybe<Array<Maybe<ParentAccount>>>;
   comById?: Maybe<CompanySettings>;
   companyList?: Maybe<Array<Maybe<CompanySettings>>>;
   companyListSelection?: Maybe<Array<Maybe<CompanySettings>>>;
@@ -3353,13 +3482,18 @@ export type Query = {
   genericActive?: Maybe<Array<Maybe<Generic>>>;
   genericList?: Maybe<Array<Maybe<Generic>>>;
   getAllAmounts?: Maybe<Scalars['BigDecimal']['output']>;
+  getAllChartOfAccountGenerate?: Maybe<Array<Maybe<ChartOfAccountGenerate>>>;
   getAmounts?: Maybe<Scalars['BigDecimal']['output']>;
   getAmountsDeduct?: Maybe<Scalars['BigDecimal']['output']>;
+  getAutoIntegrateableFromDomain?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   getBalance?: Maybe<Scalars['BigDecimal']['output']>;
   getBillingItemFilterActive?: Maybe<Array<Maybe<BillingItem>>>;
   getBrands?: Maybe<Array<Maybe<BrandDto>>>;
   getCategoryProjects?: Maybe<Array<Maybe<CategoryDto>>>;
+  /** Get getCoaById */
+  getCoaById?: Maybe<ParentAccount>;
   getDocTypeById?: Maybe<DocumentTypes>;
+  getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
   getItemByName?: Maybe<Array<Maybe<Item>>>;
@@ -3369,8 +3503,6 @@ export type Query = {
   getLegerByDoc?: Maybe<Array<Maybe<InventoryLedger>>>;
   getMaterialByRefStockCard?: Maybe<ProjectUpdatesMaterials>;
   getOnHandByItem?: Maybe<Inventory>;
-  /** get one department schedule config */
-  getOneDepartmentSchedule?: Maybe<Array<Maybe<Schedule>>>;
   getPOMonitoringByPoItemFilter?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
   getPOMonitoringByRec?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
   getPlateNo?: Maybe<Array<Maybe<PlateNumberDto>>>;
@@ -3378,9 +3510,15 @@ export type Query = {
   getPrItemInPO?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getProjectMaterialsByMilestone?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
   getScheduleLock?: Maybe<Scalars['Map_String_ScheduleLockScalar']['output']>;
+  /** get all schedule type config */
+  getScheduleTypes?: Maybe<Array<Maybe<Schedule>>>;
+  getSetupBySubAccountType?: Maybe<Array<Maybe<SubAccountSetup>>>;
+  getSetupBySubAccountTypeAll?: Maybe<Array<Maybe<SubAccountSetup>>>;
   getSrrByDateRange?: Maybe<Array<Maybe<ReceivingReport>>>;
   /** List of receiving report list per date range */
   getSrrItemByDateRange?: Maybe<Array<Maybe<ReceivingReportItem>>>;
+  getSubaccountForParent?: Maybe<Array<Maybe<SubAccountSetup>>>;
+  getSubaccountableFromDomain?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   getTotalMaterials?: Maybe<Scalars['BigDecimal']['output']>;
   getTotals?: Maybe<Scalars['BigDecimal']['output']>;
   getUnitProjects?: Maybe<Array<Maybe<UnitDto>>>;
@@ -3427,6 +3565,9 @@ export type Query = {
   jobStatusList?: Maybe<Array<Maybe<JobStatus>>>;
   jobTypeUnits?: Maybe<ItemJobsDto>;
   monById?: Maybe<PurchaseOrderItemsMonitoring>;
+  motherAccountsListWithNoSetup?: Maybe<Array<Maybe<ParentAccount>>>;
+  /** List of Mother Accounts */
+  motherAccountsPage?: Maybe<Page_ParentAccount>;
   mpByFiltersPage?: Maybe<Page_MaterialProduction>;
   mpById?: Maybe<MaterialProduction>;
   mpItemById?: Maybe<MaterialProductionItem>;
@@ -3540,6 +3681,8 @@ export type Query = {
   salesChartsRevenue?: Maybe<SalesChartsDto>;
   /** salesReport */
   salesReport?: Maybe<Array<Maybe<SalesReportDto>>>;
+  /** Search COA by Page */
+  searchCoaByPage?: Maybe<Page_ParentAccount>;
   /** Search employees */
   searchEmployees?: Maybe<Array<Maybe<Employee>>>;
   /** Search employees by role */
@@ -3570,6 +3713,7 @@ export type Query = {
   stiItemByParent?: Maybe<Array<Maybe<StockIssueItems>>>;
   /** List of Stock Card */
   stockCard?: Maybe<Array<Maybe<StockCard>>>;
+  subaccountTypeAll?: Maybe<Array<Maybe<Scalars['Map_String_StringScalar']['output']>>>;
   supById?: Maybe<Supplier>;
   supItemById?: Maybe<SupplierItem>;
   supplierActive?: Maybe<Array<Maybe<Supplier>>>;
@@ -3613,6 +3757,12 @@ export type QueryItemExpenseArgs = {
   expenseFrom?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
   start?: InputMaybe<Scalars['Instant']['input']>;
+};
+
+
+/** Query root */
+export type QueryAccountBalancesCoaListArgs = {
+  motherAccountCode?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
@@ -3910,6 +4060,17 @@ export type QueryGetAllAmountsArgs = {
 
 
 /** Query root */
+export type QueryGetAllChartOfAccountGenerateArgs = {
+  accountType?: InputMaybe<Scalars['String']['input']>;
+  department?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  excludeMotherAccount?: InputMaybe<Scalars['Boolean']['input']>;
+  motherAccountCode?: InputMaybe<Scalars['String']['input']>;
+  subaccountType?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetAmountsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -3933,6 +4094,12 @@ export type QueryGetBalanceArgs = {
 export type QueryGetBillingItemFilterActiveArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+/** Query root */
+export type QueryGetCoaByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -3996,12 +4163,6 @@ export type QueryGetOnHandByItemArgs = {
 
 
 /** Query root */
-export type QueryGetOneDepartmentScheduleArgs = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Query root */
 export type QueryGetPoMonitoringByPoItemFilterArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -4044,6 +4205,13 @@ export type QueryGetProjectMaterialsByMilestoneArgs = {
 export type QueryGetScheduleLockArgs = {
   endDate?: InputMaybe<Scalars['Instant']['input']>;
   startDate?: InputMaybe<Scalars['Instant']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetSetupBySubAccountTypeArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  subaccountType?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -4310,6 +4478,14 @@ export type QueryJobStatusListArgs = {
 /** Query root */
 export type QueryMonByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryMotherAccountsPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -4782,6 +4958,14 @@ export type QuerySalesReportArgs = {
 
 
 /** Query root */
+export type QuerySearchCoaByPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QuerySearchEmployeesArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
 };
@@ -5242,6 +5426,7 @@ export type SalesReportDto = {
 export type Schedule = {
   __typename?: 'Schedule';
   color?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   dateTimeEnd?: Maybe<Scalars['String']['output']>;
@@ -5444,6 +5629,71 @@ export type StockIssueItems = {
   unitCost?: Maybe<Scalars['BigDecimal']['output']>;
   unitMeasurement?: Maybe<Scalars['String']['output']>;
   uou?: Maybe<Scalars['String']['output']>;
+};
+
+export type SubAccountSetup = {
+  __typename?: 'SubAccountSetup';
+  attachedValue?: Maybe<Scalars['BigDecimal']['output']>;
+  attrAccrualExpense?: Maybe<Scalars['Boolean']['output']>;
+  attrAccrualOfIncome?: Maybe<Scalars['Boolean']['output']>;
+  attrBeginningBalance?: Maybe<Scalars['Boolean']['output']>;
+  attrCreditMemoAdj?: Maybe<Scalars['Boolean']['output']>;
+  attrDebitMemoAdjustment?: Maybe<Scalars['Boolean']['output']>;
+  attrExpenseAccount?: Maybe<Scalars['Boolean']['output']>;
+  attrInactive?: Maybe<Scalars['Boolean']['output']>;
+  attrIncludePostingAccruedIncomeMultipleCustomer?: Maybe<Scalars['Boolean']['output']>;
+  attrNonTradeCashReceipts?: Maybe<Scalars['Boolean']['output']>;
+  attrVatable?: Maybe<Scalars['Boolean']['output']>;
+  category?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  departmentIncludes?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  includeDepartment?: Maybe<Scalars['Boolean']['output']>;
+  journalPlacement?: Maybe<JournalPlacement>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  motherAccountsList?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  parentAccounts?: Maybe<Array<Maybe<SubParentAccount>>>;
+  requireRemarks?: Maybe<Scalars['Boolean']['output']>;
+  selectedDepartments?: Maybe<Array<Maybe<Scalars['UUID']['output']>>>;
+  sourceDomain?: Maybe<Scalars['String']['output']>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
+  subaccountParent?: Maybe<SubAccountSetup>;
+  subaccountType?: Maybe<SubAccountType>;
+  subaccountTypeDesc?: Maybe<Scalars['String']['output']>;
+};
+
+export enum SubAccountType {
+  Adjustments = 'ADJUSTMENTS',
+  Assetclass = 'ASSETCLASS',
+  Expense = 'EXPENSE',
+  Income = 'INCOME',
+  Otherentities = 'OTHERENTITIES',
+  Otherpayments = 'OTHERPAYMENTS',
+  Pettycash = 'PETTYCASH',
+  Quantityadjustments = 'QUANTITYADJUSTMENTS',
+  Revenueitems = 'REVENUEITEMS'
+}
+
+export type SubParentAccount = {
+  __typename?: 'SubParentAccount';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  parentAccount?: Maybe<ParentAccount>;
+  subAccount?: Maybe<SubAccountSetup>;
+};
+
+export type Subaccountable = {
+  __typename?: 'Subaccountable';
+  code?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
 };
 
 export type Supplier = {

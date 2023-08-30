@@ -49,15 +49,7 @@ class Discount extends AbstractAuditingEntity implements Subaccountable, Seriali
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "type", columnDefinition = "varchar")
 	DiscountType type
-	
-	@GraphQLQuery
-	@Column(name = "applyhci", columnDefinition = "bool")
-	Boolean applyhci
-	
-	@GraphQLQuery
-	@Column(name = "applypf", columnDefinition = "bool")
-	Boolean applypf
-	
+
 	@GraphQLQuery
 	@Column(name = "from_initial", columnDefinition = "bool")
 	Boolean fromInitial

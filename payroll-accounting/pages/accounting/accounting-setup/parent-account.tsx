@@ -2,7 +2,7 @@ import React from 'react'
 import asyncComponent from '@/utility/asyncComponent'
 
 const ParentAccount = asyncComponent(
-  () => import('@/routes/accounting/accounting-setup/accounting-period')
+  () => import('@/routes/accounting/accounting-setup/parent-acount')
 )
 
 const ParentAccountPage = () => {

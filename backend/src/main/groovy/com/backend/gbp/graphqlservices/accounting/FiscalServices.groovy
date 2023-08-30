@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.Fiscal
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -56,13 +57,14 @@ class FiscalServices extends AbstractDaoService<Fiscal> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-		
-		getPageable("Select c from Fiscal c  where lower(c.remarks) like lower(concat('%',:filter,'%')) ORDER BY c.fiscalId ASC",
-				"Select count(c) from Fiscal c  where lower(c.remarks) like lower(concat('%',:filter,'%'))",
+		UUID companyId = SecurityUtils.currentCompanyId()
+		getPageable("Select c from Fiscal c  where c.company.id = :companyId and lower(c.remarks) like lower(concat('%',:filter,'%')) ORDER BY c.fiscalId ASC",
+				"Select count(c) from Fiscal c  where c.company.id = :companyId and lower(c.remarks) like lower(concat('%',:filter,'%'))",
 				page,
 				size,
 				[
-						filter: filter
+						filter: filter,
+						companyId:companyId
 				]
 		)
 	}
@@ -76,6 +78,7 @@ class FiscalServices extends AbstractDaoService<Fiscal> {
 		upsertFromMap(id, fields, { Fiscal entity, boolean forInsert ->
 			
 			if (forInsert) {
+				entity.company = SecurityUtils.currentCompany()
 				entity.fiscalId = generatorService.getNextValue(GeneratorType.FISCAL, {
 					return "FL-" + StringUtils.leftPad(it.toString(), 6, "0")
 				})

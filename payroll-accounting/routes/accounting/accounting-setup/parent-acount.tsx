@@ -1,12 +1,10 @@
-import CreateAccountingPeriod from '@/components/accounting/accounting-setup/createAccountingPeriod'
 import CreateParentAccount from '@/components/accounting/accounting-setup/createParentAccount'
-import AccountingSetupSideBar from '@/components/accounting/commons/sidebar'
-import { Fiscal } from '@/graphql/gql/graphql'
+import ParentAccountTabPane from '@/components/accounting/accounting-setup/parentAccountTabPane'
+import { AccountCategory, Fiscal } from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
 import { PageContainer } from '@ant-design/pro-components'
 import { gql, useQuery } from '@apollo/client'
-import { Button, Input, Space, Table } from 'antd'
-import { ColumnsType } from 'antd/es/table'
+import { Button, Tabs } from 'antd'
 
 const GET_FISCAL = gql`
   query ($filter: String!, $page: Int!, $size: Int!) {
@@ -53,49 +51,9 @@ export default function ParentAccount() {
     createDialog({ record }, () => refetch())
   }
 
-  const columns: ColumnsType<Fiscal> = [
-    {
-      title: 'Fiscal',
-      dataIndex: 'fiscalId',
-      key: 'fiscalId',
-    },
-    {
-      title: 'Date from',
-      dataIndex: 'fromDate',
-      key: 'fromDate',
-    },
-    {
-      title: 'Date to',
-      dataIndex: 'toDate',
-      key: 'toDate',
-    },
-    {
-      title: 'Remarks',
-      dataIndex: 'remarks',
-      key: 'remarks',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'active',
-      key: 'active',
-      render: (text: string) => (text ? 'ACTIVE' : 'INACTIVE'),
-    },
-    {
-      title: 'Action',
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center',
-      width: 90,
-      render: (_: string, record: Fiscal) => (
-        <Button type='primary' onClick={() => onHandleClickCreateEdit(record)}>
-          Edit
-        </Button>
-      ),
-    },
-  ]
   return (
     <PageContainer
-      title='Accounting Period'
+      title='Parent Account'
       content='Seamlessly manage and configure your list of offices.'
       extra={[
         <Button
@@ -103,20 +61,53 @@ export default function ParentAccount() {
           type='primary'
           onClick={() => onHandleClickCreateEdit()}
         >
-          Add New Fiscal Year
+          Add Parent Account
         </Button>,
       ]}
     >
-      <Space direction='vertical' style={{ width: '100%' }}>
-        <Input.Search placeholder='Search here' />
-        <Table
-          rowKey='id'
-          dataSource={data?.fiscal?.content ?? []}
-          columns={columns}
-          size='small'
-          loading={loading}
-        />
-      </Space>
+      <Tabs
+        defaultActiveKey='1'
+        type='card'
+        items={[
+          {
+            label: 'All Accounts',
+            key: 'all',
+            children: <ParentAccountTabPane />,
+          },
+          {
+            label: 'Assets',
+            key: 'assets',
+            children: (
+              <ParentAccountTabPane accountCategory={AccountCategory.Asset} />
+            ),
+          },
+          {
+            label: 'Liabilities',
+            key: 'liabilities',
+            children: 'Tab 3',
+          },
+          {
+            label: 'Equity',
+            key: 'equity',
+            children: 'Tab 3',
+          },
+          {
+            label: 'Expenses',
+            key: 'expenses',
+            children: 'Tab 3',
+          },
+          {
+            label: 'Revenue',
+            key: 'revenue',
+            children: 'Tab 3',
+          },
+          {
+            label: 'Archive',
+            key: 'archive',
+            children: 'Tab 3',
+          },
+        ]}
+      />
     </PageContainer>
   )
 }

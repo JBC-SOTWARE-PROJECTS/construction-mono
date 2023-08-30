@@ -10,9 +10,7 @@ CREATE TABLE billing.discounts (
   "type" varchar NULL,
   value numeric(15,2) NULL,
 
-  from_initial boolean NULL
-  applyhci boolean NULL,
-  applypf boolean NULL,
+  from_initial boolean NULL,
   vat boolean NULL,
   include_vat boolean NULL,
   validation_source varchar NULL,
