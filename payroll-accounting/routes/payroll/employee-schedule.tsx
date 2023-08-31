@@ -1,5 +1,7 @@
 import CustomButton from "@/components/common/CustomButton";
+import AssignEmployeeScheduleModal from "@/components/payroll/employee-schedule/AssignEmployeeScheduleModal";
 import ScheduleCell from "@/components/payroll/employee-schedule/ScheduleCell";
+import { useDialog } from "@/hooks";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
 import useGetEmployeeSchedule from "@/hooks/employee-schedule/useGetEmployeeSchedule";
 import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
@@ -49,6 +51,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
   const [employees, loadingEmployees, refetchEmployes] = useGetEmployeeSchedule(
     { startDate: dates[0], endDate: dates[1] }
   );
+  const showModal = useDialog(AssignEmployeeScheduleModal);
 
   const additionalColumns = () => {
     const start = dates[0];
@@ -105,7 +108,6 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
   return (
     <PageContainer title="Employee Schedule Management">
       <ProCard
-        // title="Employee Schedule Management"
         headStyle={{
           flexWrap: "wrap",
         }}
@@ -120,8 +122,11 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
               type="primary"
               icon={<PlusCircleOutlined />}
               allowedPermissions={["add_edit_schedule_type"]}
+              onClick={() => {
+                showModal({});
+              }}
             >
-              Create New
+              Assign Employee Schedule
             </CustomButton>
           </ProFormGroup>
         }

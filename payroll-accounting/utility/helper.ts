@@ -100,3 +100,7 @@ export function transformDate(currentDate: dayjs.Dayjs, referenceDate: string) {
   const transformedDate = currentDate.set("hour", hour).set("minute", minute);
   return transformedDate;
 }
+
+export function getTimeFromDate(date: dayjs.Dayjs) {
+  return dayjs(date).format("h:mm a");
+}

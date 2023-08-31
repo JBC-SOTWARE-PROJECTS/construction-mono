@@ -20,7 +20,7 @@ const UseDialog = (Component: React.FC<any>) => {
     );
   }, [myProps]);
 
-  return (props: any, onCloseCallback: Function) => {
+  return (props: any, onCloseCallback?: Function) => {
     let tProps = props || {};
     if (onCloseCallback) tProps.onCloseCallback = onCloseCallback;
 

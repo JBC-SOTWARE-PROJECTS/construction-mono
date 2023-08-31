@@ -302,11 +302,16 @@ th.ant-table-cell {
   width: calc(100% - 58px);
 }
 
-.test_custom_calender table tbody tr {
+.custom_calender table tbody tr {
   font-size: 2rem !important;
   height: 70px !important;
 }
-.test_custom_calender table thead tr {
+.custom_calender table thead tr {
   font-size: 2rem !important;
   height: 70px !important;
+}
+
+.custom_calendar_cell:hover {
+  background-color: rgb(236, 234, 234) !important;
+  color: rgb(39, 39, 39) !important;
 }

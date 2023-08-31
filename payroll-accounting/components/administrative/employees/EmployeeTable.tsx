@@ -1,27 +1,18 @@
 import { CompanySettings, Employee } from "@/graphql/gql/graphql";
-import { currency } from "@/utility/constant";
-import { DateFormatter, NumberFormater } from "@/utility/helper";
-import { EditOutlined, FolderOpenOutlined } from "@ant-design/icons";
-import {
-  Row,
-  Col,
-  Table,
-  Pagination,
-  Button,
-  Tag,
-  Tooltip,
-  Switch,
-} from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import { Button, Col, Pagination, Row, Switch, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import dayjs from "dayjs";
+import { TableRowSelection } from "antd/es/table/interface";
 import { useRouter } from "next/router";
 
 interface IProps {
   dataSource: Employee[];
-  loading: boolean;
+  loading?: boolean;
   totalElements: number;
   handleOpen: (record: CompanySettings) => void;
-  changePage: (page: number) => void;
+  changePage?: (page: number) => void;
+  rowSelection?: TableRowSelection<Employee>;
+  hideExtraColumns?: boolean;
 }
 
 export default function EmployeeTable({
@@ -30,36 +21,12 @@ export default function EmployeeTable({
   totalElements = 1,
   handleOpen,
   changePage,
+  rowSelection,
+  hideExtraColumns = false,
 }: IProps) {
   const router = useRouter();
 
-  const columns: ColumnsType<Employee> = [
-    {
-      title: "Employee No",
-      dataIndex: "employeeNo",
-      key: "employeeNo",
-      width: 160,
-    },
-    {
-      title: "Name",
-      dataIndex: "fullName",
-      key: "fullName",
-    },
-    {
-      title: "Position",
-      dataIndex: ["position", "description"],
-      key: "position",
-    },
-    {
-      title: "Office",
-      dataIndex: ["office", "officeDescription"],
-      key: "office",
-    },
-    {
-      title: "Gender",
-      dataIndex: "gender",
-      key: "gender",
-    },
+  const extraColumns: ColumnsType<Employee> = [
     {
       title: "Active",
       dataIndex: "isActive",
@@ -91,7 +58,37 @@ export default function EmployeeTable({
       },
     },
   ];
-  // ;
+
+  const columns: ColumnsType<Employee> = [
+    {
+      title: "Employee No",
+      dataIndex: "employeeNo",
+      key: "employeeNo",
+      width: 160,
+    },
+    {
+      title: "Name",
+      dataIndex: "fullName",
+      key: "fullName",
+    },
+    {
+      title: "Position",
+      dataIndex: ["position", "description"],
+      key: "position",
+    },
+    {
+      title: "Office",
+      dataIndex: ["office", "officeDescription"],
+      key: "office",
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
+    },
+    ...(!hideExtraColumns ? extraColumns : []),
+  ];
+
   return (
     <Row>
       <Col span={24}>
@@ -102,6 +99,7 @@ export default function EmployeeTable({
           dataSource={dataSource}
           pagination={false}
           loading={loading}
+          rowSelection={rowSelection}
           footer={() => (
             <Pagination
               showSizeChanger={false}
@@ -109,7 +107,7 @@ export default function EmployeeTable({
               responsive={true}
               total={totalElements}
               onChange={(e) => {
-                changePage(e - 1);
+                if (changePage) changePage(e - 1);
               }}
             />
           )}

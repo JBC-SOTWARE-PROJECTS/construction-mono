@@ -64,8 +64,6 @@ function UpsertScheduleType(props: IProps) {
     }
   );
 
-  function myFunc() {}
-
   const onSubmit = (values: any) => {
     let payload = { ...values };
     payload.dateTimeStart = dayjs(values.dateTimeStart);

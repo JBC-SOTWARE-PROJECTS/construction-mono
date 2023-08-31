@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 const { Search } = Input;
-const filterOptions = [
+export const filterOptions = [
   {
     value: null,
     label: "All Employee",
@@ -30,7 +30,7 @@ const filterOptions = [
     icon: "close-circle",
   },
 ];
-interface IState {
+export interface IState {
   filter: string;
   page: number;
   size: number;
@@ -52,7 +52,7 @@ export default function EmployeesPage({ account }: IPageProps) {
   const [state, setState] = useState(initialState);
   const router = useRouter();
   const [filterData] = useGetFilters();
-  const { loading, data, refetch } = useGetEmployeesByFilter({
+  const [data, loading, refetch] = useGetEmployeesByFilter({
     variables: {
       filter: state.filter,
       status: state.status,
