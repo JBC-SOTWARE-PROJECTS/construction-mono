@@ -31,7 +31,7 @@ function ScheduleCell({
     };
     upsertEmpSchedule({
       variables: {
-        employeeId: "4a37c743-6caf-424b-9545-1078f476a7f6",
+        employeeId,
         id: null,
         fields: fields,
       },

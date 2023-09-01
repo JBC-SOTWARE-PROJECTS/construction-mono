@@ -123,7 +123,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
               icon={<PlusCircleOutlined />}
               allowedPermissions={["add_edit_schedule_type"]}
               onClick={() => {
-                showModal({});
+                showModal({ refetchEmployes });
               }}
             >
               Assign Employee Schedule

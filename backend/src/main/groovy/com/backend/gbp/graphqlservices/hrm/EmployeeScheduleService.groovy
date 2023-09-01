@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.Authority
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.User
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeSchedule
@@ -92,18 +93,17 @@ class EmployeeScheduleService {
     @GraphQLQuery(name = "getEmployeeScheduleByFilter", description = "Search employees")
     List<EmployeeScheduleDto> getEmployeeScheduleByFilter(
 //            @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "startDate") Instant startDate,
-            @GraphQLArgument(name = "endDate") Instant endDate,
+@GraphQLArgument(name = "startDate") Instant startDate,
+@GraphQLArgument(name = "endDate") Instant endDate,
 @GraphQLArgument(name = "employeeIds") List<UUID> employeeIds
 
     ) {
         Map<String, Map<String, List<Map<String, Object>>>> employeeMap = new HashMap<>() // Initialize employeeMap
-        List<EmployeeScheduleDto> employeeScheduleList = []
         String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
         List<Map<String, Object>> results = jdbcTemplate.queryForList("""
     Select e.id, concat(e.first_name, ' ', e.last_name) as full_name, s.*  from hrm.employee_schedule s
     left join hrm.employees e on e.id = s.employee
-    where s.employee = ${formattedStringIds}
+    where s.employee in ${formattedStringIds}
     AND s.date_time_start >= '${startDate.toString()}'
     AND s.date_time_start <= '${endDate.toString()}'
     """)
@@ -151,23 +151,56 @@ class EmployeeScheduleService {
     //============== All Mutation ====================
 
     @GraphQLMutation(name = "upsertEmployeeSchedule", description = "create or update schedule config.")
-    GraphQLResVal<EmployeeSchedule> upsertEmployeeSchedule(
+    GraphQLResVal<String> upsertEmployeeSchedule(
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "employeeId") UUID employeeId,
-            @GraphQLArgument(name = "fields") Map<String, Object> fields
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "employeeIdList") List<UUID> employeeIdList,
+            @GraphQLArgument(name = "dates") List<String> dates = []
     ) {
+        if (dates?.size() > 0) {
+            CompanySettings company = SecurityUtils.currentCompany()
 
-        EmployeeSchedule employeeSchedule
-        if (id) {
-            employeeSchedule = employeeScheduleRepository.findById(id).get()
-            employeeSchedule = objectMapper.updateValue(employeeSchedule, fields)
+            List<EmployeeSchedule> scheduleList = []
+            List<Employee> employeeList = employeeRepository.findAllById(employeeIdList)
+            dates.each { String date ->
+                employeeList.each { Employee employee ->
+
+                    EmployeeSchedule employeeSchedule
+                    employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
+
+                    employeeSchedule.dateTimeStart = Instant.parse(date.substring(0, 10) + (fields.get('dateTimeStart') as String).substring(10))
+                    employeeSchedule.dateTimeEnd = Instant.parse(date.substring(0, 10) + (fields.get('dateTimeEnd') as String).substring(10))
+                    employeeSchedule.mealBreakStart = Instant.parse(date.substring(0, 10) + (fields.get('mealBreakStart') as String).substring(10))
+                    employeeSchedule.mealBreakEnd = Instant.parse(date.substring(0, 10) + (fields.get('mealBreakEnd') as String).substring(10))
+                    employeeSchedule.employee = employee
+                    employeeSchedule.company = company
+                    scheduleList.push(employeeSchedule)
+                }
+
+            }
+            employeeScheduleRepository.saveAll(scheduleList)
+
         } else {
-            employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
-        }
-        employeeSchedule.employee = employeeRepository.findById(employeeId).get()
-        employeeSchedule.company = SecurityUtils.currentCompany()
+            EmployeeSchedule employeeSchedule
 
-        employeeScheduleRepository.save(employeeSchedule)
-        return new GraphQLResVal<EmployeeSchedule>(employeeSchedule, true, "Successfully created department schedule")
+            if (id) {
+                employeeSchedule = employeeScheduleRepository.findById(id).get()
+                employeeSchedule = objectMapper.updateValue(employeeSchedule, fields)
+            } else {
+                employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
+            }
+            employeeSchedule.employee = employeeRepository.findById(employeeId).get()
+            employeeSchedule.company = SecurityUtils.currentCompany()
+
+            employeeScheduleRepository.save(employeeSchedule)
+
+        }
+
+
+        return new GraphQLResVal<String>('Success', true, "Successfully created department schedule")
     }
+
+
+    //Utility methods
 }

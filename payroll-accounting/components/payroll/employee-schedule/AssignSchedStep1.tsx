@@ -78,6 +78,7 @@ function AssignSchedStep1({
               onSearch={(e) =>
                 setState((prev: any) => ({ ...prev, filter: e }))
               }
+              allowClear
               className="select-header"
             />
             <Select

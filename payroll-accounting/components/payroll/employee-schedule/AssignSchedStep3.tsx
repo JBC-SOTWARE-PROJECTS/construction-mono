@@ -4,21 +4,10 @@ import { getTimeFromDate } from "@/utility/helper";
 import { ProCard, ProFormGroup } from "@ant-design/pro-components";
 import { Card, Col, Empty, Row, Table, Tag } from "antd";
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
+import { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
-const month = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+import { columns, transformDatesArray } from "./AssignEmployeeScheduleModal";
+
 interface IProps {
   selectedDates: string[];
   handleSelectDate: (e: dayjs.Dayjs, selectedInfo: SelectInfo) => void;
@@ -26,52 +15,6 @@ interface IProps {
   selectedEmployees: Employee[];
 }
 
-function sortDayjsObjects(obj: any) {
-  const keys = Object.keys(obj);
-
-  keys.forEach((key) => {
-    let arr: number[] = obj[key]?.sort((a: any, b: any) => {
-      return a - b;
-    });
-
-    let magic: any[] = [];
-    let a = arr[0];
-    arr.forEach((item, index) => {
-      if (item + 1 !== arr[index + 1]) {
-        if (a === item) magic.push(`${a}`);
-        else magic.push(`${a} - ${item}`);
-        a = arr[index + 1];
-      }
-    });
-    obj[key] = [...magic];
-  });
-  return obj;
-}
-function groupByMonths(dayjsArray: Dayjs[]) {
-  let obj: any = {};
-
-  dayjsArray.map((item) => {
-    const monthNumber = item.get("month");
-    obj[month[monthNumber]] =
-      obj[month[monthNumber]]?.length > 0
-        ? [...obj[month[monthNumber]], item.get("date")]
-        : [item.get("date")];
-  });
-
-  return sortDayjsObjects(obj);
-}
-
-function transformDatesArray(datesArray: string[]): any {
-  const sortedDates = groupByMonths(
-    datesArray.map((item) => {
-      return dayjs(item);
-    })
-  );
-
-  return Object.keys(sortedDates).map((item) => {
-    return { month: item, dates: sortedDates[item] };
-  });
-}
 function AssignSchedStep3({
   selectedDates,
   handleSelectDate,
@@ -80,28 +23,6 @@ function AssignSchedStep3({
 }: IProps) {
   const formattedDates = transformDatesArray(selectedDates);
 
-  const columns = [
-    {
-      title: "Month",
-      dataIndex: "month",
-      key: "month",
-      width: 150,
-    },
-    {
-      title: "Dates",
-      dataIndex: "dates",
-      key: "dates",
-      render: (value: string[]) => {
-        return value.map((item: string) => {
-          return (
-            <Tag key={item} style={{ paddingRight: 10 }}>
-              {item}
-            </Tag>
-          );
-        });
-      },
-    },
-  ];
   return (
     <div>
       <ProCard
@@ -159,11 +80,9 @@ function AssignSchedStep3({
               bordered={false}
             >
               <Table
-                // showHeader={false}
                 size="small"
-                // bordered={false}
                 columns={columns}
-                dataSource={formattedDates}
+                dataSource={transformDatesArray(selectedDates)}
               />
             </Card>
           </Col>

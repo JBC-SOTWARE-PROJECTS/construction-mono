@@ -303,12 +303,12 @@ th.ant-table-cell {
 }
 
 .custom_calender table tbody tr {
-  font-size: 2rem !important;
-  height: 70px !important;
+  font-size: 1.2rem !important;
+  height: 40px !important;
 }
 .custom_calender table thead tr {
-  font-size: 2rem !important;
-  height: 70px !important;
+  font-size: 1.2rem !important;
+  height: 40px !important;
 }
 
 .custom_calendar_cell:hover {
