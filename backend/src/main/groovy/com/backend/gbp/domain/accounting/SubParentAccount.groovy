@@ -26,10 +26,8 @@ class SubParentAccount extends AbstractAuditingEntity implements Serializable {
     @JoinColumn(name = "sub_account", referencedColumnName = "id")
     SubAccountSetup subAccount
 
-
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_account", referencedColumnName = "id")
     ParentAccount parentAccount
-
 }

@@ -4,6 +4,7 @@ import com.backend.gbp.domain.accounting.AccountCategory
 import com.backend.gbp.domain.accounting.AccountType
 import com.backend.gbp.domain.accounting.ParentAccount
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.requestscope.ChartofAccountGenerator
@@ -38,16 +39,26 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 		super(ParentAccount.class)
 	}
 
-	@GraphQLQuery(name = "coaList", description = "List of charts of Accounts")
-	List<ParentAccount> getCOAList() {
-		
-		createQuery("Select coa from ParentAccount coa where coa.parent is null order by coa.accountCode")
+	@GraphQLQuery(name = "parentAccountsPerCategory", description = "List of parents account")
+	List<AccountTypeDto> parentAccountsPerCategory() {
+		List<ParentAccount> parentAccounts = createQuery("Select p from ParentAccount p order by p.accountCode")
 				.resultList.findAll { BooleanUtils.isNotTrue(it.deprecated)}
-		
+		return   AccountCategory.values().collect { category ->
+			[
+					label: category.label,
+					options: parentAccounts.findAll { it.accountCategory == category }
+							.collect {
+								[
+										label:it.accountName,
+										value:it.id
+								] as OptionDto
+							}
+			] as AccountTypeDto
+		}
 	}
 
 	@GraphQLQuery(name = "groupedAccountTypes", description = "List of  grouped account types")
-	List<AccountTypeDto> groupedAccountTypes(){
+	static List<AccountTypeDto> groupedAccountTypes(){
 		def groupedAccountType = AccountCategory.values().collect { category ->
 			[
 					label: category.label,
@@ -67,36 +78,39 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 
 	@GraphQLQuery(name = "parentAccountPageable", description = "List of Mother Accounts")
 	Page<ParentAccount> parentAccountPageable(
+			@GraphQLArgument(name="accountCategory") AccountCategory accountCategory,
 			@GraphQLArgument(name="filter") String filter,
 			@GraphQLArgument(name="page") Integer page,
 			@GraphQLArgument(name="size") Integer size
 	) {
 		UUID companyID = SecurityUtils.currentCompanyId()
-		def pageData = getPageable("""
-				Select s from ParentAccount s where
+		Map<String,Object> params = [:]
+		params['filter'] = filter
+		params['companyID'] = companyID
+
+		String query = """ from ParentAccount s where
 				s.company.id = :companyID
 				and 
-				 (lower(s.accountCode) like lower(concat('%',:filter,'%'))
-				  or
-				  lower(s.description) like lower(concat('%',:filter,'%'))
-				 )
+				(lower(s.accountCode) like lower(concat('%',:filter,'%'))
+				or
+				lower(s.accountName) like lower(concat('%',:filter,'%'))
+				) """
+
+		if(accountCategory){
+			query += """ and s.accountCategory = :accountCategory """
+			params['accountCategory'] = accountCategory
+		}
+
+		def pageData = getPageable("""
+				Select s ${query}
 				 order by s.accountCode
 			""",
 				"""
-				 Select count(s) from ParentAccount s where
-				 s.company.id = :companyID
-				 and
-				   (lower(s.accountCode) like lower(concat('%',:filter,'%'))
-				 or
-				 lower(s.description) like lower(concat('%',:filter,'%'))
-				  )
+				 Select count(s) ${query}
 			""",
 				page,
 				size,
-				[
-						filter: filter,
-						companyID: companyID
-				]
+				params
 		)
 
 		pageData.content.each {
@@ -118,22 +132,29 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 	}
 
 	//mutation
-	@Transactional(rollbackFor = Exception.class)
+//	@Transactional(rollbackFor = Exception.class)
 	@GraphQLMutation(name = "updateInsertParentAccount", description = "insert chartsOfAccounts")
-	ParentAccount updateInsertParentAccount(
+	GraphQLRetVal<ParentAccount> updateInsertParentAccount(
 			@GraphQLArgument(name = "fields") Map<String, Object> fields,
 			@GraphQLArgument(name = "id") UUID id
 	) {
 
-		upsertFromMap(id, fields, { ParentAccount entity, boolean forInsert ->
-			if (forInsert) {
-				entity.company = SecurityUtils.currentCompany()
-				entity.accountCategory = entity.accountType.category.name().toString()
-				String a = entity.accountType.category.name().toString()
-				String b = entity.accountCategory
-			}
-		})
-
+		try {
+			ParentAccount parentAccount = upsertFromMap(id, fields, { ParentAccount entity, boolean forInsert ->
+				if (forInsert) {
+					entity.company = SecurityUtils.currentCompany()
+					entity.accountCategory = entity.accountType.category.name().toString()
+					String a = entity.accountType.category.name().toString()
+					String b = entity.accountCategory
+				}
+			})
+			return  new GraphQLRetVal<ParentAccount>(parentAccount,true,'Your changes have been saved.')
+		}catch (e){
+			if(e?.cause['constraintName'] == 'constraint_code_unique')
+				return  new GraphQLRetVal<ParentAccount>(new ParentAccount(),false,'Code Duplication Detected.')
+			else
+				return  new GraphQLRetVal<ParentAccount>(new ParentAccount(),false,'An error occurred while attempting to save the record.')
+		}
 	}
 
 

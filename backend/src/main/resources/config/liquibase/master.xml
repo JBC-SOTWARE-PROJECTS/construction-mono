@@ -249,4 +249,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/10_donss_alter_fiscal_and_accounts.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/08_dons_subaccountsetup.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

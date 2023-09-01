@@ -1,11 +1,14 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.AccountCategory
+import com.backend.gbp.domain.accounting.AccountType
 import com.backend.gbp.domain.accounting.ParentAccount
 import com.backend.gbp.domain.accounting.SubAccountSetup
-import com.backend.gbp.domain.accounting.SubAccountType
+import com.backend.gbp.domain.accounting.SubParentAccount
 import com.backend.gbp.domain.types.AutoIntegrateable
 import com.backend.gbp.domain.types.Subaccountable
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.services.requestscope.ChartofAccountGenerator
 import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -200,18 +203,29 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
                 .resultList.find()
     }
 
-    @GraphQLQuery(name = "getSetupBySubAccountType")
+    @GraphQLQuery(name = "subAccountByAccountType")
     List<SubAccountSetup> getSetupBySubAccountType(
-            @GraphQLArgument(name = "subaccountType") String subaccountType,
+            @GraphQLArgument(name = "accountCategory") AccountCategory accountCategory,
             @GraphQLArgument(name = "filter") String filter = ''
 
     ) {
+        String query = """ Select sub from SubAccountSetup sub  where 
+            (
+                lower(sub.accountName) like lower(concat('%',:filter,'%'))
+                or lower(sub.subaccountCode) like lower(concat('%',:filter,'%'))
+            )  """
+        Map<String,Object> params = [:]
+        params['filter'] = filter
 
-        createQuery("Select sub from SubAccountSetup sub  where sub.subaccountType=:subaccountType and (lower(sub.description) like lower(concat('%',:filter,'%'))) order by sub.subaccountCode, sub.createdDate",
-        [
-                subaccountType: SubAccountType.valueOf(subaccountType),
-                filter: filter
-        ]).resultList
+        if(accountCategory){
+            query += """and sub.accountCategory = :accountCategory """
+            params['accountCategory'] = accountCategory
+        }
+
+        createQuery("""
+            ${query}
+            order by sub.subaccountCode, sub.createdDate
+        """, params).resultList
     }
 
     @GraphQLQuery(name = "getSetupBySubAccountTypeAll")
@@ -229,39 +243,6 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
        }
     }
 
-    String getDescSubaccountType(SubAccountType subAccountType) {
-
-        switch (subAccountType) {
-            case SubAccountType.INCOME:
-                return "A/R Income Transaction Types"
-                break
-            case SubAccountType.EXPENSE:
-                return "AP Expense Transaction Types"
-                break
-            case SubAccountType.ADJUSTMENTS:
-                return "Debit and Credit Adjustments"
-                break
-            case SubAccountType.REVENUEITEMS:
-                return "Revenue Items"
-                break
-            case SubAccountType.OTHERPAYMENTS:
-                return "Other Payment Types"
-                break
-            case SubAccountType.PETTYCASH:
-                return "Petty Cash Transaction Types"
-                break
-            case SubAccountType.QUANTITYADJUSTMENTS:
-                return "Quantity Adjustment Types"
-                break
-            case SubAccountType.ASSETCLASS:
-                return "Asset Classification"
-                break
-            case SubAccountType.OTHERENTITIES:
-                return "Other Entities"
-                break
-                ""
-        }
-    }
 
     @GraphQLQuery(name = "subaccountTypeDesc")
     String subaccountTypeDesc(@GraphQLContext SubAccountSetup subAccountSetup ) {
@@ -290,7 +271,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
 
 
     @GraphQLQuery(name = "getAutoIntegrateableFromDomain")
-    List<String> getAutoIntegrateableFromDomain(
+    static List<String> getAutoIntegrateableFromDomain(
 
     ) {
 
@@ -304,12 +285,10 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     }
 
 
-    @GraphQLQuery(name = "getSubaccountableFromDomain")
-    List<String> getSubaccountableFromDomain(
+    @GraphQLQuery(name = "getSubAccountableFromDomain")
+    static List<String> getSubAccountableFromDomain() {
 
-    ) {
-
-        Reflections reflections = new Reflections("com.hisd3.hismk2.domain")
+        Reflections reflections = new Reflections("com.backend.gbp.domain")
         Set<Class<? extends Subaccountable>> subTypes = reflections.getSubTypesOf(Subaccountable.class)
 
         subTypes.collect {
@@ -328,51 +307,26 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
 
     @Transactional(rollbackFor = Exception.class)
     @GraphQLMutation(name = "upsertSubAccount")
-    SubAccountSetup upsertSubAccount(
+    GraphQLRetVal<SubAccountSetup> upsertSubAccount(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
-       def entity = upsertFromMap(id, fields, { SubAccountSetup entity, boolean forInsert ->
-            if (forInsert) {
-
-                entity.description = entity.description.toUpperCase()
+        try{
+           def entity = upsertFromMap(id, fields, { SubAccountSetup entity, boolean forInsert ->
+                entity.accountName = entity.accountName.toUpperCase()
                 entity.subaccountCode = entity.subaccountCode.toUpperCase()
-            }
-        })
+                entity.subaccountType = entity.parentAccount.accountType
+                entity.accountCategory = entity.parentAccount.accountCategory
+            })
 
-        def coaList = chartOfAccountServices.findAll().findAll {
-            BooleanUtils.isNotTrue(it.deprecated)
-        }.toSorted {a,b ->
-            a.accountCode <=> b.accountCode
+            save(entity)
+
+            return  new GraphQLRetVal<SubAccountSetup>(entity,true,'Your changes have been saved.')
+        }catch (e){
+            if(e?.cause['constraintName'] == 'constraint_code_unique')
+                return  new GraphQLRetVal<SubAccountSetup>(new SubAccountSetup(),false,'Code Duplication Detected.')
+            else
+                return  new GraphQLRetVal<SubAccountSetup>(new SubAccountSetup(),false,'An error occurred while attempting to save the record.')
         }
-
-        def _motherAccounts = fields.get("_motherAccounts",null) as List<String>
-
-        if(_motherAccounts ){
-
-            entity.motherAccounts.clear()
-            _motherAccounts.each {code->
-                def matchMotherAccounts = coaList.findAll {
-                    it.accountCode == code
-                }
-
-                matchMotherAccounts.each {coa ->
-                    def mo = new ParentAccount()
-                    mo.subAccount = entity
-                    mo.chartOfAccount =coa
-
-                            entity.motherAccounts << mo
-                }
-
-
-            }
-
-        }
-        else {
-            entity.motherAccounts.clear()
-        }
-
-        save(entity)
-
     }
 }

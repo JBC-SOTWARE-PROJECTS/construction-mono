@@ -17,5 +17,6 @@ create table if not exists accounting.parent_account
     last_modified_by               varchar(50) NULL,
     last_modified_date             timestamp NULL DEFAULT now(),
     deleted                        bool,
-    CONSTRAINT mother_account_pkey PRIMARY KEY (id)
+    CONSTRAINT mother_account_pkey PRIMARY KEY (id),
+    CONSTRAINT unique_constraint_code UNIQUE (code)
 );
