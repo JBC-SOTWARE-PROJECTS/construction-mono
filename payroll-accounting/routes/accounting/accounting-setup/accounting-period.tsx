@@ -48,6 +48,10 @@ export default function AccountingPeriod() {
 
   const createDialog = useDialog(CreateAccountingPeriod)
 
+  const onHandleSearch = (filter: string) => {
+    refetch({ filter, page: 0 })
+  }
+
   const onHandleClickCreateEdit = (record?: Fiscal) => {
     createDialog({ record }, () => refetch())
   }
@@ -95,7 +99,7 @@ export default function AccountingPeriod() {
   return (
     <PageContainer
       title='Accounting Period'
-      content='Seamlessly manage and configure your list of offices.'
+      content="Manage Your Organization's Financial Calendar."
       extra={[
         <Button
           key='add-fiscal'
@@ -107,7 +111,10 @@ export default function AccountingPeriod() {
       ]}
     >
       <Space direction='vertical' style={{ width: '100%' }}>
-        <Input.Search placeholder='Search here' />
+        <Input.Search
+          placeholder='Search remarks here'
+          onSearch={(e) => onHandleSearch(e)}
+        />
         <Table
           rowKey='id'
           dataSource={data?.fiscal?.content ?? []}

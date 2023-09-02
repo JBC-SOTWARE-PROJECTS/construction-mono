@@ -1,16 +1,22 @@
 import { FormInput, FormSelect, FormTextArea } from '@/components/common'
-import { ParentAccount } from '@/graphql/gql/graphql'
+import { SubAccountSetup } from '@/graphql/gql/graphql'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { Divider, Form, Modal, message } from 'antd'
 
-interface CreateMotherAccountI {
+interface CreateSubAccountI {
   hide: () => void
-  record: ParentAccount
+  record: SubAccountSetup
 }
+
+const SUB_ACCOUNTABLE_DOMAIN = gql`
+  query {
+    domain: getSubAccountableFromDomain
+  }
+`
 
 const GROUP_ACCOUNT_TYPES = gql`
   query {
-    optGroup: groupedAccountTypes {
+    parentAccountsPerCategory {
       label
       options {
         label
@@ -22,7 +28,7 @@ const GROUP_ACCOUNT_TYPES = gql`
 
 const UPDATE_INSERT = gql`
   mutation ($fields: Map_String_ObjectScalar, $id: UUID) {
-    parentAccount: updateInsertParentAccount(fields: $fields, id: $id) {
+    subAccount: upsertSubAccount(fields: $fields, id: $id) {
       payload {
         id
       }
@@ -32,27 +38,33 @@ const UPDATE_INSERT = gql`
   }
 `
 
-export default function CreateMotherAccount(props: CreateMotherAccountI) {
+export default function CreateSubAccount(props: CreateSubAccountI) {
   const { record, hide } = props
 
+  console.log(record, 'record')
   const [form] = Form.useForm()
 
+  const { data: getDomainData, loading: getDomainLoading } = useQuery(
+    SUB_ACCOUNTABLE_DOMAIN
+  )
+
   const { data, loading } = useQuery(GROUP_ACCOUNT_TYPES)
+
   const [updateInsert, { loading: updateInsertLoading }] = useMutation(
     UPDATE_INSERT,
     {
-      onCompleted: ({ parentAccount }) => {
-        if (parentAccount?.success) {
-          message.success(parentAccount?.message)
+      onCompleted: ({ subAccount }) => {
+        if (subAccount?.success) {
+          message.success(subAccount?.message)
           hide()
         } else {
-          message.error(parentAccount?.message)
+          message.error(subAccount?.message)
         }
       },
     }
   )
 
-  const onHandleClickOk = (values: ParentAccount) => {
+  const onHandleClickOk = (values: SubAccountSetup) => {
     const fields = { ...values }
     updateInsert({
       variables: {
@@ -65,7 +77,7 @@ export default function CreateMotherAccount(props: CreateMotherAccountI) {
   return (
     <Modal
       open
-      title='Add New Parent Account'
+      title='Add New Sub-Account'
       onCancel={() => props.hide()}
       okText={record?.id ? 'Save' : 'Create'}
       onOk={() => form.submit()}
@@ -84,15 +96,23 @@ export default function CreateMotherAccount(props: CreateMotherAccountI) {
         onFinish={onHandleClickOk}
       >
         <FormSelect
-          name='accountType'
-          label='Account Type'
+          name='parentAccount'
+          label='Parent Accounts'
           propsselect={{
-            options: data?.optGroup ?? [],
+            options: data?.parentAccountsPerCategory ?? [],
+            optionFilterProp: 'label',
           }}
           rules={[{ required: true }]}
         />
+        {/* <FormSelect
+          name='parentSubAccounts'
+          label='Parent Sub-accounts'
+          propsselect={{
+            options: data?.parentAccountsPerCategory ?? [],
+          }}
+        /> */}
         <FormInput
-          name='accountCode'
+          name='subaccountCode'
           label='Code'
           rules={[{ required: true }]}
         />
@@ -102,6 +122,16 @@ export default function CreateMotherAccount(props: CreateMotherAccountI) {
           rules={[{ required: true }]}
         />
         <FormTextArea name='description' label='Description (Optional)' />
+        {/* <FormSelect
+          name='sourceDomain'
+          label='Get From'
+          propsselect={{
+            options: (getDomainData?.domain ?? []).map((domain: string) => ({
+              label: domain,
+              value: domain,
+            })),
+          }}
+        /> */}
       </Form>
     </Modal>
   )

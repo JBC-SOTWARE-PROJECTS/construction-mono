@@ -1,28 +1,32 @@
-import { Maybe, ParentAccount } from '@/graphql/gql/graphql'
+import { Maybe, SubAccountSetup } from '@/graphql/gql/graphql'
+import { gql, useQuery } from '@apollo/client'
 import { Button, Input, Pagination, Space, Table, Typography } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { AccountType } from '../enum/parentAccountEnum'
 
-interface ParentAccountTabPaneI {
-  accountCategory?: string
-  dataSource: never[] | Maybe<ParentAccount>[] | null | undefined
+interface SubAccountTabPaneI {
+  dataSource: never[] | Maybe<SubAccountSetup>[] | null | undefined
   loading: boolean
-  totalElements: number
-  onHandleClickCreateEdit: (record?: ParentAccount) => void
-  handleLoadMore: (page: number) => void
+  onHandleClickCreateEdit: (record?: SubAccountSetup) => void
   onHandleSearch: (filter: string) => void
 }
 
-export default function ParentAccountTabPane(props: ParentAccountTabPaneI) {
-  const columns: ColumnsType<ParentAccount> = [
+export default function SubAccountTabPane(props: SubAccountTabPaneI) {
+  const columns: ColumnsType<SubAccountSetup> = [
     {
       title: 'Code',
-      dataIndex: 'accountCode',
-      key: 'accountCode',
+      dataIndex: 'subaccountCode',
+      key: 'subaccountCode',
       width: 100,
     },
     {
-      title: 'Name',
+      title: 'Parent Account',
+      dataIndex: ['parentAccount', 'accountName'],
+      key: 'parentAccount',
+      width: 350,
+    },
+    {
+      title: 'Sub-account Name',
       dataIndex: 'accountName',
       key: 'accountName',
       render: (text, record) => (
@@ -42,8 +46,8 @@ export default function ParentAccountTabPane(props: ParentAccountTabPaneI) {
     },
     {
       title: 'Type',
-      dataIndex: 'accountType',
-      key: 'accountType',
+      dataIndex: 'subaccountType',
+      key: 'subaccountType',
       width: 150,
       render: (text) => AccountType[text as keyof typeof AccountType].label,
     },
@@ -53,7 +57,7 @@ export default function ParentAccountTabPane(props: ParentAccountTabPaneI) {
       key: 'id',
       align: 'center',
       width: 90,
-      render: (_: string, record: ParentAccount) => (
+      render: (_: string, record: SubAccountSetup) => (
         <Button
           type='primary'
           onClick={() => props.onHandleClickCreateEdit(record)}
@@ -69,24 +73,15 @@ export default function ParentAccountTabPane(props: ParentAccountTabPaneI) {
       <Table
         title={() => (
           <Input.Search
-            placeholder='Search account name here'
+            placeholder='Search sub-account name here'
             onSearch={(e) => props?.onHandleSearch(e)}
           />
         )}
         rowKey='id'
-        dataSource={props?.dataSource as ParentAccount[]}
+        dataSource={props?.dataSource as SubAccountSetup[]}
         columns={columns}
         size='small'
         loading={props?.loading}
-        footer={() => (
-          <Pagination
-            defaultCurrent={1}
-            pageSize={10}
-            responsive={true}
-            total={props.totalElements}
-            onChange={(page) => props.handleLoadMore(page - 1)}
-          />
-        )}
       />
     </Space>
   )

@@ -1,60 +1,96 @@
 import CreateParentAccount from '@/components/accounting/accounting-setup/createParentAccount'
 import ParentAccountTabPane from '@/components/accounting/accounting-setup/parentAccountTabPane'
-import { AccountCategory, Fiscal } from '@/graphql/gql/graphql'
+import { AccountType } from '@/components/accounting/enum/parentAccountEnum'
+import {
+  AccountCategory,
+  Fiscal,
+  ParentAccount,
+  Query,
+} from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
 import { PageContainer } from '@ant-design/pro-components'
 import { gql, useQuery } from '@apollo/client'
 import { Button, Tabs } from 'antd'
 
-const GET_FISCAL = gql`
-  query ($filter: String!, $page: Int!, $size: Int!) {
-    fiscal: fiscals(filter: $filter, page: $page, size: $size) {
+const PARENT_ACCOUNT = gql`
+  query (
+    $filter: String
+    $accountCategory: AccountCategory
+    $page: Int
+    $size: Int
+  ) {
+    parentAccountPageable(
+      filter: $filter
+      page: $page
+      size: $size
+      accountCategory: $accountCategory
+    ) {
       content {
         id
-        fiscalId
-        fromDate
-        toDate
-        remarks
-        active
-        lockJanuary
-        lockFebruary
-        lockMarch
-        lockApril
-        lockMay
-        lockJune
-        lockJuly
-        lockAugust
-        lockSeptember
-        lockOctober
-        lockNovember
-        lockDecember
+        accountCode
+        accountName
+        description
+        accountType
+        accountCategory
       }
-      totalPages
-      size
       number
+      totalPages
+      totalElements
     }
   }
 `
 
 export default function ParentAccount() {
-  const { data, loading, refetch } = useQuery(GET_FISCAL, {
-    variables: {
-      filter: '',
-      page: 0,
-      size: 10,
-    },
-  })
+  const { data, loading, refetch, fetchMore } = useQuery<Query>(
+    PARENT_ACCOUNT,
+    {
+      variables: {
+        filter: '',
+        accountCategory: null,
+        page: 0,
+        size: 10,
+      },
+    }
+  )
+
+  const { content, number, totalElements } = data?.parentAccountPageable || {
+    content: [],
+    number: 0,
+    totalElements: 0,
+  }
 
   const createDialog = useDialog(CreateParentAccount)
 
-  const onHandleClickCreateEdit = (record?: Fiscal) => {
+  const onHandleClickCreateEdit = (record?: ParentAccount) => {
     createDialog({ record }, () => refetch())
+  }
+
+  const onHandleSearch = (filter: string) => {
+    refetch({ filter, page: 0 })
+  }
+
+  const onHandleChangeTab = (activeKey: string) => {
+    if (activeKey == 'all') refetch({ accountCategory: null, page: 0 })
+    else refetch({ accountCategory: activeKey, page: 0 })
+  }
+
+  const handleLoadMore = (page: number) => {
+    refetch({ page })
+  }
+
+  const tabPaneProps = {
+    dataSource: content,
+    loading,
+    totalElements,
+    onHandleClickCreateEdit,
+    handleLoadMore,
+    onHandleSearch,
   }
 
   return (
     <PageContainer
       title='Parent Account'
-      content='Seamlessly manage and configure your list of offices.'
+      content='Overview of Parent Account Details.'
       extra={[
         <Button
           key='add-fiscal'
@@ -66,45 +102,39 @@ export default function ParentAccount() {
       ]}
     >
       <Tabs
+        onChange={(activeKey) => onHandleChangeTab(activeKey)}
         defaultActiveKey='1'
         type='card'
         items={[
           {
             label: 'All Accounts',
             key: 'all',
-            children: <ParentAccountTabPane />,
+            children: <ParentAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Assets',
-            key: 'assets',
-            children: (
-              <ParentAccountTabPane accountCategory={AccountCategory.Asset} />
-            ),
+            key: 'ASSET',
+            children: <ParentAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Liabilities',
-            key: 'liabilities',
-            children: 'Tab 3',
+            key: 'LIABILITY',
+            children: <ParentAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Equity',
-            key: 'equity',
-            children: 'Tab 3',
+            key: 'EQUITY',
+            children: <ParentAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Expenses',
-            key: 'expenses',
-            children: 'Tab 3',
+            key: 'EXPENSE',
+            children: <ParentAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Revenue',
-            key: 'revenue',
-            children: 'Tab 3',
-          },
-          {
-            label: 'Archive',
-            key: 'archive',
-            children: 'Tab 3',
+            key: 'REVENUE',
+            children: <ParentAccountTabPane {...tabPaneProps} />,
           },
         ]}
       />

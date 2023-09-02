@@ -38,39 +38,27 @@ export type Scalars = {
 
 export enum AccountCategory {
   Asset = 'ASSET',
-  CostOfSale = 'COST_OF_SALE',
   Equity = 'EQUITY',
   Expense = 'EXPENSE',
-  GainAndLoss = 'GAIN_AND_LOSS',
   Liability = 'LIABILITY',
-  OtherComprehensiveIncome = 'OTHER_COMPREHENSIVE_INCOME',
   Revenue = 'REVENUE'
 }
 
 export enum AccountType {
-  AdditionalPaidInCapital = 'ADDITIONAL_PAID_IN_CAPITAL',
-  ChangesInFairValue = 'CHANGES_IN_FAIR_VALUE',
-  CommonStock = 'COMMON_STOCK',
-  CurrencyTranslationAdjustments = 'CURRENCY_TRANSLATION_ADJUSTMENTS',
   CurrentAssets = 'CURRENT_ASSETS',
   CurrentLiabilities = 'CURRENT_LIABILITIES',
-  DepreciationAmortization = 'DEPRECIATION_AMORTIZATION',
-  DirectCosts = 'DIRECT_COSTS',
-  GainOnSaleOfAssets = 'GAIN_ON_SALE_OF_ASSETS',
-  IntercompanyReceivablesPayables = 'INTERCOMPANY_RECEIVABLES_PAYABLES',
-  InterestExpenses = 'INTEREST_EXPENSES',
-  InterestIncome = 'INTEREST_INCOME',
-  LossOnImpairment = 'LOSS_ON_IMPAIRMENT',
-  NonCurrentAsset = 'NON_CURRENT_ASSET',
-  NonCurrentLiability = 'NON_CURRENT_LIABILITY',
-  OperatingExpenses = 'OPERATING_EXPENSES',
-  OtherExpenses = 'OTHER_EXPENSES',
-  OtherRevenue = 'OTHER_REVENUE',
-  RentalIncome = 'RENTAL_INCOME',
-  RetainedEarnings = 'RETAINED_EARNINGS',
-  SalesRevenue = 'SALES_REVENUE',
-  Taxes = 'TAXES'
+  Equity = 'EQUITY',
+  Expenses = 'EXPENSES',
+  LongTermAssets = 'LONG_TERM_ASSETS',
+  LongTermLiabilities = 'LONG_TERM_LIABILITIES',
+  Revenue = 'REVENUE'
 }
+
+export type AccountTypeDto = {
+  __typename?: 'AccountTypeDto';
+  label?: Maybe<Scalars['String']['output']>;
+  options?: Maybe<Array<Maybe<OptionDto>>>;
+};
 
 export type Assets = {
   __typename?: 'Assets';
@@ -654,6 +642,14 @@ export type GraphQlRetVal_Boolean = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlRetVal_ParentAccount = {
+  __typename?: 'GraphQLRetVal_ParentAccount';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<ParentAccount>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlRetVal_Schedule = {
   __typename?: 'GraphQLRetVal_Schedule';
   message?: Maybe<Scalars['String']['output']>;
@@ -1054,11 +1050,6 @@ export type JobStatus = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
 };
 
-export enum JournalPlacement {
-  Credit = 'CREDIT',
-  Debit = 'DEBIT'
-}
-
 export type MaterialProduction = {
   __typename?: 'MaterialProduction';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -1128,8 +1119,6 @@ export type Mutation = {
   cancelItem?: Maybe<BillingItem>;
   changeCompany?: Maybe<Employee>;
   changePassword?: Maybe<Scalars['String']['output']>;
-  /** insert chartsOfAccounts */
-  chartsOfAccounts?: Maybe<ParentAccount>;
   clearSchedule?: Maybe<GraphQlRetVal_String>;
   closeBilling?: Maybe<Billing>;
   /** close shift */
@@ -1174,6 +1163,8 @@ export type Mutation = {
   setToCompleted?: Maybe<PurchaseOrder>;
   updateBegBalStatus?: Maybe<BeginningBalance>;
   updateBilled?: Maybe<JobItems>;
+  /** insert chartsOfAccounts */
+  updateInsertParentAccount?: Maybe<GraphQlRetVal_ParentAccount>;
   updateJobAssetStatus?: Maybe<JobOrder>;
   updateJobBilled?: Maybe<Job>;
   updateJobStatus?: Maybe<Job>;
@@ -1365,13 +1356,6 @@ export type MutationChangeCompanyArgs = {
 /** Mutation root */
 export type MutationChangePasswordArgs = {
   username?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-/** Mutation root */
-export type MutationChartsOfAccountsArgs = {
-  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -1630,6 +1614,13 @@ export type MutationUpdateBegBalStatusArgs = {
 export type MutationUpdateBilledArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpdateInsertParentAccountArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -2376,6 +2367,12 @@ export type OnHandReport = {
   unit_of_usage?: Maybe<Scalars['String']['output']>;
 };
 
+export type OptionDto = {
+  __typename?: 'OptionDto';
+  label?: Maybe<Scalars['String']['output']>;
+  value?: Maybe<Scalars['String']['output']>;
+};
+
 export type Order = {
   __typename?: 'Order';
   direction?: Maybe<Direction>;
@@ -2796,10 +2793,10 @@ export type Pagination = {
 export type ParentAccount = {
   __typename?: 'ParentAccount';
   accountCategory?: Maybe<AccountCategory>;
+  accountCode?: Maybe<Scalars['String']['output']>;
   accountName?: Maybe<Scalars['String']['output']>;
   accountTrace?: Maybe<Scalars['String']['output']>;
   accountType?: Maybe<AccountType>;
-  code?: Maybe<Scalars['String']['output']>;
   company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
@@ -2811,7 +2808,6 @@ export type ParentAccount = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   normalSide?: Maybe<NormalSide>;
-  tags?: Maybe<Scalars['String']['output']>;
 };
 
 export type Payment = {
@@ -3404,8 +3400,6 @@ export type Query = {
   ItemExpense?: Maybe<Array<Maybe<StockIssueItems>>>;
   /** Get User by login */
   account?: Maybe<Employee>;
-  /** List of charts of Accounts */
-  accountBalancesCoaList?: Maybe<Array<Maybe<ChartOfAccountGenerate>>>;
   /** Get All Offices Active */
   activeOffices?: Maybe<Array<Maybe<Office>>>;
   /** Search Positions Active */
@@ -3442,8 +3436,6 @@ export type Query = {
   checkBalancesByPO?: Maybe<Array<Maybe<PurchaseOrderItemsMonitoring>>>;
   cityByProvince?: Maybe<Array<Maybe<City>>>;
   cityFilter?: Maybe<Array<Maybe<City>>>;
-  /** List of charts of Accounts */
-  coaList?: Maybe<Array<Maybe<ParentAccount>>>;
   comById?: Maybe<CompanySettings>;
   companyList?: Maybe<Array<Maybe<CompanySettings>>>;
   companyListSelection?: Maybe<Array<Maybe<CompanySettings>>>;
@@ -3512,18 +3504,19 @@ export type Query = {
   getScheduleLock?: Maybe<Scalars['Map_String_ScheduleLockScalar']['output']>;
   /** get all schedule type config */
   getScheduleTypes?: Maybe<Array<Maybe<Schedule>>>;
-  getSetupBySubAccountType?: Maybe<Array<Maybe<SubAccountSetup>>>;
   getSetupBySubAccountTypeAll?: Maybe<Array<Maybe<SubAccountSetup>>>;
   getSrrByDateRange?: Maybe<Array<Maybe<ReceivingReport>>>;
   /** List of receiving report list per date range */
   getSrrItemByDateRange?: Maybe<Array<Maybe<ReceivingReportItem>>>;
+  getSubAccountableFromDomain?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   getSubaccountForParent?: Maybe<Array<Maybe<SubAccountSetup>>>;
-  getSubaccountableFromDomain?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   getTotalMaterials?: Maybe<Scalars['BigDecimal']['output']>;
   getTotals?: Maybe<Scalars['BigDecimal']['output']>;
   getUnitProjects?: Maybe<Array<Maybe<UnitDto>>>;
   /** Get all Group Policies */
   groupPolicies?: Maybe<Array<Maybe<GroupPolicy>>>;
+  /** List of  grouped account types */
+  groupedAccountTypes?: Maybe<Array<Maybe<AccountTypeDto>>>;
   insuranceActive?: Maybe<Array<Maybe<Insurances>>>;
   insuranceAll?: Maybe<Array<Maybe<Insurances>>>;
   insuranceList?: Maybe<Array<Maybe<Insurances>>>;
@@ -3566,8 +3559,6 @@ export type Query = {
   jobTypeUnits?: Maybe<ItemJobsDto>;
   monById?: Maybe<PurchaseOrderItemsMonitoring>;
   motherAccountsListWithNoSetup?: Maybe<Array<Maybe<ParentAccount>>>;
-  /** List of Mother Accounts */
-  motherAccountsPage?: Maybe<Page_ParentAccount>;
   mpByFiltersPage?: Maybe<Page_MaterialProduction>;
   mpById?: Maybe<MaterialProduction>;
   mpItemById?: Maybe<MaterialProductionItem>;
@@ -3598,6 +3589,10 @@ export type Query = {
   pUpdatesByList?: Maybe<Array<Maybe<ProjectUpdates>>>;
   pUpdatesNotesById?: Maybe<ProjectUpdatesNotes>;
   pUpdatesNotesList?: Maybe<Array<Maybe<ProjectUpdatesNotes>>>;
+  /** List of Mother Accounts */
+  parentAccountPageable?: Maybe<Page_ParentAccount>;
+  /** List of parents account */
+  parentAccountsPerCategory?: Maybe<Array<Maybe<AccountTypeDto>>>;
   /** List of Payments By Billing ID */
   paymentByBillingId?: Maybe<Array<Maybe<Payment>>>;
   /** List of Payments By shift ID */
@@ -3681,8 +3676,6 @@ export type Query = {
   salesChartsRevenue?: Maybe<SalesChartsDto>;
   /** salesReport */
   salesReport?: Maybe<Array<Maybe<SalesReportDto>>>;
-  /** Search COA by Page */
-  searchCoaByPage?: Maybe<Page_ParentAccount>;
   /** Search employees */
   searchEmployees?: Maybe<Array<Maybe<Employee>>>;
   /** Search employees by role */
@@ -3713,6 +3706,7 @@ export type Query = {
   stiItemByParent?: Maybe<Array<Maybe<StockIssueItems>>>;
   /** List of Stock Card */
   stockCard?: Maybe<Array<Maybe<StockCard>>>;
+  subAccountByAccountType?: Maybe<Array<Maybe<SubAccountSetup>>>;
   subaccountTypeAll?: Maybe<Array<Maybe<Scalars['Map_String_StringScalar']['output']>>>;
   supById?: Maybe<Supplier>;
   supItemById?: Maybe<SupplierItem>;
@@ -3757,12 +3751,6 @@ export type QueryItemExpenseArgs = {
   expenseFrom?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
   start?: InputMaybe<Scalars['Instant']['input']>;
-};
-
-
-/** Query root */
-export type QueryAccountBalancesCoaListArgs = {
-  motherAccountCode?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
@@ -4209,13 +4197,6 @@ export type QueryGetScheduleLockArgs = {
 
 
 /** Query root */
-export type QueryGetSetupBySubAccountTypeArgs = {
-  filter?: InputMaybe<Scalars['String']['input']>;
-  subaccountType?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-/** Query root */
 export type QueryGetSrrByDateRangeArgs = {
   end?: InputMaybe<Scalars['Instant']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
@@ -4482,14 +4463,6 @@ export type QueryMonByIdArgs = {
 
 
 /** Query root */
-export type QueryMotherAccountsPageArgs = {
-  filter?: InputMaybe<Scalars['String']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-/** Query root */
 export type QueryMpByFiltersPageArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   office?: InputMaybe<Scalars['UUID']['input']>;
@@ -4621,6 +4594,15 @@ export type QueryPUpdatesNotesByIdArgs = {
 /** Query root */
 export type QueryPUpdatesNotesListArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryParentAccountPageableArgs = {
+  accountCategory?: InputMaybe<AccountCategory>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -4958,14 +4940,6 @@ export type QuerySalesReportArgs = {
 
 
 /** Query root */
-export type QuerySearchCoaByPageArgs = {
-  filter?: InputMaybe<Scalars['String']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-/** Query root */
 export type QuerySearchEmployeesArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
 };
@@ -5082,6 +5056,13 @@ export type QueryStiItemByParentArgs = {
 export type QueryStockCardArgs = {
   itemId?: InputMaybe<Scalars['String']['input']>;
   office?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QuerySubAccountByAccountTypeArgs = {
+  accountCategory?: InputMaybe<AccountCategory>;
+  filter?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -5633,59 +5614,21 @@ export type StockIssueItems = {
 
 export type SubAccountSetup = {
   __typename?: 'SubAccountSetup';
-  attachedValue?: Maybe<Scalars['BigDecimal']['output']>;
-  attrAccrualExpense?: Maybe<Scalars['Boolean']['output']>;
-  attrAccrualOfIncome?: Maybe<Scalars['Boolean']['output']>;
-  attrBeginningBalance?: Maybe<Scalars['Boolean']['output']>;
-  attrCreditMemoAdj?: Maybe<Scalars['Boolean']['output']>;
-  attrDebitMemoAdjustment?: Maybe<Scalars['Boolean']['output']>;
-  attrExpenseAccount?: Maybe<Scalars['Boolean']['output']>;
-  attrInactive?: Maybe<Scalars['Boolean']['output']>;
-  attrIncludePostingAccruedIncomeMultipleCustomer?: Maybe<Scalars['Boolean']['output']>;
-  attrNonTradeCashReceipts?: Maybe<Scalars['Boolean']['output']>;
-  attrVatable?: Maybe<Scalars['Boolean']['output']>;
-  category?: Maybe<Scalars['String']['output']>;
+  accountCategory?: Maybe<AccountCategory>;
+  accountName?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
-  departmentIncludes?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
-  includeDepartment?: Maybe<Scalars['Boolean']['output']>;
-  journalPlacement?: Maybe<JournalPlacement>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   motherAccountsList?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  parentAccounts?: Maybe<Array<Maybe<SubParentAccount>>>;
-  requireRemarks?: Maybe<Scalars['Boolean']['output']>;
-  selectedDepartments?: Maybe<Array<Maybe<Scalars['UUID']['output']>>>;
+  parentAccount?: Maybe<ParentAccount>;
   sourceDomain?: Maybe<Scalars['String']['output']>;
   subaccountCode?: Maybe<Scalars['String']['output']>;
   subaccountParent?: Maybe<SubAccountSetup>;
-  subaccountType?: Maybe<SubAccountType>;
+  subaccountType?: Maybe<AccountType>;
   subaccountTypeDesc?: Maybe<Scalars['String']['output']>;
-};
-
-export enum SubAccountType {
-  Adjustments = 'ADJUSTMENTS',
-  Assetclass = 'ASSETCLASS',
-  Expense = 'EXPENSE',
-  Income = 'INCOME',
-  Otherentities = 'OTHERENTITIES',
-  Otherpayments = 'OTHERPAYMENTS',
-  Pettycash = 'PETTYCASH',
-  Quantityadjustments = 'QUANTITYADJUSTMENTS',
-  Revenueitems = 'REVENUEITEMS'
-}
-
-export type SubParentAccount = {
-  __typename?: 'SubParentAccount';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Instant']['output']>;
-  id?: Maybe<Scalars['UUID']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  parentAccount?: Maybe<ParentAccount>;
-  subAccount?: Maybe<SubAccountSetup>;
 };
 
 export type Subaccountable = {
