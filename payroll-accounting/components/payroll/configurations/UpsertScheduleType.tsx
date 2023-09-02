@@ -101,10 +101,13 @@ function UpsertScheduleType(props: IProps) {
         onFinish={onSubmit}
         initialValues={{
           ...record,
-          dateTimeStartRaw: dayjs(record?.dateTimeStartRaw),
-          dateTimeEndRaw: dayjs(record?.dateTimeEndRaw),
-          mealBreakStart: dayjs(record?.mealBreakStart),
-          mealBreakEnd: dayjs(record?.mealBreakEnd),
+          dateTimeStartRaw:
+            record?.dateTimeStartRaw && dayjs(record?.dateTimeStartRaw),
+          dateTimeEndRaw:
+            record?.dateTimeStartRaw && dayjs(record?.dateTimeEndRaw),
+          mealBreakStart:
+            record?.mealBreakStart && dayjs(record?.mealBreakStart),
+          mealBreakEnd: record?.mealBreakEnd && dayjs(record?.mealBreakEnd),
         }}
       >
         <Row gutter={[8, 0]}>
