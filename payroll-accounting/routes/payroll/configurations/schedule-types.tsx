@@ -119,7 +119,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
   };
 
   return (
-    <Sidebar menuItems={payrollConfigurations}>
+    <>
       <PageContainer title="Configurations">
         <ProCard
           title="Work Schedule Setup"
@@ -148,6 +148,6 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
           <Table columns={columns} dataSource={schedules} />
         </ProCard>
       </PageContainer>
-    </Sidebar>
+    </>
   );
 }

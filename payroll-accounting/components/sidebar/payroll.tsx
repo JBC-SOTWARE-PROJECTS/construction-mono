@@ -1,7 +1,7 @@
 import { TDiverseTradeMenu } from "@/utility/interfaces";
 import { SettingOutlined } from "@ant-design/icons";
 
-const administrativeMenu: TDiverseTradeMenu[] = [
+const payrollmenu: TDiverseTradeMenu[] = [
   {
     title: "Configurations",
     subtitle: "Manage configurations for the payroll module.",
@@ -10,4 +10,4 @@ const administrativeMenu: TDiverseTradeMenu[] = [
   },
 ];
 
-export default administrativeMenu;
+export default payrollmenu;
