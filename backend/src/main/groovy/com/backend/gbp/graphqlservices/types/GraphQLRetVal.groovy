@@ -9,3 +9,10 @@ class GraphQLRetVal<T> {
 	String message = ""
 	UUID returnId = null
 }
+@Canonical
+class GraphQLResVal<T> {
+	T response
+	boolean success = false
+	String message = ""
+	UUID returnId = null
+}
