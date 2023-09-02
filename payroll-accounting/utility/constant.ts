@@ -62,3 +62,38 @@ export const OFFICETYPE = [
 export const REST_DAY_SCHEDULE_LABEL = "R";
 export const REST_DAY_SCHEDULE_TITLE = "Rest Day";
 export const REST_DAY_SCHEDULE_COLOR = "#95a5a6";
+
+export const ScheduledWorkFields = [
+  {
+    title: "Regular Day",
+    name: "regular",
+  },
+  {
+    title: "Rest Day",
+    name: "restday",
+  },
+  {
+    title: "Special Holiday",
+    name: "specialHoliday",
+  },
+  {
+    title: "Special Holiday and Restday",
+    name: "specialHolidayAndRestDay",
+  },
+  {
+    title: "Regular Holiday",
+    name: "regularHoliday",
+  },
+  {
+    title: "Regular Holiday and Restday",
+    name: "regularHolidayAndRestDay",
+  },
+  {
+    title: "Double Holiday",
+    name: "doubleHoliday",
+  },
+  {
+    title: "Double Holiday and Restday",
+    name: "doubleHolidayAndRestDay",
+  },
+];
