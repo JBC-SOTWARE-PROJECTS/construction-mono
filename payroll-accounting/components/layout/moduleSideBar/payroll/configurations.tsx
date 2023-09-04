@@ -12,6 +12,15 @@ const payrollConfigurationsMenu = {
             path: "/payroll/configurations/schedule-types",
             name: "Work Schedule",
           },
+          {
+            path: "/payroll/configurations/salary-rate-config",
+            name: "Salary Rate",
+          },
+          {
+            path: "/payroll/configurations/contribution/contribution-management",
+            name: "Contribtion Management",
+          },
+
         ],
       },
     ],
