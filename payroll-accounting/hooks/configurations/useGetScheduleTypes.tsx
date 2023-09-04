@@ -1,3 +1,4 @@
+import { Schedule } from "@/graphql/gql/graphql";
 import { OptionsValue } from "@/utility/interfaces";
 import { gql, useQuery } from "@apollo/client";
 import React, { useState } from "react";
@@ -19,8 +20,12 @@ const QUERY = gql`
 
 const useGetScheduleTypes = () => {
   const { data, loading, refetch } = useQuery(QUERY);
-
-  return [data?.getScheduleTypes, loading, refetch];
+  const returnValue: [Schedule[], boolean, () => {}] = [
+    data?.getScheduleTypes,
+    loading,
+    refetch,
+  ];
+  return returnValue;
 };
 
 export default useGetScheduleTypes;

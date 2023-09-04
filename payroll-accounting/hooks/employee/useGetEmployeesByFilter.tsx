@@ -46,7 +46,7 @@ const useGetEmployeesByFilter = (props: QueryHookOptions) => {
       }
     },
   });
-  return { loading, data: data?.list, refetch };
+  return [data?.list, loading, refetch];
 };
 
 export default useGetEmployeesByFilter;
