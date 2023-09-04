@@ -1,8 +1,10 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.payroll.PHICContribution
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.payroll.PHICContributionRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -43,10 +45,13 @@ class PHICContributionService {
             @GraphQLArgument(name = "fields") Map<String, Object> fields
     ) {
         PHICContribution contribution = new PHICContribution()
+        CompanySettings company = SecurityUtils.currentCompany()
         if (id) {
             contribution = phicContributionRepository.findById(id).get()
+            contribution.company = company
             objectMapper.updateValue(contribution, fields)
         } else {
+            contribution.company = company
             contribution = objectMapper.convertValue(fields, PHICContribution)
         }
 

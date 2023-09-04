@@ -1,8 +1,10 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.payroll.SSSContribution
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.payroll.SSSContributionRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -42,10 +44,13 @@ class SSSContributionService {
             @GraphQLArgument(name = "fields") Map<String, Object> fields
     ) {
         SSSContribution contribution = new SSSContribution()
+        CompanySettings company = SecurityUtils.currentCompany()
         if (id) {
             contribution = sssContributionRepository.findById(id).get()
+            contribution.company = company
             objectMapper.updateValue(contribution, fields)
         } else {
+            contribution.company = company
             contribution = objectMapper.convertValue(fields, SSSContribution)
         }
 
