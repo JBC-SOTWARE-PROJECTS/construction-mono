@@ -47,7 +47,6 @@ export default function MainMenu({ account }: IPageProps) {
     });
   };
 
-  console.log("account =>>>", account);
   // ================= end fuctions =================
   return (
     <div className="w-full">
