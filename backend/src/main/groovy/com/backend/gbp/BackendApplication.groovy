@@ -86,7 +86,7 @@ class BackendApplication {
 	
 	static void main(String[] args) {
 		
-		println("Starting GBP Application...")
+		println("Starting DiverseTrade Application...")
 		def start = System.currentTimeMillis()
 
 		def app = new SpringApplication(BackendApplication)
@@ -104,7 +104,7 @@ class BackendApplication {
 				env.getProperty("server.port"))
 		
 		def end = System.currentTimeMillis()
-		log.warn("Geodetic Business Process Started in : ${(end - start) / 1000} seconds")
+		log.warn("Drivers Trade Started in : ${(end - start) / 1000} seconds")
 		
 	}
 	

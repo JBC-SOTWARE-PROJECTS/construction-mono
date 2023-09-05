@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { IPageProps } from "@/utility/interfaces";
+import { ICredentials, IPageProps } from "@/utility/interfaces";
 import { Alert, Button, Divider } from "antd";
 import React from "react";
 import logo from "@/public/images/DTLogo.png";
@@ -12,6 +12,8 @@ import { useDialog } from "@/hooks";
 import ChangeCompanyModal from "@/components/companyChanger/companyChanger";
 import { useRouter } from "next/router";
 import { accountingMenu } from "@/components/sidebar";
+import { post } from "@/utility/graphql-client";
+import qs from "qs";
 
 export default function MainMenu({ account }: IPageProps) {
   const roles = account.user.roles;
@@ -19,13 +21,32 @@ export default function MainMenu({ account }: IPageProps) {
   // ================= Modals =======================
   const modal = useDialog(ChangeCompanyModal);
   // ================= functions ====================
+  const onLogin = async (record: Record<string, any>) => {
+    let data = record as ICredentials;
+    post("/api/authenticate", qs.stringify(data), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+      .then((res) => {
+        if (res) {
+          router.reload();
+        }
+      })
+      .catch((error) => {
+        console.log("error login: ", error);
+      });
+    console.log("record => ", record);
+  };
+
   const onChangeCompany = () => {
-    modal({ account: account }, (e: any) => {
+    modal({ account: account }, (e?: string) => {
       if (e) {
-        router.reload();
+        onLogin({ username: account.user.login, password: e });
       }
     });
   };
+
   console.log("account =>>>", account);
   // ================= end fuctions =================
   return (

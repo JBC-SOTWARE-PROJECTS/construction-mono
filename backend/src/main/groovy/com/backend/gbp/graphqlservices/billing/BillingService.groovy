@@ -195,6 +195,7 @@ class BillingService extends AbstractDaoService<Billing> {
             @GraphQLArgument(name = "size") Integer size
     ) {
         def companyId = SecurityUtils.currentCompanyId()
+        println("companyId ===> "+ companyId)
 
         String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
