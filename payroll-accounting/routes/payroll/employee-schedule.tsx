@@ -4,6 +4,7 @@ import EmployeeScheduleDetailsModal from "@/components/payroll/employee-schedule
 import ScheduleCell from "@/components/payroll/employee-schedule/ScheduleCell";
 import { useDialog } from "@/hooks";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
+import { useGetFilters } from "@/hooks/employee";
 import useGetEmployeeSchedule from "@/hooks/employee-schedule/useGetEmployeeSchedule";
 import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 import { IPageProps } from "@/utility/interfaces";
@@ -13,7 +14,8 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { DatePicker, Table } from "antd";
+import { DatePicker, Select, Table } from "antd";
+import Search from "antd/es/input/Search";
 import dayjs from "dayjs";
 import { startCase, toLower } from "lodash";
 import Head from "next/head";
@@ -43,6 +45,8 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
     dayjs().endOf("month"),
   ]);
 
+  const [filterData] = useGetFilters();
+  const [state, setState] = useState(initialState);
   const [schedules, loadingSchedules] = useGetScheduleTypes();
   const { upsertEmployeeSchedule, loadingUpsert } = useUpsertEmployeeSchedule(
     () => {
@@ -50,7 +54,13 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
     }
   );
   const [employees, loadingEmployees, refetchEmployes] = useGetEmployeeSchedule(
-    { startDate: dates[0], endDate: dates[1] }
+    {
+      startDate: dates[0],
+      endDate: dates[1],
+      position: state.position,
+      office: state.office,
+      filter: state.filter,
+    }
   );
   const showAssignSchedModal = useDialog(AssignEmployeeScheduleModal);
   const showScheduleDetailsModal = useDialog(EmployeeScheduleDetailsModal);
@@ -121,6 +131,35 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
               onChange={(dates: any) => {
                 handleDateChange(dates);
               }}
+            />
+            <Search
+              size="middle"
+              placeholder="Search here.."
+              onSearch={(e) =>
+                setState((prev: any) => ({ ...prev, filter: e }))
+              }
+              allowClear
+              className="select-header"
+            />
+            <Select
+              allowClear
+              style={{ width: 170 }}
+              placeholder="Office"
+              defaultValue={null}
+              onChange={(value) => {
+                setState({ ...state, office: value });
+              }}
+              options={filterData?.office}
+            />
+            <Select
+              allowClear
+              style={{ width: 170 }}
+              placeholder="Position"
+              defaultValue={null}
+              onChange={(value) => {
+                setState({ ...state, position: value });
+              }}
+              options={filterData.position}
             />
             <CustomButton
               type="primary"

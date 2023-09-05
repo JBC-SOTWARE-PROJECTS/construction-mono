@@ -40,14 +40,22 @@ function AssignSchedStep3({
                   <td style={{ paddingRight: 30, fontWeight: "bold" }}>
                     Label:
                   </td>
-                  <td width={60}>{scheduleType?.label}</td>
+                  <td colSpan={3}>{scheduleType?.label}</td>
                 </tr>
                 <tr>
-                  <td style={{ paddingRight: 30, fontWeight: "bold" }}>
+                  <td
+                    style={{
+                      paddingRight: 30,
+                      fontWeight: "bold",
+                    }}
+                  >
                     Title:
                   </td>
-                  <td width={60}>{scheduleType?.title}</td>
+                  <td colSpan={3}>{scheduleType?.title}</td>
                 </tr>
+                {/* </table> */}
+
+                {/* <table> */}
                 <tr>
                   <td style={{ paddingRight: 30, fontWeight: "bold" }}>
                     Schedule Duration:

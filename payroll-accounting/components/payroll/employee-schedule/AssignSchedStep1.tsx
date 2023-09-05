@@ -83,7 +83,7 @@ function AssignSchedStep1({
             <Select
               allowClear
               style={{ width: 170 }}
-              placeholder="Office"
+              placeholder="Status"
               defaultValue={null}
               onChange={(value) => {
                 setState({ ...state, status: value });

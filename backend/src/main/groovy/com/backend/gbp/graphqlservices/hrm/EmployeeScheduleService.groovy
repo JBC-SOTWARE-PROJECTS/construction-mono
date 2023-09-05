@@ -99,22 +99,35 @@ class EmployeeScheduleService {
 //            @GraphQLArgument(name = "filter") String filter,
 @GraphQLArgument(name = "startDate") Instant startDate,
 @GraphQLArgument(name = "endDate") Instant endDate,
-@GraphQLArgument(name = "employeeIds") List<UUID> employeeIds
+@GraphQLArgument(name = "filter") String filter = '',
+@GraphQLArgument(name = "position") UUID position,
+@GraphQLArgument(name = "office") UUID office
+
 
     ) {
         Map<String, Map<String, List<Map<String, Object>>>> employeeMap = new HashMap<>() // Initialize employeeMap
-        String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
+//        String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
         List<Map<String, Object>> results = jdbcTemplate.queryForList("""
     Select e.id, concat(e.first_name, ' ', e.last_name) as full_name, s.id as schedule_id, s.*  from hrm.employee_schedule s
     left join hrm.employees e on e.id = s.employee
-    where s.employee in ${formattedStringIds}
+    where LOWER(
+    CONCAT(
+        COALESCE(e.first_name, ''), ' ',
+        COALESCE(e.middle_name, ''), ' ',
+        COALESCE(e.last_name, ''), ' ',
+        COALESCE(e.name_suffix, '')
+    )
+    ) LIKE LOWER('%${filter}%')
     AND s.date_time_start >= '${startDate.toString()}'
     AND s.date_time_start <= '${endDate.toString()}'
+    AND e.position = COALESCE(${position ? """'${position}'""" : null}, e.position)
+    AND e.office = COALESCE(${office ? """'${office}'""" : null}, e.office)
     """)
-
+        List<UUID> employeeIds = []
 
         results.each {
             String empId = it['id'].toString()
+            employeeIds.push(UUID.fromString(empId))
             Timestamp timestamp = (Timestamp) it['date_time_start'];
             LocalDateTime dateTimeStart = timestamp.toLocalDateTime();
 
@@ -134,7 +147,7 @@ class EmployeeScheduleService {
             }
         }
 
-        List<Employee> employeeList = employeeRepository.getEmployees(employeeIds)
+        List<Employee> employeeList = employeeRepository.getEmployees(employeeIds.unique())
         List<EmployeeScheduleDto> employeeSchedules = []
         employeeList.each {
             EmployeeScheduleDto employee = new EmployeeScheduleDto()
@@ -150,6 +163,13 @@ class EmployeeScheduleService {
         }
 
         employeeSchedules
+    }
+
+    @GraphQLQuery(name = "getEmployeeScheduleById", description = "Search employees")
+    EmployeeSchedule getEmployeeScheduleById(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        return employeeScheduleRepository.findById(id).get()
     }
 
     //============== All Mutation ====================
@@ -173,8 +193,8 @@ class EmployeeScheduleService {
             def dateFormatter = new SimpleDateFormat('yyyy-MM-dd')
 
             List<String> trimmedDates = []
-            dates.each{
-                trimmedDates.push(it.substring(0, 10) )
+            dates.each {
+                trimmedDates.push(it.substring(0, 10))
             }
 
             employeeList.each { Employee employee ->
