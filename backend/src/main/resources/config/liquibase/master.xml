@@ -249,5 +249,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/09_jeriah_alter_column.sql"
              relativeToChangelogFile="false"/>
-
+    <include file="classpath:config/liquibase/changelog4/10_michael_alter_employee_schedule.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

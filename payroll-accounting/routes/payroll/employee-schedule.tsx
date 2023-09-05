@@ -1,5 +1,6 @@
 import CustomButton from "@/components/common/CustomButton";
 import AssignEmployeeScheduleModal from "@/components/payroll/employee-schedule/AssignEmployeeScheduleModal";
+import EmployeeScheduleDetailsModal from "@/components/payroll/employee-schedule/EmployeeScheduleDetailsModal";
 import ScheduleCell from "@/components/payroll/employee-schedule/ScheduleCell";
 import { useDialog } from "@/hooks";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
@@ -51,7 +52,8 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
   const [employees, loadingEmployees, refetchEmployes] = useGetEmployeeSchedule(
     { startDate: dates[0], endDate: dates[1] }
   );
-  const showModal = useDialog(AssignEmployeeScheduleModal);
+  const showAssignSchedModal = useDialog(AssignEmployeeScheduleModal);
+  const showScheduleDetailsModal = useDialog(EmployeeScheduleDetailsModal);
 
   const additionalColumns = () => {
     const start = dates[0];
@@ -66,6 +68,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
         dataIndex: ["schedule", currentDate.format("MM_DD_YYYY")],
         key: currentDate.format("MM_DD_YYYY"),
         width: 150,
+        onCell: () => ({ className: "employee_schedule_table_cell" }),
         render: (val: any, { id }: any) => {
           return (
             <ScheduleCell
@@ -74,6 +77,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
               employeeSchedule={val}
               employeeId={id}
               upsertEmpSchedule={upsertEmployeeSchedule}
+              showScheduleDetailsModal={showScheduleDetailsModal}
             />
           );
         },
@@ -123,7 +127,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
               icon={<PlusCircleOutlined />}
               allowedPermissions={["add_edit_schedule_type"]}
               onClick={() => {
-                showModal({ refetchEmployes });
+                showAssignSchedModal({ refetchEmployes });
               }}
             >
               Assign Employee Schedule
@@ -135,6 +139,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
           <title>Employee Schedule Management</title>
         </Head>
         <Table
+          className="employee_schedule_table"
           rowKey="id"
           size="small"
           dataSource={employees}

@@ -315,3 +315,6 @@ th.ant-table-cell {
   background-color: rgb(236, 234, 234) !important;
   color: rgb(39, 39, 39) !important;
 }
+.employee_schedule_table_cell {
+  padding: 0px !important;
+}
