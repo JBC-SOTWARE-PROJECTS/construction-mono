@@ -109,7 +109,7 @@ class CommonResource {
 
     @RequestMapping("/")
     String index() {
-        "WELCOME TO Backend GBP GraphQL Server."
+        "WELCOME TO Backend DiverseTrade GraphQL Server."
     }
 
     @RequestMapping("/serverTime")
