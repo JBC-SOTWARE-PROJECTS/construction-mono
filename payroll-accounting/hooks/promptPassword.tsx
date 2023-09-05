@@ -15,7 +15,7 @@ const PromptPassword = ({
 }: {
   account: any;
   hide: () => void;
-  onSuccess: () => void;
+  onSuccess: (e?: string) => void;
 }) => {
   const [form] = Form.useForm();
   const inputRef = useRef<InputRef>(null);
@@ -29,7 +29,7 @@ const PromptPassword = ({
           message.success("Successfully authenticated!");
 
           if (hide) hide();
-          if (onSuccess) onSuccess();
+          if (onSuccess) onSuccess(values.passwordAuth);
         } else {
           message.error("Wrong password authentication!");
           form.setFields([
@@ -125,7 +125,7 @@ const PromptPassword = ({
 const ConfirmationPasswordHook = () => {
   const accountContext = useContext(AccountContext);
   const [successCallback, setSuccessCallback] = useState({
-    callback: () => {
+    callback: (e?: string) => {
       alert("Please specify Success Callback");
     },
   });
@@ -134,7 +134,7 @@ const ConfirmationPasswordHook = () => {
     () => (
       <PromptPassword
         hide={hidePasswordConfirmation}
-        onSuccess={successCallback.callback}
+        onSuccess={(e?: string) => successCallback.callback(e)}
         account={accountContext}
       />
     ),
@@ -142,11 +142,11 @@ const ConfirmationPasswordHook = () => {
   );
 
   return [
-    (onSuccess: () => void) => {
+    (onSuccess: (e?: string) => void) => {
       if (onSuccess)
         setSuccessCallback({
-          callback: () => {
-            onSuccess();
+          callback: (e?: string) => {
+            onSuccess(e);
           },
         });
       showPasswordConfirmation();
