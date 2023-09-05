@@ -245,6 +245,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/07_jeriah_alter_table_salary_rate_config.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/08_jeriah_alter_table_contribution.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/09_jeriah_alter_column.sql"
+             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/08_wilson_billing_add_company.sql"
              relativeToChangelogFile="false"/>
 

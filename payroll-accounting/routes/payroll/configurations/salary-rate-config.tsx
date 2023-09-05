@@ -1,6 +1,4 @@
 import React from "react";
-import SideBar from "@/components/common/sideBar/sideBar";
-import { payrollConfigurations } from "@/utility/sidebar-routes";
 import {
   PageContainer,
   ProCard,
@@ -66,136 +64,134 @@ function SalaryRateConfig() {
   };
 
   return (
-    <SideBar menuItems={payrollConfigurations}>
-      <>
-        <PageContainer title="Salary Rate Configuration">
-          <ProCard
-            headStyle={{
-              flexWrap: "wrap",
-            }}
-            bordered
-            headerBordered
-            extra={
-              <ProFormGroup>
-                <Button
-                  htmlType="submit"
-                  form="upsertForm"
-                  type="primary"
-                  icon={<PlusCircleOutlined />}
-                  loading={salaryRateLoading}
-                >
-                  Saved Changes
-                </Button>
-              </ProFormGroup>
-            }
+    <>
+      <PageContainer title="Salary Rate Configuration">
+        <ProCard
+          headStyle={{
+            flexWrap: "wrap",
+          }}
+          bordered
+          headerBordered
+          extra={
+            <ProFormGroup>
+              <Button
+                htmlType="submit"
+                form="upsertForm"
+                type="primary"
+                icon={<PlusCircleOutlined />}
+                loading={salaryRateLoading}
+              >
+                Saved Changes
+              </Button>
+            </ProFormGroup>
+          }
+        >
+          <Form
+            form={form}
+            name="upsertForm"
+            layout="vertical"
+            onFinish={onSubmit}
+            onFinishFailed={onFinishFailed}
           >
-            <Form
-              form={form}
-              name="upsertForm"
-              layout="vertical"
-              onFinish={onSubmit}
-              onFinishFailed={onFinishFailed}
-            >
-              <Row gutter={[12, 12]}>
-                <Col span={12}>
-                  <Spin spinning={loading}>
-                    <Card>
-                      <Typography.Title level={5}>
-                        Scheduled Work Multiplier
-                      </Typography.Title>
-                      <Divider />
-                      <Row gutter={[10, 12]}>
-                        {ScheduledWorkFields.map(({ title, name }) => {
-                          return (
-                            <>
-                              <Col
-                                span={12}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "flex-end",
-                                  alignItems: "center",
+            <Row gutter={[12, 12]}>
+              <Col span={12}>
+                <Spin spinning={loading}>
+                  <Card>
+                    <Typography.Title level={5}>
+                      Scheduled Work Multiplier
+                    </Typography.Title>
+                    <Divider />
+                    <Row gutter={[10, 12]}>
+                      {ScheduledWorkFields.map(({ title, name }) => {
+                        return (
+                          <>
+                            <Col
+                              span={12}
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography.Text style={{ fontSize: 16 }}>
+                                <strong>{title} :</strong>
+                              </Typography.Text>
+                            </Col>
+                            <Col
+                              span={8}
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "center",
+                              }}
+                            >
+                              {/* TODO: make the custom input required */}
+                              <FormInputNumber
+                                name={name}
+                                rules={requiredField}
+                                propsinputnumber={{
+                                  placeholder: title,
                                 }}
-                              >
-                                <Typography.Text style={{ fontSize: 16 }}>
-                                  <strong>{title} :</strong>
-                                </Typography.Text>
-                              </Col>
-                              <Col
-                                span={8}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "flex-end",
-                                  alignItems: "center",
+                              />
+                            </Col>
+                          </>
+                        );
+                      })}
+                    </Row>
+                  </Card>
+                </Spin>
+              </Col>
+              <Col span={12}>
+                <Spin spinning={loading}>
+                  <Card>
+                    <Typography.Title level={5}>
+                      Overtime Work Multiplier
+                    </Typography.Title>
+                    <Divider />
+                    <Row gutter={[10, 12]}>
+                      {ScheduledWorkFields.map(({ title, name }) => {
+                        return (
+                          <>
+                            <Col
+                              span={12}
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography.Text style={{ fontSize: 16 }}>
+                                <strong>{title} :</strong>
+                              </Typography.Text>
+                            </Col>
+                            <Col
+                              span={8}
+                              style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                alignItems: "center",
+                              }}
+                            >
+                              <FormInputNumber
+                                name={name + "Overtime"}
+                                rules={requiredField}
+                                propsinputnumber={{
+                                  placeholder: title,
                                 }}
-                              >
-                                {/* TODO: make the custom input required */}
-                                <FormInputNumber
-                                  name={name}
-                                  rules={requiredField}
-                                  propsinputnumber={{
-                                    placeholder: title,
-                                  }}
-                                />
-                              </Col>
-                            </>
-                          );
-                        })}
-                      </Row>
-                    </Card>
-                  </Spin>
-                </Col>
-                <Col span={12}>
-                  <Spin spinning={loading}>
-                    <Card>
-                      <Typography.Title level={5}>
-                        Overtime Work Multiplier
-                      </Typography.Title>
-                      <Divider />
-                      <Row gutter={[10, 12]}>
-                        {ScheduledWorkFields.map(({ title, name }) => {
-                          return (
-                            <>
-                              <Col
-                                span={12}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "flex-end",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Typography.Text style={{ fontSize: 16 }}>
-                                  <strong>{title} :</strong>
-                                </Typography.Text>
-                              </Col>
-                              <Col
-                                span={8}
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "flex-end",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <FormInputNumber
-                                  name={name + "Overtime"}
-                                  rules={requiredField}
-                                  propsinputnumber={{
-                                    placeholder: title,
-                                  }}
-                                />
-                              </Col>
-                            </>
-                          );
-                        })}
-                      </Row>
-                    </Card>
-                  </Spin>
-                </Col>
-              </Row>
-            </Form>
-          </ProCard>
-        </PageContainer>
-      </>
-    </SideBar>
+                              />
+                            </Col>
+                          </>
+                        );
+                      })}
+                    </Row>
+                  </Card>
+                </Spin>
+              </Col>
+            </Row>
+          </Form>
+        </ProCard>
+      </PageContainer>
+    </>
   );
 }
 

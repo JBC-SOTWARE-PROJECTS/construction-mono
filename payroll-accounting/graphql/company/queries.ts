@@ -89,3 +89,85 @@ export const SAVE_SALARY_RATE_MULTIPLIER = gql`
     }
   }
 `;
+
+export const UPSERT_SSS_CONTRIBUTION = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    result: upsertSSSContribution(id: $id, fields: $fields) {
+      payload {
+        id
+        eeContribution
+        erContribution
+      }
+      message
+      success
+    }
+  }
+`;
+
+export const GET_SSS_CONTRIBUTIONS = gql`
+  query {
+    list: getSSSContributions {
+      id
+      minAmount
+      maxAmount
+      monthlySalaryCredit
+      erContribution
+      eeContribution
+      er_ec_Contribution
+      wispErContribution
+      wispEeContribution
+      lastModifiedBy
+      lastModifiedDate
+    }
+  }
+`;
+
+export const UPSERT_HDMF_CONTRIBUTION = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    result: upsertHDMFContribution(id: $id, fields: $fields) {
+      payload {
+        id
+        minAmount
+      }
+      message
+      success
+    }
+  }
+`;
+
+export const GET_HDMF_CONTRIBUTIONS = gql`
+  query {
+    list: getHDMFContributions {
+      id
+      minAmount
+      maxAmount
+      eeRate
+      erRate
+    }
+  }
+`;
+
+export const UPSERT_PHIC_CONTRIBUTION = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    result: upsertPHICContribution(id: $id, fields: $fields) {
+      payload {
+        id
+      }
+      message
+      success
+    }
+  }
+`;
+
+export const GET_PHIC_CONTRIBUTIONS = gql`
+  query {
+    list: getPHICContributions {
+      id
+      minAmount
+      maxAmount
+      premiumRate
+      eeRate
+      erRate
+    }
+  }
+`;
