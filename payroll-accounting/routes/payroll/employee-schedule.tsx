@@ -87,7 +87,12 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
               employeeSchedule={val}
               employee={{ id, position, fullName }}
               upsertEmpSchedule={upsertEmployeeSchedule}
-              showScheduleDetailsModal={showScheduleDetailsModal}
+              showScheduleDetailsModal={(props) => {
+                showScheduleDetailsModal(
+                  { ...props, refetchEmployes },
+                  () => {}
+                );
+              }}
             />
           );
         },

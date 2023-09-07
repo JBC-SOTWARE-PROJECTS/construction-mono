@@ -14,7 +14,7 @@ interface Iprops {
   currentDate: dayjs.Dayjs;
   employeeSchedule: any;
   upsertEmpSchedule: ({ variables }: IUpsertEmployeeScheduleParams) => void;
-  showScheduleDetailsModal: (pros: any, callback: () => void) => void;
+  showScheduleDetailsModal: (pros: any) => void;
   employee: IEmployee;
 }
 
@@ -40,20 +40,20 @@ function ScheduleCell({
     upsertEmpSchedule({
       variables: {
         employeeId: employee.id,
-        id: employeeSchedule && employeeSchedule[0].schedule_id,
+        id:
+          employeeSchedule &&
+          employeeSchedule.filter((item: any) => !item.is_overtime)[0]
+            .schedule_id,
         fields: fields,
       },
     });
   };
 
   const handleClickSchedule = () => {
-    showScheduleDetailsModal(
-      {
-        employee,
-        currentDate,
-      },
-      () => {}
-    );
+    showScheduleDetailsModal({
+      employee,
+      currentDate,
+    });
   };
 
   return (
@@ -94,19 +94,24 @@ function ScheduleCell({
         onClick={handleClickSchedule}
       >
         {(employeeSchedule ?? []).length !== 0
-          ? employeeSchedule?.map((item: any) => {
-              return (
-                <>
-                  <b>{item.label}</b>
-                  {`${dayjs(item.date_time_start)
-                    .add(8, "hour")
-                    .format("h:mm a")} - ${dayjs(item.date_time_end)
-                    .add(8, "hour")
-                    .format("h:mm a")}`}{" "}
-                  <br />
-                </>
-              );
-            })
+          ? employeeSchedule
+              ?.filter((item: any) => {
+                console.log(item);
+                return !item.is_overtime;
+              })
+              .map((item: any) => {
+                return (
+                  <>
+                    <b>{item.label}</b>
+                    {`${dayjs(item.date_time_start)
+                      .add(8, "hour")
+                      .format("h:mm a")} - ${dayjs(item.date_time_end)
+                      .add(8, "hour")
+                      .format("h:mm a")}`}{" "}
+                    <br />
+                  </>
+                );
+              })
           : "No Schedule"}
       </div>
     </Dropdown>

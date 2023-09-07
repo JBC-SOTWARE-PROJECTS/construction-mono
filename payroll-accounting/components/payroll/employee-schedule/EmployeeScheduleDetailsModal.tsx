@@ -9,6 +9,7 @@ import {
   Modal,
   Space,
   Spin,
+  Tag,
   Typography,
 } from "antd";
 import dayjs from "dayjs";
@@ -19,6 +20,7 @@ import ScheduleCard from "@/components/common/ScheduleCard";
 import CustomButton from "@/components/common/CustomButton";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
+import UpsertEmployeeScheduleModal from "./UpsertEmployeeScheduleModal";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -49,6 +51,7 @@ function EmployeeScheduleDetailsModal({
 
   const { upsertEmployeeSchedule, loadingUpsert } = useUpsertEmployeeSchedule(
     () => {
+      refetch();
       refetchEmployes();
     }
   );
@@ -60,7 +63,7 @@ function EmployeeScheduleDetailsModal({
         hide(false);
       }}
       maskClosable={false}
-      width={"40vw"}
+      width={"45vw"}
       title={"Employee Schedule Details"}
       footer={null}
     >
@@ -85,44 +88,38 @@ function EmployeeScheduleDetailsModal({
         </Typography.Title>
         <Divider />
 
-        {data?.regularSchedule ? (
-          <ScheduleCard
-            employeeSchedule={data?.regularSchedule}
-            title="Regular Schedule"
-            extra={
-              <CustomButton icon={<EditOutlined />} type="default">
-                Edit
-              </CustomButton>
-            }
-          />
-        ) : (
-          <Card title="Regular Schedule">
-            <Empty description="No Regular Schedule Assigned" />
-          </Card>
-        )}
+        <ScheduleCard
+          employeeSchedule={data?.regularSchedule}
+          title="Regular Schedule"
+          isCustom={data?.regularSchedule?.isCustom && true}
+          extra={
+            <UpsertEmployeeScheduleModal
+              employeeSchedule={data?.regularSchedule}
+              refetchEmployes={refetchEmployes}
+              currentDate={currentDate}
+              employeeId={employee.id}
+              upsertEmployeeSchedule={upsertEmployeeSchedule}
+              loading={loadingUpsert}
+            />
+          }
+        />
+
         <br />
-        {data?.overtimeSchedule ? (
-          <ScheduleCard
-            employeeSchedule={data?.overtimeSchedule}
-            title="Overtime Schedule"
-            extra={
-              <CustomButton icon={<EditOutlined />} type="default">
-                Edit
-              </CustomButton>
-            }
-          />
-        ) : (
-          <Card
-            title="Overtime Schedule"
-            extra={
-              <CustomButton icon={<PlusOutlined />} type="default">
-                Add
-              </CustomButton>
-            }
-          >
-            <Empty description="No Overtime Schedule Assigned" />
-          </Card>
-        )}
+        <ScheduleCard
+          employeeSchedule={data?.overtimeSchedule}
+          title="Overtime Schedule"
+          extra={
+            <UpsertEmployeeScheduleModal
+              employeeSchedule={data?.overtimeSchedule}
+              refetchEmployes={refetchEmployes}
+              currentDate={currentDate}
+              employeeId={employee.id}
+              upsertEmployeeSchedule={upsertEmployeeSchedule}
+              loading={loadingUpsert}
+              isOvertime={true}
+            />
+          }
+        />
       </Spin>
     </Modal>
   );
