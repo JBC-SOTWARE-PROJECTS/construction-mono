@@ -1,21 +1,26 @@
 import { Schedule } from "@/graphql/gql/graphql";
 import { IUpsertEmployeeScheduleParams } from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 import { transformDate } from "@/utility/helper";
-import { Dropdown } from "antd";
+import { Divider, Dropdown, Menu } from "antd";
 import dayjs from "dayjs";
 
+export interface IEmployee {
+  id: string;
+  fullName: string;
+  position: string;
+}
 interface Iprops {
   schedules: Schedule[];
-  employeeId: string;
   currentDate: dayjs.Dayjs;
   employeeSchedule: any;
   upsertEmpSchedule: ({ variables }: IUpsertEmployeeScheduleParams) => void;
   showScheduleDetailsModal: (pros: any, callback: () => void) => void;
+  employee: IEmployee;
 }
 
 function ScheduleCell({
   schedules,
-  employeeId,
+  employee,
   employeeSchedule,
   upsertEmpSchedule,
   currentDate,
@@ -32,10 +37,9 @@ function ScheduleCell({
       title: schedule?.title,
     };
 
-    console.log(employeeSchedule);
     upsertEmpSchedule({
       variables: {
-        employeeId,
+        employeeId: employee.id,
         id: employeeSchedule && employeeSchedule[0].schedule_id,
         fields: fields,
       },
@@ -43,7 +47,13 @@ function ScheduleCell({
   };
 
   const handleClickSchedule = () => {
-    showScheduleDetailsModal(null, () => {});
+    showScheduleDetailsModal(
+      {
+        employee,
+        currentDate,
+      },
+      () => {}
+    );
   };
 
   return (

@@ -12,4 +12,7 @@ interface EmployeeScheduleRepository extends JpaRepository<EmployeeSchedule, UUI
     @Query(value = "Select es from EmployeeSchedule es where es.dateString in :dates and es.employee.id = :employeeId ")
     List<EmployeeSchedule> getRegularSchedules(@Param("dates") List<String> dates, @Param("employeeId") UUID employeeId)
 
+    @Query(value = "Select es from EmployeeSchedule es where es.dateString = :date and es.employee.id = :employeeId ")
+    List<EmployeeSchedule> findByDateAndEmployeeId(@Param("date") String date, @Param("employeeId") UUID employeeId)
+
 }

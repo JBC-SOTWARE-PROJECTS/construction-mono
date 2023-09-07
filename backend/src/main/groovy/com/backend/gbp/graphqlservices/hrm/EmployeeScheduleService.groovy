@@ -47,12 +47,16 @@ class EmployeeScheduleDto {
     UUID employeeId
     Map<String, List<Map<String, Object>>> schedule
 }
-//class Test {
-//    String fullName
-//    String position
-//    UUID employeeId
-//    List<Map<String, Object>>
-//}
+
+class EmployeeScheduleDetailsDto {
+    UUID id
+    String fullName
+    String position
+    UUID employeeId
+    String dateString
+    EmployeeSchedule regularSchedule
+    EmployeeSchedule overtimeSchedule
+}
 
 @TypeChecked
 @Component
@@ -105,29 +109,31 @@ class EmployeeScheduleService {
 
 
     ) {
+        List<Employee> employeeList = employeeRepository.findByFilterPositionOffice(
+                filter,
+                position ? position.toString() : '',
+                office ? office.toString() : '')
+        List<UUID> employeeIds = []
+
+        employeeList.each {
+            employeeIds.push((it.id))
+        }
+
         Map<String, Map<String, List<Map<String, Object>>>> employeeMap = new HashMap<>() // Initialize employeeMap
-//        String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
+
+        String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
+
         List<Map<String, Object>> results = jdbcTemplate.queryForList("""
     Select e.id, concat(e.first_name, ' ', e.last_name) as full_name, s.id as schedule_id, s.*  from hrm.employee_schedule s
     left join hrm.employees e on e.id = s.employee
-    where LOWER(
-    CONCAT(
-        COALESCE(e.first_name, ''), ' ',
-        COALESCE(e.middle_name, ''), ' ',
-        COALESCE(e.last_name, ''), ' ',
-        COALESCE(e.name_suffix, '')
-    )
-    ) LIKE LOWER('%${filter}%')
+    where s.employee in ${formattedStringIds}
     AND s.date_time_start >= '${startDate.toString()}'
     AND s.date_time_start <= '${endDate.toString()}'
-    AND e.position = COALESCE(${position ? """'${position}'""" : null}, e.position)
-    AND e.office = COALESCE(${office ? """'${office}'""" : null}, e.office)
+
     """)
-        List<UUID> employeeIds = []
 
         results.each {
             String empId = it['id'].toString()
-            employeeIds.push(UUID.fromString(empId))
             Timestamp timestamp = (Timestamp) it['date_time_start'];
             LocalDateTime dateTimeStart = timestamp.toLocalDateTime();
 
@@ -147,7 +153,7 @@ class EmployeeScheduleService {
             }
         }
 
-        List<Employee> employeeList = employeeRepository.getEmployees(employeeIds.unique())
+
         List<EmployeeScheduleDto> employeeSchedules = []
         employeeList.each {
             EmployeeScheduleDto employee = new EmployeeScheduleDto()
@@ -165,11 +171,26 @@ class EmployeeScheduleService {
         employeeSchedules
     }
 
-    @GraphQLQuery(name = "getEmployeeScheduleById", description = "Search employees")
-    EmployeeSchedule getEmployeeScheduleById(
-            @GraphQLArgument(name = "id") UUID id
+    @GraphQLQuery(name = "getEmployeeScheduleDetails", description = "Search employees")
+    EmployeeScheduleDetailsDto getEmployeeScheduleDetails(
+            @GraphQLArgument(name = "employeeId") UUID employeeId,
+            @GraphQLArgument(name = "date") String date
     ) {
-        return employeeScheduleRepository.findById(id).get()
+
+        List<EmployeeSchedule> employeeSchedules = employeeScheduleRepository.findByDateAndEmployeeId(date, employeeId)
+        EmployeeScheduleDetailsDto scheduleDetails = new EmployeeScheduleDetailsDto()
+
+        scheduleDetails.id = employeeSchedules[0].employee.id
+        scheduleDetails.dateString = employeeSchedules[0].dateString
+        scheduleDetails.fullName = employeeSchedules[0].employee.fullName
+        scheduleDetails.position = employeeSchedules[0].employee.position.description
+
+        employeeSchedules.each {
+            if (it.isOvertime) scheduleDetails.overtimeSchedule = it
+            else scheduleDetails.regularSchedule = it
+        }
+
+        return scheduleDetails
     }
 
     //============== All Mutation ====================

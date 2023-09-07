@@ -1,13 +1,30 @@
-import { PageHeader } from "@/components/common";
-import { Schedule } from "@/graphql/gql/graphql";
+import { EmployeeSchedule, Schedule } from "@/graphql/gql/graphql";
+import useGetEmployeeScheduleDetails from "@/hooks/employee-schedule/useGetEmployeeScheduleDetails";
 import { IState } from "@/routes/administrative/Employees";
-import { Modal, Space } from "antd";
+import {
+  Card,
+  Divider,
+  Empty,
+  List,
+  Modal,
+  Space,
+  Spin,
+  Typography,
+} from "antd";
+import dayjs from "dayjs";
 import { useState } from "react";
+import { IEmployee } from "./ScheduleCell";
+import { PageHeader } from "@ant-design/pro-components";
+import ScheduleCard from "@/components/common/ScheduleCard";
+import CustomButton from "@/components/common/CustomButton";
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
+import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 
 interface IProps {
   hide: (hideProps: any) => void;
   refetchEmployes: () => void;
-  record?: Schedule | null | undefined;
+  employee: IEmployee;
+  currentDate: dayjs.Dayjs;
 }
 
 const initialState: IState = {
@@ -19,8 +36,22 @@ const initialState: IState = {
   position: null,
 };
 
-function EmployeeScheduleDetailsModal(props: IProps) {
-  const { hide, refetchEmployes } = props;
+function EmployeeScheduleDetailsModal({
+  hide,
+  refetchEmployes,
+  employee,
+  currentDate,
+}: IProps) {
+  const [data, loading, refetch] = useGetEmployeeScheduleDetails({
+    employeeId: employee.id,
+    date: currentDate,
+  });
+
+  const { upsertEmployeeSchedule, loadingUpsert } = useUpsertEmployeeSchedule(
+    () => {
+      refetchEmployes();
+    }
+  );
 
   return (
     <Modal
@@ -29,10 +60,71 @@ function EmployeeScheduleDetailsModal(props: IProps) {
         hide(false);
       }}
       maskClosable={false}
-      width={"60vw"}
+      width={"40vw"}
       title={"Employee Schedule Details"}
-      footer={<Space></Space>}
-    ></Modal>
+      footer={null}
+    >
+      <Spin spinning={loading}>
+        <Typography.Title level={5}>
+          <table>
+            <tr>
+              <td>Date:</td>
+              <td style={{ paddingLeft: 10 }}>
+                {dayjs(currentDate).format("MMM DD, YYYY (dddd)")}
+              </td>
+            </tr>
+            <tr>
+              <td>Name:</td>
+              <td style={{ paddingLeft: 10 }}>{employee?.fullName}</td>
+            </tr>
+            <tr>
+              <td>Position:</td>
+              <td style={{ paddingLeft: 10 }}>{employee?.position}</td>
+            </tr>
+          </table>
+        </Typography.Title>
+        <Divider />
+
+        {data?.regularSchedule ? (
+          <ScheduleCard
+            employeeSchedule={data?.regularSchedule}
+            title="Regular Schedule"
+            extra={
+              <CustomButton icon={<EditOutlined />} type="default">
+                Edit
+              </CustomButton>
+            }
+          />
+        ) : (
+          <Card title="Regular Schedule">
+            <Empty description="No Regular Schedule Assigned" />
+          </Card>
+        )}
+        <br />
+        {data?.overtimeSchedule ? (
+          <ScheduleCard
+            employeeSchedule={data?.overtimeSchedule}
+            title="Overtime Schedule"
+            extra={
+              <CustomButton icon={<EditOutlined />} type="default">
+                Edit
+              </CustomButton>
+            }
+          />
+        ) : (
+          <Card
+            title="Overtime Schedule"
+            extra={
+              <CustomButton icon={<PlusOutlined />} type="default">
+                Add
+              </CustomButton>
+            }
+          >
+            <Empty description="No Overtime Schedule Assigned" />
+          </Card>
+        )}
+      </Spin>
+    </Modal>
   );
 }
 

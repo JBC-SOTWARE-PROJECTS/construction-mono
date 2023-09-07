@@ -1,39 +1,66 @@
+import { EmployeeScheduleDetailsDto } from "@/graphql/gql/graphql";
 import { gql, useQuery } from "@apollo/client";
 import dayjs from "dayjs";
 
 const QUERY = gql`
-  query ($startDate: Instant, $endDate: Instant, $employeeIds: [UUID]) {
-    list: getEmployeeScheduleByFilter(
-      employeeIds: $employeeIds
-      startDate: $startDate
-      endDate: $endDate
-    ) {
+  query ($employeeId: UUID, $date: String) {
+    data: getEmployeeScheduleDetails(employeeId: $employeeId, date: $date) {
       id
       fullName
       position
-      schedule
+      employeeId
+      dateString
+      regularSchedule {
+        id
+        dateTimeStart
+        dateTimeEnd
+        isRestDay
+        isOvertime
+        deleted
+        mealBreakStart
+        mealBreakEnd
+        label
+        title
+        isCustom
+        dateString
+      }
+      overtimeSchedule {
+        id
+        dateTimeStart
+        dateTimeEnd
+        isRestDay
+        isOvertime
+        deleted
+        mealBreakStart
+        mealBreakEnd
+        label
+        title
+        isCustom
+        dateString
+      }
     }
   }
 `;
 
 interface IParams {
-  startDate: dayjs.Dayjs;
-  endDate: dayjs.Dayjs;
+  employeeId: String;
+  date: dayjs.Dayjs;
 }
 
-const useGetEmployeeScheduleDetails = ({ startDate, endDate }: IParams) => {
+const useGetEmployeeScheduleDetails = ({ employeeId, date }: IParams) => {
   const { data, loading, refetch } = useQuery(QUERY, {
     variables: {
-      startDate: startDate,
-      endDate: endDate,
-      employeeIds: [
-        "4a37c743-6caf-424b-9545-1078f476a7f6",
-        "f5b333f5-ba65-406b-972c-df08d7e9d1c5",
-      ],
+      employeeId,
+      date: date.add(8, "hours").format("YYYY-MM-DD"), //get date, add 8hrs and convert to YYYY-MM-DD format
     },
   });
 
-  return [data?.list, loading, refetch];
+  const returnValue: [EmployeeScheduleDetailsDto, boolean, () => void] = [
+    data?.data,
+    loading,
+    refetch,
+  ];
+  return returnValue;
 };
 
 export default useGetEmployeeScheduleDetails;

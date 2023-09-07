@@ -79,13 +79,13 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
         key: currentDate.format("MM_DD_YYYY"),
         width: 150,
         onCell: () => ({ className: "employee_schedule_table_cell" }),
-        render: (val: any, { id }: any) => {
+        render: (val: any, { id, position, fullName }: any) => {
           return (
             <ScheduleCell
               currentDate={date}
               schedules={schedules}
               employeeSchedule={val}
-              employeeId={id}
+              employee={{ id, position, fullName }}
               upsertEmpSchedule={upsertEmployeeSchedule}
               showScheduleDetailsModal={showScheduleDetailsModal}
             />
