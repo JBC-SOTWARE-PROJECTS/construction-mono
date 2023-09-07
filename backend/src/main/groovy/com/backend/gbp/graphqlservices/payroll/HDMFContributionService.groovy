@@ -1,8 +1,10 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.payroll.HDMFContribution
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.payroll.HDMFContributionRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -42,10 +44,13 @@ class HDMFContributionService {
             @GraphQLArgument(name = "fields") Map<String, Object> fields
     ) {
         HDMFContribution contribution = new HDMFContribution()
+        CompanySettings company = SecurityUtils.currentCompany()
         if (id) {
             contribution = hdmfContributionRepository.findById(id).get()
+            contribution.company = company
             objectMapper.updateValue(contribution, fields)
         } else {
+            contribution.company = company
             contribution = objectMapper.convertValue(fields, HDMFContribution)
         }
 

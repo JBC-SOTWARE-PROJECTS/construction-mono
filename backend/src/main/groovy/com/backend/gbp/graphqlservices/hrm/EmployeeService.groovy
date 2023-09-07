@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.hrm
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.repository.AuthorityRepository
 import com.backend.gbp.repository.OfficeRepository
@@ -7,6 +8,7 @@ import com.backend.gbp.repository.PermissionRepository
 import com.backend.gbp.repository.PositionRepository
 import com.backend.gbp.repository.UserRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.security.HISUser
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -21,10 +23,9 @@ import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 
@@ -222,7 +223,9 @@ class EmployeeService {
             @GraphQLArgument(name = "company") UUID company
     ) {
         Employee employee = employeeRepository.findById(id).get()
-        employee.currentCompany = companySettingsService.comById(company)
-        employeeRepository.save(employee)
+        CompanySettings newCompany = companySettingsService.comById(company)
+        employee.currentCompany = newCompany
+        return employeeRepository.save(employee)
+
     }
 }

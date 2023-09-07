@@ -54,6 +54,10 @@ class Billing extends AbstractAuditingEntity implements Serializable {
 	Projects project
 
 	@GraphQLQuery
+	@Column(name = "company")
+	UUID companyId
+
+	@GraphQLQuery
 	@Column(name = "otc_name")
 	String otcName
 

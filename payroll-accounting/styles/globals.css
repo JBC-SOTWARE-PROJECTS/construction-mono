@@ -181,6 +181,10 @@ th.ant-table-cell {
   width: 100% !important;
 }
 
+.h-full {
+  height: 100% !important;
+}
+
 .mb-10 {
   margin-bottom: 40px;
 }
@@ -191,6 +195,10 @@ th.ant-table-cell {
 
 .mb-2-5 {
   margin-bottom: 10px !important;
+}
+
+.mt-2-5 {
+  margin-top: 10px !important;
 }
 
 .margin-0 {
@@ -215,6 +223,10 @@ th.ant-table-cell {
   justify-content: flex-end;
 }
 
+.items-center {
+  align-items: center;
+}
+
 .dev-between {
   display: flex;
   justify-content: space-between;
@@ -224,6 +236,22 @@ th.ant-table-cell {
 
 .currency-red {
   color: red;
+  font-size: 24px;
+}
+
+.currency-green {
+  color: green;
+  font-size: 24px;
+}
+
+.currency-orange {
+  color: orange;
+  font-size: 24px;
+}
+
+.currency-blue {
+  color: blue;
+  font-size: 24px;
 }
 
 .select-option-loading {
