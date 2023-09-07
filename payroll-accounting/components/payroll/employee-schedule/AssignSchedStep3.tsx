@@ -7,6 +7,7 @@ import { SelectInfo } from "antd/es/calendar/generateCalendar";
 import { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
 import { columns, transformDatesArray } from "./AssignEmployeeScheduleModal";
+import ScheduleCard from "@/components/common/ScheduleCard";
 
 interface IProps {
   selectedDates: string[];
@@ -34,44 +35,7 @@ function AssignSchedStep3({
       >
         <Row gutter={16}>
           <Col span={10}>
-            <Card title="Schedule Details" bordered={false}>
-              <table>
-                <tr>
-                  <td style={{ paddingRight: 30, fontWeight: "bold" }}>
-                    Label:
-                  </td>
-                  <td width={60}>{scheduleType?.label}</td>
-                </tr>
-                <tr>
-                  <td style={{ paddingRight: 30, fontWeight: "bold" }}>
-                    Title:
-                  </td>
-                  <td width={60}>{scheduleType?.title}</td>
-                </tr>
-                <tr>
-                  <td style={{ paddingRight: 30, fontWeight: "bold" }}>
-                    Schedule Duration:
-                  </td>
-                  <td width={60}>
-                    {getTimeFromDate(scheduleType?.dateTimeStartRaw)}
-                  </td>
-                  <td width={20} style={{ textAlign: "center" }}>
-                    -
-                  </td>
-                  <td width={60}>
-                    {getTimeFromDate(scheduleType?.dateTimeEndRaw)}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ paddingRight: 30, fontWeight: "bold" }}>
-                    Meal break Duration:{" "}
-                  </td>
-                  <td>{getTimeFromDate(scheduleType?.mealBreakStart)}</td>
-                  <td style={{ textAlign: "center" }}>-</td>
-                  <td>{getTimeFromDate(scheduleType?.mealBreakEnd)}</td>
-                </tr>
-              </table>
-            </Card>
+            <ScheduleCard scheduleType={scheduleType} />
           </Col>
           <Col span={14}>
             <Card

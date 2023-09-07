@@ -31,10 +31,14 @@ import org.springframework.stereotype.Component
 import javax.transaction.Transactional
 import java.sql.Timestamp
 import java.sql.Types
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.function.Consumer
+import java.util.function.Predicate
 
 class EmployeeScheduleDto {
     UUID id
@@ -43,12 +47,16 @@ class EmployeeScheduleDto {
     UUID employeeId
     Map<String, List<Map<String, Object>>> schedule
 }
-//class Test {
-//    String fullName
-//    String position
-//    UUID employeeId
-//    List<Map<String, Object>>
-//}
+
+class EmployeeScheduleDetailsDto {
+    UUID id
+    String fullName
+    String position
+    UUID employeeId
+    String dateString
+    EmployeeSchedule regularSchedule
+    EmployeeSchedule overtimeSchedule
+}
 
 @TypeChecked
 @Component
@@ -95,19 +103,34 @@ class EmployeeScheduleService {
 //            @GraphQLArgument(name = "filter") String filter,
 @GraphQLArgument(name = "startDate") Instant startDate,
 @GraphQLArgument(name = "endDate") Instant endDate,
-@GraphQLArgument(name = "employeeIds") List<UUID> employeeIds
+@GraphQLArgument(name = "filter") String filter = '',
+@GraphQLArgument(name = "position") UUID position,
+@GraphQLArgument(name = "office") UUID office
+
 
     ) {
+        List<Employee> employeeList = employeeRepository.findByFilterPositionOffice(
+                filter,
+                position ? position.toString() : '',
+                office ? office.toString() : '')
+        List<UUID> employeeIds = []
+
+        employeeList.each {
+            employeeIds.push((it.id))
+        }
+
         Map<String, Map<String, List<Map<String, Object>>>> employeeMap = new HashMap<>() // Initialize employeeMap
+
         String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
+
         List<Map<String, Object>> results = jdbcTemplate.queryForList("""
-    Select e.id, concat(e.first_name, ' ', e.last_name) as full_name, s.*  from hrm.employee_schedule s
+    Select e.id, concat(e.first_name, ' ', e.last_name) as full_name, s.id as schedule_id, s.*  from hrm.employee_schedule s
     left join hrm.employees e on e.id = s.employee
     where s.employee in ${formattedStringIds}
     AND s.date_time_start >= '${startDate.toString()}'
     AND s.date_time_start <= '${endDate.toString()}'
-    """)
 
+    """)
 
         results.each {
             String empId = it['id'].toString()
@@ -130,7 +153,7 @@ class EmployeeScheduleService {
             }
         }
 
-        List<Employee> employeeList = employeeRepository.getEmployees(employeeIds)
+
         List<EmployeeScheduleDto> employeeSchedules = []
         employeeList.each {
             EmployeeScheduleDto employee = new EmployeeScheduleDto()
@@ -148,6 +171,28 @@ class EmployeeScheduleService {
         employeeSchedules
     }
 
+    @GraphQLQuery(name = "getEmployeeScheduleDetails", description = "Search employees")
+    EmployeeScheduleDetailsDto getEmployeeScheduleDetails(
+            @GraphQLArgument(name = "employeeId") UUID employeeId,
+            @GraphQLArgument(name = "date") String date
+    ) {
+
+        List<EmployeeSchedule> employeeSchedules = employeeScheduleRepository.findByDateAndEmployeeId(date, employeeId)
+        EmployeeScheduleDetailsDto scheduleDetails = new EmployeeScheduleDetailsDto()
+
+        scheduleDetails.id = employeeSchedules[0].employee.id
+        scheduleDetails.dateString = employeeSchedules[0].dateString
+        scheduleDetails.fullName = employeeSchedules[0].employee.fullName
+        scheduleDetails.position = employeeSchedules[0].employee.position.description
+
+        employeeSchedules.each {
+            if (it.isOvertime) scheduleDetails.overtimeSchedule = it
+            else scheduleDetails.regularSchedule = it
+        }
+
+        return scheduleDetails
+    }
+
     //============== All Mutation ====================
 
     @GraphQLMutation(name = "upsertEmployeeSchedule", description = "create or update schedule config.")
@@ -156,26 +201,54 @@ class EmployeeScheduleService {
             @GraphQLArgument(name = "employeeId") UUID employeeId,
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "employeeIdList") List<UUID> employeeIdList,
-            @GraphQLArgument(name = "dates") List<String> dates = []
+            @GraphQLArgument(name = "dates") List<String> dates = [],
+            @GraphQLArgument(name = "isOverTime") Boolean isOverTime = false
+
     ) {
         if (dates?.size() > 0) {
             CompanySettings company = SecurityUtils.currentCompany()
 
             List<EmployeeSchedule> scheduleList = []
             List<Employee> employeeList = employeeRepository.findAllById(employeeIdList)
-            dates.each { String date ->
-                employeeList.each { Employee employee ->
 
-                    EmployeeSchedule employeeSchedule
-                    employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
+            def dateFormatter = new SimpleDateFormat('yyyy-MM-dd')
 
-                    employeeSchedule.dateTimeStart = Instant.parse(date.substring(0, 10) + (fields.get('dateTimeStart') as String).substring(10))
-                    employeeSchedule.dateTimeEnd = Instant.parse(date.substring(0, 10) + (fields.get('dateTimeEnd') as String).substring(10))
-                    employeeSchedule.mealBreakStart = Instant.parse(date.substring(0, 10) + (fields.get('mealBreakStart') as String).substring(10))
-                    employeeSchedule.mealBreakEnd = Instant.parse(date.substring(0, 10) + (fields.get('mealBreakEnd') as String).substring(10))
+            List<String> trimmedDates = []
+            dates.each {
+                trimmedDates.push(it.substring(0, 10))
+            }
+
+            employeeList.each { Employee employee ->
+                List<EmployeeSchedule> all = employeeScheduleRepository.findAll()
+
+                List<EmployeeSchedule> employeeSchedules = employeeScheduleRepository.getRegularSchedules(trimmedDates, employee.id)
+
+                trimmedDates.each { String date ->
+
+                    EmployeeSchedule employeeSchedule = null
+                    Predicate<EmployeeSchedule> filterPredicate = { EmployeeSchedule it -> it.dateString == date }
+                    Consumer<EmployeeSchedule> consumer = { EmployeeSchedule it -> employeeSchedule = it }
+
+                    employeeSchedules.stream()
+                            .filter(filterPredicate)
+                            .findFirst()
+                            .ifPresent(consumer)
+
+                    if (employeeSchedule == null)
+                        employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
+                    else
+                        employeeSchedule = objectMapper.updateValue(employeeSchedule, fields)
+
+                    employeeSchedule.dateTimeStart = Instant.parse(date + (fields.get('dateTimeStart') as String).substring(10))
+                    employeeSchedule.dateTimeEnd = Instant.parse(date + (fields.get('dateTimeEnd') as String).substring(10))
+                    employeeSchedule.mealBreakStart = Instant.parse(date + (fields.get('mealBreakStart') as String).substring(10))
+                    employeeSchedule.mealBreakEnd = Instant.parse(date + (fields.get('mealBreakEnd') as String).substring(10))
                     employeeSchedule.employee = employee
                     employeeSchedule.company = company
+                    employeeSchedule.dateString = date
+
                     scheduleList.push(employeeSchedule)
+
                 }
 
             }
@@ -190,6 +263,7 @@ class EmployeeScheduleService {
             } else {
                 employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
             }
+            employeeSchedule.dateString = (fields.get('dateTimeStart') as String).substring(0, 10)
             employeeSchedule.employee = employeeRepository.findById(employeeId).get()
             employeeSchedule.company = SecurityUtils.currentCompany()
 

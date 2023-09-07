@@ -74,7 +74,7 @@ function AssignEmployeeScheduleModal(props: IProps) {
       if (current === 1 && selectedDates.length === 0) {
         message.warning(
           <>
-            Please select <b>employees</b> and a <b>schedule type</b>
+            Please select <b>dates</b>
           </>
         );
         return false;
@@ -172,7 +172,6 @@ function AssignEmployeeScheduleModal(props: IProps) {
               size="large"
               onClick={() => {
                 if (checkStep(current + 1)) setCurrent(current + 1);
-                debugger;
               }}
             >
               Next <RightCircleOutlined />
@@ -290,7 +289,6 @@ export function transformDatesArray(datesArray: string[]): any {
       return dayjs(item);
     })
   );
-  debugger;
 
   return Object.keys(sortedDates).map((item) => {
     return {

@@ -1,5 +1,5 @@
 /* start global css */
-
+@import "payroll-styles.css";
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -328,18 +328,4 @@ th.ant-table-cell {
 .menu-item-left-container {
   margin-left: 16px;
   width: calc(100% - 58px);
-}
-
-.custom_calender table tbody tr {
-  font-size: 1.2rem !important;
-  height: 40px !important;
-}
-.custom_calender table thead tr {
-  font-size: 1.2rem !important;
-  height: 40px !important;
-}
-
-.custom_calendar_cell:hover {
-  background-color: rgb(236, 234, 234) !important;
-  color: rgb(39, 39, 39) !important;
 }
