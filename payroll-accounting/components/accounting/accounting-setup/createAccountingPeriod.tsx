@@ -8,6 +8,7 @@ import { Fiscal } from '@/graphql/gql/graphql'
 import { gql, useMutation } from '@apollo/client'
 import { Checkbox, Divider, Form, List, Modal, message } from 'antd'
 import dayjs from 'dayjs'
+import moment from 'moment'
 
 const options = [
   { label: 'January', value: 'lockJanuary' },
@@ -41,7 +42,10 @@ export default function CreateAccountingPeriod(props: CreateAccountingPeriodI) {
   const { hide, record } = props
   const initialValues = {
     ...record,
-    fiscalRange: [dayjs(record?.fromDate), dayjs(record?.toDate)],
+    fiscalRange: [
+      dayjs(record?.fromDate).subtract(1, 'day'),
+      dayjs(record?.toDate).subtract(1, 'day'),
+    ],
     fiscalMonths: [
       ...(record
         ? options.map(({ value }) => (record[value] ? value : null))
@@ -64,9 +68,10 @@ export default function CreateAccountingPeriod(props: CreateAccountingPeriodI) {
 
   const onHandleClickOk = (values: any) => {
     const { fiscalRange, remarks, fiscalMonths, active } = values
+
     const fields: any = {
-      fromDate: fiscalRange[0],
-      toDate: fiscalRange[1],
+      fromDate: dayjs(fiscalRange[0]).add(1, 'day').startOf('day'),
+      toDate: dayjs(fiscalRange[1]).endOf('day'),
       remarks: remarks ?? '',
       active,
     }

@@ -6,6 +6,7 @@ import { PageContainer } from '@ant-design/pro-components'
 import { gql, useQuery } from '@apollo/client'
 import { Button, Input, Space, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
+import moment from 'moment'
 
 const GET_FISCAL = gql`
   query ($filter: String!, $page: Int!, $size: Int!) {
@@ -66,11 +67,13 @@ export default function AccountingPeriod() {
       title: 'Date from',
       dataIndex: 'fromDate',
       key: 'fromDate',
+      render: (text) => moment(text).format('YYYY-MM-DD'),
     },
     {
       title: 'Date to',
       dataIndex: 'toDate',
       key: 'toDate',
+      render: (text) => moment(text).format('YYYY-MM-DD'),
     },
     {
       title: 'Remarks',
@@ -90,7 +93,16 @@ export default function AccountingPeriod() {
       align: 'center',
       width: 90,
       render: (_: string, record: Fiscal) => (
-        <Button type='primary' onClick={() => onHandleClickCreateEdit(record)}>
+        <Button
+          type='primary'
+          onClick={() =>
+            onHandleClickCreateEdit({
+              ...record,
+              fromDate: moment(record?.fromDate).add('day', 1),
+              toDate: moment(record?.toDate).add('day', 1),
+            })
+          }
+        >
           Edit
         </Button>
       ),

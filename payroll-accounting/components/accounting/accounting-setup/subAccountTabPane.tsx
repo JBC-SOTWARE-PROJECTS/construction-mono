@@ -17,7 +17,7 @@ export default function SubAccountTabPane(props: SubAccountTabPaneI) {
       title: 'Code',
       dataIndex: 'subaccountCode',
       key: 'subaccountCode',
-      width: 100,
+      width: 200,
     },
     {
       title: 'Parent Account',

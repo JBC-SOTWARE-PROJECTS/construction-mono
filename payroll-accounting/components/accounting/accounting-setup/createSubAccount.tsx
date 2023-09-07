@@ -1,18 +1,20 @@
-import { FormInput, FormSelect, FormTextArea } from '@/components/common'
+import {
+  FormInput,
+  FormSegment,
+  FormSelect,
+  FormTextArea,
+} from '@/components/common'
 import { SubAccountSetup } from '@/graphql/gql/graphql'
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { AppstoreOutlined, BarsOutlined } from '@ant-design/icons'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { Divider, Form, Modal, message } from 'antd'
+import { useState } from 'react'
+import { DomainEnum } from '../enum/parentAccountEnum'
 
 interface CreateSubAccountI {
   hide: () => void
   record: SubAccountSetup
 }
-
-const SUB_ACCOUNTABLE_DOMAIN = gql`
-  query {
-    domain: getSubAccountableFromDomain
-  }
-`
 
 const GROUP_ACCOUNT_TYPES = gql`
   query {
@@ -38,17 +40,45 @@ const UPDATE_INSERT = gql`
   }
 `
 
+const SUB_ACCOUNT_PARENT = gql`
+  query ($parentAccountId: UUID) {
+    parentSubAccounts: getSubAccountForParent(
+      parentAccountId: $parentAccountId
+    ) {
+      value: id
+      label: accountName
+    }
+  }
+`
+
+const SUB_ACCOUNT_DOMAINS = gql`
+  query {
+    subAccountDomains {
+      label
+      value
+    }
+  }
+`
 export default function CreateSubAccount(props: CreateSubAccountI) {
   const { record, hide } = props
 
-  console.log(record, 'record')
   const [form] = Form.useForm()
-
-  const { data: getDomainData, loading: getDomainLoading } = useQuery(
-    SUB_ACCOUNTABLE_DOMAIN
+  const [subType, setSubType] = useState(
+    record?.sourceDomain
+      ? record?.sourceDomain == DomainEnum.NO_DOMAIN.toString()
+        ? 'default'
+        : 'records'
+      : 'default'
   )
 
   const { data, loading } = useQuery(GROUP_ACCOUNT_TYPES)
+  const { data: domainData, loading: domainLoading } =
+    useQuery(SUB_ACCOUNT_DOMAINS)
+
+  const [
+    loadSubAccountOpt,
+    { loading: subAccountLoading, data: subAccountData },
+  ] = useLazyQuery(SUB_ACCOUNT_PARENT)
 
   const [updateInsert, { loading: updateInsertLoading }] = useMutation(
     UPDATE_INSERT,
@@ -65,11 +95,25 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
   )
 
   const onHandleClickOk = (values: SubAccountSetup) => {
+    const { subType } = form.getFieldsValue()
+    console.log(subType, 'subType')
     const fields = { ...values }
+    fields.sourceDomain =
+      subType == 'default' ? DomainEnum.NO_DOMAIN : fields.sourceDomain
+
+    console.log(fields, 'fields')
     updateInsert({
       variables: {
         id: record?.id,
         fields,
+      },
+    })
+  }
+
+  const onHandleSelectParent = (parentAccountId: string) => {
+    loadSubAccountOpt({
+      variables: {
+        parentAccountId,
       },
     })
   }
@@ -87,9 +131,16 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
       <Divider />
       <Form
         form={form}
-        name='form-fiscal'
+        name='form-sub-account'
         autoComplete='off'
-        initialValues={{ ...record }}
+        initialValues={{
+          ...record,
+          subType: record?.sourceDomain
+            ? record?.sourceDomain == DomainEnum.NO_DOMAIN.toString()
+              ? 'default'
+              : 'records'
+            : 'default',
+        }}
         labelCol={{ span: 8 }}
         wrapperCol={{ span: 16 }}
         style={{ maxWidth: 600 }}
@@ -101,27 +152,67 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
           propsselect={{
             options: data?.parentAccountsPerCategory ?? [],
             optionFilterProp: 'label',
+            onSelect: (e) => onHandleSelectParent(e),
           }}
           rules={[{ required: true }]}
         />
-        {/* <FormSelect
+
+        <FormSelect
           name='parentSubAccounts'
           label='Parent Sub-accounts'
           propsselect={{
-            options: data?.parentAccountsPerCategory ?? [],
+            allowClear: true,
+            options: subAccountData?.parentSubAccounts ?? [],
           }}
-        /> */}
-        <FormInput
-          name='subaccountCode'
-          label='Code'
-          rules={[{ required: true }]}
         />
-        <FormInput
-          name='accountName'
-          label='Name'
-          rules={[{ required: true }]}
+
+        <FormSegment
+          name='subType'
+          label='Sub-account Type'
+          propssegment={{
+            options: [
+              {
+                label: 'Default',
+                value: 'default',
+                icon: <BarsOutlined />,
+              },
+              {
+                label: 'Data Records',
+                value: 'records',
+                icon: <AppstoreOutlined />,
+              },
+            ],
+            onChange: (e: any) => setSubType(e),
+          }}
         />
-        <FormTextArea name='description' label='Description (Optional)' />
+
+        {subType == 'default' ? (
+          <>
+            <FormInput
+              name='subaccountCode'
+              label='Code'
+              rules={[{ required: true }]}
+            />
+
+            <FormInput
+              name='accountName'
+              label='Name'
+              rules={[{ required: true }]}
+            />
+
+            <FormTextArea name='description' label='Description (Optional)' />
+          </>
+        ) : (
+          <FormSelect
+            name='sourceDomain'
+            label='Data Records'
+            propsselect={{
+              allowClear: true,
+              options: domainData?.subAccountDomains ?? [],
+            }}
+          />
+        )}
+
         {/* <FormSelect
           name='sourceDomain'
           label='Get From'

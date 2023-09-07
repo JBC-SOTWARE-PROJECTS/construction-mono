@@ -27,3 +27,8 @@ export const AccountType = {
   REVENUE: { label: 'Revenue', category: AccountCategory.REVENUE },
   EXPENSES: { label: 'Expenses', category: AccountCategory.EXPENSE },
 } as const
+
+export enum DomainEnum {
+  NO_DOMAIN = 'NO_DOMAIN',
+  ITEM_CATEGORY = 'ITEM_CATEGORY',
+}

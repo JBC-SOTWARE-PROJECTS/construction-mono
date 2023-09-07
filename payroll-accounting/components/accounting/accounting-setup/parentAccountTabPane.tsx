@@ -8,6 +8,7 @@ interface ParentAccountTabPaneI {
   dataSource: never[] | Maybe<ParentAccount>[] | null | undefined
   loading: boolean
   totalElements: number
+  number: number
   onHandleClickCreateEdit: (record?: ParentAccount) => void
   handleLoadMore: (page: number) => void
   onHandleSearch: (filter: string) => void
@@ -81,6 +82,7 @@ export default function ParentAccountTabPane(props: ParentAccountTabPaneI) {
         footer={() => (
           <Pagination
             defaultCurrent={1}
+            current={props.number + 1}
             pageSize={10}
             responsive={true}
             total={props.totalElements}

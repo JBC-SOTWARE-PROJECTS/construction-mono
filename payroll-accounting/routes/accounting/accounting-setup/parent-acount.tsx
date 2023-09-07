@@ -81,6 +81,7 @@ export default function ParentAccount() {
   const tabPaneProps = {
     dataSource: content,
     loading,
+    number,
     totalElements,
     onHandleClickCreateEdit,
     handleLoadMore,

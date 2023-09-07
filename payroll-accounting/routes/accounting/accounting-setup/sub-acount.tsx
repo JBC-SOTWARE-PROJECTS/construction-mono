@@ -23,6 +23,7 @@ const SUB_ACCOUNT = gql`
         accountName
         description
       }
+      sourceDomain
     }
   }
 `
