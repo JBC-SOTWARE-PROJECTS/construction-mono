@@ -44,6 +44,11 @@ export const GET_BILLING_INFO_BY_ID = gql`
         id
         projectCode
         description
+        location {
+          id
+          fullAddress
+        }
+        status
       }
       customer {
         id

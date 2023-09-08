@@ -254,6 +254,11 @@ th.ant-table-cell {
   font-size: 24px;
 }
 
+.currency-black {
+  color: black;
+  font-size: 24px;
+}
+
 .select-option-loading {
   min-height: 50px;
   display: flex;
@@ -342,4 +347,18 @@ th.ant-table-cell {
 .custom_calendar_cell:hover {
   background-color: rgb(236, 234, 234) !important;
   color: rgb(39, 39, 39) !important;
+}
+
+.billing-info-width {
+  font-weight: 700;
+  width: 300px;
+}
+.billing-info-value {
+  width: calc(100% - 300px);
+}
+
+.flex-div {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
