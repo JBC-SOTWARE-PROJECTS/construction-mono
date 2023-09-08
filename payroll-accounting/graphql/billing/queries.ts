@@ -34,6 +34,37 @@ export const GET_BILLING_RECORDS = gql`
   }
 `;
 
+export const GET_BILLING_INFO_BY_ID = gql`
+  query ($id: UUID) {
+    billingById(id: $id) {
+      id
+      dateTrans
+      billNo
+      project {
+        id
+        projectCode
+        description
+      }
+      customer {
+        id
+        fullName
+        customerType
+        address
+        telNo
+        emailAdd
+      }
+      otcName
+      locked
+      lockedBy
+      balance
+      totals
+      deductions
+      payments
+      status
+    }
+  }
+`;
+
 export const GET_OTC_RECORD = gql`
   query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
     billingOTCByFiltersPage(

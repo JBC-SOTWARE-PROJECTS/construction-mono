@@ -88,9 +88,9 @@ div.my-prefix-sider-logo + div::-webkit-scrollbar-thumb {
   color: #fff !important;
 }
 
-.ant-btn-primary {
+/* .ant-btn-primary {
   background-color: #399b53 !important;
-}
+} */
 
 th.ant-table-cell {
   background: #399b53 !important;
