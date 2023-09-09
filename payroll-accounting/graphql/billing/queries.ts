@@ -70,6 +70,34 @@ export const GET_BILLING_INFO_BY_ID = gql`
   }
 `;
 
+export const GET_BILLING_ITEMS = gql`
+  query ($filter: String, $id: UUID, $type: [String]) {
+    billingItemByParentType(filter: $filter, id: $id, type: $type) {
+      id
+      transDate
+      recordNo
+      description
+      qty
+      debit
+      credit
+      subTotal
+      itemType
+      transType
+      orNum
+      lastModifiedBy
+      status
+    }
+  }
+`;
+
+export const CANCEL_BILLING_ITEM = gql`
+  mutation ($id: UUID, $office: UUID) {
+    cancelItem(id: $id, office: $office) {
+      id
+    }
+  }
+`;
+
 export const GET_OTC_RECORD = gql`
   query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
     billingOTCByFiltersPage(

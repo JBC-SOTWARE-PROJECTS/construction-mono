@@ -1,28 +1,99 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   BarcodeOutlined,
   PayCircleOutlined,
   PercentageOutlined,
   TagsOutlined,
 } from "@ant-design/icons";
-import { Card, Col, Input, Row, Segmented, Table, Tag, Typography } from "antd";
-import { Billing, BillingItem } from "@/graphql/gql/graphql";
+import {
+  Button,
+  Card,
+  Col,
+  Input,
+  Row,
+  Segmented,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
+import { Billing, BillingItem, Mutation, Query } from "@/graphql/gql/graphql";
 import { ColumnsType } from "antd/es/table";
 import { DateFormatterWithTime, NumberFormater } from "@/utility/helper";
-import dayjs from "dayjs";
 import { currency } from "@/utility/constant";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  CANCEL_BILLING_ITEM,
+  GET_BILLING_ITEMS,
+} from "@/graphql/billing/queries";
+import _ from "lodash";
+import { useConfirm } from "@/hooks";
+import { AccountContext } from "@/components/accessControl/AccountContext";
 
 interface Iprops {
   record?: Billing;
   billingId?: string;
+  onRefetchBillingInfo: () => void;
 }
 
 const { Search } = Input;
 const { Text } = Typography;
 
 export default function BillingTables(props: Iprops) {
-  const { record, billingId } = props;
-  const [activeTab, setActiveTab] = useState<string | number>("items");
+  const { record, billingId, onRefetchBillingInfo } = props;
+  const account = useContext(AccountContext);
+  const [activeTab, setActiveTab] = useState<string | number>("ITEM");
+  const [items, setItems] = useState<BillingItem[]>([]);
+  const [filter, setFilter] = useState("");
+  // ========================= Queries ===================================
+  const { loading, refetch } = useQuery<Query>(GET_BILLING_ITEMS, {
+    fetchPolicy: "cache-and-network",
+    variables: {
+      filter: filter,
+      id: billingId,
+      type: [activeTab],
+    },
+    onCompleted: (data) => {
+      let result = data?.billingItemByParentType as BillingItem[];
+      setItems(result);
+    },
+  });
+
+  const [cancelBilling] = useMutation<Mutation>(CANCEL_BILLING_ITEM, {
+    ignoreResults: false,
+  });
+  // ======================== functions =================================
+  const onCancelled = (e?: BillingItem) => {
+    let loading = false;
+    useConfirm({
+      title: "Are you sure you want to cancel this billing item?",
+      subTitle: "Click Yes if you want to proceed",
+      loading: loading,
+      onCallBack: async () => {
+        try {
+          return await new Promise((resolve, reject) => {
+            cancelBilling({
+              variables: {
+                id: e?.id ?? null,
+                office: account?.office?.id ?? null,
+              },
+              onCompleted: (data_1) => {
+                let result = data_1?.cancelItem as BillingItem;
+                if (result?.id) {
+                  refetch();
+                  onRefetchBillingInfo();
+                  resolve();
+                } else {
+                  reject();
+                }
+              },
+            });
+          });
+        } catch {
+          return console.log("Oops errors!");
+        }
+      },
+    });
+  };
   //========================= columnns ==================================
   const columns: ColumnsType<BillingItem> = [
     {
@@ -32,13 +103,13 @@ export default function BillingTables(props: Iprops) {
       width: 200,
       render: (transDate, record) => {
         if (!record.status) {
-          return <span>{DateFormatterWithTime(transDate)}</span>;
-        } else {
           return (
             <Text type="danger" delete={!record.status}>
               {DateFormatterWithTime(transDate)}
             </Text>
           );
+        } else {
+          return <span>{DateFormatterWithTime(transDate)}</span>;
         }
       },
     },
@@ -64,14 +135,15 @@ export default function BillingTables(props: Iprops) {
       dataIndex: "description",
       key: "description",
       render: (description, record) => {
+        let desc = _.toUpper(description);
         if (!record.status) {
           return (
             <Text type="danger" delete={!record.status}>
-              {description}
+              {desc}
             </Text>
           );
         } else {
-          return <span>{description}</span>;
+          return <span>{desc}</span>;
         }
       },
     },
@@ -132,11 +204,17 @@ export default function BillingTables(props: Iprops) {
         if (!record.status) {
           return (
             <Text type="danger" delete={!record.status}>
-              {subTotal}
+              {currency + " "}
+              {NumberFormater(subTotal)}
             </Text>
           );
         } else {
-          return <span>{subTotal}</span>;
+          return (
+            <span>
+              {currency + " "}
+              {NumberFormater(subTotal)}
+            </span>
+          );
         }
       },
     },
@@ -172,6 +250,19 @@ export default function BillingTables(props: Iprops) {
       width: 100,
       align: "center",
       fixed: "right",
+      render: (_, record) => {
+        if (record.status) {
+          return (
+            <Button
+              type="dashed"
+              size="small"
+              danger
+              onClick={() => onCancelled(record)}>
+              Cancel
+            </Button>
+          );
+        }
+      },
     },
   ];
 
@@ -187,33 +278,42 @@ export default function BillingTables(props: Iprops) {
               onChange={setActiveTab}
               options={[
                 {
-                  value: "items",
+                  value: "ITEM",
                   label: "Inventory Items",
                   icon: <BarcodeOutlined />,
                 },
                 {
-                  value: "services",
+                  value: "SERVICE",
                   label: "Services",
                   icon: <TagsOutlined />,
                 },
                 {
                   label: "Deduction/Discount",
-                  value: "discounts",
+                  value: "DEDUCTIONS",
                   icon: <PercentageOutlined />,
                 },
                 {
                   label: "Payment History",
-                  value: "payments",
+                  value: "PAYMENTS",
                   icon: <PayCircleOutlined />,
                 },
               ]}
             />
           </Col>
           <Col span={24}>
-            <Search placeholder="Search here ..." />
+            <Search placeholder="Search here ..." onSearch={setFilter} />
           </Col>
           <Col span={24}>
-            <Table size="small" columns={columns} />
+            <Table
+              size="small"
+              columns={columns}
+              loading={loading}
+              dataSource={items}
+              pagination={{
+                showSizeChanger: false,
+                pageSize: 5,
+              }}
+            />
           </Col>
         </Row>
       </Card>

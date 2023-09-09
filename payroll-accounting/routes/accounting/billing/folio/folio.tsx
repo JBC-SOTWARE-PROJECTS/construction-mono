@@ -16,8 +16,8 @@ export default function BillingFolioComponent(props: Iprops) {
   const [active, setActive] = useState(true);
   const [billingInfo, setBillingInfo] = useState<Billing>({});
 
-  const { loading, refetch } = useQuery<Query>(GET_BILLING_INFO_BY_ID, {
-    //fetchPolicy: "cache-and-network",
+  const { refetch } = useQuery<Query>(GET_BILLING_INFO_BY_ID, {
+    fetchPolicy: "cache-and-network",
     variables: {
       id: id,
     },
@@ -45,9 +45,16 @@ export default function BillingFolioComponent(props: Iprops) {
             </Button>
           </>
         }>
-        <BillingHeader record={billingInfo} />
+        <BillingHeader
+          record={billingInfo}
+          onRefetchBillingInfo={onRefetchBillingInfo}
+        />
       </Card>
-      <BillingTables record={billingInfo} billingId={id} />
+      <BillingTables
+        record={billingInfo}
+        billingId={id}
+        onRefetchBillingInfo={onRefetchBillingInfo}
+      />
     </>
   );
 }
