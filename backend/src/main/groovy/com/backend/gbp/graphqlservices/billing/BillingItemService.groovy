@@ -450,12 +450,6 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
             inventoryLedgerService.voidLedgerByRef(it.recordNo)
 
         }
-        if(it.itemType.equalsIgnoreCase('SERVICE')){
-            def type = it.service.type;
-            if(type.equalsIgnoreCase("BUNDLE")){
-                inventoryLedgerService.voidLedgerByRef(it.recordNo)
-            }
-        }
 
         //delete discount details
         if(it.itemType == 'DEDUCTIONS'){

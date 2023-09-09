@@ -10,10 +10,12 @@ import { Billing, Query } from "@/graphql/gql/graphql";
 import { useQuery } from "@apollo/client";
 import { GET_BILLING_RECORDS } from "@/graphql/billing/queries";
 import { FormSwitch } from "@/components/common";
+import { useRouter } from "next/router";
 
 const { Search } = Input;
 
 export default function BillingComponent() {
+  const router = useRouter();
   const [active, setActive] = useState(true);
   const [state, setState] = useState({
     filter: "",
@@ -38,8 +40,7 @@ export default function BillingComponent() {
   return (
     <PageContainer
       title="Billing Portfolio Control Center"
-      content="Effortlessly manage and oversee your list of billing records."
-    >
+      content="Effortlessly manage and oversee your list of billing records.">
       <ProCard
         title="Billing Folio List"
         headStyle={{
@@ -56,8 +57,7 @@ export default function BillingComponent() {
               className="select-header-list"
             />
           </ProFormGroup>
-        }
-      >
+        }>
         <Form layout="horizontal" className="filter-form">
           <Row gutter={[8, 8]}>
             <Col span={24}>
@@ -85,7 +85,9 @@ export default function BillingComponent() {
               totalElements={
                 data?.billingByFiltersPageProjects?.totalElements as number
               }
-              handleOpen={(record) => console.log(record)}
+              handleOpen={(record) =>
+                router.push(`/accounting/billing/folio/${record?.id}`)
+              }
               changePage={(page) =>
                 setState((prev) => ({ ...prev, page: page }))
               }
