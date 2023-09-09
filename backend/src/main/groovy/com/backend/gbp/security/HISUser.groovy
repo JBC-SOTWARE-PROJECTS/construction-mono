@@ -1,6 +1,5 @@
 package com.backend.gbp.security
 
-import com.backend.gbp.domain.CompanySettings
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
@@ -13,17 +12,13 @@ class HISUser implements UserDetails {
 	private Boolean accountNonLocked
 	private Boolean credentialsNonExpired
 	private Boolean enabled
-	private UUID company
-	private CompanySettings companyDomain
 	
 	HISUser(String username, String password,
 	        Set<GrantedAuthority> authorities,
 	        Boolean accountNonExpired,
 	        Boolean accountNonLocked,
 	        Boolean credentialsNonExpired,
-	        Boolean enabled,
-			UUID company,
-			CompanySettings companyDomain) {
+	        Boolean enabled) {
 		this.username = username
 		this.password = password
 		this.authorities = authorities
@@ -31,8 +26,6 @@ class HISUser implements UserDetails {
 		this.accountNonLocked = accountNonLocked
 		this.credentialsNonExpired = credentialsNonExpired
 		this.enabled = enabled
-		this.company = company
-		this.companyDomain = companyDomain
 	}
 	
 	@Override
@@ -48,14 +41,6 @@ class HISUser implements UserDetails {
 	@Override
 	String getUsername() {
 		return username
-	}
-
-	UUID getCompany() {
-		return company
-	}
-
-	CompanySettings getCompanyDomain() {
-		return companyDomain
 	}
 	
 	@Override

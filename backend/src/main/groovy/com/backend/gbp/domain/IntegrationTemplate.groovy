@@ -20,6 +20,8 @@ class SubAccountHolder implements Subaccountable{
      String domain
      String code
      String description
+
+
 }
 @Builder
 class IntegrationTemplate implements AutoIntegrateable{

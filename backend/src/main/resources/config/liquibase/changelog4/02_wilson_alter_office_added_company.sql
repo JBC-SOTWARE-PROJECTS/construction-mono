@@ -1,1 +1,0 @@
-ALTER TABLE public.office ADD COLUMN company uuid default null;

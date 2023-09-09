@@ -65,7 +65,6 @@ class UserDetailsService implements org.springframework.security.core.userdetail
 		// activated is not used ... this is
 		//TODO: Use Activated column of user
 		//	if (userFromDatabase.activated) {
-		def company = userFromDatabase.employee.currentCompany
 		
 		userFromDatabase.authorities?.forEach {
 			authority ->
@@ -81,6 +80,9 @@ class UserDetailsService implements org.springframework.security.core.userdetail
 		// all user should be a ROLE_USER
 		if (!hasROLE_USER) {
 			grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"))
+			if (userFromDatabase.id == null) {
+				grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_PATIENT"))
+			}
 		}
 		
 		return new HISUser(
@@ -90,9 +92,7 @@ class UserDetailsService implements org.springframework.security.core.userdetail
 				true,
 				true,
 				true,
-				true,
-				company.id,
-				company
+				true
 		)
 		
 	}
