@@ -18,6 +18,7 @@ import { NumberFormater } from "@/utility/helper";
 
 interface Iprops {
   record?: Billing;
+  onRefetchBillingInfo: () => void;
 }
 
 const formatter = (value: number, color?: string) => (
@@ -28,7 +29,7 @@ const formatter = (value: number, color?: string) => (
 );
 
 export default function BillingHeader(props: Iprops) {
-  const { record } = props;
+  const { record, onRefetchBillingInfo } = props;
 
   const borderedItems: DescriptionsProps["items"] = useMemo(() => {
     let status = { color: "red", text: "INACTIVE" };
