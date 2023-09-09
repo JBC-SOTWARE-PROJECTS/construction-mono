@@ -1,7 +1,10 @@
 import { CompanySettings } from "@/graphql/gql/graphql";
+import { currency } from "@/utility/constant";
+import { DateFormatter, NumberFormater } from "@/utility/helper";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Row, Col, Table, Pagination, Button, Tag } from "antd";
+import { Row, Col, Table, Pagination, Button, Tag, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs";
 
 interface IProps {
   dataSource: CompanySettings[];
@@ -20,46 +23,112 @@ export default function CompanyTable({
 }: IProps) {
   const columns: ColumnsType<CompanySettings> = [
     {
-      title: "Company Code",
-      dataIndex: "companyCode",
-      key: "companyCode",
+      title: "A/P No",
+      dataIndex: "apNo",
+      key: "apNo",
+      width: 100,
     },
     {
-      title: "Company Name",
-      dataIndex: "companyName",
-      key: "companyName",
+      title: "A/P Date",
+      dataIndex: "apvDate",
+      key: "apvDate",
+      width: 110,
+      render: (text) => <span>{DateFormatter(text)}</span>,
     },
     {
-      title: "Company Vat Rate",
-      dataIndex: "vatRate",
-      key: "vatRate",
-    },
-    {
-      title: "Hide in Selection",
-      dataIndex: "hideInSelection",
-      key: "hideInSelection",
+      title: "Due Date",
+      key: "dueDate",
+      dataIndex: "dueDate",
+      width: 110,
       align: "center",
-      render: (text) => {
-        let color = "blue";
-        if (text) {
-          color = "green";
-        }
-        return <Tag color={color}>{text ? "Yes" : "No"}</Tag>;
+      render: (text, record) => {
+        return <span>{record.companyName}</span>;
       },
     },
     {
+      title: "Supplier",
+      dataIndex: "supplier.supplierFullname",
+      key: "supplier.supplierFullname",
+      render: (text, record) => <span key={text}>{record.companyName}</span>,
+    },
+    {
+      title: "Amount",
+      dataIndex: "grossAmount",
+      key: "grossAmount",
+      align: "right",
+      width: 130,
+      render: (amount) => (
+        <span>
+          <small>{currency} </small>
+          {NumberFormater(amount)}
+        </span>
+      ),
+    },
+    {
+      title: "Discount",
+      dataIndex: "discountAmount",
+      key: "discountAmount",
+      align: "right",
+      width: 130,
+      render: (amount) => (
+        <span>
+          <small>{currency} </small>
+          {NumberFormater(amount)}
+        </span>
+      ),
+    },
+    {
+      title: "EWT",
+      dataIndex: "ewtAmount",
+      key: "ewtAmount",
+      align: "right",
+      width: 130,
+      render: (amount) => (
+        <span>
+          <small>{currency} </small>
+          {NumberFormater(amount)}
+        </span>
+      ),
+    },
+    {
+      title: "Net Amount",
+      dataIndex: "netAmount",
+      key: "netAmount",
+      align: "right",
+      fixed: "right",
+      width: 130,
+      render: (amount) => (
+        <span>
+          <small>{currency} </small>
+          {NumberFormater(amount)}
+        </span>
+      ),
+    },
+    {
+      title: "Balance",
+      dataIndex: "balance",
+      key: "balance",
+      align: "right",
+      fixed: "right",
+      width: 130,
+      render: (amount) => (
+        <span>
+          <small>{currency} </small>
+          {NumberFormater(amount)}
+        </span>
+      ),
+    },
+    {
       title: "Status",
-      dataIndex: "isActive",
-      key: "isActive",
+      dataIndex: "status",
+      key: "status",
       align: "center",
       fixed: "right",
       width: 90,
-      render: (text) => {
-        let color = "red";
-        if (text) {
-          color = "green";
-        }
-        return <Tag color={color}>{text ? "Active" : "Inactive"}</Tag>;
+      render: (text, record) => {
+        let color = "orange";
+
+        return <Tag color={color}>{text}</Tag>;
       },
     },
 
@@ -101,7 +170,10 @@ export default function CompanyTable({
               }}
             />
           )}
-          scroll={{ x: 1400 }}
+          expandable={{
+            expandedRowRender: (record) => <>sample</>,
+          }}
+          scroll={{ x: 1600 }}
         />
       </Col>
     </Row>

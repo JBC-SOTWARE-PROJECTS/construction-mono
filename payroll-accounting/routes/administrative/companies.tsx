@@ -4,19 +4,17 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, message } from "antd";
+import { Input, Button } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import CompanyTable from "@/components/administrative/company/companyTable";
-import { CompanySettings, Query } from "@/graphql/gql/graphql";
+import { CompanySettings } from "@/graphql/gql/graphql";
+import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { useDialog } from "@/hooks";
-import { useQuery } from "@apollo/client";
-import { GET_COMPANY_RECORDS } from "@/graphql/company/queries";
-import UpsertCompanyModal from "@/components/administrative/company/dialogs/upsertCompanyModal";
 
 const { Search } = Input;
 
 export default function CompanyComponent() {
-  const modal = useDialog(UpsertCompanyModal);
+  const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [state, setState] = useState({
     filter: "",
     status: true,
@@ -24,25 +22,24 @@ export default function CompanyComponent() {
     size: 10,
   });
 
-  const { data, loading, refetch } = useQuery<Query>(GET_COMPANY_RECORDS, {
-    variables: {
-      filter: state.filter,
-      page: state.page,
-      size: state.size,
-    },
-    fetchPolicy: "cache-and-network",
-  });
+  //   const { data, loading } = useQuery<Query>(GET_RECORDS_PAYABLES, {
+  //     variables: {
+  //       filter: state.filter,
+  //       supplier: supplier?.value,
+  //       status: state.status,
+  //       start: dateToString(filterDates.start),
+  //       end: dateEndToString(filterDates.end),
+  //       page: state.page,
+  //       size: state.size,
+  //     },
+  //     fetchPolicy: "cache-and-network",
+  //   });
 
-  const onUpsertRecord = (record?: CompanySettings) => {
-    modal({ record: record }, (result: boolean) => {
-      if (result) {
-        if (record?.id) {
-          message.success("Company successfully added");
-        } else {
-          message.success("Company successfully updated");
-        }
-        refetch();
-      }
+  console.log("state => ", state);
+
+  const onShowPassword = () => {
+    showPasswordConfirmation(() => {
+      alert("asdasdasd");
     });
   };
 
@@ -69,7 +66,7 @@ export default function CompanyComponent() {
             <Button
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={() => onUpsertRecord()}
+              onClick={onShowPassword}
             >
               Create New
             </Button>
@@ -77,10 +74,10 @@ export default function CompanyComponent() {
         }
       >
         <CompanyTable
-          dataSource={data?.companyPage?.content as CompanySettings[]}
-          loading={loading}
-          totalElements={data?.companyPage?.totalElements as number}
-          handleOpen={(record) => onUpsertRecord(record)}
+          dataSource={[] as CompanySettings[]}
+          loading={false}
+          totalElements={1 as number}
+          handleOpen={(record) => console.log("record => ", record)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
         />
       </ProCard>

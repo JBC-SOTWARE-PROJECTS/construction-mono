@@ -1,8 +1,7 @@
 package com.backend.gbp.repository
 
+
 import com.backend.gbp.domain.Position
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -25,13 +24,4 @@ interface PositionRepository extends JpaRepository<Position, UUID> {
 			value = '''Select p from Position p where p.status = true'''
 	)
 	List<Position> activePositions()
-
-	@Query(
-			value = '''Select p from Position p where (lower(p.code) like lower(concat('%',:filter,'%')) or 
-						lower(p.description) like lower(concat('%',:filter,'%')))''',
-			countQuery = '''Select count(p) from Position p where (lower(p.code) like lower(concat('%',:filter,'%')) or 
-						lower(p.description) like lower(concat('%',:filter,'%')))'''
-	)
-	Page<Position> positionFilterPage(@Param("filter") String filter, Pageable pageable)
-
 }

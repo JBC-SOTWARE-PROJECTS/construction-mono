@@ -6,7 +6,6 @@ import { Col, Input, Modal, Row, Form, message, InputRef } from "antd";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import Image from "next/image";
 import { LockOutlined } from "@ant-design/icons";
-import { password } from "@/defaultaccount";
 
 const PromptPassword = ({
   account,
@@ -72,7 +71,6 @@ const PromptPassword = ({
           <Form.Item
             name="passwordAuth"
             label=""
-            initialValue={password}
             rules={[
               { required: true, message: "Wrong password authentication!" },
             ]}

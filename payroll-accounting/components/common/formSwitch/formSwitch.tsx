@@ -1,9 +1,9 @@
-import { Form, FormItemProps, SwitchProps, Switch } from 'antd'
-import React, { forwardRef } from 'react'
-import _ from 'lodash'
+import { Form, FormItemProps, SwitchProps, Switch } from "antd";
+import React, { forwardRef } from "react";
+import _ from "lodash";
 
 interface ExtendedSwitchProps extends FormItemProps {
-  switchprops?: SwitchProps
+  switchprops: SwitchProps;
 }
 
 const FormSwitch = (
@@ -11,10 +11,10 @@ const FormSwitch = (
   ref: any
 ) => {
   return (
-    <Form.Item {...props} style={{ marginBottom: '6px' }}>
+    <Form.Item {...props} style={{ marginBottom: "6px" }}>
       <Switch {...switchprops} ref={ref} />
     </Form.Item>
-  )
-}
+  );
+};
 
-export default forwardRef(FormSwitch)
+export default forwardRef(FormSwitch);

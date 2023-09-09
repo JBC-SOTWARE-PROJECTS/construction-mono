@@ -21,17 +21,20 @@ export function isInAnyRole(roles: string[], rolesRepo: string[]) {
       found = true;
     }
   });
+
   return found;
 }
 
 const AccessManager = ({ roles, children }: IProps) => {
   const accountContext = useContext(AccountContext);
+
   //allowedRoles
   const allowedRoles: string[] = roles || ["USER"];
 
   const account = accountContext;
 
-  const currentRoles = _.get(account, "user.roles", ["USER"]);
+  const currentRoles = _.get(account, "role", ["USER"]);
+
   if (isArray(allowedRoles)) {
     if (isInAnyRole(allowedRoles, currentRoles)) {
       return <>{children}</>;
