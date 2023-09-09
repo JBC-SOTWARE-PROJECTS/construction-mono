@@ -255,5 +255,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/08_wilson_billing_add_company.sql"
              relativeToChangelogFile="false"/>
-
+    <include file="classpath:config/liquibase/changelog4/11_michael_payroll_module_initial_tables.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
