@@ -1,0 +1,20 @@
+.custom_calender table tbody tr {
+  font-size: 1.2rem !important;
+  height: 40px !important;
+}
+.custom_calender table thead tr {
+  font-size: 1.2rem !important;
+  height: 40px !important;
+}
+
+.custom_calendar_cell:hover {
+  background-color: rgb(236, 234, 234) !important;
+  color: rgb(39, 39, 39) !important;
+}
+.employee_schedule_table_cell {
+  padding: 0px !important;
+}
+
+.employee_schedule_table_cell:hover {
+  cursor: pointer !important;
+}

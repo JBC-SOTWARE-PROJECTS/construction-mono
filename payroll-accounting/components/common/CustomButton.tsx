@@ -11,7 +11,7 @@ interface ExtendedButtonProps extends ButtonProps {
 const CustomButton = ({ ...props }: ExtendedButtonProps) => {
   return (
     <AccessControl allowedPermissions={props.allowedPermissions || []}>
-      <Button type="primary" htmlType="submit" block {...props}>
+      <Button htmlType="submit" block {...props}>
         {props.children}
       </Button>
     </AccessControl>

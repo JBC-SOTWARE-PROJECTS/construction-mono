@@ -32,7 +32,6 @@ function AssignSchedStep1({
   const [scheduleTypes, loadingSchedules] = useGetScheduleTypes();
 
   const [filterData] = useGetFilters();
-  console.log(scheduleType);
   return (
     <div>
       <div style={{ marginTop: 20, marginLeft: 20 }}>
@@ -45,7 +44,7 @@ function AssignSchedStep1({
               label:
                 item.label +
                 " " +
-                `(${getTimeFromDate(item.dateTimeEndRaw)} - ${getTimeFromDate(
+                `(${getTimeFromDate(item.dateTimeStartRaw)} - ${getTimeFromDate(
                   item.dateTimeEndRaw
                 )})`,
             };
@@ -84,7 +83,7 @@ function AssignSchedStep1({
             <Select
               allowClear
               style={{ width: 170 }}
-              placeholder="Office"
+              placeholder="Status"
               defaultValue={null}
               onChange={(value) => {
                 setState({ ...state, status: value });

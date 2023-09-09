@@ -94,4 +94,7 @@ class EmployeeSchedule extends AbstractAuditingEntity {
 	@JoinColumn(name = "company", referencedColumnName = "id")
 	CompanySettings company
 
+	@GraphQLQuery
+	@Column(name = "schedule_date", columnDefinition = "varchar")
+	String dateString
 }
