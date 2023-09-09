@@ -102,6 +102,10 @@ th.ant-table-cell {
   max-width: 100% !important;
   margin: 0 !important;
 }
+
+.ant-input-number {
+  width: 100% !important;
+}
 /* end ant d overrides */
 /* hide header menus */
 .my-prefix-top-nav-header-base-menu {
@@ -133,6 +137,14 @@ th.ant-table-cell {
 }
 
 .select-header-reapplication {
+  width: 100%;
+
+  @media only screen and (min-width: 838px) {
+    width: 400px;
+  }
+}
+
+.select-header-list {
   width: 100%;
 
   @media only screen and (min-width: 838px) {

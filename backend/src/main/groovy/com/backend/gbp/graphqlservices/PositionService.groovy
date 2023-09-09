@@ -13,6 +13,9 @@ import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -54,7 +57,15 @@ class PositionService {
         }else{
             positionRepository.positionFilter(filter).sort { it.code }
         }
+    }
 
+    @GraphQLQuery(name = "positionPage", description = "Search Positions")
+    Page<Position> positionPage(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+        positionRepository.positionFilterPage(filter, new PageRequest(page, size, Sort.Direction.ASC, "code"))
     }
 
 

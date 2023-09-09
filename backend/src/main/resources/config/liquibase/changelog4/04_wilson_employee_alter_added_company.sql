@@ -1,0 +1,1 @@
+ALTER TABLE hrm.employees ADD COLUMN current_company uuid default null;

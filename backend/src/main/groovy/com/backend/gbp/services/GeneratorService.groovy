@@ -98,7 +98,8 @@ enum GeneratorType {
 	JOB_STATUS,
 	PROJECT_CODE,
 	ASSET_CODE,
-	JOB_ITEM_REC
+	JOB_ITEM_REC,
+	COMPANY_CODE
 
 }
 

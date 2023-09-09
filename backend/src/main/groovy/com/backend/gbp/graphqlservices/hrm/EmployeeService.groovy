@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.hrm
 
+import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.repository.AuthorityRepository
 import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.PermissionRepository
@@ -63,6 +64,9 @@ class EmployeeService {
 
     @Autowired
     AuthorityRepository authorityRepository
+
+    @Autowired
+    CompanySettingsService companySettingsService
 
     //============== All Queries ====================
 
@@ -208,6 +212,17 @@ class EmployeeService {
     ) {
         Employee employee = employeeRepository.findById(id).get()
         employee.isActive = status
+        employeeRepository.save(employee)
+    }
+
+    @GraphQLMutation(name = "changeCompany")
+    @Transactional
+    Employee changeCompany(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "company") UUID company
+    ) {
+        Employee employee = employeeRepository.findById(id).get()
+        employee.currentCompany = companySettingsService.comById(company)
         employeeRepository.save(employee)
     }
 }
