@@ -30,6 +30,7 @@ import { useQuery, useMutation } from "@apollo/react-hooks";
 import { dialogHook } from "../../../../util/customhooks";
 import { gql } from "apollo-boost";
 import {
+  PR_PO_TYPE,
   col2,
   col4,
   col8,
@@ -105,6 +106,10 @@ const GET_RECORDS = gql`
       isPosted
     }
     projectList {
+      value: id
+      label: description
+    }
+    assetList: findAllAssets {
       value: id
       label: description
     }
@@ -186,6 +191,7 @@ const DRForm = ({ visible, hide, ...props }) => {
   {
     /* error = { errorTitle: "", errorMsg: ""}*/
   }
+  const [category, setCategory] = useState(props.category ?? "");
   const [editable, setEditable] = useState({});
   const [items, setItems] = useState([]);
   const [amount, setAmount] = useState({
@@ -284,7 +290,13 @@ const DRForm = ({ visible, hide, ...props }) => {
     payload.paymentTerms = { id: data.paymentTerms };
     payload.supplier = { id: data.supplier };
     payload.receivedOffice = { id: data.receivedOffice };
-    payload.project = { id: data.project };
+    payload.project = null;
+    payload.assets = null;
+    if (data?.category === "PROJECTS") {
+      payload.project = { id: data?.project };
+    } else if (data?.category === "SPARE_PARTS") {
+      payload.assets = { id: data?.assets };
+    }
     if (_.isEmpty(props?.id)) {
       payload.userId = account?.id;
       payload.userFullname = account?.fullName;
@@ -1355,19 +1367,55 @@ const DRForm = ({ visible, hide, ...props }) => {
               <Col {...col2}>
                 <FormSelect
                   loading={loading}
-                  description={"Project"}
+                  description={"Receiving Category"}
                   rules={[
                     { required: true, message: "This Field is required" },
                   ]}
-                  initialValue={props?.project?.id}
-                  name="project"
-                  field="project"
-                  placeholder="Select Project"
-                  list={_.get(data, "projectList", [])}
+                  initialValue={props?.category}
+                  name="category"
+                  field="category"
+                  placeholder="Select Receiving Category"
+                  onChange={(e) => {
+                    setCategory(e);
+                  }}
+                  list={PR_PO_TYPE}
                   disabled={props?.isPosted || props?.isVoid}
                 />
               </Col>
               <Col {...col2}>
+                {category === "PROJECTS" && (
+                  <FormSelect
+                    loading={loading}
+                    description={"Project"}
+                    rules={[
+                      { required: true, message: "This Field is required" },
+                    ]}
+                    initialValue={props?.project?.id}
+                    name="project"
+                    field="project"
+                    placeholder="Select Project"
+                    list={_.get(data, "projectList", [])}
+                    disabled={props?.isPosted || props?.isVoid}
+                  />
+                )}
+                {category === "SPARE_PARTS" && (
+                  <FormSelect
+                    loading={loading}
+                    description={"Equipments (Assets)"}
+                    rules={[
+                      { required: true, message: "This Field is required" },
+                    ]}
+                    initialValue={props?.assets?.id}
+                    name="assets"
+                    field="assets"
+                    placeholder="Select Equipments (Assets)"
+                    list={_.get(data, "assetList", [])}
+                    disabled={props?.isPosted || props?.isVoid}
+                  />
+                )}
+              </Col>
+
+              <Col span={24}>
                 <FormInput
                   description={"Remarks/Notes"}
                   name="receivedRemarks"

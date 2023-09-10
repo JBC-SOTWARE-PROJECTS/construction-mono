@@ -2,6 +2,7 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -47,12 +48,21 @@ class PurchaseOrder extends AbstractAuditingEntity implements Serializable {
 
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset", referencedColumnName = "id")
+	Assets assets
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "`payment_terms`", referencedColumnName = "id")
 	PaymentTerm paymentTerms
 
 	@GraphQLQuery
 	@Column(name = "pr_nos", columnDefinition = "varchar")
 	String prNos
+
+	@GraphQLQuery
+	@Column(name = "category", columnDefinition = "varchar")
+	String category
 	
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)

@@ -228,5 +228,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog3/15_alter_pr_po_form.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/16_gasoline_type.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog3/17_alter_wilson_pr_po_dr.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

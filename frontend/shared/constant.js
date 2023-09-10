@@ -73,6 +73,12 @@ export const ORDER_TYPE = [
   { label: "DELIVERED", value: "DELIVERED" },
 ];
 
+export const PR_PO_TYPE = [
+  { label: "PROJECTS", value: "PROJECTS" },
+  { label: "SPARE SPARTS", value: "SPARE_PARTS" },
+  { label: "PERSONAL", value: "PERSONAL" },
+];
+
 export const avatar = [
   "/images/avatar-male.png", //male
   "/images/avatar-female.png", //female

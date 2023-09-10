@@ -19,7 +19,13 @@ import ColTitlePopUp from "../../../../app/components/common/ColTitlePopUp";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { dialogHook } from "../../../../util/customhooks";
 import { gql } from "apollo-boost";
-import { col3, col4, PR_TYPE } from "../../../../shared/constant";
+import {
+  col2,
+  col3,
+  col4,
+  PR_PO_TYPE,
+  PR_TYPE,
+} from "../../../../shared/constant";
 import numeral from "numeral";
 import _ from "lodash";
 import moment from "moment";
@@ -49,6 +55,10 @@ const GET_RECORDS = gql`
       remarks
     }
     projectList {
+      value: id
+      label: description
+    }
+    assetList: findAllAssets {
       value: id
       label: description
     }
@@ -84,6 +94,7 @@ const PRForm = ({ visible, hide, ...props }) => {
   const [editable, setEditable] = useState({});
   const [items, setItems] = useState([]);
   const [form] = Form.useForm();
+  const [category, setCategory] = useState(props.category ?? "");
 
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     variables: {
@@ -158,7 +169,13 @@ const PRForm = ({ visible, hide, ...props }) => {
     let payload = _.clone(data);
     payload.requestedOffice = { id: data?.requestedOffice };
     payload.supplier = { id: data?.supplier };
-    payload.project = { id: data?.project };
+    payload.project = null;
+    payload.assets = null;
+    if (data?.category === "PROJECTS") {
+      payload.project = { id: data?.project };
+    } else if (data?.category === "SPARE_PARTS") {
+      payload.assets = { id: data?.assets };
+    }
     if (_.isEmpty(props?.id)) {
       payload.requestingOffice = account?.office;
       payload.userId = account?.id;
@@ -365,7 +382,7 @@ const PRForm = ({ visible, hide, ...props }) => {
               disabled={props?.isApprove}
             />
           </Col>
-          <Col {...col4}>
+          <Col {...col3}>
             <FormSelect
               loading={loading}
               description={"Request To"}
@@ -378,7 +395,7 @@ const PRForm = ({ visible, hide, ...props }) => {
               disabled={props?.isApprove}
             />
           </Col>
-          <Col {...col4}>
+          <Col {...col3}>
             <FormSelect
               description={"Urgency"}
               rules={[{ required: true, message: "This Field is required" }]}
@@ -390,20 +407,7 @@ const PRForm = ({ visible, hide, ...props }) => {
               disabled={props?.isApprove}
             />
           </Col>
-          <Col {...col4}>
-            <FormSelect
-              loading={loading}
-              description={"Project"}
-              rules={[{ required: true, message: "This Field is required" }]}
-              initialValue={props?.project?.id}
-              name="project"
-              field="project"
-              placeholder="Select Project"
-              list={_.get(data, "projectList", [])}
-              disabled={props?.isApprove}
-            />
-          </Col>
-          <Col {...col4}>
+          <Col {...col3}>
             <FormInput
               description={"Requested By"}
               name="userFullname"
@@ -412,6 +416,51 @@ const PRForm = ({ visible, hide, ...props }) => {
               disabled
             />
           </Col>
+          <Col {...col2}>
+            <FormSelect
+              loading={loading}
+              description={"Request Category"}
+              rules={[{ required: true, message: "This Field is required" }]}
+              initialValue={props?.category}
+              name="category"
+              field="category"
+              placeholder="Select Request Category"
+              onChange={(e) => {
+                setCategory(e);
+              }}
+              list={PR_PO_TYPE}
+              disabled={props?.isApprove}
+            />
+          </Col>
+          <Col {...col2}>
+            {category === "PROJECTS" && (
+              <FormSelect
+                loading={loading}
+                description={"Project"}
+                rules={[{ required: true, message: "This Field is required" }]}
+                initialValue={props?.project?.id}
+                name="project"
+                field="project"
+                placeholder="Select Project"
+                list={_.get(data, "projectList", [])}
+                disabled={props?.isApprove}
+              />
+            )}
+            {category === "SPARE_PARTS" && (
+              <FormSelect
+                loading={loading}
+                description={"Equipments (Assets)"}
+                rules={[{ required: true, message: "This Field is required" }]}
+                initialValue={props?.assets?.id}
+                name="assets"
+                field="assets"
+                placeholder="Select Equipments (Assets)"
+                list={_.get(data, "assetList", [])}
+                disabled={props?.isApprove}
+              />
+            )}
+          </Col>
+
           <Col span={24}>
             <FormInput
               description={"Remarks/Notes"}
