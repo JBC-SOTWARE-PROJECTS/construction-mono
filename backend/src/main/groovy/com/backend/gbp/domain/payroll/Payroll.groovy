@@ -1,8 +1,11 @@
 package com.backend.gbp.domain.payroll
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
+import org.hibernate.annotations.NotFound
+import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
@@ -49,6 +52,11 @@ class Payroll extends  PayrollAuditingEntity implements Serializable {
 
     @OneToMany(mappedBy = "payroll", orphanRemoval = true, cascade = CascadeType.ALL)
     List<PayrollEmployee> payrollEmployees = []
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company", referencedColumnName = "id")
+    CompanySettings company
 //
 //    @OneToOne(mappedBy = "payroll")
 //    Timekeeping timekeeping

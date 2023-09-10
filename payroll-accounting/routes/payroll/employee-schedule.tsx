@@ -14,13 +14,14 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { DatePicker, Select, Table } from "antd";
-import Search from "antd/es/input/Search";
+import { DatePicker, Input, Select, Table } from "antd";
+
 import dayjs from "dayjs";
 import { startCase, toLower } from "lodash";
 import Head from "next/head";
 import { useState } from "react";
 
+const { Search } = Input;
 interface IState {
   filter: string;
   page: number;

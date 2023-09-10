@@ -12,6 +12,7 @@ CREATE TABLE payroll.payrolls (
     last_modified_by varchar(50),
     last_modified_date timestamp DEFAULT CURRENT_TIMESTAMP,
     deleted bool,
+    company uuid not null,
     PRIMARY KEY (id)
 );
 
@@ -26,6 +27,7 @@ CREATE TABLE payroll.payroll_employees (
     created_date timestamp DEFAULT CURRENT_TIMESTAMP,
     last_modified_by varchar(50),
     last_modified_date timestamp DEFAULT CURRENT_TIMESTAMP,
+    company uuid not null,
     CONSTRAINT fk_employee FOREIGN KEY (employee) REFERENCES hrm.employees(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_payroll_employee FOREIGN KEY (payroll) REFERENCES payroll.payrolls(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     PRIMARY KEY (id)

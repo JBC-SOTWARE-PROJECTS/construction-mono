@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
@@ -10,6 +11,7 @@ import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -81,14 +83,12 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
     @GraphQLQuery(name = 'getPayrollByPagination', description = 'list of all allowances with pagination')
     Page<Payroll> getPayrollByPagination(
-            @GraphQLArgument(name = "pageSize") Integer pageSize,
+            @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "filter") String filter
     ) {
-        return payrollRepository.getPayrollByFilterPageable(filter, PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, 'createdDate')))
+        return payrollRepository.getPayrollByFilterPageable(filter, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, 'createdDate')))
     }
-
-
 
 
     //=================================QUERY=================================\\
@@ -103,6 +103,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "employeeList") List<UUID> employeeList
     ) {
+
+        CompanySettings companySettings = SecurityUtils.currentCompany()
         if (id) {
             Payroll payroll = payrollRepository.findById(id).get()
             if (fields) {
@@ -130,6 +132,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             }
 
             payroll.payrollEmployees.removeAll(employeesToRemove)
+            payroll.company = companySettings
             payrollRepository.save(payroll)
 
             if (payroll.status == PayrollStatus.ACTIVE && employeesToAdd.size() > 0) {
@@ -148,7 +151,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
             List<Employee> employees = employeeRepository.getEmployees(employeeList)
             payroll.payrollEmployees.addAll(createPayrollEmployees(employees, payroll))
-
+            payroll.company = companySettings
             payroll = payrollRepository.save(payroll)
 
             return new GraphQLResVal<Payroll>(payroll, true, "Successfully created new Payroll")
@@ -156,12 +159,15 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     }
 
     static List<PayrollEmployee> createPayrollEmployees(List<Employee> employees, Payroll payroll) {
+
+        CompanySettings companySettings = SecurityUtils.currentCompany()
         List<PayrollEmployee> payrollEmployees = new ArrayList<PayrollEmployee>()
         employees.each {
             PayrollEmployee payrollEmployee = new PayrollEmployee()
             payrollEmployee.status = PayrollEmployeeStatus.DRAFT
             payrollEmployee.employee = it
             payrollEmployee.payroll = payroll
+            payrollEmployee.company = companySettings
             payrollEmployees.add(payrollEmployee)
         }
         return payrollEmployees

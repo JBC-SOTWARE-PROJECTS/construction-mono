@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -38,6 +39,12 @@ class PayrollEmployee extends AbstractAuditingEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "employee", referencedColumnName = "id")
     Employee employee
+
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company", referencedColumnName = "id")
+    CompanySettings company
 
 //    @OneToOne(mappedBy = "payrollEmployee")
 //    OtherDeductionEmployee otherDeduction

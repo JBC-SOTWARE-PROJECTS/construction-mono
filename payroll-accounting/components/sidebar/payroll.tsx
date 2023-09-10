@@ -24,6 +24,12 @@ const payrollmenu: TDiverseTradeMenu[] = [
     icon: <CalendarOutlined className="diverse-trade-icon" />,
     path: "/payroll/employee-schedule",
   },
+  {
+    title: "Payroll Management",
+    subtitle: "View and manage payroll",
+    icon: <CalendarOutlined className="diverse-trade-icon" />,
+    path: "/payroll/payroll-management",
+  },
 ];
 
 export default payrollmenu;
