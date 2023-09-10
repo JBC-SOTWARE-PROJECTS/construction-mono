@@ -5,13 +5,17 @@ import useGetPayrollEmployees from "@/hooks/payroll/useGetPayrollEmployees";
 import useUpsertPayroll from "@/hooks/payroll/useUpsertPayroll";
 import { IState } from "@/routes/administrative/Employees";
 import { requiredField } from "@/utility/helper";
-import { SaveOutlined } from "@ant-design/icons";
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import { ProCard } from "@ant-design/pro-components";
-import { Button, Col, Divider, Form, Row, Spin } from "antd";
+import { Button, Col, Divider, Form, Modal, Row, Space, Spin } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
 import { useForm } from "antd/lib/form/Form";
 import dayjs from "dayjs";
-import { get } from "lodash";
+import { capitalize, get } from "lodash";
 import { useRouter } from "next/router";
 import { Key, useState } from "react";
 import EmployeeTable from "../administrative/employees/EmployeeTable";
@@ -19,6 +23,9 @@ import { FormDateRange } from "../common";
 import FormInput from "../common/formInput/formInput";
 import FormTextArea from "../common/formTextArea/formTextArea";
 import EmployeeDrawer from "./EmployeeDrawer";
+import useUpdatePayrollStatus, {
+  PayrollStatus,
+} from "@/hooks/payroll/useUpdatePayrollStatus";
 const initialState: IState = {
   filter: "",
   status: true,
@@ -70,6 +77,8 @@ function PayrollForm({ usage }: IProps) {
   });
 
   const [upsert, loadingUpsert] = useUpsertPayroll(usage);
+  const [updateStatus, loadingUpdateStatus] = useUpdatePayrollStatus();
+
   const onSubmit = (values: any) => {
     upsert({
       employeeList: selectedIds,
@@ -80,6 +89,17 @@ function PayrollForm({ usage }: IProps) {
         dateEnd: dayjs(values?.dateRange[1]).endOf("day"),
       },
       id: router?.query?.id,
+    });
+  };
+
+  const confirmStartPayroll = () => {
+    Modal.confirm({
+      title: "Are you sure you want to logout?",
+      content: "Please click ok to continue",
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        updateStatus(PayrollStatus.ACTIVE);
+      },
     });
   };
 
@@ -99,37 +119,42 @@ function PayrollForm({ usage }: IProps) {
         headStyle={{
           flexWrap: "wrap",
         }}
-        title={"Create Payroll"}
+        title={`${capitalize(usage)} Payroll`}
         extra={
-          <>
+          <Space>
             <Button
               type="primary"
               htmlType="submit"
-              loading={loadingUpsert || loadingEmployees || loadingPayroll}
+              loading={
+                loadingUpsert ||
+                loadingEmployees ||
+                loadingPayroll ||
+                loadingUpdateStatus
+              }
               icon={<SaveOutlined />}
               form="upsertForm"
             >
               Save Details
             </Button>
 
-            {/* {isDraftPayroll == true && (
-                            <Button
-                              type="primary"
-                              htmlType="submit"
-                              icon={<CheckCircleOutlined />}
-                              onClick={(e) => {
-                                setAction('SET_AS_ACTIVE');
-                              }}
-                              loading={loadingCalcAccumulatedLogs}
-                              allowedPermissions={['start_payroll']}
-                            >
-                              Start Payroll
-                            </Button>
-                          )} */}
-          </>
+            {payroll?.status == "DRAFT" && (
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<CheckCircleOutlined />}
+                onClick={(e) => {
+                  confirmStartPayroll();
+                }}
+                // loading={loadingCalcAccumulatedLogs}
+                // allowedPermissions={["start_payroll"]}
+              >
+                Start Payroll
+              </Button>
+            )}
+          </Space>
         }
       >
-        <Spin spinning={loadingPayroll}>
+        <Spin spinning={loadingPayroll || loadingUpdateStatus}>
           <Form
             name="upsertForm"
             layout="vertical"

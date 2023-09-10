@@ -16,7 +16,7 @@ const GET_PAYROLL = gql`
   }
 `;
 
-function useGetOnePayroll(usage: string, callBack: (payroll: any) => void) {
+function useGetOnePayroll(usage?: string, callBack?: (payroll: any) => void) {
   const router = useRouter();
   const { data, loading } = useQuery(GET_PAYROLL, {
     skip: usage === PayrollFormUsage.CREATE && true,

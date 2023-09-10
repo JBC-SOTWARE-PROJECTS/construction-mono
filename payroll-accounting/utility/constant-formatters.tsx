@@ -1,4 +1,7 @@
-export const payrollStatusColorGenerator = (value: string) => {
+import { PayrollStatus } from "@/graphql/gql/graphql";
+import { Maybe } from "graphql/jsutils/Maybe";
+
+export const payrollStatusColorGenerator = (value: Maybe<PayrollStatus>) => {
   switch (value) {
     case "DRAFT":
       return "orange";
