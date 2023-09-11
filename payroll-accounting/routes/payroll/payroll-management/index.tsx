@@ -4,13 +4,7 @@ import { Payroll } from "@/graphql/gql/graphql";
 import useGetPayrollPagable from "@/hooks/payroll/useGetPayrollPagable";
 import { payrollStatusColorGenerator } from "@/utility/constant-formatters";
 import { IPageProps, IPaginationFilters } from "@/utility/interfaces";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  UnorderedListOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   PageContainer,
   ProCard,
@@ -110,7 +104,7 @@ export default function PayrollPage({ account }: IPageProps) {
                 // ghost
                 icon={<EyeOutlined />}
                 type="primary"
-                // allowedPermissions={["view_payroll"]}
+                allowedPermissions={["view_payroll"]}
               />
             </Tooltip>
 
@@ -124,7 +118,7 @@ export default function PayrollPage({ account }: IPageProps) {
                 // onClick={(e) => {
                 //   showModal(record.id);
                 // }}
-                // allowedPermissions={["delete_payroll"]}
+                allowedPermissions={["delete_payroll"]}
               />
             )}
           </Space>
@@ -169,7 +163,7 @@ export default function PayrollPage({ account }: IPageProps) {
               href={"/payroll/payroll-management/create"}
               icon={<PlusOutlined />}
               type="primary"
-              // allowedPermissions={['create_new_payroll']}
+              allowedPermissions={["create_new_payroll"]}
             >
               New Payroll
             </CustomButton>

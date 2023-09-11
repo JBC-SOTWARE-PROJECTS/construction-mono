@@ -11,7 +11,17 @@ import {
   SaveOutlined,
 } from "@ant-design/icons";
 import { ProCard } from "@ant-design/pro-components";
-import { Button, Col, Divider, Form, Modal, Row, Space, Spin } from "antd";
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Modal,
+  Result,
+  Row,
+  Space,
+  Spin,
+} from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
 import { useForm } from "antd/lib/form/Form";
 import dayjs from "dayjs";
@@ -26,6 +36,8 @@ import EmployeeDrawer from "./EmployeeDrawer";
 import useUpdatePayrollStatus, {
   PayrollStatus,
 } from "@/hooks/payroll/useUpdatePayrollStatus";
+import CustomButton from "../common/CustomButton";
+import AccessControl from "../accessControl/AccessControl";
 const initialState: IState = {
   filter: "",
   status: true,
@@ -115,103 +127,110 @@ function PayrollForm({ usage }: IProps) {
 
   return (
     <>
-      <ProCard
-        headStyle={{
-          flexWrap: "wrap",
-        }}
-        title={`${capitalize(usage)} Payroll`}
-        extra={
-          <Space>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={
-                loadingUpsert ||
-                loadingEmployees ||
-                loadingPayroll ||
-                loadingUpdateStatus
-              }
-              icon={<SaveOutlined />}
-              form="upsertForm"
-            >
-              Save Details
-            </Button>
-
-            {payroll?.status == "DRAFT" && (
+      <AccessControl
+        allowedPermissions={["edit_payroll"]}
+        renderNoAccess={
+          <Result title="You are not authorized to view this page" />
+        }
+      >
+        <ProCard
+          headStyle={{
+            flexWrap: "wrap",
+          }}
+          title={`${capitalize(usage)} Payroll`}
+          extra={
+            <Space>
               <Button
                 type="primary"
                 htmlType="submit"
-                icon={<CheckCircleOutlined />}
-                onClick={(e) => {
-                  confirmStartPayroll();
-                }}
-                // loading={loadingCalcAccumulatedLogs}
-                // allowedPermissions={["start_payroll"]}
+                loading={
+                  loadingUpsert ||
+                  loadingEmployees ||
+                  loadingPayroll ||
+                  loadingUpdateStatus
+                }
+                icon={<SaveOutlined />}
+                form="upsertForm"
               >
-                Start Payroll
+                Save Details
               </Button>
-            )}
-          </Space>
-        }
-      >
-        <Spin spinning={loadingPayroll || loadingUpdateStatus}>
-          <Form
-            name="upsertForm"
-            layout="vertical"
-            onFinish={onSubmit}
-            form={form}
-          >
-            <Row gutter={[8, 0]}>
-              <Col span={12}>
-                <FormInput
-                  name="title"
-                  rules={requiredField}
-                  label="Title"
-                  propsinput={{
-                    placeholder: "Title",
-                  }}
-                  initialValue={get(payroll, "title")}
-                />
-              </Col>
-              <Col span={12}>
-                <FormDateRange
-                  name="dateRange"
-                  label="Date Range"
-                  propsrangepicker={{
-                    format: "MMMM D, YYYY",
-                    use12Hours: true,
-                  }}
-                />
-              </Col>
-              <Col span={24}>
-                <FormTextArea
-                  name="description"
-                  label="Description"
-                  propstextarea={{ rows: 1 }}
-                />
-              </Col>
-            </Row>
-            <Divider />
 
-            <EmployeeDrawer
-              selectedEmployees={selectedEmployees}
-              loading={loadingPayrollEmployees}
-            />
+              {payroll?.status == "DRAFT" && (
+                <CustomButton
+                  type="primary"
+                  htmlType="submit"
+                  icon={<CheckCircleOutlined />}
+                  onClick={() => {
+                    confirmStartPayroll();
+                  }}
+                  loading={loadingUpdateStatus}
+                  allowedPermissions={["start_payroll"]}
+                >
+                  Start Payroll
+                </CustomButton>
+              )}
+            </Space>
+          }
+        >
+          <Spin spinning={loadingPayroll || loadingUpdateStatus}>
+            <Form
+              name="upsertForm"
+              layout="vertical"
+              onFinish={onSubmit}
+              form={form}
+            >
+              <Row gutter={[8, 0]}>
+                <Col span={12}>
+                  <FormInput
+                    name="title"
+                    rules={requiredField}
+                    label="Title"
+                    propsinput={{
+                      placeholder: "Title",
+                    }}
+                    initialValue={get(payroll, "title")}
+                  />
+                </Col>
+                <Col span={12}>
+                  <FormDateRange
+                    name="dateRange"
+                    label="Date Range"
+                    propsrangepicker={{
+                      format: "MMMM D, YYYY",
+                      use12Hours: true,
+                    }}
+                  />
+                </Col>
+                <Col span={24}>
+                  <FormTextArea
+                    name="description"
+                    label="Description"
+                    propstextarea={{ rows: 1 }}
+                  />
+                </Col>
+              </Row>
+              <Divider />
 
-            <EmployeeTable
-              dataSource={employees as Employee[]}
-              loading={loadingEmployees}
-              totalElements={1 as number}
-              handleOpen={(record) => console.log("record => ", record)}
-              changePage={(page) =>
-                setState((prev: any) => ({ ...prev, page: page }))
-              }
-              hideExtraColumns
-              rowSelection={rowSelection}
-            />
-          </Form>
-        </Spin>
-      </ProCard>
+              <EmployeeDrawer
+                selectedEmployees={selectedEmployees}
+                loading={loadingPayrollEmployees}
+              />
+
+              <EmployeeTable
+                dataSource={employees as Employee[]}
+                loading={loadingEmployees}
+                totalElements={1 as number}
+                handleOpen={(record) => console.log("record => ", record)}
+                changePage={(page) =>
+                  setState((prev: any) => ({ ...prev, page: page }))
+                }
+                hideExtraColumns
+                rowSelection={rowSelection}
+              />
+            </Form>
+          </Spin>
+        </ProCard>
+      </AccessControl>
     </>
   );
 }
