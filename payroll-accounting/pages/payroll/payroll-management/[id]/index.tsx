@@ -43,7 +43,7 @@ const menuItems = [
     icon: <FieldTimeOutlined />,
     link: "/p-contributions",
     description:
-      "Handles mandatory deductions mandated by the government (SSS, Pag-ibig, PhilHealth).",
+      "Handles mandatory deductions mandated by the government (SSS, HDMF, PHIC).",
   },
   {
     title: "Loans",

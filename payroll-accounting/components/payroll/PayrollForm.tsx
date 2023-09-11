@@ -1,4 +1,4 @@
-import { Employee } from "@/graphql/gql/graphql";
+import { Employee, PayrollStatus } from "@/graphql/gql/graphql";
 import { useGetEmployeesByFilter } from "@/hooks/employee";
 import useGetOnePayroll from "@/hooks/payroll/useGetOnePayroll";
 import useGetPayrollEmployees from "@/hooks/payroll/useGetPayrollEmployees";
@@ -33,9 +33,7 @@ import { FormDateRange } from "../common";
 import FormInput from "../common/formInput/formInput";
 import FormTextArea from "../common/formTextArea/formTextArea";
 import EmployeeDrawer from "./EmployeeDrawer";
-import useUpdatePayrollStatus, {
-  PayrollStatus,
-} from "@/hooks/payroll/useUpdatePayrollStatus";
+import useUpdatePayrollStatus from "@/hooks/payroll/useUpdatePayrollStatus";
 import CustomButton from "../common/CustomButton";
 import AccessControl from "../accessControl/AccessControl";
 const initialState: IState = {
@@ -110,7 +108,7 @@ function PayrollForm({ usage }: IProps) {
       content: "Please click ok to continue",
       icon: <ExclamationCircleOutlined />,
       onOk() {
-        updateStatus(PayrollStatus.ACTIVE);
+        updateStatus(PayrollStatus.Active);
       },
     });
   };
@@ -155,7 +153,7 @@ function PayrollForm({ usage }: IProps) {
                 Save Details
               </Button>
 
-              {payroll?.status === PayrollStatus.DRAFT && (
+              {payroll?.status === PayrollStatus.Draft && (
                 <CustomButton
                   type="primary"
                   htmlType="submit"
