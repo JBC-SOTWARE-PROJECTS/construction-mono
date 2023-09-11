@@ -155,7 +155,7 @@ function PayrollForm({ usage }: IProps) {
                 Save Details
               </Button>
 
-              {payroll?.status == "DRAFT" && (
+              {payroll?.status === PayrollStatus.DRAFT && (
                 <CustomButton
                   type="primary"
                   htmlType="submit"
