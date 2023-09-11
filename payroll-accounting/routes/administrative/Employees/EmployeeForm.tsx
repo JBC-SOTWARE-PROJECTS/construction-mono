@@ -1,5 +1,6 @@
 import { FormInput, FormSelect } from "@/components/common";
 import FormButton from "@/components/common/formButton/formButton";
+import { UseCompanySelection } from "@/hooks/companySelection";
 import { CIVIL, EMPSTATUS, GENDER, col2, col3, col4 } from "@/utility/constant";
 import { IPageProps } from "@/utility/interfaces";
 import {
@@ -37,6 +38,9 @@ const GET_RECORDS = gql`
       position {
         id
         description
+      }
+      currentCompany {
+        id
       }
       employeeNo
       firstName
@@ -126,6 +130,7 @@ const UPSERT_RECORD = gql`
     $permissions: [String!]
     $officeId: UUID
     $position: UUID
+    $company: UUID
   ) {
     upsert: upsertEmployee(
       id: $id
@@ -134,6 +139,7 @@ const UPSERT_RECORD = gql`
       permissions: $permissions
       officeId: $officeId
       position: $position
+      company: $company
     ) {
       id
     }
@@ -148,6 +154,7 @@ const CHANGE_PASSWORD = gql`
 
 const EmployeeForm = ({ account }: IPageProps) => {
   const router = useRouter();
+  const companyList = UseCompanySelection();
   const id = router?.query?.id;
   const [formError, setFormError] = useState({});
   const [state, setState] = useState({
@@ -240,6 +247,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
               permissions: e.permissions,
               officeId: e.office,
               position: e.position,
+              company: e.company,
             },
           });
         }
@@ -252,6 +260,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
             permissions: e.permissions,
             officeId: e.office,
             position: e.position,
+            company: e.company,
           },
         });
       }
@@ -264,6 +273,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
           permissions: e.permissions,
           officeId: e.office,
           position: e.position,
+          company: e.company,
         },
       });
     }
@@ -551,7 +561,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                 <Divider>
                   Employee Contact Information and Office Designation
                 </Divider>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormInput
                     label={"Telephone No."}
                     initialValue={_.get(data, "emp.employeeTelNo")}
@@ -559,7 +569,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{ placeholder: "Telephone No." }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormInput
                     label={"Mobile No."}
                     initialValue={_.get(data, "emp.employeeCelNo")}
@@ -567,7 +577,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{ placeholder: "Mobile No." }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormSelect
                     label={"Assigned Office"}
                     initialValue={_.get(data, "emp.office.id")}
@@ -585,6 +595,27 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
+                <Col {...col4}>
+                  <FormSelect
+                    label={"Company"}
+                    initialValue={_.get(data, "emp.currentCompany.id")}
+                    rules={[
+                      { required: true, message: "This Field is required" },
+                    ]}
+                    name="company"
+                    propsselect={{
+                      placeholder: "Company",
+                      loading: loading,
+                      options: companyList?.map((item) => {
+                        return { value: item.id, label: item.companyName };
+                      }),
+                      onChange: (value) => {
+                        handleChangeAddress(value, "barangay");
+                      },
+                    }}
+                  />
+                </Col>
+
                 {/* 7th Row */}
                 <Divider>Employee Details</Divider>
                 <Col {...col3}>
