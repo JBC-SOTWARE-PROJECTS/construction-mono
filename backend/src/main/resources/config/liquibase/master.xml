@@ -259,6 +259,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/12_michael_payroll_setup_roles_and_permissions.sql"
              relativeToChangelogFile="false"/>
-
+    <include file="classpath:config/liquibase/changelog4/11_wilson_billing_item_index.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

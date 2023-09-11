@@ -50,9 +50,11 @@ const AuthManager = (props: any) => {
               React.cloneElement(child, { account: value || NULLACCOUNT })
           );
           return (
-            <DiverseTradeLayout account={value}>
-              <ModalProvider>{childrenWithProps}</ModalProvider>
-            </DiverseTradeLayout>
+            <ModalProvider>
+              <DiverseTradeLayout account={value}>
+                {childrenWithProps}
+              </DiverseTradeLayout>
+            </ModalProvider>
           );
         }}
       </AccountConsumer>

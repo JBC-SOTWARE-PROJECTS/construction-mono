@@ -423,44 +423,6 @@ export type EmployeeInput = {
   zipCode?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type EmployeeSchedule = {
-  __typename?: 'EmployeeSchedule';
-  color?: Maybe<Scalars['String']['output']>;
-  company?: Maybe<CompanySettings>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Instant']['output']>;
-  dateString?: Maybe<Scalars['String']['output']>;
-  dateTimeEnd?: Maybe<Scalars['Instant']['output']>;
-  dateTimeStart?: Maybe<Scalars['Instant']['output']>;
-  deleted?: Maybe<Scalars['Boolean']['output']>;
-  employee?: Maybe<Employee>;
-  id?: Maybe<Scalars['UUID']['output']>;
-  isCustom?: Maybe<Scalars['Boolean']['output']>;
-  isLeave?: Maybe<Scalars['Boolean']['output']>;
-  isOvertime?: Maybe<Scalars['Boolean']['output']>;
-  isRestDay?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  locked?: Maybe<Scalars['Boolean']['output']>;
-  mealBreakEnd?: Maybe<Scalars['Instant']['output']>;
-  mealBreakStart?: Maybe<Scalars['Instant']['output']>;
-  request?: Maybe<Scalars['UUID']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
-  withPay?: Maybe<Scalars['Boolean']['output']>;
-};
-
-export type EmployeeScheduleDetailsDto = {
-  __typename?: 'EmployeeScheduleDetailsDto';
-  dateString?: Maybe<Scalars['String']['output']>;
-  employeeId?: Maybe<Scalars['UUID']['output']>;
-  fullName?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['UUID']['output']>;
-  overtimeSchedule?: Maybe<EmployeeSchedule>;
-  position?: Maybe<Scalars['String']['output']>;
-  regularSchedule?: Maybe<EmployeeSchedule>;
-};
-
 export type EmployeeScheduleDto = {
   __typename?: 'EmployeeScheduleDto';
   employeeId?: Maybe<Scalars['UUID']['output']>;
@@ -1953,7 +1915,6 @@ export type MutationUpsertEmployeeScheduleArgs = {
   employeeIdList?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
-  isOverTime?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -3665,8 +3626,6 @@ export type Query = {
   getDocTypeById?: Maybe<DocumentTypes>;
   /** Search employees */
   getEmployeeScheduleByFilter?: Maybe<Array<Maybe<EmployeeScheduleDto>>>;
-  /** Search employees */
-  getEmployeeScheduleDetails?: Maybe<EmployeeScheduleDetailsDto>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
   /** Get allowance by ID */
@@ -4269,18 +4228,9 @@ export type QueryGetDocTypeByIdArgs = {
 
 /** Query root */
 export type QueryGetEmployeeScheduleByFilterArgs = {
+  employeeIds?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
   endDate?: InputMaybe<Scalars['Instant']['input']>;
-  filter?: InputMaybe<Scalars['String']['input']>;
-  office?: InputMaybe<Scalars['UUID']['input']>;
-  position?: InputMaybe<Scalars['UUID']['input']>;
   startDate?: InputMaybe<Scalars['Instant']['input']>;
-};
-
-
-/** Query root */
-export type QueryGetEmployeeScheduleDetailsArgs = {
-  date?: InputMaybe<Scalars['String']['input']>;
-  employeeId?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 

@@ -88,9 +88,9 @@ div.my-prefix-sider-logo + div::-webkit-scrollbar-thumb {
   color: #fff !important;
 }
 
-.ant-btn-primary {
+/* .ant-btn-primary {
   background-color: #399b53 !important;
-}
+} */
 
 th.ant-table-cell {
   background: #399b53 !important;
@@ -254,6 +254,11 @@ th.ant-table-cell {
   font-size: 24px;
 }
 
+.currency-black {
+  color: black;
+  font-size: 24px;
+}
+
 .select-option-loading {
   min-height: 50px;
   display: flex;
@@ -328,4 +333,32 @@ th.ant-table-cell {
 .menu-item-left-container {
   margin-left: 16px;
   width: calc(100% - 58px);
+}
+
+.custom_calender table tbody tr {
+  font-size: 1.2rem !important;
+  height: 40px !important;
+}
+.custom_calender table thead tr {
+  font-size: 1.2rem !important;
+  height: 40px !important;
+}
+
+.custom_calendar_cell:hover {
+  background-color: rgb(236, 234, 234) !important;
+  color: rgb(39, 39, 39) !important;
+}
+
+.billing-info-width {
+  font-weight: 700;
+  width: 300px;
+}
+.billing-info-value {
+  width: calc(100% - 300px);
+}
+
+.flex-div {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
