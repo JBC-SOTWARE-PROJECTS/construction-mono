@@ -154,23 +154,25 @@ class BillingService extends AbstractDaoService<Billing> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
+        def companyId = SecurityUtils.currentCompanyId()
 
 		String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
            lower(q.job.jobNo) like lower(concat('%',:filter,'%')) OR
            lower(q.job.description) like lower(concat('%',:filter,'%'))) 
-           AND q.otcName is null'''
+           AND q.otcName is null AND q.companyId = :company'''
 
 		String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
            lower(q.job.jobNo) like lower(concat('%',:filter,'%')) OR
            lower(q.job.description) like lower(concat('%',:filter,'%')))
-           AND q.otcName is null'''
+           AND q.otcName is null AND q.companyId = :company'''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
+        params.put('company', companyId)
 
         if (status) {
             query += ''' and (q.status = :status)'''
@@ -192,23 +194,25 @@ class BillingService extends AbstractDaoService<Billing> {
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
+        def companyId = SecurityUtils.currentCompanyId()
 
         String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
            lower(q.project.projectCode) like lower(concat('%',:filter,'%')) OR
            lower(q.project.description) like lower(concat('%',:filter,'%'))) 
-           AND q.otcName is null'''
+           AND q.otcName is null AND q.companyId = :company'''
 
         String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
            lower(q.project.projectCode) like lower(concat('%',:filter,'%')) OR
            lower(q.project.description) like lower(concat('%',:filter,'%')))
-           AND q.otcName is null'''
+           AND q.otcName is null AND q.companyId = :company'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        params.put('company', companyId)
 
         if (status) {
             query += ''' and (q.status = :status)'''
@@ -230,19 +234,21 @@ class BillingService extends AbstractDaoService<Billing> {
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
+        def companyId = SecurityUtils.currentCompanyId()
 
         String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.otcName) like lower(concat('%',:filter,'%')))
-           AND q.project is null'''
+           AND q.project is null AND q.companyId = :company'''
 
         String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
            lower(q.otcName) like lower(concat('%',:filter,'%')))
-           AND q.project is null'''
+           AND q.project is null AND q.companyId = :company'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        params.put('company', companyId)
 
         if (status) {
             query += ''' and (q.status = :status)'''
@@ -264,17 +270,21 @@ class BillingService extends AbstractDaoService<Billing> {
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
+        def companyId = SecurityUtils.currentCompanyId()
 
         String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
-           lower(q.otcName) like lower(concat('%',:filter,'%')))'''
+           lower(q.otcName) like lower(concat('%',:filter,'%')))
+           AND q.companyId = :company'''
 
         String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
-           lower(q.otcName) like lower(concat('%',:filter,'%')))'''
+           lower(q.otcName) like lower(concat('%',:filter,'%')))
+           AND q.companyId = :company'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        params.put('company', companyId)
 
         if (status) {
             query += ''' and (q.status = :status)'''

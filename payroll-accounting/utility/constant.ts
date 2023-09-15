@@ -1,5 +1,30 @@
 export const currency = "Php";
 export const dateFormat = "YYYY-MM-DD";
+export const vatRate = 12;
+
+// =============== columns
+export const col4 = {
+  xl: 6,
+  lg: 6,
+  md: 8,
+  sm: 24,
+  xs: 24,
+};
+export const col2 = {
+  xl: 12,
+  lg: 12,
+  md: 12,
+  sm: 24,
+  xs: 24,
+};
+export const col3 = {
+  xl: 8,
+  lg: 8,
+  md: 12,
+  sm: 24,
+  xs: 24,
+};
+// ===============end columns
 
 export const GENDER = [
   { label: "MALE", value: "MALE" },
@@ -31,27 +56,6 @@ export const AP_TRANSCTION_CATEGORY = [
   { label: "DEBIT MEMO", value: "DM" },
   { label: "DEBIT ADVICE", value: "DA" },
 ];
-export const col4 = {
-  xl: 6,
-  lg: 6,
-  md: 8,
-  sm: 24,
-  xs: 24,
-};
-export const col2 = {
-  xl: 12,
-  lg: 12,
-  md: 12,
-  sm: 24,
-  xs: 24,
-};
-export const col3 = {
-  xl: 8,
-  lg: 8,
-  md: 12,
-  sm: 24,
-  xs: 24,
-};
 
 export const OFFICETYPE = [
   { label: "MAIN OFFICE", value: "MAIN" },
@@ -62,3 +66,38 @@ export const OFFICETYPE = [
 export const REST_DAY_SCHEDULE_LABEL = "R";
 export const REST_DAY_SCHEDULE_TITLE = "Rest Day";
 export const REST_DAY_SCHEDULE_COLOR = "#95a5a6";
+
+export const ScheduledWorkFields = [
+  {
+    title: "Regular Day",
+    name: "regular",
+  },
+  {
+    title: "Rest Day",
+    name: "restday",
+  },
+  {
+    title: "Special Holiday",
+    name: "specialHoliday",
+  },
+  {
+    title: "Special Holiday and Restday",
+    name: "specialHolidayAndRestDay",
+  },
+  {
+    title: "Regular Holiday",
+    name: "regularHoliday",
+  },
+  {
+    title: "Regular Holiday and Restday",
+    name: "regularHolidayAndRestDay",
+  },
+  {
+    title: "Double Holiday",
+    name: "doubleHoliday",
+  },
+  {
+    title: "Double Holiday and Restday",
+    name: "doubleHolidayAndRestDay",
+  },
+];

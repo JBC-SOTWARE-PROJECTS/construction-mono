@@ -8,6 +8,7 @@ import { CheckCard } from "@ant-design/pro-components";
 import { UseCompanySelection } from "@/hooks/companySelection";
 import { CHANGE_COMPANY } from "@/graphql/company/queries";
 import { IUserEmployee } from "@/utility/interfaces";
+import { Employee, Mutation, Query } from "@/graphql/gql/graphql";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -20,23 +21,29 @@ export default function ChangeCompanyModal(props: IProps) {
   const [company, setCompany] = useState<any>(account?.currentCompany?.id);
   // ===================== Queries ==============================
   const companyList = UseCompanySelection();
-  const [upsert, { loading: upsertLoading }] = useMutation(CHANGE_COMPANY, {
-    ignoreResults: false,
-    onCompleted: (data) => {
-      if (data) {
-        hide(data);
-      }
-    },
-  });
+  const [upsert, { loading: upsertLoading }] = useMutation<Mutation>(
+    CHANGE_COMPANY,
+    {
+      ignoreResults: false,
+    }
+  );
 
   //================== functions ====================
 
   const onSubmit = () => {
-    showPasswordConfirmation(() => {
+    showPasswordConfirmation((password) => {
       upsert({
         variables: {
           company: company,
           id: account.id,
+        },
+        onCompleted: (data) => {
+          if (data) {
+            let result = data?.changeCompany as Employee;
+            if (result.id) {
+              hide(password);
+            }
+          }
         },
       });
     });

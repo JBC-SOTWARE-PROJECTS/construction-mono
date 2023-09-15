@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.hrm.Schedule
+import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.ScheduleTypeRepository
 import com.backend.gbp.security.SecurityUtils
@@ -49,7 +50,7 @@ class ScheduleService {
     //===============================Mutation==============================\\
 
     @GraphQLMutation(name = "upsertScheduleType", description = "create or update schedule config.")
-    GraphQLRetVal<Schedule> upsertScheduleType(
+    GraphQLResVal<Schedule> upsertScheduleType(
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "fields") Map<String, Object> fields
     ) {
@@ -58,12 +59,12 @@ class ScheduleService {
             schedule = objectMapper.updateValue(schedule, fields)
             schedule.company = SecurityUtils.currentCompany()
             scheduleTypeRepository.save(schedule)
-            return new GraphQLRetVal<Schedule>(schedule, true, "Successfully updated department schedule.")
+            return new GraphQLResVal<Schedule>(schedule, true, "Successfully updated department schedule.")
         } else {
             Schedule schedule = objectMapper.convertValue(fields, Schedule)
             schedule.company = SecurityUtils.currentCompany()
             scheduleTypeRepository.save(schedule)
-            return new GraphQLRetVal<Schedule>(schedule, true, "Successfully created department schedule")
+            return new GraphQLResVal<Schedule>(schedule, true, "Successfully created department schedule")
         }
     }
 

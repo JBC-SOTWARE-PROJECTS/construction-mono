@@ -163,7 +163,7 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	String employeeType
 	
 	@GraphQLQuery
-	@Column(name = "monthly_basic_salary")
+	@Column(name = "basic_salary")
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	BigDecimal basicSalary
 	

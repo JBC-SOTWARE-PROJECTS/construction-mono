@@ -251,4 +251,26 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/08_dons_subaccountsetup.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/07_jeriah_alter_table_salary_rate_config.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/07_michael_employee_schedule_tables.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/08_jeriah_alter_table_contribution.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/09_jeriah_alter_column.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/10_michael_alter_employee_schedule.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/10_jeriah_alter_add_column.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/08_wilson_billing_add_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/11_michael_payroll_module_initial_tables.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/12_michael_payroll_setup_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/11_wilson_billing_item_index.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/13_michael_payroll_contributions_tables_and_view.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
