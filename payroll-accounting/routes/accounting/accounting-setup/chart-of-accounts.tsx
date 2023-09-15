@@ -1,5 +1,5 @@
+import ChartOfAccountTabPane from '@/components/accounting/accounting-setup/chartOfAccountTabPane'
 import CreateSubAccount from '@/components/accounting/accounting-setup/createSubAccount'
-import SubAccountTabPane from '@/components/accounting/accounting-setup/subAccountTabPane'
 import { ParentAccount, Query, SubAccountSetup } from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
 import { PageContainer } from '@ant-design/pro-components'
@@ -20,12 +20,6 @@ const SUB_ACCOUNT = gql`
       accountCategory
       parentAccount {
         id
-        accountName
-        description
-      }
-      subaccountParent {
-        id
-        subaccountCode
         accountName
         description
       }
@@ -71,8 +65,8 @@ export default function SubAccount() {
 
   return (
     <PageContainer
-      title='Sub-account'
-      content='Overview of Sub-account Details.'
+      title='Chart of Accounts'
+      content='Overview of Chart of Accounts.'
       extra={[
         <Button
           key='add-fiscal'
@@ -91,32 +85,32 @@ export default function SubAccount() {
           {
             label: 'All Accounts',
             key: 'all',
-            children: <SubAccountTabPane {...tabPaneProps} />,
+            children: <ChartOfAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Assets',
             key: 'ASSET',
-            children: <SubAccountTabPane {...tabPaneProps} />,
+            children: <ChartOfAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Liabilities',
             key: 'LIABILITY',
-            children: <SubAccountTabPane {...tabPaneProps} />,
+            children: <ChartOfAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Equity',
             key: 'EQUITY',
-            children: <SubAccountTabPane {...tabPaneProps} />,
+            children: <ChartOfAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Expenses',
             key: 'EXPENSE',
-            children: <SubAccountTabPane {...tabPaneProps} />,
+            children: <ChartOfAccountTabPane {...tabPaneProps} />,
           },
           {
             label: 'Revenue',
             key: 'REVENUE',
-            children: <SubAccountTabPane {...tabPaneProps} />,
+            children: <ChartOfAccountTabPane {...tabPaneProps} />,
           },
         ]}
       />

@@ -8,7 +8,7 @@ import { SubAccountSetup } from '@/graphql/gql/graphql'
 import { AppstoreOutlined, BarsOutlined } from '@ant-design/icons'
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { Divider, Form, Modal, message } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DomainEnum } from '../enum/parentAccountEnum'
 
 interface CreateSubAccountI {
@@ -96,7 +96,6 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
 
   const onHandleClickOk = (values: SubAccountSetup) => {
     const { subType } = form.getFieldsValue()
-    console.log(subType, 'subType')
     const fields = { ...values }
     fields.sourceDomain =
       subType == 'default' ? DomainEnum.NO_DOMAIN : fields.sourceDomain
@@ -117,6 +116,17 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
       },
     })
   }
+
+  useEffect(() => {
+    console.log(record?.parentAccount, 'record?.parentAccount?.id')
+    if (record?.parentAccount) {
+      loadSubAccountOpt({
+        variables: {
+          parentAccountId: record?.parentAccount,
+        },
+      })
+    }
+  }, [record, loadSubAccountOpt])
 
   return (
     <Modal
@@ -158,7 +168,7 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
         />
 
         <FormSelect
-          name='parentSubAccounts'
+          name={['subaccountParent', 'id']}
           label='Parent Sub-accounts'
           propsselect={{
             allowClear: true,

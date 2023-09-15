@@ -20,6 +20,10 @@ const AccountingSetupMenu = {
             path: '/accounting/accounting-setup/sub-account',
             name: 'Sub-account',
           },
+          {
+            path: '/accounting/accounting-setup/chart-of-accounts',
+            name: 'Chart of Accounts',
+          },
         ],
       },
     ],

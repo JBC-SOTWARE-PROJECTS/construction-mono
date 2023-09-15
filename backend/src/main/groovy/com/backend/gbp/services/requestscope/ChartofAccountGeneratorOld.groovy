@@ -1,6 +1,5 @@
 package com.backend.gbp.services.requestscope
 
-import com.backend.gbp.domain.accounting.AccountType
 import com.backend.gbp.domain.accounting.ParentAccount
 import com.backend.gbp.domain.billing.Discount
 import com.backend.gbp.domain.types.Subaccountable
@@ -19,7 +18,7 @@ import javax.persistence.EntityManager
 
 @Component
 @RequestScope
-class ChartofAccountGenerator {
+class ChartofAccountGeneratorOld {
 
     @Autowired
     ParentAccountServices parentAccountServices
@@ -50,7 +49,7 @@ class ChartofAccountGenerator {
       //  SubAccountSetup setup
 
         List<ChartOfAccountGenerate> results = []
-        def coaList = chartOfAccountServices.findAll().findAll {
+        def coaList = parentAccountServices.findAll().findAll {
             BooleanUtils.isNotTrue(it.deprecated)
         }.toSorted {a,b ->
             a.accountCode <=> b.accountCode
@@ -58,8 +57,9 @@ class ChartofAccountGenerator {
 
         def subAccounts = subAccountSetupService.getActiveSubAccount()
 
+
         if(subaccountType){
-            subAccounts = subAccounts.findAll { it.subaccountType == AccountType.valueOf(subaccountType)}
+            subAccounts = subAccounts.findAll { it.subaccountType == SubAccountType.valueOf(subaccountType)}
         }
 
         // Just Add Reference to Mother Account
@@ -70,7 +70,10 @@ class ChartofAccountGenerator {
             }
         }
 
+
+
         //List<Subaccountable> departments = departmentService.findAllSortedByCodeAndFlatten(null) g balhin sa sulod
+
 
         Map<String,List<Subaccountable>> entityListMap = [:]
 
