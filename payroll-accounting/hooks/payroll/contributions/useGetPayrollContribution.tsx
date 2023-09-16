@@ -1,5 +1,7 @@
+import { PayrollContribution } from "@/graphql/gql/graphql";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
+import { type } from "os";
 
 const PAYROLL_CONTRIBUTION = gql`
   query ($id: UUID!) {
@@ -8,6 +10,9 @@ const PAYROLL_CONTRIBUTION = gql`
       success
       response {
         id
+        isActivePHIC
+        isActiveSSS
+        isActiveHDMF
         payroll {
           id
           title
@@ -16,6 +21,9 @@ const PAYROLL_CONTRIBUTION = gql`
     }
   }
 `;
+
+type IReturnValue = [PayrollContribution, boolean, () => void];
+
 /**
  * This hook is used to get payroll contribution module.
  * @param {function} callback - the function to implement after query completion.
@@ -34,11 +42,10 @@ const useGetPayrollContribution = (callback?: (any: any) => void) => {
       if (callback) callback(result?.data?.response);
     },
   });
-  return {
-    data: data?.data?.response,
-    loading,
-    refetch,
-  };
+
+  const returnValue: IReturnValue = [data?.data?.response, loading, refetch];
+
+  return returnValue;
 };
 
 export default useGetPayrollContribution;

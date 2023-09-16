@@ -44,8 +44,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     @Autowired
     List<IPayrollEmployeeBaseOperation> payrollEmployeeOperations
 //
-//    @Autowired
-//    PayrollContributionsService payrollContributionsService
+    @Autowired
+    PayrollContributionsService payrollContributionsService
 //
 //    @Autowired
 //    PayrollAllowanceService payrollAllowanceService
@@ -53,8 +53,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 //    @Autowired
 //    TimekeepingEmployeeService timekeepingEmployeeService
 //
-//    @Autowired
-//    PayrollEmployeeContributionService payrollEmployeeContributionService
+    @Autowired
+    PayrollEmployeeContributionService payrollEmployeeContributionService
 
     @Autowired
     ObjectMapper objectMapper

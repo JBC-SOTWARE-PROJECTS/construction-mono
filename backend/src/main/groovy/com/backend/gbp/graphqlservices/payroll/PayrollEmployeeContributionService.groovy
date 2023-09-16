@@ -37,7 +37,6 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
         this.employeeRepository = employeeRepository
         this.payrollEmployeeContributionRepository = payrollEmployeeContributionRepository
     }
-
     @Autowired
     PayrollEmployeeContributionsViewRepository payrollEmployeeContributionsViewRepository
 

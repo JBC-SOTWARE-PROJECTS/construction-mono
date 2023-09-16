@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
+import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
@@ -18,6 +19,18 @@ class PayrollContribution extends  PayrollAuditingEntity implements Serializable
     @JoinColumn(name = "payroll", referencedColumnName = "id")
     @MapsId
     Payroll payroll
+
+    @GraphQLQuery
+    @Column(name = "is_active_phic", columnDefinition = "boolean")
+    Boolean isActivePHIC
+
+    @GraphQLQuery
+    @Column(name = "is_active_sss", columnDefinition = "boolean")
+    Boolean isActiveSSS
+
+    @GraphQLQuery
+    @Column(name = "is_active_hdmf", columnDefinition = "boolean")
+    Boolean isActiveHDMF
 
 
     @OneToMany(mappedBy = "contribution", cascade = CascadeType.ALL)

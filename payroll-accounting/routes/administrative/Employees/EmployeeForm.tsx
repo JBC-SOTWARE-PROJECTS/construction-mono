@@ -1,5 +1,6 @@
 import { FormInput, FormSelect } from "@/components/common";
 import FormButton from "@/components/common/formButton/formButton";
+import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
 import { UseCompanySelection } from "@/hooks/companySelection";
 import { CIVIL, EMPSTATUS, GENDER, col2, col3, col4 } from "@/utility/constant";
 import { IPageProps } from "@/utility/interfaces";
@@ -72,6 +73,9 @@ const GET_RECORDS = gql`
       pagIbigId
       employeeType
       basicSalary
+      isActivePHIC
+      isActiveSSS
+      isActiveHDMF
       user {
         login
         password
@@ -667,6 +671,43 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{ placeholder: "Basic Salary", type: "number" }}
                   />
                 </Col>
+
+                <Col {...col3}>
+                  <FormCheckBox
+                    name="isActiveSSS"
+                    valuePropName="checked"
+                    checkBoxLabel="Include in SSS"
+                    initialValue={_.get(data, "emp.isActiveSSS")}
+                    propscheckbox={{
+                      defaultChecked: true,
+                    }}
+                  />
+                </Col>
+
+                <Col {...col3}>
+                  <FormCheckBox
+                    name="isActivePHIC"
+                    valuePropName="checked"
+                    checkBoxLabel="include in PHIC"
+                    initialValue={_.get(data, "emp.isActivePHIC")}
+                    propscheckbox={{
+                      defaultChecked: true,
+                    }}
+                  />
+                </Col>
+
+                <Col {...col3}>
+                  <FormCheckBox
+                    name="isActiveHDMF"
+                    initialValue={_.get(data, "emp.isActiveHDMF")}
+                    valuePropName="checked"
+                    checkBoxLabel="include in HDMF"
+                    propscheckbox={{
+                      defaultChecked: true,
+                    }}
+                  />
+                </Col>
+
                 {/* 9th Row */}
                 <Divider>In Case of Emergency</Divider>
                 <Col {...col2}>

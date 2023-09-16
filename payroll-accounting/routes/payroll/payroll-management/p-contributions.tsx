@@ -1,6 +1,6 @@
 import { ReloadOutlined } from "@ant-design/icons";
 
-import { Tabs, Typography } from "antd";
+import { Switch, Tabs, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/router";
 // import { payrollHeaderBreadcrumbRenderer } from "./adjustments";
@@ -11,6 +11,7 @@ import useGetContributionEmployees from "@/hooks/payroll/contributions/useGetCon
 import PayrollEmployeeStatusTag from "@/components/payroll/payroll-management/PayrollEmployeeStatusTag";
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
+  PayrollContribution,
   PayrollEmployeeContributionDto,
   PayrollEmployeeStatus,
   PayrollModule,
@@ -19,6 +20,9 @@ import { PageHeader } from "@ant-design/pro-components";
 import TablePaginated from "@/components/common/TablePaginated";
 import { ColumnsType } from "antd/es/table";
 import { ButtonProps } from "antd/lib/button";
+import { PayrollContributionFilter } from "@/components/payroll/payroll-management/contributions/PayrollContributionFilter";
+import usePaginationState from "@/hooks/usePaginationState";
+import useUpdateContributionTypeStatus from "@/hooks/payroll/contributions/useUpdateContributionTypeStatus";
 
 const recalculateButton: ButtonProps = {
   shape: "circle",
@@ -67,13 +71,7 @@ const headerMap: {
 interface params {
   active: boolean | null | undefined;
   text: string;
-}
-function NumeralDisabledComponent({ active, text }: params) {
-  return active ? (
-    <NumeralFormatter value={text} format="0,0.00" />
-  ) : (
-    <Text type="secondary">Disabled</Text>
-  );
+  type: string;
 }
 
 interface variables {
@@ -87,15 +85,26 @@ interface variables {
 
 function PayrollContributionsPage() {
   const router = useRouter();
-  // const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
-  const [state, setState] = useState<variables>(initialState);
+  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
   const [activeTab, setActiveTab] = useState<string>("ALL");
 
-  const { data: contribution, loading: loadingContribution } =
+  const [contribution, loadingContribution, refetchContribution] =
     useGetPayrollContribution();
   const { data, loading, refetch } = useGetContributionEmployees({
     variables: state,
   });
+
+  const [updateContributionStatus, loadingContributionStatus] =
+    useUpdateContributionTypeStatus(() => refetchContribution());
+
+  function NumeralDisabledComponent({ active, text, type }: params) {
+    const key = `isActive${type}`;
+    return active && contribution[key as keyof typeof contribution] ? (
+      <NumeralFormatter value={text} format="0,0.00" />
+    ) : (
+      <Text type="secondary">Disabled</Text>
+    );
+  }
 
   const commonColumns: ColumnsType<PayrollEmployeeContributionDto> = [
     {
@@ -111,7 +120,7 @@ function PayrollContributionsPage() {
       dataIndex: "sssEE",
       key: "sssEE",
       render: (text, { isActiveSSS }) => (
-        <NumeralDisabledComponent active={isActiveSSS} text={text} />
+        <NumeralDisabledComponent active={isActiveSSS} type="SSS" text={text} />
       ),
     },
     {
@@ -119,7 +128,7 @@ function PayrollContributionsPage() {
       dataIndex: "sssER",
       key: "sssER",
       render: (text, { isActiveSSS }) => (
-        <NumeralDisabledComponent active={isActiveSSS} text={text} />
+        <NumeralDisabledComponent active={isActiveSSS} type="SSS" text={text} />
       ),
     },
     {
@@ -127,7 +136,7 @@ function PayrollContributionsPage() {
       dataIndex: "sssWispEE",
       key: "sssWispEE",
       render: (text, { isActiveSSS }) => (
-        <NumeralDisabledComponent active={isActiveSSS} text={text} />
+        <NumeralDisabledComponent active={isActiveSSS} type="SSS" text={text} />
       ),
     },
     {
@@ -135,7 +144,7 @@ function PayrollContributionsPage() {
       dataIndex: "sssWispER",
       key: "sssWispER",
       render: (text, { isActiveSSS }) => (
-        <NumeralDisabledComponent active={isActiveSSS} text={text} />
+        <NumeralDisabledComponent active={isActiveSSS} type="SSS" text={text} />
       ),
     },
   ];
@@ -145,7 +154,7 @@ function PayrollContributionsPage() {
       dataIndex: "sssEETotal",
       key: "sssEETotal",
       render: (text, { isActiveSSS }) => (
-        <NumeralDisabledComponent active={isActiveSSS} text={text} />
+        <NumeralDisabledComponent active={isActiveSSS} type="SSS" text={text} />
       ),
     },
     {
@@ -153,7 +162,7 @@ function PayrollContributionsPage() {
       dataIndex: "sssERTotal",
       key: "sssERTotal",
       render: (text, { isActiveSSS }) => (
-        <NumeralDisabledComponent active={isActiveSSS} text={text} />
+        <NumeralDisabledComponent active={isActiveSSS} type="SSS" text={text} />
       ),
     },
   ];
@@ -163,7 +172,11 @@ function PayrollContributionsPage() {
       dataIndex: "phicEE",
       key: "phicEE",
       render: (text, { isActivePHIC }) => (
-        <NumeralDisabledComponent active={isActivePHIC} text={text} />
+        <NumeralDisabledComponent
+          active={isActivePHIC}
+          type="PHIC"
+          text={text}
+        />
       ),
     },
     {
@@ -171,7 +184,11 @@ function PayrollContributionsPage() {
       dataIndex: "phicER",
       key: "phicER",
       render: (text, { isActivePHIC }) => (
-        <NumeralDisabledComponent active={isActivePHIC} text={text} />
+        <NumeralDisabledComponent
+          active={isActivePHIC}
+          type="PHIC"
+          text={text}
+        />
       ),
     },
   ];
@@ -181,7 +198,11 @@ function PayrollContributionsPage() {
       dataIndex: "hdmfEE",
       key: "hdmfEE",
       render: (text, { isActiveHDMF }) => (
-        <NumeralDisabledComponent active={isActiveHDMF} text={text} />
+        <NumeralDisabledComponent
+          active={isActiveHDMF}
+          type="HDMF"
+          text={text}
+        />
       ),
     },
     {
@@ -189,7 +210,11 @@ function PayrollContributionsPage() {
       dataIndex: "hdmfER",
       key: "hdmfER",
       render: (text, { isActiveHDMF }) => (
-        <NumeralDisabledComponent active={isActiveHDMF} text={text} />
+        <NumeralDisabledComponent
+          active={isActiveHDMF}
+          type="HDMF"
+          text={text}
+        />
       ),
     },
   ];
@@ -289,7 +314,7 @@ function PayrollContributionsPage() {
       <PageHeader title={headerMap[activeTab]} />
       <TablePaginated
         columns={finalColumns}
-        loading={loading || loadingContribution}
+        loading={loading || loadingContribution || loadingContributionStatus}
         size={"small"}
         dataSource={data?.response?.content}
         total={data?.totalElements}
@@ -314,28 +339,55 @@ function PayrollContributionsPage() {
         //   routes,
         //   itemRender: payrollHeaderBreadcrumbRenderer,
         // }}
-        // extra={
-        //   <>
-        //     <PayrollContributionsDownloadCSVModal
-        //       title={`${contribution?.payroll?.title} Contribution Employees`}
-        //     />
-        //     <PayrollModuleRecalculateAllEmployeeAction
-        //       id={router?.query?.id}
-        //       module={PayrollModule.CONTRIBUTION}
-        //       buttonProps={recalculateButton}
-        //       tooltipProps={{ placement: "topRight" }}
-        //       refetch={refetch}
-        //       allowedPermissions={["recalculate_all_contributions_employees"]}
-        //     />
-        //   </>
-        // }
+        extra={
+          <>
+            <Switch
+              checkedChildren="SSS Enabled"
+              unCheckedChildren="SSS Disabled"
+              checked={contribution?.isActiveSSS ? true : false}
+              onChange={() => {
+                updateContributionStatus("SSS");
+              }}
+              loading={loadingContributionStatus}
+            />
+            <Switch
+              checkedChildren="PHIC Enabled"
+              unCheckedChildren="PHIC Disabled"
+              checked={contribution?.isActivePHIC ? true : false}
+              onChange={() => {
+                updateContributionStatus("PHIC");
+              }}
+              loading={loadingContributionStatus}
+            />
+
+            <Switch
+              checkedChildren="HDMF Enabled"
+              unCheckedChildren="HDMF Disabled"
+              checked={contribution?.isActiveHDMF ? true : false}
+              onChange={() => {
+                updateContributionStatus("HDMF");
+              }}
+              loading={loadingContributionStatus}
+            />
+
+            {/* <PayrollModuleRecalculateAllEmployeeAction
+              id={router?.query?.id}
+              module={PayrollModule.CONTRIBUTION}
+              buttonProps={recalculateButton}
+              tooltipProps={{ placement: "topRight" }}
+              refetch={refetch}
+              allowedPermissions={["recalculate_all_contributions_employees"]}
+            /> */}
+          </>
+        }
       />
 
-      {/* <PayrollContributionFilter
+      <PayrollContributionFilter
         onQueryChange={onQueryChange}
-        loadingDepartment={loadingDepartment}
-        departmentData={departmentData}
-      /> */}
+        // loadingDepartment={loadingDepartment}
+        // departmentData={departmentData}
+      />
+
       <Tabs
         defaultActiveKey="ALL"
         onChange={onChange}
@@ -346,21 +398,33 @@ function PayrollContributionsPage() {
             key: "ALL",
             children: tabContent,
           },
-          {
-            label: `SSS Contributions`,
-            key: "SSS",
-            children: tabContent,
-          },
-          {
-            label: `PHIC Contributions`,
-            key: "PHIC",
-            children: tabContent,
-          },
-          {
-            label: `HDMF Contributions`,
-            key: "HDMF",
-            children: tabContent,
-          },
+          ...(contribution?.isActiveSSS
+            ? [
+                {
+                  label: `SSS Contributions`,
+                  key: "SSS",
+                  children: tabContent,
+                },
+              ]
+            : []),
+          ...(contribution?.isActivePHIC
+            ? [
+                {
+                  label: `PHIC Contributions`,
+                  key: "PHIC",
+                  children: tabContent,
+                },
+              ]
+            : []),
+          ...(contribution?.isActiveHDMF
+            ? [
+                {
+                  label: `HDMF Contributions`,
+                  key: "HDMF",
+                  children: tabContent,
+                },
+              ]
+            : []),
         ]}
       />
     </div>

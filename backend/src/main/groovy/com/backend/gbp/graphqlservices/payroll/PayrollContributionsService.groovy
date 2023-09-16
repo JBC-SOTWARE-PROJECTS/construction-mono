@@ -5,6 +5,7 @@ import com.backend.gbp.domain.payroll.PayrollContribution
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.PayrollEmployeeContribution
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.graphqlservices.payroll.enums.ContributionTypes
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.payroll.PayrollContributionRepository
@@ -43,8 +44,6 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
     PayrollEmployeeContributionService payrollEmployeeContributionService
 
 
-
-
     @Autowired
     ObjectMapper objectMapper
 
@@ -68,11 +67,34 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
     }
 
 
-
     //=================================QUERY=================================\\
 
 
     //================================MUTATION================================\\
+
+    @Transactional(rollbackFor = Exception.class)
+    @GraphQLMutation
+    GraphQLResVal<PayrollContribution> updateContributionTypeStatus(
+            @GraphQLArgument(name = "payrollId") UUID payrollId,
+            @GraphQLArgument(name = "contributionType") ContributionTypes contributionType
+
+    ) {
+        PayrollContribution contribution = payrollContributionRepository.findByPayrollId(payrollId).get()
+        switch (contributionType) {
+            case ContributionTypes.SSS:
+                contribution.isActiveSSS = !contribution.isActiveSSS
+                break;
+            case ContributionTypes.PHIC:
+                contribution.isActivePHIC = !contribution.isActivePHIC
+                break;
+            case ContributionTypes.HDMF:
+                contribution.isActiveHDMF = !contribution.isActiveHDMF
+                break;
+        }
+        payrollContributionRepository.save(contribution)
+        return new GraphQLResVal<PayrollContribution>(contribution, true, "Successfully updated contribution")
+
+    }
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -118,9 +140,6 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
     void finalizePayroll(Payroll payroll) {
 
     }
-
-
-
 
 }
 

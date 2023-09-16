@@ -358,6 +358,9 @@ export type Employee = {
   id?: Maybe<Scalars['UUID']['output']>;
   initialName?: Maybe<Scalars['String']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
+  isActiveHDMF?: Maybe<Scalars['Boolean']['output']>;
+  isActivePHIC?: Maybe<Scalars['Boolean']['output']>;
+  isActiveSSS?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   lastName?: Maybe<Scalars['String']['output']>;
@@ -405,6 +408,9 @@ export type EmployeeInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   initialName?: InputMaybe<Scalars['String']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  isActiveHDMF?: InputMaybe<Scalars['Boolean']['input']>;
+  isActivePHIC?: InputMaybe<Scalars['Boolean']['input']>;
+  isActiveSSS?: InputMaybe<Scalars['Boolean']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   middleName?: InputMaybe<Scalars['String']['input']>;
   nameSuffix?: InputMaybe<Scalars['String']['input']>;
@@ -3122,6 +3128,9 @@ export type PayrollContribution = {
   finalizedBy?: Maybe<Employee>;
   finalizedDate?: Maybe<Scalars['Instant']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
+  isActiveHDMF?: Maybe<Scalars['Boolean']['output']>;
+  isActivePHIC?: Maybe<Scalars['Boolean']['output']>;
+  isActiveSSS?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
