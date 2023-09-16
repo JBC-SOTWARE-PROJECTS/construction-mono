@@ -267,5 +267,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/14_michael_payroll_contributions_additional_active_status.sql"
              relativeToChangelogFile="false"/>
-
+    <include file="classpath:config/liquibase/changelog4/15_michael_payroll_contributions_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

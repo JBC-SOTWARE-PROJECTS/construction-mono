@@ -23,6 +23,8 @@ import { ButtonProps } from "antd/lib/button";
 import { PayrollContributionFilter } from "@/components/payroll/payroll-management/contributions/PayrollContributionFilter";
 import usePaginationState from "@/hooks/usePaginationState";
 import useUpdateContributionTypeStatus from "@/hooks/payroll/contributions/useUpdateContributionTypeStatus";
+import useHasPermission from "@/hooks/useHasPermission";
+import ContributionStatusAction from "@/components/payroll/payroll-management/contributions/ContributionStatusAction";
 
 const recalculateButton: ButtonProps = {
   shape: "circle",
@@ -230,19 +232,16 @@ function PayrollContributionsPage() {
             module={PayrollModule.Contribution}
             buttonProps={recalculateButton}
             refetch={refetch}
-            // allowedPermissions={[
-            //   "recalculate_one_contributions_employee",
-            // ]}
+            allowedPermissions={["recalculate_one_contributions_employee"]}
           />
-          {/* <ContributionStatusAction
+          <ContributionStatusAction
             id={id}
             value={employee?.status}
-            buttonProps={{ type: "primary", ghost: true }}
+            // buttonProps={{ type: "primary", ghost: true }}
             refetch={refetch}
-            allowedPermissions={contributionStatusActionsPermissions}
             record={record}
           />
-          <PayrollEmployeeStatusAction
+          {/* <PayrollEmployeeStatusAction
             id={id}
             module={PayrollModule.CONTRIBUTION}
             value={employee?.status}
@@ -340,37 +339,40 @@ function PayrollContributionsPage() {
         //   itemRender: payrollHeaderBreadcrumbRenderer,
         // }}
         extra={
-          <>
-            <Switch
-              checkedChildren="SSS Enabled"
-              unCheckedChildren="SSS Disabled"
-              checked={contribution?.isActiveSSS ? true : false}
-              onChange={() => {
-                updateContributionStatus("SSS");
-              }}
-              loading={loadingContributionStatus}
-            />
-            <Switch
-              checkedChildren="PHIC Enabled"
-              unCheckedChildren="PHIC Disabled"
-              checked={contribution?.isActivePHIC ? true : false}
-              onChange={() => {
-                updateContributionStatus("PHIC");
-              }}
-              loading={loadingContributionStatus}
-            />
+          useHasPermission([
+            "enable_or_disable_payroll_contribution_types",
+          ]) && (
+            <>
+              <Switch
+                checkedChildren="SSS Enabled"
+                unCheckedChildren="SSS Disabled"
+                checked={contribution?.isActiveSSS ? true : false}
+                onChange={() => {
+                  updateContributionStatus("SSS");
+                }}
+                loading={loadingContributionStatus}
+              />
+              <Switch
+                checkedChildren="PHIC Enabled"
+                unCheckedChildren="PHIC Disabled"
+                checked={contribution?.isActivePHIC ? true : false}
+                onChange={() => {
+                  updateContributionStatus("PHIC");
+                }}
+                loading={loadingContributionStatus}
+              />
 
-            <Switch
-              checkedChildren="HDMF Enabled"
-              unCheckedChildren="HDMF Disabled"
-              checked={contribution?.isActiveHDMF ? true : false}
-              onChange={() => {
-                updateContributionStatus("HDMF");
-              }}
-              loading={loadingContributionStatus}
-            />
+              <Switch
+                checkedChildren="HDMF Enabled"
+                unCheckedChildren="HDMF Disabled"
+                checked={contribution?.isActiveHDMF ? true : false}
+                onChange={() => {
+                  updateContributionStatus("HDMF");
+                }}
+                loading={loadingContributionStatus}
+              />
 
-            {/* <PayrollModuleRecalculateAllEmployeeAction
+              {/* <PayrollModuleRecalculateAllEmployeeAction
               id={router?.query?.id}
               module={PayrollModule.CONTRIBUTION}
               buttonProps={recalculateButton}
@@ -378,15 +380,12 @@ function PayrollContributionsPage() {
               refetch={refetch}
               allowedPermissions={["recalculate_all_contributions_employees"]}
             /> */}
-          </>
+            </>
+          )
         }
       />
 
-      <PayrollContributionFilter
-        onQueryChange={onQueryChange}
-        // loadingDepartment={loadingDepartment}
-        // departmentData={departmentData}
-      />
+      <PayrollContributionFilter onQueryChange={onQueryChange} />
 
       <Tabs
         defaultActiveKey="ALL"
