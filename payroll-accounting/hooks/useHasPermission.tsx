@@ -5,7 +5,6 @@ import { useContext } from "react";
 const useHasPermission = (allowedPermissions: any) => {
   const accountContext = useContext(AccountContext) || {};
   const { access } = accountContext?.user || {};
-  console.log(access);
   if (allowedPermissions.length === 0)
     throw new Error("Must provide array of allowed permission.");
   return isInAnyRole(access, allowedPermissions);

@@ -16,7 +16,6 @@ export const employeeStatusOptions = () => {
     };
   });
 
-  console.log(arr);
   return arr;
 };
 

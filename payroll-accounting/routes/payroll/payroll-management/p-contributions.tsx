@@ -25,6 +25,7 @@ import usePaginationState from "@/hooks/usePaginationState";
 import useUpdateContributionTypeStatus from "@/hooks/payroll/contributions/useUpdateContributionTypeStatus";
 import useHasPermission from "@/hooks/useHasPermission";
 import ContributionStatusAction from "@/components/payroll/payroll-management/contributions/ContributionStatusAction";
+import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 
 const recalculateButton: ButtonProps = {
   shape: "circle",
@@ -33,13 +34,6 @@ const recalculateButton: ButtonProps = {
   danger: true,
 };
 const { Text } = Typography;
-
-let permissionMap = {
-  [PayrollEmployeeStatus.Draft]: "draft_payroll_contributions_employee",
-  [PayrollEmployeeStatus.Approved]: "approve_payroll_contributions_employee",
-  [PayrollEmployeeStatus.Rejected]: "reject_payroll_contributions_employee",
-  [PayrollEmployeeStatus.Finalized]: "finalized_payroll_contributions_employee",
-};
 
 const initialState: variables = {
   filter: "",
@@ -53,12 +47,6 @@ const initialState: variables = {
 //   "enable_disable_employee_HDMF_contribution_status",
 // ];
 const contributionStatusActionsPermissions = true;
-const contributionsEmployeeActionPermissions = [
-  "finalized_payroll_contributions_employee",
-  "draft_payroll_contributions_employee",
-  "approve_payroll_contributions_employee",
-  "reject_payroll_contributions_employee",
-];
 
 const rowKey = (record: PayrollEmployeeContributionDto) => record?.employee?.id;
 
@@ -234,22 +222,18 @@ function PayrollContributionsPage() {
             refetch={refetch}
             allowedPermissions={["recalculate_one_contributions_employee"]}
           />
+          <PayrollEmployeeStatusAction
+            id={id}
+            module={PayrollModule.Contribution}
+            value={record?.status}
+            refetch={refetch}
+          />
           <ContributionStatusAction
             id={id}
-            value={employee?.status}
-            // buttonProps={{ type: "primary", ghost: true }}
+            value={record?.status}
             refetch={refetch}
             record={record}
           />
-          {/* <PayrollEmployeeStatusAction
-            id={id}
-            module={PayrollModule.CONTRIBUTION}
-            value={employee?.status}
-            buttonProps={{ type: "primary" }}
-            refetch={refetch}
-            allowedPermissions={contributionsEmployeeActionPermissions}
-            permissionMap={permissionMap}
-          /> */}
         </>
       ),
     },

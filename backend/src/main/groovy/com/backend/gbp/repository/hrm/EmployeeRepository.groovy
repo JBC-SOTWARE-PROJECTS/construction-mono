@@ -74,4 +74,11 @@ interface EmployeeRepository extends JpaRepository<Employee, UUID> {
                                               @Param("position") String position,
                                               @Param("office") String office
     )
+
+
+
+    @Query(
+            value = "Select e from Employee e where e.user.login = :username"
+    )
+    Optional<Employee> findOneByUsername(@Param("username") String username)
 }
