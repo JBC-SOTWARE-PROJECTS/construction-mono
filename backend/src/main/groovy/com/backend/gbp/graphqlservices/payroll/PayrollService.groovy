@@ -38,14 +38,14 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     @Autowired
     PayrollEmployeeRepository payrollEmployeeRepository
 
-//    @Autowired
-//    List<IPayrollModuleBaseOperations> payrollOperations
+    @Autowired
+    List<IPayrollModuleBaseOperations> payrollOperations
 
-//    @Autowired
-//    List<IPayrollEmployeeBaseOperation> payrollEmployeeOperations
+    @Autowired
+    List<IPayrollEmployeeBaseOperation> payrollEmployeeOperations
 //
-//    @Autowired
-//    PayrollContributionsService payrollContributionsService
+    @Autowired
+    PayrollContributionsService payrollContributionsService
 //
 //    @Autowired
 //    PayrollAllowanceService payrollAllowanceService
@@ -53,8 +53,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 //    @Autowired
 //    TimekeepingEmployeeService timekeepingEmployeeService
 //
-//    @Autowired
-//    PayrollEmployeeContributionService payrollEmployeeContributionService
+    @Autowired
+    PayrollEmployeeContributionService payrollEmployeeContributionService
 
     @Autowired
     ObjectMapper objectMapper
@@ -139,9 +139,9 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 //                timekeepingEmployeeService.addEmployees(employeesToAdd, payroll) //TODO: Temporary only, use the code below in the future
 //                payrollEmployeeAllowanceService.addEmployees(employeesToAdd, payroll) //TODO: Temporary only, use the code below in the future
 
-//                payrollEmployeeOperations.each {
-//                    it.addEmployees(employeesToAdd, payroll)
-//                }
+                payrollEmployeeOperations.each {
+                    it.addEmployees(employeesToAdd, payroll)
+                }
             }
 
             return new GraphQLResVal<Payroll>(payroll, true, "Successfully updated Payroll")
@@ -192,9 +192,9 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
 //            timekeepingService.startPayroll(payroll) //TODO: Temporary only, use the code below in the future
 //            payrollContributionsService.startPayroll(payroll)
-//            payrollOperations.each {
-//                it.startPayroll(payroll)
-//            }
+            payrollOperations.each {
+                it.startPayroll(payroll)
+            }
 
         }
 //        else if (status == 'CANCELLED')

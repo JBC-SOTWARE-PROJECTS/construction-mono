@@ -195,6 +195,18 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@Formula("concat(street , coalesce(' ' || nullif(barangay,'') , ''), coalesce(' ' || nullif(municipality,'') , ''), coalesce(', ' || nullif(province,'') , ''), coalesce(', ' || nullif(country,'') , ''), coalesce(', ' || nullif(zipcode,'') , ''))")
 	String fullAddress
 
+	@GraphQLQuery
+	@Column(name = "is_active_phic", columnDefinition = "boolean")
+	Boolean isActivePHIC
+
+	@GraphQLQuery
+	@Column(name = "is_active_sss", columnDefinition = "boolean")
+	Boolean isActiveSSS
+
+	@GraphQLQuery
+	@Column(name = "is_active_hdmf", columnDefinition = "boolean")
+	Boolean isActiveHDMF
+
 	@Override
 	String resolveEntityForJavers() {
 		return fullName

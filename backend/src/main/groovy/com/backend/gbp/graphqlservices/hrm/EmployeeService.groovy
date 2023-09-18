@@ -45,10 +45,11 @@ class EmployeeService {
     @Autowired
     OfficeRepository officeRepository
 
+
     @Autowired
     PositionRepository positionRepository
 
-	@Autowired
+    @Autowired
     JdbcTemplate jdbcTemplate
 
     @Autowired
@@ -124,7 +125,7 @@ class EmployeeService {
         return id ? employeeRepository.findById(id).get() : null
     }
 
-	//============== All Mutations ====================
+    //============== All Mutations ====================
 
     @GraphQLMutation
     @Transactional
@@ -134,7 +135,8 @@ class EmployeeService {
             @GraphQLArgument(name = "authorities") Set<String> authorities,
             @GraphQLArgument(name = "permissions") Set<String> permissions,
             @GraphQLArgument(name = "officeId") UUID officeId,
-            @GraphQLArgument(name = "position") UUID position
+            @GraphQLArgument(name = "position") UUID position,
+            @GraphQLArgument(name = "company") UUID company
     ) {
         if (id) {
             Employee employee = employeeRepository.findById(id).get()
@@ -186,6 +188,7 @@ class EmployeeService {
 
             employee.office = officeRepository.findById(officeId).get()
             employee.position = positionRepository.findById(position).get()
+            employee.currentCompany = companySettingsService.comById(company)
             employee.dob = employee.dob.plusDays(1)
 
             return employeeRepository.save(employee)
@@ -196,7 +199,7 @@ class EmployeeService {
             employee.office = officeRepository.findById(officeId).get()
             employee.position = positionRepository.findById(position).get()
             employee.dob = employee.dob.plusDays(1)
-
+            employee.currentCompany = companySettingsService.comById(company)
             employee.employeeNo = "EMP" + generatorService.getNextValue(GeneratorType.EMPLOYEE_NO) { Long no ->
                 StringUtils.leftPad(no.toString(), 6, "0")
             }

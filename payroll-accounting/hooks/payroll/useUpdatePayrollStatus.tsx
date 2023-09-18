@@ -24,7 +24,7 @@ function useUpdatePayrollStatus() {
   const [update, { loading }] = useMutation(UPDATE_PAYROLL_STATUS, {
     onCompleted: (data) => {
       router.push(
-        `/payroll/payroll-management/${data?.updatePayrollStatus?.payload?.id}`
+        `/payroll/payroll-management/${data?.updatePayrollStatus?.response?.id}`
       );
     },
     onError: () => {
