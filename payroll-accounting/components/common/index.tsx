@@ -11,3 +11,4 @@ export { default as FormTextArea } from "./formTextArea/formTextArea";
 export { default as FormDateRange } from "./formDateRange/filterDateRange";
 export { default as FormCheckBoxGroup } from "./formCheckBoxGroup";
 export { default as FullScreenModal } from "./fullScreenModal/fullScreenModal";
+export { default as FormSegment } from './formSegment';
