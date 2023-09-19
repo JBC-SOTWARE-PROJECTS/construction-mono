@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollContribution
 import com.backend.gbp.domain.payroll.PayrollEmployee
@@ -182,9 +183,11 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
 
     //================================= UTILITY METHODS ====================================================================
     private void resetEmployeeContribution(PayrollEmployeeContribution employee) {
-        employee.isActiveSSS = true
-        employee.isActivePHIC = true
-        employee.isActiveHDMF = true
+        Employee emp = employee.payrollEmployee.employee
+
+        employee.isActiveSSS = emp.isActiveSSS
+        employee.isActivePHIC = emp.isActivePHIC
+        employee.isActiveHDMF = emp.isActiveHDMF
         assignContributionAmounts(employee)
     }
 
