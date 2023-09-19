@@ -12,7 +12,7 @@ import javax.persistence.*
 @javax.persistence.Table(schema = "inventory", name = "supplier")
 @SQLDelete(sql = "UPDATE inventory.supplier SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class Supplier extends AbstractAuditingEntity implements Serializable {
+class Supplier extends AbstractAuditingEntity implements Serializable, Subaccountable {
 	
 	@GraphQLQuery
 	@Id
@@ -114,4 +114,19 @@ class Supplier extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "is_active")
 	Boolean isActive
+
+	@Override
+	String getCode() {
+		return supplierCode
+	}
+
+	@Override
+	String getDescription() {
+		return supplierFullname
+	}
+
+	@Override
+	String getDomain() {
+		return Supplier.class.name
+	}
 }

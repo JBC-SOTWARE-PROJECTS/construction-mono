@@ -1,6 +1,7 @@
 package com.backend.gbp.services.requestscope
 
 import com.backend.gbp.domain.accounting.AccountType
+import com.backend.gbp.domain.accounting.DomainEnum
 import com.backend.gbp.domain.accounting.ParentAccount
 import com.backend.gbp.domain.billing.Discount
 import com.backend.gbp.domain.types.Subaccountable
@@ -60,20 +61,18 @@ class ChartofAccountGenerator {
         // Just Add Reference to Mother Account
         Set<String> motherAccountsWithSubAccount = []
         subAccounts.each {
-            it.motherAccounts.each {
-                motherAccountsWithSubAccount << it.chartOfAccount.accountCode
+            it.parentAccount.each {
+                motherAccountsWithSubAccount << it.accountCode
             }
         }
 
-        //List<Subaccountable> departments = departmentService.findAllSortedByCodeAndFlatten(null) g balhin sa sulod
-
-        Map<String,List<Subaccountable>> entityListMap = [:]
+        Map<DomainEnum,List<Subaccountable>> entityListMap = [:]
 
         coaList.each {coa->
             ChartOfAccountGenerate coaNew
             if(!subaccountType) {
                 coaNew = new ChartOfAccountGenerate(motherAccount: new CoaComponentContainer(coa.accountCode, coa.id, coa.description,
-                        coa.class.name, coa.normalSide.name()), accountType: coa.accountType.name(), fromGenerator: true)
+                        coa.class.name, coa.normalSide.name()), accountType: coa.accountType.name(),accountCategory: coa.accountCategory.name(), fromGenerator: true)
 
 
                 results << coaNew
@@ -83,21 +82,20 @@ class ChartofAccountGenerator {
 
             subAccounts.each {subAccount->
 
-                def match =  subAccount.motherAccounts.findAll {
-                    it.chartOfAccount.accountCode ==  coa.accountCode
+                def match =  subAccount.parentAccount.findAll {
+                    it.accountCode ==  coa.accountCode
                 }
 
                 if(match){
 
                     // Check if sourceDomain is applied
                     // When SourceDomain is set No Department or Parent Subaccount below it
-
-                    if(subAccount.sourceDomain){
+                    if(subAccount.sourceDomain.name() != 'NO_DOMAIN'){
                         // load this entity
                         if(!entityListMap.containsKey(subAccount.sourceDomain)){
                             //prevent duplicate loading
                             List<Subaccountable> entities=  entityManager.createQuery("from ${subAccount.sourceDomain}",
-                                    Class.forName(subAccount.sourceDomain)).resultList.
+                                    Class.forName(subAccount.sourceDomain as String)).resultList.
                                     findAll {
                                         // filter Discounts to exclude VAT Discounts
                                         if(it instanceof Discount){
@@ -109,17 +107,13 @@ class ChartofAccountGenerator {
                                         else {
                                             return true
                                         }
-                                    }
+                                    } as List<Subaccountable>
                             entityListMap.put(subAccount.sourceDomain,entities.toSorted { a,b ->
                                 a.code <=> b.code
                             })
                         }
 
-
                         if(subAccount.subaccountParent){
-
-
-
                             entityListMap.get(subAccount.sourceDomain).each {
                                 def m = it.config.motherAccounts ?: []
                                 if(it.config.show) { // show sub account

@@ -3,6 +3,7 @@ package com.backend.gbp.domain.accounting
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.graphqlservices.accounting.DomainOptionDto
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -98,5 +99,10 @@ class SubAccountSetup extends AbstractAuditingEntity implements Serializable {
     @GraphQLQuery
     @Column(name = "is_inactive", columnDefinition = "bool")
     Boolean isInactive
+
+    @GraphQLQuery
+    @Type(type = "jsonb")
+    @Column(name="domain_excludes",columnDefinition = "jsonb")
+    List<DomainOptionDto> domainExcludes
 
 }

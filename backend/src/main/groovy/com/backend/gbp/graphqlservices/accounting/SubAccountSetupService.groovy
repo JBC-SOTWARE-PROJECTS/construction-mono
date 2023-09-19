@@ -10,6 +10,7 @@ import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.requestscope.ChartofAccountGenerator
+
 import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLContext
@@ -29,6 +30,7 @@ import javax.persistence.EntityManager
 class DomainOptionDto {
     String label
     String value
+    String key = ''
 }
 
 @Canonical
@@ -283,7 +285,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
           departmentService.findAllSortedByCodeAndFlatten(null)
     }
 
-
+    // Start
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -313,6 +315,10 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
                     }
 
                 }
+
+                if((fields['domainExcludes'] ?: []).size() > 0){
+                    entity.domainExcludes = fields['domainExcludes']
+                }
             })
 
             save(entity)
@@ -329,5 +335,15 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     @GraphQLQuery(name='subAccountDomains')
     static List<DomainOptionDto> subAccountDomains(){
         return DomainEnum.values().findAll { it != DomainEnum.NO_DOMAIN } .collect { [label: it.displayName, value: it.name()] as DomainOptionDto }
+    }
+
+    @GraphQLQuery(name='subAccountDomainsRecords')
+    List<DomainOptionDto> subAccountDomainsRecords(
+            @GraphQLArgument(name = "domain") DomainEnum domain
+    ) {
+        return entityManager.createQuery("from ${domain.path as String}",
+                Class.forName(domain.path as String)).resultList
+               .collect { [label: it['description'], value: it['id']] as DomainOptionDto }
+
     }
 }

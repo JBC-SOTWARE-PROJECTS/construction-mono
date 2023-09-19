@@ -3,6 +3,11 @@ import { gql, useQuery } from '@apollo/client'
 import { Button, Input, Pagination, Space, Table, Typography } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { AccountCategory, AccountType } from '../enum/parentAccountEnum'
+import {
+  CheckCircleTwoTone,
+  CloseCircleOutlined,
+  CloseCircleTwoTone,
+} from '@ant-design/icons'
 
 interface SubAccountTabPaneI {
   dataSource: never[] | Maybe<SubAccountSetup>[] | null | undefined
@@ -51,6 +56,19 @@ export default function SubAccountTabPane(props: SubAccountTabPaneI) {
       key: 'subaccountType',
       width: 150,
       render: (text) => AccountType[text as keyof typeof AccountType].label,
+    },
+    {
+      title: 'Active',
+      dataIndex: 'isInactive',
+      key: 'isInactive',
+      align: 'center',
+      width: 80,
+      render: (text) =>
+        text ? (
+          <CloseCircleTwoTone twoToneColor='#eb2f96' />
+        ) : (
+          <CheckCircleTwoTone twoToneColor='#52c41a' />
+        ),
     },
     {
       title: 'Action',

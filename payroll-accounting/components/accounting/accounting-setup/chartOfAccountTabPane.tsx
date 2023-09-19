@@ -17,7 +17,7 @@ export default function ChartOfAccountTabPane(props: ChartOfAccountTabPaneI) {
       title: 'Code',
       dataIndex: 'code',
       key: 'code',
-      width: 200,
+      width: 150,
     },
     {
       title: 'Name',

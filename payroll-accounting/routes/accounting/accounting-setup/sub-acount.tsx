@@ -29,7 +29,12 @@ const SUB_ACCOUNT = gql`
         accountName
         description
       }
+      domainExcludes {
+        value
+        label
+      }
       sourceDomain
+      isInactive
     }
   }
 `
