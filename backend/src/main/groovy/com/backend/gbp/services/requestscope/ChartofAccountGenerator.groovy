@@ -30,11 +30,6 @@ class ChartofAccountGenerator {
     @Autowired
     SubAccountSetupService subAccountSetupService
 
-    @Memoize
-    List<ParentAccount> getMemoizedCoa(){
-       return  chartOfAccountServices.getCOAList()
-    }
-
 
     @Memoize
     List<ChartOfAccountGenerate> getAllChartOfAccountGenerate(
@@ -50,7 +45,7 @@ class ChartofAccountGenerator {
       //  SubAccountSetup setup
 
         List<ChartOfAccountGenerate> results = []
-        def coaList = chartOfAccountServices.findAll().findAll {
+        def coaList = parentAccountServices.findAll().findAll {
             BooleanUtils.isNotTrue(it.deprecated)
         }.toSorted {a,b ->
             a.accountCode <=> b.accountCode
