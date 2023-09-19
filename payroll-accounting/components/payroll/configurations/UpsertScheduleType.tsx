@@ -5,7 +5,7 @@ import FormTimePicker from "@/components/common/formTimePicker/formTimePicker";
 import { Schedule } from "@/graphql/gql/graphql";
 import { requiredField } from "@/utility/helper";
 import { SaveOutlined } from "@ant-design/icons";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Col,
@@ -36,12 +36,22 @@ const ADD_DEPARTMENT_SCHEDULE = gql`
   }
 `;
 
+export const GET_ACTIVE_PROJECTS = gql`
+  query {
+    list: getActiveProjects {
+      id
+      description
+    }
+  }
+`;
+
 interface IProps {
   hide: (hideProps: any) => void;
   record?: Schedule | null | undefined;
 }
 function UpsertScheduleType(props: IProps) {
   const { hide, record } = props;
+  const { loading, error, data: projects } = useQuery(GET_ACTIVE_PROJECTS);
 
   const [upsertSchedule, { loading: loadingUpsertSchedule }] = useMutation(
     ADD_DEPARTMENT_SCHEDULE,
@@ -58,7 +68,6 @@ function UpsertScheduleType(props: IProps) {
           message.error(
             data?.message ?? "Failed to create department schedule"
           );
-          hide(false);
         }
       },
     }
@@ -128,6 +137,21 @@ function UpsertScheduleType(props: IProps) {
               label="Label"
               propsinput={{
                 placeholder: "Label",
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormSelect
+              name="project_id"
+              label="Project"
+              rules={requiredField}
+              propsselect={{
+                options: projects?.list?.map((item: any) => ({
+                  value: item.id,
+                  label: item.description,
+                })),
+                allowClear: true,
+                placeholder: "Select Project",
               }}
             />
           </Col>

@@ -96,7 +96,6 @@ function ScheduleCell({
         {(employeeSchedule ?? []).length !== 0
           ? employeeSchedule
               ?.filter((item: any) => {
-                console.log(item);
                 return !item.is_overtime;
               })
               .map((item: any) => {

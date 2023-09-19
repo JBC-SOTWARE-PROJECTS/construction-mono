@@ -14,6 +14,10 @@ const QUERY = gql`
       dateTimeEndRaw
       mealBreakStart
       mealBreakEnd
+      project {
+        id
+        description
+      }
     }
   }
 `;

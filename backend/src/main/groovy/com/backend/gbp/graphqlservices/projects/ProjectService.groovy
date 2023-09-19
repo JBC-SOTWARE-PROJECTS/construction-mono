@@ -73,9 +73,9 @@ class ProjectService extends AbstractDaoService<Projects> {
     Projects projectById(
             @GraphQLArgument(name = "id") UUID id
     ) {
-        if(id){
+        if (id) {
             findOne(id)
-        }else{
+        } else {
             null
         }
     }
@@ -91,8 +91,13 @@ class ProjectService extends AbstractDaoService<Projects> {
         createQuery(query, params).resultList.sort { it.projectCode }
     }
 
-    @GraphQLQuery(name = "projectList")
+    @GraphQLQuery(name = "projectLists")
     List<Projects> projectList() {
+        findAll()
+    }
+
+    @GraphQLQuery(name = "getActiveProjects")
+    List<Projects> getActiveProject() {
         findAll()
     }
 
@@ -162,7 +167,7 @@ class ProjectService extends AbstractDaoService<Projects> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def project = upsertFromMap(id, fields, { Projects entity, boolean forInsert ->
-            if(forInsert){
+            if (forInsert) {
                 entity.projectCode = generatorService.getNextValue(GeneratorType.PROJECT_CODE, {
                     return "PROJ-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
@@ -170,7 +175,7 @@ class ProjectService extends AbstractDaoService<Projects> {
         })
 
         //create billing if id is misssing
-        if(!id){
+        if (!id) {
             billingService.createBillingProject(project)
         }
         //return

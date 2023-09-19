@@ -82,11 +82,22 @@ function ScheduleCard({
                 )}
               </td>
             </tr>
+            <tr>
+              <td>
+                <b> Project:</b>
+              </td>
+              <td>:</td>
+              <td colSpan={3}>
+                {employeeSchedule?.project?.description ||
+                  scheduleType?.project?.description}
+              </td>
+            </tr>
             {isCustom && (
               <tr>
                 <td>
-                  <b> is Custom:</b>
+                  <b> is Custom</b>
                 </td>
+                <td>:</td>
                 <td>
                   <Tag color="blue">Yes</Tag>
                 </td>

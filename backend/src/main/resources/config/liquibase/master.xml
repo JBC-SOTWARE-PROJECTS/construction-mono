@@ -277,4 +277,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/15_michael_payroll_contributions_roles_and_permissions.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/16_michael_alter_schedule_types_add_project.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -96,6 +96,7 @@ function AssignEmployeeScheduleModal(props: IProps) {
           mealBreakEnd: transformDate(date, scheduleType?.mealBreakEnd),
           label: scheduleType?.label,
           title: scheduleType?.title,
+          project_id: scheduleType?.project?.id,
         };
         upsertEmployeeSchedule({
           variables: {

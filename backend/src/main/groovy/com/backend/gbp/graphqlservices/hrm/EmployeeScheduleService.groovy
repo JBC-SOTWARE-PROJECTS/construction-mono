@@ -7,7 +7,9 @@ import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeSchedule
 import com.backend.gbp.domain.hrm.Schedule
 import com.backend.gbp.domain.hrm.ScheduleLock
+import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.CompanySettingsService
+import com.backend.gbp.graphqlservices.projects.ProjectService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.*
@@ -56,6 +58,7 @@ class EmployeeScheduleDetailsDto {
     String dateString
     EmployeeSchedule regularSchedule
     EmployeeSchedule overtimeSchedule
+    Projects project
 }
 
 @TypeChecked
@@ -80,6 +83,9 @@ class EmployeeScheduleService {
 
     @Autowired
     GeneratorService generatorService
+
+    @Autowired
+    ProjectService projectService
 
     @Autowired
     ObjectMapper objectMapper
@@ -184,6 +190,7 @@ class EmployeeScheduleService {
         scheduleDetails.dateString = employeeSchedules[0].dateString
         scheduleDetails.fullName = employeeSchedules[0].employee.fullName
         scheduleDetails.position = employeeSchedules[0].employee.position.description
+        scheduleDetails.project = employeeSchedules[0].project
 
         employeeSchedules.each {
             if (it.isOvertime) scheduleDetails.overtimeSchedule = it
@@ -246,7 +253,7 @@ class EmployeeScheduleService {
                     employeeSchedule.employee = employee
                     employeeSchedule.company = company
                     employeeSchedule.dateString = date
-
+                    employeeSchedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
                     scheduleList.push(employeeSchedule)
 
                 }
@@ -266,7 +273,7 @@ class EmployeeScheduleService {
             employeeSchedule.dateString = (fields.get('dateTimeStart') as String).substring(0, 10)
             employeeSchedule.employee = employeeRepository.findById(employeeId).get()
             employeeSchedule.company = SecurityUtils.currentCompany()
-
+            employeeSchedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
             employeeScheduleRepository.save(employeeSchedule)
 
         }
