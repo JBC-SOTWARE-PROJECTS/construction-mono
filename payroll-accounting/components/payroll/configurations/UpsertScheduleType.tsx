@@ -79,7 +79,6 @@ function UpsertScheduleType(props: IProps) {
     payload.dateTimeEnd = dayjs(values.dateTimeEnd);
     payload.mealBreakStart = dayjs(values.mealBreakStart);
     payload.mealBreakEnd = dayjs(values.dateStart);
-    console.log(payload);
     upsertSchedule({ variables: { fields: values, id: record?.id } });
   };
   return (

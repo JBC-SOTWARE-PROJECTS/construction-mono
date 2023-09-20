@@ -141,20 +141,19 @@ class EmployeeAttendanceService {
         if (!employee) return new GraphQLResVal<EmployeeAttendance>(null, false, "Failed to ${id ? 'update' : 'create'} employee attendance.")
         if (id) {
             EmployeeAttendance selectedAttendance = employeeAttendanceRepository.findById(id).get()
-            if (!selectedAttendance) return new GraphQLResVal<EmployeeAttendance>(null, false, "Failed to ${id ? 'update' : 'create'} employee attendance.")
             EmployeeAttendance attendance = objectMapper.updateValue(selectedAttendance, fields)
             Employee selectedEmployee = employeeRepository.findById(employee).get()
-            if (!selectedEmployee) return new GraphQLResVal<EmployeeAttendance>(null, false, "Failed to ${id ? 'update' : 'create'} employee attendance.")
             attendance.employee = selectedEmployee
             attendance = employeeAttendanceRepository.save(attendance)
-            return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully ${id ? 'update' : 'create'} employee attendance.")
+            return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully updated employee attendance.")
         } else {
             EmployeeAttendance attendance = objectMapper.convertValue(fields, EmployeeAttendance)
             Employee selectedEmployee = employeeRepository.findById(employee).get()
-            if (!selectedEmployee) return new GraphQLResVal<EmployeeAttendance>(null, false, "Failed to ${id ? 'update' : 'create'} employee attendance.")
             attendance.employee = selectedEmployee
+            attendance.original_attendance_time = attendance.attendance_time
+            attendance.originalType = attendance.type
             attendance = employeeAttendanceRepository.save(attendance)
-            return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully ${id ? 'updated' : 'created'} employee attendance.")
+            return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully created employee attendance.")
         }
     }
 

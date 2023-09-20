@@ -46,11 +46,11 @@ class EmployeeAttendance extends AbstractAuditingEntity {
 	
 	@GraphQLQuery
 	@Column(name = "type", columnDefinition = "varchar")
-	AttendanceType type
+	String type
 
 	@GraphQLQuery
 	@Column(name = "original_type", columnDefinition = "varchar")
-	AttendanceType originalType
+	String originalType
 	
 
 	@GraphQLQuery
