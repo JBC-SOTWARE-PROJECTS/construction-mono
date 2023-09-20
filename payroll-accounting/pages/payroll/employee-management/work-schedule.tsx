@@ -5,9 +5,12 @@ import AccessManager from "@/components/accessControl/AccessManager";
 import CircularProgress from "@/components/circularProgress";
 import { IPageProps } from "@/utility/interfaces";
 
-const Component = dynamic(() => import("@/routes/payroll/employee-schedule"), {
-  loading: () => <CircularProgress />,
-});
+const Component = dynamic(
+  () => import("@/routes/payroll/employee-management/work-schedule"),
+  {
+    loading: () => <CircularProgress />,
+  }
+);
 
 const Employees = ({ account }: IPageProps) => (
   <React.Fragment>

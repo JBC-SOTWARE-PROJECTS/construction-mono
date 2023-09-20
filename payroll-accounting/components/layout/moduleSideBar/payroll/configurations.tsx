@@ -1,5 +1,3 @@
-import { MenuOutlined } from "@ant-design/icons";
-
 const payrollConfigurationsMenu = {
   route: {
     path: "/",
@@ -20,7 +18,6 @@ const payrollConfigurationsMenu = {
             path: "/payroll/configurations/contribution/contribution-management",
             name: "Contribtion Management",
           },
-
         ],
       },
     ],
