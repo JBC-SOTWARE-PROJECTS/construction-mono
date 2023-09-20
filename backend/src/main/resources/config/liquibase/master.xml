@@ -279,4 +279,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/16_michael_alter_schedule_types_add_project.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/17_michael_attendance_tables.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

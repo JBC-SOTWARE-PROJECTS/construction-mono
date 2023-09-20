@@ -1,7 +1,7 @@
 import CustomButton from "@/components/common/CustomButton";
-import AssignEmployeeScheduleModal from "@/components/payroll/employee-schedule/AssignEmployeeScheduleModal";
-import EmployeeScheduleDetailsModal from "@/components/payroll/employee-schedule/EmployeeScheduleDetailsModal";
-import ScheduleCell from "@/components/payroll/employee-schedule/ScheduleCell";
+import AssignEmployeeScheduleModal from "@/components/payroll/employee-management/work-schedule/AssignEmployeeScheduleModal";
+import EmployeeScheduleDetailsModal from "@/components/payroll/employee-management/work-schedule/EmployeeScheduleDetailsModal";
+import ScheduleCell from "@/components/payroll/employee-management/work-schedule/ScheduleCell";
 import { useDialog } from "@/hooks";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
 import { useGetFilters } from "@/hooks/employee";

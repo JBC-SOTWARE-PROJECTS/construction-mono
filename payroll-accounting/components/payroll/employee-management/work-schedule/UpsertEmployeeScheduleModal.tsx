@@ -30,8 +30,8 @@ import { requiredField, transformDate } from "@/utility/helper";
 import FormTimePicker from "@/components/common/formTimePicker/formTimePicker";
 import { Maybe } from "graphql/jsutils/Maybe";
 import { useQuery } from "@apollo/client";
-import { GET_ACTIVE_PROJECTS } from "../configurations/UpsertScheduleType";
 import FormSelect from "@/components/common/formSelect/formSelect";
+import { GET_ACTIVE_PROJECTS } from "../../configurations/UpsertScheduleType";
 const colSpan2 = {
   xs: 24,
   md: 12,
