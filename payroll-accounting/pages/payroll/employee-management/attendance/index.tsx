@@ -15,7 +15,7 @@ const Component = dynamic(
 const Employees = ({ account }: IPageProps) => (
   <React.Fragment>
     <Head>
-      <title>Construction IMS Employees</title>
+      <title>Employee Attendance</title>
     </Head>
     <AccessManager roles={["ROLE_ADMIN", "MANAGE_SCHEDULE_TYPES"]}>
       <div className="gx-main-content-wrapper-full-width">
