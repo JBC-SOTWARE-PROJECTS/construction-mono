@@ -35,6 +35,7 @@ function ScheduleCell({
       mealBreakEnd: transformDate(currentDate, schedule?.mealBreakEnd),
       label: schedule?.label,
       title: schedule?.title,
+      project_id: schedule?.project?.id,
     };
 
     upsertEmpSchedule({
