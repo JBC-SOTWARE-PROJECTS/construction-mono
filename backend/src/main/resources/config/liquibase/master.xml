@@ -253,5 +253,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/08_wilson_billing_add_company.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/11_jeriah_alter_table_calendar.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/12_jeriah_alter_table_add_column.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>
