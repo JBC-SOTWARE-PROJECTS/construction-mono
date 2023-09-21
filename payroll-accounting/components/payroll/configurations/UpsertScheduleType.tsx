@@ -75,11 +75,12 @@ function UpsertScheduleType(props: IProps) {
 
   const onSubmit = (values: any) => {
     let payload = { ...values };
-    payload.dateTimeStart = dayjs(values.dateTimeStart);
-    payload.dateTimeEnd = dayjs(values.dateTimeEnd);
-    payload.mealBreakStart = dayjs(values.mealBreakStart);
-    payload.mealBreakEnd = dayjs(values.dateStart);
-    upsertSchedule({ variables: { fields: values, id: record?.id } });
+    payload.dateTimeStartRaw = dayjs(values.dateTimeStartRaw).millisecond(0);
+    payload.dateTimeEndRaw = dayjs(values.dateTimeEndRaw).millisecond(0);
+    payload.mealBreakStart = dayjs(values.mealBreakStart).millisecond(0);
+    payload.mealBreakEnd = dayjs(values.mealBreakEnd).millisecond(0);
+    debugger;
+    upsertSchedule({ variables: { fields: payload, id: record?.id } });
   };
   return (
     <Modal
@@ -116,6 +117,7 @@ function UpsertScheduleType(props: IProps) {
           mealBreakStart:
             record?.mealBreakStart && dayjs(record?.mealBreakStart),
           mealBreakEnd: record?.mealBreakEnd && dayjs(record?.mealBreakEnd),
+          project_id: record?.project?.id,
         }}
       >
         <Row gutter={[8, 0]}>

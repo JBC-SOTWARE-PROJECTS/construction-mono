@@ -2,11 +2,13 @@ package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.Authority
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.User
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeSchedule
 import com.backend.gbp.domain.hrm.Schedule
 import com.backend.gbp.domain.hrm.ScheduleLock
+import com.backend.gbp.domain.hrm.dto.ScheduleDto
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.projects.ProjectService
@@ -47,7 +49,7 @@ class EmployeeScheduleDto {
     String fullName
     String position
     UUID employeeId
-    Map<String, List<Map<String, Object>>> schedule
+    Map<String, List<ScheduleDto>> schedule
 }
 
 class EmployeeScheduleDetailsDto {
@@ -125,7 +127,6 @@ class EmployeeScheduleService {
             employeeIds.push((it.id))
         }
 
-        Map<String, Map<String, List<Map<String, Object>>>> employeeMap = new HashMap<>() // Initialize employeeMap
 
         String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
 
@@ -137,7 +138,13 @@ class EmployeeScheduleService {
     AND s.date_time_start <= '${endDate.toString()}'
 
     """)
+        return transformEmployeeSchedule(results, employeeList)
 
+    }
+
+    List<EmployeeScheduleDto> transformEmployeeSchedule(List<Map<String, Object>> results, List<Employee> employeeList) {
+
+        Map<String, Map<String, List<ScheduleDto>>> employeeMap = new HashMap<>() // Initialize employeeMap
         results.each {
             String empId = it['id'].toString()
             Timestamp timestamp = (Timestamp) it['date_time_start'];
@@ -148,13 +155,14 @@ class EmployeeScheduleService {
             String date = formatter.format(dateTimeStart)
 
             if (!employeeMap.containsKey(empId)) {
-                Map<String, List<Map<String, Object>>> dateMap = new HashMap<>();  // Initialize dateMap
-                dateMap.put(date, [it]);  // Initialize the list with the current map
+                Map<String, List<ScheduleDto>> dateMap = new HashMap<>();  // Initialize dateMap
+                dateMap.put(date, [objectMapper.convertValue(it, ScheduleDto)] as List<ScheduleDto>);
+                // Initialize the list with the current map
                 employeeMap.put(empId, dateMap);
             } else {
-                Map<String, List<Map<String, Object>>> dateMap = employeeMap.get(empId) as Map<String, List<Map<String, Object>>>;
-                List<Map<String, Object>> dateArr = dateMap.getOrDefault(date, []);
-                dateArr.add(it);
+                Map<String, List<ScheduleDto>> dateMap = employeeMap.get(empId) as Map<String, List<ScheduleDto>>;
+                List<ScheduleDto> dateArr = dateMap.getOrDefault(date, []);
+                dateArr.add(objectMapper.convertValue(it, ScheduleDto));
                 dateMap.put(date, dateArr);
             }
         }
@@ -163,7 +171,7 @@ class EmployeeScheduleService {
         List<EmployeeScheduleDto> employeeSchedules = []
         employeeList.each {
             EmployeeScheduleDto employee = new EmployeeScheduleDto()
-            Map<String, List<Map<String, Object>>> dateMap = employeeMap.get(it.id.toString()) as Map<String, List<Map<String, Object>>>;
+            Map<String, List<ScheduleDto>> dateMap = employeeMap.get(it.id.toString()) as Map<String, List<ScheduleDto>>;
 
             employee.id = it.id
             employee.schedule = dateMap
@@ -174,8 +182,9 @@ class EmployeeScheduleService {
 
         }
 
-        employeeSchedules
+        return employeeSchedules
     }
+
 
     @GraphQLQuery(name = "getEmployeeScheduleDetails", description = "Search employees")
     EmployeeScheduleDetailsDto getEmployeeScheduleDetails(

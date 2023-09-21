@@ -8,6 +8,7 @@ import org.hibernate.annotations.*
 import javax.persistence.Table
 import javax.persistence.Entity
 import javax.persistence.*
+import java.time.Duration
 import java.time.Instant
 
 
@@ -103,5 +104,17 @@ class EmployeeSchedule extends AbstractAuditingEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
+
+	@Transient
+	BigDecimal getScheduleDuration (){
+		if (mealBreakEnd || mealBreakStart) {
+			Duration duration1 = Duration.between(dateTimeStart, mealBreakStart)
+			Duration duration2 = Duration.between(mealBreakEnd, dateTimeEnd)
+			return duration1.toHours() + duration2.toHours()
+		} else {
+			Duration duration = Duration.between(dateTimeStart, dateTimeEnd)
+			return duration.toHours()
+		}
+	}
 
 }

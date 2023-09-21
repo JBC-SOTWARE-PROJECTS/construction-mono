@@ -64,61 +64,6 @@ class EmployeeAttendanceService {
         return employeeAttendanceRepository.getEmployeeAttendance(id, startDate, endDate, new PageRequest(page, size, Sort.Direction.ASC, "attendance_time"))
     }
 
-//    @GraphQLQuery(name = "getAccumulatedLogsOld", description = "Get saved employee logs with computed in and out")
-//    List<EmployeeAccumulatedAttendanceDto> getAccumulatedLogsOld(
-//            @GraphQLArgument(name = "startDate") Instant startDate,
-//            @GraphQLArgument(name = "endDate") Instant endDate,
-//            @GraphQLArgument(name = "id") UUID id
-//    ) {
-//        if (!id || !startDate || !endDate) {
-//            throw new RuntimeException("Failed to get accumulated logs.")
-//        }
-//
-//        List<EmployeeAccumulatedAttendanceDto> accumulatedLogs = payrollTimeKeepingCalculatorService.getAccumulatedLogs(id, startDate, endDate)
-//
-//        return accumulatedLogs
-//
-//    }
-
-//    @GraphQLQuery(name = "getAccumulatedLogs", description = "Get saved employee logs with computed in and out")
-//    List<AccumulatedLogSummary> getAccumulatedLogs(
-//            @GraphQLArgument(name = "startDate") Instant startDate,
-//            @GraphQLArgument(name = "endDate") Instant endDate,
-//            @GraphQLArgument(name = "id") UUID id
-//    ) {
-//        if (!id || !startDate || !endDate) {
-//            throw new RuntimeException("Failed to get accumulated logs.")
-//        }
-//
-//        List<AccumulatedLogSummary> accumulatedLogs = timeKeepingCalculatorService.getAccumulatedLogs(id, startDate, endDate)
-//
-//        return accumulatedLogs
-//
-//    }
-
-//    @GraphQLQuery(name = "getEmployeePerformanceSummaryOld", description = "Compute the employee's performance summary")
-//    EmployeeAccumulatedAttendanceDto getEmployeePerformanceSummaryOld(
-//            @GraphQLArgument(name = "startDate") Instant startDate,
-//            @GraphQLArgument(name = "endDate") Instant endDate,
-//            @GraphQLArgument(name = "id") UUID id
-//    ) {
-//        if (!id || !startDate || !endDate) throw new RuntimeException("Failed to get accumulated logs.")
-//        EmployeeAccumulatedAttendanceDto employeePerfSummary = payrollTimeKeepingCalculatorService.getEmployeePerformanceSummary(id, startDate, endDate)
-//
-//        return employeePerfSummary
-//    }
-//
-//    @GraphQLQuery(name = "getEmployeePerformanceSummary", description = "Compute the employee's performance summary")
-//    EmployeeAccumulatedAttendanceDto getEmployeePerformanceSummary(
-//            @GraphQLArgument(name = "startDate") Instant startDate,
-//            @GraphQLArgument(name = "endDate") Instant endDate,
-//            @GraphQLArgument(name = "id") UUID id
-//    ) {
-//        if (!id || !startDate || !endDate) throw new RuntimeException("Failed to get accumulated logs.")
-//        EmployeeAccumulatedAttendanceDto employeePerfSummary = timeKeepingCalculatorService.getEmployeePerformanceSummary(id, startDate, endDate)
-//
-//        return employeePerfSummary
-//    }
 
     @GraphQLQuery(name = "getOneRawLog")
     EmployeeAttendance getOneRawLog(

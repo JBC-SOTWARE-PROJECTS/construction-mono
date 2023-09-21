@@ -16,60 +16,64 @@ import javax.persistence.Entity
 @SQLDelete(sql = "UPDATE hrm.employee_attendance SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
 class EmployeeAttendance extends AbstractAuditingEntity {
-	
-	@GraphQLQuery
-	@Id
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
-	@Column(name = "id", columnDefinition = "uuid")
-	@Type(type = "pg-uuid")
-	UUID id
 
-	@JsonIgnore
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "employee", referencedColumnName = "id")
-	Employee employee
+    @GraphQLQuery
+    @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "uuid")
+    @Type(type = "pg-uuid")
+    UUID id
 
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "project", referencedColumnName = "id")
-	Projects project
+    @JsonIgnore
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee", referencedColumnName = "id")
+    Employee employee
 
-	@GraphQLQuery
-	@Column(name = "attendance_time", nullable = false)
-	Instant attendance_time
-	
-	@GraphQLQuery
-	@Column(name = "original_attendance_time", nullable = false)
-	Instant original_attendance_time
-	
-	@GraphQLQuery
-	@Column(name = "type", columnDefinition = "varchar")
-	String type
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project", referencedColumnName = "id")
+    Projects project
 
-	@GraphQLQuery
-	@Column(name = "original_type", columnDefinition = "varchar")
-	String originalType
-	
+    @GraphQLQuery
+    @Column(name = "attendance_time", nullable = false)
+    Instant attendance_time
 
-	@GraphQLQuery
-	@Column(name = "additional_note", columnDefinition = "varchar")
-	String additionalNote
+    @GraphQLQuery
+    @Column(name = "original_attendance_time", nullable = false)
+    Instant original_attendance_time
 
-	@GraphQLQuery
-	@Column(name = "is_manual", columnDefinition = "bool")
-	Boolean isManual
+    @GraphQLQuery
+    @Column(name = "type", columnDefinition = "varchar")
+    String type
 
-	@GraphQLQuery
-	@Column(name = "is_ignored", columnDefinition = "bool")
-	Boolean isIgnored
-
-	@GraphQLQuery
-	@Column(name = "is_transfer", columnDefinition = "bool")
-	Boolean isTransfer
+    @GraphQLQuery
+    @Column(name = "original_type", columnDefinition = "varchar")
+    String originalType
 
 
+    @GraphQLQuery
+    @Column(name = "additional_note", columnDefinition = "varchar")
+    String additionalNote
+
+    @GraphQLQuery
+    @Column(name = "is_manual", columnDefinition = "bool")
+    Boolean isManual
+
+    @GraphQLQuery
+    @Column(name = "is_ignored", columnDefinition = "bool")
+    Boolean isIgnored
+
+    @GraphQLQuery
+    @Column(name = "is_transfer", columnDefinition = "bool")
+    Boolean isTransfer
+
+
+    @Transient
+    String getDateString() {
+        return attendance_time.toString().substring(0, 10)
+    }
 
 
 }

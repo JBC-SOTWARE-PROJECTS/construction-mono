@@ -32,6 +32,18 @@ interface EmployeeAttendanceRepository extends JpaRepository<EmployeeAttendance,
             @Param("endDate") Instant endDate,
             Pageable pageable)
 
+
+    @Query(
+            value = """Select e from EmployeeAttendance e 
+				join fetch e.employee emp
+				where emp.id = :id
+				and (e.attendance_time >= :startDate and e.attendance_time <= :endDate)"""
+    )
+    List<EmployeeAttendance> getEmployeeAttendanceList(
+            @Param("id") UUID id,
+            @Param("startDate") Instant startDate,
+            @Param("endDate") Instant endDate)
+
     @Query(
             value = """Select e from EmployeeAttendance e 
 				join fetch e.employee emp

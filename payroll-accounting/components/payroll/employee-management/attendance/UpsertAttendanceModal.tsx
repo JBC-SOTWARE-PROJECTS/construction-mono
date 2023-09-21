@@ -42,7 +42,13 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
   });
 
   const onSubmit = (values: IUpsertEmployeeAttendanceParams) => {
-    upsertEmployeeSchedule(values, record?.id);
+    upsertEmployeeSchedule(
+      {
+        ...values,
+        attendance_time: dayjs(values.attendance_time).millisecond(0),
+      },
+      record?.id
+    );
   };
   return (
     <Modal
