@@ -4,6 +4,7 @@ const theme: ThemeConfig = {
   token: {
     fontSize: 14,
     colorPrimary: "#399B53",
+    colorPrimaryBg: "#399B53",
     fontFamily: "'Lato', sans-serif",
   },
   components: {
@@ -12,6 +13,10 @@ const theme: ThemeConfig = {
     },
     Segmented: {
       itemSelectedBg: "#399B53",
+    },
+    Button: {
+      colorPrimary: "#399B53",
+      colorPrimaryBg: "#399B53",
     },
   },
 };

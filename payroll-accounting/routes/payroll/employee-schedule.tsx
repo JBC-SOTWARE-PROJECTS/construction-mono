@@ -1,8 +1,10 @@
 import CustomButton from "@/components/common/CustomButton";
 import AssignEmployeeScheduleModal from "@/components/payroll/employee-schedule/AssignEmployeeScheduleModal";
+import EmployeeScheduleDetailsModal from "@/components/payroll/employee-schedule/EmployeeScheduleDetailsModal";
 import ScheduleCell from "@/components/payroll/employee-schedule/ScheduleCell";
 import { useDialog } from "@/hooks";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
+import { useGetFilters } from "@/hooks/employee";
 import useGetEmployeeSchedule from "@/hooks/employee-schedule/useGetEmployeeSchedule";
 import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 import { IPageProps } from "@/utility/interfaces";
@@ -12,12 +14,14 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { DatePicker, Table } from "antd";
+import { DatePicker, Input, Select, Table } from "antd";
+
 import dayjs from "dayjs";
 import { startCase, toLower } from "lodash";
 import Head from "next/head";
 import { useState } from "react";
 
+const { Search } = Input;
 interface IState {
   filter: string;
   page: number;
@@ -42,6 +46,8 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
     dayjs().endOf("month"),
   ]);
 
+  const [filterData] = useGetFilters();
+  const [state, setState] = useState(initialState);
   const [schedules, loadingSchedules] = useGetScheduleTypes();
   const { upsertEmployeeSchedule, loadingUpsert } = useUpsertEmployeeSchedule(
     () => {
@@ -49,9 +55,16 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
     }
   );
   const [employees, loadingEmployees, refetchEmployes] = useGetEmployeeSchedule(
-    { startDate: dates[0], endDate: dates[1] }
+    {
+      startDate: dates[0],
+      endDate: dates[1],
+      position: state.position,
+      office: state.office,
+      filter: state.filter,
+    }
   );
-  const showModal = useDialog(AssignEmployeeScheduleModal);
+  const showAssignSchedModal = useDialog(AssignEmployeeScheduleModal);
+  const showScheduleDetailsModal = useDialog(EmployeeScheduleDetailsModal);
 
   const additionalColumns = () => {
     const start = dates[0];
@@ -66,14 +79,21 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
         dataIndex: ["schedule", currentDate.format("MM_DD_YYYY")],
         key: currentDate.format("MM_DD_YYYY"),
         width: 150,
-        render: (val: any, { id }: any) => {
+        onCell: () => ({ className: "employee_schedule_table_cell" }),
+        render: (val: any, { id, position, fullName }: any) => {
           return (
             <ScheduleCell
               currentDate={date}
               schedules={schedules}
               employeeSchedule={val}
-              employeeId={id}
+              employee={{ id, position, fullName }}
               upsertEmpSchedule={upsertEmployeeSchedule}
+              showScheduleDetailsModal={(props) => {
+                showScheduleDetailsModal(
+                  { ...props, refetchEmployes },
+                  () => {}
+                );
+              }}
             />
           );
         },
@@ -118,12 +138,41 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
                 handleDateChange(dates);
               }}
             />
+            <Search
+              size="middle"
+              placeholder="Search here.."
+              onSearch={(e) =>
+                setState((prev: any) => ({ ...prev, filter: e }))
+              }
+              allowClear
+              className="select-header"
+            />
+            <Select
+              allowClear
+              style={{ width: 170 }}
+              placeholder="Office"
+              defaultValue={null}
+              onChange={(value) => {
+                setState({ ...state, office: value });
+              }}
+              options={filterData?.office}
+            />
+            <Select
+              allowClear
+              style={{ width: 170 }}
+              placeholder="Position"
+              defaultValue={null}
+              onChange={(value) => {
+                setState({ ...state, position: value });
+              }}
+              options={filterData.position}
+            />
             <CustomButton
               type="primary"
               icon={<PlusCircleOutlined />}
               allowedPermissions={["add_edit_schedule_type"]}
               onClick={() => {
-                showModal({ refetchEmployes });
+                showAssignSchedModal({ refetchEmployes });
               }}
             >
               Assign Employee Schedule
@@ -135,6 +184,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
           <title>Employee Schedule Management</title>
         </Head>
         <Table
+          className="employee_schedule_table"
           rowKey="id"
           size="small"
           dataSource={employees}

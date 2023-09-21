@@ -5,9 +5,8 @@ import { useGetFilters } from "@/hooks/employee";
 import { filterOptions } from "@/routes/administrative/Employees";
 import { getTimeFromDate } from "@/utility/helper";
 import { ProCard, ProFormGroup } from "@ant-design/pro-components";
-import { Card, Col, Divider, Empty, Input, Row, Select } from "antd";
+import { Divider, Input, Select } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
-import dayjs from "dayjs";
 
 const { Search } = Input;
 
@@ -32,7 +31,6 @@ function AssignSchedStep1({
   const [scheduleTypes, loadingSchedules] = useGetScheduleTypes();
 
   const [filterData] = useGetFilters();
-  console.log(scheduleType);
   return (
     <div>
       <div style={{ marginTop: 20, marginLeft: 20 }}>
@@ -45,7 +43,7 @@ function AssignSchedStep1({
               label:
                 item.label +
                 " " +
-                `(${getTimeFromDate(item.dateTimeEndRaw)} - ${getTimeFromDate(
+                `(${getTimeFromDate(item.dateTimeStartRaw)} - ${getTimeFromDate(
                   item.dateTimeEndRaw
                 )})`,
             };
@@ -84,7 +82,7 @@ function AssignSchedStep1({
             <Select
               allowClear
               style={{ width: 170 }}
-              placeholder="Office"
+              placeholder="Status"
               defaultValue={null}
               onChange={(value) => {
                 setState({ ...state, status: value });

@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.billing
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.services.ServiceManagement
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -61,6 +62,7 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 	String recordNo
 
 	@GraphQLQuery
+	@UpperCase
 	@Column(name = "description")
 	String description
 

@@ -163,7 +163,7 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	String employeeType
 	
 	@GraphQLQuery
-	@Column(name = "monthly_basic_salary")
+	@Column(name = "basic_salary")
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	BigDecimal basicSalary
 	
@@ -194,6 +194,18 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Formula("concat(street , coalesce(' ' || nullif(barangay,'') , ''), coalesce(' ' || nullif(municipality,'') , ''), coalesce(', ' || nullif(province,'') , ''), coalesce(', ' || nullif(country,'') , ''), coalesce(', ' || nullif(zipcode,'') , ''))")
 	String fullAddress
+
+	@GraphQLQuery
+	@Column(name = "is_active_phic", columnDefinition = "boolean")
+	Boolean isActivePHIC
+
+	@GraphQLQuery
+	@Column(name = "is_active_sss", columnDefinition = "boolean")
+	Boolean isActiveSSS
+
+	@GraphQLQuery
+	@Column(name = "is_active_hdmf", columnDefinition = "boolean")
+	Boolean isActiveHDMF
 
 	@Override
 	String resolveEntityForJavers() {

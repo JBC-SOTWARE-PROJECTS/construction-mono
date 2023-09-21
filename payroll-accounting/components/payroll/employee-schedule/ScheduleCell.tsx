@@ -1,25 +1,32 @@
 import { Schedule } from "@/graphql/gql/graphql";
 import { IUpsertEmployeeScheduleParams } from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 import { transformDate } from "@/utility/helper";
-import { Dropdown } from "antd";
+import { Divider, Dropdown, Menu } from "antd";
 import dayjs from "dayjs";
 
+export interface IEmployee {
+  id: string;
+  fullName: string;
+  position: string;
+}
 interface Iprops {
   schedules: Schedule[];
-  employeeId: string;
   currentDate: dayjs.Dayjs;
   employeeSchedule: any;
   upsertEmpSchedule: ({ variables }: IUpsertEmployeeScheduleParams) => void;
+  showScheduleDetailsModal: (pros: any) => void;
+  employee: IEmployee;
 }
 
 function ScheduleCell({
   schedules,
-  employeeId,
+  employee,
   employeeSchedule,
   upsertEmpSchedule,
   currentDate,
+  showScheduleDetailsModal,
 }: Iprops) {
-  const handleClick = ({ key }: any) => {
+  const handleRightClick = ({ key }: any) => {
     const schedule = schedules.find((item) => item.id === key);
     const fields = {
       dateTimeStart: transformDate(currentDate, schedule?.dateTimeStartRaw),
@@ -29,12 +36,23 @@ function ScheduleCell({
       label: schedule?.label,
       title: schedule?.title,
     };
+
     upsertEmpSchedule({
       variables: {
-        employeeId,
-        id: null,
+        employeeId: employee.id,
+        id:
+          employeeSchedule &&
+          employeeSchedule.filter((item: any) => !item.is_overtime)[0]
+            .schedule_id,
         fields: fields,
       },
+    });
+  };
+
+  const handleClickSchedule = () => {
+    showScheduleDetailsModal({
+      employee,
+      currentDate,
     });
   };
 
@@ -51,27 +69,49 @@ function ScheduleCell({
                 item.dateTimeEndRaw
               ).format("h:mm a")})`,
             key: item.id,
-            onClick: handleClick,
+            onClick: handleRightClick,
           };
         }),
       }}
     >
-      <div style={{ textAlign: "center" }}>
+      <div
+        style={{
+          textAlign: "center",
+          margin: 0,
+          lineHeight: 1.2,
+          padding: 10,
+          position: "relative",
+          top: 0,
+          bottom: 0,
+          height: "auto",
+          width: "100%",
+          boxSizing: "border-box",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+        onClick={handleClickSchedule}
+      >
         {(employeeSchedule ?? []).length !== 0
-          ? employeeSchedule?.map((item: any) => {
-              return (
-                <>
-                  <b>{item.label}</b>
-                  <br />
-                  {`${dayjs(item.date_time_start)
-                    .add(8, "hour")
-                    .format("h:mm a")} - ${dayjs(item.date_time_end)
-                    .add(8, "hour")
-                    .format("h:mm a")}`}{" "}
-                  <br />
-                </>
-              );
-            })
+          ? employeeSchedule
+              ?.filter((item: any) => {
+                console.log(item);
+                return !item.is_overtime;
+              })
+              .map((item: any) => {
+                return (
+                  <>
+                    <b>{item.label}</b>
+                    {`${dayjs(item.date_time_start)
+                      .add(8, "hour")
+                      .format("h:mm a")} - ${dayjs(item.date_time_end)
+                      .add(8, "hour")
+                      .format("h:mm a")}`}{" "}
+                    <br />
+                  </>
+                );
+              })
           : "No Schedule"}
       </div>
     </Dropdown>

@@ -16,8 +16,9 @@ interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     )
     Page<Employee> getEmployees(@Param("filter") String filter, Pageable pageable)
 
+
     @Query(value = "Select e from Employee e where e.id in :id")
-    List<Employee> getEmployees(@Param("id")List<UUID> id)
+    List<Employee> getEmployees(@Param("id") List<UUID> id)
 
     @Query(
             value = "Select e from Employee e where lower(e.fullName) like lower(concat('%',:filter,'%'))",
@@ -51,5 +52,33 @@ interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     Employee findOneByUser(@Param("user") User user)
 
+//    @Query(
+//            value = """Select e from Employee e where lower(e.fullName) like lower(concat('%',:filter,'%'))
+//and e.position.id = coalesce(:position, e.position.id)
+//and e.office.id = coalesce(:office, e.office.id)
+//"""
+//    )
+//    List<Employee> findByFilterPositionOffice(@Param("filter") String filter,
+//                                              @Param("position") UUID position,
+//                                              @Param("office") UUID office
+//    )
 
+    @Query(
+            value = """Select e from Employee e where lower(e.fullName) like lower(concat('%',:filter,'%'))
+           AND (:position = '' OR CAST(e.position.id AS text) = :position)
+           AND (:office = '' OR CAST(e.office.id AS text) = :office)
+
+"""
+    )
+    List<Employee> findByFilterPositionOffice(@Param("filter") String filter,
+                                              @Param("position") String position,
+                                              @Param("office") String office
+    )
+
+
+
+    @Query(
+            value = "Select e from Employee e where e.user.login = :username"
+    )
+    Optional<Employee> findOneByUsername(@Param("username") String username)
 }

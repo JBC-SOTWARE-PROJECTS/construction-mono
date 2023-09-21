@@ -13,8 +13,12 @@ const AccountingSetupMenu = {
             name: 'Accounting Period',
           },
           {
-            path: '/accounting/accounting-setup/mother-account',
-            name: 'Mother Account',
+            path: '/accounting/accounting-setup/parent-account',
+            name: 'Parent Account',
+          },
+          {
+            path: '/accounting/accounting-setup/sub-account',
+            name: 'Sub-account',
           },
         ],
       },
