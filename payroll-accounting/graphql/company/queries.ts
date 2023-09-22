@@ -171,3 +171,42 @@ export const GET_PHIC_CONTRIBUTIONS = gql`
     }
   }
 `;
+
+export const GET_EVENTS = gql`
+  {
+    events: getCalendarEvents {
+      id
+      name
+      startDate
+      endDate
+      holidayType
+      fixed
+    }
+  }
+`;
+
+export const CREATE_EVENT = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    data: upsertEventCalendar(id: $id, fields: $fields) {
+      payload {
+        id
+        startDate
+        name
+        endDate
+        fixed
+        holidayType
+      }
+      message
+      success
+    }
+  }
+`;
+
+export const DELETE_EVENT = gql`
+  mutation ($id: UUID) {
+    data: deleteEventCalendar(id: $id) {
+      message
+      success
+    }
+  }
+`;
