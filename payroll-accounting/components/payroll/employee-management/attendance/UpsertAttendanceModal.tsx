@@ -5,9 +5,11 @@ import { EmployeeAttendance } from "@/graphql/gql/graphql";
 import useUpsertEmployeeAttendance, {
   IUpsertEmployeeAttendanceParams,
 } from "@/hooks/attendance/useUpsertEmployeeAttendance";
+import { useQuery } from "@apollo/client";
 import { Button, Divider, Form, Modal, Spin } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import dayjs from "dayjs";
+import { GET_ACTIVE_PROJECTS } from "../../configurations/UpsertScheduleType";
 const types = [
   {
     value: "IN",
@@ -24,8 +26,9 @@ interface IProps {
   toggleModal: () => void;
   record?: EmployeeAttendance | undefined;
 }
-
 function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
+  const { error, data: projects } = useQuery(GET_ACTIVE_PROJECTS);
+
   const [form] = useForm();
   const handleCancel = () => {
     toggleModal();
@@ -47,6 +50,7 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
         ...values,
         attendance_time: dayjs(values.attendance_time).millisecond(0),
       },
+      values?.project_id,
       record?.id
     );
   };
@@ -67,6 +71,7 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
           ...record,
           attendance_time:
             record?.attendance_time && dayjs(record?.attendance_time),
+          project_id: record?.project?.id,
         }}
       >
         <Spin spinning={loading}>
@@ -89,7 +94,19 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
               options: types,
             }}
           />
-
+          <FormSelect
+            name="project_id"
+            label="Project"
+            required
+            propsselect={{
+              options: projects?.list?.map((item: any) => ({
+                value: item.id,
+                label: item.description,
+              })),
+              allowClear: true,
+              placeholder: "Select Project",
+            }}
+          />
           <FormInput
             name="additionalNote"
             label="Notes"

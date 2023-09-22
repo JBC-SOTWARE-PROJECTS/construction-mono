@@ -67,6 +67,11 @@ function RawLogs() {
       key: "type",
     },
     {
+      title: "Project",
+      dataIndex: ["project", "description"],
+      key: "project",
+    },
+    {
       title: "Action",
       dataIndex: "id",
       key: "id",

@@ -32,6 +32,10 @@ const GET_SAVED_EMPLOYEE_ATTENDANCE = gql`
         employee {
           id
         }
+        project {
+          id
+          description
+        }
       }
       totalElements
     }

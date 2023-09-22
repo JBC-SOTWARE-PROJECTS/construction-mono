@@ -63,7 +63,8 @@ class AccumulatedLogsCalculator {
     List<AccumulatedLogsDto> getAccumulatedLogs(
             @GraphQLArgument(name = "startDate") Instant startDate,
             @GraphQLArgument(name = "endDate") Instant endDate,
-            @GraphQLArgument(name = "id") UUID id
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "generateBreakdown") Boolean generateBreakdown
 
     ) {
         if (!startDate || !endDate || !id) throw new RuntimeException("Failed to get employee attendance.")
@@ -87,19 +88,26 @@ class AccumulatedLogsCalculator {
 
                 EmployeeSchedule regularSchedule = scheduleList.find({ !it.isOvertime })
                 EmployeeSchedule overtimeSchedule = scheduleList.find({ it.isOvertime })
-
                 HoursLog hoursLog = new HoursLog()
-                hoursLog.regular = computeHours(regularSchedule, firstIn, out)
-                hoursLog.overtime = overtimeSchedule ? computeHours(overtimeSchedule, firstIn, out) : 0
+
+                if (generateBreakdown) {
+                    accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList)
+                    accumulatedLogs.projectBreakdown.each {
+                        hoursLog.regular += it.regular
+                        hoursLog.overtime += it.overtime
+                    }
+                } else {
+                    hoursLog.regular = computeHours(regularSchedule, firstIn, out)
+                    hoursLog.overtime = overtimeSchedule ? computeHours(overtimeSchedule, firstIn, out) : 0
+                }
 
                 hoursLog.late = getLateHours(regularSchedule.dateTimeStart, firstIn)
                 hoursLog.underTime = regularSchedule.scheduleDuration - hoursLog.late - hoursLog.regular
                 hoursLog.absent
-
-
                 accumulatedLogs.hours = hoursLog
                 accumulatedLogs.scheduleStart = regularSchedule.dateTimeStart
                 accumulatedLogs.scheduleEnd = overtimeSchedule ? overtimeSchedule.dateTimeEnd : regularSchedule.dateTimeEnd
+
 
                 accumulatedLogs.date = date
                 accumulatedLogs.scheduleTitle = regularSchedule.title
@@ -120,6 +128,21 @@ class AccumulatedLogsCalculator {
         return accumulatedLogsList.sort({ it.date })
     }
 
+    static List<HoursLog> computeProjectBreakdown(EmployeeSchedule regularSchedule, EmployeeSchedule overtimeSchedule, List<EmployeeAttendance> attendanceList) {
+        List<HoursLog> hoursLogList = []
+        for (int i = 1; i < attendanceList.size(); i++) {
+            HoursLog hoursLog = new HoursLog()
+            hoursLog.project = attendanceList[i - 1].project.id
+            hoursLog.projectName = attendanceList[i - 1].project.description
+
+            hoursLog.regular = computeHours(regularSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time)
+            hoursLog.overtime = overtimeSchedule ? computeHours(overtimeSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time) : 0
+            hoursLogList.push(hoursLog)
+
+        }
+        return hoursLogList.reverse()
+    }
+
     static BigDecimal getLateHours(Instant scheduleStart, Instant firstIn) {
         BigDecimal lateHours = Duration.between(scheduleStart, firstIn).toMillis() / 3600000.0
         if (lateHours >= 0) {
@@ -129,7 +152,6 @@ class AccumulatedLogsCalculator {
         }
 
     }
-
 
     static BigDecimal computeHours(EmployeeSchedule schedule, Instant logStart, Instant logEnd) {
         logStart = logStart.with(ChronoField.MILLI_OF_SECOND, 0)
@@ -173,6 +195,11 @@ class AccumulatedLogsCalculator {
                 workedHours = Duration.between(mealBreakEnd, consideredOut).getSeconds() / HOUR_COMPUTATION
             } else if (consideredOut.isBefore(mealBreakStart)) {
                 workedHours = Duration.between(consideredIn, consideredOut).getSeconds() / HOUR_COMPUTATION
+            } else if (
+                    consideredIn.isAfter(mealBreakStart) && consideredIn.isAfter(mealBreakEnd) && consideredOut.isAfter(mealBreakStart) && consideredOut.isAfter(mealBreakEnd)
+            ) {
+                workedHours = Duration.between(consideredIn, consideredOut).getSeconds() / HOUR_COMPUTATION
+
             } else {
                 workedHours = Duration.between(consideredIn, consideredOut).getSeconds() / HOUR_COMPUTATION
                 workedHours -= mealBreakDuration
@@ -184,9 +211,7 @@ class AccumulatedLogsCalculator {
         return workedHours
     }
 
-    Map<String, List<EmployeeAttendance>> getAttendanceLogs(Instant startDate,
-                                                            Instant endDate,
-                                                            UUID id) {
+    private Map<String, List<EmployeeAttendance>> getAttendanceLogs(Instant startDate, Instant endDate, UUID id) {
         Map<String, List<EmployeeAttendance>> sortedAttendance = new HashMap<>()
         List<EmployeeAttendance> attendanceList = employeeAttendanceRepository.getEmployeeAttendanceList(id, startDate, endDate)
 
@@ -204,9 +229,7 @@ class AccumulatedLogsCalculator {
         return sortedAttendance
     }
 
-    Map<String, List<EmployeeSchedule>> getSchedules(Instant startDate,
-                                                     Instant endDate,
-                                                     UUID id) {
+    private Map<String, List<EmployeeSchedule>> getSchedules(Instant startDate, Instant endDate, UUID id) {
         Map<String, List<EmployeeSchedule>> sortedSchedule = new HashMap<>()
         List<EmployeeSchedule> scheduleList = employeeScheduleRepository.findByDateRangeEmployeeId(id, startDate, endDate)
 

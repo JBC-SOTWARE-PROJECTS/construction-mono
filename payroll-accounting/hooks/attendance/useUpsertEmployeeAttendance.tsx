@@ -5,11 +5,17 @@ import { message } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 const UPSERT_EMPLOYEE_ATTENDANCE = gql`
-  mutation ($id: UUID, $employee: UUID, $fields: Map_String_ObjectScalar) {
+  mutation (
+    $id: UUID
+    $project_id: UUID
+    $employee: UUID
+    $fields: Map_String_ObjectScalar
+  ) {
     data: upsertEmployeeAttendance(
       id: $id
       employee: $employee
       fields: $fields
+      project_id: $project_id
     ) {
       success
       message
@@ -20,6 +26,7 @@ export interface IUpsertEmployeeAttendanceParams {
   attendance_time: dayjs.Dayjs;
   type: string;
   additionalNote: string;
+  project_id: string;
 }
 
 const useUpsertEmployeeAttendance = (callBack: () => void) => {
@@ -41,6 +48,7 @@ const useUpsertEmployeeAttendance = (callBack: () => void) => {
 
   const upsertEmployeeSchedule = (
     variables: IUpsertEmployeeAttendanceParams,
+    project_id: string,
     id?: string
   ) => {
     upsert({
@@ -48,11 +56,16 @@ const useUpsertEmployeeAttendance = (callBack: () => void) => {
         fields: variables,
         id: id,
         employee: router?.query?.id,
+        project_id: project_id,
       },
     });
   };
   const returnValue: [
-    (variables: IUpsertEmployeeAttendanceParams, id?: string) => void,
+    (
+      variables: IUpsertEmployeeAttendanceParams,
+      project_id: string,
+      id?: string
+    ) => void,
     boolean
   ] = [upsertEmployeeSchedule, loading];
 

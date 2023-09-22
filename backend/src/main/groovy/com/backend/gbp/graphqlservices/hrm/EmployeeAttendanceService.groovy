@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
+import com.backend.gbp.graphqlservices.projects.ProjectService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.EmployeeAttendanceRepository
@@ -33,6 +34,8 @@ class EmployeeAttendanceService {
     @Autowired
     EmployeeRepository employeeRepository
 
+    @Autowired
+    ProjectService projectService
 //    @Autowired
 //    PayrollTimeKeepingCalculatorService payrollTimeKeepingCalculatorService
 
@@ -81,6 +84,7 @@ class EmployeeAttendanceService {
     GraphQLResVal<EmployeeAttendance> upsertEmployeeAttendance(
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "employee") UUID employee,
+            @GraphQLArgument(name = "project_id") UUID project_id,
             @GraphQLArgument(name = "fields") Map<String, Object> fields
     ) {
         if (!employee) return new GraphQLResVal<EmployeeAttendance>(null, false, "Failed to ${id ? 'update' : 'create'} employee attendance.")
@@ -89,6 +93,7 @@ class EmployeeAttendanceService {
             EmployeeAttendance attendance = objectMapper.updateValue(selectedAttendance, fields)
             Employee selectedEmployee = employeeRepository.findById(employee).get()
             attendance.employee = selectedEmployee
+            attendance.project = projectService.findOne(project_id)
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully updated employee attendance.")
         } else {
@@ -97,6 +102,7 @@ class EmployeeAttendanceService {
             attendance.employee = selectedEmployee
             attendance.original_attendance_time = attendance.attendance_time
             attendance.originalType = attendance.type
+            attendance.project = projectService.findOne(project_id)
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully created employee attendance.")
         }

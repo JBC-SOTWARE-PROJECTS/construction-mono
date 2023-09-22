@@ -6,22 +6,23 @@ import java.time.Instant
 class HoursLog {
 
     UUID project
+    String projectName
 
     BigDecimal late = 0
     BigDecimal underTime = 0
     BigDecimal absent = 0
 
-    BigDecimal regular
-    BigDecimal overtime
+    BigDecimal regular = 0
+    BigDecimal overtime = 0
 
-    BigDecimal regularHoliday
-    BigDecimal overtimeHoliday
+    BigDecimal regularHoliday = 0
+    BigDecimal overtimeHoliday = 0
 
-    BigDecimal regularDoubleHoliday
-    BigDecimal overtimeDoubleHoliday
+    BigDecimal regularDoubleHoliday = 0
+    BigDecimal overtimeDoubleHoliday = 0
 
-    BigDecimal regularSpecialHoliday
-    BigDecimal overtimeSpecialHoliday
+    BigDecimal regularSpecialHoliday = 0
+    BigDecimal overtimeSpecialHoliday = 0
 
 }
 
@@ -46,6 +47,7 @@ class AccumulatedLogsDto {
 
 class ScheduleDto {
     UUID id
+    UUID emp_id
     String label
     String title
 

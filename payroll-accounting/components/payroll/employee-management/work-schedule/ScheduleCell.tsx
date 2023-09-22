@@ -37,14 +37,13 @@ function ScheduleCell({
       title: schedule?.title,
       project_id: schedule?.project?.id,
     };
-
+    debugger;
     upsertEmpSchedule({
       variables: {
         employeeId: employee.id,
         id:
           employeeSchedule &&
-          employeeSchedule.filter((item: any) => !item.is_overtime)[0]
-            .schedule_id,
+          employeeSchedule.filter((item: any) => !item.is_overtime)[0].id,
         fields: fields,
       },
     });

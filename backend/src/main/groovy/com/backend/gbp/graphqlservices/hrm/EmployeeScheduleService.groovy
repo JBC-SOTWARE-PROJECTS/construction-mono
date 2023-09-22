@@ -131,7 +131,7 @@ class EmployeeScheduleService {
         String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
 
         List<Map<String, Object>> results = jdbcTemplate.queryForList("""
-    Select e.id, concat(e.first_name, ' ', e.last_name) as full_name, s.id as schedule_id, s.*  from hrm.employee_schedule s
+    Select e.id as emp_id, concat(e.first_name, ' ', e.last_name) as full_name, s.id , s.*  from hrm.employee_schedule s
     left join hrm.employees e on e.id = s.employee
     where s.employee in ${formattedStringIds}
     AND s.date_time_start >= '${startDate.toString()}'
@@ -146,7 +146,7 @@ class EmployeeScheduleService {
 
         Map<String, Map<String, List<ScheduleDto>>> employeeMap = new HashMap<>() // Initialize employeeMap
         results.each {
-            String empId = it['id'].toString()
+            String empId = it['emp_id'].toString()
             Timestamp timestamp = (Timestamp) it['date_time_start'];
             LocalDateTime dateTimeStart = timestamp.toLocalDateTime();
 
@@ -156,7 +156,8 @@ class EmployeeScheduleService {
 
             if (!employeeMap.containsKey(empId)) {
                 Map<String, List<ScheduleDto>> dateMap = new HashMap<>();  // Initialize dateMap
-                dateMap.put(date, [objectMapper.convertValue(it, ScheduleDto)] as List<ScheduleDto>);
+                ScheduleDto scheduleDto = objectMapper.convertValue(it, ScheduleDto)
+                dateMap.put(date, [scheduleDto] as List<ScheduleDto>);
                 // Initialize the list with the current map
                 employeeMap.put(empId, dateMap);
             } else {
