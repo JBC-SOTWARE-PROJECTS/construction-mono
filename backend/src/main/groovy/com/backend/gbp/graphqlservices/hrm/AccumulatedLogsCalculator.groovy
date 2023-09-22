@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.hrm
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
 import com.backend.gbp.domain.hrm.EmployeeSchedule
+import com.backend.gbp.domain.hrm.EventCalendar
 import com.backend.gbp.domain.hrm.dto.AccumulatedLogsDto
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.hrm.dto.ScheduleDto
@@ -48,6 +49,9 @@ class AccumulatedLogsCalculator {
     EmployeeRepository employeeRepository
 
     @Autowired
+    EventCalendarService eventCalendarService
+
+    @Autowired
     JdbcTemplate jdbcTemplate
 
     @Autowired
@@ -72,6 +76,7 @@ class AccumulatedLogsCalculator {
         List<AccumulatedLogsDto> accumulatedLogsList = []
         Map<String, List<EmployeeAttendance>> attendanceMap = getAttendanceLogs(startDate, endDate, id)
         Map<String, List<EmployeeSchedule>> scheduleMap = getSchedules(startDate, endDate, id)
+        Map<String, List<EventCalendar>> holidayMap = eventCalendarService.mapEventsToDates(startDate, endDate)
 
         Instant date = startDate.plus(8, ChronoUnit.HOURS);
         while (date.isBefore(endDate)) {
@@ -79,9 +84,9 @@ class AccumulatedLogsCalculator {
             if (scheduleMap.get(dateString)) {
                 AccumulatedLogsDto accumulatedLogs = new AccumulatedLogsDto()
 
-
                 List<EmployeeAttendance> attendanceList = attendanceMap.get(dateString).sort({ it.attendance_time })
                 List<EmployeeSchedule> scheduleList = scheduleMap.get(dateString).sort({ it.dateTimeStart })
+                List<EventCalendar> holidays = holidayMap.get(dateString)
 
                 Instant firstIn = attendanceList.find({ it.type == 'IN' && !it.isTransfer }).attendance_time
                 Instant out = attendanceList.find({ it.type == 'OUT' && !it.isTransfer }).attendance_time
@@ -91,14 +96,32 @@ class AccumulatedLogsCalculator {
                 HoursLog hoursLog = new HoursLog()
 
                 if (generateBreakdown) {
-                    accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList)
+                    accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList, holidays)
                     accumulatedLogs.projectBreakdown.each {
                         hoursLog.regular += it.regular
                         hoursLog.overtime += it.overtime
+
+                        hoursLog.regularHoliday += it.regularHoliday
+                        hoursLog.overtimeHoliday += it.overtimeHoliday
+
+                        hoursLog.regularDoubleHoliday += it.regularDoubleHoliday
+                        hoursLog.overtimeDoubleHoliday += it.overtimeDoubleHoliday
+
+                        hoursLog.regularSpecialHoliday += it.regularSpecialHoliday
+                        hoursLog.overtimeSpecialHoliday += it.overtimeSpecialHoliday
+
                     }
                 } else {
-                    hoursLog.regular = computeHours(regularSchedule, firstIn, out)
-                    hoursLog.overtime = overtimeSchedule ? computeHours(overtimeSchedule, firstIn, out) : 0
+                    BigDecimal regularHours = computeHours(regularSchedule, firstIn, out)
+                    BigDecimal overtimeHours = overtimeSchedule ? computeHours(overtimeSchedule, firstIn, out) : 0
+                    if (holidays?.size() > 0) {
+                        calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
+                    } else {
+                        hoursLog.regular = regularHours
+                        hoursLog.overtime = overtimeHours
+                    }
+
+
                 }
 
                 hoursLog.late = getLateHours(regularSchedule.dateTimeStart, firstIn)
@@ -128,15 +151,60 @@ class AccumulatedLogsCalculator {
         return accumulatedLogsList.sort({ it.date })
     }
 
-    static List<HoursLog> computeProjectBreakdown(EmployeeSchedule regularSchedule, EmployeeSchedule overtimeSchedule, List<EmployeeAttendance> attendanceList) {
+    private static void calculateHolidayHours(List<EventCalendar> holidays, BigDecimal regularHours, HoursLog hoursLog, BigDecimal overtimeHours) {
+        Integer regularCount = 0
+        Integer nonHolidayCount = 0
+        Integer specialNonWorkingCount = 0
+
+        holidays.each {
+            if (it.holidayType == 'REGULAR') regularCount++
+            if (it.holidayType == 'SPECIAL_NON_WORKING') specialNonWorkingCount++
+            if (it.holidayType == 'NON_HOLIDAY') nonHolidayCount++
+        }
+        Integer totalHolidayCount = regularCount + specialNonWorkingCount
+        switch (totalHolidayCount) {
+            case 1:
+                if (regularCount == 1) {
+                    hoursLog.regularHoliday = regularHours
+                    hoursLog.overtimeHoliday = overtimeHours
+                } else if (specialNonWorkingCount == 1) {
+                    hoursLog.regularSpecialHoliday = regularHours
+                    hoursLog.overtimeSpecialHoliday = overtimeHours
+                }
+                break;
+            default:
+                if (totalHolidayCount >= 2) {
+                    hoursLog.regularDoubleHoliday = regularHours
+                    hoursLog.overtimeDoubleHoliday = overtimeHours
+                }
+                break;
+        }
+    }
+
+    static List<HoursLog> computeProjectBreakdown(
+            EmployeeSchedule regularSchedule,
+            EmployeeSchedule overtimeSchedule,
+            List<EmployeeAttendance> attendanceList,
+            List<EventCalendar> holidays) {
         List<HoursLog> hoursLogList = []
         for (int i = 1; i < attendanceList.size(); i++) {
             HoursLog hoursLog = new HoursLog()
             hoursLog.project = attendanceList[i - 1].project.id
             hoursLog.projectName = attendanceList[i - 1].project.description
+            Instant timeIn = attendanceList[i - 1].attendance_time
+            Instant timeOut = attendanceList[i].attendance_time
+            BigDecimal overtimeHours = 0
+            BigDecimal regularHours = computeHours(regularSchedule, timeIn, timeOut)
+            if (overtimeSchedule && !timeOut.isBefore(overtimeSchedule.dateTimeStart)) {
+                overtimeHours = computeHours(overtimeSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time)
+            }
 
-            hoursLog.regular = computeHours(regularSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time)
-            hoursLog.overtime = overtimeSchedule ? computeHours(overtimeSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time) : 0
+            if (holidays?.size() > 0) {
+                calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
+            } else {
+                hoursLog.regular = regularHours
+                hoursLog.overtime = overtimeHours
+            }
             hoursLogList.push(hoursLog)
 
         }
