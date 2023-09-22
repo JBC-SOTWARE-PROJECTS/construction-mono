@@ -68,42 +68,32 @@ const Event = () => {
     return listData;
   };
 
-  function typeOfHoliday(item: { id?: string; type?: string; content?: any }) {
+  function getHolidayType(item: { id?: string; type?: string; content?: any }) {
     const holiday = data?.events?.find(
       (event: { name: any }) => event.name === item.content
     );
-    let style: React.CSSProperties = {
-      width: "100%",
-      minHeight: "30px",
-      borderRadius: "5px",
-      textAlign: "center",
-      padding: "3px",
-      marginTop: "2px",
-      marginBottom: "2px",
-    };
-    if (holiday) {
-      if (holiday.holidayType === "REGULAR") {
-        style.backgroundColor = "#2db7f5";
-      } else if (holiday.holidayType === "SPECIAL_NON_WORKING") {
-        style.backgroundColor = "#87d068";
-      } else if (holiday.holidayType === "NON_HOLIDAY") {
-        style.backgroundColor = "#ff9933";
-      } else {
-        throw new Error("None of the holiday type");
-      }
-    }
-    return style;
+
+    return holiday?.holidayType;
   }
 
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value);
     const cellHeight = 50;
     return (
-      <div className="events" style={{ height: `${cellHeight}px` }}>
+      <div style={{ height: `${cellHeight}px` }}>
         {listData.map((item) => (
           <div
+            className={`events_${getHolidayType(item)}`}
             key={item?.id}
-            style={typeOfHoliday(item)}
+            style={{
+              width: "100%",
+              minHeight: "20px",
+              borderRadius: "5px",
+              textAlign: "center",
+              padding: "1px",
+              marginTop: "1px",
+              marginBottom: "1px",
+            }}
             onClick={() => handleClick(item)}
           >
             {item.content}
@@ -199,6 +189,7 @@ const Event = () => {
             )}`}
           />
           <Calendar
+            className="events_calendar"
             fullscreen={true}
             value={value}
             onSelect={onSelect}
