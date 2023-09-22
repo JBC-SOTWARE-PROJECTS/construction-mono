@@ -265,6 +265,12 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/08_wilson_billing_add_company.sql"
              relativeToChangelogFile="false"/>
+  
+    <include file="classpath:config/liquibase/changelog4/11_jeriah_alter_table_calendar.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/12_jeriah_alter_table_add_column.sql"
+             relativeToChangelogFile="false"/>
+
     <include file="classpath:config/liquibase/changelog4/11_michael_payroll_module_initial_tables.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/12_michael_payroll_setup_roles_and_permissions.sql"
@@ -277,4 +283,5 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/15_michael_payroll_contributions_roles_and_permissions.sql"
              relativeToChangelogFile="false"/>
+
 </databaseChangeLog>
