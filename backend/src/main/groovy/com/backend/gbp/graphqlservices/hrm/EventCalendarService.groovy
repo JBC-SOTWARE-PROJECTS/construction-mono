@@ -68,7 +68,7 @@ class EventCalendarService {
                 .getResultStream()
                 .collect(Collectors.groupingBy({
                     EventCalendar d ->
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_yyyy").withZone(ZoneId.systemDefault())
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
                         String dateTime = formatter.format(d.startDate)
                         return dateTime
                 })) as Map

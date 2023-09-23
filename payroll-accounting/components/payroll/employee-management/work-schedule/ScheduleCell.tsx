@@ -35,15 +35,14 @@ function ScheduleCell({
       mealBreakEnd: transformDate(currentDate, schedule?.mealBreakEnd),
       label: schedule?.label,
       title: schedule?.title,
+      project_id: schedule?.project?.id,
     };
-
     upsertEmpSchedule({
       variables: {
         employeeId: employee.id,
         id:
           employeeSchedule &&
-          employeeSchedule.filter((item: any) => !item.is_overtime)[0]
-            .schedule_id,
+          employeeSchedule.filter((item: any) => !item.is_overtime)[0].id,
         fields: fields,
       },
     });
@@ -96,7 +95,6 @@ function ScheduleCell({
         {(employeeSchedule ?? []).length !== 0
           ? employeeSchedule
               ?.filter((item: any) => {
-                console.log(item);
                 return !item.is_overtime;
               })
               .map((item: any) => {

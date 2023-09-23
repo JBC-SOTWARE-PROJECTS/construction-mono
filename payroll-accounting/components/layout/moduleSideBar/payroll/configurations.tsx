@@ -1,5 +1,3 @@
-import { MenuOutlined } from "@ant-design/icons";
-
 const payrollConfigurationsMenu = {
   route: {
     path: "/",

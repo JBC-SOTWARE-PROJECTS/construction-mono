@@ -5,14 +5,17 @@ import AccessManager from "@/components/accessControl/AccessManager";
 import CircularProgress from "@/components/circularProgress";
 import { IPageProps } from "@/utility/interfaces";
 
-const Component = dynamic(() => import("@/routes/payroll/employee-schedule"), {
-  loading: () => <CircularProgress />,
-});
+const Component = dynamic(
+  () => import("@/routes/payroll/employee-management/attendance"),
+  {
+    loading: () => <CircularProgress />,
+  }
+);
 
 const Employees = ({ account }: IPageProps) => (
   <React.Fragment>
     <Head>
-      <title>Construction IMS Employees</title>
+      <title>Employee Attendance</title>
     </Head>
     <AccessManager roles={["ROLE_ADMIN", "MANAGE_SCHEDULE_TYPES"]}>
       <div className="gx-main-content-wrapper-full-width">

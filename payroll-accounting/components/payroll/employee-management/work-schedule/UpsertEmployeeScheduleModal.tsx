@@ -29,6 +29,9 @@ import FormInput from "@/components/common/formInput/formInput";
 import { requiredField, transformDate } from "@/utility/helper";
 import FormTimePicker from "@/components/common/formTimePicker/formTimePicker";
 import { Maybe } from "graphql/jsutils/Maybe";
+import { useQuery } from "@apollo/client";
+import FormSelect from "@/components/common/formSelect/formSelect";
+import { GET_ACTIVE_PROJECTS } from "../../configurations/UpsertScheduleType";
 const colSpan2 = {
   xs: 24,
   md: 12,
@@ -55,17 +58,26 @@ function UpsertEmployeeScheduleModal({
   isOvertime = false,
 }: IProps) {
   const [visible, setVisible] = useState(false);
-
-  const onSubmit = (values: EmployeeSchedule) => {
+  const {
+    loading: loadingProjects,
+    error,
+    data: projects,
+  } = useQuery(GET_ACTIVE_PROJECTS);
+  const onSubmit = (values: any) => {
     const fields = {
       dateTimeStart: transformDate(currentDate, values?.dateTimeStart),
       dateTimeEnd: transformDate(currentDate, values?.dateTimeEnd),
-      mealBreakStart: transformDate(currentDate, values?.mealBreakStart),
-      mealBreakEnd: transformDate(currentDate, values?.mealBreakEnd),
+      mealBreakStart: values?.mealBreakStart
+        ? transformDate(currentDate, values?.mealBreakStart)
+        : null,
+      mealBreakEnd: values?.mealBreakEnd
+        ? transformDate(currentDate, values?.mealBreakEnd)
+        : null,
       label: values?.label,
       title: values?.title,
       isCustom: true,
       isOvertime,
+      project_id: values.project_id,
     };
 
     upsertEmployeeSchedule({
@@ -75,11 +87,9 @@ function UpsertEmployeeScheduleModal({
         fields: fields,
       },
     });
-    debugger;
-
     setVisible(false);
   };
-  console.log(employeeSchedule);
+
   return (
     <>
       <Button
@@ -120,6 +130,7 @@ function UpsertEmployeeScheduleModal({
           onFinish={onSubmit}
           initialValues={{
             ...employeeSchedule,
+            project_id: employeeSchedule?.project?.id,
             dateTimeStart:
               employeeSchedule?.dateTimeStart &&
               dayjs(employeeSchedule?.dateTimeStart),
@@ -152,6 +163,21 @@ function UpsertEmployeeScheduleModal({
                 label="Label"
                 propsinput={{
                   placeholder: "Label",
+                }}
+              />
+            </Col>
+            <Col span={24}>
+              <FormSelect
+                name="project_id"
+                label="Project"
+                rules={requiredField}
+                propsselect={{
+                  options: projects?.list?.map((item: any) => ({
+                    value: item.id,
+                    label: item.description,
+                  })),
+                  allowClear: true,
+                  placeholder: "Select Project",
                 }}
               />
             </Col>
