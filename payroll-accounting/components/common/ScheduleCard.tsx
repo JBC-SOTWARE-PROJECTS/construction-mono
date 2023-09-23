@@ -64,24 +64,29 @@ function ScheduleCard({
                 )}
               </td>
             </tr>
-            <tr>
-              <td style={{ paddingRight: 30, fontWeight: "bold" }}>
-                Meal break Duration
-              </td>
-              <td>:</td>
-              <td>
-                {getTimeFromDate(
-                  scheduleType?.mealBreakStart ||
-                    employeeSchedule?.mealBreakStart
-                )}
-              </td>
-              <td style={{ textAlign: "center" }}>-</td>
-              <td>
-                {getTimeFromDate(
-                  scheduleType?.mealBreakEnd || employeeSchedule?.mealBreakEnd
-                )}
-              </td>
-            </tr>
+            {(scheduleType?.mealBreakStart ||
+              employeeSchedule?.mealBreakStart ||
+              scheduleType?.mealBreakEnd ||
+              employeeSchedule?.mealBreakEnd) && (
+              <tr>
+                <td style={{ paddingRight: 30, fontWeight: "bold" }}>
+                  Meal break Duration
+                </td>
+                <td>:</td>
+                <td>
+                  {getTimeFromDate(
+                    scheduleType?.mealBreakStart ||
+                      employeeSchedule?.mealBreakStart
+                  )}
+                </td>
+                <td style={{ textAlign: "center" }}>-</td>
+                <td>
+                  {getTimeFromDate(
+                    scheduleType?.mealBreakEnd || employeeSchedule?.mealBreakEnd
+                  )}
+                </td>
+              </tr>
+            )}
             <tr>
               <td>
                 <b> Project:</b>

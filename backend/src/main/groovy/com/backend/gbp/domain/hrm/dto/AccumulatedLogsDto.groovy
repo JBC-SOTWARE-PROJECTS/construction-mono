@@ -24,6 +24,13 @@ class HoursLog {
     BigDecimal regularSpecialHoliday = 0
     BigDecimal overtimeSpecialHoliday = 0
 
+    BigDecimal getTotalRegularHours() {
+        regular +
+                regularHoliday +
+                regularDoubleHoliday +
+                regularSpecialHoliday
+    }
+
 }
 
 

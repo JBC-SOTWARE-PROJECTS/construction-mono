@@ -82,19 +82,36 @@ class AccumulatedLogsCalculator {
         while (date.isBefore(endDate)) {
             String dateString = date.toString().substring(0, 10)
             if (scheduleMap.get(dateString)) {
-                AccumulatedLogsDto accumulatedLogs = new AccumulatedLogsDto()
 
-                List<EmployeeAttendance> attendanceList = attendanceMap.get(dateString).sort({ it.attendance_time })
+
+                List<EmployeeAttendance> attendanceList = attendanceMap.get(dateString)?.sort({ it.attendance_time })
                 List<EmployeeSchedule> scheduleList = scheduleMap.get(dateString).sort({ it.dateTimeStart })
                 List<EventCalendar> holidays = holidayMap.get(dateString)
 
-                Instant firstIn = attendanceList.find({ it.type == 'IN' && !it.isTransfer }).attendance_time
-                Instant out = attendanceList.find({ it.type == 'OUT' && !it.isTransfer }).attendance_time
+                Instant firstIn = attendanceList?.find({ it.type == 'IN' && !it.isTransfer })?.attendance_time
+                Instant out = attendanceList?.find({ it.type == 'OUT' && !it.isTransfer })?.attendance_time
 
                 EmployeeSchedule regularSchedule = scheduleList.find({ !it.isOvertime })
                 EmployeeSchedule overtimeSchedule = scheduleList.find({ it.isOvertime })
-                HoursLog hoursLog = new HoursLog()
 
+                AccumulatedLogsDto accumulatedLogs = new AccumulatedLogsDto()
+                accumulatedLogs.date = date
+                accumulatedLogs.scheduleTitle = regularSchedule.title
+                accumulatedLogs.scheduleStart = regularSchedule.dateTimeStart
+                accumulatedLogs.scheduleEnd = overtimeSchedule ? overtimeSchedule.dateTimeEnd : regularSchedule.dateTimeEnd
+
+                HoursLog hoursLog = new HoursLog()
+                if (!firstIn && !out) {
+                    hoursLog.absent = regularSchedule.scheduleDuration
+                    accumulatedLogs.isError = true
+                    accumulatedLogs.hours = hoursLog
+                    accumulatedLogs.message = "Absent"
+                    accumulatedLogsList.push(accumulatedLogs)
+                    date = date.plus(1, ChronoUnit.DAYS)
+                    continue;
+                }
+                accumulatedLogs.inTime = firstIn
+                accumulatedLogs.outTime = out
                 if (generateBreakdown) {
                     accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList, holidays)
                     accumulatedLogs.projectBreakdown.each {
@@ -125,22 +142,16 @@ class AccumulatedLogsCalculator {
                 }
 
                 hoursLog.late = getLateHours(regularSchedule.dateTimeStart, firstIn)
-                hoursLog.underTime = regularSchedule.scheduleDuration - hoursLog.late - hoursLog.regular
-                hoursLog.absent
+                hoursLog.underTime = regularSchedule.scheduleDuration - hoursLog.totalRegularHours - hoursLog.late
+
                 accumulatedLogs.hours = hoursLog
-                accumulatedLogs.scheduleStart = regularSchedule.dateTimeStart
-                accumulatedLogs.scheduleEnd = overtimeSchedule ? overtimeSchedule.dateTimeEnd : regularSchedule.dateTimeEnd
 
 
-                accumulatedLogs.date = date
-                accumulatedLogs.scheduleTitle = regularSchedule.title
-                accumulatedLogs.inTime = firstIn
-                accumulatedLogs.outTime = out
-                accumulatedLogs.message = "Fuck You"
                 accumulatedLogsList.push(accumulatedLogs)
             } else {
                 AccumulatedLogsDto accumulatedLogs = new AccumulatedLogsDto()
                 accumulatedLogs.date = date
+                accumulatedLogs.isError = true
                 accumulatedLogs.message = "No Schedule"
                 accumulatedLogsList.push(accumulatedLogs)
             }

@@ -10,22 +10,15 @@ import { useRouter } from "next/router";
 import { ColumnsType } from "antd/es/table";
 import { EmployeeAttendance } from "@/graphql/gql/graphql";
 import usePaginationState from "@/hooks/usePaginationState";
+import useDateRangeState from "@/hooks/useDateRangeState";
 
 function RawLogs() {
   const [_, { onNextPage }] = usePaginationState({}, 0, 25);
-  const [dates, setDates] = useState<dayjs.Dayjs[] | null[]>([null, null]);
+
   const [open, setOpen] = useState(false);
   const router = useRouter();
-
+  const [startDate, endDate, handleDateChange] = useDateRangeState();
   const [getEmployeeSchedule, data, loading] = useGetEmployeeAttendance();
-
-  const handleDateChange = (dates: any) => {
-    try {
-      setDates([dayjs(dates[0]).startOf("day"), dayjs(dates[1]).endOf("day")]);
-    } catch {
-      setDates([dayjs().startOf("month"), dayjs().endOf("month")]);
-    }
-  };
 
   const [record, setRecord] = useState<EmployeeAttendance>();
   const handleEdit = (record: EmployeeAttendance) => {
@@ -117,8 +110,8 @@ function RawLogs() {
                 id: router?.query?.id,
                 size: 10,
                 page: 0,
-                startDate: dates[0]?.startOf("day"),
-                endDate: dates[1]?.endOf("day"),
+                startDate: startDate?.startOf("day"),
+                endDate: endDate?.endOf("day"),
               });
             }}
           >

@@ -37,7 +37,6 @@ function ScheduleCell({
       title: schedule?.title,
       project_id: schedule?.project?.id,
     };
-    debugger;
     upsertEmpSchedule({
       variables: {
         employeeId: employee.id,

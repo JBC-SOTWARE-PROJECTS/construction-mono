@@ -67,8 +67,12 @@ function UpsertEmployeeScheduleModal({
     const fields = {
       dateTimeStart: transformDate(currentDate, values?.dateTimeStart),
       dateTimeEnd: transformDate(currentDate, values?.dateTimeEnd),
-      mealBreakStart: transformDate(currentDate, values?.mealBreakStart),
-      mealBreakEnd: transformDate(currentDate, values?.mealBreakEnd),
+      mealBreakStart: values?.mealBreakStart
+        ? transformDate(currentDate, values?.mealBreakStart)
+        : null,
+      mealBreakEnd: values?.mealBreakEnd
+        ? transformDate(currentDate, values?.mealBreakEnd)
+        : null,
       label: values?.label,
       title: values?.title,
       isCustom: true,
@@ -83,8 +87,6 @@ function UpsertEmployeeScheduleModal({
         fields: fields,
       },
     });
-    debugger;
-
     setVisible(false);
   };
 
