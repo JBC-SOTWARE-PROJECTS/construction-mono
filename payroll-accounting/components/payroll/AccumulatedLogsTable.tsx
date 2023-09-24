@@ -3,6 +3,7 @@ import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { Col, Row, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { round } from "lodash";
 import React, { CSSProperties, useState } from "react";
 interface IProps {
   dataSource: AccumulatedLogsDto[];
@@ -28,11 +29,16 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
       style = { ...style, backgroundColor: "#f7e9e9", color: "#db3939" };
     return { style };
   };
+
+  const render = (value: any) => {
+    return value && round(value, 4);
+  };
   const columns = [
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
+      width: 250,
       render: (value: any, record: any) => (
         <Row>
           <Col span={16}>
@@ -57,11 +63,13 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
       title: "Time in",
       dataIndex: "inTime",
       key: "inTime",
+      width: 90,
       render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
     },
     {
       title: "Time Out",
       dataIndex: "outTime",
+      width: 90,
       key: "outTime",
       render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
     },
@@ -74,22 +82,25 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Late",
           dataIndex: ["hours", "late"],
           key: "late",
-          width: 100,
+          width: 87,
           onCell: (record: any) => underPerformanceCell(record, "late"),
+          render: render,
         },
         {
           title: "Undertime",
           dataIndex: ["hours", "underTime"],
           key: "underTime",
-          width: 100,
+          width: 87,
           onCell: (record: any) => underPerformanceCell(record, "underTime"),
+          render: render,
         },
         {
           title: "Absent",
           dataIndex: ["hours", "absent"],
           key: "absent",
-          width: 100,
+          width: 87,
           onCell: (record: any) => underPerformanceCell(record, "absent"),
+          render: render,
         },
       ],
     },
@@ -102,16 +113,18 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regular"],
           key: "regular",
-          width: 100,
+          width: 87,
           onCell: (record: any) => onCellProps(record, "regular"),
+          render: render,
         },
 
         {
           title: "Overtime",
           dataIndex: ["hours", "overtime"],
           key: "overtime",
-          width: 100,
+          width: 87,
           onCell: (record: any) => onCellProps(record, "overtime"),
+          render: render,
         },
       ],
     },
@@ -124,16 +137,18 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regularHoliday"],
           key: "regularHoliday",
-          width: 100,
+          width: 87,
           onCell: (record: any) => onCellProps(record, "regularHoliday"),
+          render: render,
         },
 
         {
           title: "Overtime",
           dataIndex: ["hours", "overtimeHoliday"],
           key: "overtimeHoliday",
-          width: 100,
+          width: 87,
           onCell: (record: any) => onCellProps(record, "overtimeHoliday"),
+          render: render,
         },
       ],
     },
@@ -146,17 +161,19 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regularSpecialHoliday"],
           key: "regularSpecialHoliday",
-          width: 100,
+          width: 87,
           onCell: (record: any) => onCellProps(record, "regularSpecialHoliday"),
+          render: render,
         },
 
         {
           title: "Overtime",
           dataIndex: ["hours", "overtimeSpecialHoliday"],
           key: "overtimeSpecialHoliday",
-          width: 100,
+          width: 87,
           onCell: (record: any) =>
             onCellProps(record, "overtimeSpecialHoliday"),
+          render: render,
         },
       ],
     },
@@ -169,27 +186,31 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regularDoubleHoliday"],
           key: "regularDoubleHoliday",
-          width: 100,
+          width: 87,
           onCell: (record: any) => onCellProps(record, "regularDoubleHoliday"),
+          render: render,
         },
 
         {
           title: "Overtime",
           dataIndex: ["hours", "overtimeDoubleHoliday"],
           key: "overtimeDoubleHoliday",
-          width: 100,
+          width: 87,
           onCell: (record: any) => onCellProps(record, "overtimeDoubleHoliday"),
+          render: render,
         },
       ],
     },
   ];
-
+  const scrollProps = { y: "calc(100vh - 330px)" };
   return (
     <>
       <Table
+        className="ant-table-body"
         columns={columns}
         dataSource={dataSource}
         bordered
+        scroll={scrollProps}
         onHeaderRow={() => ({ style: { textAlignLast: "center" } })}
       />
     </>
