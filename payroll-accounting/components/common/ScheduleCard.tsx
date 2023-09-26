@@ -64,29 +64,45 @@ function ScheduleCard({
                 )}
               </td>
             </tr>
+            {(scheduleType?.mealBreakStart ||
+              employeeSchedule?.mealBreakStart ||
+              scheduleType?.mealBreakEnd ||
+              employeeSchedule?.mealBreakEnd) && (
+              <tr>
+                <td style={{ paddingRight: 30, fontWeight: "bold" }}>
+                  Meal break Duration
+                </td>
+                <td>:</td>
+                <td>
+                  {getTimeFromDate(
+                    scheduleType?.mealBreakStart ||
+                      employeeSchedule?.mealBreakStart
+                  )}
+                </td>
+                <td style={{ textAlign: "center" }}>-</td>
+                <td>
+                  {getTimeFromDate(
+                    scheduleType?.mealBreakEnd || employeeSchedule?.mealBreakEnd
+                  )}
+                </td>
+              </tr>
+            )}
             <tr>
-              <td style={{ paddingRight: 30, fontWeight: "bold" }}>
-                Meal break Duration
+              <td>
+                <b> Project:</b>
               </td>
               <td>:</td>
-              <td>
-                {getTimeFromDate(
-                  scheduleType?.mealBreakStart ||
-                    employeeSchedule?.mealBreakStart
-                )}
-              </td>
-              <td style={{ textAlign: "center" }}>-</td>
-              <td>
-                {getTimeFromDate(
-                  scheduleType?.mealBreakEnd || employeeSchedule?.mealBreakEnd
-                )}
+              <td colSpan={3}>
+                {employeeSchedule?.project?.description ||
+                  scheduleType?.project?.description}
               </td>
             </tr>
             {isCustom && (
               <tr>
                 <td>
-                  <b> is Custom:</b>
+                  <b> is Custom</b>
                 </td>
+                <td>:</td>
                 <td>
                   <Tag color="blue">Yes</Tag>
                 </td>

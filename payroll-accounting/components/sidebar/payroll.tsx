@@ -13,16 +13,10 @@ const payrollmenu: TDiverseTradeMenu[] = [
     path: "/payroll/configurations/schedule-types",
   },
   {
-    title: "Attendance",
-    subtitle: "View and manage employee attendance",
-    icon: <CarryOutOutlined className="diverse-trade-icon" />,
-    path: "/payroll/attendance/upload-biometric",
-  },
-  {
-    title: "Employee Work Schedule",
-    subtitle: "View and manage employee work schedule",
+    title: "Employee Management",
+    subtitle: "Manage employee work schedule and attendance",
     icon: <CalendarOutlined className="diverse-trade-icon" />,
-    path: "/payroll/employee-schedule",
+    path: "/payroll/employee-management/work-schedule",
   },
   {
     title: "Payroll Management",

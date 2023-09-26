@@ -299,6 +299,43 @@ export const TAX_OPTIONS = [
   { label: "30%", value: 30 },
 ];
 
+export const HolidayTransferabilityTypes = {
+  MOVABLE: "MOVABLE",
+  FIXED: "FIXED",
+};
+
+export const HolidayTypes = {
+  REGULAR: "REGULAR",
+  SPECIAL: "SPECIAL_NON_WORKING",
+  NON_HOLIDAY: "NON_HOLIDAY",
+};
+
+export const HolidayTransferability = [
+  {
+    label: "Fixed",
+    value: "FIXED",
+  },
+  {
+    label: "Movable",
+    value: "MOVABLE",
+  },
+];
+
+export const HolidayType = [
+  {
+    label: "Regular Holiday",
+    value: "REGULAR",
+  },
+  {
+    label: "Special Non-working Holiday",
+    value: "SPECIAL_NON_WORKING",
+  },
+  {
+    label: "Non-Holiday",
+    value: "NON_HOLIDAY",
+  },
+];
+
 export const ACCOUNT_TYPES = [
   { label: "ASSET", value: "ASSET" },
   { label: "LIABILITY", value: "LIABILITY" },

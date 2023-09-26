@@ -5,7 +5,7 @@ import FormTimePicker from "@/components/common/formTimePicker/formTimePicker";
 import { Schedule } from "@/graphql/gql/graphql";
 import { requiredField } from "@/utility/helper";
 import { SaveOutlined } from "@ant-design/icons";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Col,
@@ -36,12 +36,22 @@ const ADD_DEPARTMENT_SCHEDULE = gql`
   }
 `;
 
+export const GET_ACTIVE_PROJECTS = gql`
+  query {
+    list: getActiveProjects {
+      id
+      description
+    }
+  }
+`;
+
 interface IProps {
   hide: (hideProps: any) => void;
   record?: Schedule | null | undefined;
 }
 function UpsertScheduleType(props: IProps) {
   const { hide, record } = props;
+  const { loading, error, data: projects } = useQuery(GET_ACTIVE_PROJECTS);
 
   const [upsertSchedule, { loading: loadingUpsertSchedule }] = useMutation(
     ADD_DEPARTMENT_SCHEDULE,
@@ -58,7 +68,6 @@ function UpsertScheduleType(props: IProps) {
           message.error(
             data?.message ?? "Failed to create department schedule"
           );
-          hide(false);
         }
       },
     }
@@ -66,12 +75,11 @@ function UpsertScheduleType(props: IProps) {
 
   const onSubmit = (values: any) => {
     let payload = { ...values };
-    payload.dateTimeStart = dayjs(values.dateTimeStart);
-    payload.dateTimeEnd = dayjs(values.dateTimeEnd);
-    payload.mealBreakStart = dayjs(values.mealBreakStart);
-    payload.mealBreakEnd = dayjs(values.dateStart);
-    console.log(payload);
-    upsertSchedule({ variables: { fields: values, id: record?.id } });
+    payload.dateTimeStartRaw = dayjs(values.dateTimeStartRaw).millisecond(0);
+    payload.dateTimeEndRaw = dayjs(values.dateTimeEndRaw).millisecond(0);
+    payload.mealBreakStart = dayjs(values.mealBreakStart).millisecond(0);
+    payload.mealBreakEnd = dayjs(values.mealBreakEnd).millisecond(0);
+    upsertSchedule({ variables: { fields: payload, id: record?.id } });
   };
   return (
     <Modal
@@ -108,6 +116,7 @@ function UpsertScheduleType(props: IProps) {
           mealBreakStart:
             record?.mealBreakStart && dayjs(record?.mealBreakStart),
           mealBreakEnd: record?.mealBreakEnd && dayjs(record?.mealBreakEnd),
+          project_id: record?.project?.id,
         }}
       >
         <Row gutter={[8, 0]}>
@@ -128,6 +137,21 @@ function UpsertScheduleType(props: IProps) {
               label="Label"
               propsinput={{
                 placeholder: "Label",
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormSelect
+              name="project_id"
+              label="Project"
+              rules={requiredField}
+              propsselect={{
+                options: projects?.list?.map((item: any) => ({
+                  value: item.id,
+                  label: item.description,
+                })),
+                allowClear: true,
+                placeholder: "Select Project",
               }}
             />
           </Col>

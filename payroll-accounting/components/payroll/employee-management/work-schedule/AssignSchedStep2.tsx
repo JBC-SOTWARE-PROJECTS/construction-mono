@@ -25,7 +25,7 @@ function AssignSchedStep2({ selectedDates, handleSelectDate }: IProps) {
                 className="custom_calender"
                 fullscreen={false}
                 onSelect={handleSelectDate}
-                dateFullCellRender={(date) => {
+                dateCellRender={(date) => {
                   const style = selectedDates?.includes(
                     date.startOf("day").format()
                   )

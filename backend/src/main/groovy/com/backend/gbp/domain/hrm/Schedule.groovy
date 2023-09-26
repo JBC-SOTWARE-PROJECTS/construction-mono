@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.hrm
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.*
 import javax.persistence.Table
@@ -64,5 +65,10 @@ class Schedule extends AbstractAuditingEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company", referencedColumnName = "id")
 	CompanySettings company
-	
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project", referencedColumnName = "id")
+	Projects project
+
 }

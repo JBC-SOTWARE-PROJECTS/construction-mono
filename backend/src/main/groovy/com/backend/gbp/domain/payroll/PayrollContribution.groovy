@@ -22,15 +22,15 @@ class PayrollContribution extends  PayrollAuditingEntity implements Serializable
 
     @GraphQLQuery
     @Column(name = "is_active_phic", columnDefinition = "boolean")
-    Boolean isActivePHIC
+    Boolean isActivePHIC = true
 
     @GraphQLQuery
     @Column(name = "is_active_sss", columnDefinition = "boolean")
-    Boolean isActiveSSS
+    Boolean isActiveSSS = true
 
     @GraphQLQuery
     @Column(name = "is_active_hdmf", columnDefinition = "boolean")
-    Boolean isActiveHDMF
+    Boolean isActiveHDMF = true
 
 
     @OneToMany(mappedBy = "contribution", cascade = CascadeType.ALL)

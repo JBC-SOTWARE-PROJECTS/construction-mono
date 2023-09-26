@@ -9,10 +9,11 @@ interface IProps {
   dataSource: Employee[];
   loading?: boolean;
   totalElements: number;
-  handleOpen: (record: CompanySettings) => void;
+  handleOpen?: (record: CompanySettings) => void;
   changePage?: (page: number) => void;
   rowSelection?: TableRowSelection<Employee>;
   hideExtraColumns?: boolean;
+  additionalColumns?: ColumnsType<Employee>;
 }
 
 export default function EmployeeTable({
@@ -23,6 +24,7 @@ export default function EmployeeTable({
   changePage,
   rowSelection,
   hideExtraColumns = false,
+  additionalColumns,
 }: IProps) {
   const router = useRouter();
 
@@ -87,6 +89,7 @@ export default function EmployeeTable({
       key: "gender",
     },
     ...(!hideExtraColumns ? extraColumns : []),
+    ...(additionalColumns ? additionalColumns : []),
   ];
 
   return (

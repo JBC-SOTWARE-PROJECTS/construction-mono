@@ -1,3 +1,4 @@
+import { IState } from "@/routes/administrative/Employees";
 import { OptionsValue } from "@/utility/interfaces";
 import { QueryHookOptions, gql, useQuery } from "@apollo/client";
 import React, { useState } from "react";
@@ -30,14 +31,23 @@ const GET_RECORDS = gql`
   }
 `;
 
-interface FiltersData {
-  office: OptionsValue[];
-  position: OptionsValue[];
-}
-
+const initialState: IState = {
+  filter: "",
+  status: true,
+  page: 0,
+  size: 10,
+  office: null,
+  position: null,
+};
 const useGetEmployeesByFilter = (props: QueryHookOptions) => {
+  const [filter, setFilters] = useState(initialState);
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
-    variables: props.variables,
+    variables: {
+      filter: filter.filter,
+      status: filter.status,
+      office: filter.office,
+      position: filter.position,
+    },
     fetchPolicy: "network-only",
     ...props,
     onCompleted: (res) => {
@@ -46,7 +56,7 @@ const useGetEmployeesByFilter = (props: QueryHookOptions) => {
       }
     },
   });
-  return [data?.list, loading, refetch];
+  return [data?.list, loading, setFilters, refetch];
 };
 
 export default useGetEmployeesByFilter;

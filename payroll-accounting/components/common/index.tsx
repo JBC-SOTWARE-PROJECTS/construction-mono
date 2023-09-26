@@ -10,6 +10,7 @@ export { default as FormSwitch } from "./formSwitch/formSwitch";
 export { default as FormTextArea } from "./formTextArea/formTextArea";
 export { default as FormDateRange } from "./formDateRange/filterDateRange";
 export { default as FormCheckBoxGroup } from "./formCheckBoxGroup";
+export { default as FormDatePicker } from "./formDatePicker/formDatePicker";
 export { default as FullScreenModal } from "./fullScreenModal/fullScreenModal";
 export { default as FormSegment } from "./formSegment";
 export { default as FormDatePicker } from "./formDatePicker/formDatePicker";
