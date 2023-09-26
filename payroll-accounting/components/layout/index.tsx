@@ -15,11 +15,11 @@ import {
   Dropdown,
   Empty,
   Modal,
+  App,
 } from "antd";
 import theme from "@/theme/themeConfig";
 import { IUserEmployee } from "@/utility/interfaces";
 import { useRouter } from "next/router";
-import defaultProps from "@/components/sidebar/_defaultProps";
 import CircularProgress from "../circularProgress";
 import useLogout from "@/hooks/useLogout";
 import enUS from "antd/locale/en_US";
@@ -39,7 +39,7 @@ const DiverseTradeLayout = (props: IProps) => {
   const logOut = useLogout();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [mobile, setMobile] = useState(false);
+  // const [mobile, setMobile] = useState(false);
 
   const routerSplit = router.pathname.split("/");
   const modulePath = routerSplit[1];
@@ -256,16 +256,18 @@ const DiverseTradeLayout = (props: IProps) => {
               </div>
             )}
             {...settings}>
-            {children}
-            <Drawer
-              title="App Notifications"
-              placement="right"
-              closable={false}
-              onClose={onClose}
-              open={open}
-              key="right">
-              <Empty />
-            </Drawer>
+            <App>
+              {children}
+              <Drawer
+                title="App Notifications"
+                placement="right"
+                closable={false}
+                onClose={onClose}
+                open={open}
+                key="right">
+                <Empty />
+              </Drawer>
+            </App>
           </ProLayout>
         </ConfigProvider>
       </ProConfigProvider>

@@ -77,6 +77,16 @@ class OfficeService {
 
     }
 
+    @GraphQLQuery(name = "officePageList", description = "Search Offices")
+    Page<Office> officePageList(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "pageSize") Integer size
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        officeRepository.officeCompanyPage(filter, company, new PageRequest(page, size, Sort.Direction.ASC, "officeCode"))
+    }
+
     @GraphQLQuery(name = "officeById", description = "Get Office By Id")
     Office findById(@GraphQLArgument(name = "id") UUID id) {
         return id ? officeRepository.findById(id).get() : null

@@ -362,3 +362,61 @@ th.ant-table-cell {
   justify-content: flex-start;
   align-items: center;
 }
+
+.list-icon-custom {
+  display: none;
+
+  @media only screen and (min-width: 606px) {
+    display: block;
+  }
+}
+
+.list-margin-left {
+  padding-left: 0;
+
+  @media only screen and (min-width: 838px) {
+    padding-left: 80px;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.fullscreen-modal {
+  max-width: 100% !important;
+}
+
+.supplier-info-descriptions
+  > .ant-descriptions-view
+  > table
+  > tbody
+  > .ant-descriptions-row
+  > td {
+  padding-bottom: 0px !important;
+}
+
+.text-red {
+  color: red;
+}
+
+.text-blue {
+  color: blue;
+}
+
+.text-green {
+  color: green;
+}
+
+.text-orange {
+  color: orange;
+}
+
+.text-gray {
+  color: #767676;
+}
+
+.virtual-table .ant-table-container:before,
+.virtual-table .ant-table-container:after {
+  display: none;
+}

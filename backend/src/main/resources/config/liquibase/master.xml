@@ -277,4 +277,18 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/15_michael_payroll_contributions_roles_and_permissions.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="classpath:config/liquibase/changelog4/16_wilson_accounts_payables.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/17_wilson_accounts_payables_transaction.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/18_wilson_accounts_payables_details.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/19_alter_supplier_added_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/20_wilson_expense_transaction_type.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/21_wilson_bankaccounts.sql"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

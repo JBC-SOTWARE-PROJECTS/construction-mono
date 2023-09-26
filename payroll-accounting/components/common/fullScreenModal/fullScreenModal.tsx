@@ -52,8 +52,7 @@ const FullScreenModal = ({
       width={width}
       style={style}
       onCancel={() => hide(false)}
-      {...props}
-    >
+      {...props}>
       {children}
     </Modal>
   );
