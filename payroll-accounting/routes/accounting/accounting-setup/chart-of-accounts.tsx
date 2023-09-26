@@ -1,55 +1,65 @@
 import ChartOfAccountTabPane from '@/components/accounting/accounting-setup/chartOfAccountTabPane'
 import CreateSubAccount from '@/components/accounting/accounting-setup/createSubAccount'
-import { ParentAccount, Query, SubAccountSetup } from '@/graphql/gql/graphql'
+import {
+  ChartOfAccountGenerate,
+  ParentAccount,
+  Query,
+  SubAccountSetup,
+} from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
 import { PageContainer } from '@ant-design/pro-components'
 import { gql, useQuery } from '@apollo/client'
 import { Button, Tabs } from 'antd'
 
-const SUB_ACCOUNT = gql`
-  query ($filter: String, $accountCategory: AccountCategory) {
-    subAccountByAccountType(
-      filter: $filter
+const CHART_OF_ACCOUNT = gql`
+  query (
+    $accountCategory: String
+    $accountType: String
+    $motherAccountCode: String
+    $accountName: String
+    $subaccountType: String
+    $department: String
+    $excludeMotherAccount: Boolean
+  ) {
+    getAllChartOfAccountGenerate(
+      accountType: $accountType
+      motherAccountCode: $motherAccountCode
+      accountName: $accountName
+      subaccountType: $subaccountType
+      department: $department
       accountCategory: $accountCategory
+      excludeMotherAccount: $excludeMotherAccount
     ) {
-      id
-      subaccountCode
+      code
       accountName
-      description
-      subaccountType
+      accountType
       accountCategory
-      parentAccount {
-        id
-        accountName
-        description
-      }
-      sourceDomain
     }
   }
 `
 
 export default function SubAccount() {
-  const { data, loading, refetch } = useQuery<Query>(SUB_ACCOUNT, {
+  const { data, loading, refetch } = useQuery<Query>(CHART_OF_ACCOUNT, {
     variables: {
-      filter: '',
+      accountType: null,
+      motherAccountCode: null,
+      accountName: '',
+      subaccountType: null,
+      department: null,
       accountCategory: null,
+      excludeMotherAccount: true,
     },
   })
 
-  const dataSource = data?.subAccountByAccountType || []
+  const dataSource = data?.getAllChartOfAccountGenerate || []
 
   const createDialog = useDialog(CreateSubAccount)
 
-  const onHandleSearch = (filter: string) => {
-    refetch({ filter, page: 0 })
+  const onHandleSearch = (accountName: string) => {
+    refetch({ accountName, page: 0 })
   }
 
-  const onHandleClickCreateEdit = (record?: SubAccountSetup) => {
-    createDialog(
-      { record: { ...record, parentAccount: record?.parentAccount?.id } },
-      () => refetch()
-    )
-  }
+  const onHandleClickCreateEdit = (record?: ChartOfAccountGenerate) => {}
 
   const onHandleChangeTab = (activeKey: string) => {
     if (activeKey == 'all') refetch({ accountCategory: null, page: 0 })
@@ -67,15 +77,6 @@ export default function SubAccount() {
     <PageContainer
       title='Chart of Accounts'
       content='Overview of Chart of Accounts.'
-      extra={[
-        <Button
-          key='add-fiscal'
-          type='primary'
-          onClick={() => onHandleClickCreateEdit()}
-        >
-          Add Sub-Account
-        </Button>,
-      ]}
     >
       <Tabs
         onChange={(activeKey) => onHandleChangeTab(activeKey)}

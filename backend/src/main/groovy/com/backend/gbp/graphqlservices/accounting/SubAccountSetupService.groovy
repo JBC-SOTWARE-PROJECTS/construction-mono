@@ -43,13 +43,19 @@ class CoaComponentContainer implements Serializable{
     UUID id
 
     @GraphQLQuery
-    String description
+    String accountName
 
     @GraphQLQuery
     String domain
 
     @GraphQLQuery
     String normalSide // DEBIT/CREDIT applicable to Mother account only
+
+    @GraphQLQuery
+    String accountType
+
+    @GraphQLQuery
+    String accountCategory
 }
 
 @Canonical
@@ -74,17 +80,17 @@ class ChartOfAccountGenerate implements Serializable{
         return concat
     }
 
-    String description
-    String getDescription(){
+    String accountName
+    String getAccountName(){
 
         String concat = ""
-        concat = StringUtils.defaultIfEmpty(motherAccount?.description,"")
+        concat = StringUtils.defaultIfEmpty(motherAccount?.accountName,"")
 
-        if(subAccount?.description)
-        concat += "-" + subAccount?.description?:""
+        if(subAccount?.accountName)
+        concat += "-" + subAccount?.accountName?:""
 
-        if(subSubAccount?.description)
-        concat += "-" + subSubAccount?.description?:""
+        if(subSubAccount?.accountName)
+        concat += "-" + subSubAccount?.accountName?:""
 
         return concat
     }
@@ -115,17 +121,19 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     List<ChartOfAccountGenerate> getAllChartOfAccountGenerate(
             @GraphQLArgument(name = "accountType")    String accountType,
             @GraphQLArgument(name = "motherAccountCode")  String motherAccountCode,
-            @GraphQLArgument(name = "description") String description,
+            @GraphQLArgument(name = "accountName") String accountName,
             @GraphQLArgument(name = "subaccountType") String subaccountType,
             @GraphQLArgument(name = "department") String department,
+            @GraphQLArgument(name = "accountCategory") String accountCategory,
             @GraphQLArgument(name = "excludeMotherAccount") Boolean excludeMotherAccount=false
     ) { // department flatten code
 
        def a =  chartofAccountGenerator.getAllChartOfAccountGenerate(accountType,
         motherAccountCode,
-        description,
+        accountName,
         subaccountType,
         department,
+        accountCategory,
         excludeMotherAccount)
 
         /*
@@ -231,7 +239,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
 
     @GraphQLQuery(name = "getSetupBySubAccountTypeAll")
     List<SubAccountSetup> getSetupBySubAccountTypeAll() {
-        createQuery("Select sub from SubAccountSetup sub  where coalesce(sub.attrInactive,false) = false   order by sub.description, sub.createdDate",
+        createQuery("Select sub from SubAccountSetup sub  where coalesce(sub.isInactive,false) = false   order by sub.description, sub.createdDate",
                 [:])
                 .resultList
     }
@@ -261,7 +269,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     }
 
     List<SubAccountSetup> getActiveSubAccount( ) {
-        createQuery("Select sub from SubAccountSetup sub  where (sub.attrInactive is null or sub.attrInactive=false)  order by sub.subaccountCode, sub.createdDate",[:])
+        createQuery("Select sub from SubAccountSetup sub  where (sub.isInactive is null or sub.isInactive=false)  order by sub.subaccountCode, sub.createdDate",[:])
                 .resultList
     }
 

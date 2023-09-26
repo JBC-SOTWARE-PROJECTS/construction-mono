@@ -1,18 +1,18 @@
-import { Maybe, SubAccountSetup } from '@/graphql/gql/graphql'
+import { ChartOfAccountGenerate, Maybe } from '@/graphql/gql/graphql'
 import { gql, useQuery } from '@apollo/client'
 import { Button, Input, Pagination, Space, Table, Typography } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { AccountCategory, AccountType } from '../enum/parentAccountEnum'
 
 interface ChartOfAccountTabPaneI {
-  dataSource: never[] | Maybe<SubAccountSetup>[] | null | undefined
+  dataSource: never[] | Maybe<ChartOfAccountGenerate>[] | null | undefined
   loading: boolean
-  onHandleClickCreateEdit: (record?: SubAccountSetup) => void
+  onHandleClickCreateEdit: (record?: ChartOfAccountGenerate) => void
   onHandleSearch: (filter: string) => void
 }
 
 export default function ChartOfAccountTabPane(props: ChartOfAccountTabPaneI) {
-  const columns: ColumnsType<SubAccountSetup> = [
+  const columns: ColumnsType<ChartOfAccountGenerate> = [
     {
       title: 'Code',
       dataIndex: 'code',
@@ -30,14 +30,14 @@ export default function ChartOfAccountTabPane(props: ChartOfAccountTabPaneI) {
       dataIndex: 'accountCategory',
       key: 'accountCategory',
       width: 150,
-      // render: (text) => AccountCategory[text as keyof typeof AccountCategory],
+      render: (text) => AccountCategory[text as keyof typeof AccountCategory],
     },
     {
       title: 'Type',
       dataIndex: 'accountType',
       key: 'accountType',
       width: 150,
-      // render: (text) => AccountType[text as keyof typeof AccountType].label,
+      render: (text) => AccountType[text as keyof typeof AccountType].label,
     },
   ]
 
@@ -50,8 +50,8 @@ export default function ChartOfAccountTabPane(props: ChartOfAccountTabPaneI) {
             onSearch={(e) => props?.onHandleSearch(e)}
           />
         )}
-        rowKey='id'
-        dataSource={props?.dataSource as SubAccountSetup[]}
+        rowKey='code'
+        dataSource={props?.dataSource as ChartOfAccountGenerate[]}
         columns={columns}
         size='small'
         loading={props?.loading}

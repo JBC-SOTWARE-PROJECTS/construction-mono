@@ -246,9 +246,9 @@ export type ChargeItemsDto = {
 export type ChartOfAccountGenerate = {
   __typename?: 'ChartOfAccountGenerate';
   accountCategory?: Maybe<Scalars['String']['output']>;
+  accountName?: Maybe<Scalars['String']['output']>;
   accountType?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   fromGenerator?: Maybe<Scalars['Boolean']['output']>;
   motherAccount?: Maybe<CoaComponentContainer>;
   subAccount?: Maybe<CoaComponentContainer>;
@@ -266,8 +266,10 @@ export type City = {
 
 export type CoaComponentContainer = {
   __typename?: 'CoaComponentContainer';
+  accountCategory?: Maybe<Scalars['String']['output']>;
+  accountName?: Maybe<Scalars['String']['output']>;
+  accountType?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   normalSide?: Maybe<Scalars['String']['output']>;
@@ -966,12 +968,12 @@ export type Item = {
 
 export type ItemCategory = {
   __typename?: 'ItemCategory';
+  accountName?: Maybe<Scalars['String']['output']>;
   categoryCode?: Maybe<Scalars['String']['output']>;
   categoryDescription?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
@@ -6297,19 +6299,19 @@ export type SubAccountSetup = {
 
 export type Subaccountable = {
   __typename?: 'Subaccountable';
+  accountName?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
 };
 
 export type Supplier = {
   __typename?: 'Supplier';
+  accountName?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   creditLimit?: Maybe<Scalars['BigDecimal']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;

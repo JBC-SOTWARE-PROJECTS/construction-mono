@@ -121,7 +121,7 @@ class Supplier extends AbstractAuditingEntity implements Serializable, Subaccoun
 	}
 
 	@Override
-	String getDescription() {
+	String getAccountName() {
 		return supplierFullname
 	}
 

@@ -144,6 +144,7 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 				if (forInsert) {
 					entity.company = SecurityUtils.currentCompany()
 					entity.accountCategory = entity.accountType.category.name().toString()
+					entity.normalSide = entity.accountType.normalSide.name().toString()
 				}
 			})
 			return  new GraphQLRetVal<ParentAccount>(parentAccount,true,'Your changes have been saved.')

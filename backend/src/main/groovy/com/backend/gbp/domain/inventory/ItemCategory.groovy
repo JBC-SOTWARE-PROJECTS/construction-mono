@@ -53,7 +53,7 @@ class ItemCategory extends AbstractAuditingEntity implements Serializable, Subac
 	}
 
 	@Override
-	String getDescription() {
+	String getAccountName() {
 		return categoryDescription
 	}
 
