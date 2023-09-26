@@ -82,22 +82,6 @@ export type AccountTypeDto = {
   options?: Maybe<Array<Maybe<OptionDto>>>;
 };
 
-export type AccumulatedLogsDto = {
-  __typename?: 'AccumulatedLogsDto';
-  date?: Maybe<Scalars['Instant']['output']>;
-  hours?: Maybe<HoursLog>;
-  inTime?: Maybe<Scalars['Instant']['output']>;
-  isError?: Maybe<Scalars['Boolean']['output']>;
-  isLeave?: Maybe<Scalars['Boolean']['output']>;
-  isRestDay?: Maybe<Scalars['Boolean']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
-  outTime?: Maybe<Scalars['Instant']['output']>;
-  projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
-  scheduleEnd?: Maybe<Scalars['Instant']['output']>;
-  scheduleStart?: Maybe<Scalars['Instant']['output']>;
-  scheduleTitle?: Maybe<Scalars['String']['output']>;
-};
-
 export type AccountsPayable = {
   __typename?: 'AccountsPayable';
   apCategory?: Maybe<Scalars['String']['output']>;
@@ -229,6 +213,22 @@ export type AccountsPayableInput = {
   vatAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
   vatInclusive?: InputMaybe<Scalars['Boolean']['input']>;
   vatRate?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
+export type AccumulatedLogsDto = {
+  __typename?: 'AccumulatedLogsDto';
+  date?: Maybe<Scalars['Instant']['output']>;
+  hours?: Maybe<HoursLog>;
+  inTime?: Maybe<Scalars['Instant']['output']>;
+  isError?: Maybe<Scalars['Boolean']['output']>;
+  isLeave?: Maybe<Scalars['Boolean']['output']>;
+  isRestDay?: Maybe<Scalars['Boolean']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  outTime?: Maybe<Scalars['Instant']['output']>;
+  projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
+  scheduleEnd?: Maybe<Scalars['Instant']['output']>;
+  scheduleStart?: Maybe<Scalars['Instant']['output']>;
+  scheduleTitle?: Maybe<Scalars['String']['output']>;
 };
 
 export type ApTransaction = {
@@ -1146,6 +1146,7 @@ export type HoursLog = {
   regularDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
   regularHoliday?: Maybe<Scalars['BigDecimal']['output']>;
   regularSpecialHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  totalRegularHours?: Maybe<Scalars['BigDecimal']['output']>;
   underTime?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
@@ -1697,10 +1698,10 @@ export type Mutation = {
   upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
   /** create or update schedule config. */
   upsertEmployeeSchedule?: Maybe<GraphQlResVal_String>;
-  /** insert TransType */
-  upsertExTransType?: Maybe<GraphQlRetVal_Boolean>;
   /** Create or edit event calendar. */
   upsertEventCalendar?: Maybe<GraphQlRetVal_EventCalendar>;
+  /** insert TransType */
+  upsertExTransType?: Maybe<GraphQlRetVal_Boolean>;
   upsertFiscal?: Maybe<Fiscal>;
   upsertGenerics?: Maybe<Generic>;
   upsertGroupPolicy?: Maybe<GroupPolicy>;
@@ -4660,9 +4661,9 @@ export type Query = {
   jobStatusAll?: Maybe<Array<Maybe<JobStatus>>>;
   jobStatusList?: Maybe<Array<Maybe<JobStatus>>>;
   jobTypeUnits?: Maybe<ItemJobsDto>;
+  ledgerView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
   /** Filter Event Calendar between two dates. */
   mapEventsToDates?: Maybe<Scalars['Map_String_List_EventCalendarScalar']['output']>;
-  ledgerView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
   monById?: Maybe<PurchaseOrderItemsMonitoring>;
   motherAccountsListWithNoSetup?: Maybe<Array<Maybe<ParentAccount>>>;
   mpByFiltersPage?: Maybe<Page_MaterialProduction>;
@@ -5335,12 +5336,6 @@ export type QueryGetContributionByPayrollIdArgs = {
 
 
 /** Query root */
-export type QueryGetContributionByPayrollIdArgs = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Query root */
 export type QueryGetContributionEmployeesByPayrollIdArgs = {
   department?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
@@ -5807,15 +5802,15 @@ export type QueryJobStatusListArgs = {
 
 
 /** Query root */
-export type QueryMapEventsToDatesArgs = {
-  endDate?: InputMaybe<Scalars['Instant']['input']>;
-  startDate?: InputMaybe<Scalars['Instant']['input']>;
+export type QueryLedgerViewArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
 /** Query root */
-export type QueryLedgerViewArgs = {
-  id?: InputMaybe<Scalars['UUID']['input']>;
+export type QueryMapEventsToDatesArgs = {
+  endDate?: InputMaybe<Scalars['Instant']['input']>;
+  startDate?: InputMaybe<Scalars['Instant']['input']>;
 };
 
 
