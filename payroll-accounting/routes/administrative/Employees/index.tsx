@@ -1,6 +1,7 @@
 import EmployeeTable from "@/components/administrative/employees/EmployeeTable";
+import EmployeeFilter from "@/components/common/EmployeeFilter";
 import { Employee } from "@/graphql/gql/graphql";
-import { useGetEmployeesByFilter, useGetFilters } from "@/hooks/employee";
+import { useGetEmployeesByFilter } from "@/hooks/employee";
 import { IPageProps } from "@/utility/interfaces";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import {
@@ -8,11 +9,9 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Button, Input, Select } from "antd";
+import { Button, Input } from "antd";
 import { useRouter } from "next/router";
-import { useState } from "react";
 
-const { Search } = Input;
 export const filterOptions = [
   {
     value: null,
@@ -39,26 +38,9 @@ export interface IState {
   position: string | null;
 }
 
-const initialState: IState = {
-  filter: "",
-  status: true,
-  page: 0,
-  size: 10,
-  office: null,
-  position: null,
-};
-
 export default function EmployeesPage({ account }: IPageProps) {
-  const [state, setState] = useState(initialState);
   const router = useRouter();
-  const [filterData] = useGetFilters();
-  const [data, loading, refetch] = useGetEmployeesByFilter({
-    variables: {
-      filter: state.filter,
-      status: state.status,
-      office: state.office,
-      position: state.position,
-    },
+  const [data, loading, setFilters] = useGetEmployeesByFilter({
     fetchPolicy: "network-only",
   });
 
@@ -79,42 +61,7 @@ export default function EmployeesPage({ account }: IPageProps) {
           headerBordered
           extra={
             <ProFormGroup>
-              <Search
-                size="middle"
-                placeholder="Search here.."
-                onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-                className="select-header"
-              />
-              <Select
-                allowClear
-                style={{ width: 170 }}
-                placeholder="Office"
-                defaultValue={null}
-                onChange={(value) => {
-                  setState({ ...state, status: value });
-                }}
-                options={filterOptions}
-              />
-              <Select
-                allowClear
-                style={{ width: 170 }}
-                placeholder="Office"
-                defaultValue={null}
-                onChange={(value) => {
-                  setState({ ...state, office: value });
-                }}
-                options={filterData?.office}
-              />
-              <Select
-                allowClear
-                style={{ width: 170 }}
-                placeholder="Position"
-                defaultValue={null}
-                onChange={(value) => {
-                  setState({ ...state, position: value });
-                }}
-                options={filterData.position}
-              />
+              <EmployeeFilter setFilters={setFilters} />
               <Button
                 type="primary"
                 onClick={onAddEmployee}
@@ -125,13 +72,14 @@ export default function EmployeesPage({ account }: IPageProps) {
             </ProFormGroup>
           }
         >
-          {/* <EmployeeList emplist={data} onUpdateStatus={() => {}} /> */}
           <EmployeeTable
             dataSource={data as Employee[]}
-            loading={false}
+            loading={loading}
             totalElements={1 as number}
             handleOpen={(record) => console.log("record => ", record)}
-            changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
+            changePage={(page) =>
+              setFilters((prev: any) => ({ ...prev, page: page }))
+            }
           />
         </ProCard>
       }

@@ -2,12 +2,16 @@ package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.Authority
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.User
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeSchedule
 import com.backend.gbp.domain.hrm.Schedule
 import com.backend.gbp.domain.hrm.ScheduleLock
+import com.backend.gbp.domain.hrm.dto.ScheduleDto
+import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.CompanySettingsService
+import com.backend.gbp.graphqlservices.projects.ProjectService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.*
@@ -45,7 +49,7 @@ class EmployeeScheduleDto {
     String fullName
     String position
     UUID employeeId
-    Map<String, List<Map<String, Object>>> schedule
+    Map<String, List<ScheduleDto>> schedule
 }
 
 class EmployeeScheduleDetailsDto {
@@ -56,6 +60,7 @@ class EmployeeScheduleDetailsDto {
     String dateString
     EmployeeSchedule regularSchedule
     EmployeeSchedule overtimeSchedule
+    Projects project
 }
 
 @TypeChecked
@@ -80,6 +85,9 @@ class EmployeeScheduleService {
 
     @Autowired
     GeneratorService generatorService
+
+    @Autowired
+    ProjectService projectService
 
     @Autowired
     ObjectMapper objectMapper
@@ -119,21 +127,26 @@ class EmployeeScheduleService {
             employeeIds.push((it.id))
         }
 
-        Map<String, Map<String, List<Map<String, Object>>>> employeeMap = new HashMap<>() // Initialize employeeMap
 
         String formattedStringIds = "(${employeeIds.collect { "'${it.toString()}'" }.join(', ')})"
 
         List<Map<String, Object>> results = jdbcTemplate.queryForList("""
-    Select e.id, concat(e.first_name, ' ', e.last_name) as full_name, s.id as schedule_id, s.*  from hrm.employee_schedule s
+    Select e.id as emp_id, concat(e.first_name, ' ', e.last_name) as full_name, s.id , s.*  from hrm.employee_schedule s
     left join hrm.employees e on e.id = s.employee
     where s.employee in ${formattedStringIds}
     AND s.date_time_start >= '${startDate.toString()}'
     AND s.date_time_start <= '${endDate.toString()}'
 
     """)
+        return transformEmployeeSchedule(results, employeeList)
 
+    }
+
+    List<EmployeeScheduleDto> transformEmployeeSchedule(List<Map<String, Object>> results, List<Employee> employeeList) {
+
+        Map<String, Map<String, List<ScheduleDto>>> employeeMap = new HashMap<>() // Initialize employeeMap
         results.each {
-            String empId = it['id'].toString()
+            String empId = it['emp_id'].toString()
             Timestamp timestamp = (Timestamp) it['date_time_start'];
             LocalDateTime dateTimeStart = timestamp.toLocalDateTime();
 
@@ -142,13 +155,15 @@ class EmployeeScheduleService {
             String date = formatter.format(dateTimeStart)
 
             if (!employeeMap.containsKey(empId)) {
-                Map<String, List<Map<String, Object>>> dateMap = new HashMap<>();  // Initialize dateMap
-                dateMap.put(date, [it]);  // Initialize the list with the current map
+                Map<String, List<ScheduleDto>> dateMap = new HashMap<>();  // Initialize dateMap
+                ScheduleDto scheduleDto = objectMapper.convertValue(it, ScheduleDto)
+                dateMap.put(date, [scheduleDto] as List<ScheduleDto>);
+                // Initialize the list with the current map
                 employeeMap.put(empId, dateMap);
             } else {
-                Map<String, List<Map<String, Object>>> dateMap = employeeMap.get(empId) as Map<String, List<Map<String, Object>>>;
-                List<Map<String, Object>> dateArr = dateMap.getOrDefault(date, []);
-                dateArr.add(it);
+                Map<String, List<ScheduleDto>> dateMap = employeeMap.get(empId) as Map<String, List<ScheduleDto>>;
+                List<ScheduleDto> dateArr = dateMap.getOrDefault(date, []);
+                dateArr.add(objectMapper.convertValue(it, ScheduleDto));
                 dateMap.put(date, dateArr);
             }
         }
@@ -157,7 +172,7 @@ class EmployeeScheduleService {
         List<EmployeeScheduleDto> employeeSchedules = []
         employeeList.each {
             EmployeeScheduleDto employee = new EmployeeScheduleDto()
-            Map<String, List<Map<String, Object>>> dateMap = employeeMap.get(it.id.toString()) as Map<String, List<Map<String, Object>>>;
+            Map<String, List<ScheduleDto>> dateMap = employeeMap.get(it.id.toString()) as Map<String, List<ScheduleDto>>;
 
             employee.id = it.id
             employee.schedule = dateMap
@@ -168,8 +183,9 @@ class EmployeeScheduleService {
 
         }
 
-        employeeSchedules
+        return employeeSchedules
     }
+
 
     @GraphQLQuery(name = "getEmployeeScheduleDetails", description = "Search employees")
     EmployeeScheduleDetailsDto getEmployeeScheduleDetails(
@@ -184,6 +200,7 @@ class EmployeeScheduleService {
         scheduleDetails.dateString = employeeSchedules[0].dateString
         scheduleDetails.fullName = employeeSchedules[0].employee.fullName
         scheduleDetails.position = employeeSchedules[0].employee.position.description
+        scheduleDetails.project = employeeSchedules[0].project
 
         employeeSchedules.each {
             if (it.isOvertime) scheduleDetails.overtimeSchedule = it
@@ -246,7 +263,7 @@ class EmployeeScheduleService {
                     employeeSchedule.employee = employee
                     employeeSchedule.company = company
                     employeeSchedule.dateString = date
-
+                    employeeSchedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
                     scheduleList.push(employeeSchedule)
 
                 }
@@ -266,7 +283,7 @@ class EmployeeScheduleService {
             employeeSchedule.dateString = (fields.get('dateTimeStart') as String).substring(0, 10)
             employeeSchedule.employee = employeeRepository.findById(employeeId).get()
             employeeSchedule.company = SecurityUtils.currentCompany()
-
+            employeeSchedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
             employeeScheduleRepository.save(employeeSchedule)
 
         }

@@ -23,6 +23,10 @@ const QUERY = gql`
         title
         isCustom
         dateString
+        project {
+          id
+          description
+        }
       }
       overtimeSchedule {
         id
@@ -37,6 +41,10 @@ const QUERY = gql`
         title
         isCustom
         dateString
+        project {
+          id
+          description
+        }
       }
     }
   }

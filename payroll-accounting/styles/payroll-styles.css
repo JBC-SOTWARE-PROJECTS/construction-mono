@@ -18,3 +18,19 @@
 .employee_schedule_table_cell:hover {
   cursor: pointer !important;
 }
+
+.events_calendar table tbody tr td div {
+  background-color: white !important;
+  color: black !important;
+  border-color: rgb(233, 233, 233) !important;
+}
+.events_calendar table tbody tr td div div div div.events_REGULAR {
+  background-color: #2db7f5 !important;
+}
+
+.events_calendar table tbody tr td div div div div.events_SPECIAL_NON_WORKING {
+  background-color: #87d068 !important;
+}
+.events_calendar table tbody tr td div div div div.events_NON_HOLIDAY {
+  background-color: #87d068 !important;
+}

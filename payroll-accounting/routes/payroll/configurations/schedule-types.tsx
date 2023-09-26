@@ -84,6 +84,11 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
       },
     },
     {
+      title: "Project",
+      dataIndex: ["project", "description"],
+      key: "project",
+    },
+    {
       title: "#",
       key: "action",
       width: 100,

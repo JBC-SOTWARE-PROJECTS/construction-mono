@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.hrm.Schedule
+import com.backend.gbp.graphqlservices.projects.ProjectService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.ScheduleTypeRepository
@@ -23,7 +24,8 @@ class ScheduleService {
     @Autowired
     ScheduleTypeRepository scheduleTypeRepository
 
-
+    @Autowired
+    ProjectService projectService
 
     @Autowired
     ObjectMapper objectMapper
@@ -57,12 +59,14 @@ class ScheduleService {
         if (id) {
             Schedule schedule = scheduleTypeRepository.findById(id).get()
             schedule = objectMapper.updateValue(schedule, fields)
+            schedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
             schedule.company = SecurityUtils.currentCompany()
             scheduleTypeRepository.save(schedule)
             return new GraphQLResVal<Schedule>(schedule, true, "Successfully updated department schedule.")
         } else {
             Schedule schedule = objectMapper.convertValue(fields, Schedule)
             schedule.company = SecurityUtils.currentCompany()
+            schedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
             scheduleTypeRepository.save(schedule)
             return new GraphQLResVal<Schedule>(schedule, true, "Successfully created department schedule")
         }

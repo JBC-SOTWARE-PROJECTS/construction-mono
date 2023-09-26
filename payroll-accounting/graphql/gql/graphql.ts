@@ -25,7 +25,9 @@ export type Scalars = {
   /** Long type */
   Long: { input: any; output: any; }
   /** Built-in scalar for map-like structures */
-  Map_String_List_Map_String_ObjectScalar: { input: any; output: any; }
+  Map_String_List_EventCalendarScalar: { input: any; output: any; }
+  /** Built-in scalar for map-like structures */
+  Map_String_List_ScheduleDtoScalar: { input: any; output: any; }
   /** Built-in scalar for map-like structures */
   Map_String_ObjectScalar: { input: any; output: any; }
   /** Built-in scalar for map-like structures */
@@ -60,6 +62,22 @@ export type AccountTypeDto = {
   __typename?: 'AccountTypeDto';
   label?: Maybe<Scalars['String']['output']>;
   options?: Maybe<Array<Maybe<OptionDto>>>;
+};
+
+export type AccumulatedLogsDto = {
+  __typename?: 'AccumulatedLogsDto';
+  date?: Maybe<Scalars['Instant']['output']>;
+  hours?: Maybe<HoursLog>;
+  inTime?: Maybe<Scalars['Instant']['output']>;
+  isError?: Maybe<Scalars['Boolean']['output']>;
+  isLeave?: Maybe<Scalars['Boolean']['output']>;
+  isRestDay?: Maybe<Scalars['Boolean']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  outTime?: Maybe<Scalars['Instant']['output']>;
+  projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
+  scheduleEnd?: Maybe<Scalars['Instant']['output']>;
+  scheduleStart?: Maybe<Scalars['Instant']['output']>;
+  scheduleTitle?: Maybe<Scalars['String']['output']>;
 };
 
 export type Assets = {
@@ -449,6 +467,26 @@ export type Employee = {
   zipCode?: Maybe<Scalars['String']['output']>;
 };
 
+export type EmployeeAttendance = {
+  __typename?: 'EmployeeAttendance';
+  additionalNote?: Maybe<Scalars['String']['output']>;
+  attendance_time?: Maybe<Scalars['Instant']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dateString?: Maybe<Scalars['String']['output']>;
+  employee?: Maybe<Employee>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isIgnored?: Maybe<Scalars['Boolean']['output']>;
+  isManual?: Maybe<Scalars['Boolean']['output']>;
+  isTransfer?: Maybe<Scalars['Boolean']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  originalType?: Maybe<Scalars['String']['output']>;
+  original_attendance_time?: Maybe<Scalars['Instant']['output']>;
+  project?: Maybe<Projects>;
+  type?: Maybe<Scalars['String']['output']>;
+};
+
 export type EmployeeInput = {
   barangay?: InputMaybe<Scalars['String']['input']>;
   basicSalary?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -519,7 +557,9 @@ export type EmployeeSchedule = {
   locked?: Maybe<Scalars['Boolean']['output']>;
   mealBreakEnd?: Maybe<Scalars['Instant']['output']>;
   mealBreakStart?: Maybe<Scalars['Instant']['output']>;
+  project?: Maybe<Projects>;
   request?: Maybe<Scalars['UUID']['output']>;
+  scheduleDuration?: Maybe<Scalars['BigDecimal']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   withPay?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -532,6 +572,7 @@ export type EmployeeScheduleDetailsDto = {
   id?: Maybe<Scalars['UUID']['output']>;
   overtimeSchedule?: Maybe<EmployeeSchedule>;
   position?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<Projects>;
   regularSchedule?: Maybe<EmployeeSchedule>;
 };
 
@@ -541,7 +582,7 @@ export type EmployeeScheduleDto = {
   fullName?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   position?: Maybe<Scalars['String']['output']>;
-  schedule?: Maybe<Scalars['Map_String_List_Map_String_ObjectScalar']['output']>;
+  schedule?: Maybe<Scalars['Map_String_List_ScheduleDtoScalar']['output']>;
 };
 
 export type Endorsement = {
@@ -667,6 +708,21 @@ export type EndorsementInput = {
   wiperRH?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type EventCalendar = {
+  __typename?: 'EventCalendar';
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  endDate?: Maybe<Scalars['Instant']['output']>;
+  fixed?: Maybe<Scalars['String']['output']>;
+  holidayType?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  startDate?: Maybe<Scalars['Instant']['output']>;
+};
+
 export type Fiscal = {
   __typename?: 'Fiscal';
   active?: Maybe<Scalars['Boolean']['output']>;
@@ -711,6 +767,14 @@ export type GenericInput = {
   genericDescription?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type GraphQlResVal_EmployeeAttendance = {
+  __typename?: 'GraphQLResVal_EmployeeAttendance';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<EmployeeAttendance>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
 };
 
 export type GraphQlResVal_Page_PayrollEmployeeContributionDto = {
@@ -765,6 +829,14 @@ export type GraphQlRetVal_Boolean = {
   __typename?: 'GraphQLRetVal_Boolean';
   message?: Maybe<Scalars['String']['output']>;
   payload?: Maybe<Scalars['Boolean']['output']>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlRetVal_EventCalendar = {
+  __typename?: 'GraphQLRetVal_EventCalendar';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<EventCalendar>;
   returnId?: Maybe<Scalars['UUID']['output']>;
   success: Scalars['Boolean']['output'];
 };
@@ -854,6 +926,23 @@ export type HdmfContribution = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   maxAmount?: Maybe<Scalars['BigDecimal']['output']>;
   minAmount?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type HoursLog = {
+  __typename?: 'HoursLog';
+  absent?: Maybe<Scalars['BigDecimal']['output']>;
+  late?: Maybe<Scalars['BigDecimal']['output']>;
+  overtime?: Maybe<Scalars['BigDecimal']['output']>;
+  overtimeDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  overtimeHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  overtimeSpecialHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  project?: Maybe<Scalars['UUID']['output']>;
+  projectName?: Maybe<Scalars['String']['output']>;
+  regular?: Maybe<Scalars['BigDecimal']['output']>;
+  regularDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  regularHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  regularSpecialHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  underTime?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type InputStream = {
@@ -1306,6 +1395,9 @@ export type Mutation = {
   deleteBillingItem?: Maybe<BillingItem>;
   /** Delete one department schedule config. */
   deleteDepartmentSchedule?: Maybe<GraphQlRetVal_String>;
+  deleteEmployeeAttendance?: Maybe<GraphQlRetVal_String>;
+  /** Delete one event calender. */
+  deleteEventCalendar?: Maybe<GraphQlRetVal_String>;
   deletePayroll?: Maybe<GraphQlResVal_String>;
   directExpenseMaterials?: Maybe<GraphQlRetVal_Boolean>;
   employeeUpdateStatus?: Maybe<Employee>;
@@ -1386,8 +1478,11 @@ export type Mutation = {
   upsertCompany?: Maybe<CompanySettings>;
   upsertCustomer?: Maybe<Customer>;
   upsertEmployee?: Maybe<Employee>;
+  upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
   /** create or update schedule config. */
   upsertEmployeeSchedule?: Maybe<GraphQlResVal_String>;
+  /** Create or edit event calendar. */
+  upsertEventCalendar?: Maybe<GraphQlRetVal_EventCalendar>;
   upsertFiscal?: Maybe<Fiscal>;
   upsertGenerics?: Maybe<Generic>;
   upsertGroupPolicy?: Maybe<GroupPolicy>;
@@ -1602,6 +1697,18 @@ export type MutationDeleteBillingItemArgs = {
 
 /** Mutation root */
 export type MutationDeleteDepartmentScheduleArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteEmployeeAttendanceArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteEventCalendarArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -2114,6 +2221,15 @@ export type MutationUpsertEmployeeArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertEmployeeAttendanceArgs = {
+  employee?: InputMaybe<Scalars['UUID']['input']>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  project_id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertEmployeeScheduleArgs = {
   dates?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
@@ -2121,6 +2237,13 @@ export type MutationUpsertEmployeeScheduleArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   isOverTime?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertEventCalendarArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -2779,6 +2902,25 @@ export type Page_Billing = {
 export type Page_CompanySettings = {
   __typename?: 'Page_CompanySettings';
   content?: Maybe<Array<Maybe<CompanySettings>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_EmployeeAttendance = {
+  __typename?: 'Page_EmployeeAttendance';
+  content?: Maybe<Array<Maybe<EmployeeAttendance>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -3974,6 +4116,8 @@ export type Query = {
   fiscals?: Maybe<Page_Fiscal>;
   genericActive?: Maybe<Array<Maybe<Generic>>>;
   genericList?: Maybe<Array<Maybe<Generic>>>;
+  getAccumulatedLogs?: Maybe<Array<Maybe<AccumulatedLogsDto>>>;
+  getActiveProjects?: Maybe<Array<Maybe<Projects>>>;
   getAllAmounts?: Maybe<Scalars['BigDecimal']['output']>;
   getAllChartOfAccountGenerate?: Maybe<Array<Maybe<ChartOfAccountGenerate>>>;
   getAmounts?: Maybe<Scalars['BigDecimal']['output']>;
@@ -3982,6 +4126,8 @@ export type Query = {
   getBalance?: Maybe<Scalars['BigDecimal']['output']>;
   getBillingItemFilterActive?: Maybe<Array<Maybe<BillingItem>>>;
   getBrands?: Maybe<Array<Maybe<BrandDto>>>;
+  /** Get all calendar events */
+  getCalendarEvents?: Maybe<Array<Maybe<EventCalendar>>>;
   getCategoryProjects?: Maybe<Array<Maybe<CategoryDto>>>;
   /** Get getCoaById */
   getCoaById?: Maybe<ParentAccount>;
@@ -3994,6 +4140,9 @@ export type Query = {
   getEmployeeScheduleByFilter?: Maybe<Array<Maybe<EmployeeScheduleDto>>>;
   /** Search employees */
   getEmployeeScheduleDetails?: Maybe<EmployeeScheduleDetailsDto>;
+  /** Filter Event Calendar between two dates. */
+  getEventsBetweenTwoDates?: Maybe<Array<Maybe<EventCalendar>>>;
+  getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
@@ -4006,6 +4155,7 @@ export type Query = {
   getLegerByDoc?: Maybe<Array<Maybe<InventoryLedger>>>;
   getMaterialByRefStockCard?: Maybe<ProjectUpdatesMaterials>;
   getOnHandByItem?: Maybe<Inventory>;
+  getOneRawLog?: Maybe<EmployeeAttendance>;
   /** Get allowance by ID */
   getPHICContributions?: Maybe<Array<Maybe<PhicContribution>>>;
   getPOMonitoringByPoItemFilter?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
@@ -4026,6 +4176,8 @@ export type Query = {
   getSSSContributions?: Maybe<Array<Maybe<SssContribution>>>;
   /** Get the values of salary rate multiplier. */
   getSalaryRateMultiplier?: Maybe<SalaryRateMultiplier>;
+  /** Get employee Attendance saved from database. */
+  getSavedEmployeeAttendance?: Maybe<Page_EmployeeAttendance>;
   getScheduleLock?: Maybe<Scalars['Map_String_ScheduleLockScalar']['output']>;
   /** get all schedule type config */
   getScheduleTypes?: Maybe<Array<Maybe<Schedule>>>;
@@ -4081,6 +4233,8 @@ export type Query = {
   jobStatusAll?: Maybe<Array<Maybe<JobStatus>>>;
   jobStatusList?: Maybe<Array<Maybe<JobStatus>>>;
   jobTypeUnits?: Maybe<ItemJobsDto>;
+  /** Filter Event Calendar between two dates. */
+  mapEventsToDates?: Maybe<Scalars['Map_String_List_EventCalendarScalar']['output']>;
   monById?: Maybe<PurchaseOrderItemsMonitoring>;
   motherAccountsListWithNoSetup?: Maybe<Array<Maybe<ParentAccount>>>;
   mpByFiltersPage?: Maybe<Page_MaterialProduction>;
@@ -4165,6 +4319,7 @@ export type Query = {
   projectByStatusCount?: Maybe<Array<Maybe<DashboardDto>>>;
   projectList?: Maybe<Array<Maybe<Projects>>>;
   projectListPageable?: Maybe<Page_Projects>;
+  projectLists?: Maybe<Array<Maybe<Projects>>>;
   provinceByRegion?: Maybe<Array<Maybe<Province>>>;
   provinceFilter?: Maybe<Array<Maybe<Province>>>;
   provinces?: Maybe<Array<Maybe<Province>>>;
@@ -4570,6 +4725,15 @@ export type QueryGenericListArgs = {
 
 
 /** Query root */
+export type QueryGetAccumulatedLogsArgs = {
+  endDate?: InputMaybe<Scalars['Instant']['input']>;
+  generateBreakdown?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  startDate?: InputMaybe<Scalars['Instant']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetAllAmountsArgs = {
   type?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
@@ -4615,6 +4779,7 @@ export type QueryGetBillingItemFilterActiveArgs = {
 
 /** Query root */
 export type QueryGetCoaByIdArgs = {
+export type QueryGetCoaByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -4656,6 +4821,13 @@ export type QueryGetEmployeeScheduleByFilterArgs = {
 export type QueryGetEmployeeScheduleDetailsArgs = {
   date?: InputMaybe<Scalars['String']['input']>;
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEventsBetweenTwoDatesArgs = {
+  endDate?: InputMaybe<Scalars['Instant']['input']>;
+  startDate?: InputMaybe<Scalars['Instant']['input']>;
 };
 
 
@@ -4715,6 +4887,12 @@ export type QueryGetMaterialByRefStockCardArgs = {
 export type QueryGetOnHandByItemArgs = {
   itemId?: InputMaybe<Scalars['UUID']['input']>;
   office?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetOneRawLogArgs = {
+  id: Scalars['UUID']['input'];
 };
 
 
@@ -4792,6 +4970,16 @@ export type QueryGetProjectMaterialsByMilestoneArgs = {
 /** Query root */
 export type QueryGetSssContributionsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetSavedEmployeeAttendanceArgs = {
+  endDate?: InputMaybe<Scalars['Instant']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  startDate?: InputMaybe<Scalars['Instant']['input']>;
 };
 
 
@@ -5065,6 +5253,13 @@ export type QueryJobOrderListPageableArgs = {
 /** Query root */
 export type QueryJobStatusListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryMapEventsToDatesArgs = {
+  endDate?: InputMaybe<Scalars['Instant']['input']>;
+  startDate?: InputMaybe<Scalars['Instant']['input']>;
 };
 
 
@@ -6083,6 +6278,7 @@ export type Schedule = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   mealBreakEnd?: Maybe<Scalars['Instant']['output']>;
   mealBreakStart?: Maybe<Scalars['Instant']['output']>;
+  project?: Maybe<Projects>;
   title?: Maybe<Scalars['String']['output']>;
 };
 
