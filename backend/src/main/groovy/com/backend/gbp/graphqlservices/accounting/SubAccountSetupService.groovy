@@ -126,41 +126,15 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
             @GraphQLArgument(name = "department") String department,
             @GraphQLArgument(name = "accountCategory") String accountCategory,
             @GraphQLArgument(name = "excludeMotherAccount") Boolean excludeMotherAccount=false
-    ) { // department flatten code
+    ) {
 
-       def a =  chartofAccountGenerator.getAllChartOfAccountGenerate(accountType,
+       return chartofAccountGenerator.getAllChartOfAccountGenerate(accountType,
         motherAccountCode,
         accountName,
         subaccountType,
         department,
         accountCategory,
         excludeMotherAccount)
-
-        /*
-         Yaw lang kay sagbot sa logs hehehe
-        a =  chartofAccountGenerator.getAllChartOfAccountGenerate(accountType,
-                motherAccountCode,
-                description,
-                subaccountType,
-                department,
-                excludeMotherAccount)
-
-        a =  chartofAccountGenerator.getAllChartOfAccountGenerate(accountType,
-                motherAccountCode,
-                description,
-                subaccountType,
-                department,
-                excludeMotherAccount)
-
-        a =  chartofAccountGenerator.getAllChartOfAccountGenerate(accountType,
-                motherAccountCode,
-                description,
-                subaccountType,
-                department,
-                excludeMotherAccount)
-        */
-        a
-
     }
 
 
@@ -176,9 +150,6 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
                 usedMotherAccount.add(it.chartOfAccount.accountCode)
             }
         }
-
-
-
 
         chartOfAccountServices.findAll().findAll {BooleanUtils.isNotTrue(it.deprecated)  }.each {
             if(!usedMotherAccount.contains(it.accountCode))
@@ -202,11 +173,9 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
         ms
     }
 
-
     SubAccountSetup getSetupBySubAccountByCode(
             String code
     ) {
-
         createQuery("Select sub from SubAccountSetup sub  where sub.subaccountCode=:code order by sub.subaccountCode, sub.createdDate",
                 [code: code])
                 .resultList.find()
@@ -218,13 +187,16 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
             @GraphQLArgument(name = "filter") String filter = ''
 
     ) {
+        UUID companyID = SecurityUtils.currentCompanyId()
         String query = """ Select sub from SubAccountSetup sub  where 
+            sub.company.id = :companyID
             (
                 lower(sub.accountName) like lower(concat('%',:filter,'%'))
                 or lower(sub.subaccountCode) like lower(concat('%',:filter,'%'))
             )  """
         Map<String,Object> params = [:]
         params['filter'] = filter
+        params['companyID'] = companyID
 
         if(accountCategory){
             query += """and sub.accountCategory = :accountCategory """
@@ -239,8 +211,14 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
 
     @GraphQLQuery(name = "getSetupBySubAccountTypeAll")
     List<SubAccountSetup> getSetupBySubAccountTypeAll() {
-        createQuery("Select sub from SubAccountSetup sub  where coalesce(sub.isInactive,false) = false   order by sub.description, sub.createdDate",
-                [:])
+        UUID companyID = SecurityUtils.currentCompanyId()
+        createQuery("""
+            Select sub from SubAccountSetup sub  
+            where coalesce(sub.isInactive,false) = false   
+            order by sub.description, sub.createdDate""",
+                [
+                    companyID:companyID
+                ])
                 .resultList
     }
 
@@ -252,7 +230,6 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
        }
     }
 
-
     @GraphQLQuery(name = "subaccountTypeDesc")
     String subaccountTypeDesc(@GraphQLContext SubAccountSetup subAccountSetup ) {
         return getDescSubaccountType(subAccountSetup.subaccountType)
@@ -262,14 +239,32 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     List<SubAccountSetup> getSubAccountForParent(
             @GraphQLArgument(name = "parentAccountId") UUID parentAccountId
     ) {
-        createQuery("""Select sub from SubAccountSetup sub  
-            where sub.parentAccount.id = :parentAccountId and sub.subaccountParent is null order by sub.subaccountCode, sub.createdDate""",
-                [parentAccountId:parentAccountId])
+        UUID companyID = SecurityUtils.currentCompanyId()
+        createQuery("""
+            Select sub from SubAccountSetup sub  
+            where
+            sub.company.id = :companyID and 
+            sub.parentAccount.id = :parentAccountId and 
+            sub.subaccountParent is null 
+            order by sub.subaccountCode, sub.createdDate""",
+            [
+                    parentAccountId:parentAccountId,
+                    companyID:companyID
+            ])
                 .resultList
     }
 
     List<SubAccountSetup> getActiveSubAccount( ) {
-        createQuery("Select sub from SubAccountSetup sub  where (sub.isInactive is null or sub.isInactive=false)  order by sub.subaccountCode, sub.createdDate",[:])
+        UUID companyID = SecurityUtils.currentCompanyId()
+        createQuery("""
+                Select sub from SubAccountSetup sub  
+                where
+                sub.company.id = :companyID and
+                (sub.isInactive is null or sub.isInactive=false)  
+                order by sub.subaccountCode, sub.createdDate
+        """,[
+                companyID:companyID
+            ])
                 .resultList
     }
 
@@ -278,14 +273,11 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     static List<String> getAutoIntegrateableFromDomain(
 
     ) {
-
         Reflections reflections = new Reflections("com.hisd3.hismk2.domain")
         Set<Class<? extends AutoIntegrateable>> subTypes = reflections.getSubTypesOf(AutoIntegrateable.class)
-
         subTypes.collect {
             it.name
         }
-
     }
 
     @GraphQLQuery(name = "getFlattenDepartment")
