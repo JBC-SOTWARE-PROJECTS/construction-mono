@@ -1,15 +1,15 @@
-import { TDiverseTradeMenu } from '@/utility/interfaces'
+import { TDiverseTradeMenu } from "@/utility/interfaces";
 import {
   AppstoreAddOutlined,
   ControlOutlined,
   DiffOutlined,
   FieldTimeOutlined,
+  PayCircleOutlined,
   UsergroupAddOutlined,
-} from '@ant-design/icons'
+} from "@ant-design/icons";
 
 const accountingMenu: TDiverseTradeMenu[] = [
   {
-
     title: "Billing Portfolio Control Center",
     subtitle: "Effortlessly manage and oversee your list of billing records.",
     icon: <DiffOutlined className="diverse-trade-icon" />,
@@ -28,47 +28,47 @@ const accountingMenu: TDiverseTradeMenu[] = [
     path: "/accounting/cashier/accounts",
   },
   {
-    title: 'Accounts Receivable',
-    subtitle: 'Effortlessly manage and maintain your list of employees.',
-    icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/accounts-receivable/invoice',
+    title: "Accounts Receivable",
+    subtitle: "Effortlessly manage and maintain your list of employees.",
+    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    path: "/accounting/accounts-receivable/invoice",
   },
   {
-    title: 'Accounts Payable',
-    subtitle: 'Effortlessly manage and maintain your list of employees.',
-    icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/employees',
+    title: "Accounts Payable",
+    subtitle: "Monitor and control payment processes and transactions.",
+    icon: <PayCircleOutlined className="diverse-trade-icon" />,
+    path: "/accounting/accounts-payable/payables",
   },
   {
-    title: 'Loan Management',
-    subtitle: 'Effortlessly manage and maintain your list of employees.',
-    icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/employees',
+    title: "Loan Management",
+    subtitle: "Effortlessly manage and maintain your list of employees.",
+    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    path: "/accounting/employees",
   },
   {
-    title: 'Fixed Asset',
-    subtitle: 'Effortlessly manage and maintain your list of employees.',
-    icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/employees',
+    title: "Fixed Asset",
+    subtitle: "Effortlessly manage and maintain your list of employees.",
+    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    path: "/accounting/employees",
   },
   {
-    title: 'Cash Advance',
-    subtitle: 'Effortlessly manage and maintain your list of employees.',
-    icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/employees',
+    title: "Cash Advance",
+    subtitle: "Effortlessly manage and maintain your list of employees.",
+    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    path: "/accounting/employees",
   },
   {
-    title: 'Accounting Setup',
-    subtitle: 'Streamline and manage your list of companies effortlessly.',
-    icon: <AppstoreAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/accounting-setup/accounting-period',
+    title: "Accounting Setup",
+    subtitle: "Streamline and manage your list of companies effortlessly.",
+    icon: <AppstoreAddOutlined className="diverse-trade-icon" />,
+    path: "/accounting/accounting-setup/accounting-period",
   },
   {
-    title: 'Financial Reports',
-    subtitle: 'Effortlessly manage and maintain your list of employees.',
-    icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/employees',
+    title: "Financial Reports",
+    subtitle: "Effortlessly manage and maintain your list of employees.",
+    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    path: "/accounting/employees",
   },
-]
+];
 
-export default accountingMenu
+export default accountingMenu;

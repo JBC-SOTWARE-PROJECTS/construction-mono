@@ -18,6 +18,7 @@ import { NumberFormater } from "@/utility/helper";
 
 interface Iprops {
   record?: Billing;
+  otc?: boolean;
   onRefetchBillingInfo: () => void;
 }
 
@@ -29,7 +30,7 @@ const formatter = (value: number, color?: string) => (
 );
 
 export default function BillingHeader(props: Iprops) {
-  const { record, onRefetchBillingInfo } = props;
+  const { record, otc, onRefetchBillingInfo } = props;
 
   const borderedItems: DescriptionsProps["items"] = useMemo(() => {
     let status = { color: "red", text: "INACTIVE" };
@@ -40,7 +41,8 @@ export default function BillingHeader(props: Iprops) {
     if (record?.locked) {
       locked = { color: "red", text: "LOCKED" };
     }
-    return [
+
+    let items = [
       {
         key: "dateTrans",
         label: "Transaction Date",
@@ -84,98 +86,109 @@ export default function BillingHeader(props: Iprops) {
           </Space>
         ),
       },
-      {
-        key: "7",
-        label: "Project Information",
-        span: 3,
-        children: (
-          <div className="w-full">
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Project #</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.project?.projectCode}
-              </div>
-            </div>
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Project Description</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.project?.description}
-              </div>
-            </div>
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Project Address</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.project?.location?.fullAddress}
-              </div>
-            </div>
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Project Status</p>
-              </div>
-              <div className="billing-info-value">
-                <Tag color="green">{record?.project?.status}</Tag>
-              </div>
-            </div>
-          </div>
-        ),
-      },
-      {
-        key: "7",
-        label: "Customer Information",
-        span: 3,
-        children: (
-          <div className="w-full">
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Customer Name</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.customer?.fullName}
-              </div>
-            </div>
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Customer Type</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.customer?.customerType}
-              </div>
-            </div>
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Address</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.customer?.address ?? "--"}
-              </div>
-            </div>
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Contact Number</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.customer?.contactPersonNum ?? "--"}
-              </div>
-            </div>
-            <div className="w-full flex-div">
-              <div className="billing-info-width">
-                <p>Email Address</p>
-              </div>
-              <div className="billing-info-value">
-                {record?.customer?.emailAdd ?? "--"}
-              </div>
-            </div>
-          </div>
-        ),
-      },
     ];
-  }, [record]);
+
+    const customer = {
+      key: "7",
+      label: "Customer Information",
+      span: 3,
+      children: (
+        <div className="w-full">
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Customer Name</p>
+            </div>
+            <div className="billing-info-value">
+              {otc ? record?.otcName : record?.customer?.fullName}
+            </div>
+          </div>
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Customer Type</p>
+            </div>
+            <div className="billing-info-value">
+              {otc ? "Over the Counter (OTC)" : record?.customer?.customerType}
+            </div>
+          </div>
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Address</p>
+            </div>
+            <div className="billing-info-value">
+              {record?.customer?.address ?? "--"}
+            </div>
+          </div>
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Contact Number</p>
+            </div>
+            <div className="billing-info-value">
+              {record?.customer?.contactPersonNum ?? "--"}
+            </div>
+          </div>
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Email Address</p>
+            </div>
+            <div className="billing-info-value">
+              {record?.customer?.emailAdd ?? "--"}
+            </div>
+          </div>
+        </div>
+      ),
+    };
+
+    const project = {
+      key: "7",
+      label: "Project Information",
+      span: 3,
+      children: (
+        <div className="w-full">
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Project #</p>
+            </div>
+            <div className="billing-info-value">
+              {record?.project?.projectCode}
+            </div>
+          </div>
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Project Description</p>
+            </div>
+            <div className="billing-info-value">
+              {record?.project?.description}
+            </div>
+          </div>
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Project Address</p>
+            </div>
+            <div className="billing-info-value">
+              {record?.project?.location?.fullAddress}
+            </div>
+          </div>
+          <div className="w-full flex-div">
+            <div className="billing-info-width">
+              <p>Project Status</p>
+            </div>
+            <div className="billing-info-value">
+              <Tag color="green">{record?.project?.status}</Tag>
+            </div>
+          </div>
+        </div>
+      ),
+    };
+
+    if (otc) {
+      items.push(customer);
+    } else {
+      items.push(project);
+      items.push(customer);
+    }
+
+    return items;
+  }, [record, otc]);
 
   return (
     <div className="w-full">
