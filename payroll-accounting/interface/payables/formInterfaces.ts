@@ -1,10 +1,11 @@
-import { AccountsPayableDetails } from "@/graphql/gql/graphql";
+import { AccountsPayable, AccountsPayableDetails } from "@/graphql/gql/graphql";
 import { Dayjs } from "dayjs";
 import { OptionsValue } from "@/utility/interfaces";
 
 export interface IFormAPTransactionDetails {
   transType?: any;
-  department?: any;
+  office?: any;
+  project?: any;
   amount: number;
   discRate: number;
   discAmount: number;
@@ -82,6 +83,11 @@ export interface IPayloadValues {
   discount: number;
   ewtAmount: number;
   appliedAmount: number;
+}
+
+export interface IDisbursementApplication {
+  payable?: AccountsPayable;
+  isNew?: boolean;
 }
 
 export interface ExtendedAPTransactionDto extends AccountsPayableDetails {

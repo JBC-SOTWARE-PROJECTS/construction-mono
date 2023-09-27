@@ -4,8 +4,13 @@ import com.backend.gbp.domain.accounting.AccountsPayable
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.SupplierService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.repository.inventory.ReceivingRepository
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
 import com.backend.gbp.rest.dto.payables.AccountPayableDetialsDto
+import com.backend.gbp.rest.dto.payables.OfficeDto
+import com.backend.gbp.rest.dto.payables.ProjectDto
+import com.backend.gbp.rest.dto.payables.TransTypeDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -16,7 +21,6 @@ import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
-import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Service
 @GraphQLApi
@@ -47,8 +49,14 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     @Autowired
     SupplierService supplierService
 
+    @Autowired
+    ReceivingRepository receivingRepository
 
+    @Autowired
+    ApLedgerServices apLedgerServices
 
+    @Autowired
+    Wtx2307Service wtx2307Service
 
 	AccountsPayableServices() {
 		super(AccountsPayable.class)
@@ -63,7 +71,14 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 	
 	@GraphQLQuery(name = "apListPosted", description = "Find Ap posted")
 	List<AccountsPayable> apListPosted() {
-		createQuery("Select ap from AccountsPayable ap where ap.posted = true").resultList
+        def company = SecurityUtils.currentCompanyId()
+
+        def query = "Select ap from AccountsPayable ap where ap.company = :company and ap.posted = true"
+        Map<String, Object> params = new HashMap<>()
+        params.put('company', company)
+
+        createQuery(query, params).resultList.sort { it.ledgerDate }
+
 	}
 
 	@GraphQLQuery(name = "apListBySupplierFilter", description = "List of AP Pageable By Supplier")
@@ -73,6 +88,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
+        def company = SecurityUtils.currentCompanyId()
 
         String query = '''Select ap from AccountsPayable ap where
 							ap.posted = true and
@@ -93,6 +109,12 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             params.put("supplier", supplier)
         }
 
+        if (company) {
+            query += ''' and (ap.company = :company) '''
+            countQuery += ''' and (ap.company = :company) '''
+            params.put("company", company)
+        }
+
         query += ''' ORDER BY ap.apvDate DESC'''
 
         getPageable(query, countQuery, page, size, params)
@@ -103,6 +125,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "supplier") UUID supplier
     ) {
+        def company = SecurityUtils.currentCompanyId()
 
         String query = '''Select ap from AccountsPayable ap where ap.posted = true and
 						( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
@@ -114,6 +137,12 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         if (supplier) {
             query += ''' and (ap.supplier.id = :supplier) '''
             params.put("supplier", supplier)
+        }
+
+        if (company) {
+            query += ''' and (ap.company = :company) '''
+            countQuery += ''' and (ap.company = :company) '''
+            params.put("company", company)
         }
 
         query += ''' ORDER BY ap.apvDate DESC'''
@@ -132,6 +161,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
+        def company = SecurityUtils.currentCompanyId()
 
         String query = '''Select ap from AccountsPayable ap where
                         to_date(to_char(ap.apvDate, 'YYYY-MM-DD'),'YYYY-MM-DD')
@@ -154,6 +184,13 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             params.put('filter', filter)
         }
 
+
+        if (company) {
+            query += ''' and (ap.company = :company) '''
+            countQuery += ''' and (ap.company = :company) '''
+            params.put("company", company)
+        }
+
         if (supplier) {
             query += ''' and (ap.supplier.id = :supplier) '''
             countQuery += ''' and (ap.supplier.id = :supplier) '''
@@ -165,6 +202,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             countQuery += ''' and (ap.posted = :status or ap.posted is null) '''
             params.put("status", !status)
         }
+
 
         query += ''' ORDER BY ap.apvDate DESC'''
 
@@ -180,6 +218,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def apCat = 'AP'
+        def company = SecurityUtils.currentCompanyId()
         def ap = upsertFromMap(id, fields, { AccountsPayable entity, boolean forInsert ->
             if (forInsert) {
                 entity.apNo = generatorService.getNextValue(GeneratorType.APNO, {
@@ -200,6 +239,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                 //
                 entity.daAmount = BigDecimal.ZERO
                 entity.dmAmount = BigDecimal.ZERO
+                entity.company = company
             } else {
                 //round numbers to 2 decimal
                 entity.grossAmount = entity.grossAmount.setScale(2, RoundingMode.HALF_EVEN)
@@ -217,11 +257,15 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             it ->
                 def trans = objectMapper.convertValue(it.transType, TransTypeDto.class)
                 def apDto = objectMapper.convertValue(it, AccountPayableDetialsDto.class)
-                def dep = null
-                if (it.department) {
-                    dep = objectMapper.convertValue(it.department, DepDto.class)
+                def office = null
+                def project = null
+                if (it.office) {
+                    office = objectMapper.convertValue(it.office, OfficeDto.class)
                 }
-                accountsPayableDetialServices.upsertPayablesDetails(apDto, ap, trans?.id, dep?.id)
+                if (it.project) {
+                    project = objectMapper.convertValue(it.project, ProjectDto.class)
+                }
+                accountsPayableDetialServices.upsertPayablesDetails(apDto, ap, trans?.id, office?.id, project?.id)
         }
 
         return ap
@@ -233,7 +277,8 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def apCat = 'AP'
-        def rec = receivingReportRepository.findById(id).get()
+        def company = SecurityUtils.currentCompanyId()
+        def rec = receivingRepository.findById(id).get()
 
 		AccountsPayable ap = new AccountsPayable()
 		if(rec.refAp){
@@ -272,6 +317,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 			ap.vatAmount = vatAmount
 			ap.netOfVat = rec.vatInclusive ? netOfDiscount : amount
 			ap.netAmount = amount
+            ap.company = company
 
 			def afterSave = save(ap)
 
@@ -281,7 +327,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 
 				//update receiving has ap
 				rec.refAp = afterSave.id
-				receivingReportRepository.save(rec)
+                receivingRepository.save(rec)
 			}
 		}
 
@@ -417,12 +463,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     ) {
         def apCat = 'AP'
         def ap = findOne(id)
-        if (ap.apCategory.equalsIgnoreCase("PROFESSIONAL FEE")) {
-            apCat = 'PF'
-        }
-        if (ap.apCategory.equalsIgnoreCase("READER'S FEE")) {
-            apCat = 'RF'
-        }
         if (status) {
             def header = ledgerServices.findOne(ap.postedLedger)
             ledgerServices.reverseEntriesCustom(header, ap.apvDate)
@@ -645,7 +685,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     @Transactional(rollbackFor = Exception.class)
     AccountsPayable updateAp(UUID id, String disNo, BigDecimal applied) {
         def ap = findOne(id)
-        //ap.disbursement = ap.disbursement ? ap.disbursement + ',' + disNo : disNo
         if(ap.disbursement){
             ArrayList<String> originalArray = ap.disbursement.split(",") as ArrayList<String>
             originalArray.add(disNo)
@@ -690,8 +729,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     @Transactional(rollbackFor = Exception.class)
     AccountsPayable updateApFromDM(UUID id, String dmNo, BigDecimal applied, String type) {
         def ap = findOne(id)
-        //ap.dmRefNo = ap.dmRefNo ? ap.dmRefNo + ',' + dmNo : dmNo
-        //updated
         if(ap.dmRefNo){
             ArrayList<String> originalArray = ap.dmRefNo.split(",") as ArrayList<String>
             originalArray.add(dmNo)
@@ -714,21 +751,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     @Transactional(rollbackFor = Exception.class)
     AccountsPayable updateApForRemoveDM(UUID id, String dmNo, BigDecimal applied, Boolean posted, String type) {
         def ap = findOne(id)
-        //def str = ap.dmRefNo ? ap.dmRefNo.split(",") : null
-        //def dm = null
-        //if (str) {
-        //    List<String> al = Arrays.asList(str) //initialize list
-        //    al.indexOf(dmNo)
-        //    def count = al.size()
-        //    if (count > 1) {
-        //        al.each {
-        //            ap.dmRefNo = dm ? dm + ',' + it : it
-        //        }
-        //    } else {
-        //        ap.dmRefNo = null
-        //    }
-        //}
-        //end remove
         if (posted) {
             //remove
             if(ap.dmRefNo){

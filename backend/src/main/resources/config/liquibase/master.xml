@@ -288,7 +288,6 @@
     <include file="classpath:config/liquibase/changelog4/17_michael_attendance_tables.sql"
              relativeToChangelogFile="false"/>
 
-
     <include file="classpath:config/liquibase/changelog4/16_wilson_accounts_payables.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/17_wilson_accounts_payables_transaction.sql"
@@ -300,6 +299,10 @@
     <include file="classpath:config/liquibase/changelog4/20_wilson_expense_transaction_type.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/21_wilson_bankaccounts.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/22_wilson_alter_receiving.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/23_wtx_table.sql"
              relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

@@ -4,9 +4,9 @@ import { OptionsValue } from "@/utility/interfaces";
 
 const GET_OFFICES = gql`
   query {
-    activeOffices(filter: "") {
+    activeOffices {
       value: id
-      label: departmentName
+      label: officeDescription
     }
   }
 `;

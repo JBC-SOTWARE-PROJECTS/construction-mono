@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import { AccountsPayableDetails, Supplier } from "@/graphql/gql/graphql";
-// import { useConfirm, useDialog } from "@/hooks";
+import { useDialog } from "@/hooks";
 import { currency } from "@/utility/constant";
 import { NumberFormater } from "@/utility/helper";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Space, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
-// import APDetailsModal from "../../dialogs/apDetailsModal";
+import APDetailsModal from "../../dialogs/apDetailsModal";
 import _ from "lodash";
 import {
   ExtendedAPTransactionDto,
   IFormAPTransactionDetailsBulk,
 } from "@/interface/payables/formInterfaces";
 import APDetailsTransactionSummaryFooter from "../../common/apDetailsSummary";
-// import APDetailsBulkModal from "../../dialogs/apDetailsBulkModal";
+import APDetailsBulkModal from "../../dialogs/apDetailsBulkModal";
 
 interface IProps {
   loading?: boolean;
@@ -39,21 +39,21 @@ export default function APTransactionDetailsTable(props: IProps) {
     supplier,
     isVoided,
   } = props;
-  // console.log("vatRate ==> ", vatRate);
+
   const [size, setSize] = useState(5);
   // ===================== modal ====================================
-  // const showTransaction = useDialog(APDetailsModal);
-  // const transactionBulk = useDialog(APDetailsBulkModal);
+  const showTransaction = useDialog(APDetailsModal);
+  const transactionBulk = useDialog(APDetailsBulkModal);
   // ======================== functions ===============================
   const onShowTransaction = (e?: AccountsPayableDetails) => {
     let payload = _.clone(e ?? {}) as ExtendedAPTransactionDto;
     payload.vatRate = getVatRate();
-    // showTransaction({ record: payload, supplier: supplier }, (e: any) => {
-    //   if (e?.id) {
-    //     let result = e as ExtendedAPTransactionDto;
-    //     onAddDetails(result);
-    //   }
-    // });
+    showTransaction({ record: payload, supplier: supplier }, (e: any) => {
+      if (e?.id) {
+        let result = e as ExtendedAPTransactionDto;
+        onAddDetails(result);
+      }
+    });
   };
 
   const onRemove = (e?: AccountsPayableDetails) => {
@@ -66,14 +66,14 @@ export default function APTransactionDetailsTable(props: IProps) {
   };
 
   const onUpdateMany = () => {
-    // transactionBulk(
-    //   { vatRate: getVatRate(), supplier: supplier },
-    //   (e: IFormAPTransactionDetailsBulk) => {
-    //     if (e) {
-    //       onBulkUpdates(e);
-    //     }
-    //   }
-    // );
+    transactionBulk(
+      { vatRate: getVatRate(), supplier: supplier },
+      (e: IFormAPTransactionDetailsBulk) => {
+        if (e) {
+          onBulkUpdates(e);
+        }
+      }
+    );
   };
 
   // ======================== columns ================================

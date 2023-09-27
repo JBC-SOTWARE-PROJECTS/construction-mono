@@ -5,6 +5,7 @@ import com.backend.gbp.domain.accounting.AccountsPayableDetails
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.repository.OfficeRepository
+import com.backend.gbp.repository.projects.ProjectsRepository
 import com.backend.gbp.rest.dto.payables.AccountPayableDetialsDto
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -37,6 +38,8 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
     @Autowired
     AccountsPayableServices accountsPayableServices
 
+    @Autowired
+    ProjectsRepository projectsRepository
 
 
     AccountsPayableDetialServices() {
@@ -62,7 +65,8 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
             @GraphQLArgument(name = "it") AccountPayableDetialsDto it,
             @GraphQLArgument(name = "ap") AccountsPayable ap,
             @GraphQLArgument(name = "trans") UUID trans,
-            @GraphQLArgument(name = "dep") UUID dep
+            @GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "project") UUID project
     ) {
         AccountsPayableDetails upsert = new AccountsPayableDetails()
         if (!it.isNew) {
@@ -72,8 +76,11 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
         if (trans) {
             upsert.transType = apTransactionServices.apTransactionById(trans)
         }
-        if (dep) {
-            upsert.department = departmentRepository.findById(dep).get()
+        if (office) {
+            upsert.office = officeRepository.findById(office).get()
+        }
+        if (project) {
+            upsert.project = projectsRepository.findById(project).get()
         }
         upsert.amount = it.amount
         upsert.discRate = it.discRate
@@ -108,7 +115,8 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
         def s_price = amount - discountAmount;
         def discountRate = ((amount - s_price) / amount) * 100;
         upsert.accountsPayable = ap
-        upsert.department = it.receiveDepartment
+        upsert.office = it.receivedOffice
+        upsert.project = it.project
         upsert.amount = grossAmount
         upsert.discRate = discountRate
         upsert.discAmount = discountAmount
@@ -123,33 +131,6 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
         save(upsert)
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    @GraphQLMutation(name = "upsertPayablesDetailsByInvestor")
-    AccountsPayableDetails upsertPayablesDetailsByInvestor(
-            @GraphQLArgument(name = "unallocated") BigDecimal unallocated,
-            @GraphQLArgument(name = "refId") UUID refId,
-            @GraphQLArgument(name = "refNo") String refNo,
-            @GraphQLArgument(name = "ap") AccountsPayable ap
-    ) {
-        AccountsPayableDetails upsert = new AccountsPayableDetails()
-
-        upsert.accountsPayable = ap
-        upsert.department = null
-        upsert.amount = unallocated
-        upsert.discRate = BigDecimal.ZERO
-        upsert.discAmount = BigDecimal.ZERO
-        upsert.vatInclusive = true
-        upsert.vatAmount = BigDecimal.ZERO
-        upsert.ewtRate = 0
-        upsert.ewtAmount = 0
-        upsert.netAmount = unallocated
-        upsert.refId = refId
-        upsert.refNo = refNo
-//        upsert.refId = payment.id
-//        upsert.refNo = "${payment.receiptType} # "+ payment.ornumber
-        upsert.source = "investor"
-        save(upsert)
-    }
 
     @Transactional(rollbackFor = Exception.class)
     @GraphQLMutation(name = "removeApDetails")
@@ -158,14 +139,7 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
     ) {
         def details = findOne(id)
         //update billing
-        if (details.refId) {
-            if (details.source.equalsIgnoreCase("pfNonCompany") || details.source.equalsIgnoreCase("rf")) {
-                billingItemServices.updatePfProcess(details.refId, false)
-            } else if (details.source.equalsIgnoreCase("pfCompany")) {
-                accountReceivableItemsServices.updateApProcess(details.refId, false)
-            }
 
-        }
         if(details.accountsPayable?.id){
             accountsPayableServices.updatePayableForRemove(
                     details.accountsPayable?.id,
@@ -193,7 +167,7 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
                 vat * vatRate :
                 (amount) * vatRate
 
-        return vatAmount.round(2)
+        return vatAmount.setScale(2, RoundingMode.HALF_EVEN)
     }
 
     static calculateEwt(Boolean vatInclusive, BigDecimal amount, BigDecimal vatRate, BigDecimal ewtRate) {
@@ -207,7 +181,7 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
                     vat * ewtRate :
                     netOfdiscount * ewtRate;
         }
-
-        return ewt.round(2)
+        def ewtRound = ewt.setScale(2, RoundingMode.HALF_EVEN)
+        return ewtRound
     }
 }
