@@ -71,19 +71,6 @@ a {
   margin-top: 4px;
 }
 
-div.my-prefix-sider-logo + div::-webkit-scrollbar {
-  width: 8px !important;
-  height: 10px !important;
-}
-div.my-prefix-sider-logo + div::-webkit-scrollbar-track {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-div.my-prefix-sider-logo + div::-webkit-scrollbar-thumb {
-  background-color: #d1d1d1;
-  border-radius: 10px;
-}
-
 .ant-badge-count-sm {
   font-size: 10px !important;
 }

@@ -604,7 +604,7 @@ export default function PayableModal(props: IProps) {
               <Button
                 type="dashed"
                 size="large"
-                // onClick={onViewJournalEntries}
+                onClick={onViewJournalEntries}
                 icon={<FileTextOutlined />}>
                 View Journal Entries
               </Button>
@@ -615,7 +615,7 @@ export default function PayableModal(props: IProps) {
               type="primary"
               danger
               size="large"
-              // onClick={onVoidTransaction}
+              onClick={onVoidTransaction}
               icon={<IssuesCloseOutlined />}>
               Void Transaction
             </Button>
@@ -626,8 +626,8 @@ export default function PayableModal(props: IProps) {
                   type="dashed"
                   danger
                   size="large"
-                  // loading={updateLoading}
-                  // onClick={onUpdateStatus}
+                  loading={updateLoading}
+                  onClick={onUpdateStatus}
                   icon={<RedoOutlined />}>
                   Draft Transaction
                 </Button>
@@ -640,9 +640,9 @@ export default function PayableModal(props: IProps) {
                       size="large"
                       htmlType="submit"
                       form="upsertForm"
-                      // onClick={() => setAction("save_post")}
+                      onClick={() => setAction("save_post")}
                       icon={<CarryOutOutlined />}
-                      disabled={record?.posted || _.isEmpty([])}>
+                      disabled={record?.posted || _.isEmpty(items)}>
                       Save Changes & Post
                     </Button>
                   ) : null}
@@ -651,10 +651,10 @@ export default function PayableModal(props: IProps) {
                     size="large"
                     htmlType="submit"
                     form="upsertForm"
-                    // onClick={() => setAction("save_close")}
-                    // loading={saveCloseLoading}
+                    onClick={() => setAction("save_close")}
+                    loading={saveCloseLoading}
                     icon={<SaveOutlined />}
-                    disabled={record?.posted || _.isEmpty([])}>
+                    disabled={record?.posted || _.isEmpty(items)}>
                     {`Save ${record?.id ? "Changes" : ""} & Close`}
                   </Button>
                 </Space>

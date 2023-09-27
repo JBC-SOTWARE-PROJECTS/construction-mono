@@ -48,7 +48,6 @@ export const EMPSTATUS = [
   { label: "OUTSOURCED", value: "OUTSOURCED" },
 ];
 
-
 export const OFFICETYPE = [
   { label: "MAIN OFFICE", value: "MAIN" },
   { label: "BRANCH OFFICE", value: "BRANCH" },
@@ -275,14 +274,6 @@ export const APCATEGORY = [
   {
     label: "ACCOUNTS PAYABLE",
     value: "ACCOUNTS PAYABLE",
-  },
-  {
-    label: "PROFESSIONAL FEE",
-    value: "PROFESSIONAL FEE",
-  },
-  {
-    label: "READER'S FEE",
-    value: "READER'S FEE",
   },
 ];
 

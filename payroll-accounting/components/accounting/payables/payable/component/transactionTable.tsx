@@ -86,11 +86,18 @@ export default function APTransactionDetailsTable(props: IProps) {
       render: (_, record) => <span>{record?.transType?.description}</span>,
     },
     {
-      title: "Department",
+      title: "Office",
       dataIndex: "department.departmentName",
       key: "department.departmentName",
-      width: 350,
+      width: 200,
       render: (_, record) => <span>{record?.office?.officeDescription}</span>,
+    },
+    {
+      title: "Project",
+      dataIndex: "project.description",
+      key: "project.description",
+      width: 200,
+      render: (_, record) => <span>{record?.project?.description}</span>,
     },
     {
       title: "Amount",
@@ -263,7 +270,7 @@ export default function APTransactionDetailsTable(props: IProps) {
         columns={columns}
         loading={loading}
         dataSource={dataSource}
-        scroll={{ x: 2400 }}
+        scroll={{ x: 2600 }}
         pagination={{
           pageSize: size,
           onShowSizeChange: (_, size) => {

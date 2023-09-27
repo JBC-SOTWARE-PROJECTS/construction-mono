@@ -55,7 +55,7 @@ const DiverseTradeLayout = (props: IProps) => {
     splitMenus: false,
     navTheme: "light",
     contentWidth: "Fixed",
-    colorPrimary: "#2F54EB",
+    colorPrimary: "#399b53",
     fixedHeader: true,
     siderMenuType: "group",
     footerRender: false,

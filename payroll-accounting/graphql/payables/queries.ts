@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-
 export const GET_JOURNAL_POSTED = gql`
   query ($id: UUID) {
     ledgerView(id: $id) {
@@ -138,7 +137,6 @@ export const GET_RECORDS_PAYABLES = gql`
   }
 `;
 
-
 export const GET_AP_ITEMS = gql`
   query ($id: UUID) {
     detailsByAp(id: $id) {
@@ -147,9 +145,13 @@ export const GET_AP_ITEMS = gql`
         id
         description
       }
-      department {
+      office {
         id
-        departmentName
+        officeDescription
+      }
+      project {
+        id
+        description
       }
       amount
       discRate
