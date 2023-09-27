@@ -15,6 +15,7 @@ build/
 .sts4-cache
 
 ### IntelliJ IDEA ###
+bin
 .idea
 *.iws
 *.iml

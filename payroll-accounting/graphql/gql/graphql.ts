@@ -474,9 +474,10 @@ export type ChargeItemsDto = {
 
 export type ChartOfAccountGenerate = {
   __typename?: 'ChartOfAccountGenerate';
+  accountCategory?: Maybe<Scalars['String']['output']>;
+  accountName?: Maybe<Scalars['String']['output']>;
   accountType?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   fromGenerator?: Maybe<Scalars['Boolean']['output']>;
   motherAccount?: Maybe<CoaComponentContainer>;
   subAccount?: Maybe<CoaComponentContainer>;
@@ -494,8 +495,10 @@ export type City = {
 
 export type CoaComponentContainer = {
   __typename?: 'CoaComponentContainer';
+  accountCategory?: Maybe<Scalars['String']['output']>;
+  accountName?: Maybe<Scalars['String']['output']>;
+  accountType?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   normalSide?: Maybe<Scalars['String']['output']>;
@@ -611,11 +614,13 @@ export type DocumentTypes = {
 
 export enum DomainEnum {
   ItemCategory = 'ITEM_CATEGORY',
-  NoDomain = 'NO_DOMAIN'
+  NoDomain = 'NO_DOMAIN',
+  Supplier = 'SUPPLIER'
 }
 
 export type DomainOptionDto = {
   __typename?: 'DomainOptionDto';
+  key?: Maybe<Scalars['String']['output']>;
   label?: Maybe<Scalars['String']['output']>;
   value?: Maybe<Scalars['String']['output']>;
 };
@@ -1280,10 +1285,13 @@ export type Item = {
 
 export type ItemCategory = {
   __typename?: 'ItemCategory';
+  accountName?: Maybe<Scalars['String']['output']>;
   categoryCode?: Maybe<Scalars['String']['output']>;
   categoryDescription?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
   itemGroup?: Maybe<ItemGroup>;
@@ -4688,6 +4696,7 @@ export type Query = {
   /** Filter Event Calendar between two dates. */
   getEventsBetweenTwoDates?: Maybe<Array<Maybe<EventCalendar>>>;
   getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
+  getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
   /** Get allowance by ID */
@@ -4936,6 +4945,7 @@ export type Query = {
   stockCard?: Maybe<Array<Maybe<StockCard>>>;
   subAccountByAccountType?: Maybe<Array<Maybe<SubAccountSetup>>>;
   subAccountDomains?: Maybe<Array<Maybe<DomainOptionDto>>>;
+  subAccountDomainsRecords?: Maybe<Array<Maybe<DomainOptionDto>>>;
   subaccountTypeAll?: Maybe<Array<Maybe<Scalars['Map_String_StringScalar']['output']>>>;
   supById?: Maybe<Supplier>;
   supItemById?: Maybe<SupplierItem>;
@@ -5480,6 +5490,7 @@ export type QueryGetBillingItemFilterActiveArgs = {
 
 
 /** Query root */
+export type QueryGetCoaByIdArgs = {
 export type QueryGetCoaByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -6589,6 +6600,12 @@ export type QuerySubAccountByAccountTypeArgs = {
 
 
 /** Query root */
+export type QuerySubAccountDomainsRecordsArgs = {
+  domain?: InputMaybe<DomainEnum>;
+};
+
+
+/** Query root */
 export type QuerySupByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -7255,10 +7272,13 @@ export type SubAccountSetup = {
   __typename?: 'SubAccountSetup';
   accountCategory?: Maybe<AccountCategory>;
   accountName?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  domainExcludes?: Maybe<Array<Maybe<DomainOptionDto>>>;
   id?: Maybe<Scalars['UUID']['output']>;
+  isInactive?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   motherAccountsList?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -7272,18 +7292,21 @@ export type SubAccountSetup = {
 
 export type Subaccountable = {
   __typename?: 'Subaccountable';
+  accountName?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
 };
 
 export type Supplier = {
   __typename?: 'Supplier';
+  accountName?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   creditLimit?: Maybe<Scalars['BigDecimal']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
   isVatInclusive?: Maybe<Scalars['Boolean']['output']>;

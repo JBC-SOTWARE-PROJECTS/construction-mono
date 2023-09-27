@@ -1,7 +1,9 @@
 package com.backend.gbp.domain.accounting
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.graphqlservices.accounting.DomainOptionDto
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -15,7 +17,8 @@ import javax.persistence.*
 
 enum DomainEnum {
     NO_DOMAIN("NO DOMAIN", ""),
-    ITEM_CATEGORY("Item Category", "com.backend.gbp.domain.inventory.ItemCategory")
+    ITEM_CATEGORY("Item Category", "com.backend.gbp.domain.inventory.ItemCategory"),
+    SUPPLIER("Supplier", "com.backend.gbp.domain.inventory.Supplier")
 
     String displayName
     String path
@@ -86,5 +89,20 @@ class SubAccountSetup extends AbstractAuditingEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "source_domain", columnDefinition = "varchar")
     DomainEnum sourceDomain
+
+    @GraphQLQuery
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    CompanySettings company
+
+    @GraphQLQuery
+    @Column(name = "is_inactive", columnDefinition = "bool")
+    Boolean isInactive
+
+    @GraphQLQuery
+    @Type(type = "jsonb")
+    @Column(name="domain_excludes",columnDefinition = "jsonb")
+    List<DomainOptionDto> domainExcludes
 
 }

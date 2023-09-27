@@ -1,14 +1,15 @@
 import {
+  FormCheckBox,
   FormInput,
   FormSegment,
   FormSelect,
   FormTextArea,
 } from '@/components/common'
-import { SubAccountSetup } from '@/graphql/gql/graphql'
+import { Maybe, SubAccountSetup } from '@/graphql/gql/graphql'
 import { AppstoreOutlined, BarsOutlined } from '@ant-design/icons'
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { Divider, Form, Modal, message } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DomainEnum } from '../enum/parentAccountEnum'
 
 interface CreateSubAccountI {
@@ -59,6 +60,16 @@ const SUB_ACCOUNT_DOMAINS = gql`
     }
   }
 `
+
+const SUB_ACCOUNT_DOMAINS_RECORDS = gql`
+  query ($domain: DomainEnum) {
+    domainRecords: subAccountDomainsRecords(domain: $domain) {
+      label
+      value
+    }
+  }
+`
+
 export default function CreateSubAccount(props: CreateSubAccountI) {
   const { record, hide } = props
 
@@ -74,6 +85,10 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
   const { data, loading } = useQuery(GROUP_ACCOUNT_TYPES)
   const { data: domainData, loading: domainLoading } =
     useQuery(SUB_ACCOUNT_DOMAINS)
+
+  const [loadDomainRecords, { data: domainRecordsData }] = useLazyQuery(
+    SUB_ACCOUNT_DOMAINS_RECORDS
+  )
 
   const [
     loadSubAccountOpt,
@@ -96,12 +111,11 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
 
   const onHandleClickOk = (values: SubAccountSetup) => {
     const { subType } = form.getFieldsValue()
-    console.log(subType, 'subType')
     const fields = { ...values }
-    fields.sourceDomain =
+    fields.sourceDomain = (
       subType == 'default' ? DomainEnum.NO_DOMAIN : fields.sourceDomain
+    ) as any
 
-    console.log(fields, 'fields')
     updateInsert({
       variables: {
         id: record?.id,
@@ -117,6 +131,33 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
       },
     })
   }
+
+  const onChangeDomain = (e: string) => {
+    loadDomainRecords({
+      variables: {
+        domain: e,
+      },
+    })
+    form.setFieldValue('domainExcludes', [])
+  }
+
+  useEffect(() => {
+    if (record?.parentAccount) {
+      loadSubAccountOpt({
+        variables: {
+          parentAccountId: record?.parentAccount,
+        },
+      })
+    }
+
+    if (record?.sourceDomain) {
+      loadDomainRecords({
+        variables: {
+          domain: record?.sourceDomain,
+        },
+      })
+    }
+  }, [record, loadSubAccountOpt, loadDomainRecords])
 
   return (
     <Modal
@@ -158,7 +199,7 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
         />
 
         <FormSelect
-          name='parentSubAccounts'
+          name={['subaccountParent', 'id']}
           label='Parent Sub-accounts'
           propsselect={{
             allowClear: true,
@@ -203,26 +244,35 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
             <FormTextArea name='description' label='Description (Optional)' />
           </>
         ) : (
-          <FormSelect
-            name='sourceDomain'
-            label='Data Records'
-            propsselect={{
-              allowClear: true,
-              options: domainData?.subAccountDomains ?? [],
-            }}
-          />
+          <>
+            <FormSelect
+              name='sourceDomain'
+              label='Data Records'
+              propsselect={{
+                allowClear: true,
+                options: domainData?.subAccountDomains ?? [],
+                onChange: (e) => onChangeDomain(e),
+              }}
+            />
+            <FormSelect
+              name='domainExcludes'
+              label='Exclude data'
+              propsselect={{
+                mode: 'tags',
+                allowClear: true,
+                options: domainRecordsData?.domainRecords ?? [],
+                labelInValue: true,
+              }}
+            />
+          </>
         )}
 
-        {/* <FormSelect
-          name='sourceDomain'
-          label='Get From'
-          propsselect={{
-            options: (getDomainData?.domain ?? []).map((domain: string) => ({
-              label: domain,
-              value: domain,
-            })),
-          }}
-        /> */}
+        <FormCheckBox
+          name='isInactive'
+          label='Depreciate'
+          valuePropName='checked'
+          propscheckbox={{}}
+        />
       </Form>
     </Modal>
   )

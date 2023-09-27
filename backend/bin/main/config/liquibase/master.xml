@@ -265,12 +265,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/08_wilson_billing_add_company.sql"
              relativeToChangelogFile="false"/>
-
-    <include file="classpath:config/liquibase/changelog4/11_jeriah_alter_table_calendar.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/12_jeriah_alter_table_add_column.sql"
-             relativeToChangelogFile="false"/>
-
     <include file="classpath:config/liquibase/changelog4/11_michael_payroll_module_initial_tables.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/12_michael_payroll_setup_roles_and_permissions.sql"
@@ -279,34 +273,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/13_michael_payroll_contributions_tables_and_view.sql"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/14_michael_payroll_contributions_additional_active_status.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/15_michael_payroll_contributions_roles_and_permissions.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/16_michael_alter_schedule_types_add_project.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/17_michael_attendance_tables.sql"
-             relativeToChangelogFile="false"/>
-
     <include file="classpath:config/liquibase/changelog4/14_donss_alter_subaccounts.sql"
              relativeToChangelogFile="false"/>
-
-    <include file="classpath:config/liquibase/changelog4/16_wilson_accounts_payables.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/17_wilson_accounts_payables_transaction.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/18_wilson_accounts_payables_details.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/19_alter_supplier_added_company.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/20_wilson_expense_transaction_type.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/21_wilson_bankaccounts.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/22_wilson_alter_receiving.sql"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/23_wtx_table.sql"
-             relativeToChangelogFile="false"/>
-
-
 </databaseChangeLog>
