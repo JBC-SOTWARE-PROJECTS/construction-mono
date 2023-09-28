@@ -1,23 +1,16 @@
 import AccessControl from "@/components/accessControl/AccessControl";
 import { PayrollModule } from "@/graphql/gql/graphql";
-import useRecalculatePayrollModuleEmployee from "@/hooks/payroll/useRecalculatePayrollModuleEmployee";
-import {
-  Button,
-  ButtonProps,
-  message,
-  Modal,
-  Tooltip,
-  TooltipProps,
-} from "antd";
-import { Maybe } from "graphql/jsutils/Maybe";
+import useRecalculateAllPayrollModuleEmployee from "@/hooks/payroll/useRecalculateAllPayrollModuleEmployee";
+import { Button, message, Modal, Tooltip, TooltipProps } from "antd";
+import { ButtonProps } from "antd/lib/button";
 
 /**
- * Component to recalculate of One Payroll Module Employee. Based on the payroll module employee
+ * Component to recalculate of All Payroll Module Employees. Based on the payroll module
  * id passed and the payroll module passed.
  *
  * @component
  * @example
- * <PayrollModuleRecalculateEmployeeAction
+ * <PayrollModuleRecalculateAllEmployeeAction
  *    id={item?.id}
  *    module={PayrollModule.OTHER_DEDUCTION}
  *    buttonProps={{
@@ -26,17 +19,18 @@ import { Maybe } from "graphql/jsutils/Maybe";
  * />
  *
  */
+
 interface IProps {
   buttonProps: ButtonProps;
   tooltipProps?: TooltipProps;
   refetch: () => void;
   allowedPermissions?: string[];
-  module: PayrollModule;
-  id: Maybe<string> | undefined;
   children?: any;
+  module: PayrollModule;
+  id: string;
 }
 
-function PayrollModuleRecalculateEmployeeAction({
+function PayrollModuleRecalculateAllEmployeeAction({
   buttonProps,
   tooltipProps,
   refetch,
@@ -60,7 +54,7 @@ function PayrollModuleRecalculateEmployeeAction({
   const onErrorCallback = () => {
     message.error("Failed to update employee status. Please try again later.");
   };
-  const [updateStatus, loading] = useRecalculatePayrollModuleEmployee(
+  const [recalculateEmployee, loading] = useRecalculateAllPayrollModuleEmployee(
     module,
     upsertCallback,
     onErrorCallback
@@ -69,10 +63,10 @@ function PayrollModuleRecalculateEmployeeAction({
   const recalculatePayrollEmployee = () => {
     Modal.confirm({
       title: "Confirm",
-      content: `Are you sure you want to Recalculate this Employee?`,
+      content: `Are you sure you want to Recalculate ALL of the Employees?`,
       okText: "Confirm",
       cancelText: "Cancel",
-      onOk: () => updateStatus(id),
+      onOk: () => recalculateEmployee(id),
     });
   };
 
@@ -80,7 +74,7 @@ function PayrollModuleRecalculateEmployeeAction({
     <AccessControl
       allowedPermissions={allowedPermissions ? allowedPermissions : []}
     >
-      <Tooltip title="Recalculate Employee" {...tooltipProps}>
+      <Tooltip title="Recalculate All Employees" {...tooltipProps}>
         <Button
           {...buttonProps}
           loading={loading}
@@ -93,4 +87,4 @@ function PayrollModuleRecalculateEmployeeAction({
   );
 }
 
-export default PayrollModuleRecalculateEmployeeAction;
+export default PayrollModuleRecalculateAllEmployeeAction;

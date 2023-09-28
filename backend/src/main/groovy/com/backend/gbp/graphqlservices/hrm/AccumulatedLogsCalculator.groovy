@@ -7,6 +7,7 @@ import com.backend.gbp.domain.hrm.EventCalendar
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.hrm.dto.ScheduleDto
 import com.backend.gbp.domain.payroll.AccumulatedLogs
+import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.EmployeeAttendanceRepository
@@ -68,7 +69,9 @@ class AccumulatedLogsCalculator {
             @GraphQLArgument(name = "startDate") Instant startDate,
             @GraphQLArgument(name = "endDate") Instant endDate,
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "generateBreakdown") Boolean generateBreakdown
+            @GraphQLArgument(name = "generateBreakdown") Boolean generateBreakdown,
+            @GraphQLArgument(name = "timekeepingEmployee") TimekeepingEmployee timekeepingEmployee
+
 
     ) {
         if (!startDate || !endDate || !id) throw new RuntimeException("Failed to get employee attendance.")
@@ -146,13 +149,14 @@ class AccumulatedLogsCalculator {
 
                 accumulatedLogs.hours = hoursLog
 
-
+//                if (timekeepingEmployee) accumulatedLogs.timekeepingEmployee = timekeepingEmployee
                 accumulatedLogsList.push(accumulatedLogs)
             } else {
                 AccumulatedLogs accumulatedLogs = new AccumulatedLogs()
                 accumulatedLogs.date = date
                 accumulatedLogs.isError = true
                 accumulatedLogs.message = "No Schedule"
+//                if (timekeepingEmployee) accumulatedLogs.timekeepingEmployee = timekeepingEmployee
                 accumulatedLogsList.push(accumulatedLogs)
             }
 

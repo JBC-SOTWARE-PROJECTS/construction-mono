@@ -8,6 +8,7 @@ import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.TimekeepingEmployeeRepository
 import com.backend.gbp.repository.TimekeepingRepository
+import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -39,6 +40,9 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
 
     @Autowired
     TimekeepingEmployeeService timekeepingEmployeeService
+
+    @Autowired
+    PayrollEmployeeRepository payrollEmployeeRepository
 
 
     @Autowired
@@ -111,14 +115,12 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
     GraphQLResVal<String> calculateOneTimekeepingEmployee(
             @GraphQLArgument(name = "id") UUID id
     ) {
-            TimekeepingEmployee timekeepingEmployee = timekeepingEmployeeRepository.findById(id).get()
-        Payroll payroll = timekeepingEmployee.payrollEmployee.payroll
-        PayrollEmployee payrollEmployee= timekeepingEmployee.payrollEmployee
-        timekeepingEmployeeService.recalculateEmployee(payrollEmployee, payroll)
+
+
+        PayrollEmployee payrollEmployee = payrollEmployeeRepository.findById(id).get()
+        timekeepingEmployeeService.recalculateEmployee(payrollEmployee, payrollEmployee.payroll)
         return new GraphQLResVal<String>(null, true, "Successfully recalculated timekeeping employee.")
     }
-
-
 
 
 //===================================================================
@@ -142,7 +144,6 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
     }
 
 //===================================================================
-
 
 
 }

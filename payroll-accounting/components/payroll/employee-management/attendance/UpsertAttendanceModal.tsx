@@ -61,6 +61,7 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
       title="Create Raw Logs"
       onCancel={handleCancel}
       footer={null}
+      destroyOnClose
     >
       <Form
         layout="vertical"

@@ -1,17 +1,43 @@
-import { AccumulatedLogsDto, HoursLog } from "@/graphql/gql/graphql";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { Col, Row, Table, Tag } from "antd";
-import { ColumnsType } from "antd/es/table";
+import {
+  AccumulatedLogs,
+  HoursLog,
+  PayrollModule,
+} from "@/graphql/gql/graphql";
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  ReloadOutlined,
+  UnorderedListOutlined,
+} from "@ant-design/icons";
+import { Button, Col, Modal, Row, Space, Table, Tag } from "antd";
 import dayjs from "dayjs";
 import { round } from "lodash";
-import React, { CSSProperties, useState } from "react";
+import { CSSProperties } from "react";
+import CustomButton from "../common/CustomButton";
+import LogsProjectBreakdownModal from "./LogsProjectBreakdownModal";
+import PayrollModuleRecalculateEmployeeAction from "./payroll-management/PayrollModuleRecalculateEmployeeAction";
+import useRecalculateOneLog from "@/hooks/payroll/timekeeping/useRecalculateOneLog";
+import { debug } from "console";
+
 interface IProps {
-  dataSource: AccumulatedLogsDto[];
+  dataSource: AccumulatedLogs[];
   loading: boolean;
+  refetch?: () => void;
+  isTimekeeping?: boolean;
+  showBreakdown?: boolean;
 }
 
-function AccumulatedLogsTable({ dataSource, loading }: IProps) {
-  const onCellProps = (record: AccumulatedLogsDto, key: keyof HoursLog) => {
+function AccumulatedLogsTable({
+  dataSource,
+  loading,
+  refetch,
+  isTimekeeping = false,
+  showBreakdown = false,
+}: IProps) {
+  const [calculate, loadingRecalculate] = useRecalculateOneLog(refetch);
+
+  const onCellProps = (record: AccumulatedLogs, key: keyof HoursLog) => {
     const hours = record?.hours?.[key] || 0;
     var style: CSSProperties = { textAlign: "center" };
     if (hours > 0)
@@ -20,7 +46,7 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
   };
 
   const underPerformanceCell = (
-    record: AccumulatedLogsDto,
+    record: AccumulatedLogs,
     key: keyof HoursLog
   ) => {
     const hours = record?.hours?.[key] || 0;
@@ -33,13 +59,25 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
   const render = (value: any) => {
     return value && round(value, 4);
   };
+
+  const confirmRecalculate = (id: string) => {
+    debugger;
+    Modal.confirm({
+      title: "Are you sure you want to recalculate this date?",
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        calculate(id);
+      },
+      onCancel() {},
+    });
+  };
   const columns = [
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
       width: 250,
-      render: (value: any, record: any) => (
+      render: (value: any, record: AccumulatedLogs) => (
         <Row>
           <Col span={16}>
             {!record.isError ? (
@@ -63,13 +101,11 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
       title: "Time in",
       dataIndex: "inTime",
       key: "inTime",
-      width: 90,
       render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
     },
     {
       title: "Time Out",
       dataIndex: "outTime",
-      width: 90,
       key: "outTime",
       render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
     },
@@ -82,24 +118,27 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Late",
           dataIndex: ["hours", "late"],
           key: "late",
-          width: 87,
-          onCell: (record: any) => underPerformanceCell(record, "late"),
+
+          onCell: (record: AccumulatedLogs) =>
+            underPerformanceCell(record, "late"),
           render: render,
         },
         {
           title: "Undertime",
           dataIndex: ["hours", "underTime"],
           key: "underTime",
-          width: 87,
-          onCell: (record: any) => underPerformanceCell(record, "underTime"),
+
+          onCell: (record: AccumulatedLogs) =>
+            underPerformanceCell(record, "underTime"),
           render: render,
         },
         {
           title: "Absent",
           dataIndex: ["hours", "absent"],
           key: "absent",
-          width: 87,
-          onCell: (record: any) => underPerformanceCell(record, "absent"),
+
+          onCell: (record: AccumulatedLogs) =>
+            underPerformanceCell(record, "absent"),
           render: render,
         },
       ],
@@ -113,8 +152,8 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regular"],
           key: "regular",
-          width: 87,
-          onCell: (record: any) => onCellProps(record, "regular"),
+
+          onCell: (record: AccumulatedLogs) => onCellProps(record, "regular"),
           render: render,
         },
 
@@ -122,8 +161,8 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Overtime",
           dataIndex: ["hours", "overtime"],
           key: "overtime",
-          width: 87,
-          onCell: (record: any) => onCellProps(record, "overtime"),
+
+          onCell: (record: AccumulatedLogs) => onCellProps(record, "overtime"),
           render: render,
         },
       ],
@@ -137,8 +176,9 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regularHoliday"],
           key: "regularHoliday",
-          width: 87,
-          onCell: (record: any) => onCellProps(record, "regularHoliday"),
+
+          onCell: (record: AccumulatedLogs) =>
+            onCellProps(record, "regularHoliday"),
           render: render,
         },
 
@@ -146,8 +186,9 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Overtime",
           dataIndex: ["hours", "overtimeHoliday"],
           key: "overtimeHoliday",
-          width: 87,
-          onCell: (record: any) => onCellProps(record, "overtimeHoliday"),
+
+          onCell: (record: AccumulatedLogs) =>
+            onCellProps(record, "overtimeHoliday"),
           render: render,
         },
       ],
@@ -161,8 +202,9 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regularSpecialHoliday"],
           key: "regularSpecialHoliday",
-          width: 87,
-          onCell: (record: any) => onCellProps(record, "regularSpecialHoliday"),
+
+          onCell: (record: AccumulatedLogs) =>
+            onCellProps(record, "regularSpecialHoliday"),
           render: render,
         },
 
@@ -170,8 +212,8 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Overtime",
           dataIndex: ["hours", "overtimeSpecialHoliday"],
           key: "overtimeSpecialHoliday",
-          width: 87,
-          onCell: (record: any) =>
+
+          onCell: (record: AccumulatedLogs) =>
             onCellProps(record, "overtimeSpecialHoliday"),
           render: render,
         },
@@ -186,8 +228,9 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Regular",
           dataIndex: ["hours", "regularDoubleHoliday"],
           key: "regularDoubleHoliday",
-          width: 87,
-          onCell: (record: any) => onCellProps(record, "regularDoubleHoliday"),
+
+          onCell: (record: AccumulatedLogs) =>
+            onCellProps(record, "regularDoubleHoliday"),
           render: render,
         },
 
@@ -195,23 +238,53 @@ function AccumulatedLogsTable({ dataSource, loading }: IProps) {
           title: "Overtime",
           dataIndex: ["hours", "overtimeDoubleHoliday"],
           key: "overtimeDoubleHoliday",
-          width: 87,
-          onCell: (record: any) => onCellProps(record, "overtimeDoubleHoliday"),
+
+          onCell: (record: AccumulatedLogs) =>
+            onCellProps(record, "overtimeDoubleHoliday"),
           render: render,
         },
       ],
+    },
+    {
+      title: "Actions",
+      dataIndex: "id",
+      key: "id",
+      render: (id: string, record: AccumulatedLogs) => {
+        return (
+          <Space>
+            {showBreakdown && (
+              <LogsProjectBreakdownModal render={render} record={record} />
+            )}
+
+            {isTimekeeping && (
+              <CustomButton
+                id={id}
+                tooltip="Recalculate This Date"
+                shape="circle"
+                type="primary"
+                icon={<ReloadOutlined />}
+                danger
+                onClick={() => confirmRecalculate(id)}
+                // allowedPermissions={["recalculate_one_timekeeping_employee"]}
+              />
+            )}
+          </Space>
+        );
+      },
     },
   ];
   const scrollProps = { y: "calc(100vh - 330px)" };
   return (
     <>
       <Table
+        pagination={false}
         className="ant-table-body"
         columns={columns}
         dataSource={dataSource}
         bordered
         scroll={scrollProps}
         onHeaderRow={() => ({ style: { textAlignLast: "center" } })}
+        loading={loading || loadingRecalculate}
       />
     </>
   );

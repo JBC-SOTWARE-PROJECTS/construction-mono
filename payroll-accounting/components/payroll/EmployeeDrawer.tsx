@@ -5,9 +5,16 @@ import { Employee } from "@/graphql/gql/graphql";
 interface IProps {
   selectedEmployees: Employee[];
   loading: boolean;
+  usage?: string;
+  setDisplayedEmployee?: (any: any) => void;
 }
 
-const EmployeeDrawer = ({ selectedEmployees = [], loading }: IProps) => {
+const EmployeeDrawer = ({
+  selectedEmployees = [],
+  loading,
+  usage,
+  setDisplayedEmployee,
+}: IProps) => {
   const [open, setOpen] = useState(false);
 
   const showDrawer = () => {
@@ -30,7 +37,10 @@ const EmployeeDrawer = ({ selectedEmployees = [], loading }: IProps) => {
     <>
       <div style={{ display: "flex", justifyContent: "end", marginBottom: 15 }}>
         <Button type="primary" onClick={showDrawer} loading={loading}>
-          View Selected ({selectedEmployees?.length})
+          {usage === "TIMEKEEPING"
+            ? "Select Employee"
+            : `View Selected (
+          ${selectedEmployees?.length})`}
         </Button>
       </div>
 
@@ -47,6 +57,14 @@ const EmployeeDrawer = ({ selectedEmployees = [], loading }: IProps) => {
           showHeader={false}
           pagination={false}
           loading={loading}
+          rowSelection={{
+            onSelect: (employee) => {
+              if (usage === "TIMEKEEPING") {
+                setDisplayedEmployee && setDisplayedEmployee(employee);
+              }
+            },
+            type: usage === "TIMEKEEPING" ? "radio" : "checkbox",
+          }}
         />
       </Drawer>
     </>

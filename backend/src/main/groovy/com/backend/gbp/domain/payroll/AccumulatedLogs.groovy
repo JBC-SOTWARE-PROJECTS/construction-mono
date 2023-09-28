@@ -6,6 +6,7 @@ import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.common.PayrollEmployeeAuditingEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.leangen.graphql.annotations.GraphQLQuery
+import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
 import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
@@ -19,7 +20,9 @@ class AccumulatedLogs extends AbstractAuditingEntity implements Serializable {
 
     @GraphQLQuery
     @Id
-    @Column(name = "employee", columnDefinition = "uuid")
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @Column(name = "id", columnDefinition = "uuid")
     @Type(type = "pg-uuid")
     UUID id
 

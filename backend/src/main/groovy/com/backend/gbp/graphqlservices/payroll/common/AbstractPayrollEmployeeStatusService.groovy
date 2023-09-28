@@ -31,26 +31,27 @@ abstract class AbstractPayrollEmployeeStatusService<T extends PayrollEmployeeAud
             if (employee == null) throw new RuntimeException("No approver found.")
             entity.status = status
 
-            if (status == PayrollEmployeeStatus.APPROVED) {
-                entity.approvedBy = employee
-                entity.approvedDate = Instant.now()
-            } else if (status == PayrollEmployeeStatus.REJECTED) {
-                entity.rejectedBy = employee
-                entity.rejectedDate = Instant.now()
-            }else if (status == PayrollEmployeeStatus.FINALIZED ){
+//            if (status == PayrollEmployeeStatus.APPROVED) {
+//                entity.approvedBy = employee
+//                entity.approvedDate = Instant.now()
+//            } else if (status == PayrollEmployeeStatus.REJECTED) {
+//                entity.rejectedBy = employee
+//                entity.rejectedDate = Instant.now()
+//            }else
+            if (status == PayrollEmployeeStatus.FINALIZED ){
                 entity.finalizedBy = employee
                 entity.finalizedDate = Instant.now()
             }
-
-            // clearing "xxxxBy" and "xxxxDate" to null depending on the new status
-            if(status == PayrollEmployeeStatus.REJECTED || status == PayrollEmployeeStatus.FINALIZED|| status == PayrollEmployeeStatus.DRAFT ){
-                entity.approvedBy = null
-                entity.approvedDate = null
-            }
-            if(status == PayrollEmployeeStatus.APPROVED || status == PayrollEmployeeStatus.FINALIZED|| status == PayrollEmployeeStatus.DRAFT ) {
-                entity.rejectedBy = null
-                entity.rejectedDate = null
-            }
+//
+//            // clearing "xxxxBy" and "xxxxDate" to null depending on the new status
+//            if(status == PayrollEmployeeStatus.REJECTED || status == PayrollEmployeeStatus.FINALIZED|| status == PayrollEmployeeStatus.DRAFT ){
+//                entity.approvedBy = null
+//                entity.approvedDate = null
+//            }
+//            if(status == PayrollEmployeeStatus.APPROVED || status == PayrollEmployeeStatus.FINALIZED|| status == PayrollEmployeeStatus.DRAFT ) {
+//                entity.rejectedBy = null
+//                entity.rejectedDate = null
+//            }
             if(status == PayrollEmployeeStatus.DRAFT){
                 entity.finalizedBy = null
                 entity.finalizedDate = null

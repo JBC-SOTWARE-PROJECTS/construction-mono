@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.payroll.AccumulatedLogs
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.Timekeeping
@@ -11,8 +12,11 @@ import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollEmployeeSta
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.AccumulatedLogRepository
+import com.backend.gbp.repository.TimekeepingEmployeeDto
 import com.backend.gbp.repository.TimekeepingEmployeeRepository
+import com.backend.gbp.repository.TimekeepingRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.payroll.PayrollRepository
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -23,11 +27,12 @@ import org.springframework.stereotype.Component
 
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
+import java.time.Instant
 
 @TypeChecked
 @Component
 @GraphQLApi
-class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<TimekeepingEmployee> implements IPayrollEmployeeBaseOperation<TimekeepingEmployee>{
+class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<TimekeepingEmployee> implements IPayrollEmployeeBaseOperation<TimekeepingEmployee> {
 
     final PayrollModule payrollModule = PayrollModule.TIMEKEEPING
 
@@ -35,8 +40,10 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
     TimekeepingEmployeeRepository timekeepingEmployeeRepository
 
     @Autowired
-    AccumulatedLogsCalculator accumulatedLogsCalculator
+    PayrollRepository payrollRepository
 
+    @Autowired
+    AccumulatedLogsCalculator accumulatedLogsCalculator
 
     @Autowired
     AccumulatedLogRepository accumulatedLogRepository
@@ -70,15 +77,15 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
             }
         }
         timekeeping.timekeepingEmployees = timekeepingEmployeeRepository.saveAll(timekeepingEmployeeList)
-//        generateSummaries(timekeeping.timekeepingEmployees,payroll)
+        generateAccumulatedLogs(timekeeping.timekeepingEmployees, payroll)
         payroll.timekeeping = timekeeping
         return timekeepingEmployeeList
     }
 
     @Override
     void recalculateAllEmployee(Payroll payroll) {
-
-
+        payroll.timekeeping.timekeepingEmployees
+        generateAccumulatedLogs(payroll.timekeeping.timekeepingEmployees, payroll)
     }
 
     @Override
@@ -99,23 +106,46 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     @Override
     TimekeepingEmployee recalculateEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
-
+        TimekeepingEmployee timekeepingEmployee = payrollEmployee.timekeepingEmployee
+        timekeepingEmployee.accumulatedLogs.clear()
+        generateAccumulatedLogs([timekeepingEmployee], payroll)
+        return null
     }
 
 
 //============================================================UTILITY METHODS====================================================================
 
+    List<TimekeepingEmployee> generateAccumulatedLogs(List<TimekeepingEmployee> timekeepingEmployees, Payroll payroll) {
+        timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
+            List<AccumulatedLogs> accumulatedLogs = accumulatedLogsCalculator.getAccumulatedLogs(
+                    payroll.dateStart,
+                    payroll.dateEnd,
+                    timekeepingEmployee.payrollEmployee.employee.id,
+                    true,
+                    timekeepingEmployee)
+            accumulatedLogs.each {
+                it.timekeepingEmployee = timekeepingEmployee
+            }
+            accumulatedLogRepository.saveAll(accumulatedLogs)
+        }
 
+    }
 //=================================QUERY=================================\\
 
-    @GraphQLQuery(name = "getTimekeepingEmployee", description = "Gets all the ids of the employees of the timekeeping")
-    List<Employee> getTimekeepingEmployee(@GraphQLArgument(name="id") UUID id) {
-        return timekeepingEmployeeRepository.findByTimekeepingEmployee(id)
+    @GraphQLQuery(name = "getTimekeepingEmployees", description = "Gets the timekeeping employees by payroll id")
+    List<TimekeepingEmployeeDto> getTimekeepingEmployees(@GraphQLArgument(name = "id") UUID id) {
+        Payroll payroll = payrollRepository.getOne(id)
+        return timekeepingEmployeeRepository.findByTimekeeping(payroll)
     }
-//
+
     @GraphQLQuery(name = "getTimekeepingEmployeesV2", description = "Gets all the ids of the employees of the timekeeping")
-    List<TimekeepingEmployee> getTimekeepingEmployeesV2(@GraphQLArgument(name="id") UUID id) {
+    List<TimekeepingEmployee> getTimekeepingEmployeesV2(@GraphQLArgument(name = "id") UUID id) {
         return timekeepingEmployeeRepository.findByTimekeepingId(id)
+    }
+
+    @GraphQLQuery(name = "getTimekeepingEmployeeLogs", description = "Gets all the ids of the employees of the timekeeping")
+    List<AccumulatedLogs> getTimekeepingEmployeeLogs(@GraphQLArgument(name = "id") UUID id) {
+        return accumulatedLogRepository.findByTimekeepingEmployee(id)?.sort({ it.date })
     }
 //
 //    List<TimekeepingEmployee> getByIds(@GraphQLArgument(name="getByIds") UUID id) {
@@ -124,18 +154,32 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     //=================================MUTATIONS=================================\\
     @Override
-    @GraphQLMutation(name="updateTimekeepingEmployeeStatus")
+    @GraphQLMutation(name = "updateTimekeepingEmployeeStatus")
     GraphQLResVal<TimekeepingEmployee> updateEmployeeStatus(
-            @GraphQLArgument(name = "id", description = "ID of the module employee.")UUID id,
+            @GraphQLArgument(name = "id", description = "ID of the module employee.") UUID id,
             @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status
-    ){
+    ) {
         TimekeepingEmployee employee = null
-        timekeepingEmployeeRepository.findById(id).ifPresent {employee = it}
-        if(!employee) return new GraphQLResVal<TimekeepingEmployee>(null, false, "Failed to update employee timekeeping status. Please try again later!")
-        else{
+        timekeepingEmployeeRepository.findById(id).ifPresent { employee = it }
+        if (!employee) return new GraphQLResVal<TimekeepingEmployee>(null, false, "Failed to update employee timekeeping status. Please try again later!")
+        else {
             employee = this.updateStatus(id, status)
             return new GraphQLResVal<TimekeepingEmployee>(employee, true, "Successfully updated employee timekeeping status!")
         }
+    }
+
+    @Override
+    @GraphQLMutation(name = "recalculateOneDay")
+    GraphQLResVal<String> recalculateOneDay(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "startDate") Instant startDate,
+            @GraphQLArgument(name = "endDate") Instant endDate
+
+
+    ) {
+        AccumulatedLogs accumulatedLogs = accumulatedLogRepository.findById(id).get()
+
+        accumulatedLogsCalculator.getAccumulatedLogs(startDate,endDate,accumulatedLogs.)
     }
 
 

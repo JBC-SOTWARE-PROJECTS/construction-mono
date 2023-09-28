@@ -6,6 +6,7 @@ CREATE TABLE payroll.timekeepings (
     last_modified_by varchar(50),
     last_modified_date timestamp DEFAULT CURRENT_TIMESTAMP,
     payroll uuid NOT NULL,
+    status varchar,
     finalized_by uuid,
     finalized_date timestamp,
     CONSTRAINT fk_timekeepings_payroll_id FOREIGN KEY (payroll) REFERENCES payroll.payrolls(id) ON DELETE CASCADE ON UPDATE CASCADE,
