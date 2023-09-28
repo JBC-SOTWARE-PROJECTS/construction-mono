@@ -107,7 +107,6 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
     @Override
     TimekeepingEmployee recalculateEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
         TimekeepingEmployee timekeepingEmployee = payrollEmployee.timekeepingEmployee
-        timekeepingEmployee.accumulatedLogs.clear()
         generateAccumulatedLogs([timekeepingEmployee], payroll)
         return null
     }
@@ -117,12 +116,12 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     List<TimekeepingEmployee> generateAccumulatedLogs(List<TimekeepingEmployee> timekeepingEmployees, Payroll payroll) {
         timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
+            timekeepingEmployee.accumulatedLogs.clear()
             List<AccumulatedLogs> accumulatedLogs = accumulatedLogsCalculator.getAccumulatedLogs(
                     payroll.dateStart,
                     payroll.dateEnd,
                     timekeepingEmployee.payrollEmployee.employee.id,
-                    true,
-                    timekeepingEmployee)
+                    true)
             accumulatedLogs.each {
                 it.timekeepingEmployee = timekeepingEmployee
             }
@@ -168,18 +167,20 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
         }
     }
 
-    @Override
     @GraphQLMutation(name = "recalculateOneDay")
     GraphQLResVal<String> recalculateOneDay(
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "startDate") Instant startDate,
-            @GraphQLArgument(name = "endDate") Instant endDate
-
-
+            @GraphQLArgument(name = "endDate") Instant endDate,
+            @GraphQLArgument(name = "employeeId") UUID employeeId
     ) {
         AccumulatedLogs accumulatedLogs = accumulatedLogRepository.findById(id).get()
+        List<AccumulatedLogs> list = accumulatedLogsCalculator.getAccumulatedLogs(startDate, endDate, employeeId, true)
+        list[0].timekeepingEmployee = accumulatedLogs.timekeepingEmployee
+        accumulatedLogRepository.delete(accumulatedLogs)
+        accumulatedLogRepository.save(list[0])
+        return new GraphQLResVal<String>('Success', true, "Successfully updated employee timekeeping status!")
 
-        accumulatedLogsCalculator.getAccumulatedLogs(startDate,endDate,accumulatedLogs.)
     }
 
 

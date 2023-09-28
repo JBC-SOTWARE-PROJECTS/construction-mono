@@ -1,30 +1,46 @@
 import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
+import dayjs from "dayjs";
 
-export const CALCULATE_ONE_EMPLOYEE = gql`
-  mutation ($id: UUID) {
-    data: calculateOneTimekeepingEmployee(id: $id) {
+const CALCULATE_ONE_DAY = gql`
+  mutation (
+    $id: UUID
+    $employeeId: UUID
+    $startDate: Instant
+    $endDate: Instant
+  ) {
+    data: recalculateOneDay(
+      id: $id
+      employeeId: $employeeId
+      startDate: $startDate
+      endDate: $endDate
+    ) {
       message
     }
   }
 `;
+
+interface params {
+  id: string;
+  employeeId: string;
+  startDate: dayjs.Dayjs;
+  endDate: dayjs.Dayjs;
+}
 function useRecalculateOneLog(callBack?: (result: any) => void) {
-  const [mutationFn, { loading }] = useMutation(CALCULATE_ONE_EMPLOYEE, {
+  const [mutationFn, { loading }] = useMutation(CALCULATE_ONE_DAY, {
     onCompleted: (result: any) => {
       debugger;
-      message.success(result.data.message);
+      message.success(result?.data?.message);
       if (callBack) callBack(result?.data);
     },
   });
 
-  const calculate = (id: string) => {
+  const calculate = (params: params) => {
     mutationFn({
-      variables: {
-        id: id,
-      },
+      variables: params,
     });
   };
-  const returnValue: [(id: string) => void, boolean] = [calculate, loading];
+  const returnValue: [(params: params) => void, boolean] = [calculate, loading];
   return returnValue;
 }
 

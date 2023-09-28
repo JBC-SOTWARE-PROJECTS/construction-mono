@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param
 
 interface TimekeepingEmployeeDto{
     UUID getId()
+    UUID getEmployeeId()
     String getFullName()
     String getGender()
     Position getPosition()
@@ -28,6 +29,7 @@ interface TimekeepingEmployeeRepository extends JpaRepository<TimekeepingEmploye
             value = """
 Select 
 te.id as id,
+e.id as employeeId,
 e.fullName as fullName, 
 e.position as position,
 e.gender as gender,

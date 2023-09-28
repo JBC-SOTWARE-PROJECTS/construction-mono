@@ -57,6 +57,7 @@ const EmployeeDrawer = ({
           showHeader={false}
           pagination={false}
           loading={loading}
+          rowKey={({ id }) => id}
           rowSelection={{
             onSelect: (employee) => {
               if (usage === "TIMEKEEPING") {

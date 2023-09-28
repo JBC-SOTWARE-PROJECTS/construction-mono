@@ -32,6 +32,9 @@ class AccumulatedLogs extends AbstractAuditingEntity implements Serializable {
     @JoinColumn(name = "timekeeping_employee", referencedColumnName = "employee")
     TimekeepingEmployee timekeepingEmployee
 
+    @Column(name = "employee", columnDefinition = "uuid")
+    UUID employeeId
+
     @Column(name = "log_date", columnDefinition = "timestamp")
     Instant date
 

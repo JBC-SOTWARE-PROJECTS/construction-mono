@@ -36,6 +36,7 @@ CREATE TABLE payroll.timekeeping_employees (
 CREATE TABLE payroll.accumulated_logs (
     id uuid NOT NULL,
     timekeeping_employee uuid not null,
+    employee uuid,
     log_date timestamp DEFAULT now(),
     schedule_start timestamp,
     schedule_end timestamp ,

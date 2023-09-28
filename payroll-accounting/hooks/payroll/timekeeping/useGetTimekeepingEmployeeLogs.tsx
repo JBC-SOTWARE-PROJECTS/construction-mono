@@ -5,6 +5,7 @@ const QUERY = gql`
   query ($id: UUID) {
     list: getTimekeepingEmployeeLogs(id: $id) {
       id
+      employeeId
       date
       scheduleStart
       scheduleEnd

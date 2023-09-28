@@ -69,8 +69,7 @@ class AccumulatedLogsCalculator {
             @GraphQLArgument(name = "startDate") Instant startDate,
             @GraphQLArgument(name = "endDate") Instant endDate,
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "generateBreakdown") Boolean generateBreakdown,
-            @GraphQLArgument(name = "timekeepingEmployee") TimekeepingEmployee timekeepingEmployee
+            @GraphQLArgument(name = "generateBreakdown") Boolean generateBreakdown
 
 
     ) {
@@ -148,15 +147,14 @@ class AccumulatedLogsCalculator {
                 hoursLog.underTime = regularSchedule.scheduleDuration - hoursLog.totalRegularHours - hoursLog.late
 
                 accumulatedLogs.hours = hoursLog
-
-//                if (timekeepingEmployee) accumulatedLogs.timekeepingEmployee = timekeepingEmployee
+                accumulatedLogs.employeeId = id
                 accumulatedLogsList.push(accumulatedLogs)
             } else {
                 AccumulatedLogs accumulatedLogs = new AccumulatedLogs()
                 accumulatedLogs.date = date
                 accumulatedLogs.isError = true
                 accumulatedLogs.message = "No Schedule"
-//                if (timekeepingEmployee) accumulatedLogs.timekeepingEmployee = timekeepingEmployee
+                accumulatedLogs.employeeId = id
                 accumulatedLogsList.push(accumulatedLogs)
             }
 

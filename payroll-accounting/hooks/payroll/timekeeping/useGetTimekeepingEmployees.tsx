@@ -5,6 +5,7 @@ const GET_EMPLOYEES = gql`
   query ($id: UUID) {
     employees: getTimekeepingEmployees(id: $id) {
       id
+      employeeId
       fullName
       gender
       position {

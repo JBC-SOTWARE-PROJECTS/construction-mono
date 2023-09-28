@@ -69,6 +69,7 @@ export type AccumulatedLogs = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   date?: Maybe<Scalars['Instant']['output']>;
+  employeeId?: Maybe<Scalars['UUID']['output']>;
   hours?: Maybe<HoursLog>;
   id?: Maybe<Scalars['UUID']['output']>;
   inTime?: Maybe<Scalars['Instant']['output']>;
@@ -88,6 +89,7 @@ export type AccumulatedLogs = {
 
 export type AccumulatedLogsInput = {
   date?: InputMaybe<Scalars['Instant']['input']>;
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
   hours?: InputMaybe<HoursLogInput>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   inTime?: InputMaybe<Scalars['Instant']['input']>;
@@ -1467,6 +1469,7 @@ export type Mutation = {
   quantityAdjustmentInsert?: Maybe<QuantityAdjustment>;
   /** A mutation to recalculate all payroll module employee . */
   recalculateAllPayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
+  recalculateOneDay?: Maybe<GraphQlResVal_String>;
   /** A mutation to recalculate payroll module employee . */
   recalculatePayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
   /** Remove */
@@ -1900,6 +1903,15 @@ export type MutationQuantityAdjustmentInsertArgs = {
 export type MutationRecalculateAllPayrollModuleEmployeeArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   module?: InputMaybe<PayrollModule>;
+};
+
+
+/** Mutation root */
+export type MutationRecalculateOneDayArgs = {
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
+  endDate?: InputMaybe<Scalars['Instant']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  startDate?: InputMaybe<Scalars['Instant']['input']>;
 };
 
 
@@ -6761,6 +6773,7 @@ export type TimekeepingEmployee = {
 
 export type TimekeepingEmployeeDto = {
   __typename?: 'TimekeepingEmployeeDto';
+  employeeId?: Maybe<Scalars['UUID']['output']>;
   fullName?: Maybe<Scalars['String']['output']>;
   gender?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;

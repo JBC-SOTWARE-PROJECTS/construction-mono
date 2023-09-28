@@ -60,13 +60,18 @@ function AccumulatedLogsTable({
     return value && round(value, 4);
   };
 
-  const confirmRecalculate = (id: string) => {
+  const confirmRecalculate = (record: AccumulatedLogs) => {
     debugger;
     Modal.confirm({
       title: "Are you sure you want to recalculate this date?",
       icon: <ExclamationCircleOutlined />,
       onOk() {
-        calculate(id);
+        calculate({
+          id: record.id,
+          startDate: dayjs(record.date).startOf("day"),
+          endDate: dayjs(record.date).endOf("day"),
+          employeeId: record.employeeId,
+        });
       },
       onCancel() {},
     });
@@ -264,7 +269,7 @@ function AccumulatedLogsTable({
                 type="primary"
                 icon={<ReloadOutlined />}
                 danger
-                onClick={() => confirmRecalculate(id)}
+                onClick={() => confirmRecalculate(record)}
                 // allowedPermissions={["recalculate_one_timekeeping_employee"]}
               />
             )}
