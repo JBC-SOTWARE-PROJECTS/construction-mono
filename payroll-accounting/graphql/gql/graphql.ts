@@ -234,6 +234,7 @@ export type AccumulatedLogsDto = {
 
 export type ApLedger = {
   __typename?: 'ApLedger';
+  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   credit?: Maybe<Scalars['BigDecimal']['output']>;
@@ -4696,7 +4697,6 @@ export type Query = {
   /** Filter Event Calendar between two dates. */
   getEventsBetweenTwoDates?: Maybe<Array<Maybe<EventCalendar>>>;
   getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
-  getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
   /** Get allowance by ID */
@@ -5453,9 +5453,10 @@ export type QueryGetAllAmountsArgs = {
 
 /** Query root */
 export type QueryGetAllChartOfAccountGenerateArgs = {
+  accountCategory?: InputMaybe<Scalars['String']['input']>;
+  accountName?: InputMaybe<Scalars['String']['input']>;
   accountType?: InputMaybe<Scalars['String']['input']>;
   department?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
   excludeMotherAccount?: InputMaybe<Scalars['Boolean']['input']>;
   motherAccountCode?: InputMaybe<Scalars['String']['input']>;
   subaccountType?: InputMaybe<Scalars['String']['input']>;
@@ -5490,7 +5491,6 @@ export type QueryGetBillingItemFilterActiveArgs = {
 
 
 /** Query root */
-export type QueryGetCoaByIdArgs = {
 export type QueryGetCoaByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };

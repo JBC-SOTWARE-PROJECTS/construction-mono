@@ -65,6 +65,10 @@ class ApLedger extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "is_include", columnDefinition = "bool")
 	Boolean isInclude
 
+	@GraphQLQuery
+	@Column(name = "company", columnDefinition = "uuid")
+	UUID company
+
 	
 }
 

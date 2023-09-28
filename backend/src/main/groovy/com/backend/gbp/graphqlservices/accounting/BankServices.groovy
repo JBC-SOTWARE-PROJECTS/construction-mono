@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.Bank
 import com.backend.gbp.repository.accounting.BankRepository
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -35,7 +36,8 @@ class BankServices {
 
 	@GraphQLQuery(name = "bankList")
 	List<Bank> bankList() {
-		return bankRepository.findAll()
+		def company = SecurityUtils.currentCompanyId()
+		return bankRepository.getBankList(company)
 	}
 	
 	@GraphQLQuery(name = "banks")
@@ -44,8 +46,8 @@ class BankServices {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-		
-		return bankRepository.getBanks(filter, new PageRequest(page, size, Sort.Direction.ASC, "bankaccountId"))
+		def company = SecurityUtils.currentCompanyId()
+		return bankRepository.getBanks(filter, company, new PageRequest(page, size, Sort.Direction.ASC, "bankaccountId"))
 		
 	}
 	
@@ -54,7 +56,8 @@ class BankServices {
 			@GraphQLArgument(name = "id") UUID id,
 			@GraphQLArgument(name = "fields") Map<String, Object> fields
 	) {
-		
+		def company = SecurityUtils.currentCompanyId()
+
 		if (id) {
 			def item = bankRepository.findById(id).get()
 			entityObjectMapperService.updateFromMap(item, fields)
@@ -63,11 +66,10 @@ class BankServices {
 			
 		} else {
 			def item = new Bank()
-			
+			item.company = company
 			item.bankaccountId = generatorService.getNextValue(GeneratorType.BANKID, {
 				return "BNK-" + StringUtils.leftPad(it.toString(), 6, "0")
 			})
-			
 			entityObjectMapperService.updateFromMap(item, fields)
 			bankRepository.save(item)
 		}

@@ -307,6 +307,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/23_wtx_table.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/24_ap_ledger_table.sql"
+             relativeToChangelogFile="false"/>
 
 
 </databaseChangeLog>

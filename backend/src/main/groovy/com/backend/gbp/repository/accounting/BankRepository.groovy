@@ -10,16 +10,18 @@ import org.springframework.data.repository.query.Param
 interface BankRepository extends JpaRepository<Bank, UUID> {
 	
 	@Query(value = """
-    Select c from Bank c  where lower(c.bankname) like lower(concat('%',:filter,'%'))
+    Select c from Bank c  where (lower(c.bankname) like lower(concat('%',:filter,'%'))
     or
-    lower(c.accountNumber) like lower(concat('%',:filter,'%'))
+    lower(c.accountNumber) like lower(concat('%',:filter,'%'))) and c.company = :company
 """,
 			countQuery = """
-     Select count(c) from Bank c  where lower(c.bankname) like lower(concat('%',:filter,'%'))
+     Select count(c) from Bank c  where (lower(c.bankname) like lower(concat('%',:filter,'%'))
      or
-    lower(c.accountNumber) like lower(concat('%',:filter,'%'))
+    lower(c.accountNumber) like lower(concat('%',:filter,'%'))) and c.company = :company
 """)
-	Page<Bank> getBanks(@Param("filter") String filter,
+	Page<Bank> getBanks(@Param("filter") String filter, @Param("company") UUID company,
                         Pageable page)
-	
+
+	@Query(value = """Select c from Bank c  where c.company = :company""")
+	List<Bank> getBankList(@Param("company") UUID company)
 }
