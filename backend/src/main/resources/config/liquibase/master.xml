@@ -287,5 +287,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/17_michael_attendance_tables.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/18_jeriah_alter_table_allowance.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/19_jeriah_alter_table_allowance_package.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

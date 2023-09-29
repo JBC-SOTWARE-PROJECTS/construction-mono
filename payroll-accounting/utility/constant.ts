@@ -138,3 +138,14 @@ export const HolidayType = [
     value: "NON_HOLIDAY",
   },
 ];
+
+export const AllowanceType = [
+  {
+    label: "SEMI-MONTHLY",
+    value: "SEMI-MONTHLY",
+  },
+  {
+    label: "HOURLY",
+    value: "HOURLY",
+  },
+];

@@ -210,3 +210,84 @@ export const DELETE_EVENT = gql`
     }
   }
 `;
+
+export const UPSERT_ALLOWANCE_TYPE = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    data: upsertAllowanceType(id: $id, fields: $fields) {
+      payload {
+        id
+      }
+      message
+      success
+    }
+  }
+`;
+
+export const FETCH_ALLOWANCE_PAGEABLE = gql`
+  query ($filter: String, $page: Int, $pageSize: Int) {
+    data: fetchAllowancePageable(
+      filter: $filter
+      page: $page
+      pageSize: $pageSize
+    ) {
+      content {
+        id
+        name
+        allowanceType
+        amount
+      }
+      totalElements
+      totalPages
+      number
+    }
+  }
+`;
+
+export const DELETE_ALLOWANCE = gql`
+  mutation ($id: UUID) {
+    data: deleteAllowance(id: $id) {
+      message
+      success
+    }
+  }
+`;
+
+export const UPSERT_ALLOWANCE_PACKAGE = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    data: upsertAllAllowancePackage(id: $id, fields: $fields) {
+      payload {
+        id
+      }
+      message
+      success
+    }
+  }
+`;
+
+export const FETCH_ALLOWANCE_PACKAGE_PAGEABLE = gql`
+  query ($filter: String, $page: Int, $pageSize: Int) {
+    data: fetchAllowancePackagePageable(
+      filter: $filter
+      page: $page
+      pageSize: $pageSize
+    ) {
+      content {
+        id
+        name
+        status
+      }
+      totalElements
+      totalPages
+      number
+    }
+  }
+`;
+
+export const DELETE_ALLOWANCE_PACKAGE = gql`
+  mutation ($id: UUID) {
+    data: deleteAllowancePackage(id: $id) {
+      message
+      success
+    }
+  }
+`;
