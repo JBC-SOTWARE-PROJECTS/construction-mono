@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal } from "antd";
+import { App } from "antd";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 
 interface OwnProps {
@@ -9,24 +9,28 @@ interface OwnProps {
   onCallBack: () => void;
 }
 
-const { confirm } = Modal;
-
 const UseConfirm = (props: OwnProps) => {
+  const { modal } = App.useApp();
   const { title, subTitle, loading, onCallBack } = props;
-  confirm({
-    title: title,
-    icon: <ExclamationCircleFilled />,
-    content: subTitle,
-    okText: "Yes",
-    okType: "danger",
-    cancelText: "No",
-    okButtonProps: {
-      loading: loading,
-    },
-    onOk() {
-      onCallBack();
-    },
-  });
+
+  const showConfirm = () => {
+    return modal.confirm({
+      title: title,
+      icon: <ExclamationCircleFilled />,
+      content: subTitle,
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      okButtonProps: {
+        loading: loading,
+      },
+      onOk() {
+        onCallBack();
+      },
+    });
+  };
+
+  return showConfirm();
 };
 
 export default UseConfirm;

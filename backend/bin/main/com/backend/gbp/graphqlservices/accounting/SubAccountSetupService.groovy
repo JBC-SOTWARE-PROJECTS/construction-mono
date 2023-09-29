@@ -8,6 +8,7 @@ import com.backend.gbp.domain.types.AutoIntegrateable
 import com.backend.gbp.domain.types.Subaccountable
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.requestscope.ChartofAccountGenerator
 import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -57,6 +58,7 @@ class ChartOfAccountGenerate implements Serializable{
     CoaComponentContainer subSubAccount
 
     String accountType
+    String accountCategory
 
     Boolean fromGenerator
 
@@ -251,17 +253,14 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
             @GraphQLArgument(name = "parentAccountId") UUID parentAccountId
     ) {
         createQuery("""Select sub from SubAccountSetup sub  
-            where sub.parentAccount.id = :parentAccountId order by sub.subaccountCode, sub.createdDate""",
+            where sub.parentAccount.id = :parentAccountId and sub.subaccountParent is null order by sub.subaccountCode, sub.createdDate""",
                 [parentAccountId:parentAccountId])
                 .resultList
     }
 
     List<SubAccountSetup> getActiveSubAccount( ) {
-
-
         createQuery("Select sub from SubAccountSetup sub  where (sub.attrInactive is null or sub.attrInactive=false)  order by sub.subaccountCode, sub.createdDate",[:])
                 .resultList
-
     }
 
 
@@ -295,13 +294,24 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     ) {
         try{
            def entity = upsertFromMap(id, fields, { SubAccountSetup entity, boolean forInsert ->
+                if(forInsert){
+                    entity.company = SecurityUtils.currentCompany()
+                }
                 entity.accountName = (entity?.accountName ?: '').toUpperCase()
                 entity.subaccountCode = (entity?.subaccountCode ?: '').toUpperCase()
                 entity.subaccountType = entity.parentAccount.accountType
                 entity.accountCategory = entity.parentAccount.accountCategory
                 if(entity.sourceDomain != DomainEnum.NO_DOMAIN){
-                    entity.subaccountCode = ("${entity.sourceDomain.displayName} Code").toUpperCase()
-                    entity.accountName = (entity.sourceDomain.displayName).toUpperCase()
+
+                    if(entity.subaccountParent){
+                        entity.subaccountCode = entity.subaccountParent.subaccountCode+" - "+("${entity.sourceDomain.displayName} Code").toUpperCase()
+                        entity.accountName = entity.subaccountParent.accountName+" - "+(entity.sourceDomain.displayName).toUpperCase()
+                    }
+                    else {
+                        entity.subaccountCode = ("${entity.sourceDomain.displayName} Code").toUpperCase()
+                        entity.accountName = (entity.sourceDomain.displayName).toUpperCase()
+                    }
+
                 }
             })
 

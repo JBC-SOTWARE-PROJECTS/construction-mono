@@ -13,11 +13,13 @@ import UpsertCompanyModal from "@/components/administrative/company/dialogs/upse
 import { FormSwitch } from "@/components/common";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import OTCTable from "@/components/accounting/billing/otcTable";
+import { useRouter } from "next/router";
 
 const { Search } = Input;
 
 export default function OTCTransactionComponent() {
   const modal = useDialog(UpsertCompanyModal);
+  const router = useRouter();
   const [active, setActive] = useState(true);
   const [state, setState] = useState({
     filter: "",
@@ -44,8 +46,7 @@ export default function OTCTransactionComponent() {
   return (
     <PageContainer
       title="Over the Counter (OTC) Transactions"
-      content="Effortlessly manage and oversee your list of OTC records."
-    >
+      content="Effortlessly manage and oversee your list of OTC records.">
       <ProCard
         title="OTC Transaction List"
         headStyle={{
@@ -64,13 +65,11 @@ export default function OTCTransactionComponent() {
             <Button
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={() => onUpsertRecord()}
-            >
+              onClick={() => onUpsertRecord()}>
               New Customer
             </Button>
           </ProFormGroup>
-        }
-      >
+        }>
         <Form layout="horizontal" className="filter-form">
           <Row gutter={[8, 8]}>
             <Col span={24}>
@@ -96,7 +95,9 @@ export default function OTCTransactionComponent() {
               totalElements={
                 data?.billingOTCByFiltersPage?.totalElements as number
               }
-              handleOpen={(record) => console.log(record)}
+              handleOpen={(record) =>
+                router.push(`/accounting/billing/folio/${record?.id}`)
+              }
               changePage={(page) =>
                 setState((prev) => ({ ...prev, page: page }))
               }
