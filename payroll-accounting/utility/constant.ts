@@ -327,6 +327,16 @@ export const HolidayType = [
   },
 ];
 
+
+export const AllowanceType = [
+  {
+    label: "SEMI-MONTHLY",
+    value: "SEMI-MONTHLY",
+  },
+  {
+    label: "HOURLY",
+    value: "HOURLY",
+
 export const ACCOUNT_TYPES = [
   { label: "ASSET", value: "ASSET" },
   { label: "LIABILITY", value: "LIABILITY" },

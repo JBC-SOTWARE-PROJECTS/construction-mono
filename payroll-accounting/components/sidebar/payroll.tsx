@@ -3,6 +3,7 @@ import {
   CalendarOutlined,
   CarryOutOutlined,
   SettingOutlined,
+  MoneyCollectOutlined,
 } from "@ant-design/icons";
 
 const payrollmenu: TDiverseTradeMenu[] = [
@@ -23,6 +24,12 @@ const payrollmenu: TDiverseTradeMenu[] = [
     subtitle: "View and manage payroll",
     icon: <CalendarOutlined className="diverse-trade-icon" />,
     path: "/payroll/payroll-management",
+  },
+  {
+    title: "Allowance Management",
+    subtitle: "Manage configuration for allowance management",
+    icon: <MoneyCollectOutlined className="diverse-trade-icon" />,
+    path: "/payroll/allowance-management/allowance-type",
   },
 ];
 
