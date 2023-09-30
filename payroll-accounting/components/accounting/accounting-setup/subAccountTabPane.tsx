@@ -44,6 +44,19 @@ export default function SubAccountTabPane(props: SubAccountTabPaneI) {
       ),
     },
     {
+      title: 'Data Records',
+      dataIndex: 'domainName',
+      key: 'domainName',
+      render: (text, record) => (
+        <Space direction='vertical' size={1}>
+          <Typography.Text>{text}</Typography.Text>
+          <p style={{ color: '#868686', fontSize: '11px' }}>
+            {record.description}
+          </p>
+        </Space>
+      ),
+    },
+    {
       title: 'Category',
       dataIndex: 'accountCategory',
       key: 'accountCategory',

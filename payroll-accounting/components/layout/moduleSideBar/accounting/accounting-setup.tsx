@@ -24,6 +24,10 @@ const AccountingSetupMenu = {
             path: '/accounting/accounting-setup/chart-of-accounts',
             name: 'Chart of Accounts',
           },
+          {
+            path: '/accounting/accounting-setup/integrations',
+            name: 'Integrations',
+          },
         ],
       },
     ],

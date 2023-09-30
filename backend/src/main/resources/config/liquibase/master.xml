@@ -287,7 +287,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/17_michael_attendance_tables.sql"
              relativeToChangelogFile="false"/>
-
     <include file="classpath:config/liquibase/changelog4/14_donss_alter_subaccounts.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/18_donss_create_integration_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/20_donss_create_integration_details.sql"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -32,7 +32,7 @@ class ChartofAccountGenerator {
     SubAccountSetupService subAccountSetupService
 
 
-    @Memoize
+//    @Memoize
     List<ChartOfAccountGenerate> getAllChartOfAccountGenerate(
              String accountType,
              String motherAccountCode,
@@ -58,13 +58,13 @@ class ChartofAccountGenerator {
 
         // Just Add Reference to Mother Account
         Set<String> motherAccountsWithSubAccount = []
-        Set<String> subAccountsWithSubAccount = []
+        Set<UUID> subAccountsWithSubAccount = []
         subAccounts.each {
             if(it.parentAccount)
                 motherAccountsWithSubAccount << it.parentAccount.accountCode
 
             if(it.subaccountParent)
-                subAccountsWithSubAccount << "${it.parentAccount.accountCode}-${it.subaccountParent.subaccountCode}-0000"
+                subAccountsWithSubAccount << it.subaccountParent.id
         }
 
         Map<DomainEnum,List<Subaccountable>> entityListMap = [:]
@@ -101,14 +101,11 @@ class ChartofAccountGenerator {
                         // Prevent duplicate loading [USING DOMAIN]
                         if(!entityListMap.containsKey(subAccount.sourceDomain)){
                             List<Subaccountable> entities=  entityManager.createQuery("from ${subAccount.sourceDomain.path}",
-                                    Class.forName(subAccount.sourceDomain.path as String)).resultList.
-                                    findAll {
+                                    Class.forName(subAccount.sourceDomain.path as String)).resultList
+                                    .findAll {
                                         // filter Discounts to exclude VAT Discounts
                                         if(it instanceof Discount){
-                                            if(it.active)
-                                                return true
-                                            else
-                                                return false
+                                            return it.active
                                         }
                                         else {
                                             return true
@@ -121,33 +118,114 @@ class ChartofAccountGenerator {
 
                         // Check for sub-account parent [USING DOMAIN]
                         if(subAccount.subaccountParent){
+                            if(subAccount.subaccountParent.sourceDomain.name() != 'NO_DOMAIN') {
+                                // Remove exclude records
+                                Map<UUID, String> subDomainExcludes = [:]
+                                if (subAccount.subaccountParent.domainExcludes.size() > 0) {
+                                    subAccount.subaccountParent.domainExcludes.each {
+                                        de ->
+                                            subDomainExcludes.put(UUID.fromString(de.key), de.label)
+                                    }
+                                }
+
+                                if(!entityListMap.containsKey(subAccount.subaccountParent.sourceDomain)){
+                                    List<Subaccountable> entities=  entityManager.createQuery("from ${subAccount.subaccountParent.sourceDomain.path}",
+                                            Class.forName(subAccount.subaccountParent.sourceDomain.path as String)).resultList
+                                            .findAll {
+                                                // filter Discounts to exclude VAT Discounts
+                                                if(it instanceof Discount){
+                                                    return it.active
+                                                }
+                                                else {
+                                                    return true
+                                                }
+                                            } as List<Subaccountable>
+                                    entityListMap.put(subAccount.subaccountParent.sourceDomain.name(),entities.toSorted { a,b ->
+                                        a.code <=> b.code
+                                    })
+                                }
+
+                                entityListMap.get(subAccount.subaccountParent.sourceDomain.name()).each {
+                                    if(!subDomainExcludes[it.id]) {
+                                        if(entityListMap.get(subAccount.sourceDomain.name())) subAccountsWithSubAccount << it.id
+
+                                        entityListMap.get(subAccount.sourceDomain.name()).each {
+                                            subSub ->
+                                            if(!domainExcludes[subSub.id]) {
+                                                coaNew = new ChartOfAccountGenerate(motherAccount: new CoaComponentContainer(coa.accountCode, coa.id, coa.accountName,
+                                                        coa.class.name, coa.normalSide.name()), accountType: coa.accountType.name(),accountCategory:coa.accountCategory.name(),  fromGenerator: true)
+                                                coaNew.subAccount = new CoaComponentContainer(
+                                                        it.code,
+                                                        it.id,
+                                                        it.accountName,
+                                                        it.domain,
+                                                        coa.normalSide.name(),
+                                                        coa.accountType.name(),
+                                                        coa.accountCategory.name()
+                                                )
+
+                                                coaNew.subSubAccount = new CoaComponentContainer(
+                                                        subSub.code,
+                                                        subSub.id,
+                                                        subSub.accountName,
+                                                        subSub.domain,
+                                                        coa.normalSide.name(),
+                                                        coa.accountType.name(),
+                                                        coa.accountCategory.name()
+                                                )
+                                                results << coaNew
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                            else {
+                                entityListMap.get(subAccount.sourceDomain.name()).each {
+                                    if(!domainExcludes[it.id]) {
+                                        coaNew = new ChartOfAccountGenerate(motherAccount: new CoaComponentContainer(coa.accountCode, coa.id, coa.accountName,
+                                                coa.class.name, coa.normalSide.name()), accountType: coa.accountType.name(),accountCategory:coa.accountCategory.name(),  fromGenerator: true)
+                                        coaNew.subAccount = new CoaComponentContainer(
+                                              subAccount.subaccountParent.subaccountCode,
+                                              subAccount.subaccountParent.id,
+                                              subAccount.subaccountParent.accountName,
+                                              subAccount.subaccountParent.class.name,
+                                              coa.normalSide.name(),
+                                              coa.accountType.name(),
+                                              coa.accountCategory.name()
+                                        )
+                                        coaNew.subSubAccount = new CoaComponentContainer(
+                                                it.code,
+                                                it.id,
+                                                it.accountName,
+                                                it.domain,
+                                                coa.normalSide.name(),
+                                                coa.accountType.name(),
+                                                coa.accountCategory.name()
+                                        )
+
+                                        results << coaNew
+                                    }
+                                }
+                            }
+                        }
+                        else {
                             entityListMap.get(subAccount.sourceDomain.name()).each {
-                              if(!domainExcludes[it.id]) {
-                                  coaNew = new ChartOfAccountGenerate(motherAccount: new CoaComponentContainer(coa.accountCode, coa.id, coa.accountName,
-                                          coa.class.name, coa.normalSide.name()), accountType: coa.accountType.name(),accountCategory:coa.accountCategory.name(),  fromGenerator: true)
+                                if(!domainExcludes[it.id]) {
+                                    coaNew = new ChartOfAccountGenerate(motherAccount: new CoaComponentContainer(coa.accountCode, coa.id, coa.accountName,
+                                            coa.class.name, coa.normalSide.name()), accountType: coa.accountType.name(),accountCategory:coa.accountCategory.name(),  fromGenerator: true)
 
-                                  coaNew.subAccount = new CoaComponentContainer(
-                                          subAccount.subaccountParent.subaccountCode,
-                                          subAccount.subaccountParent.id,
-                                          subAccount.subaccountParent.accountName,
-                                          subAccount.subaccountParent.class.name,
-                                          coa.normalSide.name(),
-                                          coa.accountType.name(),
-                                          coa.accountCategory.name()
-                                  )
-
-                                  coaNew.subSubAccount = new CoaComponentContainer(
-                                          it.code,
-                                          it.id,
-                                          it.accountName,
-                                          it.domain,
-                                          coa.normalSide.name(),
-                                          coa.accountType.name(),
-                                          coa.accountCategory.name()
-                                  )
-
-                                  results << coaNew
-                              }
+                                    coaNew.subAccount = new CoaComponentContainer(
+                                            it.code,
+                                            it.id,
+                                            it.accountName,
+                                            it.domain,
+                                            coa.normalSide.name(),
+                                            coa.accountType.name(),
+                                            coa.accountCategory.name()
+                                    )
+                                    results << coaNew
+                                }
                             }
                         }
                     }
@@ -259,9 +337,9 @@ class ChartofAccountGenerator {
                         filter = false
                 }
 
-                if(subAccountsWithSubAccount.contains("${gen?.motherAccount?.code}-${gen?.subAccount?.code}-0000"))
+                if(subAccountsWithSubAccount.contains(gen?.subAccount?.id))
                 {
-                    if(!gen.subSubAccount)
+                    if(!gen?.subSubAccount)
                         filter = false
                 }
             }

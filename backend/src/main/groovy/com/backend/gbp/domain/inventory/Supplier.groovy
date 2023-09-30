@@ -129,4 +129,5 @@ class Supplier extends AbstractAuditingEntity implements Serializable, Subaccoun
 	String getDomain() {
 		return Supplier.class.name
 	}
+
 }
