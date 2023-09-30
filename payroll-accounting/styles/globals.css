@@ -101,8 +101,8 @@ a {
 }
 
 .ant-segmented-item-selected {
-  /* color: #fff !important; */
-}
+  color: #fff !important;
+} 
 
 /* .ant-btn-primary {
   background-color: #399b53 !important;
