@@ -327,7 +327,6 @@ export const HolidayType = [
   },
 ];
 
-
 export const AllowanceType = [
   {
     label: "SEMI-MONTHLY",
@@ -336,6 +335,8 @@ export const AllowanceType = [
   {
     label: "HOURLY",
     value: "HOURLY",
+  },
+];
 
 export const ACCOUNT_TYPES = [
   { label: "ASSET", value: "ASSET" },
