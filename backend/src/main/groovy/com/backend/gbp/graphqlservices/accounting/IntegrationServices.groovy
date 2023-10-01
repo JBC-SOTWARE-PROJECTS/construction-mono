@@ -569,171 +569,82 @@ class IntegrationServices extends AbstractDaoService<Integration> {
     @GraphQLMutation(name = "addSubAccountToIntegration")
     Boolean addSubAccountToIntegration(
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "subAccountId") UUID subAccountId
+            @GraphQLArgument(name = "accountId") UUID accountId
 
     ) {
+        def parentAccount = null
+        def subAccountSetup = subAccountSetupService.findOne(accountId)
+        if(!subAccountSetup)
+            parentAccount = parentAccountServices.findOne(accountId)
 
-        def subAccountSetup = subAccountSetupService.findOne(subAccountId)
         def integration =  findOne(id)
         CoaPattern pattern = new CoaPattern()
-        pattern.subAccountSetupId = subAccountSetup.id
-        pattern.subAccountName = subAccountSetup.accountName
-        pattern.motherAccount.normalSide = subAccountSetup.parentAccount.normalSide.name()
-        pattern.motherAccount.id = subAccountSetup.parentAccount.id
-        pattern.motherAccount.code= subAccountSetup.parentAccount.accountCode
-        pattern.motherAccount.accountName =subAccountSetup.parentAccount.accountName
-        pattern.motherAccount.domain = subAccountSetup.parentAccount.class.name.split("\\\$")[0]
+        if(parentAccount){
+            pattern.motherAccount.normalSide = parentAccount.normalSide.name()
+            pattern.motherAccount.id = parentAccount.id
+            pattern.motherAccount.code= parentAccount.accountCode
+            pattern.motherAccount.accountName =parentAccount.accountName
+            pattern.motherAccount.domain = parentAccount.class.name.split("\\\$")[0]
+        }else {
+            pattern.subAccountSetupId = subAccountSetup.id
+            pattern.subAccountName = subAccountSetup.accountName
+            pattern.motherAccount.normalSide = subAccountSetup.parentAccount.normalSide.name()
+            pattern.motherAccount.id = subAccountSetup.parentAccount.id
+            pattern.motherAccount.code = subAccountSetup.parentAccount.accountCode
+            pattern.motherAccount.accountName = subAccountSetup.parentAccount.accountName
+            pattern.motherAccount.domain = subAccountSetup.parentAccount.class.name.split("\\\$")[0]
 
+
+
+            if (StringUtils.isNotBlank(subAccountSetup.sourceDomain.path)) {
+
+                if (!(subAccountSetup.subaccountParent)) {
+                    pattern.subAccount.id = UUID.randomUUID()
+                    pattern.subAccount.code = "####"
+                    pattern.subAccount.accountName = subAccountSetup.accountName
+                    pattern.subAccount.domain = subAccountSetup.sourceDomain.path
+                } else {
+                    if (subAccountSetup.subaccountParent) {
+
+                        pattern.subAccount.id = subAccountSetup.subaccountParent.id
+                        pattern.subAccount.code = subAccountSetup.subaccountParent.subaccountCode
+                        pattern.subAccount.accountName = subAccountSetup.subaccountParent.accountName
+                        pattern.subAccount.domain = subAccountSetup.subaccountParent.class.name
+
+                        pattern.subSubAccount.id = UUID.randomUUID()
+                        pattern.subSubAccount.code = "####"
+                        pattern.subSubAccount.accountName = subAccountSetup.accountName
+                        pattern.subSubAccount.domain = subAccountSetup.sourceDomain.path
+                    }
+                }
+
+            } else {
+                if (!(subAccountSetup.subaccountParent)) {
+                    // not 3rd level
+                    pattern.subAccount.id = subAccountSetup.id
+                    pattern.subAccount.code = subAccountSetup.subaccountCode
+                    pattern.subAccount.accountName = subAccountSetup.accountName
+                    pattern.subAccount.domain = subAccountSetup.sourceDomain.path
+                } else {
+                    if (subAccountSetup.subaccountParent) {
+                        pattern.subAccount.id = subAccountSetup.subaccountParent.id
+                        pattern.subAccount.code = subAccountSetup.subaccountParent.subaccountCode
+                        pattern.subAccount.accountName = subAccountSetup.subaccountParent.accountName
+                        pattern.subAccount.domain = subAccountSetup.subaccountParent.sourceDomain.path
+
+
+                        pattern.subSubAccount.id = subAccountSetup.id
+                        pattern.subSubAccount.code = subAccountSetup.subaccountCode
+                        pattern.subSubAccount.accountName = subAccountSetup.accountName
+                        pattern.subSubAccount.domain = subAccountSetup.sourceDomain.path
+                    }
+                }
+            }
+        }
         IntegrationItem integrationItem = new IntegrationItem()
-        integrationItem.integration= integration
-
-        if(StringUtils.isNotBlank(subAccountSetup.sourceDomain.path)){
-
-            if(!(subAccountSetup.subaccountParent)) {
-                pattern.subAccount.id = UUID.randomUUID()
-                pattern.subAccount.code = "####"
-                pattern.subAccount.accountName = subAccountSetup.accountName
-                pattern.subAccount.domain = subAccountSetup.sourceDomain.path
-            }
-            else {
-                if(subAccountSetup.subaccountParent){
-
-                    pattern.subAccount.id = subAccountSetup.subaccountParent.id
-                    pattern.subAccount.code= subAccountSetup.subaccountParent.subaccountCode
-                    pattern.subAccount.accountName =subAccountSetup.subaccountParent.accountName
-                    pattern.subAccount.domain = subAccountSetup.subaccountParent.class.name
-
-                    pattern.subSubAccount.id = UUID.randomUUID()
-                    pattern.subSubAccount.code = "####"
-                    pattern.subSubAccount.accountName = subAccountSetup.accountName
-                    pattern.subSubAccount.domain = subAccountSetup.sourceDomain.path
-                }
-            }
-
-        }
-        else {
-            if(!(subAccountSetup.subaccountParent)){
-                // not 3rd level
-                pattern.subAccount.id = subAccountSetup.id
-                pattern.subAccount.code= subAccountSetup.subaccountCode
-                pattern.subAccount.accountName =subAccountSetup.accountName
-                pattern.subAccount.domain = subAccountSetup.sourceDomain.path
-            }
-
-            else {
-
-                if(subAccountSetup.subaccountParent){
-                    pattern.subAccount.id = subAccountSetup.subaccountParent.id
-                    pattern.subAccount.code= subAccountSetup.subaccountParent.subaccountCode
-                    pattern.subAccount.accountName =subAccountSetup.subaccountParent.accountName
-                    pattern.subAccount.domain = subAccountSetup.subaccountParent.sourceDomain.path
-
-
-                    pattern.subSubAccount.id = subAccountSetup.id
-                    pattern.subSubAccount.code= subAccountSetup.subaccountCode
-                    pattern.subSubAccount.accountName =subAccountSetup.accountName
-                    pattern.subSubAccount.domain = subAccountSetup.sourceDomain.path
-                }
-            }
-        }
-
+        integrationItem.integration = integration
         integrationItem.journalAccount = pattern
         integration.integrationItems << integrationItem
-
-//        subAccountSetup.motherAccounts.each {
-//
-//            CoaPattern pattern = new CoaPattern()
-//            pattern.subAccountSetupId = subAccountSetup.id
-//            pattern.subAccountName = subAccountSetup.description
-//            pattern.motherAccount.normalSide = it.chartOfAccount.normalSide.name()
-//            pattern.motherAccount.id = it.id
-//            pattern.motherAccount.code= it.chartOfAccount.accountCode
-//            pattern.motherAccount.description =it.chartOfAccount.description
-//            pattern.motherAccount.domain = it.class.name
-//
-//            IntegrationItem integrationItem = new IntegrationItem()
-//            integrationItem.integration= integration
-//
-//
-//            if(StringUtils.isNotBlank(subAccountSetup.sourceDomain)){
-//
-//                if(!(subAccountSetup.subaccountParent || subAccountSetup.includeDepartment)) {
-//                    pattern.subAccount.id = UUID.randomUUID()
-//                    pattern.subAccount.code = "####"
-//                    pattern.subAccount.description = subAccountSetup.description
-//                    pattern.subAccount.domain = subAccountSetup.sourceDomain
-//                }
-//                else {
-//                    if(subAccountSetup.subaccountParent){
-//
-//                        pattern.subAccount.id = subAccountSetup.subaccountParent.id
-//                        pattern.subAccount.code= subAccountSetup.subaccountParent.subaccountCode
-//                        pattern.subAccount.description =subAccountSetup.subaccountParent.description
-//                        pattern.subAccount.domain = subAccountSetup.subaccountParent.class.name
-//
-//                        pattern.subSubAccount.id = UUID.randomUUID()
-//                        pattern.subSubAccount.code = "####"
-//                        pattern.subSubAccount.description = subAccountSetup.description
-//                        pattern.subSubAccount.domain = subAccountSetup.sourceDomain
-//
-//
-//                    } else if(subAccountSetup.includeDepartment){
-//
-//                        pattern.subAccount.id = UUID.randomUUID()
-//                        pattern.subAccount.code= "####"
-//                        pattern.subAccount.description = "Department"
-//                        pattern.subAccount.domain = Department.class.name
-//
-//                        pattern.subSubAccount.id = UUID.randomUUID()
-//                        pattern.subSubAccount.code = "####"
-//                        pattern.subSubAccount.description = subAccountSetup.description
-//                        pattern.subSubAccount.domain = subAccountSetup.sourceDomain
-//                    }
-//                }
-//
-//            }
-//            else {
-//                if(!(subAccountSetup.subaccountParent || subAccountSetup.includeDepartment)){
-//                    // not 3rd level
-//                    pattern.subAccount.id = subAccountSetup.id
-//                    pattern.subAccount.code= subAccountSetup.subaccountCode
-//                    pattern.subAccount.description =subAccountSetup.description
-//                    pattern.subAccount.domain = subAccountSetup.class.name
-//
-//                }
-//
-//                else {
-//
-//                     if(subAccountSetup.subaccountParent){
-//                         pattern.subAccount.id = subAccountSetup.subaccountParent.id
-//                         pattern.subAccount.code= subAccountSetup.subaccountParent.subaccountCode
-//                         pattern.subAccount.description =subAccountSetup.subaccountParent.description
-//                         pattern.subAccount.domain = subAccountSetup.subaccountParent.class.name
-//
-//
-//                         pattern.subSubAccount.id = subAccountSetup.id
-//                         pattern.subSubAccount.code= subAccountSetup.subaccountCode
-//                         pattern.subSubAccount.description =subAccountSetup.description
-//                         pattern.subSubAccount.domain = subAccountSetup.class.name
-//                     }
-//                    else if(subAccountSetup.includeDepartment){
-//                         pattern.subAccount.id = UUID.randomUUID()
-//                         pattern.subAccount.code= "####"
-//                         pattern.subAccount.description = "Department"
-//                         pattern.subAccount.domain = Department.class.name
-//
-//                         pattern.subSubAccount.id = subAccountSetup.id
-//                         pattern.subSubAccount.code= subAccountSetup.subaccountCode
-//                         pattern.subSubAccount.description =subAccountSetup.description
-//                         pattern.subSubAccount.domain = subAccountSetup.class.name
-//                     }
-//
-//                }
-//            }
-//
-//            integrationItem.journalAccount = pattern
-//            integration.integrationItems << integrationItem
-//        }
         save(integration)
         true
     }
