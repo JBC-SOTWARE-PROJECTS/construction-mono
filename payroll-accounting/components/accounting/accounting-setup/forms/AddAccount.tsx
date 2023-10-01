@@ -6,8 +6,8 @@ import _ from 'lodash'
 import React, { useEffect } from 'react'
 
 export const ADD_SUBCCOUNT_RECORD = gql`
-  mutation AddSubAccount($id: UUID, $subAccountId: UUID) {
-    addSubAccountToIntegration(id: $id, subAccountId: $subAccountId)
+  mutation AddSubAccount($id: UUID, $accountId: UUID) {
+    addSubAccountToIntegration(id: $id, accountId: $accountId)
   }
 `
 
@@ -19,15 +19,10 @@ const ACCOUNTS_LEVEL_VALUES = gql`
 
 export const GET_COA_SUB = gql`
   query {
-    getSetupBySubAccountTypeAll {
-      id
-      subaccountCode
-      description: accountName
-      parentAccount {
-        id
-        accountName
-      }
-      subaccountType
+    getAllCOAParent {
+      value
+      label
+      key
     }
   }
 `
@@ -59,7 +54,7 @@ const AddAccount = (props: AddAccountProps) => {
     // console.log("payload for add", props.itemid, fields.id)
     addSubAccountNow({
       variables: {
-        subAccountId: fields.id,
+        accountId: fields.id,
         id: props.itemid,
       },
     })
@@ -96,14 +91,7 @@ const AddAccount = (props: AddAccountProps) => {
               },
             ]}
             propsselect={{
-              options: (data?.getSetupBySubAccountTypeAll || []).map(
-                (item: any) => {
-                  return {
-                    label: `${item.parentAccount.accountName}-${item.description}`,
-                    value: item.id,
-                  }
-                }
-              ),
+              options: data?.getAllCOAParent || [],
             }}
           />
         </Form>
