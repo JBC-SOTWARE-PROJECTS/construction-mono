@@ -97,7 +97,9 @@ const IntergrationItem = (props: IntegrationProps) => {
         columns={columns}
         dataSource={integrationgroupList ?? []}
         expandable={{
-          expandedRowRender: (record) => <JournalAccounts id={record.id} />,
+          expandedRowRender: (record) => (
+            <JournalAccounts id={record.id} domain={record?.domain} />
+          ),
         }}
       />
     </Space>

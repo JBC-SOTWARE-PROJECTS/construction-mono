@@ -3,6 +3,7 @@ package com.backend.gbp.domain.accounting
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.inventory.SupplierType
+import com.backend.gbp.domain.types.Subaccountable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -59,6 +60,5 @@ class ApTransaction extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "status", columnDefinition = "numeric")
 	Boolean status
 
-	
 }
 

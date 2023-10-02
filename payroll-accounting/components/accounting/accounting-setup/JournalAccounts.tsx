@@ -84,6 +84,7 @@ export const INTEGRATION_ITEM = gql`
 
 interface JournalProps {
   id: string
+  domain: string
 }
 
 const JournalAccounts = (props: JournalProps) => {
@@ -112,11 +113,14 @@ const JournalAccounts = (props: JournalProps) => {
       }
     })
   const handleEditAccount = (row: any) =>
-    onEditAccount({ row }, (e: boolean) => {
-      if (e) {
-        refetch()
+    onEditAccount(
+      { row, domain: props?.domain, integrationId: props.id },
+      (e: boolean) => {
+        if (e) {
+          refetch()
+        }
       }
-    })
+    )
   const handleTransferIntegration = () =>
     onTransferIntegration({ itemid: props.id }, (e: boolean) => {
       if (e) {

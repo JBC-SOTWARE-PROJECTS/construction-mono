@@ -301,8 +301,16 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
                     else {
                         entity.subaccountCode = 'AUTO GENERATED'
                         entity.accountName = (entity.sourceDomain.displayName).toUpperCase()
+                        entity.setSubaccountParent(null)
                     }
                 }
+                else {
+                    entity.sourceDomain = DomainEnum.NO_DOMAIN
+                }
+
+               if(!fields['subaccountParent']){
+                   entity.setSubaccountParent(null)
+               }
 
                 if((fields['domainExcludes'] as List<DomainOptionDto> ?: []).size() > 0){
                     entity.domainExcludes = fields['domainExcludes'] as List<DomainOptionDto>

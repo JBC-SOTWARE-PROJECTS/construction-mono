@@ -14,7 +14,8 @@ import javax.persistence.*
 
 enum IntegrationDomainEnum {
     NO_DOMAIN("NO DOMAIN", ""),
-    BILLING_ITEM("Billing Item", "com.backend.gbp.domain.billing.BillingItem")
+    BILLING_ITEM("Billing Item", "com.backend.gbp.domain.billing.BillingItem"),
+    ACCOUNTS_PAYABLE("Accounts Payable", "com.backend.gbp.domain.accounting.AccountsPayable")
 
     String displayName
     String path

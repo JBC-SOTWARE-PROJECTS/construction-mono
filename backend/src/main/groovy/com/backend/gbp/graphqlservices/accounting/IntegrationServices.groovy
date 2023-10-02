@@ -495,10 +495,10 @@ class IntegrationServices extends AbstractDaoService<Integration> {
     }
 
     @GraphQLQuery(name = "getStringFieldsFromDomain")
-    List<String> getStringFieldsFromDomain(
-            @GraphQLArgument(name = "domain") String domain
+    static List<String> getStringFieldsFromDomain(
+            @GraphQLArgument(name = "domain") IntegrationDomainEnum domain
     ) {
-        def classType = Class.forName(domain)
+        def classType = Class.forName(domain.path)
         Set<Field> fields = ReflectionUtils.getAllFields(classType,ReflectionUtils.withTypeAssignableTo(String.class))
 
         fields.collect {
@@ -511,10 +511,10 @@ class IntegrationServices extends AbstractDaoService<Integration> {
     }
 
     @GraphQLQuery(name = "getBigDecimalFieldsFromDomain")
-    List<String> getBigDecimalFieldsFromDomain(
-            @GraphQLArgument(name = "domain") String domain
+    static List<String> getBigDecimalFieldsFromDomain(
+            @GraphQLArgument(name = "domain") IntegrationDomainEnum domain
     ) {
-        def classType = Class.forName(domain)
+        def classType = Class.forName(domain.path)
         Set<Field> fields = ReflectionUtils.getAllFields(classType,ReflectionUtils.withTypeAssignableTo(BigDecimal.class))
 
         fields.collect {
@@ -528,33 +528,19 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
 
     @GraphQLQuery(name = "getSpecificFieldsFromDomain")
-    List<String> getSpecificFieldsFromDomain(
-            @GraphQLArgument(name = "domain") String domain,
+    static List<String> getSpecificFieldsFromDomain(
+            @GraphQLArgument(name = "domain") IntegrationDomainEnum domain,
             @GraphQLArgument(name = "target") String target
     ) {
-        def classType = Class.forName(domain)
+        def classType = Class.forName(domain.path)
 
-        if(StringUtils.equalsIgnoreCase(target,Department.class.name)){
-            def targetType = Class.forName(target)
-            Set<Field> fields = ReflectionUtils.getAllFields(classType,ReflectionUtils.withTypeAssignableTo(targetType))
-
-            fields.collect {
-                it.name
-            }.toSorted {
-                a,b ->
-                    a <=> b
-            }
+        Set<Field> fields = ReflectionUtils.getAllFields(classType,ReflectionUtils.withTypeAssignableTo(Subaccountable))
+        fields.findAll {it.type.name == target}.collect {
+             it.name
+        }.toSorted {
+            a,b ->
+                a <=> b
         }
-        else {
-            Set<Field> fields = ReflectionUtils.getAllFields(classType,ReflectionUtils.withTypeAssignableTo(Subaccountable))
-            fields.collect {
-                it.name
-            }.toSorted {
-                a,b ->
-                    a <=> b
-            }
-        }
-
 
     }
 
@@ -585,6 +571,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
             pattern.motherAccount.code= parentAccount.accountCode
             pattern.motherAccount.accountName =parentAccount.accountName
             pattern.motherAccount.domain = parentAccount.class.name.split("\\\$")[0]
+
         }else {
             pattern.subAccountSetupId = subAccountSetup.id
             pattern.subAccountName = subAccountSetup.accountName
@@ -609,7 +596,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
                         pattern.subAccount.id = subAccountSetup.subaccountParent.id
                         pattern.subAccount.code = subAccountSetup.subaccountParent.subaccountCode
                         pattern.subAccount.accountName = subAccountSetup.subaccountParent.accountName
-                        pattern.subAccount.domain = subAccountSetup.subaccountParent.class.name
+                        pattern.subAccount.domain = subAccountSetup.subaccountParent.sourceDomain.path
 
                         pattern.subSubAccount.id = UUID.randomUUID()
                         pattern.subSubAccount.code = "####"
