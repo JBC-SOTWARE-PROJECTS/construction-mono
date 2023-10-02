@@ -26,7 +26,7 @@ import {
   GET_BILLING_ITEMS,
 } from "@/graphql/billing/queries";
 import _ from "lodash";
-import { useConfirm } from "@/hooks";
+// import { useConfirm } from "@/hooks";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 
 interface Iprops {
@@ -64,35 +64,35 @@ export default function BillingTables(props: Iprops) {
   // ======================== functions =================================
   const onCancelled = (e?: BillingItem) => {
     let loading = false;
-    useConfirm({
-      title: "Are you sure you want to cancel this billing item?",
-      subTitle: "Click Yes if you want to proceed",
-      loading: loading,
-      onCallBack: async () => {
-        try {
-          return await new Promise((resolve, reject) => {
-            cancelBilling({
-              variables: {
-                id: e?.id ?? null,
-                office: account?.office?.id ?? null,
-              },
-              onCompleted: (data_1) => {
-                let result = data_1?.cancelItem as BillingItem;
-                if (result?.id) {
-                  refetch();
-                  onRefetchBillingInfo();
-                  resolve();
-                } else {
-                  reject();
-                }
-              },
-            });
-          });
-        } catch {
-          return console.log("Oops errors!");
-        }
-      },
-    });
+    // useConfirm({
+    //   title: "Are you sure you want to cancel this billing item?",
+    //   subTitle: "Click Yes if you want to proceed",
+    //   loading: loading,
+    //   onCallBack: async () => {
+    //     try {
+    //       return await new Promise((resolve, reject) => {
+    //         cancelBilling({
+    //           variables: {
+    //             id: e?.id ?? null,
+    //             office: account?.office?.id ?? null,
+    //           },
+    //           onCompleted: (data_1) => {
+    //             let result = data_1?.cancelItem as BillingItem;
+    //             if (result?.id) {
+    //               refetch();
+    //               onRefetchBillingInfo();
+    //               resolve();
+    //             } else {
+    //               reject();
+    //             }
+    //           },
+    //         });
+    //       });
+    //     } catch {
+    //       return console.log("Oops errors!");
+    //     }
+    //   },
+    // });
   };
   //========================= columnns ==================================
   const columns: ColumnsType<BillingItem> = [

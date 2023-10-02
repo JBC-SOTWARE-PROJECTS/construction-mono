@@ -4,8 +4,6 @@ const theme: ThemeConfig = {
   token: {
     fontSize: 14,
     colorPrimary: "#399B53",
-    colorPrimaryBg: "#399B53",
-    fontFamily: "'Lato', sans-serif",
   },
   components: {
     Input: {
@@ -16,7 +14,6 @@ const theme: ThemeConfig = {
     },
     Button: {
       colorPrimary: "#399B53",
-      colorPrimaryBg: "#399B53",
     },
   },
 };
