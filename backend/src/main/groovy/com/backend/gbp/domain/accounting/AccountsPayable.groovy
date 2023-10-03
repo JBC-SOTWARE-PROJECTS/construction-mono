@@ -203,7 +203,7 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	//accounting integrate
 	@Override
 	String getDomain() {
-		return AccountsPayable.class.name
+		return IntegrationDomainEnum.ACCOUNTS_PAYABLE.name()
 	}
 
 	@Transient

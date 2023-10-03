@@ -67,18 +67,6 @@ class Ledger extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "company_id", referencedColumnName = "id")
 	CompanySettings company
 
-	@GraphQLQuery
-	@Column(name = "transaction_date_only")
-	LocalDate transactionDateOnly
-
-	@PrePersist
-	@PreUpdate
-	void updateTransactionDate() {
-		// Subtract 8 hours from transactionDatetime and assign the date part to transactionDate
-		if(header != null) {
-			transactionDateOnly = header.transactionDateOnly
-		}
-	}
 
 }
 

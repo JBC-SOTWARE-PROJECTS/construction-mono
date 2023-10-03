@@ -7,7 +7,9 @@ import com.backend.gbp.domain.accounting.HeaderLedger
 import com.backend.gbp.domain.accounting.Integration
 import com.backend.gbp.domain.accounting.IntegrationDomainEnum
 import com.backend.gbp.domain.accounting.IntegrationItem
+import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.accounting.ParentAccount
 import com.backend.gbp.domain.types.AutoIntegrateable
 import com.backend.gbp.domain.types.Subaccountable
@@ -89,9 +91,9 @@ class IntegrationServices extends AbstractDaoService<Integration> {
         List<List<T>> multipleData= []
         init.init(autoIntegrateable,multipleData)
         def username = SecurityUtils.currentLogin()
-        def user = userRepository.findOneByLogin(username)
-        def emp = employeeRepository.findOneByUser(user)
-        def department = emp.departmentOfDuty
+//        def user = userRepository.findOneByLogin(username)
+//        def emp = employeeRepository.findOneByUser(user)
+//        def department = emp.departmentOfDuty
 
 
         String tagValue = autoIntegrateable.flagValue
@@ -102,7 +104,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
 
 //        List<Integration> matchList = getIntegrationByDomainAndTagValueList(autoIntegrateable.domain,autoIntegrateable.flagValue)
-       Integration match = getIntegrationByDomainAndTagValue(autoIntegrateable.domain,autoIntegrateable.flagValue)
+       Integration match = getIntegrationByDomainAndTagValue(IntegrationDomainEnum.valueOf(autoIntegrateable.domain),autoIntegrateable.flagValue)
         if(!match)
             throw  new Exception("No Integration Rules for ${autoIntegrateable.domain} and ${autoIntegrateable.flagValue}")
 
@@ -129,30 +131,18 @@ class IntegrationServices extends AbstractDaoService<Integration> {
              if(StringUtils.equalsIgnoreCase(subAccountCode,"####")){
                  // needs parameter
                  String domain = item.journalAccount.subAccount.domain
-
-                 if(!StringUtils.equalsIgnoreCase(domain,Department.class.name)){
-                     // its not a department will look for a parameter
-                     String param = item.details[domain]
-                     if(StringUtils.isBlank(param))
-                     {
-                         throw new Exception("Parameter required for ${domain}")
-                     }
-
-                     Object paramValue = autoIntegrateable[param]
-
-                     if(!paramValue){
-                         throw new Exception("Parameter ${param} needs a Value")
-                     }
-                 }else {
-                       String param = item.details[domain]
-                       if(param){
-                         Object paramValue = autoIntegrateable[param]
-
-                         if(!paramValue){
-                             throw new Exception("Parameter ${param} needs a Value")
-                         }
-                     }
+                 String param = item.details[domain]
+                 if(StringUtils.isBlank(param))
+                 {
+                     throw new Exception("Parameter required for ${domain}")
                  }
+
+                 Object paramValue = autoIntegrateable[param]
+
+                 if(!paramValue){
+                     throw new Exception("Parameter ${param} needs a Value")
+                 }
+
              }
 
 
@@ -162,30 +152,18 @@ class IntegrationServices extends AbstractDaoService<Integration> {
             if(StringUtils.equalsIgnoreCase(subSubAccountCode,"####")){
                 // needs parameter
                 String domain = item.journalAccount.subSubAccount.domain
-
-                if(!StringUtils.equalsIgnoreCase(domain,Department.class.name)){
-                    // its not a department will look for a parameter
-                    String param = item.details[domain]
-                    if(StringUtils.isBlank(param))
-                    {
-                        throw new Exception("Parameter required for ${domain}")
-                    }
-
-                    Object paramValue = autoIntegrateable[param]
-
-                    if(!paramValue){
-                        throw new Exception("Parameter ${param} needs a Value")
-                    }
-                }else {
-                    String param = item.details[domain]
-                    if(param){
-                        Object paramValue = autoIntegrateable[param]
-
-                        if(!paramValue){
-                            throw new Exception("Parameter ${param} needs a Value")
-                        }
-                    }
+                String param = item.details[domain]
+                if(StringUtils.isBlank(param))
+                {
+                    throw new Exception("Parameter required for ${domain}")
                 }
+
+                Object paramValue = autoIntegrateable[param]
+
+                if(!paramValue){
+                    throw new Exception("Parameter ${param} needs a Value")
+                }
+
             }
         }
 
@@ -207,8 +185,8 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
         match.integrationItems.findAll { BooleanUtils.isNotTrue(it.multiple) }.each { item ->
             Ledger ledger = new Ledger()
-
-            def coa =   createCoaFromItem(autoIntegrateable,item,department)
+            ledger.company = SecurityUtils.currentCompany()
+            def coa =   createCoaFromItem(autoIntegrateable,item)
 
             ledger.debit = 0.0
             ledger.credit = 0.0
@@ -256,7 +234,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
                      Ledger ledger = new Ledger()
 
-                     def coa =   createCoaFromItem(tmpAutoIntegrateable,entry,department)
+                     def coa =   createCoaFromItem(tmpAutoIntegrateable,entry)
 
                      ledger.debit = 0.0
                      ledger.credit = 0.0
@@ -300,189 +278,127 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
 
 
-//      ChartOfAccountGenerate  createCoaFromItem(AutoIntegrateable autoIntegrateable,IntegrationItem item,Department department) {
-//
-//
-//        ChartOfAccountGenerate coa = new ChartOfAccountGenerate()
-//        coa.motherAccount = item.journalAccount.motherAccount
-//
-//        // Testing for SubAccount
-//
-//        String subAccountCode =  item.journalAccount?.subAccount?.code
-//
-//        if(StringUtils.equalsIgnoreCase(subAccountCode,"####")){
-//            // needs parameter
-//            String domain = item.journalAccount.subAccount.domain
-//
-//            if(!StringUtils.equalsIgnoreCase(domain,Department.class.name)){
-//                // its not a department will look for a parameter
-//                String param = item.details[domain]
-//                Subaccountable paramValue = (Subaccountable) autoIntegrateable[param]
-//
-//
-//                if(paramValue instanceof SubAccountHolder)
-//                {
-//                    // this is from a subaccountHolder
-//
-//                    String targetDomain = domain
-//                    UUID targetId = paramValue.id
-//
-//                    if(!targetId)
-//                        throw new Exception("Subaccount holder id not found")
-//
-//                    Subaccountable realValue = entityManager.find(Class.forName(targetDomain),targetId)
-//
-//                    if(!realValue)
-//                        throw new Exception("Subaccount holder instance not found ${targetId.toString()} - ${targetDomain}")
-//
-//                    coa.subAccount = new CoaComponentContainer(realValue.code,
-//                            realValue.id,
-//                            realValue.description,
-//                            realValue.domain,
-//                            ""
-//                    )
-//
-//                }else {
-//                    coa.subAccount = new CoaComponentContainer(paramValue.code,
-//                            paramValue.id,
-//                            paramValue.description,
-//                            paramValue.domain,
-//                            ""
-//                    )
-//                }
-//
-//
-//            }
-//            else {
-//
-//                // is a department
-//
-//                Department target = department
-//
-//                // check if it has an override ... if override is null
-//                String param = item.details[domain]
-//                if(param){
-//                    Object paramValue = autoIntegrateable[param]
-//
-//                    if(!paramValue){
-//                        throw new Exception("Parameter ${param} needs a Value")
-//                    }
-//                    target = (Department) paramValue
-//                }
-//
-//
-//
-//                coa.subAccount = new CoaComponentContainer( departmentService.generatePrefixParentDepartment(target),
-//                        target.id,
-//                        target.description,
-//                        target.class.name,
-//                        ""
-//                )
-//
-//            }
-//        }
-//        else {
-//
-//            // just copy
-//            coa.subAccount = new CoaComponentContainer( item.journalAccount.subAccount.code,
-//                    item.journalAccount.subAccount.id,
-//                    item.journalAccount.subAccount.description,
-//                    item.journalAccount.subAccount.domain,
-//                    ""
-//            )
-//        }
-//
-//
-//
-//        String subSubAccountCode =  item.journalAccount?.subSubAccount?.code
-//
-//        if(StringUtils.equalsIgnoreCase(subSubAccountCode,"####")){
-//            // needs parameter
-//            String domain = item.journalAccount.subSubAccount.domain
-//
-//            if(!StringUtils.equalsIgnoreCase(domain,Department.class.name)){
-//                // its not a department will look for a parameter
-//                String param = item.details[domain]
-//                Subaccountable paramValue = (Subaccountable) autoIntegrateable[param]
-//
-//                if(paramValue instanceof SubAccountHolder)
-//                {
-//                    // this is from a subaccountHolder
-//
-//                    String targetDomain = domain
-//                    UUID targetId = paramValue.id
-//
-//                    if(!targetId)
-//                        throw new Exception("Subaccount holder id not found")
-//
-//                    Subaccountable realValue = entityManager.find(Class.forName(targetDomain),targetId)
-//
-//                    if(!realValue)
-//                        throw new Exception("Subaccount holder instance not found ${targetId.toString()} - ${targetDomain}")
-//
-//                    coa.subSubAccount = new CoaComponentContainer(realValue.code,
-//                            realValue.id,
-//                            realValue.description,
-//                            realValue.domain,
-//                            ""
-//                    )
-//
-//                }else {
-//                    coa.subSubAccount = new CoaComponentContainer(paramValue.code,
-//                            paramValue.id,
-//                            paramValue.description,
-//                            paramValue.domain,
-//                            ""
-//                    )
-//                }
-//
-//            }
-//            else {
-//
-//                // is a department
-//
-//                Department target = department
-//
-//                // check if it has an override ... if override is null
-//                String param = item.details[domain]
-//                if(param){
-//                    Object paramValue = autoIntegrateable[param]
-//
-//                    if(!paramValue){
-//                        throw new Exception("Parameter ${param} needs a Value")
-//                    }
-//                    target = (Department) paramValue
-//                }
-//
-//
-//
-//                coa.subSubAccount = new CoaComponentContainer( departmentService.generatePrefixParentDepartment(target),
-//                        target.id,
-//                        target.description,
-//                        target.class.name,
-//                        ""
-//                )
-//
-//            }
-//        }else {
-//
-//            // just copy
-//            coa.subSubAccount = new CoaComponentContainer( item.journalAccount.subSubAccount.code,
-//                    item.journalAccount.subSubAccount.id,
-//                    item.journalAccount.subSubAccount.description,
-//                    item.journalAccount.subSubAccount.domain,
-//                    ""
-//            )
-//        }
-//        return coa
-//    }
+      ChartOfAccountGenerate  createCoaFromItem(AutoIntegrateable autoIntegrateable,IntegrationItem item) {
+
+
+        ChartOfAccountGenerate coa = new ChartOfAccountGenerate()
+        coa.motherAccount = item.journalAccount.motherAccount
+
+        // Testing for SubAccount
+
+        String subAccountCode =  item.journalAccount?.subAccount?.code
+
+        if(StringUtils.equalsIgnoreCase(subAccountCode,"####")){
+            // needs parameter
+            String domain = item.journalAccount.subAccount.domain
+
+            // its not a department will look for a parameter
+            String param = item.details[domain]
+            Subaccountable paramValue = (Subaccountable) autoIntegrateable[param]
+
+
+            if(paramValue instanceof SubAccountHolder)
+            {
+                // this is from a subaccountHolder
+
+                String targetDomain = domain
+                UUID targetId = paramValue.id
+
+                if(!targetId)
+                    throw new Exception("Subaccount holder id not found")
+
+                Subaccountable realValue = entityManager.find(Class.forName(targetDomain),targetId)
+
+                if(!realValue)
+                    throw new Exception("Subaccount holder instance not found ${targetId.toString()} - ${targetDomain}")
+
+                coa.subAccount = new CoaComponentContainer(realValue.code,
+                        realValue.id,
+                        realValue.accountName,
+                        realValue.domain,
+                        ""
+                )
+
+            }else {
+                coa.subAccount = new CoaComponentContainer(paramValue.code,
+                        paramValue.id,
+                        paramValue.accountName,
+                        paramValue.domain,
+                        ""
+                )
+            }
+        }
+        else {
+
+            // just copy
+            coa.subAccount = new CoaComponentContainer( item.journalAccount.subAccount.code,
+                    item.journalAccount.subAccount.id,
+                    item.journalAccount.subAccount.accountName,
+                    item.journalAccount.subAccount.domain,
+                    ""
+            )
+        }
 
 
 
-    Integration getIntegrationByDomainAndTagValue(String domain,String tagValue){
-        createQuery("from Integration i where i.domain=:domain and i.flagValue=:flagValue order by i.orderPriority ",
+        String subSubAccountCode =  item.journalAccount?.subSubAccount?.code
+
+        if(StringUtils.equalsIgnoreCase(subSubAccountCode,"####")){
+            // needs parameter
+            String domain = item.journalAccount.subSubAccount.domain
+            String param = item.details[domain]
+            Subaccountable paramValue = (Subaccountable) autoIntegrateable[param]
+
+            if(paramValue instanceof SubAccountHolder)
+            {
+                // this is from a subaccountHolder
+
+                String targetDomain = domain
+                UUID targetId = paramValue.id
+
+                if(!targetId)
+                    throw new Exception("Subaccount holder id not found")
+
+                Subaccountable realValue = entityManager.find(Class.forName(targetDomain),targetId)
+
+                if(!realValue)
+                    throw new Exception("Subaccount holder instance not found ${targetId.toString()} - ${targetDomain}")
+
+                coa.subSubAccount = new CoaComponentContainer(realValue.code,
+                        realValue.id,
+                        realValue.accountName,
+                        realValue.domain,
+                        ""
+                )
+
+            }else {
+                coa.subSubAccount = new CoaComponentContainer(paramValue.code,
+                        paramValue.id,
+                        paramValue.accountName,
+                        paramValue.domain,
+                        ""
+                )
+            }
+
+        }else {
+
+            // just copy
+            coa.subSubAccount = new CoaComponentContainer( item.journalAccount.subSubAccount.code,
+                    item.journalAccount.subSubAccount.id,
+                    item.journalAccount.subSubAccount.accountName,
+                    item.journalAccount.subSubAccount.domain,
+                    ""
+            )
+        }
+        return coa
+    }
+
+
+
+    Integration getIntegrationByDomainAndTagValue(IntegrationDomainEnum domain,String tagValue){
+        createQuery("from Integration i where i.domain = :domain and i.flagValue=:flagValue order by i.orderPriority ",
         [flagValue:tagValue,
-         domain:domain])
+         domain: domain])
         .setMaxResults(1)
         .resultList.find()
     }

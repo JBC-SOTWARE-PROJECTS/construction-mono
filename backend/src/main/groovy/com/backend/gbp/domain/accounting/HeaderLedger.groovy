@@ -96,22 +96,30 @@ class HeaderLedger extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "docnum", columnDefinition = "date")
 	@UpperCase
 	String docnum
+
+	@GraphQLQuery
+	@Column(name = "transaction_num", columnDefinition = "varchar")
+	String transactionNo
+
+	@GraphQLQuery
+	@Column(name = "transaction_type", columnDefinition = "varchar")
+	@UpperCase
+	String transactionType
+
+	@GraphQLQuery
+	@Column(name = "reference_num", columnDefinition = "varchar")
+	String referenceNo
+
+	@GraphQLQuery
+	@Column(name = "reference_type", columnDefinition = "varchar")
+	@UpperCase
+	String referenceType
 	
 	@GraphQLQuery
 	@Column(name = "transaction_date", columnDefinition = "date")
 	@UpperCase
 	Instant transactionDate
 
-	@Column(name = "transaction_date_only")
-	LocalDate transactionDateOnly
-
-	@PrePersist
-	@PreUpdate
-	void updateTransactionDate() {
-		// Subtract 8 hours from transactionDatetime and assign the date part to transactionDate
-		transactionDateOnly = transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
-	}
-	
 	@GraphQLQuery
 	@Enumerated(EnumType.STRING)
 	@Column(name = "journal_type", columnDefinition = "varchar")
@@ -124,9 +132,8 @@ class HeaderLedger extends AbstractAuditingEntity implements Serializable {
 	Boolean custom
 	
 	@GraphQLQuery
-	@Column(name = "parent_ledger", columnDefinition = "uuid")
-	@UpperCase
-	UUID parentLedger
+	@Column(name = "header_ledger_group_id", columnDefinition = "uuid")
+	UUID headerLedgerGroup
 	
 	@GraphQLQuery
 	@Column(name = "beginning_balance", columnDefinition = "boolean")
@@ -152,12 +159,6 @@ class HeaderLedger extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "entity_name", columnDefinition = "varchar")
 	@UpperCase
 	String entityName
-
-
-	@GraphQLQuery
-	@Column(name = "invoice_soa_reference", columnDefinition = "varchar")
-	@UpperCase
-	String invoiceSoaReference
 
 	@GraphQLQuery
 	@Column(name = "reversal", columnDefinition = "boolean")

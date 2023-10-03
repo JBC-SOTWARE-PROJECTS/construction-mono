@@ -1,6 +1,10 @@
 package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.AccountsPayable
+import com.backend.gbp.domain.accounting.Integration
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.Ledger
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.SupplierService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
@@ -28,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Service
 @GraphQLApi
@@ -57,6 +63,12 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 
     @Autowired
     Wtx2307Service wtx2307Service
+
+    @Autowired
+    IntegrationServices integrationServices
+
+    @Autowired
+    LedgerServices ledgerServices
 
 	AccountsPayableServices() {
 		super(AccountsPayable.class)
@@ -343,114 +355,114 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     ) {
         def result = new ArrayList<JournalEntryViewDto>()
         //ewt rate
-//        if (id) {
-//            def actPay = findOne(id)
-//            def ewt1 = BigDecimal.ZERO; def ewt2 = BigDecimal.ZERO; def ewt3 = BigDecimal.ZERO
-//            def ewt4 = BigDecimal.ZERO; def ewt5 = BigDecimal.ZERO; def ewt7 = BigDecimal.ZERO
-//            def ewt10 = BigDecimal.ZERO; def ewt15 = BigDecimal.ZERO; def ewt18 = BigDecimal.ZERO
-//            def ewt30 = BigDecimal.ZERO
-//
-//            def actPayDetials = accountsPayableDetialServices.detailsByAp(actPay.id)
-//            actPayDetials.each {
-//                switch (it.ewtRate) {
-//                    case 1:
-//                        ewt1 += it.ewtAmount
-//                        break
-//                    case 2:
-//                        ewt2 += it.ewtAmount
-//                        break
-//                    case 3:
-//                        ewt3 += it.ewtAmount
-//                        break
-//                    case 4:
-//                        ewt4 += it.ewtAmount
-//                        break
-//                    case 5:
-//                        ewt5 += it.ewtAmount
-//                        break
-//                    case 7:
-//                        ewt7 += it.ewtAmount
-//                        break
-//                    case 10:
-//                        ewt10 += it.ewtAmount
-//                        break
-//                    case 15:
-//                        ewt15 += it.ewtAmount
-//                        break
-//                    case 18:
-//                        ewt18 += it.ewtAmount
-//                        break
-//                    case 30:
-//                        ewt30 += it.ewtAmount
-//                        break
-//                }
-//            }
-//            //ewt rate
-//            if (actPay.transType?.flagValue) {
-//                def headerLedger = integrationServices.generateAutoEntries(actPay) { it, mul ->
-//                    it.flagValue = actPay.transType?.flagValue
-//                    //initialize
-//                    if (actPay.apCategory.equalsIgnoreCase("ACCOUNTS PAYABLE")) {
-//                        def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
-//                        def discountAmount = actPay.discountAmount.setScale(2, RoundingMode.HALF_EVEN)
-//                        def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
-//
-//                        BigDecimal clearing = netOfVat + discountAmount
-//                        it.clearingAmount = status ? (clearing * -1) : clearing
-//
-//                        // credit normal side make it negative to debit
-//                        it.discAmount = status ? discountAmount : discountAmount * -1
-//                        it.supplierAmount = status ? netAmount : netAmount * -1
-//                    } else {
-//                        def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
-//                        def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
-//
-//                        it.doctorFee = status ? (netOfVat * -1) : netOfVat
-//                        //debit (normal side credit)
-//                        it.readersFee = status ? netOfVat : (netOfVat * -1)
-//                        //debit normal side
-//                        it.dueToDoctors = status ? netAmount : (netAmount * -1)//credit
-//                    }
-//
-//                    //ewt
-//                    it.ewt1Percent = status ? ewt1.setScale(2, RoundingMode.HALF_EVEN) : ewt1.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt2Percent = status ? ewt2.setScale(2, RoundingMode.HALF_EVEN) : ewt2.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt3Percent = status ? ewt3.setScale(2, RoundingMode.HALF_EVEN) : ewt3.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt4Percent = status ? ewt4.setScale(2, RoundingMode.HALF_EVEN) : ewt4.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt5Percent = status ? ewt5.setScale(2, RoundingMode.HALF_EVEN) : ewt5.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt7Percent = status ? ewt7.setScale(2, RoundingMode.HALF_EVEN) : ewt7.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt10Percent = status ? ewt10.setScale(2, RoundingMode.HALF_EVEN) : ewt10.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt15Percent = status ? ewt15.setScale(2, RoundingMode.HALF_EVEN) : ewt15.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt18Percent = status ? ewt18.setScale(2, RoundingMode.HALF_EVEN) : ewt18.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                    it.ewt30Percent = status ? ewt30.setScale(2, RoundingMode.HALF_EVEN) : ewt30.setScale(2, RoundingMode.HALF_EVEN) * -1
-//                }
-//
-//                Set<Ledger> ledger = new HashSet<Ledger>(headerLedger.ledger);
-//                ledger.each {
-//                    def list = new JournalEntryViewDto(
-//                            code: it.journalAccount.code,
-//                            desc: it.journalAccount.description,
-//                            debit: it.debit,
-//                            credit: it.credit
-//                    )
-//                    result.add(list)
-//                }
-//            } else {
-//                if (actPay.postedLedger) {
-//                    def header = ledgerServices.findOne(actPay.postedLedger)
-//                    Set<Ledger> ledger = new HashSet<Ledger>(header.ledger);
-//                    ledger.each {
-//                        def list = new JournalEntryViewDto(
-//                                code: it.journalAccount.code,
-//                                desc: it.journalAccount.description,
-//                                debit: it.credit,
-//                                credit: it.debit
-//                        )
-//                        result.add(list)
-//                    }
-//                }
-//            }
-//        }
+        if (id) {
+            def actPay = findOne(id)
+            def ewt1 = BigDecimal.ZERO; def ewt2 = BigDecimal.ZERO; def ewt3 = BigDecimal.ZERO
+            def ewt4 = BigDecimal.ZERO; def ewt5 = BigDecimal.ZERO; def ewt7 = BigDecimal.ZERO
+            def ewt10 = BigDecimal.ZERO; def ewt15 = BigDecimal.ZERO; def ewt18 = BigDecimal.ZERO
+            def ewt30 = BigDecimal.ZERO
+
+            def actPayDetials = accountsPayableDetialServices.detailsByAp(actPay.id)
+            actPayDetials.each {
+                switch (it.ewtRate) {
+                    case 1:
+                        ewt1 += it.ewtAmount
+                        break
+                    case 2:
+                        ewt2 += it.ewtAmount
+                        break
+                    case 3:
+                        ewt3 += it.ewtAmount
+                        break
+                    case 4:
+                        ewt4 += it.ewtAmount
+                        break
+                    case 5:
+                        ewt5 += it.ewtAmount
+                        break
+                    case 7:
+                        ewt7 += it.ewtAmount
+                        break
+                    case 10:
+                        ewt10 += it.ewtAmount
+                        break
+                    case 15:
+                        ewt15 += it.ewtAmount
+                        break
+                    case 18:
+                        ewt18 += it.ewtAmount
+                        break
+                    case 30:
+                        ewt30 += it.ewtAmount
+                        break
+                }
+            }
+            //ewt rate
+            if (actPay.transType?.flagValue) {
+                def headerLedger = integrationServices.generateAutoEntries(actPay) { it, mul ->
+                    it.flagValue = actPay.transType?.flagValue
+                    //initialize
+                    if (actPay.apCategory.equalsIgnoreCase("ACCOUNTS PAYABLE")) {
+                        def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
+                        def discountAmount = actPay.discountAmount.setScale(2, RoundingMode.HALF_EVEN)
+                        def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
+
+                        BigDecimal clearing = netOfVat + discountAmount
+                        it.clearingAmount = status ? (clearing * -1) : clearing
+
+                        // credit normal side make it negative to debit
+                        it.discAmount = status ? discountAmount : discountAmount * -1
+                        it.supplierAmount = status ? netAmount : netAmount * -1
+                    } else {
+                        def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
+                        def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
+
+                        it.doctorFee = status ? (netOfVat * -1) : netOfVat
+                        //debit (normal side credit)
+                        it.readersFee = status ? netOfVat : (netOfVat * -1)
+                        //debit normal side
+                        it.dueToDoctors = status ? netAmount : (netAmount * -1)//credit
+                    }
+
+                    //ewt
+                    it.ewt1Percent = status ? ewt1.setScale(2, RoundingMode.HALF_EVEN) : ewt1.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt2Percent = status ? ewt2.setScale(2, RoundingMode.HALF_EVEN) : ewt2.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt3Percent = status ? ewt3.setScale(2, RoundingMode.HALF_EVEN) : ewt3.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt4Percent = status ? ewt4.setScale(2, RoundingMode.HALF_EVEN) : ewt4.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt5Percent = status ? ewt5.setScale(2, RoundingMode.HALF_EVEN) : ewt5.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt7Percent = status ? ewt7.setScale(2, RoundingMode.HALF_EVEN) : ewt7.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt10Percent = status ? ewt10.setScale(2, RoundingMode.HALF_EVEN) : ewt10.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt15Percent = status ? ewt15.setScale(2, RoundingMode.HALF_EVEN) : ewt15.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt18Percent = status ? ewt18.setScale(2, RoundingMode.HALF_EVEN) : ewt18.setScale(2, RoundingMode.HALF_EVEN) * -1
+                    it.ewt30Percent = status ? ewt30.setScale(2, RoundingMode.HALF_EVEN) : ewt30.setScale(2, RoundingMode.HALF_EVEN) * -1
+                }
+
+                Set<Ledger> ledger = new HashSet<Ledger>(headerLedger.ledger);
+                ledger.each {
+                    def list = new JournalEntryViewDto(
+                            code: it.journalAccount.code,
+                            desc: it.journalAccount.accountName,
+                            debit: it.debit,
+                            credit: it.credit
+                    )
+                    result.add(list)
+                }
+            } else {
+                if (actPay.postedLedger) {
+                    def header = ledgerServices.findOne(actPay.postedLedger)
+                    Set<Ledger> ledger = new HashSet<Ledger>(header.ledger);
+                    ledger.each {
+                        def list = new JournalEntryViewDto(
+                                code: it.journalAccount.code,
+                                desc: it.journalAccount.accountName,
+                                debit: it.credit,
+                                credit: it.debit
+                        )
+                        result.add(list)
+                    }
+                }
+            }
+        }
         return result.sort { it.credit }
     }
 
@@ -473,7 +485,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             ap.postedBy = null
             save(ap)
             //remove ap ledger
-            apLedgerServices.removeApLedger(ap.apNo)
+//            apLedgerServices.removeApLedger(ap.apNo)
             if (ap.ewtAmount > BigDecimal.ZERO) {
                 wtx2307Service.remove2307(ap.id)
             }
@@ -488,7 +500,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             ledger.put('refId', ap?.id)
             ledger.put('debit', 0.00)
             ledger.put('credit', ap?.netAmount)
-            apLedgerServices.upsertApLedger(ledger, ap?.supplier?.id, null)
+//            apLedgerServices.upsertApLedger(ledger, ap?.supplier?.id, null)
             //end to ap ledger
 
             //insert if ewt is not zero
@@ -576,108 +588,108 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     //save to accounting in post
     @Transactional(rollbackFor = Exception.class)
     AccountsPayable postToLedgerAccounting(AccountsPayable accountsPayable) {
-//        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
-//        def actPay = super.save(accountsPayable) as AccountsPayable
-//        //ewt rate
-//        def ewt1 = BigDecimal.ZERO; def ewt2 = BigDecimal.ZERO; def ewt3 = BigDecimal.ZERO
-//        def ewt4 = BigDecimal.ZERO; def ewt5 = BigDecimal.ZERO; def ewt7 = BigDecimal.ZERO
-//        def ewt10 = BigDecimal.ZERO; def ewt15 = BigDecimal.ZERO; def ewt18 = BigDecimal.ZERO
-//        def ewt30 = BigDecimal.ZERO
-//        def actPayDetials = accountsPayableDetialServices.detailsByAp(actPay.id)
-//        actPayDetials.each {
-//            switch (it.ewtRate) {
-//                case 1:
-//                    ewt1 += it.ewtAmount
-//                    break
-//                case 2:
-//                    ewt2 += it.ewtAmount
-//                    break
-//                case 3:
-//                    ewt3 += it.ewtAmount
-//                    break
-//                case 4:
-//                    ewt4 += it.ewtAmount
-//                    break
-//                case 5:
-//                    ewt5 += it.ewtAmount
-//                    break
-//                case 7:
-//                    ewt7 += it.ewtAmount
-//                    break
-//                case 10:
-//                    ewt10 += it.ewtAmount
-//                    break
-//                case 15:
-//                    ewt15 += it.ewtAmount
-//                    break
-//                case 18:
-//                    ewt18 += it.ewtAmount
-//                    break
-//                case 30:
-//                    ewt30 += it.ewtAmount
-//                    break
-//            }
-//        }
-//        //ewt rate
-//
-//        def headerLedger = integrationServices.generateAutoEntries(accountsPayable) { it, mul ->
-//            it.flagValue = actPay.transType?.flagValue
-//            //initialize
-//
-//            if (actPay.apCategory.equalsIgnoreCase("ACCOUNTS PAYABLE")) {
-//                def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
-//                def discountAmount = actPay.discountAmount.setScale(2, RoundingMode.HALF_EVEN)
-//                def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
-//
-//                BigDecimal clearing = netOfVat + discountAmount
-//                it.clearingAmount = clearing * -1 // credit normal side make it negative to debit
-//                it.discAmount = discountAmount
-//                it.supplierAmount = netAmount
-//            } else {
-//                def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
-//                def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
-//
-//                it.doctorFee = netOfVat * -1 //debit (credit normal side)
-//                it.readersFee = netOfVat //debit normal side
-//                it.dueToDoctors = netAmount //credit
-//            }
-//
-//            //ewt
-//            it.ewt1Percent = ewt1.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt2Percent = ewt2.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt3Percent = ewt3.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt4Percent = ewt4.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt5Percent = ewt5.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt7Percent = ewt7.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt10Percent = ewt10.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt15Percent = ewt15.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt18Percent = ewt18.setScale(2, RoundingMode.HALF_EVEN)
-//            it.ewt30Percent = ewt30.setScale(2, RoundingMode.HALF_EVEN)
-//        }
-//        Map<String, String> details = [:]
-//
-//        actPay.details.each { k, v ->
-//            details[k] = v
-//        }
-//
-//        details["ACC_PAYABLE_ID"] = actPay.id.toString()
-//        details["SUPPLIER_ID"] = actPay.supplier.id.toString()
-//
-//        def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
-//                "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",
-//                "${actPay.apNo}-${actPay.supplier.supplierFullname}",
-//                "${actPay.apNo}-${actPay.remarksNotes}",
-//                LedgerDocType.AP,
-//                JournalType.PURCHASES_PAYABLES,
-//                actPay.apvDate,
-//                details)
-//
-//        actPay.postedLedger = pHeader.id
-//        actPay.status = "POSTED"
-//        actPay.posted = true
-//        actPay.postedBy = SecurityUtils.currentLogin()
-//
-//        save(actPay)
+        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
+        def actPay = super.save(accountsPayable) as AccountsPayable
+        //ewt rate
+        def ewt1 = BigDecimal.ZERO; def ewt2 = BigDecimal.ZERO; def ewt3 = BigDecimal.ZERO
+        def ewt4 = BigDecimal.ZERO; def ewt5 = BigDecimal.ZERO; def ewt7 = BigDecimal.ZERO
+        def ewt10 = BigDecimal.ZERO; def ewt15 = BigDecimal.ZERO; def ewt18 = BigDecimal.ZERO
+        def ewt30 = BigDecimal.ZERO
+        def actPayDetials = accountsPayableDetialServices.detailsByAp(actPay.id)
+        actPayDetials.each {
+            switch (it.ewtRate) {
+                case 1:
+                    ewt1 += it.ewtAmount
+                    break
+                case 2:
+                    ewt2 += it.ewtAmount
+                    break
+                case 3:
+                    ewt3 += it.ewtAmount
+                    break
+                case 4:
+                    ewt4 += it.ewtAmount
+                    break
+                case 5:
+                    ewt5 += it.ewtAmount
+                    break
+                case 7:
+                    ewt7 += it.ewtAmount
+                    break
+                case 10:
+                    ewt10 += it.ewtAmount
+                    break
+                case 15:
+                    ewt15 += it.ewtAmount
+                    break
+                case 18:
+                    ewt18 += it.ewtAmount
+                    break
+                case 30:
+                    ewt30 += it.ewtAmount
+                    break
+            }
+        }
+        //ewt rate
+
+        def headerLedger = integrationServices.generateAutoEntries(accountsPayable) { it, mul ->
+            it.flagValue = actPay.transType?.flagValue
+            //initialize
+
+            if (actPay.apCategory.equalsIgnoreCase("ACCOUNTS PAYABLE")) {
+                def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
+                def discountAmount = actPay.discountAmount.setScale(2, RoundingMode.HALF_EVEN)
+                def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
+
+                BigDecimal clearing = netOfVat + discountAmount
+                it.clearingAmount = clearing * -1 // credit normal side make it negative to debit
+                it.discAmount = discountAmount
+                it.supplierAmount = netAmount
+            } else {
+                def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
+                def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
+
+                it.doctorFee = netOfVat * -1 //debit (credit normal side)
+                it.readersFee = netOfVat //debit normal side
+                it.dueToDoctors = netAmount //credit
+            }
+
+            //ewt
+            it.ewt1Percent = ewt1.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt2Percent = ewt2.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt3Percent = ewt3.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt4Percent = ewt4.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt5Percent = ewt5.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt7Percent = ewt7.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt10Percent = ewt10.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt15Percent = ewt15.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt18Percent = ewt18.setScale(2, RoundingMode.HALF_EVEN)
+            it.ewt30Percent = ewt30.setScale(2, RoundingMode.HALF_EVEN)
+        }
+        Map<String, String> details = [:]
+
+        actPay.details.each { k, v ->
+            details[k] = v
+        }
+
+        details["ACC_PAYABLE_ID"] = actPay.id.toString()
+        details["SUPPLIER_ID"] = actPay.supplier.id.toString()
+
+        def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+                "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",
+                "${actPay.apNo}-${actPay.supplier.supplierFullname}",
+                "${actPay.apNo}-${actPay.remarksNotes}",
+                LedgerDocType.AP,
+                JournalType.PURCHASES_PAYABLES,
+                actPay.apvDate,
+                details)
+
+        actPay.postedLedger = pHeader.id
+        actPay.status = "POSTED"
+        actPay.posted = true
+        actPay.postedBy = SecurityUtils.currentLogin()
+
+        save(actPay)
 
     }
 

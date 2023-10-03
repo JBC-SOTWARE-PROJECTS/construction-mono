@@ -142,15 +142,16 @@ const EditAccount = (props: AddAccountProps) => {
           initialValues={{
             multiple: props?.row?.multiple,
             sourceColumn: props?.row?.sourceColumn,
+            motherAccount:
+              props?.row?.journalAccount?.motherAccount?.accountName,
           }}
           onFinish={handleSubmmit}
           autoComplete='off'
         >
           <FormInput
             label='Parent Account'
-            name={['journalAccount', 'motherAccount', 'code']}
+            name={'motherAccount'}
             propsinput={{
-              prefix: <BookOutlined />,
               placeholder: 'Parent Account',
               readOnly: true,
             }}
