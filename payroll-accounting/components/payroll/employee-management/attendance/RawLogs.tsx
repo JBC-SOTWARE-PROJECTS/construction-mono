@@ -1,9 +1,15 @@
 import { FormDateRange } from "@/components/common";
 import CustomButton from "@/components/common/CustomButton";
-import { EditOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Col, Divider, Row, Table, Tag } from "antd";
+import {
+  EditOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { Button, Col, Divider, Row, Space, Table, Tag } from "antd";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UpsertAttendanceModal from "./UpsertAttendanceModal";
 import useGetEmployeeAttendance from "@/hooks/attendance/useGetEmployeeAttendance";
 import { useRouter } from "next/router";
@@ -11,14 +17,32 @@ import { ColumnsType } from "antd/es/table";
 import { EmployeeAttendance } from "@/graphql/gql/graphql";
 import usePaginationState from "@/hooks/usePaginationState";
 import useDateRangeState from "@/hooks/useDateRangeState";
+import useIgnoreAttendance from "@/hooks/attendance/useIgnoreAttendance";
+interface IProps {
+  id?: string;
+  useStaticData?: boolean;
+  startDateStatic?: dayjs.Dayjs;
+  endDateStatic?: dayjs.Dayjs;
+  callback?: () => void;
+}
 
-function RawLogs() {
+function RawLogs({
+  id,
+  useStaticData,
+  startDateStatic,
+  endDateStatic,
+  callback,
+}: IProps) {
   const [_, { onNextPage }] = usePaginationState({}, 0, 25);
 
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [startDate, endDate, handleDateChange] = useDateRangeState();
-  const [getEmployeeSchedule, data, loading] = useGetEmployeeAttendance();
+  const [getAttendance, data, loading, refetch] = useGetEmployeeAttendance();
+  const [ignoreAttendance, loadingIgnore] = useIgnoreAttendance(() => {
+    refetch();
+    if (callback) callback();
+  });
 
   const [record, setRecord] = useState<EmployeeAttendance>();
   const handleEdit = (record: EmployeeAttendance) => {
@@ -68,13 +92,28 @@ function RawLogs() {
       title: "Action",
       dataIndex: "id",
       key: "id",
+      width: 100,
       render: (value, record) => {
         return (
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          />
+          <Space>
+            <CustomButton
+              tooltip="edit"
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            />
+
+            <CustomButton
+              tooltip={record?.isIgnored ? "Undo Ignore" : "Ignore"}
+              danger={!record?.isIgnored}
+              type="primary"
+              ghost
+              icon={
+                record?.isIgnored ? <EyeOutlined /> : <EyeInvisibleOutlined />
+              }
+              onClick={() => ignoreAttendance(record?.id as string)}
+            />
+          </Space>
         );
       },
     },
@@ -84,39 +123,56 @@ function RawLogs() {
     if (open) setRecord({});
     setOpen(!open);
   };
+
+  useEffect(() => {
+    if (useStaticData && id) {
+      getAttendance({
+        id: id,
+        size: 10,
+        page: 0,
+        startDate: startDateStatic?.startOf("day"),
+        endDate: endDateStatic?.endOf("day"),
+      });
+    }
+  }, [startDateStatic]);
+
   return (
     <>
       <Row gutter={16}>
         <Col span={12}>
-          <FormDateRange
-            name="dateRange"
-            label="Date Range"
-            propsrangepicker={{
-              format: "MMMM D, YYYY",
-              use12Hours: true,
-              onChange: (dates: any) => {
-                handleDateChange(dates);
-              },
-            }}
-          />
+          {!useStaticData && (
+            <FormDateRange
+              name="dateRange"
+              label="Date Range"
+              propsrangepicker={{
+                format: "MMMM D, YYYY",
+                use12Hours: true,
+                onChange: (dates: any) => {
+                  handleDateChange(dates);
+                },
+              }}
+            />
+          )}
         </Col>
 
         <Col span={4}>
-          <Button
-            type="primary"
-            icon={<SearchOutlined />}
-            onClick={() => {
-              getEmployeeSchedule({
-                id: router?.query?.id,
-                size: 10,
-                page: 0,
-                startDate: startDate?.startOf("day"),
-                endDate: endDate?.endOf("day"),
-              });
-            }}
-          >
-            Search
-          </Button>
+          {!useStaticData && (
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              onClick={() => {
+                getAttendance({
+                  id: router?.query?.id || id,
+                  size: 10,
+                  page: 0,
+                  startDate: startDate?.startOf("day"),
+                  endDate: endDate?.endOf("day"),
+                });
+              }}
+            >
+              Search
+            </Button>
+          )}
         </Col>
 
         <Col span={8}>
@@ -131,19 +187,24 @@ function RawLogs() {
           </div>
         </Col>
       </Row>
+
       <Divider />
       <Table
         dataSource={data?.content}
         size="small"
         columns={columns}
         onChange={onNextPage}
-        loading={loading}
+        loading={loading || loadingIgnore}
       />
       {open && (
         <UpsertAttendanceModal
           open={open}
           toggleModal={toggleModal}
           record={record}
+          callback={() => {
+            if (callback) callback();
+            refetch();
+          }}
         />
       )}
     </>

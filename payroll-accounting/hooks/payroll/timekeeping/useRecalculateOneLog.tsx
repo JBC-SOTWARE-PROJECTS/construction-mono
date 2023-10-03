@@ -29,7 +29,6 @@ interface params {
 function useRecalculateOneLog(callBack?: (result: any) => void) {
   const [mutationFn, { loading }] = useMutation(CALCULATE_ONE_DAY, {
     onCompleted: (result: any) => {
-      debugger;
       message.success(result?.data?.message);
       if (callBack) callBack(result?.data);
     },

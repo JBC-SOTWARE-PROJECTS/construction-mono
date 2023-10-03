@@ -179,7 +179,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
         list[0].timekeepingEmployee = accumulatedLogs.timekeepingEmployee
         accumulatedLogRepository.delete(accumulatedLogs)
         accumulatedLogRepository.save(list[0])
-        return new GraphQLResVal<String>('Success', true, "Successfully updated employee timekeeping status!")
+        return new GraphQLResVal<String>('Success', true, "Successfully recalculated selected date!")
 
     }
 

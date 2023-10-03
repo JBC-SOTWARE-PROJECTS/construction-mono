@@ -98,8 +98,8 @@ class AccumulatedLogsCalculator {
 
                 AccumulatedLogs accumulatedLogs = new AccumulatedLogs()
                 accumulatedLogs.date = date
-                accumulatedLogs.scheduleTitle = regularSchedule.title
-                accumulatedLogs.scheduleStart = regularSchedule.dateTimeStart
+                accumulatedLogs.scheduleTitle = regularSchedule?.title
+                accumulatedLogs.scheduleStart = regularSchedule?.dateTimeStart
                 accumulatedLogs.scheduleEnd = overtimeSchedule ? overtimeSchedule.dateTimeEnd : regularSchedule.dateTimeEnd
 
                 HoursLog hoursLog = new HoursLog()
@@ -108,6 +108,7 @@ class AccumulatedLogsCalculator {
                     accumulatedLogs.isError = true
                     accumulatedLogs.hours = hoursLog
                     accumulatedLogs.message = "Absent"
+                    accumulatedLogs.employeeId = id
                     accumulatedLogsList.push(accumulatedLogs)
                     date = date.plus(1, ChronoUnit.DAYS)
                     continue;

@@ -25,8 +25,14 @@ interface IProps {
   open: boolean;
   toggleModal: () => void;
   record?: EmployeeAttendance | undefined;
+  callback?: () => void;
 }
-function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
+function UpsertAttendanceModal({
+  open,
+  toggleModal,
+  record,
+  callback,
+}: IProps) {
   const { error, data: projects } = useQuery(GET_ACTIVE_PROJECTS);
 
   const [form] = useForm();
@@ -37,6 +43,7 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
 
   const [upsertEmployeeSchedule, loading] = useUpsertEmployeeAttendance(() => {
     toggleModal();
+    if (callback) callback();
     form.setFieldsValue({
       attendance_time: null,
       type: null,

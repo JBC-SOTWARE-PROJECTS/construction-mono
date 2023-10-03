@@ -7,18 +7,20 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ExclamationCircleOutlined,
+  EyeOutlined,
   ReloadOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Modal, Row, Space, Table, Tag } from "antd";
 import dayjs from "dayjs";
 import { round } from "lodash";
-import { CSSProperties } from "react";
+import { CSSProperties, useState } from "react";
 import CustomButton from "../common/CustomButton";
 import LogsProjectBreakdownModal from "./LogsProjectBreakdownModal";
 import PayrollModuleRecalculateEmployeeAction from "./payroll-management/PayrollModuleRecalculateEmployeeAction";
 import useRecalculateOneLog from "@/hooks/payroll/timekeeping/useRecalculateOneLog";
 import { debug } from "console";
+import RawLogs from "./employee-management/attendance/RawLogs";
 
 interface IProps {
   dataSource: AccumulatedLogs[];
@@ -36,6 +38,9 @@ function AccumulatedLogsTable({
   showBreakdown = false,
 }: IProps) {
   const [calculate, loadingRecalculate] = useRecalculateOneLog(refetch);
+  const [openRawLogs, setOpenRawLogs] = useState<boolean>(false);
+  const [rawLogsdata, setRawLogsData] = useState<any>(null);
+  const [shouldRecalculate, setShouldRecalculate] = useState(false);
 
   const onCellProps = (record: AccumulatedLogs, key: keyof HoursLog) => {
     const hours = record?.hours?.[key] || 0;
@@ -61,7 +66,6 @@ function AccumulatedLogsTable({
   };
 
   const confirmRecalculate = (record: AccumulatedLogs) => {
-    debugger;
     Modal.confirm({
       title: "Are you sure you want to recalculate this date?",
       icon: <ExclamationCircleOutlined />,
@@ -106,12 +110,14 @@ function AccumulatedLogsTable({
       title: "Time in",
       dataIndex: "inTime",
       key: "inTime",
+      width: 110,
       render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
     },
     {
       title: "Time Out",
       dataIndex: "outTime",
       key: "outTime",
+      width: 110,
       render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
     },
     {
@@ -123,7 +129,7 @@ function AccumulatedLogsTable({
           title: "Late",
           dataIndex: ["hours", "late"],
           key: "late",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) =>
             underPerformanceCell(record, "late"),
           render: render,
@@ -132,6 +138,7 @@ function AccumulatedLogsTable({
           title: "Undertime",
           dataIndex: ["hours", "underTime"],
           key: "underTime",
+          width: 110,
 
           onCell: (record: AccumulatedLogs) =>
             underPerformanceCell(record, "underTime"),
@@ -141,6 +148,7 @@ function AccumulatedLogsTable({
           title: "Absent",
           dataIndex: ["hours", "absent"],
           key: "absent",
+          width: 110,
 
           onCell: (record: AccumulatedLogs) =>
             underPerformanceCell(record, "absent"),
@@ -157,7 +165,7 @@ function AccumulatedLogsTable({
           title: "Regular",
           dataIndex: ["hours", "regular"],
           key: "regular",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) => onCellProps(record, "regular"),
           render: render,
         },
@@ -166,7 +174,7 @@ function AccumulatedLogsTable({
           title: "Overtime",
           dataIndex: ["hours", "overtime"],
           key: "overtime",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) => onCellProps(record, "overtime"),
           render: render,
         },
@@ -181,7 +189,7 @@ function AccumulatedLogsTable({
           title: "Regular",
           dataIndex: ["hours", "regularHoliday"],
           key: "regularHoliday",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) =>
             onCellProps(record, "regularHoliday"),
           render: render,
@@ -191,7 +199,7 @@ function AccumulatedLogsTable({
           title: "Overtime",
           dataIndex: ["hours", "overtimeHoliday"],
           key: "overtimeHoliday",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) =>
             onCellProps(record, "overtimeHoliday"),
           render: render,
@@ -207,7 +215,7 @@ function AccumulatedLogsTable({
           title: "Regular",
           dataIndex: ["hours", "regularSpecialHoliday"],
           key: "regularSpecialHoliday",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) =>
             onCellProps(record, "regularSpecialHoliday"),
           render: render,
@@ -217,7 +225,7 @@ function AccumulatedLogsTable({
           title: "Overtime",
           dataIndex: ["hours", "overtimeSpecialHoliday"],
           key: "overtimeSpecialHoliday",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) =>
             onCellProps(record, "overtimeSpecialHoliday"),
           render: render,
@@ -233,7 +241,7 @@ function AccumulatedLogsTable({
           title: "Regular",
           dataIndex: ["hours", "regularDoubleHoliday"],
           key: "regularDoubleHoliday",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) =>
             onCellProps(record, "regularDoubleHoliday"),
           render: render,
@@ -243,7 +251,7 @@ function AccumulatedLogsTable({
           title: "Overtime",
           dataIndex: ["hours", "overtimeDoubleHoliday"],
           key: "overtimeDoubleHoliday",
-
+          width: 110,
           onCell: (record: AccumulatedLogs) =>
             onCellProps(record, "overtimeDoubleHoliday"),
           render: render,
@@ -254,6 +262,7 @@ function AccumulatedLogsTable({
       title: "Actions",
       dataIndex: "id",
       key: "id",
+
       render: (id: string, record: AccumulatedLogs) => {
         return (
           <Space>
@@ -262,16 +271,36 @@ function AccumulatedLogsTable({
             )}
 
             {isTimekeeping && (
-              <CustomButton
-                id={id}
-                tooltip="Recalculate This Date"
-                shape="circle"
-                type="primary"
-                icon={<ReloadOutlined />}
-                danger
-                onClick={() => confirmRecalculate(record)}
-                // allowedPermissions={["recalculate_one_timekeeping_employee"]}
-              />
+              <>
+                <CustomButton
+                  id={id}
+                  tooltip="View Raw Logs"
+                  shape="circle"
+                  type="primary"
+                  icon={<EyeOutlined />}
+                  onClick={() => {
+                    setRawLogsData({
+                      startDate: dayjs(record.date).startOf("day"),
+                      endDate: dayjs(record.date).endOf("day"),
+                      employeeId: record.employeeId,
+                      logId: record.id,
+                    });
+                    setOpenRawLogs(true);
+                  }}
+                  // allowedPermissions={["recalculate_one_timekeeping_employee"]}
+                />
+
+                <CustomButton
+                  id={id}
+                  tooltip="Recalculate"
+                  shape="circle"
+                  type="primary"
+                  icon={<ReloadOutlined />}
+                  danger
+                  onClick={() => confirmRecalculate(record)}
+                  // allowedPermissions={["recalculate_one_timekeeping_employee"]}
+                />
+              </>
             )}
           </Space>
         );
@@ -279,6 +308,19 @@ function AccumulatedLogsTable({
     },
   ];
   const scrollProps = { y: "calc(100vh - 330px)" };
+
+  const handleCloseAttendanceLogs = () => {
+    setOpenRawLogs(false);
+    if (shouldRecalculate) {
+      calculate({
+        id: rawLogsdata?.logId,
+        startDate: dayjs(rawLogsdata?.startDate).startOf("day"),
+        endDate: dayjs(rawLogsdata?.endDate).endOf("day"),
+        employeeId: rawLogsdata?.employeeId,
+      });
+      setShouldRecalculate(false);
+    }
+  };
   return (
     <>
       <Table
@@ -291,6 +333,22 @@ function AccumulatedLogsTable({
         onHeaderRow={() => ({ style: { textAlignLast: "center" } })}
         loading={loading || loadingRecalculate}
       />
+
+      <Modal
+        title="Raw Attendance Logs"
+        open={openRawLogs}
+        onCancel={handleCloseAttendanceLogs}
+        onOk={handleCloseAttendanceLogs}
+        width="70vw"
+      >
+        <RawLogs
+          id={rawLogsdata?.employeeId}
+          startDateStatic={rawLogsdata?.startDate}
+          endDateStatic={rawLogsdata?.endDate}
+          useStaticData
+          callback={() => setShouldRecalculate(true)}
+        />
+      </Modal>
     </>
   );
 }

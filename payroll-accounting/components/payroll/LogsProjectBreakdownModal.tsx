@@ -24,23 +24,10 @@ function LogsProjectBreakdownModal({ record, render }: IProps) {
   };
 
   const columns = [
-    // {
-    //   title: "Time in",
-    //   dataIndex: "inTime",
-    //   key: "inTime",
-    //   render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
-    // },
-    // {
-    //   title: "Time Out",
-    //   dataIndex: "outTime",
-    //   key: "outTime",
-    //   render: (value: any) => (value ? dayjs(value).format("hh:mm a") : "-"),
-    // },
     {
       title: "Project",
       dataIndex: "projectName",
     },
-
     {
       title: "Regular",
       dataIndex: "regular",
@@ -145,6 +132,7 @@ function LogsProjectBreakdownModal({ record, render }: IProps) {
         tooltip="View Project Breakdown"
         icon={<UnorderedListOutlined />}
         shape="circle"
+        type="primary"
         onClick={() => {
           setVisible(true);
         }}

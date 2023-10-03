@@ -120,5 +120,18 @@ class EmployeeAttendanceService {
         return new GraphQLRetVal<String>(null, true, "Successfully deleted employee attendance.")
     }
 
+    @GraphQLMutation(name = "ignoreAttendance")
+    GraphQLRetVal<String> ignoreAttendance(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        if (!id) return new GraphQLRetVal<String>(null, false, "Failed to update employee attendance.")
+
+        EmployeeAttendance employeeAttendance = employeeAttendanceRepository.findById(id).get()
+        employeeAttendance.isIgnored = !employeeAttendance.isIgnored
+        employeeAttendanceRepository.save(employeeAttendance)
+
+        return new GraphQLRetVal<String>(null, true, """Successfully  ${employeeAttendance?.isIgnored ? 'ignored' : 'undo ignored'} attendance.""")
+    }
+
     //===========================MUTATION=============================\\
 }
