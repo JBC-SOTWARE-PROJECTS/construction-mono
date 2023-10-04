@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.AccountsPayable
+import com.backend.gbp.domain.accounting.HeaderLedgerGroup
 import com.backend.gbp.domain.accounting.Integration
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
@@ -102,10 +103,18 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 	) {
         def company = SecurityUtils.currentCompanyId()
 
-        String query = '''Select ap from AccountsPayable ap where
+        String query = '''Select ap from AccountsPayable ap
+                            where
 							ap.posted = true and
 						( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
 						lower(ap.invoiceNo) like lower(concat('%',:filter,'%')) )'''
+
+//        String query = '''Select ap from AccountsPayable ap
+//                            left join fetch ap.supplier
+//                            where
+//							ap.posted = true and
+//						( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
+//						lower(ap.invoiceNo) like lower(concat('%',:filter,'%')) )'''
 
         String countQuery = '''Select count(ap) from AccountsPayable ap where
 							ap.posted = true and
@@ -674,6 +683,12 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 
         details["ACC_PAYABLE_ID"] = actPay.id.toString()
         details["SUPPLIER_ID"] = actPay.supplier.id.toString()
+
+//        headerLedger.transactionNo = ''
+//        headerLedger.transactionType = ''
+//        headerLedger.referenceType = ''
+//        headerLedger.referenceNo = ''
+//        headerLedger.headerLedgerGroup = ''
 
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",

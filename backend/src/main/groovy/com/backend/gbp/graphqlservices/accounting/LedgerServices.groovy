@@ -1554,10 +1554,10 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
         HeaderLedger reversal = new HeaderLedger()
         reversal.reversal = true
-        reversal.invoiceSoaReference = source.invoiceSoaReference
         reversal.fiscal = source.fiscal
         reversal.particulars = source.particulars
         reversal.transactionDate = Instant.now()
+        reversal.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
         reversal.particulars = "[REVERSAL (${source.docType}-${source.docnum})]-${source.particulars}"
         reversal.entityName = source.entityName
         reversal.docType = source.docType
@@ -1602,6 +1602,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         reversal.fiscal = source.fiscal
         reversal.particulars = source.particulars
         reversal.transactionDate = date
+        reversal.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
         reversal.particulars = "[REVERSAL]-${source.particulars}"
         reversal.entityName = source.entityName
         reversal.docType = source.docType

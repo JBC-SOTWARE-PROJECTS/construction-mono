@@ -43,6 +43,8 @@ class Ledger extends AbstractAuditingEntity implements Serializable {
 	@Column(name="journal_account",columnDefinition = "jsonb")
 	ChartOfAccountGenerate journalAccount
 
+	@Column(name = "transaction_date_only")
+	LocalDate transactionDateOnly
 
 	@GraphQLQuery
 	@Column(name = "particulars", columnDefinition = "varchar")

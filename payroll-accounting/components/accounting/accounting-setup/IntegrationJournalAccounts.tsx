@@ -10,7 +10,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons'
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { Button, Card, Space, Table, Tooltip, message } from 'antd'
+import { Button, Card, Modal, Space, Table, Tooltip, message } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import _ from 'lodash'
 import AddAccount from './forms/AddAccount'
@@ -85,9 +85,10 @@ export const INTEGRATION_ITEM = gql`
 interface JournalProps {
   id: string
   domain: string
+  hide: () => void
 }
 
-const JournalAccounts = (props: JournalProps) => {
+const IntegrationJournalAccounts = (props: JournalProps) => {
   const { data, loading, refetch } = useQuery(INTEGRATION_ITEM, {
     variables: {
       id: props.id,
@@ -98,9 +99,7 @@ const JournalAccounts = (props: JournalProps) => {
   })
   const JournalList = data?.integrationItemsByIntegrationId?.content as any
 
-  //delete pending
   const [onDeleteIntegrationItem] = useMutation(DELETE_INTEGRATION_ITEM)
-
   const onAddAccount = useDialog(AddAccount)
   const onEditAccount = useDialog(EditAccount)
   const onTransferIntegration = useDialog(IntegrationTransfer)
@@ -224,40 +223,29 @@ const JournalAccounts = (props: JournalProps) => {
     },
   ]
 
-  // console.log(props.id)
-  // console.log("JournalAccounts", data?.integrationItemsByIntegrationId?.content)
-
   return (
-    <>
-      <Card style={{ borderColor: 'teal' }}>
-        <Space.Compact
-          block
-          style={{ marginBottom: 10, display: 'flex', justifyContent: 'end' }}
-        >
-          <Tooltip title='Add'>
-            <Button onClick={handleAddAccount} icon={<PlusCircleOutlined />} />
-          </Tooltip>
-          <Tooltip title='Transfer'>
-            <Button
-              onClick={handleTransferIntegration}
-              icon={<DragOutlined />}
-            />
-          </Tooltip>
-          <Tooltip title='Delete'>
-            <Button icon={<DeleteFilled />} />
-          </Tooltip>
-        </Space.Compact>
-        <Table
-          scroll={{ x: 1300, y: 440 }}
-          loading={loading}
-          rowKey='id'
-          size='small'
-          columns={columns}
-          dataSource={JournalList ?? []}
-        />
-      </Card>
-    </>
+    <Modal
+      open
+      title='Journal Accounts'
+      onCancel={() => props.hide()}
+      width={'80%'}
+      footer={<Button onClick={() => props.hide()}>Close</Button>}
+    >
+      <Table
+        title={() => (
+          <Button onClick={handleAddAccount} type='primary'>
+            Add Accounts
+          </Button>
+        )}
+        scroll={{ x: 1300, y: 440 }}
+        loading={loading}
+        rowKey='id'
+        size='small'
+        columns={columns}
+        dataSource={JournalList ?? []}
+      />
+    </Modal>
   )
 }
 
-export default JournalAccounts
+export default IntegrationJournalAccounts

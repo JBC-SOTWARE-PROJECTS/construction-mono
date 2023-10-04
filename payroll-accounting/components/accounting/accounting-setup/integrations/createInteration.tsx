@@ -58,16 +58,25 @@ export default function CreateIntegration(props: IntegrationsI) {
       // okButtonProps={{ loading: updateInsertLoading }}
       // cancelButtonProps={{ loading: updateInsertLoading }}
     >
-      <Form form={form} onFinish={onHandleClickOk} layout='vertical'>
+      <Form
+        form={form}
+        onFinish={onHandleClickOk}
+        layout='vertical'
+        initialValues={{ ...props?.record }}
+      >
         <FormInput name='description' label='Integration Name' />
-        <FormSelect
-          name='domain'
-          label='Data Records'
-          propsselect={{
-            allowClear: true,
-            options: data?.domainRecords ?? [],
-          }}
-        />
+        {!props?.record?.id && (
+          <FormSelect
+            name='domain'
+            label='Data Records'
+            propsselect={{
+              allowClear: true,
+              options: data?.domainRecords ?? [],
+            }}
+          />
+        )}
+        <FormInput label='Order No.' name='orderPriority' />
+        <FormInput label='Flag Value' name='flagValue' />
       </Form>
     </Modal>
   )

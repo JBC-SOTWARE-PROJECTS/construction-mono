@@ -44,15 +44,8 @@ class HeaderLedgerGroup extends AbstractAuditingEntity implements Serializable {
 	String particulars
 
 	@GraphQLQuery
-	@Enumerated(EnumType.STRING)
-	@Column(name = "journal_type", columnDefinition = "varchar")
-	@UpperCase
-	JournalType journalType
-
-	@GraphQLQuery
-	@Column(name = "transaction_date", columnDefinition = "date")
-	@UpperCase
-	Instant transactionDate
+	@Column(name = "reference_id", columnDefinition = "date")
+	UUID referenceId
 
 	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)

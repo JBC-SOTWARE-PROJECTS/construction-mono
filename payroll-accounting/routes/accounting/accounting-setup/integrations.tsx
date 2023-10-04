@@ -1,11 +1,11 @@
-import IntergrationItem from '@/components/accounting/accounting-setup/IntergrationItem'
+import IntegrationItems from '@/components/accounting/accounting-setup/IntegrationItems'
 import CreateIntegrationsGroup from '@/components/accounting/accounting-setup/integrations/createGroup'
 import { useDialog } from '@/hooks'
 import ConfirmationPasswordHook from '@/hooks/promptPassword'
+import asyncComponent from '@/utility/asyncComponent'
 import { PageContainer, ProCard } from '@ant-design/pro-components'
-import { gql, useMutation, useQuery } from '@apollo/client'
-import { Button } from 'antd'
-type TargetKey = React.MouseEvent | React.KeyboardEvent | string
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { Button, Card, Col, Row, Space, Tabs } from 'antd'
 
 export const INTEGRATION_GROUP = gql`
   query {
@@ -21,13 +21,52 @@ export const INTEGRATION_GROUP_DELETE = gql`
     onDeleteIntegrationGroup(id: $id)
   }
 `
-
+export const INTEGRATION_PER_GROUP = gql`
+  query ($id: UUID, $filter: String, $size: Int, $page: Int) {
+    ig: integrationGroupItemList(
+      id: $id
+      filter: $filter
+      size: $size
+      page: $page
+    ) {
+      content {
+        id
+        description
+        flagValue
+        orderPriority
+        domain
+      }
+      totalPages
+      size
+      number
+      totalElements
+    }
+  }
+`
 export default function Integrations() {
   const [showPasswordConfirmation] = ConfirmationPasswordHook()
+
+  const [
+    onLoadItems,
+    { data: dataGroup, loading: loadingGroup, refetch: refetchGroup },
+  ] = useLazyQuery(INTEGRATION_PER_GROUP)
+
   const { data, loading, refetch } = useQuery(INTEGRATION_GROUP, {
     variables: {
       filter: '',
       accountCategory: null,
+    },
+    onCompleted: ({ integrationGroupList }) => {
+      if (integrationGroupList) {
+        onLoadItems({
+          variables: {
+            id: integrationGroupList[0].id,
+            filter: '',
+            size: 10,
+            page: 0,
+          },
+        })
+      }
     },
   })
 
@@ -35,19 +74,25 @@ export default function Integrations() {
     INTEGRATION_GROUP_DELETE
   )
 
-  const dataSource = []
-
   const createDialog = useDialog(CreateIntegrationsGroup)
 
   const onHandleSearch = (filter: string) => {
     // refetch({ filter, page: 0 })
   }
 
-  const onHandleClickCreateEdit = (record?: any) => {
+  const onHandleClickCreate = (record?: any) => {
     createDialog({ record: { ...record } }, () => refetch())
   }
 
-  const onHandleChangeTab = (activeKey: string) => {
+  const onTabChange = (activeKey: string) => {
+    onLoadItems({
+      variables: {
+        id: activeKey,
+        filter: '',
+        size: 10,
+        page: 0,
+      },
+    })
     // if (activeKey == 'all') refetch({ accountCategory: null, page: 0 })
     // else refetch({ accountCategory: activeKey, page: 0 })
   }
@@ -64,17 +109,42 @@ export default function Integrations() {
     <PageContainer
       title='Integrations'
       content='Overview of Journal Entries Templates.'
-      extra={[
-        <Button
-          key='add-fiscal'
-          type='primary'
-          onClick={() => onHandleClickCreateEdit()}
-        >
-          Add Group
-        </Button>,
-      ]}
     >
-      <ProCard
+      <Card
+        style={{ width: '100%' }}
+        title='Integration Group'
+        extra={[
+          <Button
+            key='add-group'
+            type='primary'
+            onClick={() => onHandleClickCreate()}
+          >
+            Add Group
+          </Button>,
+        ]}
+      >
+        <Tabs
+          type={'editable-card'}
+          hideAdd={true}
+          onEdit={onUpdateTab}
+          defaultActiveKey='1'
+          tabPosition={'top'}
+          destroyInactiveTabPane={true}
+          items={(data?.integrationGroupList || []).map((tab: any) => ({
+            label: tab.description,
+            key: tab.id,
+            children: (
+              <IntegrationItems
+                id={tab?.id}
+                description={tab?.description}
+                domain={tab?.domain}
+              />
+            ),
+          }))}
+          addIcon={<Button>asadad</Button>}
+        />
+      </Card>
+      {/* <ProCard
         ghost
         tabs={{
           type: 'editable-card',
@@ -87,7 +157,7 @@ export default function Integrations() {
             <IntergrationItem id={tab?.id} description={tab?.description} />
           </ProCard.TabPane>
         ))}
-      </ProCard>
+      </ProCard> */}
     </PageContainer>
   )
 }

@@ -4,9 +4,8 @@ CREATE TABLE IF NOT EXISTS accounting.header_ledger_group (
 	record_no varchar NULL,
 	entity_name varchar NULL,
 	particulars varchar NULL,
+	reference_id varchar NULL,
 	fiscal uuid NULL,
-	transaction_date timestamp NULL,
-	journal_type varchar NULL,
 
 	created_by varchar NULL,
 	created_date timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -15,9 +14,12 @@ CREATE TABLE IF NOT EXISTS accounting.header_ledger_group (
 	CONSTRAINT ledger_header_group_pkey PRIMARY KEY (id)
 );
 
+CREATE INDEX company_id_idx ON accounting.header_ledger_group USING btree (company_id);
+
 CREATE TABLE IF NOT EXISTS accounting.header_ledger (
 	id uuid NOT NULL,
     company_id uuid NULL,
+	header_ledger_group_id uuid NULL,
 	entity_name varchar NULL,
 	particulars varchar NULL,
 	doctype varchar NULL,
@@ -30,7 +32,6 @@ CREATE TABLE IF NOT EXISTS accounting.header_ledger (
 	transaction_date timestamp NULL,
 	journal_type varchar NULL,
 	custom bool NULL,
-	header_ledger_group_id uuid NULL,
 	beginning_balance bool NULL,
 	reversal bool NULL,
 	reapply_payment_tracker uuid NULL,
@@ -42,18 +43,13 @@ CREATE TABLE IF NOT EXISTS accounting.header_ledger (
     created_date timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     last_modified_by varchar NULL,
     last_modified_date timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT ledgerheader_pkey PRIMARY KEY (id)
-);
-CREATE INDEX docnum_idx ON accounting.header_ledger USING btree (docnum,company_id);
-CREATE INDEX entity_name_idx ON accounting.header_ledger USING btree (entity_name,company_id);
-CREATE INDEX header_ledger_approved_datetime_idx ON accounting.header_ledger USING btree (approved_datetime,company_id);
-CREATE INDEX header_ledger_beginning_balance_idx ON accounting.header_ledger USING btree (beginning_balance,company_id);
-CREATE INDEX header_ledger_reapply_payment_tracker_idx ON accounting.header_ledger USING btree (reapply_payment_tracker,company_id);
-CREATE INDEX idx_ledgerheaderorigdate ON accounting.header_ledger USING btree (transaction_date,company_id);
-CREATE INDEX idxlhfiscal ON accounting.header_ledger USING btree (fiscal,company_id);
-CREATE INDEX journal_type_idx ON accounting.header_ledger USING btree (journal_type,company_id);
-CREATE INDEX particulars_idx ON accounting.header_ledger USING btree (particulars,company_id);
+	CONSTRAINT ledger_header_pkey PRIMARY KEY (id,transaction_date_only)
+)
+PARTITION BY RANGE (transaction_date_only);
 
+CREATE INDEX idx_ledgerheaderorigdate ON accounting.header_ledger USING btree (transaction_date_only,company_id);
+CREATE INDEX header_ledger_group_id_idx ON accounting.header_ledger USING btree (header_ledger_group_id);
+CREATE INDEX transaction_date_only_header_ledger_group_id_idx ON accounting.header_ledger USING btree (transaction_date_only,header_ledger_group_id);
 
 ALTER TABLE accounting.header_ledger ADD CONSTRAINT fk1_header_ledger FOREIGN KEY (fiscal) REFERENCES accounting.fiscals(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -78,10 +74,13 @@ CREATE TABLE IF NOT EXISTS accounting.ledger (
 	last_modified_date timestamp NULL DEFAULT CURRENT_TIMESTAMP,
 	journal_account jsonb NULL,
 	transaction_date_only date NULL,
-	CONSTRAINT general_ledger_pkey PRIMARY KEY (id)
-);
+	CONSTRAINT ledger_pkey PRIMARY KEY (id,transaction_date_only)
+)
+PARTITION BY RANGE (transaction_date_only);
+
 CREATE INDEX header_idx ON accounting.ledger USING btree (header,company_id);
-CREATE INDEX ledger_journal_account_idx ON accounting.ledger USING btree (journal_account,company_id);
+CREATE INDEX transaction_date_only_idx ON accounting.ledger USING btree (header,transaction_date_only);
+CREATE INDEX ledger_journal_account_idx ON accounting.ledger USING btree (journal_account,transaction_date_only,company_id);
 
 CREATE TABLE IF NOT EXISTS accounting.ledger_details (
 	id uuid NOT NULL,
@@ -96,5 +95,3 @@ CREATE INDEX idx_field_name_value ON accounting.ledger_details USING btree (fiel
 CREATE INDEX idx_general_ledger ON accounting.ledger_details USING btree (general_ledger,company_id);
 CREATE INDEX idx_gl_field_name ON accounting.ledger_details USING btree (field_name,company_id);
 CREATE INDEX idx_gl_field_value ON accounting.ledger_details USING btree (field_value,company_id);
-
-ALTER TABLE accounting.ledger_details ADD CONSTRAINT fk_general_ledger_details_ledger FOREIGN KEY (general_ledger) REFERENCES accounting.ledger(id) ON DELETE CASCADE ON UPDATE CASCADE;

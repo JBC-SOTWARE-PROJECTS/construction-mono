@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.accounting.Integration
 import com.backend.gbp.domain.accounting.IntegrationGroup
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -36,6 +37,7 @@ class IntegrationGroupServices extends AbstractDaoService<IntegrationGroup> {
     ) {
         try{
             upsertFromMap(id, fields, { IntegrationGroup entity, boolean forInsert ->
+                if(forInsert) entity.company = SecurityUtils.currentCompany()
             })
             return true
         }catch(ignored){

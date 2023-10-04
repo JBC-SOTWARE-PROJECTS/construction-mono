@@ -32,6 +32,7 @@ import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import java.lang.reflect.Field
 import java.time.Instant
+import java.time.ZoneOffset
 
 interface AutoIntegrateableInitilizer<T extends AutoIntegrateable> {
 
@@ -65,36 +66,11 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
 
 
-
-//    @Transactional(rollbackFor = Exception.class)
-//    @GraphQLMutation(name = "testFromJsonGenerateAutoEntries", description = "insert Integrations from JSON")
-//    HeaderLedger testFromJsonGenerateAutoEntries(
-//            @GraphQLArgument(name = "fields") Map<String, Object> fields
-//    ) {
-//
-//        IntegrationTemplate integrationTemplate = new IntegrationTemplate()
-//        entityObjectMapperService.updateFromMap(integrationTemplate,fields)
-//
-//        generateAutoEntries(integrationTemplate){it, multipleData->
-//
-//
-//        }
-//    }
-
-
-    /*
-     Multiple flag is ignored
-     */
    def  <T extends AutoIntegrateable>  HeaderLedger generateAutoEntries(T autoIntegrateable, AutoIntegrateableInitilizer<T> init){
 
 
         List<List<T>> multipleData= []
         init.init(autoIntegrateable,multipleData)
-        def username = SecurityUtils.currentLogin()
-//        def user = userRepository.findOneByLogin(username)
-//        def emp = employeeRepository.findOneByUser(user)
-//        def department = emp.departmentOfDuty
-
 
         String tagValue = autoIntegrateable.flagValue
 
@@ -145,9 +121,6 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
              }
 
-
-
-
             String subSubAccountCode = item.journalAccount?.subSubAccount?.code
             if(StringUtils.equalsIgnoreCase(subSubAccountCode,"####")){
                 // needs parameter
@@ -167,11 +140,11 @@ class IntegrationServices extends AbstractDaoService<Integration> {
             }
         }
 
-
         // Generate the entries
 
         HeaderLedger header = new HeaderLedger()
         header.transactionDate = Instant.now()
+        header.transactionDateOnly = header.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
 
         // Values correspond to Temporary Entry
         header.docType = LedgerDocType.XX
@@ -182,10 +155,10 @@ class IntegrationServices extends AbstractDaoService<Integration> {
             header.details.put(k,v)
         }
 
-
         match.integrationItems.findAll { BooleanUtils.isNotTrue(it.multiple) }.each { item ->
             Ledger ledger = new Ledger()
             ledger.company = SecurityUtils.currentCompany()
+            ledger.transactionDateOnly = header.transactionDateOnly
             def coa =   createCoaFromItem(autoIntegrateable,item)
 
             ledger.debit = 0.0
@@ -218,13 +191,8 @@ class IntegrationServices extends AbstractDaoService<Integration> {
             header.ledger << ledger
         }
 
-
-
        match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
-           // def iii = entry
-           //println( "entry => " + entry.sourceColumn)
-           //println( "condition => " + "${i < multipleData.size()}")
-           //println( "size => " + multipleData.size())
+
            if(i < multipleData.size()){
 
                  def dataForItem = multipleData.get(i)
@@ -233,7 +201,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
                  dataForItem.each {tmpAutoIntegrateable ->
 
                      Ledger ledger = new Ledger()
-
+                     ledger.transactionDateOnly = header.transactionDateOnly
                      def coa =   createCoaFromItem(tmpAutoIntegrateable,entry)
 
                      ledger.debit = 0.0
@@ -268,15 +236,11 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
                  }
 
-
-
              }
        }
 
         return  header
     }
-
-
 
       ChartOfAccountGenerate  createCoaFromItem(AutoIntegrateable autoIntegrateable,IntegrationItem item) {
 
@@ -547,6 +511,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
         IntegrationItem integrationItem = new IntegrationItem()
         integrationItem.integration = integration
         integrationItem.journalAccount = pattern
+        integrationItem.company = SecurityUtils.currentCompany()
         integration.integrationItems << integrationItem
         save(integration)
         true
@@ -560,8 +525,10 @@ class IntegrationServices extends AbstractDaoService<Integration> {
     ) {
         upsertFromMap(id, fields, { Integration entity, boolean forInsert ->
 
-            if(forInsert)
+            if(forInsert) {
                 entity.orderPriority = 0
+                entity.company = SecurityUtils.currentCompany()
+            }
 
         })
 
@@ -652,11 +619,8 @@ class IntegrationServices extends AbstractDaoService<Integration> {
             @GraphQLArgument(name="fields") Map<String,Object> fields
     ){
         if(id && fields){
-            def upsert = upsertFromObjectMapper(id,fields){
-                it,bool ->
-                        return true
-            }
-            return upsert
+            upsertIntegration(fields,id)
+            return true
         }
         return false
     }

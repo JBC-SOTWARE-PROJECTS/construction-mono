@@ -168,6 +168,8 @@ class HeaderLedger extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "reapply_payment_tracker", columnDefinition = "uuid")
 	UUID reapplyPaymentTracker
 
+	@Column(name = "transaction_date_only")
+	LocalDate transactionDateOnly
 
 	@GraphQLQuery
 	@Column(name = "approved_by", columnDefinition = "varchar")
