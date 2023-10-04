@@ -26,12 +26,14 @@ interface IProps {
   toggleModal: () => void;
   record?: EmployeeAttendance | undefined;
   callback?: () => void;
+  employeeId?: string;
 }
 function UpsertAttendanceModal({
   open,
   toggleModal,
   record,
   callback,
+  employeeId,
 }: IProps) {
   const { error, data: projects } = useQuery(GET_ACTIVE_PROJECTS);
 
@@ -58,7 +60,8 @@ function UpsertAttendanceModal({
         attendance_time: dayjs(values.attendance_time).millisecond(0),
       },
       values?.project_id,
-      record?.id
+      record?.id,
+      employeeId
     );
   };
   return (

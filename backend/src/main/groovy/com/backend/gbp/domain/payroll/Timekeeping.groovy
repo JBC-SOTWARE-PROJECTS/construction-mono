@@ -1,7 +1,9 @@
 package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
+import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
@@ -30,6 +32,10 @@ class Timekeeping extends PayrollAuditingEntity implements Serializable {
     @Column(name = "deleted_date", columnDefinition = "timestamp")
     Instant deletedEnd
 
+    @Type(type = "jsonb")
+    @GraphQLQuery
+    @Column(name="project_breakdown",columnDefinition = "jsonb")
+    List<HoursLog> projectBreakdown
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "payroll", referencedColumnName = "id")

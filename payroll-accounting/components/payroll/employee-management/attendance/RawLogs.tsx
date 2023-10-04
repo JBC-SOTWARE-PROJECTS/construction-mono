@@ -20,7 +20,7 @@ import useDateRangeState from "@/hooks/useDateRangeState";
 import useIgnoreAttendance from "@/hooks/attendance/useIgnoreAttendance";
 import { useGetEmployeeById } from "@/hooks/employee";
 interface IProps {
-  id?: string;
+  employeeId?: string;
   useStaticData?: boolean;
   startDateStatic?: dayjs.Dayjs;
   endDateStatic?: dayjs.Dayjs;
@@ -29,7 +29,7 @@ interface IProps {
 }
 
 function RawLogs({
-  id,
+  employeeId,
   useStaticData,
   startDateStatic,
   endDateStatic,
@@ -130,9 +130,9 @@ function RawLogs({
   };
 
   useEffect(() => {
-    if (useStaticData && id) {
+    if (useStaticData && employeeId) {
       getAttendance({
-        id: id,
+        id: employeeId,
         size: 10,
         page: 0,
         startDate: startDateStatic?.startOf("day"),
@@ -187,7 +187,7 @@ function RawLogs({
                   icon={<SearchOutlined />}
                   onClick={() => {
                     getAttendance({
-                      id: router?.query?.id || id,
+                      id: router?.query?.id || employeeId,
                       size: 10,
                       page: 0,
                       startDate: startDate?.startOf("day"),
@@ -233,6 +233,7 @@ function RawLogs({
             if (callback) callback();
             refetch();
           }}
+          employeeId={employeeId}
         />
       )}
     </>

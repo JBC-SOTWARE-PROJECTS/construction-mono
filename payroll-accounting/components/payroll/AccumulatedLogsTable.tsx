@@ -269,7 +269,6 @@ function AccumulatedLogsTable({
           <Space>
             {showBreakdown && (
               <LogsProjectBreakdownModal
-                render={render}
                 record={record}
                 disabled={record?.isError || false}
               />
@@ -281,6 +280,7 @@ function AccumulatedLogsTable({
               type="primary"
               icon={<EyeOutlined />}
               onClick={() => {
+                console.log(record);
                 setRawLogsData({
                   startDate: dayjs(record.date).startOf("day"),
                   endDate: dayjs(record.date).endOf("day"),
@@ -402,7 +402,7 @@ function AccumulatedLogsTable({
         width="70vw"
       >
         <RawLogs
-          id={rawLogsdata?.employeeId}
+          employeeId={rawLogsdata?.employeeId}
           startDateStatic={rawLogsdata?.startDate}
           endDateStatic={rawLogsdata?.endDate}
           useStaticData

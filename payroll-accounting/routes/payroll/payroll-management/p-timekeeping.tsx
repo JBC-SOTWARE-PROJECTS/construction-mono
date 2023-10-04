@@ -1,22 +1,31 @@
 import CustomButton from "@/components/common/CustomButton";
 import AccumulatedLogsTable from "@/components/payroll/AccumulatedLogsTable";
 import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
+import LogsProjectBreakdownModal from "@/components/payroll/LogsProjectBreakdownModal";
 import PayrollHeader from "@/components/payroll/PayrollHeader";
 import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
   Employee,
+  PayrollEmployeeStatus,
   PayrollModule,
   TimekeepingEmployeeDto,
 } from "@/graphql/gql/graphql";
+import useGetTimekeeping from "@/hooks/payroll/timekeeping/useGetTimekeeping";
 import useGetTimekeepingEmployeeLogs from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployeeLogs";
 import useGetTimekeepingEmployees from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployees";
+import useUpdateTimekeepingStatus from "@/hooks/payroll/timekeeping/useUpdateTimekeepingStatus";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
-import { CheckOutlined, ReloadOutlined } from "@ant-design/icons";
+import {
+  CheckOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
 import { PageHeader } from "@ant-design/pro-components";
-import { Divider, Tag } from "antd";
+import { Divider, Modal, Spin, Tag } from "antd";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -25,8 +34,10 @@ function Timekeeping({ account }: IPageProps) {
   const [selectedEmployees, setSelectedEmployees] = useState<
     TimekeepingEmployeeDto[]
   >([]);
+
   const [displayedEmployee, setDisplayedEmployee] =
     useState<TimekeepingEmployeeDto>();
+
   const [_, loadingPayrollEmployees, refetchEmployees] =
     useGetTimekeepingEmployees((result) => {
       result.forEach((item: TimekeepingEmployeeDto) => {
@@ -38,10 +49,45 @@ function Timekeeping({ account }: IPageProps) {
   const [data, loading, refetch] = useGetTimekeepingEmployeeLogs(
     displayedEmployee?.id
   );
+  const [timekeeping, loadingTimekeeping, refetchTimekeeping] =
+    useGetTimekeeping();
 
+  const [updateStatus, loadingUpdateStatus] = useUpdateTimekeepingStatus(() => {
+    refetchTimekeeping();
+    refetchEmployees();
+  });
+  const statusMap: any = {
+    DRAFT: "FINALIZED",
+    FINALIZED: "DRAFT",
+  };
+  const handleClickFinalize = () => {
+    let countDraft = 0;
+    selectedEmployees.forEach((item) => {
+      if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
+    });
+    if (countDraft > 0) {
+      Modal.confirm({
+        title: "There still some DRAFT employees. Proceed?",
+        icon: <ExclamationCircleOutlined />,
+        onOk() {
+          updateStatus({
+            payrollId: router?.query?.id as string,
+            status: "FINALIZED",
+          });
+        },
+      });
+    } else {
+      updateStatus({
+        payrollId: router?.query?.id as string,
+        status: statusMap[timekeeping?.status],
+      });
+    }
+  };
   return (
-    <div>
+    <Spin spinning={loadingTimekeeping || loadingUpdateStatus}>
       <PayrollHeader
+        showTitle
+        status={timekeeping?.status}
         module={PayrollModule.Timekeeping}
         extra={
           <>
@@ -60,9 +106,28 @@ function Timekeeping({ account }: IPageProps) {
                 refetchEmployees();
               }}
             />
-            <CustomButton type="primary" icon={<CheckOutlined />}>
-              Finalize Timekeeping
+            <CustomButton
+              type="primary"
+              icon={
+                timekeeping?.status === "FINALIZED" ? (
+                  <EditOutlined />
+                ) : (
+                  <CheckOutlined />
+                )
+              }
+              onClick={handleClickFinalize}
+            >
+              Set as {statusMap[timekeeping?.status]}
             </CustomButton>
+
+            {timekeeping?.status === "FINALIZED" && (
+              <LogsProjectBreakdownModal
+                record={{ projectBreakdown: timekeeping?.projectBreakdown }}
+                disabled={false}
+              >
+                View Project Breakdown
+              </LogsProjectBreakdownModal>
+            )}
           </>
         }
       />
@@ -107,29 +172,37 @@ function Timekeeping({ account }: IPageProps) {
                   </td>
                 </tr>
               </table>
-              <PayrollModuleRecalculateEmployeeAction
-                id={displayedEmployee?.id}
-                module={PayrollModule.Timekeeping}
-                buttonProps={{
-                  danger: true,
-                  ghost: true,
-                  icon: <ReloadOutlined />,
-                }}
-                refetch={refetch}
-                allowedPermissions={["recalculate_one_contributions_employee"]}
-              >
-                Recalculate Employee
-              </PayrollModuleRecalculateEmployeeAction>
-
-              <PayrollEmployeeStatusAction
-                id={displayedEmployee?.id}
-                module={PayrollModule.Timekeeping}
-                value={displayedEmployee?.status}
-                buttonProps={{ type: "primary" }}
-                refetch={refetchEmployees}
-              >{`Set as ${
-                displayedEmployee?.status === "DRAFT" ? "Finalized" : "Draft"
-              }`}</PayrollEmployeeStatusAction>
+              {timekeeping?.status === "DRAFT" && (
+                <>
+                  {" "}
+                  <PayrollModuleRecalculateEmployeeAction
+                    id={displayedEmployee?.id}
+                    module={PayrollModule.Timekeeping}
+                    buttonProps={{
+                      danger: true,
+                      ghost: true,
+                      icon: <ReloadOutlined />,
+                    }}
+                    refetch={refetch}
+                    allowedPermissions={[
+                      "recalculate_one_contributions_employee",
+                    ]}
+                  >
+                    Recalculate Employee
+                  </PayrollModuleRecalculateEmployeeAction>
+                  <PayrollEmployeeStatusAction
+                    id={displayedEmployee?.id}
+                    module={PayrollModule.Timekeeping}
+                    value={displayedEmployee?.status}
+                    buttonProps={{ type: "primary" }}
+                    refetch={refetchEmployees}
+                  >{`Set as ${
+                    displayedEmployee?.status === "DRAFT"
+                      ? "Finalized"
+                      : "Draft"
+                  }`}</PayrollEmployeeStatusAction>
+                </>
+              )}
             </>
           ) : (
             "Please Select an Employee"
@@ -145,7 +218,7 @@ function Timekeeping({ account }: IPageProps) {
         dataSource={data}
         loading={loadingPayrollEmployees || loading}
       />
-    </div>
+    </Spin>
   );
 }
 

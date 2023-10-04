@@ -1489,6 +1489,7 @@ export type Mutation = {
   updateStatusCost?: Maybe<ProjectCost>;
   updateStiItemStatus?: Maybe<StockIssueItems>;
   updateTimekeepingEmployeeStatus?: Maybe<GraphQlResVal_TimekeepingEmployee>;
+  updateTimekeepingStatus?: Maybe<GraphQlResVal_String>;
   upsertAddress?: Maybe<GraphQlRetVal_Boolean>;
   upsertAsset?: Maybe<Assets>;
   upsertBegQty?: Maybe<BeginningBalance>;
@@ -2194,6 +2195,13 @@ export type MutationUpdateStiItemStatusArgs = {
 export type MutationUpdateTimekeepingEmployeeStatusArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<PayrollEmployeeStatus>;
+};
+
+
+/** Mutation root */
+export type MutationUpdateTimekeepingStatusArgs = {
+  payrollId?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollStatus>;
 };
 
 
@@ -6725,6 +6733,7 @@ export type Timekeeping = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
+  projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
   status?: Maybe<PayrollStatus>;
   timekeepingEmployees?: Maybe<Array<Maybe<TimekeepingEmployee>>>;
 };

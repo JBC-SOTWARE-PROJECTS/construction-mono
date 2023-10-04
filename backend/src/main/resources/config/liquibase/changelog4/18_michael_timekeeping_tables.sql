@@ -8,6 +8,7 @@ CREATE TABLE payroll.timekeepings (
     payroll uuid NOT NULL,
     status varchar,
     finalized_by uuid,
+    project_breakdown jsonb,
     finalized_date timestamp,
     CONSTRAINT fk_timekeepings_payroll_id FOREIGN KEY (payroll) REFERENCES payroll.payrolls(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT payroll_timekeepings_finalized_by_employees_id FOREIGN KEY (finalized_by) REFERENCES hrm.employees(id) ON DELETE RESTRICT ON UPDATE CASCADE,
