@@ -104,3 +104,8 @@ export function transformDate(currentDate: dayjs.Dayjs, referenceDate: string) {
 export function getTimeFromDate(date: dayjs.Dayjs) {
   return dayjs(date).format("h:mm a");
 }
+
+export function getStatusColor(status: string) {
+  if (status === "DRAFT") return "orange";
+  else if (status === "FINALIZED") return "green";
+}

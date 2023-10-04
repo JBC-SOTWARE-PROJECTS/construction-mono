@@ -2,31 +2,38 @@ import CustomButton from "@/components/common/CustomButton";
 import AccumulatedLogsTable from "@/components/payroll/AccumulatedLogsTable";
 import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
 import PayrollHeader from "@/components/payroll/PayrollHeader";
+import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
-import { Employee, PayrollModule } from "@/graphql/gql/graphql";
+import {
+  Employee,
+  PayrollModule,
+  TimekeepingEmployeeDto,
+} from "@/graphql/gql/graphql";
 import useGetTimekeepingEmployeeLogs from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployeeLogs";
 import useGetTimekeepingEmployees from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployees";
+import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import { CheckOutlined, ReloadOutlined } from "@ant-design/icons";
-import { Key, PageHeader } from "@ant-design/pro-components";
-import { Divider } from "antd";
+import { PageHeader } from "@ant-design/pro-components";
+import { Divider, Tag } from "antd";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
 function Timekeeping({ account }: IPageProps) {
   const router = useRouter();
-  const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Key[]>([]);
-  const [displayedEmployee, setDisplayedEmployee] = useState<Employee>();
-  const [_, loadingPayrollEmployees] = useGetTimekeepingEmployees((result) => {
-    let ids: Key[] = [];
-    result.forEach((item: Employee) => {
-      ids.push(item.id);
+  const [selectedEmployees, setSelectedEmployees] = useState<
+    TimekeepingEmployeeDto[]
+  >([]);
+  const [displayedEmployee, setDisplayedEmployee] =
+    useState<TimekeepingEmployeeDto>();
+  const [_, loadingPayrollEmployees, refetchEmployees] =
+    useGetTimekeepingEmployees((result) => {
+      result.forEach((item: TimekeepingEmployeeDto) => {
+        if (item?.id === displayedEmployee?.id) setDisplayedEmployee(item);
+      });
+      setSelectedEmployees(result);
     });
-    setSelectedIds(ids);
-    setSelectedEmployees(result);
-  });
 
   const [data, loading, refetch] = useGetTimekeepingEmployeeLogs(
     displayedEmployee?.id
@@ -48,8 +55,10 @@ function Timekeeping({ account }: IPageProps) {
                 danger: true,
               }}
               tooltipProps={{ placement: "topRight" }}
-              refetch={refetch}
-              // allowedPermissions={['recalculate_all_contributions_employees']}
+              refetch={() => {
+                refetch();
+                refetchEmployees();
+              }}
             />
             <CustomButton type="primary" icon={<CheckOutlined />}>
               Finalize Timekeeping
@@ -61,7 +70,7 @@ function Timekeeping({ account }: IPageProps) {
       <PageHeader
         extra={
           <EmployeeDrawer
-            selectedEmployees={selectedEmployees}
+            selectedEmployees={selectedEmployees as Employee[]}
             loading={loadingPayrollEmployees}
             setDisplayedEmployee={setDisplayedEmployee}
             usage="TIMEKEEPING"
@@ -81,7 +90,14 @@ function Timekeeping({ account }: IPageProps) {
                 <tr>
                   <td>Name:</td>
                   <td style={{ paddingLeft: 10 }}>
-                    {displayedEmployee?.fullName}
+                    {displayedEmployee?.fullName}{" "}
+                    <Tag
+                      color={getStatusColor(
+                        displayedEmployee?.status as string
+                      )}
+                    >
+                      {displayedEmployee?.status}
+                    </Tag>
                   </td>
                 </tr>
                 <tr>
@@ -104,6 +120,16 @@ function Timekeeping({ account }: IPageProps) {
               >
                 Recalculate Employee
               </PayrollModuleRecalculateEmployeeAction>
+
+              <PayrollEmployeeStatusAction
+                id={displayedEmployee?.id}
+                module={PayrollModule.Timekeeping}
+                value={displayedEmployee?.status}
+                buttonProps={{ type: "primary" }}
+                refetch={refetchEmployees}
+              >{`Set as ${
+                displayedEmployee?.status === "DRAFT" ? "Finalized" : "Draft"
+              }`}</PayrollEmployeeStatusAction>
             </>
           ) : (
             "Please Select an Employee"
@@ -112,6 +138,7 @@ function Timekeeping({ account }: IPageProps) {
       />
 
       <AccumulatedLogsTable
+        displayedEmployee={displayedEmployee}
         isTimekeeping
         showBreakdown
         refetch={refetch}

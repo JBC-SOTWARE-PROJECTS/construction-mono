@@ -13,6 +13,7 @@ interface TimekeepingEmployeeDto{
     UUID getEmployeeId()
     String getFullName()
     String getGender()
+    String getStatus()
     Position getPosition()
 }
 
@@ -29,6 +30,7 @@ interface TimekeepingEmployeeRepository extends JpaRepository<TimekeepingEmploye
             value = """
 Select 
 te.id as id,
+te.status as status,
 e.id as employeeId,
 e.fullName as fullName, 
 e.position as position,

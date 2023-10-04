@@ -10,9 +10,10 @@ import { DateFormatterWithTime } from "@/utility/helper";
 interface IProps {
   record: AccumulatedLogs;
   render: any;
+  disabled: boolean;
 }
 const { Text, Title } = Typography;
-function LogsProjectBreakdownModal({ record, render }: IProps) {
+function LogsProjectBreakdownModal({ record, render, disabled }: IProps) {
   const [visible, setVisible] = useState(false);
 
   const onCellProps = (record: HoursLog, key: keyof HoursLog) => {
@@ -136,6 +137,7 @@ function LogsProjectBreakdownModal({ record, render }: IProps) {
         onClick={() => {
           setVisible(true);
         }}
+        disabled={disabled}
       />
 
       <Modal

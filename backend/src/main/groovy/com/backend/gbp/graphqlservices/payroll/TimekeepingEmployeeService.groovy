@@ -116,6 +116,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     List<TimekeepingEmployee> generateAccumulatedLogs(List<TimekeepingEmployee> timekeepingEmployees, Payroll payroll) {
         timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
+            timekeepingEmployee.status = PayrollEmployeeStatus.DRAFT
             timekeepingEmployee.accumulatedLogs.clear()
             List<AccumulatedLogs> accumulatedLogs = accumulatedLogsCalculator.getAccumulatedLogs(
                     payroll.dateStart,
@@ -127,6 +128,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
             }
             accumulatedLogRepository.saveAll(accumulatedLogs)
         }
+        timekeepingEmployeeRepository.saveAll(timekeepingEmployees)
 
     }
 //=================================QUERY=================================\\

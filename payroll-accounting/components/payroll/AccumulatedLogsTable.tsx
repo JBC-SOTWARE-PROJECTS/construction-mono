@@ -1,46 +1,47 @@
 import {
   AccumulatedLogs,
   HoursLog,
-  PayrollModule,
+  TimekeepingEmployeeDto,
 } from "@/graphql/gql/graphql";
+import useRecalculateOneLog from "@/hooks/payroll/timekeeping/useRecalculateOneLog";
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ExclamationCircleOutlined,
   EyeOutlined,
   ReloadOutlined,
-  UnorderedListOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Modal, Row, Space, Table, Tag } from "antd";
+import { Col, Modal, Row, Space, Table, Tag } from "antd";
 import dayjs from "dayjs";
 import { round } from "lodash";
+import { useRouter } from "next/router";
 import { CSSProperties, useState } from "react";
 import CustomButton from "../common/CustomButton";
 import LogsProjectBreakdownModal from "./LogsProjectBreakdownModal";
-import PayrollModuleRecalculateEmployeeAction from "./payroll-management/PayrollModuleRecalculateEmployeeAction";
-import useRecalculateOneLog from "@/hooks/payroll/timekeeping/useRecalculateOneLog";
-import { debug } from "console";
 import RawLogs from "./employee-management/attendance/RawLogs";
 
 interface IProps {
   dataSource: AccumulatedLogs[];
   loading: boolean;
   refetch?: () => void;
-  isTimekeeping?: boolean;
   showBreakdown?: boolean;
+  isTimekeeping?: boolean;
+  displayedEmployee?: TimekeepingEmployeeDto;
 }
 
 function AccumulatedLogsTable({
   dataSource,
   loading,
   refetch,
-  isTimekeeping = false,
   showBreakdown = false,
+  isTimekeeping = false,
+  displayedEmployee,
 }: IProps) {
   const [calculate, loadingRecalculate] = useRecalculateOneLog(refetch);
   const [openRawLogs, setOpenRawLogs] = useState<boolean>(false);
   const [rawLogsdata, setRawLogsData] = useState<any>(null);
   const [shouldRecalculate, setShouldRecalculate] = useState(false);
+  const router = useRouter();
 
   const onCellProps = (record: AccumulatedLogs, key: keyof HoursLog) => {
     const hours = record?.hours?.[key] || 0;
@@ -49,7 +50,7 @@ function AccumulatedLogsTable({
       style = { ...style, backgroundColor: "#d7fada", color: "#2c8a34" };
     return { style };
   };
-
+  console.log(displayedEmployee?.status === "FINALIZED");
   const underPerformanceCell = (
     record: AccumulatedLogs,
     key: keyof HoursLog
@@ -262,34 +263,36 @@ function AccumulatedLogsTable({
       title: "Actions",
       dataIndex: "id",
       key: "id",
-
+      width: 145,
       render: (id: string, record: AccumulatedLogs) => {
         return (
           <Space>
             {showBreakdown && (
-              <LogsProjectBreakdownModal render={render} record={record} />
+              <LogsProjectBreakdownModal
+                render={render}
+                record={record}
+                disabled={record?.isError || false}
+              />
             )}
-
-            {isTimekeeping && (
+            <CustomButton
+              id={id}
+              tooltip="View Raw Logs"
+              shape="circle"
+              type="primary"
+              icon={<EyeOutlined />}
+              onClick={() => {
+                setRawLogsData({
+                  startDate: dayjs(record.date).startOf("day"),
+                  endDate: dayjs(record.date).endOf("day"),
+                  employeeId: record.employeeId || router?.query?.id,
+                  logId: record.id,
+                });
+                setOpenRawLogs(true);
+              }}
+              // allowedPermissions={["recalculate_one_timekeeping_employee"]}
+            />
+            {isTimekeeping && displayedEmployee?.status === "DRAFT" && (
               <>
-                <CustomButton
-                  id={id}
-                  tooltip="View Raw Logs"
-                  shape="circle"
-                  type="primary"
-                  icon={<EyeOutlined />}
-                  onClick={() => {
-                    setRawLogsData({
-                      startDate: dayjs(record.date).startOf("day"),
-                      endDate: dayjs(record.date).endOf("day"),
-                      employeeId: record.employeeId,
-                      logId: record.id,
-                    });
-                    setOpenRawLogs(true);
-                  }}
-                  // allowedPermissions={["recalculate_one_timekeeping_employee"]}
-                />
-
                 <CustomButton
                   id={id}
                   tooltip="Recalculate"
@@ -332,6 +335,63 @@ function AccumulatedLogsTable({
         scroll={scrollProps}
         onHeaderRow={() => ({ style: { textAlignLast: "center" } })}
         loading={loading || loadingRecalculate}
+        summary={(pageData: readonly AccumulatedLogs[]) => {
+          let obj: any = {};
+          const keys = [
+            "late",
+            "underTime",
+            "absent",
+            "regular",
+            "overtime",
+            "regularHoliday",
+            "overtimeHoliday",
+            "regularSpecialHoliday",
+            "overtimeSpecialHoliday",
+            "regularDoubleHoliday",
+            "overtimeDoubleHoliday",
+          ];
+          pageData.forEach((item: AccumulatedLogs) => {
+            keys.forEach((key) => {
+              obj[key] =
+                (item?.hours ? item?.hours[key as keyof HoursLog] : 0) +
+                (obj[key] ? obj[key] : 0);
+            });
+          });
+
+          return (
+            <>
+              <Table.Summary.Row>
+                <Table.Summary.Cell key={99} index={99} colSpan={3}>
+                  <b>Totals</b>
+                </Table.Summary.Cell>
+                {keys.map((item: string, index) => {
+                  return (
+                    <Table.Summary.Cell key={item} index={index}>
+                      <div
+                        style={{
+                          textAlign: "center",
+
+                          ...(obj[item] > 0
+                            ? {
+                                // backgroundColor: "#d7fada",
+                                color: ["late", "underTime", "absent"].includes(
+                                  item
+                                )
+                                  ? "red"
+                                  : "green",
+                              }
+                            : {}),
+                        }}
+                      >
+                        {round(isNaN(obj[item]) ? 0 : obj[item], 4)}
+                      </div>
+                    </Table.Summary.Cell>
+                  );
+                })}
+              </Table.Summary.Row>
+            </>
+          );
+        }}
       />
 
       <Modal
@@ -346,6 +406,7 @@ function AccumulatedLogsTable({
           startDateStatic={rawLogsdata?.startDate}
           endDateStatic={rawLogsdata?.endDate}
           useStaticData
+          hideAddButton={displayedEmployee?.status === "FINALIZED"}
           callback={() => setShouldRecalculate(true)}
         />
       </Modal>

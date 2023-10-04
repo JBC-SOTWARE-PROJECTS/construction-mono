@@ -87,23 +87,6 @@ export type AccumulatedLogs = {
   timekeepingEmployee?: Maybe<TimekeepingEmployee>;
 };
 
-export type AccumulatedLogsInput = {
-  date?: InputMaybe<Scalars['Instant']['input']>;
-  employeeId?: InputMaybe<Scalars['UUID']['input']>;
-  hours?: InputMaybe<HoursLogInput>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  inTime?: InputMaybe<Scalars['Instant']['input']>;
-  isError?: InputMaybe<Scalars['Boolean']['input']>;
-  isLeave?: InputMaybe<Scalars['Boolean']['input']>;
-  isRestDay?: InputMaybe<Scalars['Boolean']['input']>;
-  message?: InputMaybe<Scalars['String']['input']>;
-  outTime?: InputMaybe<Scalars['Instant']['input']>;
-  projectBreakdown?: InputMaybe<Array<InputMaybe<HoursLogInput>>>;
-  scheduleEnd?: InputMaybe<Scalars['Instant']['input']>;
-  scheduleStart?: InputMaybe<Scalars['Instant']['input']>;
-  scheduleTitle?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type Assets = {
   __typename?: 'Assets';
   assetCode?: Maybe<Scalars['String']['output']>;
@@ -981,22 +964,6 @@ export type HoursLog = {
   underTime?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
-export type HoursLogInput = {
-  absent?: InputMaybe<Scalars['BigDecimal']['input']>;
-  late?: InputMaybe<Scalars['BigDecimal']['input']>;
-  overtime?: InputMaybe<Scalars['BigDecimal']['input']>;
-  overtimeDoubleHoliday?: InputMaybe<Scalars['BigDecimal']['input']>;
-  overtimeHoliday?: InputMaybe<Scalars['BigDecimal']['input']>;
-  overtimeSpecialHoliday?: InputMaybe<Scalars['BigDecimal']['input']>;
-  project?: InputMaybe<Scalars['UUID']['input']>;
-  projectName?: InputMaybe<Scalars['String']['input']>;
-  regular?: InputMaybe<Scalars['BigDecimal']['input']>;
-  regularDoubleHoliday?: InputMaybe<Scalars['BigDecimal']['input']>;
-  regularHoliday?: InputMaybe<Scalars['BigDecimal']['input']>;
-  regularSpecialHoliday?: InputMaybe<Scalars['BigDecimal']['input']>;
-  underTime?: InputMaybe<Scalars['BigDecimal']['input']>;
-};
-
 export type InputStream = {
   __typename?: 'InputStream';
 };
@@ -1453,6 +1420,7 @@ export type Mutation = {
   directExpenseMaterials?: Maybe<GraphQlRetVal_Boolean>;
   employeeUpdateStatus?: Maybe<Employee>;
   expenseItemFromProjects?: Maybe<InventoryLedger>;
+  ignoreAttendance?: Maybe<GraphQlRetVal_String>;
   linkPOItemRec?: Maybe<PurchaseOrderItems>;
   lockBilling?: Maybe<Billing>;
   overrideRecItems?: Maybe<ReceivingReport>;
@@ -1807,6 +1775,12 @@ export type MutationExpenseItemFromProjectsArgs = {
   it?: InputMaybe<ProjectsInput>;
   item?: InputMaybe<ItemInput>;
   qty?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationIgnoreAttendanceArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -4822,7 +4796,6 @@ export type QueryGetAccumulatedLogsArgs = {
   generateBreakdown?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   startDate?: InputMaybe<Scalars['Instant']['input']>;
-  timekeepingEmployee?: InputMaybe<TimekeepingEmployeeInput>;
 };
 
 
@@ -6778,14 +6751,7 @@ export type TimekeepingEmployeeDto = {
   gender?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   position?: Maybe<Position>;
-};
-
-export type TimekeepingEmployeeInput = {
-  accumulatedLogs?: InputMaybe<Array<InputMaybe<AccumulatedLogsInput>>>;
-  finalizedBy?: InputMaybe<EmployeeInput>;
-  finalizedDate?: InputMaybe<Scalars['Instant']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  status?: InputMaybe<PayrollEmployeeStatus>;
+  status?: Maybe<Scalars['String']['output']>;
 };
 
 export type TransactionType = {

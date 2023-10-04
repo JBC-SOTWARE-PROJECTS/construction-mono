@@ -8,6 +8,7 @@ const GET_EMPLOYEES = gql`
       employeeId
       fullName
       gender
+      status
       position {
         description
       }
@@ -17,7 +18,7 @@ const GET_EMPLOYEES = gql`
 
 function useGetTimekeepingEmployees(callBack?: (result: any) => void) {
   const router = useRouter();
-  const { data, loading } = useQuery(GET_EMPLOYEES, {
+  const { data, loading, refetch } = useQuery(GET_EMPLOYEES, {
     variables: {
       id: router?.query.id,
     },
@@ -25,7 +26,7 @@ function useGetTimekeepingEmployees(callBack?: (result: any) => void) {
       if (callBack) callBack(result?.employees);
     },
   });
-  return [data?.employees, loading];
+  return [data?.employees, loading, refetch];
 }
 
 export default useGetTimekeepingEmployees;
