@@ -116,7 +116,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     }
 
 
-
+    // [USED]
     @GraphQLQuery(name = "getAllChartOfAccountGenerate")
     List<ChartOfAccountGenerate> getAllChartOfAccountGenerate(
             @GraphQLArgument(name = "accountType")    String accountType,
@@ -138,49 +138,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     }
 
 
-    @GraphQLQuery(name = "motherAccountsListWithNoSetup")
-    List<ParentAccount> motherAccountsListWithNoSetup(){
-        List<ParentAccount> result = []
-        Set<String> usedMotherAccount = []
-        def subaccountSetups = getSetupBySubAccountTypeAll()
-
-        subaccountSetups.each {
-
-            it.motherAccounts.each {
-                usedMotherAccount.add(it.chartOfAccount.accountCode)
-            }
-        }
-
-        chartOfAccountServices.findAll().findAll {BooleanUtils.isNotTrue(it.deprecated)  }.each {
-            if(!usedMotherAccount.contains(it.accountCode))
-                result << it
-        }
-
-        result
-    }
-
-    @GraphQLQuery(name = "motherAccountsList")
-    List<String> motherAccountsList(
-            @GraphQLContext  SubAccountSetup subAccountSetup
-    ) {
-
-        List<String> ms = []
-
-        subAccountSetup.motherAccounts.each {
-            ms << it.chartOfAccount.accountCode + "-" + it.chartOfAccount.description
-        }
-
-        ms
-    }
-
-    SubAccountSetup getSetupBySubAccountByCode(
-            String code
-    ) {
-        createQuery("Select sub from SubAccountSetup sub  where sub.subaccountCode=:code order by sub.subaccountCode, sub.createdDate",
-                [code: code])
-                .resultList.find()
-    }
-
+    // [USED]
     @GraphQLQuery(name = "subAccountByAccountType")
     List<SubAccountSetup> getSetupBySubAccountType(
             @GraphQLArgument(name = "accountCategory") AccountCategory accountCategory,
@@ -189,7 +147,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     ) {
         UUID companyID = SecurityUtils.currentCompanyId()
         String query = """ Select sub from SubAccountSetup sub  where 
-            sub.company.id = :companyID
+            sub.company.id = :companyID and
             (
                 lower(sub.accountName) like lower(concat('%',:filter,'%'))
                 or lower(sub.subaccountCode) like lower(concat('%',:filter,'%'))
@@ -209,17 +167,52 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
         """, params).resultList
     }
 
+    // [USED]
     @GraphQLQuery(name = "getSetupBySubAccountTypeAll")
     List<SubAccountSetup> getSetupBySubAccountTypeAll() {
         UUID companyID = SecurityUtils.currentCompanyId()
         createQuery("""
             Select sub from SubAccountSetup sub  
-            where coalesce(sub.isInactive,false) = false   
+            left join fetch sub.subaccountParent
+            left join fetch sub.company
+            where 
+            sub.company.id = :companyID and 
+            coalesce(sub.isInactive,false) = false   
             order by sub.description, sub.createdDate""",
                 [
                     companyID:companyID
                 ])
                 .resultList
+    }
+
+    @GraphQLQuery(name = "getAllCOAParent")
+    List<DomainOptionDto> getAllCOAParent() {
+        List<DomainOptionDto> dtoList = []
+        List<SubAccountSetup> setupList = getSetupBySubAccountTypeAll()
+        List<ParentAccount> parentAccounts = parentAccountServices.getParentAccountList()
+
+        Map<UUID,UUID> parentHasChild = [:]
+        Map<UUID,UUID> subHasChild = [:]
+        setupList.each {
+            if(!parentHasChild[it?.parentAccount?.id])
+                parentHasChild[it.parentAccount.id] = it.parentAccount.id
+            if(!subHasChild[it?.subaccountParent?.id]  && it?.subaccountParent?.id)
+                subHasChild[it.subaccountParent.id] = it.subaccountParent.id
+        }
+
+        parentAccounts.each {
+            if(!parentHasChild[it.id])
+                dtoList << new DomainOptionDto(it.accountName,it.id.toString(),it.id.toString())
+        }
+
+        setupList.each {
+            if(!subHasChild[it.id]) {
+                dtoList << new DomainOptionDto("${it.parentAccount.accountName}-${it.accountName}", it.id.toString(),it.id.toString())
+            }
+        }
+
+        return dtoList.sort {it.label}
+
     }
 
     @GraphQLQuery(name = "subaccountTypeAll")
@@ -235,6 +228,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
         return getDescSubaccountType(subAccountSetup.subaccountType)
     }
 
+    // [USED]
     @GraphQLQuery(name = "getSubAccountForParent")
     List<SubAccountSetup> getSubAccountForParent(
             @GraphQLArgument(name = "parentAccountId") UUID parentAccountId
@@ -254,6 +248,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
                 .resultList
     }
 
+    // [USED]
     List<SubAccountSetup> getActiveSubAccount( ) {
         UUID companyID = SecurityUtils.currentCompanyId()
         createQuery("""
@@ -280,14 +275,8 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
         }
     }
 
-    @GraphQLQuery(name = "getFlattenDepartment")
-    List<Subaccountable> getFlattenDepartment(){
-          departmentService.findAllSortedByCodeAndFlatten(null)
-    }
 
-    // Start
-
-
+    // [USED]
     @Transactional(rollbackFor = Exception.class)
     @GraphQLMutation(name = "upsertSubAccount")
     GraphQLRetVal<SubAccountSetup> upsertSubAccount(
@@ -306,18 +295,28 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
                 if(entity.sourceDomain != DomainEnum.NO_DOMAIN){
 
                     if(entity.subaccountParent){
-                        entity.subaccountCode = entity.subaccountParent.subaccountCode+" - "+("${entity.sourceDomain.displayName} Code").toUpperCase()
+                        entity.subaccountCode = 'AUTO GENERATED'
                         entity.accountName = entity.subaccountParent.accountName+" - "+(entity.sourceDomain.displayName).toUpperCase()
                     }
                     else {
-                        entity.subaccountCode = ("${entity.sourceDomain.displayName} Code").toUpperCase()
+                        entity.subaccountCode = 'AUTO GENERATED'
                         entity.accountName = (entity.sourceDomain.displayName).toUpperCase()
+                        entity.setSubaccountParent(null)
                     }
-
+                }
+                else {
+                    entity.sourceDomain = DomainEnum.NO_DOMAIN
                 }
 
-                if((fields['domainExcludes'] ?: []).size() > 0){
-                    entity.domainExcludes = fields['domainExcludes']
+               if(!fields['subaccountParent']){
+                   entity.setSubaccountParent(null)
+               }
+
+                if((fields['domainExcludes'] as List<DomainOptionDto> ?: []).size() > 0){
+                    entity.domainExcludes = fields['domainExcludes'] as List<DomainOptionDto>
+                }
+               else{
+                    entity.domainExcludes = []
                 }
             })
 
@@ -332,18 +331,21 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
         }
     }
 
+    // [USED]
     @GraphQLQuery(name='subAccountDomains')
     static List<DomainOptionDto> subAccountDomains(){
         return DomainEnum.values().findAll { it != DomainEnum.NO_DOMAIN } .collect { [label: it.displayName, value: it.name()] as DomainOptionDto }
     }
 
+    // [USED]
     @GraphQLQuery(name='subAccountDomainsRecords')
     List<DomainOptionDto> subAccountDomainsRecords(
             @GraphQLArgument(name = "domain") DomainEnum domain
     ) {
-        return entityManager.createQuery("from ${domain.path as String}",
+        UUID companyID = SecurityUtils.currentCompanyId()
+        return entityManager.createQuery("from ${domain.path as String} ",
                 Class.forName(domain.path as String)).resultList
-               .collect { [label: it['description'], value: it['id']] as DomainOptionDto }
+               .collect { [label: it['accountName'], value: it['id']] as DomainOptionDto }
 
     }
 }

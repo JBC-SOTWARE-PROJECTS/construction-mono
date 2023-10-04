@@ -313,4 +313,14 @@
              relativeToChangelogFile="false"/>
 
 
+    <include file="classpath:config/liquibase/changelog4/18_donss_create_integration_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/20_donss_create_integration_details.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/19_donss_create_header_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/24_donss_create_header_ledger_partition_function.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/25_donss_create_ledger_partition_function.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

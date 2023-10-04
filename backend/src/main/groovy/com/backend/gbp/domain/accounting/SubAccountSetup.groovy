@@ -75,12 +75,10 @@ class SubAccountSetup extends AbstractAuditingEntity implements Serializable {
     @Column(name = "subaccount_type", columnDefinition = "varchar")
     AccountType subaccountType
 
-    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_account", referencedColumnName = "id")
     ParentAccount parentAccount
 
-    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subaccount_parent", referencedColumnName = "id")
     SubAccountSetup subaccountParent
@@ -91,7 +89,6 @@ class SubAccountSetup extends AbstractAuditingEntity implements Serializable {
     DomainEnum sourceDomain
 
     @GraphQLQuery
-    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     CompanySettings company
@@ -104,5 +101,12 @@ class SubAccountSetup extends AbstractAuditingEntity implements Serializable {
     @Type(type = "jsonb")
     @Column(name="domain_excludes",columnDefinition = "jsonb")
     List<DomainOptionDto> domainExcludes
+
+    @GraphQLQuery(name = "domainName")
+    @Transient
+    String domainName
+    String getDomainName() {
+        return sourceDomain.displayName
+    }
 
 }
