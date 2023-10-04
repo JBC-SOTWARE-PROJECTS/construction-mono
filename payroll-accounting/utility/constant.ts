@@ -325,7 +325,7 @@ export const HolidayType = [
     label: 'Non-Holiday',
     value: 'NON_HOLIDAY',
   },
-]
+];
 
 export const AllowanceType = [
   {
@@ -333,10 +333,10 @@ export const AllowanceType = [
     value: 'SEMI-MONTHLY',
   },
   {
-    label: 'HOURLY',
-    value: 'HOURLY',
+    label: "HOURLY",
+    value: "HOURLY",
   },
-]
+];
 
 export const ACCOUNT_TYPES = [
   { label: 'ASSET', value: 'ASSET' },
