@@ -49,13 +49,14 @@ const useUpsertEmployeeAttendance = (callBack: () => void) => {
   const upsertEmployeeSchedule = (
     variables: IUpsertEmployeeAttendanceParams,
     project_id: string,
-    id?: string
+    id?: string,
+    employeeId?: string
   ) => {
     upsert({
       variables: {
         fields: variables,
         id: id,
-        employee: router?.query?.id,
+        employee: employeeId || router?.query?.id,
         project_id: project_id,
       },
     });
@@ -64,7 +65,8 @@ const useUpsertEmployeeAttendance = (callBack: () => void) => {
     (
       variables: IUpsertEmployeeAttendanceParams,
       project_id: string,
-      id?: string
+      id?: string,
+      employeeId?: string
     ) => void,
     boolean
   ] = [upsertEmployeeSchedule, loading];

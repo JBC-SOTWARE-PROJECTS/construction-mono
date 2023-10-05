@@ -26,6 +26,11 @@ import useUpdateContributionTypeStatus from "@/hooks/payroll/contributions/useUp
 import useHasPermission from "@/hooks/useHasPermission";
 import ContributionStatusAction from "@/components/payroll/payroll-management/contributions/ContributionStatusAction";
 import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
+import useMemoizedPayrollHeaderBreadcrumb, {
+  payrollHeaderBreadcrumbRenderer,
+} from "@/hooks/payroll/useMemoizedPayrollHeadBreadcrumb";
+import PayrollHeader from "@/components/payroll/PayrollHeader";
+import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 
 const recalculateButton: ButtonProps = {
   shape: "circle",
@@ -315,13 +320,8 @@ function PayrollContributionsPage() {
         <title>View Payroll Contributions</title>
       </Head>
 
-      <PageHeader
-        title={"Payroll Contributions"}
-        onBack={router.back}
-        // breadcrumb={{
-        //   routes,
-        //   itemRender: payrollHeaderBreadcrumbRenderer,
-        // }}
+      <PayrollHeader
+        module={PayrollModule.Contribution}
         extra={
           useHasPermission([
             "enable_or_disable_payroll_contribution_types",
@@ -356,14 +356,14 @@ function PayrollContributionsPage() {
                 loading={loadingContributionStatus}
               />
 
-              {/* <PayrollModuleRecalculateAllEmployeeAction
-              id={router?.query?.id}
-              module={PayrollModule.CONTRIBUTION}
-              buttonProps={recalculateButton}
-              tooltipProps={{ placement: "topRight" }}
-              refetch={refetch}
-              allowedPermissions={["recalculate_all_contributions_employees"]}
-            /> */}
+              <PayrollModuleRecalculateAllEmployeeAction
+                id={router?.query?.id as string}
+                module={PayrollModule.Contribution}
+                buttonProps={recalculateButton}
+                tooltipProps={{ placement: "topRight" }}
+                refetch={refetch}
+                // allowedPermissions={["recalculate_all_contributions_employees"]}
+              />
             </>
           )
         }

@@ -57,9 +57,9 @@ class Payroll extends  PayrollAuditingEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
-//
-//    @OneToOne(mappedBy = "payroll")
-//    Timekeeping timekeeping
+
+    @OneToOne(mappedBy = "payroll")
+    Timekeeping timekeeping
 
 //
 //

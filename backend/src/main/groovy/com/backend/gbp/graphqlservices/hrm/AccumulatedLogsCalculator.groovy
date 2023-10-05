@@ -4,9 +4,10 @@ import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
 import com.backend.gbp.domain.hrm.EmployeeSchedule
 import com.backend.gbp.domain.hrm.EventCalendar
-import com.backend.gbp.domain.hrm.dto.AccumulatedLogsDto
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.hrm.dto.ScheduleDto
+import com.backend.gbp.domain.payroll.AccumulatedLogs
+import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.EmployeeAttendanceRepository
@@ -64,16 +65,17 @@ class AccumulatedLogsCalculator {
     ObjectMapper objectMapper
 
     @GraphQLQuery(name = "getAccumulatedLogs")
-    List<AccumulatedLogsDto> getAccumulatedLogs(
+    List<AccumulatedLogs> getAccumulatedLogs(
             @GraphQLArgument(name = "startDate") Instant startDate,
             @GraphQLArgument(name = "endDate") Instant endDate,
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "generateBreakdown") Boolean generateBreakdown
 
+
     ) {
         if (!startDate || !endDate || !id) throw new RuntimeException("Failed to get employee attendance.")
 
-        List<AccumulatedLogsDto> accumulatedLogsList = []
+        List<AccumulatedLogs> accumulatedLogsList = []
         Map<String, List<EmployeeAttendance>> attendanceMap = getAttendanceLogs(startDate, endDate, id)
         Map<String, List<EmployeeSchedule>> scheduleMap = getSchedules(startDate, endDate, id)
         Map<String, List<EventCalendar>> holidayMap = eventCalendarService.mapEventsToDates(startDate, endDate)
@@ -94,10 +96,10 @@ class AccumulatedLogsCalculator {
                 EmployeeSchedule regularSchedule = scheduleList.find({ !it.isOvertime })
                 EmployeeSchedule overtimeSchedule = scheduleList.find({ it.isOvertime })
 
-                AccumulatedLogsDto accumulatedLogs = new AccumulatedLogsDto()
+                AccumulatedLogs accumulatedLogs = new AccumulatedLogs()
                 accumulatedLogs.date = date
-                accumulatedLogs.scheduleTitle = regularSchedule.title
-                accumulatedLogs.scheduleStart = regularSchedule.dateTimeStart
+                accumulatedLogs.scheduleTitle = regularSchedule?.title
+                accumulatedLogs.scheduleStart = regularSchedule?.dateTimeStart
                 accumulatedLogs.scheduleEnd = overtimeSchedule ? overtimeSchedule.dateTimeEnd : regularSchedule.dateTimeEnd
 
                 HoursLog hoursLog = new HoursLog()
@@ -106,6 +108,7 @@ class AccumulatedLogsCalculator {
                     accumulatedLogs.isError = true
                     accumulatedLogs.hours = hoursLog
                     accumulatedLogs.message = "Absent"
+                    accumulatedLogs.employeeId = id
                     accumulatedLogsList.push(accumulatedLogs)
                     date = date.plus(1, ChronoUnit.DAYS)
                     continue;
@@ -145,14 +148,14 @@ class AccumulatedLogsCalculator {
                 hoursLog.underTime = regularSchedule.scheduleDuration - hoursLog.totalRegularHours - hoursLog.late
 
                 accumulatedLogs.hours = hoursLog
-
-
+                accumulatedLogs.employeeId = id
                 accumulatedLogsList.push(accumulatedLogs)
             } else {
-                AccumulatedLogsDto accumulatedLogs = new AccumulatedLogsDto()
+                AccumulatedLogs accumulatedLogs = new AccumulatedLogs()
                 accumulatedLogs.date = date
                 accumulatedLogs.isError = true
                 accumulatedLogs.message = "No Schedule"
+                accumulatedLogs.employeeId = id
                 accumulatedLogsList.push(accumulatedLogs)
             }
 

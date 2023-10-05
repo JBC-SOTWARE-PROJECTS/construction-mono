@@ -17,7 +17,9 @@ const PayrollContributions = ({ account }: IPageProps) => (
     <Head>
       <title>Payroll Management</title>
     </Head>
-    <AccessManager roles={["ROLE_ADMIN", "PAYROLL_MANAGER"]}>
+    <AccessManager
+      roles={["ROLE_ADMIN", "PAYROLL_MANAGER", "PAYROLL_CONTRIBUTIONS_USER"]}
+    >
       <div className="gx-main-content-wrapper-full-width">
         <Component account={account} />
       </div>
