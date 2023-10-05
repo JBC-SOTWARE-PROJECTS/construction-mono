@@ -30,29 +30,31 @@ enum AccountCategory {
 
 
 enum AccountType {
-	// Assets
-	CURRENT_ASSETS("Current Assets", AccountCategory.ASSET),
-	LONG_TERM_ASSETS("Long-Term Assets", AccountCategory.ASSET),
+	// Assets (Normal side: Debit)
+	CURRENT_ASSETS("Current Assets", AccountCategory.ASSET, NormalSide.DEBIT),
+	LONG_TERM_ASSETS("Long-Term Assets", AccountCategory.ASSET, NormalSide.DEBIT),
 
-	// Liabilities
-	CURRENT_LIABILITIES("Current Liabilities", AccountCategory.LIABILITY),
-	LONG_TERM_LIABILITIES("Long-Term Liabilities", AccountCategory.LIABILITY),
+	// Liabilities (Normal side: Credit)
+	CURRENT_LIABILITIES("Current Liabilities", AccountCategory.LIABILITY, NormalSide.CREDIT),
+	LONG_TERM_LIABILITIES("Long-Term Liabilities", AccountCategory.LIABILITY, NormalSide.CREDIT),
 
-	// Equity
-	EQUITY("Equity", AccountCategory.EQUITY),
+	// Equity (Normal side: Credit)
+	EQUITY("Equity", AccountCategory.EQUITY, NormalSide.CREDIT),
 
-	// Revenue
-	REVENUE("Revenue", AccountCategory.REVENUE),
+	// Revenue (Normal side: Credit)
+	REVENUE("Revenue", AccountCategory.REVENUE, NormalSide.CREDIT),
 
-	// Expenses
-	EXPENSES("Expenses", AccountCategory.EXPENSE)
+	// Expenses (Normal side: Debit)
+	EXPENSES("Expenses", AccountCategory.EXPENSE, NormalSide.DEBIT);
 
-	String label
-	AccountCategory category
+	String label;
+	AccountCategory category;
+	NormalSide normalSide;
 
-	AccountType(String label, AccountCategory category) {
-		this.label = label
-		this.category = category
+	AccountType(String label, AccountCategory category, NormalSide normalSide) {
+		this.label = label;
+		this.category = category;
+		this.normalSide = normalSide;
 	}
 }
 
@@ -112,7 +114,6 @@ class ParentAccount extends AbstractAuditingEntity implements Serializable {
 	Boolean isContra
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company_id", referencedColumnName = "id")
 	CompanySettings company

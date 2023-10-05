@@ -1,7 +1,7 @@
 import { Maybe, ParentAccount } from '@/graphql/gql/graphql'
 import { Button, Input, Pagination, Space, Table, Typography } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { AccountType } from '../enum/parentAccountEnum'
+import { AccountCategory, AccountType } from '../enum/parentAccountEnum'
 
 interface ParentAccountTabPaneI {
   accountCategory?: string
@@ -40,6 +40,7 @@ export default function ParentAccountTabPane(props: ParentAccountTabPaneI) {
       dataIndex: 'accountCategory',
       key: 'accountCategory',
       width: 150,
+      render: (text) => AccountCategory[text as keyof typeof AccountCategory],
     },
     {
       title: 'Type',

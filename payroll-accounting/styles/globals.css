@@ -1,9 +1,9 @@
 /* start global css */
-@import "payroll-styles.css";
+@import 'payroll-styles.css';
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
-  --font-mono: "Lato", sans-serif;
+  --font-mono: 'Lato', sans-serif;
 }
 
 * {
@@ -16,7 +16,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: "Lato", sans-serif;
+  font-family: 'Lato', sans-serif;
 }
 /* 
 a {
@@ -30,7 +30,36 @@ a {
 
 /* end global css */
 
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background-color: #d1d1d1;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+}
+
 /* ant d overrides */
+.my-prefix-base-menu-inline-group-item-title {
+  font-weight: bold !important;
+  color: #399b53 !important;
+}
+
 .ant-form-item-explain-error {
   font-size: 12px !important;
 }
@@ -40,19 +69,6 @@ a {
   .my-prefix-base-menu-inline-item-icon {
   margin-bottom: auto;
   margin-top: 4px;
-}
-
-div.my-prefix-sider-logo + div::-webkit-scrollbar {
-  width: 8px !important;
-  height: 10px !important;
-}
-div.my-prefix-sider-logo + div::-webkit-scrollbar-track {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-}
-div.my-prefix-sider-logo + div::-webkit-scrollbar-thumb {
-  background-color: #d1d1d1;
-  border-radius: 10px;
 }
 
 .ant-badge-count-sm {
@@ -81,11 +97,11 @@ div.my-prefix-sider-logo + div::-webkit-scrollbar-thumb {
 }
 
 .ant-pro-form-login-page-title {
-  font-family: "League Spartan", sans-serif;
+  font-family: 'League Spartan', sans-serif;
 }
 
 .ant-segmented-item-selected {
-  color: #fff !important;
+  /* color: #fff !important; */
 }
 
 /* .ant-btn-primary {
@@ -163,6 +179,9 @@ th.ant-table-cell {
   padding: 0 0 2px !important;
   font-weight: 700;
 }
+.ant-form-vertical .ant-form-item-label {
+  padding: 0 0 4px !important;
+}
 /* end: select header className */
 
 .diverse-trade {
@@ -171,7 +190,7 @@ th.ant-table-cell {
 }
 
 .custom-title {
-  font-family: "League Spartan", sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: #000;
@@ -361,4 +380,62 @@ th.ant-table-cell {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+}
+
+.list-icon-custom {
+  display: none;
+
+  @media only screen and (min-width: 606px) {
+    display: block;
+  }
+}
+
+.list-margin-left {
+  padding-left: 0;
+
+  @media only screen and (min-width: 838px) {
+    padding-left: 80px;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.fullscreen-modal {
+  max-width: 100% !important;
+}
+
+.supplier-info-descriptions
+  > .ant-descriptions-view
+  > table
+  > tbody
+  > .ant-descriptions-row
+  > td {
+  padding-bottom: 0px !important;
+}
+
+.text-red {
+  color: red;
+}
+
+.text-blue {
+  color: blue;
+}
+
+.text-green {
+  color: green;
+}
+
+.text-orange {
+  color: orange;
+}
+
+.text-gray {
+  color: #767676;
+}
+
+.virtual-table .ant-table-container:before,
+.virtual-table .ant-table-container:after {
+  display: none;
 }

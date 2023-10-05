@@ -14,13 +14,16 @@ class SubAccountHolder implements Subaccountable{
           this.id = subaccountable.id
           this.domain = subaccountable.domain
           this.code = subaccountable.code
-          this.description = subaccountable.description
+          this.accountName = subaccountable.accountName
      }
      UUID id
      String domain
      String code
-     String description
+     String accountName
+
 }
+
+
 @Builder
 class IntegrationTemplate implements AutoIntegrateable{
      String domain = IntegrationTemplate.class.name

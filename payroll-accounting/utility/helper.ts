@@ -1,8 +1,10 @@
 import dayjs, { Dayjs } from "dayjs";
 import numeral from "numeral";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { ToWords } from "to-words";
-import { currency } from "./constant";
+import { currency, dateFormat } from "./constant";
+import { v4 as uuidv4 } from "uuid";
+import roundHalfEven from "round-half-even";
 
 export const useLocalStorage = (key: string, initialValue: any) => {
   // State to store our value
@@ -51,12 +53,27 @@ export const NumberFormater = (value: any) => {
   return numeral(value).format("0,0.00"); // 10,000.00
 };
 
+export const NumberFormaterNoDecimal = (value: any) => {
+  return numeral(value).format("0,0");
+};
+
 export const DateFormatter = (value: string) => {
   return dayjs(value).format("YYYY-MM-DD");
 };
 
 export const DateFormatterWithTime = (value: string) => {
   return dayjs(value).format("YYYY-MM-DD hh:mm:ss A");
+};
+
+export const randomId = () => {
+  return uuidv4();
+};
+
+export const decimalRound2 = (amount?: number) => {
+  if (amount) {
+    return roundHalfEven(amount, 2);
+  }
+  return 0;
 };
 
 export const NumberInString = (amount: number) => {
@@ -90,8 +107,25 @@ export const dateToString = (date: Dayjs) => {
 
 export const dateEndToString = (date: Dayjs) => {
   const instantFormat = "YYYY-MM-DDTHH:mm:sss";
-  const startOfDay = dayjs(date).endOf("day");
-  return `${startOfDay.format(instantFormat)}Z`;
+  const endOfDay = dayjs(date).endOf("day");
+  return `${endOfDay.format(instantFormat)}Z`;
+};
+
+export const stringStartDate = (date: Dayjs) => {
+  const startOfDay = dayjs(date).startOf("day");
+  return startOfDay.format(dateFormat);
+};
+
+export const stringEndDate = (date: Dayjs) => {
+  const endOfDay = dayjs(date).endOf("day");
+  return endOfDay.format(dateFormat);
+};
+
+export const shapeOptionValue = (
+  label?: ReactNode,
+  value?: string | number
+) => {
+  return { label: label, value: value };
 };
 
 export function transformDate(currentDate: dayjs.Dayjs, referenceDate: string) {

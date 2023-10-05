@@ -6,6 +6,7 @@ import { GET_BILLING_INFO_BY_ID } from "@/graphql/billing/queries";
 import { PrinterOutlined } from "@ant-design/icons";
 import BillingHeader from "@/components/accounting/billing/component/billingHeader";
 import BillingTables from "@/components/accounting/billing/component/billingTables";
+import _ from "lodash";
 
 interface Iprops {
   id?: string;
@@ -13,7 +14,6 @@ interface Iprops {
 
 export default function BillingFolioComponent(props: Iprops) {
   const { id } = props;
-  const [active, setActive] = useState(true);
   const [billingInfo, setBillingInfo] = useState<Billing>({});
 
   const { refetch } = useQuery<Query>(GET_BILLING_INFO_BY_ID, {
@@ -48,6 +48,7 @@ export default function BillingFolioComponent(props: Iprops) {
         <BillingHeader
           record={billingInfo}
           onRefetchBillingInfo={onRefetchBillingInfo}
+          otc={!_.isEmpty(billingInfo.otcName)}
         />
       </Card>
       <BillingTables

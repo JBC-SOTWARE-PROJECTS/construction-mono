@@ -79,7 +79,7 @@ class Discount extends AbstractAuditingEntity implements Subaccountable, Seriali
 	Boolean seniorPwd
 
 	@Override
-	String getDescription() {
+	String getAccountName() {
 		return discount
 	}
 

@@ -23,7 +23,19 @@ const SUB_ACCOUNT = gql`
         accountName
         description
       }
+      subaccountParent {
+        id
+        subaccountCode
+        accountName
+        description
+      }
+      domainExcludes {
+        value
+        label
+      }
       sourceDomain
+      domainName
+      isInactive
     }
   }
 `

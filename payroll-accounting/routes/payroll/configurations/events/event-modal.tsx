@@ -1,12 +1,12 @@
 import React from "react";
 import { Modal, Button, Form, Row, Col, Space, message } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
-import { FormInput, FormSelect } from "@/components/common";
+import { FormDatePicker, FormInput, FormSelect } from "@/components/common";
 import { requiredField } from "@/utility/helper";
 import { HolidayTransferability, HolidayType } from "@/utility/constant";
 import { useMutation } from "@apollo/client";
 import { CREATE_EVENT, DELETE_EVENT } from "@/graphql/company/queries";
-import FormDatePicker from "@/components/common/formDatePicker/formDatePicker";
+
 import dayjs from "dayjs";
 import _ from "lodash";
 
@@ -154,12 +154,12 @@ export default function EventModal(props: IProps) {
             <FormDatePicker
               name="startDate"
               label="Start Date"
-              // propsDatepicker={{ format: "DD-MM-YYYY" }}
+              propsdatepicker={{ format: "DD-MM-YYYY" }}
             />
             <FormDatePicker
               name="endDate"
               label="End Date"
-              // propsDatepicker={{ format: "DD-MM-YYYY" }}
+              propsdatepicker={{ format: "DD-MM-YYYY" }}
             />
             <FormSelect
               name="fixed"

@@ -141,6 +141,22 @@ class ReceivingReport extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "acct_type", columnDefinition = 'uuid')
 	UUID account
+
+	@GraphQLQuery
+	@Column(name = "ref_ap", columnDefinition = 'uuid')
+	UUID refAp
+
+	@GraphQLQuery
+	@Column(name = "posted_ledger", columnDefinition = 'uuid')
+	UUID postedLedger
+
+	@GraphQLQuery
+	@Column(name = "consignment", columnDefinition = 'bool')
+	Boolean consignment
+
+	@GraphQLQuery
+	@Column(name = "fix_asset", columnDefinition = 'bool')
+	Boolean fixAsset
 	
 	@JsonIgnore
 	@Transient

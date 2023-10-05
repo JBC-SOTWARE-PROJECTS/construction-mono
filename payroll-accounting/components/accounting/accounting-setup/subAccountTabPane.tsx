@@ -2,7 +2,12 @@ import { Maybe, SubAccountSetup } from '@/graphql/gql/graphql'
 import { gql, useQuery } from '@apollo/client'
 import { Button, Input, Pagination, Space, Table, Typography } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { AccountType } from '../enum/parentAccountEnum'
+import { AccountCategory, AccountType } from '../enum/parentAccountEnum'
+import {
+  CheckCircleTwoTone,
+  CloseCircleOutlined,
+  CloseCircleTwoTone,
+} from '@ant-design/icons'
 
 interface SubAccountTabPaneI {
   dataSource: never[] | Maybe<SubAccountSetup>[] | null | undefined
@@ -39,10 +44,24 @@ export default function SubAccountTabPane(props: SubAccountTabPaneI) {
       ),
     },
     {
+      title: 'Data Records',
+      dataIndex: 'domainName',
+      key: 'domainName',
+      render: (text, record) => (
+        <Space direction='vertical' size={1}>
+          <Typography.Text>{text}</Typography.Text>
+          <p style={{ color: '#868686', fontSize: '11px' }}>
+            {record.description}
+          </p>
+        </Space>
+      ),
+    },
+    {
       title: 'Category',
       dataIndex: 'accountCategory',
       key: 'accountCategory',
       width: 150,
+      render: (text) => AccountCategory[text as keyof typeof AccountCategory],
     },
     {
       title: 'Type',
@@ -50,6 +69,19 @@ export default function SubAccountTabPane(props: SubAccountTabPaneI) {
       key: 'subaccountType',
       width: 150,
       render: (text) => AccountType[text as keyof typeof AccountType].label,
+    },
+    {
+      title: 'Active',
+      dataIndex: 'isInactive',
+      key: 'isInactive',
+      align: 'center',
+      width: 80,
+      render: (text) =>
+        text ? (
+          <CloseCircleTwoTone twoToneColor='#eb2f96' />
+        ) : (
+          <CheckCircleTwoTone twoToneColor='#52c41a' />
+        ),
     },
     {
       title: 'Action',
