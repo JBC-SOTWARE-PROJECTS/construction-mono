@@ -289,5 +289,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/18_michael_timekeeping_tables.sql"
              relativeToChangelogFile="false"/>
-
+    <include file="classpath:config/liquibase/changelog4/19_michael_timekeeping_roles.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

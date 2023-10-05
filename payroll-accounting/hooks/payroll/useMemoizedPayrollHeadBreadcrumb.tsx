@@ -3,6 +3,7 @@ import { Dropdown } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
+import useHasRole from "../useHasRole";
 
 const useMemoizedPayrollHeaderBreadcrumb = (
   pageTitle: string,
@@ -10,17 +11,10 @@ const useMemoizedPayrollHeaderBreadcrumb = (
 ) => {
   const router = useRouter();
 
-  // const hasOtherDeductionRole = useHasRole("PAYROLL_OTHER_DEDUCTION_USER");
-  // const hastimekeepingRole = useHasRole("TIMEKEEPING_USER");
-  // const hasallowanceRole = useHasRole("PAYROLL_DE_MINIMIS_USER");
-  // const hasContributionsRole = useHasRole("PAYROLL_CONTRIBUTIONS_USER");
-  // const hasAdjustmentRole = useHasRole("PAYROLL_ADJUSTMENT_USER");
-  // const hasHazardPayRole = useHasRole("PAYROLL_HAZARD_PAY_USER");
-
+  const hastimekeepingRole = useHasRole("PAYROLL_TIMEKEEPING_USER");
+  const hasContributionsRole = useHasRole("PAYROLL_CONTRIBUTIONS_USER");
   const hasOtherDeductionRole = true;
-  const hastimekeepingRole = true;
   const hasLoansRole = true;
-  const hasContributionsRole = true;
   const hasAdjustmentRole = true;
   const hasallowanceRole = true;
   const payrollId = router?.query?.id;
