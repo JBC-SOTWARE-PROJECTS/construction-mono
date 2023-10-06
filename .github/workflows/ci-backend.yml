@@ -2,7 +2,7 @@ name: CONSTRUCTION BACKEND BETA
 
 on: 
   push:
-    branches: [ staging ]
+    branches: [ main ]
     paths:
       - "backend/**"
 
