@@ -1,4 +1,4 @@
-name: API Staging with Gradle
+name: API Staging
 
 # on:
 #   pull_request:
