@@ -12,7 +12,6 @@ defaults:
 
 jobs:
   build:
-    # if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'staging/')
     # environment: staging
     runs-on: ubuntu-latest
     outputs:
