@@ -1,8 +1,8 @@
 name: CONSTRUCTION BACKEND BETA
 
-on:
+on: 
   push:
-    branches: [staging]
+    branches: [ staging ]
     paths:
       - "backend/**"
 
