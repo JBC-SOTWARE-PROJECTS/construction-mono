@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.hrm.dto.AccumulatedLogsDto
+import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.common.PayrollEmployeeAuditingEntity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -28,5 +29,10 @@ class TimekeepingEmployee extends PayrollEmployeeAuditingEntity implements Seria
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "timekeeping", referencedColumnName = "payroll")
     Timekeeping timekeeping
+
+    @Type(type = "jsonb")
+    @GraphQLQuery
+    @Column(name="project_breakdown",columnDefinition = "jsonb")
+    List<HoursLog> projectBreakdown
 
 }

@@ -2,6 +2,7 @@ package com.backend.gbp.repository
 
 import com.backend.gbp.domain.Position
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import org.springframework.data.jpa.repository.JpaRepository
@@ -14,6 +15,7 @@ interface TimekeepingEmployeeDto{
     String getFullName()
     String getGender()
     String getStatus()
+    List<HoursLog> getProjectBreakdown()
     Position getPosition()
 }
 
@@ -35,6 +37,7 @@ e.id as employeeId,
 e.fullName as fullName, 
 e.position as position,
 e.gender as gender,
+te.projectBreakdown as projectBreakdown,
 pe,
 te
 from TimekeepingEmployee te 
