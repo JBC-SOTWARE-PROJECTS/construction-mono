@@ -20,7 +20,7 @@ export const employeeStatusOptions = () => {
 };
 
 export const PayrollContributionFilter = ({ onQueryChange }: any) => {
-  const tagRenderStatus = ({ label, value, closable, onClose }: any) => {
+  const tagRenderStatus = ({ label, value, closable, onClose }: any): any => {
     const onPreventMouseDown = (event: any) => {
       event.preventDefault();
       event.stopPropagation();
@@ -65,7 +65,7 @@ export const PayrollContributionFilter = ({ onQueryChange }: any) => {
             mode: "multiple",
             onChange: (value) => onQueryChange("status", value),
             options: employeeStatusOptions(),
-            tagRender: { tagRenderStatus },
+            tagRender: tagRenderStatus,
           }}
         />
       </Col>

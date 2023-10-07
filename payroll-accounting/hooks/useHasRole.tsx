@@ -2,7 +2,7 @@ import { isInAnyRole } from "@/components/accessControl/AccessManager";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import { useContext } from "react";
 
-const useHasRole = (allowedRoles) => {
+const useHasRole = (allowedRoles: any) => {
   const accountContext = useContext(AccountContext) || {};
   const { roles } = accountContext?.user || {};
 

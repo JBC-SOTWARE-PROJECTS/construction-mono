@@ -21,7 +21,7 @@ const PayrollContributions = ({ account }: IPageProps) => (
       roles={["ROLE_ADMIN", "PAYROLL_MANAGER", "PAYROLL_CONTRIBUTIONS_USER"]}
     >
       <div className="gx-main-content-wrapper-full-width">
-        <Component account={account} />
+        <Component />
       </div>
     </AccessManager>
   </React.Fragment>
