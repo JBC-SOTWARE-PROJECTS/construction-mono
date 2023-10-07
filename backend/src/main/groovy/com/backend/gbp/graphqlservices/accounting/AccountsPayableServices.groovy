@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 @Service
 @GraphQLApi
@@ -577,6 +578,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 //        def ewt4 = BigDecimal.ZERO; def ewt5 = BigDecimal.ZERO; def ewt7 = BigDecimal.ZERO
 //        def ewt10 = BigDecimal.ZERO; def ewt15 = BigDecimal.ZERO; def ewt18 = BigDecimal.ZERO
 //        def ewt30 = BigDecimal.ZERO
+//
 //        def actPayDetials = accountsPayableDetialServices.detailsByAp(actPay.id)
 //        actPayDetials.each {
 //            switch (it.ewtRate) {
