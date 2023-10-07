@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.accounting.ExpenseTransaction
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -38,37 +39,20 @@ class ExpenseTransactionService extends AbstractDaoService<ExpenseTransaction> {
 
 	@GraphQLQuery(name = "transTypeBySource", description = "transaction type by type")
 	ExpenseTransaction transTypeBySource(@GraphQLArgument(name = "type") String type, @GraphQLArgument(name = "source") String source) {
-		createQuery("Select f from ExpenseTransaction f where f.type = :type and f.source = :source",
-				[type: type, source: source]).resultList.find()
+		def company = SecurityUtils.currentCompanyId()
+		createQuery("Select f from ExpenseTransaction f where f.type = :type and f.source = :source and f.company = :company",
+				[type: type, source: source, company: company]).resultList.find()
 	}
 	
 	@GraphQLQuery(name = "transTypeByType", description = "transaction type by type")
 	List<ExpenseTransaction> transTypeByType(@GraphQLArgument(name = "type") String type,
                                              @GraphQLArgument(name = "filter") String filter) {
-		def result = createQuery("Select f from ExpenseTransaction f where f.type = :type and lower(f.description) like lower(concat('%',:filter,'%'))",
-				[type: type, filter: filter]).resultList
+		def company = SecurityUtils.currentCompanyId()
+		def result = createQuery("Select f from ExpenseTransaction f where f.type = :type and lower(f.description) like lower(concat('%',:filter,'%')) and f.company = :company",
+				[type: type, filter: filter, company: company]).resultList
 
-		def customCompare = { str1, str2 ->
-			def splitAndConvert = { str ->
-				def parts = str.split(/(?<=[a-zA-Z])(?=\d)/)
-				parts.collect { it.isNumber() ? it.toInteger() : it }
-			}
 
-			def parts1 = splitAndConvert(str1)
-			def parts2 = splitAndConvert(str2)
-
-			for (int i = 0; i < Math.min(parts1.size(), parts2.size()); i++) {
-				if (parts1[i] != parts2[i]) {
-					return parts1[i] <=> parts2[i]
-				}
-			}
-
-			return parts1.size() <=> parts2.size()
-		}
-
-		return result.sort {a, b ->
-			customCompare(a.source, b.source)
-		}
+		return result.sort {it.source }
 	}
 	
 	//mutation
@@ -78,9 +62,12 @@ class ExpenseTransactionService extends AbstractDaoService<ExpenseTransaction> {
 			@GraphQLArgument(name = "fields") Map<String, Object> fields,
 			@GraphQLArgument(name = "id") UUID id
 	) {
-
+		def company = SecurityUtils.currentCompanyId()
 		if(id){
 			upsertFromMap(id, fields, { ExpenseTransaction entity, boolean forInsert ->
+				if(forInsert){
+					entity.company = company
+				}
 			})
 			return new GraphQLRetVal<Boolean>(true, true, "Transaction Type successfully updated")
 		}else{
@@ -91,6 +78,9 @@ class ExpenseTransactionService extends AbstractDaoService<ExpenseTransaction> {
 				return new GraphQLRetVal<Boolean>(false, false, "Source Column is already in used")
 			}else{
 				upsertFromMap(id, fields, { ExpenseTransaction entity, boolean forInsert ->
+					if(forInsert){
+						entity.company = company
+					}
 				})
 				return new GraphQLRetVal<Boolean>(true, true, "Transaction Type successfully added")
 			}

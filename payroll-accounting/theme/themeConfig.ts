@@ -11,6 +11,7 @@ const theme: ThemeConfig = {
     },
     Segmented: {
       itemSelectedBg: "#399B53",
+      // itemSelectedColor: "white",
     },
     Button: {
       colorPrimary: "#399B53",

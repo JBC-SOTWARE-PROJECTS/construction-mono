@@ -4,6 +4,7 @@ import com.backend.gbp.domain.accounting.Wtx2307
 import com.backend.gbp.domain.accounting.Wtx2307Consolidated
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.SupplierService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -62,6 +63,7 @@ class Wtx2307ConsolidatedService extends AbstractDaoService<Wtx2307Consolidated>
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
+		def company = SecurityUtils.currentCompanyId()
 
 		String query = '''Select d from Wtx2307Consolidated d where
 						(lower(d.refNo) like lower(concat('%',:filter,'%')) )
@@ -84,6 +86,12 @@ class Wtx2307ConsolidatedService extends AbstractDaoService<Wtx2307Consolidated>
 			params.put("supplier", supplier)
 		}
 
+		if (company) {
+			query += ''' and (d.company = :company) '''
+			countQuery += ''' and (d.company = :company) '''
+			params.put("company", company)
+		}
+
 		query += ''' ORDER BY d.dateFrom DESC'''
 
 		getPageable(query, countQuery, page, size, params)
@@ -104,8 +112,10 @@ class Wtx2307ConsolidatedService extends AbstractDaoService<Wtx2307Consolidated>
 			@GraphQLArgument(name = "id") UUID id,
 			@GraphQLArgument(name = "supplier") UUID supplier
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def wtx = upsertFromMap(id, fields, { Wtx2307Consolidated entity, boolean forInsert ->
 			if(forInsert){
+				entity.company = company
 				entity.dateFrom = entity.dateFrom.plus(Duration.ofHours(8))
 				entity.dateTo = entity.dateTo.plus(Duration.ofHours(8))
 				entity.refNo = generatorService.getNextValue(GeneratorType.WTXNO, {

@@ -11,7 +11,7 @@ const AccountingAccountsPayableMenu = {
             name: "Payables",
           },
           {
-            path: "/accounting/accounts-payable/wtx",
+            path: "/accounting/accounts-payable/2307",
             name: "2307",
           },
           {

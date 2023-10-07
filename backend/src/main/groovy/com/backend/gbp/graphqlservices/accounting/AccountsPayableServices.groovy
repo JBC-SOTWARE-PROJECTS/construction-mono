@@ -539,12 +539,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     ) {
         def ap = findOne(id)
         def apCat = 'AP'
-        if (ap.apCategory.equalsIgnoreCase("PROFESSIONAL FEE")) {
-            apCat = 'PF'
-        }
-        if (ap.apCategory.equalsIgnoreCase("READER'S FEE")) {
-            apCat = 'RF'
-        }
 
         Map<String, String> details = [:]
 

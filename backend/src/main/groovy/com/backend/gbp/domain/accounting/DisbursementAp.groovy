@@ -21,8 +21,8 @@ import javax.persistence.Table
 
 
 @Entity
-@Table(name = "payables_detials", schema = "accounting")
-class AccountsPayableDetails extends AbstractAuditingEntity implements Serializable {
+@Table(name = "disbursement_ap", schema = "accounting")
+class DisbursementAp extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
 	@Id
@@ -32,13 +32,13 @@ class AccountsPayableDetails extends AbstractAuditingEntity implements Serializa
 	@Type(type = "pg-uuid")
 	UUID id
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "payables", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	AccountsPayable accountsPayable
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "payable", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	AccountsPayable payable
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trans_type", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	ApTransaction transType
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "disbursement", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	Disbursement disbursement
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "office", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -47,36 +47,27 @@ class AccountsPayableDetails extends AbstractAuditingEntity implements Serializa
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	Projects project
-	
-	@GraphQLQuery
-	@Column(name = "amount", columnDefinition = "numeric")
-	@UpperCase
-	BigDecimal amount
 
 	@GraphQLQuery
-	@Column(name = "disc_rate", columnDefinition = "numeric")
-	@UpperCase
-	BigDecimal discRate
+	@Column(name = "applied_amount", columnDefinition = "numeric")
+	BigDecimal appliedAmount
 
 	@GraphQLQuery
-	@Column(name = "disc_amount", columnDefinition = "numeric")
-	@UpperCase
-	BigDecimal discAmount
+	@Column(name = "vat_rate", columnDefinition = "numeric")
+	BigDecimal vatRate
 
 	@GraphQLQuery
 	@Column(name = "vat_inclusive", columnDefinition = "bool")
-	@UpperCase
 	Boolean vatInclusive
 
 	@GraphQLQuery
 	@Column(name = "vat_amount", columnDefinition = "numeric")
-	@UpperCase
 	BigDecimal vatAmount
 
 	@GraphQLQuery
-	@Column(name = "tax_description", columnDefinition = "varchar")
+	@Column(name = "ewt_desc", columnDefinition = "varchar")
 	@UpperCase
-	String taxDesc
+	String ewtDesc
 
 	@GraphQLQuery
 	@Column(name = "ewt_rate", columnDefinition = "numeric")
@@ -89,27 +80,31 @@ class AccountsPayableDetails extends AbstractAuditingEntity implements Serializa
 	BigDecimal ewtAmount
 
 	@GraphQLQuery
+	@Column(name = "gross_amount", columnDefinition = "numeric")
+	@UpperCase
+	BigDecimal grossAmount
+
+	@GraphQLQuery
+	@Column(name = "discount", columnDefinition = "numeric")
+	@UpperCase
+	BigDecimal discount
+
+	@GraphQLQuery
 	@Column(name = "net_amount", columnDefinition = "numeric")
 	@UpperCase
 	BigDecimal netAmount
 
 	@GraphQLQuery
-	@Column(name = "remarks_notes", columnDefinition = "varchar")
-	@UpperCase
-	String remarksNotes
+	@Column(name = "reapplication", columnDefinition = "uuid")
+	UUID reapplication
 
 	@GraphQLQuery
-	@Column(name = "ref_id", columnDefinition = "uuid")
-	UUID refId
-
-	@GraphQLQuery 	
-	@Column(name = "ref_no", columnDefinition = "varchar")
-	@UpperCase
-	String refNo
+	@Column(name = "debit_memo", columnDefinition = "uuid")
+	UUID debitMemo
 
 	@GraphQLQuery
-	@Column(name = "source", columnDefinition = "varchar")
-	String source
-	
+	@Column(name = "posted", columnDefinition = "uuid")
+	Boolean posted
+
 }
 
