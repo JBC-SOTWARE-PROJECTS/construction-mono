@@ -1,4 +1,4 @@
-name: API Staging with Gradle
+name: CONSTRUCTION BACKEND BETA
 
 on:
   push:
@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   build:
-    # if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'staging-deployment/')
+    # if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'staging/')
     # environment: staging
     runs-on: ubuntu-latest
     outputs:
