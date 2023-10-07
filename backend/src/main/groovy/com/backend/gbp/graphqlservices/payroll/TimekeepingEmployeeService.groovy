@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.AccumulatedLogs
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
@@ -164,7 +165,22 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
         timekeepingEmployeeRepository.findById(id).ifPresent { employee = it }
         if (!employee) return new GraphQLResVal<TimekeepingEmployee>(null, false, "Failed to update employee timekeeping status. Please try again later!")
         else {
+
             employee = this.updateStatus(id, status)
+            Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
+
+            if (status == PayrollEmployeeStatus.FINALIZED) {
+                employee.accumulatedLogs.each {
+                    AccumulatedLogs accumulatedLogs ->
+                        accumulatedLogs.projectBreakdown.each {
+                            TimekeepingService.consolidateProjectBreakdown(employeeBreakdownMap, it)
+                        }
+                }
+                employee.projectBreakdown = []
+                employeeBreakdownMap.keySet().each {
+                    employee.projectBreakdown.push(employeeBreakdownMap.get(it.toString()))
+                }
+            }
             return new GraphQLResVal<TimekeepingEmployee>(employee, true, "Successfully updated employee timekeeping status!")
         }
     }

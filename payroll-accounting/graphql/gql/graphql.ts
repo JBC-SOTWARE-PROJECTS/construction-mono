@@ -8297,6 +8297,7 @@ export type TimekeepingEmployee = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payrollEmployee?: Maybe<PayrollEmployee>;
+  projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
   status?: Maybe<PayrollEmployeeStatus>;
   timekeeping?: Maybe<Timekeeping>;
 };
@@ -8308,6 +8309,7 @@ export type TimekeepingEmployeeDto = {
   gender?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   position?: Maybe<Position>;
+  projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
   status?: Maybe<Scalars['String']['output']>;
 };
 

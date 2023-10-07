@@ -135,36 +135,25 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         timekeeping.status = status
 
         if (status == PayrollStatus.FINALIZED) {
-            Map<String, HoursLog> breakdownMap = new HashMap<>()
+            Map<String, HoursLog> timekeepingBreakdownMap = new HashMap<>()
             timekeeping.timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
                 timekeepingEmployee.status = PayrollEmployeeStatus.FINALIZED
+                Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
                 timekeepingEmployee.accumulatedLogs.each {
                     AccumulatedLogs accumulatedLogs ->
                         accumulatedLogs.projectBreakdown.each {
-                            HoursLog breakdown = breakdownMap.get(it.project as String)
-                            if (!breakdown) breakdown = new HoursLog()
-                            breakdown.project = it.project
-                            breakdown.projectName = it.projectName
-                            breakdown.late += it.late
-                            breakdown.underTime += it.underTime
-                            breakdown.absent += it.absent
-                            breakdown.regular += it.regular
-                            breakdown.overtime += it.overtime
-                            breakdown.regularHoliday += it.regularHoliday
-                            breakdown.overtimeHoliday += it.overtimeHoliday
-                            breakdown.regularDoubleHoliday += it.regularDoubleHoliday
-                            breakdown.overtimeDoubleHoliday += it.overtimeDoubleHoliday
-                            breakdown.regularSpecialHoliday += it.regularSpecialHoliday
-                            breakdown.overtimeSpecialHoliday += it.overtimeSpecialHoliday
-//                            if (breakdown) {
-                            breakdownMap.put(it.project as String, breakdown)
-//                            }
+//                            consolidateProjectBreakdown(employeeBreakdownMap, it)
+                            consolidateProjectBreakdown(timekeepingBreakdownMap, it)
                         }
+                }
+                timekeepingEmployee.projectBreakdown = []
+                employeeBreakdownMap.keySet().each {
+                    timekeepingEmployee.projectBreakdown.push(employeeBreakdownMap.get(it.toString()))
                 }
             }
             timekeeping.projectBreakdown = []
-            breakdownMap.keySet().each {
-                timekeeping.projectBreakdown.push(breakdownMap.get(it.toString()))
+            timekeepingBreakdownMap.keySet().each {
+                timekeeping.projectBreakdown.push(timekeepingBreakdownMap.get(it.toString()))
             }
 
         }
@@ -172,6 +161,27 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         timekeepingRepository.save(timekeeping)
 
         return new GraphQLResVal<String>(null, true, "Successfully recalculated timekeeping employee.")
+    }
+
+    static void consolidateProjectBreakdown(HashMap<String, HoursLog> breakdownMap, HoursLog it) {
+        HoursLog breakdown = breakdownMap.get(it.project as String)
+        if (!breakdown) breakdown = new HoursLog()
+        breakdown.project = it.project
+        breakdown.projectName = it.projectName
+        breakdown.late += it.late
+        breakdown.underTime += it.underTime
+        breakdown.absent += it.absent
+        breakdown.regular += it.regular
+        breakdown.overtime += it.overtime
+        breakdown.regularHoliday += it.regularHoliday
+        breakdown.overtimeHoliday += it.overtimeHoliday
+        breakdown.regularDoubleHoliday += it.regularDoubleHoliday
+        breakdown.overtimeDoubleHoliday += it.overtimeDoubleHoliday
+        breakdown.regularSpecialHoliday += it.regularSpecialHoliday
+        breakdown.overtimeSpecialHoliday += it.overtimeSpecialHoliday
+//                            if (breakdown) {
+        breakdownMap.put(it.project as String, breakdown)
+//                            }
     }
 
 
