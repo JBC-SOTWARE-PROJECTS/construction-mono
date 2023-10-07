@@ -60,11 +60,12 @@ const useGetEmployeeAttendance = () => {
     });
   };
 
-  const returnValue: [(variables: IVariables) => void, any, boolean] = [
-    getEmployeeSchedule,
-    data?.logs,
-    loading,
-  ];
+  const returnValue: [
+    (variables: IVariables) => void,
+    any,
+    boolean,
+    () => void
+  ] = [getEmployeeSchedule, data?.logs, loading, refetch];
 
   return returnValue;
 };

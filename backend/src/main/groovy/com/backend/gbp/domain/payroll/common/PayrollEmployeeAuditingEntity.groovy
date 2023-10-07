@@ -20,12 +20,12 @@ class PayrollEmployeeAuditingEntity extends PayrollStatusEntity<PayrollEmployeeS
     @MapsId
     PayrollEmployee payrollEmployee
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by", referencedColumnName = "id")
-    Employee approvedBy
-
-    @Column(name = "approved_date", columnDefinition = "timestamp")
-    Instant approvedDate
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "approved_by", referencedColumnName = "id")
+//    Employee approvedBy
+//
+//    @Column(name = "approved_date", columnDefinition = "timestamp")
+//    Instant approvedDate
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "finalized_by", referencedColumnName = "id")
@@ -34,11 +34,11 @@ class PayrollEmployeeAuditingEntity extends PayrollStatusEntity<PayrollEmployeeS
     @Column(name = "finalized_date", columnDefinition = "timestamp")
     Instant finalizedDate
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rejected_by", referencedColumnName = "id")
-    Employee rejectedBy
-
-    @Column(name = "rejected_date", columnDefinition = "timestamp")
-    Instant rejectedDate
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "rejected_by", referencedColumnName = "id")
+//    Employee rejectedBy
+//
+//    @Column(name = "rejected_date", columnDefinition = "timestamp")
+//    Instant rejectedDate
 
 }

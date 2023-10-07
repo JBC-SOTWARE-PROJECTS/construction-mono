@@ -34,6 +34,7 @@ const SUB_ACCOUNT = gql`
         label
       }
       sourceDomain
+      domainName
       isInactive
     }
   }

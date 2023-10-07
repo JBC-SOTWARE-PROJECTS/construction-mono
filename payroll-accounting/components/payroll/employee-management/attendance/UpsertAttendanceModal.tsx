@@ -25,8 +25,16 @@ interface IProps {
   open: boolean;
   toggleModal: () => void;
   record?: EmployeeAttendance | undefined;
+  callback?: () => void;
+  employeeId?: string;
 }
-function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
+function UpsertAttendanceModal({
+  open,
+  toggleModal,
+  record,
+  callback,
+  employeeId,
+}: IProps) {
   const { error, data: projects } = useQuery(GET_ACTIVE_PROJECTS);
 
   const [form] = useForm();
@@ -37,6 +45,7 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
 
   const [upsertEmployeeSchedule, loading] = useUpsertEmployeeAttendance(() => {
     toggleModal();
+    if (callback) callback();
     form.setFieldsValue({
       attendance_time: null,
       type: null,
@@ -51,7 +60,8 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
         attendance_time: dayjs(values.attendance_time).millisecond(0),
       },
       values?.project_id,
-      record?.id
+      record?.id,
+      employeeId
     );
   };
   return (
@@ -61,6 +71,7 @@ function UpsertAttendanceModal({ open, toggleModal, record }: IProps) {
       title="Create Raw Logs"
       onCancel={handleCancel}
       footer={null}
+      destroyOnClose
     >
       <Form
         layout="vertical"

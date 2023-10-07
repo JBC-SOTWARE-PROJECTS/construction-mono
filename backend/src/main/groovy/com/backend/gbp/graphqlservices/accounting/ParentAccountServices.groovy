@@ -120,7 +120,7 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 		pageData
 
 	}
-	
+
 	@GraphQLQuery(name = "getCoaById", description = "Get getCoaById")
 	ParentAccount getCoaById(@GraphQLArgument(name = "id") UUID id) {
 		if(id){
@@ -156,6 +156,16 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 		}
 	}
 
-
+	@GraphQLQuery(name = "getParentAccountList", description = "Get getCoaById")
+	List<ParentAccount> getParentAccountList() {
+		UUID companyID = SecurityUtils.currentCompanyId()
+		createQuery(""" 
+					Select p from ParentAccount p
+					left join fetch p.company
+					where p.company.id = :companyID
+		""")
+			.setParameter('companyID',companyID)
+			.resultList
+	}
 }
 
