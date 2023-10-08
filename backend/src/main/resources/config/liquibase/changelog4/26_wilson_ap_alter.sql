@@ -1,0 +1,1 @@
+ALTER TABLE accounting.payables add column beginning_balance bool default false, add column reference_type varchar default null;

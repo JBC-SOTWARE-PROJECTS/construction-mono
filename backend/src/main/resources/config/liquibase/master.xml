@@ -331,4 +331,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/25_donss_create_ledger_partition_function.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_wilson_ap_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/27_wilson_ap_ledger_queries.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

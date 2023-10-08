@@ -1,8 +1,6 @@
 package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.AccountsPayable
-import com.backend.gbp.domain.accounting.HeaderLedgerGroup
-import com.backend.gbp.domain.accounting.Integration
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.domain.accounting.LedgerDocType
@@ -12,6 +10,10 @@ import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.inventory.ReceivingRepository
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
 import com.backend.gbp.rest.dto.payables.AccountPayableDetialsDto
+import com.backend.gbp.rest.dto.payables.ApAgingDetailedDto
+import com.backend.gbp.rest.dto.payables.ApAgingSummaryDto
+import com.backend.gbp.rest.dto.payables.ApLedgerDto
+import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.rest.dto.payables.OfficeDto
 import com.backend.gbp.rest.dto.payables.ProjectDto
 import com.backend.gbp.rest.dto.payables.TransTypeDto
@@ -26,7 +28,9 @@ import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -71,6 +75,9 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     @Autowired
     LedgerServices ledgerServices
 
+    @Autowired
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
 	AccountsPayableServices() {
 		super(AccountsPayable.class)
 	}
@@ -86,13 +93,70 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 	List<AccountsPayable> apListPosted() {
         def company = SecurityUtils.currentCompanyId()
 
-        def query = "Select ap from AccountsPayable ap where ap.company = :company and ap.posted = true"
+        String query = "Select ap from AccountsPayable ap  where ap.company = :company and ap.posted = true"
         Map<String, Object> params = new HashMap<>()
         params.put('company', company)
 
         createQuery(query, params).resultList.sort { it.ledgerDate }
 
 	}
+
+    @GraphQLQuery(name = "apReferenceType", description = "Find Ap reference Type")
+    List<ApReferenceDto> apReferenceType() {
+        def company = SecurityUtils.currentCompanyId()
+
+        List<ApReferenceDto> records = []
+
+        String query = '''select distinct p.reference_type as reference_type from accounting.payables p where p.reference_type is not null '''
+
+
+        Map<String, Object> params = new HashMap<>()
+
+        if (company) {
+            query += ''' and (p.company = :company) '''
+            params.put("company", company)
+        }
+
+        def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
+
+        recordsRaw.each {
+            records << new ApReferenceDto(
+                    referenceType: StringUtils.upperCase( it.get("reference_type","") as String)
+            )
+        }
+
+        return records
+
+    }
+
+    @GraphQLQuery(name = "apBeginning", description = "Find Ap that has beginning")
+    Boolean apBeginning(
+            @GraphQLArgument(name = "supplier") UUID supplier,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+
+        String query = '''Select ap from AccountsPayable ap where ap.isBeginningBalance = true and ap.supplier.id = :supplier'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('supplier', supplier)
+
+        if (company) {
+            query += ''' and (ap.company = :company) '''
+            params.put("company", company)
+        }
+
+        if(id){
+            query += ''' and ap.id not in (:id) '''
+            params.put('id', id)
+        }
+
+
+        def result = createQuery(query, params).resultList
+        if(result.size()){
+            return false
+        }
+        return true
+    }
 
 	@GraphQLQuery(name = "apListBySupplierFilter", description = "List of AP Pageable By Supplier")
 	Page<AccountsPayable> apListBySupplierFilter(
@@ -103,21 +167,14 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 	) {
         def company = SecurityUtils.currentCompanyId()
 
-        String query = '''Select ap from AccountsPayable ap
-                            where
-							ap.posted = true and
-						( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
-						lower(ap.invoiceNo) like lower(concat('%',:filter,'%')) )'''
 
-//        String query = '''Select ap from AccountsPayable ap
-//                            left join fetch ap.supplier
-//                            where
-//							ap.posted = true and
-//						( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
-//						lower(ap.invoiceNo) like lower(concat('%',:filter,'%')) )'''
+       String query = '''Select ap from AccountsPayable ap  where ap.posted = true and
+                            ( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
+						    lower(ap.invoiceNo) like lower(concat('%',:filter,'%')) )'''
 
-        String countQuery = '''Select count(ap) from AccountsPayable ap where
-							ap.posted = true and
+
+        String countQuery = '''Select count(ap) from AccountsPayable ap 
+                            where ap.posted = true and
 							( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
 						lower(ap.invoiceNo) like lower(concat('%',:filter,'%')) ) '''
 
@@ -148,7 +205,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     ) {
         def company = SecurityUtils.currentCompanyId()
 
-        String query = '''Select ap from AccountsPayable ap where ap.posted = true and
+        query = '''Select ap from AccountsPayable ap where ap.posted = true and
 						( lower(ap.apNo) like lower(concat('%',:filter,'%')) or
 						lower(ap.invoiceNo) like lower(concat('%',:filter,'%')) )'''
 
@@ -229,6 +286,8 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 
         getPageable(query, countQuery, page, size, params)
     }
+
+
 
     //mutations
     @Transactional(rollbackFor = Exception.class)
@@ -422,15 +481,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                         // credit normal side make it negative to debit
                         it.discAmount = status ? discountAmount : discountAmount * -1
                         it.supplierAmount = status ? netAmount : netAmount * -1
-                    } else {
-                        def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
-                        def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
-
-                        it.doctorFee = status ? (netOfVat * -1) : netOfVat
-                        //debit (normal side credit)
-                        it.readersFee = status ? netOfVat : (netOfVat * -1)
-                        //debit normal side
-                        it.dueToDoctors = status ? netAmount : (netAmount * -1)//credit
                     }
 
                     //ewt
@@ -485,8 +535,10 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         def apCat = 'AP'
         def ap = findOne(id)
         if (status) {
-            def header = ledgerServices.findOne(ap.postedLedger)
-            ledgerServices.reverseEntriesCustom(header, ap.apvDate)
+            if(!ap.isBeginningBalance){
+                def header = ledgerServices.findOne(ap.postedLedger)
+                ledgerServices.reverseEntriesCustom(header, ap.apvDate)
+            }
             //update AP
             ap.postedLedger = null
             ap.status = "VOIDED"
@@ -494,22 +546,24 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             ap.postedBy = null
             save(ap)
             //remove ap ledger
-//            apLedgerServices.removeApLedger(ap.apNo)
+            apLedgerServices.removeApLedger(ap.apNo)
             if (ap.ewtAmount > BigDecimal.ZERO) {
                 wtx2307Service.remove2307(ap.id)
             }
             //end remover ap ledger
         } else {
-            postToLedgerAccounting(ap)
-
+            if(!ap.isBeginningBalance){
+                postToLedgerAccounting(ap)
+            }
             //add to ap ledger
             Map<String, Object> ledger = new HashMap<>()
             ledger.put('ledgerType', apCat)
             ledger.put('refNo', ap?.apNo)
             ledger.put('refId', ap?.id)
-            ledger.put('debit', 0.00)
+            ledger.put('debit', BigDecimal.ZERO)
             ledger.put('credit', ap?.netAmount)
-//            apLedgerServices.upsertApLedger(ledger, ap?.supplier?.id, null)
+            ledger.put('ledgerDate', ap?.apvDate)
+            apLedgerServices.upsertApLedger(ledger, ap?.supplier?.id, null)
             //end to ap ledger
 
             //insert if ewt is not zero
@@ -525,6 +579,15 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                 ewt.put('netVat', ap.netOfVat) // same by gross
                 ewt.put('ewtAmount', ap.ewtAmount) //ewt amount
                 wtx2307Service.upsert2307(ewt, null, ap.supplier.id)
+            }
+
+            //if beginning
+            if(ap.isBeginningBalance){
+                ap.postedLedger = null
+                ap.status = "POSTED"
+                ap.posted = true
+                ap.postedBy = SecurityUtils.currentLogin()
+                save(ap)
             }
         }
         return ap
@@ -564,8 +627,9 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         ledger.put('ledgerType', apCat)
         ledger.put('refNo', ap?.apNo)
         ledger.put('refId', ap?.id)
-        ledger.put('debit', 0.00)
+        ledger.put('debit', BigDecimal.ZERO)
         ledger.put('credit', ap?.netAmount)
+        ledger.put('ledgerDate', ap?.apvDate)
         apLedgerServices.upsertApLedger(ledger, ap?.supplier?.id, null)
         //end to ap ledger
 
@@ -580,7 +644,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             ewt.put('gross', ap.grossAmount) //net of discount
             ewt.put('vatAmount', ap.vatAmount) // 0
             ewt.put('netVat', ap.netOfVat) // same by gross
-            ewt.put('ewtAmount', ap.ewtAmount) //ewt amounnt
+            ewt.put('ewtAmount', ap.ewtAmount) //ewt amount
             wtx2307Service.upsert2307(ewt, null, ap.supplier.id)
         }
 
@@ -648,13 +712,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                 it.clearingAmount = clearing * -1 // credit normal side make it negative to debit
                 it.discAmount = discountAmount
                 it.supplierAmount = netAmount
-            } else {
-                def netOfVat = (actPay.netOfVat + actPay.vatAmount).setScale(2, RoundingMode.HALF_EVEN)
-                def netAmount = actPay.netAmount.setScale(2, RoundingMode.HALF_EVEN)
-
-                it.doctorFee = netOfVat * -1 //debit (credit normal side)
-                it.readersFee = netOfVat //debit normal side
-                it.dueToDoctors = netAmount //credit
             }
 
             //ewt
@@ -678,16 +735,16 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         details["ACC_PAYABLE_ID"] = actPay.id.toString()
         details["SUPPLIER_ID"] = actPay.supplier.id.toString()
 
-//        headerLedger.transactionNo = ''
-//        headerLedger.transactionType = ''
-//        headerLedger.referenceType = ''
-//        headerLedger.referenceNo = ''
+        headerLedger.transactionNo = actPay.apNo
+        headerLedger.transactionType = actPay.apCategory
+        headerLedger.referenceType = actPay.referenceType
+        headerLedger.referenceNo = actPay.invoiceNo
 //        headerLedger.headerLedgerGroup = ''
 
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",
                 "${actPay.apNo}-${actPay.supplier.supplierFullname}",
-                "${actPay.apNo}-${actPay.remarksNotes}",
+                "${actPay.apNo}-${actPay.remarksNotes ?: ""}",
                 LedgerDocType.AP,
                 JournalType.PURCHASES_PAYABLES,
                 actPay.apvDate,
@@ -802,55 +859,25 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         return ap
     }
 
-
-
-    //calculate
-    static BigDecimal calculateVat(Boolean vatInclusive,
-                                   BigDecimal amount,
-                                   BigDecimal vatRate) {
-
-        def vat = (amount) / (vatRate + 1)
-        def vatAmount = vatInclusive ?
-                vat.round(2) * vatRate :
-                (amount) * vatRate
-
-        return vatAmount.round(2)
-    }
-
-    static calculateEwt(Boolean vatInclusive, BigDecimal amount, BigDecimal vatRate, BigDecimal ewtRate) {
-        def netOfdiscount = amount;
-        def vat = netOfdiscount / (vatRate + 1)
-        def ewt = 0;
-        if (vatRate <= 0) {
-            ewt = netOfdiscount * ewtRate;
-        } else {
-            ewt = vatInclusive ?
-                    vat.round(2) * ewtRate :
-                    netOfdiscount * ewtRate;
-        }
-
-        return ewt.round(2);
-    }
-
     //ledger view general
     @GraphQLQuery(name = "ledgerView")
     List<JournalEntryViewDto> ledgerView(
             @GraphQLArgument(name = "id") UUID id
     ) {
         def result = new ArrayList<JournalEntryViewDto>()
-//        def header = ledgerServices.findOne(id)
-//        if (header) {
-//            Set<Ledger> ledger = new HashSet<Ledger>(header.ledger);
-//            ledger.each {
+        def header = ledgerServices.findOne(id)
+        if (header) {
+            Set<Ledger> ledger = new HashSet<Ledger>(header.ledger);
+            ledger.each {
                 def list = new JournalEntryViewDto(
-                        code: "",
-                        desc: "",
-                        debit: 0,
-                        credit: 0
+                        code: it.journalAccount.code,
+                        desc: it.journalAccount.accountName,
+                        debit: it.debit,
+                        credit: it.credit
                 )
                 result.add(list)
-//            }
-//        }
+            }
+        }
         return result.sort { it.credit }
     }
 
@@ -910,6 +937,115 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             ap.netAmount = net
         }
         save(ap)
+    }
+
+    //==== reports query ====//
+    @GraphQLQuery(name = "apLedger")
+    List<ApLedgerDto> apLedger(
+            @GraphQLArgument(name = "supplier") UUID supplier,
+            @GraphQLArgument(name = "start") String start,
+            @GraphQLArgument(name = "end") String end,
+            @GraphQLArgument(name = "filter") String filter
+    ) {
+
+        String sql = """select * from accounting.ap_ledger(?) 
+where date(ledger_date) between ?::date and ?::date and lower(ref_no) like lower(concat('%',?,'%'))"""
+        List<ApLedgerDto> items = jdbcTemplate.query(sql,
+                new BeanPropertyRowMapper(ApLedgerDto.class),
+                supplier,
+                start,
+                end,
+                filter
+        )
+        return items
+    }
+
+    @GraphQLQuery(name = "apAgingDetailed")
+    List<ApAgingDetailedDto> apAgingDetailed(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "supplier") UUID supplier,
+            @GraphQLArgument(name = "supplierTypes") UUID supplierTypes,
+            @GraphQLArgument(name = "posted") Boolean posted
+
+    ) {
+
+        String sql = """select * from accounting.aging_report(?::date) where supplier like '%%' """
+
+        if (posted != null) {
+            sql += """ and (posted = ${posted} or posted is null) """
+        }
+
+        if (supplierTypes) {
+            sql += """ and supplier_type_id = '${supplierTypes}' """
+        }
+
+        if (supplier) {
+            sql += """ and supplier_id = '${supplier}' """
+        }
+
+        sql += """ order by supplier;"""
+
+        List<ApAgingDetailedDto> items = jdbcTemplate.query(sql,
+                new BeanPropertyRowMapper(ApAgingDetailedDto.class),
+                filter
+        )
+        return items
+    }
+
+    @GraphQLQuery(name = "apAgingSummary")
+    List<ApAgingSummaryDto> apAgingSummary(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "supplierTypes") UUID supplierTypes,
+            @GraphQLArgument(name = "posted") Boolean posted
+    ) {
+
+        String sql = """select supplier_id as id,supplier,supplier_type_id,supplier_type,sum(current_amount) as current_amount,
+sum(day_1_to_31) as day_1_to_31,sum(day_31_to_60) as day_31_to_60,sum(day_61_to_90) as day_61_to_90,sum(day_91_to_120) as day_91_to_120,
+sum(older) as older,sum(total) as total from accounting.aging_report(?::date) where supplier like '%%' """
+
+        if (posted != null) {
+            sql += """ and (posted = ${posted} or posted is null) """
+        }
+
+        if (supplierTypes) {
+            sql += """ and supplier_type_id = '${supplierTypes}' """
+        }
+
+        sql += """ group by supplier_id,supplier,supplier_type_id,supplier_type order by supplier;"""
+
+        List<ApAgingSummaryDto> items = jdbcTemplate.query(sql,
+                new BeanPropertyRowMapper(ApAgingSummaryDto.class),
+                filter
+        )
+        return items
+    }
+
+    //calculate
+    static BigDecimal calculateVat(Boolean vatInclusive,
+                                   BigDecimal amount,
+                                   BigDecimal vatRate) {
+
+        def vat = (amount) / (vatRate + 1)
+        def vatAmount = vatInclusive ?
+                vat.round(2) * vatRate :
+                (amount) * vatRate
+
+        return vatAmount.setScale(2, RoundingMode.HALF_EVEN)
+    }
+
+    static calculateEwt(Boolean vatInclusive, BigDecimal amount, BigDecimal vatRate, BigDecimal ewtRate) {
+        def netOfdiscount = amount;
+        def vat = netOfdiscount / (vatRate + 1)
+        def ewt = 0;
+        if (vatRate <= 0) {
+            ewt = netOfdiscount * ewtRate;
+        } else {
+            ewt = vatInclusive ?
+                    vat.round(2) * ewtRate :
+                    netOfdiscount * ewtRate;
+        }
+
+        return ewt.setScale(2, RoundingMode.HALF_EVEN)
     }
 
 }

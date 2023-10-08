@@ -14,8 +14,10 @@ import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
 
 import javax.persistence.Column
+import javax.persistence.ConstraintMode
 import javax.persistence.Entity
 import javax.persistence.FetchType
+import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.JoinColumn
@@ -37,10 +39,9 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	@Column(name = "id", columnDefinition = "uuid")
 	@Type(type = "pg-uuid")
 	UUID id
-	
-	@NotFound(action = NotFoundAction.IGNORE)
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "receiving", referencedColumnName = "id")
+	@JoinColumn(name = "receiving", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	ReceivingReport receiving
 	
 	@GraphQLQuery
@@ -48,9 +49,8 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	@UpperCase
 	String apNo
 
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "supplier", referencedColumnName = "id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "supplier", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	Supplier supplier
 
 	@GraphQLQuery
@@ -58,14 +58,12 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	@UpperCase
 	String apCategory
 
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "payment_terms", referencedColumnName = "id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "payment_terms", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	PaymentTerm paymentTerms
 
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "trans_type", referencedColumnName = "id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "trans_type", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	ApTransaction transType
 
 	@GraphQLQuery
@@ -77,6 +75,11 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	@Column(name = "invoice_no", columnDefinition = "varchar")
 	@UpperCase
 	String invoiceNo
+
+	@GraphQLQuery
+	@Column(name = "reference_type", columnDefinition = "varchar")
+	@UpperCase
+	String referenceType
 
 	@GraphQLQuery
 	@Column(name = "gross_amount", columnDefinition = "numeric")
@@ -180,8 +183,9 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	Instant dueDate
 
 	@GraphQLQuery
-	@Column(name = "rounding", columnDefinition = "int")
-	Integer rounding
+	@Column(name = "beginning_balance", columnDefinition = "bool")
+	@UpperCase
+	Boolean isBeginningBalance
 
 	@GraphQLQuery(name = "balance")
 	@Transient
