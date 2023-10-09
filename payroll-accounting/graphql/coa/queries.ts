@@ -2,42 +2,27 @@ import { gql } from "@apollo/client";
 
 export const GET_COA_GEN_RECORDS = gql`
   query (
+    $accountCategory: String
     $accountType: String
     $motherAccountCode: String
+    $accountName: String
     $subaccountType: String
-    $description: String
     $department: String
     $excludeMotherAccount: Boolean
   ) {
-    subaccountTypeAll
-    motherAccounts: coaList {
-      id
-      accountCode
-      description
-    }
-    subAccountsSetup: getSetupBySubAccountTypeAll {
-      id
-      subaccountCode
-      description
-      subaccountType
-      subaccountTypeDesc
-    }
     coaList: getAllChartOfAccountGenerate(
       accountType: $accountType
       motherAccountCode: $motherAccountCode
+      accountName: $accountName
       subaccountType: $subaccountType
-      description: $description
       department: $department
+      accountCategory: $accountCategory
       excludeMotherAccount: $excludeMotherAccount
     ) {
       code
-      description
+      accountName
       accountType
-    }
-    flattedDept: getFlattenDepartment {
-      id
-      code
-      description
+      accountCategory
     }
   }
 `;

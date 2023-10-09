@@ -266,6 +266,20 @@ export type AllowancePackage = {
   status?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export type ApAccountsTemplate = {
+  __typename?: 'ApAccountsTemplate';
+  category?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  status?: Maybe<Scalars['Boolean']['output']>;
+  supplierType?: Maybe<SupplierType>;
+};
+
 export type ApAgingDetailedDto = {
   __typename?: 'ApAgingDetailedDto';
   ap_category?: Maybe<Scalars['String']['output']>;
@@ -2088,6 +2102,7 @@ export type Mutation = {
   upsertAllAllowancePackage?: Maybe<GraphQlRetVal_AllowancePackage>;
   /**  Add allowance type  */
   upsertAllowanceType?: Maybe<GraphQlRetVal_Allowance>;
+  upsertApAccountsTemplate?: Maybe<ApAccountsTemplate>;
   upsertApLedger?: Maybe<ApLedger>;
   upsertApTransaction?: Maybe<ApTransaction>;
   upsertAsset?: Maybe<Assets>;
@@ -3009,6 +3024,13 @@ export type MutationUpsertAllowanceTypeArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertApAccountsTemplateArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertApLedgerArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -3843,6 +3865,25 @@ export type Page_Allowance = {
 export type Page_AllowancePackage = {
   __typename?: 'Page_AllowancePackage';
   content?: Maybe<Array<Maybe<AllowancePackage>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_ApAccountsTemplate = {
+  __typename?: 'Page_ApAccountsTemplate';
+  content?: Maybe<Array<Maybe<ApAccountsTemplate>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -5220,6 +5261,17 @@ export type Query = {
   allItemBySupplier?: Maybe<Array<Maybe<SupplierItem>>>;
   allSupplierByItem?: Maybe<Array<Maybe<SupplierItem>>>;
   apAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
+  /** Find Ap Accounts Template Active */
+  apAccountsTemplateActive?: Maybe<Array<Maybe<ApAccountsTemplate>>>;
+  apAccountsTemplateById?: Maybe<ApAccountsTemplate>;
+  /** Find Ap Accounts Template By Type */
+  apAccountsTemplateByType?: Maybe<Array<Maybe<ApAccountsTemplate>>>;
+  /** Accounts Template List */
+  apAccountsTemplateList?: Maybe<Array<Maybe<ApAccountsTemplate>>>;
+  /** Find Ap Accounts Template Others */
+  apAccountsTemplateOthers?: Maybe<Array<Maybe<ApAccountsTemplate>>>;
+  /** Transaction List */
+  apAccountsTemplatePage?: Maybe<Page_ApAccountsTemplate>;
   apAgingDetailed?: Maybe<Array<Maybe<ApAgingDetailedDto>>>;
   apAgingSummary?: Maybe<Array<Maybe<ApAgingSummaryDto>>>;
   /** Find Ap that has beginning */
@@ -5733,6 +5785,43 @@ export type QueryAllSupplierByItemArgs = {
 export type QueryApAccountViewArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Query root */
+export type QueryApAccountsTemplateByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryApAccountsTemplateByTypeArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryApAccountsTemplateListArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryApAccountsTemplateOthersArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryApAccountsTemplatePageArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  desc?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 

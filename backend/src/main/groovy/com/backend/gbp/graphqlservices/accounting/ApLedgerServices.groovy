@@ -97,7 +97,7 @@ class ApLedgerServices extends AbstractDaoService<ApLedger> {
 					entity.supplier = supplierService.supById(supplier)
 				}
 				entity.isInclude = true
-				if(!entity.ledgerDate){
+				if(entity.ledgerDate == null){
 					entity.ledgerDate = Instant.now().plus(Duration.ofHours(8))
 				}
 

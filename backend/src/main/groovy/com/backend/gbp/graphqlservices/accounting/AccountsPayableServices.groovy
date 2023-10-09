@@ -97,7 +97,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         Map<String, Object> params = new HashMap<>()
         params.put('company', company)
 
-        createQuery(query, params).resultList.sort { it.ledgerDate }
+        createQuery(query, params).resultList.sort { it.apvDate }
 
 	}
 
@@ -612,7 +612,13 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         details["ACC_PAYABLE_ID"] = ap.id.toString()
         details["SUPPLIER_ID"] = ap.supplier.id.toString()
 
-        def result = ledgerServices.addManualJVDynamic(header, entries, LedgerDocType.AP,
+        Map<String, Object> headerLedger = header
+        headerLedger.put('transactionNo', ap.apNo)
+        headerLedger.put('transactionType', ap.apCategory)
+        headerLedger.put('referenceType', ap.referenceType)
+        headerLedger.put('referenceNo', ap.invoiceNo)
+
+        def result = ledgerServices.addManualJVDynamic(headerLedger, entries, LedgerDocType.AP,
                 JournalType.PURCHASES_PAYABLES, ap.apvDate, details)
 
         //update parent
@@ -739,7 +745,6 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         headerLedger.transactionType = actPay.apCategory
         headerLedger.referenceType = actPay.referenceType
         headerLedger.referenceNo = actPay.invoiceNo
-//        headerLedger.headerLedgerGroup = ''
 
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",

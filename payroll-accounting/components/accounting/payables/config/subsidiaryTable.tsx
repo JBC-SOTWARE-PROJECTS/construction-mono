@@ -2,7 +2,7 @@ import { ApLedgerDto } from "@/graphql/gql/graphql";
 import { currency } from "@/utility/constant";
 import { DateFormatter, NumberFormater } from "@/utility/helper";
 import { FolderOpenOutlined } from "@ant-design/icons";
-import { Row, Col, Table, Button, Space, Statistic } from "antd";
+import { Row, Col, Table, Button, Statistic } from "antd";
 import { ColumnsType } from "antd/es/table";
 import _ from "lodash";
 
@@ -38,10 +38,10 @@ export default function SubsidiaryTable({
     },
     {
       title: "Date",
-      dataIndex: "flagValue",
-      key: "flagValue",
+      dataIndex: "ledger_date",
+      key: "ledger_date",
       width: 110,
-      render: (text) => <span>{DateFormatter(text)}</span>,
+      render: (text) => <span>{DateFormatter(text) }</span>,
     },
     {
       title: "Refrerence No",
