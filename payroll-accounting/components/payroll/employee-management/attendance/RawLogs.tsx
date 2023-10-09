@@ -139,6 +139,18 @@ function RawLogs({
       });
     }
   }, [startDateStatic]);
+
+  useEffect(() => {
+    if (!useStaticData) {
+      getAttendance({
+        id: router?.query?.id,
+        size: 10,
+        page: 0,
+        startDate: startDate?.startOf("day"),
+        endDate: endDate?.endOf("day"),
+      });
+    }
+  }, [router?.query?.id]);
   return (
     <>
       {(!useStaticData || !hideAddButton) && (

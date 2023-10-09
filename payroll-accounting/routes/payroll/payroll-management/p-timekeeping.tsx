@@ -138,7 +138,7 @@ function Timekeeping({ account }: IPageProps) {
           <EmployeeDrawer
             selectedEmployees={selectedEmployees as Employee[]}
             loading={loadingPayrollEmployees}
-            setDisplayedEmployee={setDisplayedEmployee}
+            onSelect={setDisplayedEmployee}
             usage="TIMEKEEPING"
           >
             Select Employee

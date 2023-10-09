@@ -1,8 +1,8 @@
+import EmployeeManagementHeader from "@/components/administrative/employees/EmployeeManagementHeader";
 import EmployeeDetails from "@/components/common/EmployeeDetails";
 import AccumulatedLogs from "@/components/payroll/employee-management/attendance/AccumulatedLogs";
 import RawLogs from "@/components/payroll/employee-management/attendance/RawLogs";
 import { useGetEmployeeById } from "@/hooks/employee";
-import { PageHeader } from "@ant-design/pro-components";
 import type { TabsProps } from "antd";
 import { Divider, Tabs } from "antd";
 import { useRouter } from "next/router";
@@ -29,12 +29,12 @@ function EmployeeSchedulePage() {
 
   return (
     <>
-      <PageHeader onBack={() => router?.back()} title="Employee Attendance">
+      <EmployeeManagementHeader title="Employee Attendance">
         <EmployeeDetails
           fullName={employee?.fullName}
           position={employee?.position?.description}
         />
-      </PageHeader>
+      </EmployeeManagementHeader>
 
       <Divider />
       <Tabs defaultActiveKey="1" items={items} onChange={onChange} />

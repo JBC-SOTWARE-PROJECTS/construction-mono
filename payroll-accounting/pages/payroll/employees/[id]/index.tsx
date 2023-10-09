@@ -1,14 +1,11 @@
 import AccessManager from "@/components/accessControl/AccessManager";
+import EmployeeManagementHeader from "@/components/administrative/employees/EmployeeManagementHeader";
 import EmployeeDetails from "@/components/common/EmployeeDetails";
 import { useGetEmployeeById } from "@/hooks/employee";
 import { IPageProps } from "@/utility/interfaces";
-import {
-  EditOutlined,
-  FieldTimeOutlined,
-  SwapOutlined,
-} from "@ant-design/icons";
-import { PageHeader, ProCard } from "@ant-design/pro-components";
-import { Button, Card, Divider, Space, Typography } from "antd";
+import { EditOutlined, FieldTimeOutlined } from "@ant-design/icons";
+import { ProCard } from "@ant-design/pro-components";
+import { Button, Card, Divider, Typography } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -68,35 +65,21 @@ const ViewEmployee = ({ account }: IPageProps) => {
               flexWrap: "wrap",
             }}
           >
-            <PageHeader
-              onBack={() => router.back()}
-              title="Employee Management"
-              extra={
-                <Space>
-                  <Button
-                    icon={<SwapOutlined />}
-                    type="primary"
-                    onClick={() => {}}
-                  >
-                    Switch Employee
-                  </Button>
-                </Space>
-              }
-            >
+            <EmployeeManagementHeader title="Employee Management">
               <EmployeeDetails
                 fullName={employee?.fullName}
                 position={employee?.position?.description}
               />
               <Button
                 icon={<EditOutlined />}
-                type="primary"
+                type="default"
                 onClick={() => {
                   router.push(`/payroll/employees/${router?.query?.id}/edit`);
                 }}
               >
                 Edit Employee Information
               </Button>
-            </PageHeader>
+            </EmployeeManagementHeader>
 
             <Divider />
             <Card bodyStyle={{ padding: 0 }}>
