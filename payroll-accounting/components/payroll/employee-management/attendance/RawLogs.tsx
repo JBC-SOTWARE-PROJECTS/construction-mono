@@ -1,5 +1,10 @@
 import { FormDateRange } from "@/components/common";
 import CustomButton from "@/components/common/CustomButton";
+import { EmployeeAttendance } from "@/graphql/gql/graphql";
+import useGetEmployeeAttendance from "@/hooks/attendance/useGetEmployeeAttendance";
+import useIgnoreAttendance from "@/hooks/attendance/useIgnoreAttendance";
+import useDateRangeState from "@/hooks/useDateRangeState";
+import usePaginationState from "@/hooks/usePaginationState";
 import {
   EditOutlined,
   EyeInvisibleOutlined,
@@ -8,17 +13,11 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Divider, Row, Space, Table, Tag } from "antd";
+import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import UpsertAttendanceModal from "./UpsertAttendanceModal";
-import useGetEmployeeAttendance from "@/hooks/attendance/useGetEmployeeAttendance";
-import { useRouter } from "next/router";
-import { ColumnsType } from "antd/es/table";
-import { EmployeeAttendance } from "@/graphql/gql/graphql";
-import usePaginationState from "@/hooks/usePaginationState";
-import useDateRangeState from "@/hooks/useDateRangeState";
-import useIgnoreAttendance from "@/hooks/attendance/useIgnoreAttendance";
-import { useGetEmployeeById } from "@/hooks/employee";
 interface IProps {
   employeeId?: string;
   useStaticData?: boolean;
@@ -140,29 +139,10 @@ function RawLogs({
       });
     }
   }, [startDateStatic]);
-  const [employee, loadingEmployee] = useGetEmployeeById(router?.query?.id);
   return (
     <>
-      {!useStaticData && (
-        <table>
-          <tr>
-            <td>Name:</td>
-            <td style={{ paddingLeft: 10, fontWeight: "bold" }}>
-              {employee?.fullName}
-            </td>
-          </tr>
-          <tr>
-            <td>Position:</td>
-            <td style={{ paddingLeft: 10, fontWeight: "bold" }}>
-              {employee?.position?.description}
-            </td>
-          </tr>
-        </table>
-      )}
       {(!useStaticData || !hideAddButton) && (
         <>
-          {" "}
-          <Divider />
           <Row gutter={16}>
             <Col span={12}>
               {!useStaticData && (

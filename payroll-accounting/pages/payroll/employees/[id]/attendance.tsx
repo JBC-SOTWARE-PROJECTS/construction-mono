@@ -29,11 +29,13 @@ function EmployeeSchedulePage() {
 
   return (
     <>
-      <PageHeader title="Employee Allowance" onBack={() => router?.back()} />
-      <EmployeeDetails
-        fullName={employee?.fullName}
-        position={employee?.position?.description}
-      />
+      <PageHeader onBack={() => router?.back()} title="Employee Attendance">
+        <EmployeeDetails
+          fullName={employee?.fullName}
+          position={employee?.position?.description}
+        />
+      </PageHeader>
+
       <Divider />
       <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
     </>

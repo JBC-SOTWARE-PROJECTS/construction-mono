@@ -5,9 +5,7 @@ import AccessManager from "@/components/accessControl/AccessManager";
 import { IPageProps } from "@/utility/interfaces";
 import asyncComponent from "@/utility/asyncComponent";
 
-const Employee = asyncComponent(
-  () => import("@/routes/administrative/Employees")
-);
+const Employee = asyncComponent(() => import("@/routes/payroll/employees"));
 
 const Employees = ({ account }: IPageProps) => (
   <React.Fragment>
