@@ -4,7 +4,7 @@ const payrollConfigurationsMenu = {
     routes: [
       {
         path: "/payroll/employee-management",
-        name: "Employee Management",
+        name: "Employee Attendance and Schedule",
         routes: [
           {
             path: "/payroll/employee-management/work-schedule",

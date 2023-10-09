@@ -790,6 +790,27 @@ export type EmployeeInput = {
   zipCode?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type EmployeeLoan = {
+  __typename?: 'EmployeeLoan';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  category?: Maybe<EmployeeLoanCategory>;
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  employee?: Maybe<Employee>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isVoided?: Maybe<Scalars['Boolean']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  status?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export enum EmployeeLoanCategory {
+  CashAdvance = 'CASH_ADVANCE',
+  EquipmentLoan = 'EQUIPMENT_LOAN'
+}
+
 export type EmployeeSchedule = {
   __typename?: 'EmployeeSchedule';
   color?: Maybe<Scalars['String']['output']>;
@@ -1069,6 +1090,14 @@ export type GraphQlResVal_EmployeeAttendance = {
   __typename?: 'GraphQLResVal_EmployeeAttendance';
   message?: Maybe<Scalars['String']['output']>;
   response?: Maybe<EmployeeAttendance>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlResVal_EmployeeLoan = {
+  __typename?: 'GraphQLResVal_EmployeeLoan';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<EmployeeLoan>;
   returnId?: Maybe<Scalars['UUID']['output']>;
   success: Scalars['Boolean']['output'];
 };
@@ -2039,6 +2068,7 @@ export type Mutation = {
   upsertCustomer?: Maybe<Customer>;
   upsertEmployee?: Maybe<Employee>;
   upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
+  upsertEmployeeLoan?: Maybe<GraphQlResVal_EmployeeLoan>;
   /** create or update schedule config. */
   upsertEmployeeSchedule?: Maybe<GraphQlResVal_String>;
   /** Create or edit event calendar. */
@@ -3056,6 +3086,16 @@ export type MutationUpsertEmployeeAttendanceArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertEmployeeLoanArgs = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  category?: InputMaybe<EmployeeLoanCategory>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertEmployeeScheduleArgs = {
   dates?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
@@ -3894,6 +3934,25 @@ export type Page_CompanySettings = {
 export type Page_EmployeeAttendance = {
   __typename?: 'Page_EmployeeAttendance';
   content?: Maybe<Array<Maybe<EmployeeAttendance>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_EmployeeLoan = {
+  __typename?: 'Page_EmployeeLoan';
+  content?: Maybe<Array<Maybe<EmployeeLoan>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -5289,6 +5348,7 @@ export type Query = {
   /** Get contribution by ID, this query is pagable */
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
   getDocTypeById?: Maybe<DocumentTypes>;
+  getEmployeeLoansByEmployee?: Maybe<Page_EmployeeLoan>;
   /** Search employees */
   getEmployeeScheduleByFilter?: Maybe<Array<Maybe<EmployeeScheduleDto>>>;
   /** Search employees */
@@ -6189,6 +6249,14 @@ export type QueryGetContributionEmployeesByPayrollIdArgs = {
 /** Query root */
 export type QueryGetDocTypeByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeLoansByEmployeeArgs = {
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
