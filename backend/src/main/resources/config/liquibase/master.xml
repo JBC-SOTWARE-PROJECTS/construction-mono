@@ -337,4 +337,12 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/28_michael_employee_loan_ledger_item.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_wilson_ap_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/27_wilson_ap_ledger_queries.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/28_wilson_ap_ledger_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/29_wilson_ap_accounts_template.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
