@@ -327,4 +327,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/25_donss_create_ledger_partition_function.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_jacky_employee_alter_added_pincode.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
