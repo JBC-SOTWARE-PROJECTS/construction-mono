@@ -203,6 +203,17 @@ function Timekeeping({ account }: IPageProps) {
                   }`}</PayrollEmployeeStatusAction>
                 </>
               )}
+
+              {displayedEmployee?.status === "FINALIZED" && (
+                <LogsProjectBreakdownModal
+                  record={{
+                    projectBreakdown: displayedEmployee?.projectBreakdown,
+                  }}
+                  disabled={false}
+                >
+                  View Project Breakdown
+                </LogsProjectBreakdownModal>
+              )}
             </>
           ) : (
             "Please Select an Employee"
