@@ -3,7 +3,6 @@ import FullScreenModal from "../common/fullScreenModal/fullScreenModal";
 import {
   CarryOutOutlined,
   CheckCircleTwoTone,
-  CheckOutlined,
   FileDoneOutlined,
 } from "@ant-design/icons";
 import {
@@ -25,7 +24,6 @@ import { useQuery } from "@apollo/client";
 import { ChartOfAccountGenerate } from "@/graphql/gql/graphql";
 import { GET_COA_GEN_RECORDS } from "@/graphql/coa/queries";
 import _ from "lodash";
-import numeral from "numeral";
 import { Table as VirtualTable, Column, AutoSizer } from "react-virtualized";
 
 interface IProps {

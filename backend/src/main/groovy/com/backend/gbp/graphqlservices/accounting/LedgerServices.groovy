@@ -421,7 +421,9 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
                                               @GraphQLArgument(name = "details")  Map<String,String> details) {
 
 
-        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+        def coa =  subAccountSetupService.getAllChartOfAccountGenerate(null,null,"",null,null, null, true)
+
+
         // validate if code is on cOa
 
         List<EntryFull> entriesTarget = []
@@ -1534,6 +1536,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         headerLedger.docType = ledgerDocType
         headerLedger.journalType = journalType
         headerLedger.transactionDate = transactionDatetime
+        headerLedger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
         headerLedger.beginningBalance = begBalance
         headerLedger.custom = custom
         headerLedger.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
