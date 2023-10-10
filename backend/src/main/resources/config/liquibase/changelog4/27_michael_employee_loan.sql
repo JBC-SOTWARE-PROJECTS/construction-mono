@@ -1,6 +1,8 @@
 Create table payroll.employee_loan (
     id                  uuid NOT NULL primary key,
     employee			uuid not null,
+    receiving_report    uuid,
+
 	description         varchar,
 	category            varchar,
     status              bool,

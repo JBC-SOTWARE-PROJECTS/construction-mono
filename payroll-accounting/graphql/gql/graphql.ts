@@ -687,6 +687,7 @@ export type Employee = {
   emergencyContactNo?: Maybe<Scalars['String']['output']>;
   emergencyContactRelationship?: Maybe<Scalars['String']['output']>;
   employeeCelNo?: Maybe<Scalars['String']['output']>;
+  employeeLoanConfig?: Maybe<EmployeeLoanConfig>;
   employeeNo?: Maybe<Scalars['String']['output']>;
   employeeTelNo?: Maybe<Scalars['String']['output']>;
   employeeType?: Maybe<Scalars['String']['output']>;
@@ -764,6 +765,7 @@ export type EmployeeInput = {
   emergencyContactNo?: InputMaybe<Scalars['String']['input']>;
   emergencyContactRelationship?: InputMaybe<Scalars['String']['input']>;
   employeeCelNo?: InputMaybe<Scalars['String']['input']>;
+  employeeLoanConfig?: InputMaybe<EmployeeLoanConfigInput>;
   employeeNo?: InputMaybe<Scalars['String']['input']>;
   employeeTelNo?: InputMaybe<Scalars['String']['input']>;
   employeeType?: InputMaybe<Scalars['String']['input']>;
@@ -818,20 +820,30 @@ export enum EmployeeLoanCategory {
   EquipmentLoan = 'EQUIPMENT_LOAN'
 }
 
-export type EmployeeLoanLedgerItem = {
-  __typename?: 'EmployeeLoanLedgerItem';
-  category?: Maybe<EmployeeLoanCategory>;
-  company?: Maybe<CompanySettings>;
-  createdBy?: Maybe<Scalars['String']['output']>;
+export type EmployeeLoanConfig = {
+  __typename?: 'EmployeeLoanConfig';
+  cashAdvanceAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  cashAdvanceTerm?: Maybe<PaymentTerm>;
+  equipmentLoanAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  equipmentLoanTerm?: Maybe<PaymentTerm>;
+};
+
+export type EmployeeLoanConfigInput = {
+  cashAdvanceAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  cashAdvanceTerm?: InputMaybe<PaymentTerm>;
+  equipmentLoanAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  equipmentLoanTerm?: InputMaybe<PaymentTerm>;
+};
+
+export type EmployeeLoanLedgerDto = {
+  __typename?: 'EmployeeLoanLedgerDto';
+  category?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   credit?: Maybe<Scalars['BigDecimal']['output']>;
   debit?: Maybe<Scalars['BigDecimal']['output']>;
-  employee?: Maybe<Employee>;
-  employeeLoan?: Maybe<EmployeeLoan>;
+  description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  status?: Maybe<Scalars['Boolean']['output']>;
+  runningBalance?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type EmployeeSchedule = {
@@ -2092,6 +2104,7 @@ export type Mutation = {
   upsertEmployee?: Maybe<Employee>;
   upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
   upsertEmployeeLoan?: Maybe<GraphQlResVal_EmployeeLoan>;
+  upsertEmployeeLoanConfig?: Maybe<GraphQlResVal_String>;
   /** create or update schedule config. */
   upsertEmployeeSchedule?: Maybe<GraphQlResVal_String>;
   /** Create or edit event calendar. */
@@ -3119,6 +3132,13 @@ export type MutationUpsertEmployeeLoanArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertEmployeeLoanConfigArgs = {
+  config?: InputMaybe<EmployeeLoanConfigInput>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertEmployeeScheduleArgs = {
   dates?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
@@ -3992,9 +4012,9 @@ export type Page_EmployeeLoan = {
   totalPages: Scalars['Int']['output'];
 };
 
-export type Page_EmployeeLoanLedgerItem = {
-  __typename?: 'Page_EmployeeLoanLedgerItem';
-  content?: Maybe<Array<Maybe<EmployeeLoanLedgerItem>>>;
+export type Page_EmployeeLoanLedgerDto = {
+  __typename?: 'Page_EmployeeLoanLedgerDto';
+  content?: Maybe<Array<Maybe<EmployeeLoanLedgerDto>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -4592,18 +4612,10 @@ export type PaymentItems = {
   transDate?: Maybe<Scalars['Instant']['output']>;
 };
 
-export type PaymentTerm = {
-  __typename?: 'PaymentTerm';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Instant']['output']>;
-  id?: Maybe<Scalars['UUID']['output']>;
-  isActive?: Maybe<Scalars['Boolean']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  paymentCode?: Maybe<Scalars['String']['output']>;
-  paymentDesc?: Maybe<Scalars['String']['output']>;
-  paymentNoDays?: Maybe<Scalars['Int']['output']>;
-};
+export enum PaymentTerm {
+  Monthly = 'MONTHLY',
+  SemiMonthly = 'SEMI_MONTHLY'
+}
 
 export type PaymentTermInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -5392,7 +5404,8 @@ export type Query = {
   /** Get contribution by ID, this query is pagable */
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
   getDocTypeById?: Maybe<DocumentTypes>;
-  getEmployeeLoanLedger?: Maybe<Page_EmployeeLoanLedgerItem>;
+  getEmployeeLoanConfig?: Maybe<EmployeeLoanConfig>;
+  getEmployeeLoanLedger?: Maybe<Page_EmployeeLoanLedgerDto>;
   getEmployeeLoansByEmployee?: Maybe<Page_EmployeeLoan>;
   /** Search employees */
   getEmployeeScheduleByFilter?: Maybe<Array<Maybe<EmployeeScheduleDto>>>;
@@ -6293,6 +6306,12 @@ export type QueryGetContributionEmployeesByPayrollIdArgs = {
 
 /** Query root */
 export type QueryGetDocTypeByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeLoanConfigArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 

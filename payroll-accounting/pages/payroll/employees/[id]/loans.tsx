@@ -2,6 +2,7 @@ import EmployeeManagementHeader from "@/components/administrative/employees/Empl
 import EmployeeDetails from "@/components/common/EmployeeDetails";
 import CashAdvance from "@/components/payroll/employee-management/loans/CashAdvance";
 import EquipmentLoan from "@/components/payroll/employee-management/loans/EquipmentLoan";
+import LoanConfiguration from "@/components/payroll/employee-management/loans/LoanConfiguration";
 import LoansLedger from "@/components/payroll/employee-management/loans/LoansLedger";
 import { useGetEmployeeById } from "@/hooks/employee";
 import type { TabsProps } from "antd";
@@ -27,6 +28,11 @@ const items: TabsProps["items"] = [
     key: "3",
     label: "Equipment Loan",
     children: <EquipmentLoan />,
+  },
+  {
+    key: "4",
+    label: "Configuration",
+    children: <LoanConfiguration />,
   },
 ];
 function EmployeeLoansPage() {

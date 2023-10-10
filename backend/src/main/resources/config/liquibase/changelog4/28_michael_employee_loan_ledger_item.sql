@@ -16,3 +16,6 @@ Create table payroll.employee_loan_ledger_item (
 	last_modified_date  timestamp NULL DEFAULT now(),
 	deleted             bool NULL
 );
+
+alter table hrm.employees
+add column employee_loan_config jsonb;

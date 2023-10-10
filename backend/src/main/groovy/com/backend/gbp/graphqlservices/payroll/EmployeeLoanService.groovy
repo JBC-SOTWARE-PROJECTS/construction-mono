@@ -1,6 +1,8 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.hrm.dto.EmployeeLoanConfig
 import com.backend.gbp.domain.payroll.EmployeeLoan
 import com.backend.gbp.domain.payroll.EmployeeLoanLedgerItem
 import com.backend.gbp.domain.payroll.PHICContribution
@@ -73,6 +75,22 @@ class EmployeeLoanService {
             @GraphQLArgument(name = "size") Integer size
     ) {
         return employeeLoanRepository.getByEmployeePageable(employeeId, category, new PageRequest(page, size, Sort.Direction.ASC, "createdDate"))
+    }
+
+    @GraphQLQuery(name = "getEmployeeLoanConfig")
+    EmployeeLoanConfig getEmployeeLoanConfig(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        employeeRepository.findById(id).get().employeeLoanConfig
+    }
+
+    @GraphQLQuery(name = "useGetLoanBalance")
+    BigDecimal useGetLoanBalance(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "category") EmployeeLoanCategory category
+
+    ) {
+        employeeLoanLedgerItemRepository.getBalanceByCategory(id, category)
     }
 
     @GraphQLQuery(name = "getEmployeeLoanLedger")
@@ -160,7 +178,19 @@ limit ${size} offset ${size * page}
         ledgerItem.description = description
         ledgerItem.status = true
         employeeLoanLedgerItemRepository.save(ledgerItem)
-        return new GraphQLResVal<EmployeeLoan>(employeeLoan, true, "Successfully deleted employee attendance.")
+        return new GraphQLResVal<EmployeeLoan>(employeeLoan, true, "Successfully created employee loan.")
+    }
+
+    @GraphQLMutation(name = "upsertEmployeeLoanConfig")
+    GraphQLResVal<String> upsertEmployeeLoanConfig(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "config") EmployeeLoanConfig config
+
+    ) {
+        Employee employee = employeeRepository.findById(id).get()
+        employee.employeeLoanConfig = config
+        employeeRepository.save(employee)
+        return new GraphQLResVal<String>('success', true, "Successfully updated employee loan configuration.")
 
     }
 }
