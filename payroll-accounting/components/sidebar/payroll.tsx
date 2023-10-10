@@ -4,6 +4,7 @@ import {
   CarryOutOutlined,
   SettingOutlined,
   MoneyCollectOutlined,
+  UsergroupAddOutlined,
 } from "@ant-design/icons";
 
 const payrollmenu: TDiverseTradeMenu[] = [
@@ -14,7 +15,13 @@ const payrollmenu: TDiverseTradeMenu[] = [
     path: "/payroll/configurations/schedule-types",
   },
   {
-    title: "Employee Management",
+    title: "Employee Database Center",
+    subtitle: "Effortlessly manage and maintain your list of employees.",
+    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    path: "/payroll/employees",
+  },
+  {
+    title: "Work Schedule & Attendance",
     subtitle: "Manage employee work schedule and attendance",
     icon: <CalendarOutlined className="diverse-trade-icon" />,
     path: "/payroll/employee-management/work-schedule",
