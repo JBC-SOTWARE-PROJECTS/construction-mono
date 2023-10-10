@@ -1,7 +1,7 @@
 import { EmployeeLoan, EmployeeLoanCategory } from "@/graphql/gql/graphql";
 import { gql, useMutation } from "@apollo/client";
 interface variables {
-  id: string;
+  id?: string | null;
   employeeId: string;
   category: EmployeeLoanCategory;
   amount: number;

@@ -15,18 +15,18 @@ const onChange = (key: string) => {
 const items: TabsProps["items"] = [
   {
     key: "1",
+    label: "Ledger",
+    children: <LoansLedger />,
+  },
+  {
+    key: "2",
     label: "Cash Advance",
     children: <CashAdvance />,
   },
   {
-    key: "2",
+    key: "3",
     label: "Equipment Loan",
     children: <EquipmentLoan />,
-  },
-  {
-    key: "3",
-    label: "Ledger",
-    children: <LoansLedger />,
   },
 ];
 function EmployeeLoansPage() {
@@ -39,6 +39,7 @@ function EmployeeLoansPage() {
         <EmployeeDetails
           fullName={employee?.fullName}
           position={employee?.position?.description}
+          loading={loadingEmployee}
         />
       </EmployeeManagementHeader>
 

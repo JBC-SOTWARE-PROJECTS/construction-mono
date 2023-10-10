@@ -67,6 +67,7 @@ const ViewEmployee = ({ account }: IPageProps) => {
           >
             <EmployeeManagementHeader title="Employee Management">
               <EmployeeDetails
+                loading={loadingEmployee}
                 fullName={employee?.fullName}
                 position={employee?.position?.description}
               />

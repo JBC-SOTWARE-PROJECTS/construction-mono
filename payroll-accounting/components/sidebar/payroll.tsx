@@ -21,7 +21,7 @@ const payrollmenu: TDiverseTradeMenu[] = [
     path: "/payroll/employees",
   },
   {
-    title: "Employee Management",
+    title: "Work Schedule & Attendance",
     subtitle: "Manage employee work schedule and attendance",
     icon: <CalendarOutlined className="diverse-trade-icon" />,
     path: "/payroll/employee-management/work-schedule",

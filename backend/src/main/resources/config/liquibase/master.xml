@@ -335,4 +335,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/27_michael_employee_loan.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/28_michael_employee_loan_ledger_item.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
