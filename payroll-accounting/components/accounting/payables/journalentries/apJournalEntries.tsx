@@ -47,11 +47,12 @@ interface IProps {
   refNo?: string;
   supplierName?: string;
   refDate?: string;
+  particulars?: string;
 }
 
 export default function APJournalEntries(props: IProps) {
   const { message } = App.useApp();
-  const { hide, id, status, refNo, supplierName, refDate } = props;
+  const { hide, id, status, refNo, supplierName, refDate, particulars } = props;
   const [ledger, setLedger] = useState<JournalEntryViewDto[]>([]);
   const [manual, setManual] = useState<boolean>(false);
   const [editable, setEditable] = useState<any>({});
@@ -152,16 +153,16 @@ export default function APJournalEntries(props: IProps) {
       { defaultSelected: ledger ?? undefined },
       (selected: any) => {
         if (selected) {
-          setLedger(
-            selected.map((item: any) => {
-              return {
-                ...item,
-                desc: item?.description ?? "",
-                debit: 0.0,
-                credit: 0.0,
-              };
-            })
-          );
+          const mapped = selected.map((item: any) => {
+            return {
+              ...item,
+              desc: item?.accountName ?? "",
+              debit: 0.0,
+              credit: 0.0,
+            };
+          });
+          console.log("mapped", mapped);
+          setLedger(mapped);
         }
       }
     );
@@ -355,7 +356,7 @@ export default function APJournalEntries(props: IProps) {
                 initialValues={{
                   invoiceSoaReference: `${refDate}-${refNo}`,
                   entityName: `${refNo}-${supplierName}`,
-                  particulars: `${refNo}-${supplierName}`,
+                  particulars: particulars ?? `${refNo}-${supplierName}`,
                 }}>
                 <Row gutter={[16, 0]}>
                   <Col {...responsiveColumn2}>

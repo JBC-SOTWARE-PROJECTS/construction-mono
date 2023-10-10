@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-
 export const GET_TRANSACTION_TYPE_RECORDS = gql`
   query (
     $desc: String
@@ -136,6 +135,47 @@ export const GET_AGING_DETAILED_RECORDS = gql`
       day_91_to_120
       older
       total
+    }
+  }
+`;
+//=================================== Accounts Templates ===========================================
+export const GET_ACCOUNTS_TEMPLATES_RECORDS = gql`
+  query (
+    $desc: String
+    $type: UUID
+    $category: String
+    $page: Int!
+    $size: Int!
+  ) {
+    apAccountsTemplatePage(
+      desc: $desc
+      type: $type
+      category: $category
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        supplierType {
+          id
+          supplierTypeCode
+          supplierTypeDesc
+        }
+        category
+        description
+        status
+      }
+      totalElements
+      size
+      number
+    }
+  }
+`;
+
+export const UPSERT_ACCOUNTS_TEMPLATES = gql`
+  mutation ($fields: Map_String_ObjectScalar, $id: UUID) {
+    upsertApAccountsTemplate(fields: $fields, id: $id) {
+      id
     }
   }
 `;
