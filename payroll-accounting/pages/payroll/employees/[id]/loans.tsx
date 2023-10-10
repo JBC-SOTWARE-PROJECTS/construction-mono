@@ -35,7 +35,7 @@ function EmployeeLoansPage() {
 
   return (
     <>
-      <EmployeeManagementHeader title="Employee Loans">
+      <EmployeeManagementHeader title="Loans">
         <EmployeeDetails
           fullName={employee?.fullName}
           position={employee?.position?.description}

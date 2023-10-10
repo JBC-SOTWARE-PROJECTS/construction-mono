@@ -29,7 +29,7 @@ function EmployeeSchedulePage() {
 
   return (
     <>
-      <EmployeeManagementHeader title="Employee Attendance">
+      <EmployeeManagementHeader title="Attendance">
         <EmployeeDetails
           fullName={employee?.fullName}
           position={employee?.position?.description}

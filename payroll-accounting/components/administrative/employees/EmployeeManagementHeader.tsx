@@ -1,11 +1,11 @@
 import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
 import { Employee } from "@/graphql/gql/graphql";
 import useGetEmployeesBasic from "@/hooks/employee/useGetEmployeesBasic";
-import { SwapOutlined } from "@ant-design/icons";
+import { DownOutlined, SwapOutlined } from "@ant-design/icons";
 import { PageHeader } from "@ant-design/pro-components";
-import { Space } from "antd";
+import { Breadcrumb, Dropdown } from "antd";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
 interface IParams {
   title?: string;
   children?: any;
@@ -13,12 +13,74 @@ interface IParams {
 
 function EmployeeManagementHeader({ title, children }: IParams) {
   const router = useRouter();
-  const [employeeList, loading] = useGetEmployeesBasic();
 
+  const basePathName = "/payroll/employees/[id]";
+  const basePath = `/payroll/employees/${router?.query?.id}`;
+  const [employeeList, loading] = useGetEmployeesBasic();
+  const pathname = router.pathname;
+
+  const menus = [
+    {
+      key: `${basePath}/attendance`,
+      title: "Attendance",
+      path: `${basePath}/attendance`,
+      disabled: pathname === `${basePathName}/attendance`,
+    },
+    {
+      key: `${basePath}/loans`,
+      title: "Loans",
+      path: `${basePath}/loans`,
+      disabled: pathname === `${basePathName}/loans`,
+    },
+  ];
+
+  const routes = [
+    {
+      path: basePath,
+      breadcrumbName: "Employee Management",
+    },
+    {
+      path: "module",
+      breadcrumbName: title,
+      items: menus?.map(({ title: key, path, disabled }) => ({
+        key,
+        label: (
+          <Link href={path} passHref legacyBehavior>
+            <a>{key}</a>
+          </Link>
+        ),
+        disabled,
+      })),
+    },
+  ];
   return (
     <PageHeader
-      onBack={() => router.push(`/payroll/employees/${router?.query?.id}`)}
-      title={title || ""}
+      title={
+        basePathName === pathname ? (
+          title
+        ) : (
+          <Breadcrumb
+            itemRender={(route: any, params: any, routes: any, paths: any) => {
+              const { items, breadcrumbName } = route;
+              return route.path === "module" ? (
+                <Dropdown menu={{ items }} trigger={["click"]}>
+                  <span style={{ cursor: "pointer" }}>
+                    {breadcrumbName}
+                    <span style={{ marginLeft: 5 }}>
+                      <DownOutlined />
+                    </span>
+                  </span>
+                </Dropdown>
+              ) : (
+                <Link href={`/${paths.join("/")}`} passHref legacyBehavior>
+                  <a>{route.breadcrumbName}</a>
+                </Link>
+              );
+            }}
+            items={routes}
+          />
+        )
+      }
       extra={
         <EmployeeDrawer
           selectedEmployees={employeeList as Employee[]}
