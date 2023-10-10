@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollContribution
@@ -14,6 +15,7 @@ import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeContributionDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeContributionRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeContributionsViewRepository
+import com.backend.gbp.security.SecurityUtils
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -132,7 +134,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
 
     @Override
     List<PayrollEmployeeContribution> addEmployees(List<PayrollEmployee> payrollEmployees, Payroll payroll) {
-
+        CompanySettings company = SecurityUtils.currentCompany()
         PayrollContribution contribution = payroll.contribution
 
         List<PayrollEmployeeContribution> employeeList = []
@@ -143,6 +145,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
                 employee.status = PayrollEmployeeStatus.DRAFT
                 employee.payrollEmployee = it
                 employee.contribution = contribution
+                employee.company = company
                 employee.basicSalary = it.employee.basicSalary
                 resetEmployeeContribution(employee)
 

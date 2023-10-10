@@ -13,6 +13,7 @@ import com.backend.gbp.repository.TimekeepingEmployeeRepository
 import com.backend.gbp.repository.TimekeepingRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -192,6 +193,7 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         Timekeeping timekeeping = new Timekeeping();
         timekeeping.payroll = payroll
         timekeeping.status = PayrollStatus.DRAFT
+        timekeeping.company = SecurityUtils.currentCompany()
         timekeeping = timekeepingRepository.save(timekeeping)
 
         payroll.timekeeping = timekeeping
