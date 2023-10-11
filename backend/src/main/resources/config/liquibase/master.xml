@@ -347,4 +347,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/30_michael_payroll_add_company_columns.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/31_michael_payroll_loans_module.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
