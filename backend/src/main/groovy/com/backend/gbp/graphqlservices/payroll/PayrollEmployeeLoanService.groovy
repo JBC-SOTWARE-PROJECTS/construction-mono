@@ -1,30 +1,36 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.CompanySettings
-import com.backend.gbp.domain.hrm.dto.HoursLog
+
 import com.backend.gbp.domain.payroll.*
+import com.backend.gbp.domain.payroll.enums.EmployeeLoanCategory
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
-import com.backend.gbp.graphqlservices.hrm.AccumulatedLogsCalculator
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollEmployeeStatusService
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
-import com.backend.gbp.repository.AccumulatedLogRepository
-import com.backend.gbp.repository.TimekeepingEmployeeDto
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeLoanRepository
+import com.backend.gbp.repository.payroll.PayrollLoanItemRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
-import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.BeanPropertyRowMapper
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
 
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
-import java.time.Instant
+
+
+class LoanItemsDto {
+    UUID employee
+    EmployeeLoanCategory category
+    BigDecimal amount
+}
 
 @TypeChecked
 @Component
@@ -34,14 +40,19 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
     final PayrollModule payrollModule = PayrollModule.LOANS
 
     @Autowired
-    PayrollEmployeeLoanRepository timekeepingEmployeeRepository
+    PayrollEmployeeLoanRepository payrollEmployeeLoanRepository
 
     @Autowired
     PayrollRepository payrollRepository
 
+    @Autowired
+    PayrollLoanItemRepository payrollLoanItemRepository
 
     @PersistenceContext
     EntityManager entityManager
+
+    @Autowired
+    JdbcTemplate jdbcTemplate
 
     private final EmployeeRepository employeeRepository
 
@@ -56,22 +67,46 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
     List<PayrollEmployeeLoan> addEmployees(List<PayrollEmployee> payrollEmployees, Payroll payroll) {
         CompanySettings company = SecurityUtils.currentCompany()
         PayrollLoan loan = payroll.loan
-        List<PayrollEmployeeLoan> timekeepingEmployeeList = []
+        List<PayrollEmployeeLoan> employeeList = []
+        List<PayrollLoanItem> payrollLoanItems = []
         if (payrollEmployees.size() > 0) {
-            payrollEmployees.each {
-                if (!it.isOld) {
-                    PayrollEmployeeLoan employee = new PayrollEmployeeLoan()
-                    employee.status = PayrollEmployeeStatus.DRAFT
-                    employee.payrollEmployee = it
-                    employee.payrollLoan = loan
-                    employee.company = company
-                    timekeepingEmployeeList.push(employee)
+            List<LoanItemsDto> loanItems = generateLoanItems(payrollEmployees)
+
+
+            payrollEmployees.each { PayrollEmployee payrollEmployee ->
+
+                PayrollEmployeeLoan employee = new PayrollEmployeeLoan()
+                employee.status = PayrollEmployeeStatus.DRAFT
+                employee.payrollEmployee = payrollEmployee
+                employee.payrollLoan = loan
+                employee.company = company
+                employee = payrollEmployeeLoanRepository.save(employee)
+
+                List<LoanItemsDto> foundLoanItems = []
+                loanItems = loanItems.findAll { item ->
+                    if (item.employee == payrollEmployee.employee.id) {
+                        foundLoanItems << item
+                        return false
+                    } else {
+                        return true
+                    }
                 }
+                foundLoanItems.each {
+                    PayrollLoanItem payrollLoanItem = new PayrollLoanItem()
+                    payrollLoanItem.employeeLoan = employee
+                    payrollLoanItem.category = it.category
+                    payrollLoanItem.amount = it.amount
+                    payrollLoanItem.status = true
+                    payrollLoanItem.company = company
+                    payrollLoanItems.push(payrollLoanItem)
+                }
+                employeeList.push(employee)
             }
         }
-        loan.employees = timekeepingEmployeeRepository.saveAll(timekeepingEmployeeList)
+        loan.employees = employeeList
+        payrollLoanItemRepository.saveAll(payrollLoanItems)
         payroll.loan = loan
-        return timekeepingEmployeeList
+        return employeeList
     }
 
     @Override
@@ -104,17 +139,39 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
 
 //============================================================UTILITY METHODS====================================================================
 
+    List<LoanItemsDto> generateLoanItems(List<PayrollEmployee> payrollEmployeeList) {
+        List<UUID> ids = []
+        payrollEmployeeList.each {
+            ids.push(it.employee.id)
+        }
+
+        String formattedStringIds = "(${ids.collect { "'${it.toString()}'" }.join(', ')})"
+        jdbcTemplate.query("""
+
+select 
+    l.employee as employee,
+    l.category as category,
+    sum(l.debit - l.credit) as amount
+FROM payroll.employee_loan_ledger_item l
+where l.employee in ${formattedStringIds}
+GROUP by l.employee, l.category;
+
+""", new BeanPropertyRowMapper(LoanItemsDto.class))
+
+    }
+
+
 //=================================QUERY=================================\\
 
 //    @GraphQLQuery(name = "getTimekeepingEmployees", description = "Gets the loan employees by payroll id")
 //    List<TimekeepingEmployeeDto> getTimekeepingEmployees(@GraphQLArgument(name = "id") UUID id) {
 //        Payroll payroll = payrollRepository.getOne(id)
-//        return timekeepingEmployeeRepository.findByTimekeeping(payroll)
+//        return payrollEmployeeLoanRepository.findByTimekeeping(payroll)
 //    }
 //
 //    @GraphQLQuery(name = "getTimekeepingEmployeesV2", description = "Gets all the ids of the employees of the loan")
 //    List<PayrollEmployeeLoan> getTimekeepingEmployeesV2(@GraphQLArgument(name = "id") UUID id) {
-//        return timekeepingEmployeeRepository.findByTimekeepingId(id)
+//        return payrollEmployeeLoanRepository.findByTimekeepingId(id)
 //    }
 //
 //    @GraphQLQuery(name = "getTimekeepingEmployeeLogs", description = "Gets all the ids of the employees of the loan")
@@ -123,7 +180,7 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
 //    }
 //
 //    List<PayrollEmployeeLoan> getByIds(@GraphQLArgument(name="getByIds") UUID id) {
-//        return timekeepingEmployeeRepository.findByTimekeepingId(id)
+//        return payrollEmployeeLoanRepository.findByTimekeepingId(id)
 //    }
 
     //=================================MUTATIONS=================================\\
@@ -134,7 +191,7 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
             @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status
     ) {
         PayrollEmployeeLoan employee = null
-        timekeepingEmployeeRepository.findById(id).ifPresent { employee = it }
+        payrollEmployeeLoanRepository.findById(id).ifPresent { employee = it }
         if (!employee) return new GraphQLResVal<PayrollEmployeeLoan>(null, false, "Failed to update employee loan status. Please try again later!")
         else {
 

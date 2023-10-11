@@ -45,7 +45,7 @@ function LoanConfiguration() {
   };
 
   const getNoOfPayments = (balance: number, deduction: number) => {
-    const val = round(equipmentLoanBalance / config?.equipmentLoanAmount);
+    const val = round(balance / deduction);
     if (isNaN(val)) return 0;
     else return val;
   };

@@ -24,7 +24,7 @@ class PayrollEmployeeLoan extends PayrollEmployeeAuditingEntity implements Seria
     @NotFound(action = NotFoundAction.IGNORE)
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "payrollLoan", referencedColumnName = "payroll")
+    @JoinColumn(name = "payroll_loans", referencedColumnName = "payroll")
     PayrollLoan payrollLoan
 
     @OneToMany(mappedBy = "employeeLoan", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -39,7 +39,7 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
     PayrollEmployeeLoanService payrollEmployeeLoanService
 
     @Autowired
-    PayrollEmployeeRepository payrollEmployeeRepository
+    PayrollEmployeeLoanRepository payrollEmployeeLoanRepository
 
 
     @Autowired
@@ -94,7 +94,7 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
         loan.status = PayrollStatus.DRAFT
         loan.company = SecurityUtils.currentCompany()
         loan = payrollLoanRepository.save(loan)
-
+        payrollEmployeeLoanRepository.fetchEmployeeLoan(payroll.id)
         payroll.loan = loan
         payrollEmployeeLoanService.addEmployees(payroll.payrollEmployees, payroll)
         return loan
