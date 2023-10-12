@@ -17,6 +17,7 @@ import useGetTimekeeping from "@/hooks/payroll/timekeeping/useGetTimekeeping";
 import useGetTimekeepingEmployeeLogs from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployeeLogs";
 import useGetTimekeepingEmployees from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployees";
 import useUpdateTimekeepingStatus from "@/hooks/payroll/timekeeping/useUpdateTimekeepingStatus";
+import { statusMap } from "@/utility/constant";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import {
@@ -57,10 +58,7 @@ function Timekeeping({ account }: IPageProps) {
     refetchTimekeeping();
     refetchEmployees();
   });
-  const statusMap: any = {
-    DRAFT: "FINALIZED",
-    FINALIZED: "DRAFT",
-  };
+
   const handleClickFinalize = () => {
     let countDraft = 0;
     selectedEmployees.forEach((item) => {

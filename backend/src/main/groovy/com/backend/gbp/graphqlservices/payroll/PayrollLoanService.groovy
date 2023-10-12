@@ -52,7 +52,7 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
 
 
     //=================================QUERY=================================\\
-    
+
     @GraphQLQuery(name = "getPayrollLoanById", description = "Get loan by ID")
     PayrollLoan findById(@GraphQLArgument(name = "id") UUID id) {
         if (id) {
@@ -64,7 +64,7 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
     }
 
     @GraphQLQuery(name = "getPayrollLoanByPayrollId", description = "Get loan by ID")
-    PayrollLoan findByPayrollId(@GraphQLArgument(name = "id") UUID id) {
+    PayrollLoan getPayrollLoanByPayrollId(@GraphQLArgument(name = "id") UUID id) {
         if (id) {
             return payrollLoanRepository.findByPayrollId(id).get()
         } else {
@@ -74,15 +74,24 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
     }
 
 
-
     //=================================QUERY=================================\\
 
 
     //================================MUTATION================================\\
 
+    @Transactional(rollbackFor = Exception.class)
+    @GraphQLMutation
+    GraphQLResVal<String> updatePayrollLoanStatus(
+            @GraphQLArgument(name = "payrollId") UUID payrollId,
+            @GraphQLArgument(name = "status") PayrollStatus status
 
-
-
+    ) {
+        PayrollLoan payrollLoan = payrollLoanRepository.findByPayrollId(payrollId).get()
+        payrollLoan.status = status
+        payrollLoanRepository.save(payrollLoan)
+//        TODO: Additional operations when finalizing loan module
+        return new GraphQLResVal<String>(null, true, "Successfully updated Payroll Loan status.")
+    }
 
 
 //===================================================================

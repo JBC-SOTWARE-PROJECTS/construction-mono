@@ -136,6 +136,7 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         timekeeping.status = status
 
         if (status == PayrollStatus.FINALIZED) {
+//            TODO: generate salary amount based on accumulated logs and hourly rate
             Map<String, HoursLog> timekeepingBreakdownMap = new HashMap<>()
             timekeeping.timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
                 timekeepingEmployee.status = PayrollEmployeeStatus.FINALIZED
@@ -143,7 +144,6 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
                 timekeepingEmployee.accumulatedLogs.each {
                     AccumulatedLogs accumulatedLogs ->
                         accumulatedLogs.projectBreakdown.each {
-//                            consolidateProjectBreakdown(employeeBreakdownMap, it)
                             consolidateProjectBreakdown(timekeepingBreakdownMap, it)
                         }
                 }
@@ -161,7 +161,7 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         timekeepingEmployeeRepository.saveAll(timekeeping.timekeepingEmployees)
         timekeepingRepository.save(timekeeping)
 
-        return new GraphQLResVal<String>(null, true, "Successfully recalculated timekeeping employee.")
+        return new GraphQLResVal<String>(null, true, "Successfully updated Timekeeping status.")
     }
 
     static void consolidateProjectBreakdown(HashMap<String, HoursLog> breakdownMap, HoursLog it) {

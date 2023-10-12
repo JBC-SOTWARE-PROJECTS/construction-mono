@@ -131,8 +131,8 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
         payrollEmployeeLoanRepository.findById(id).ifPresent { employee = it }
         if (!employee) return new GraphQLResVal<PayrollEmployeeLoan>(null, false, "Failed to update employee loan status. Please try again later!")
         else {
-
-            def a
+            employee.status = status
+            payrollEmployeeLoanRepository.save(employee)
         }
         return new GraphQLResVal<PayrollEmployeeLoan>(employee, true, "Successfully updated employee loan status!")
     }
@@ -142,61 +142,73 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
 
     @Override
     List<PayrollEmployeeLoan> addEmployees(List<PayrollEmployee> payrollEmployees, Payroll payroll) {
-        CompanySettings company = SecurityUtils.currentCompany()
         PayrollLoan loan = payroll.loan
         List<PayrollEmployeeLoan> employeeList = []
-        List<PayrollLoanItem> payrollLoanItems = []
         if (payrollEmployees.size() > 0) {
-            List<LoanItemsDto> loanItems = generateLoanItems(payrollEmployees)
-
-
-            payrollEmployees.each { PayrollEmployee payrollEmployee ->
-
-                PayrollEmployeeLoan employee = new PayrollEmployeeLoan()
-                employee.status = PayrollEmployeeStatus.DRAFT
-                employee.payrollEmployee = payrollEmployee
-                employee.payrollLoan = loan
-                employee.company = company
-                employee = payrollEmployeeLoanRepository.save(employee)
-
-                List<LoanItemsDto> foundLoanItems = []
-                loanItems = loanItems.findAll { item ->
-                    if (item.employee == payrollEmployee.employee.id) {
-                        foundLoanItems << item
-                        return false
-                    } else {
-                        return true
-                    }
-                }
-                foundLoanItems.each {
-                    PayrollLoanItem payrollLoanItem = new PayrollLoanItem()
-                    payrollLoanItem.employeeLoan = employee
-                    payrollLoanItem.category = it.category
-                    switch (it.category) {
-                        case EmployeeLoanCategory.CASH_ADVANCE:
-                            payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.cashAdvanceAmount
-                            break;
-                        case EmployeeLoanCategory.EQUIPMENT_LOAN:
-                            payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.equipmentLoanAmount
-                            break;
-                    }
-
-                    payrollLoanItem.status = true
-                    payrollLoanItem.company = company
-                    payrollLoanItems.push(payrollLoanItem)
-                }
-                employeeList.push(employee)
-            }
+            employeeList = generateLoanItems(payrollEmployees, loan)
         }
-        loan.employees = employeeList
-        payrollLoanItemRepository.saveAll(payrollLoanItems)
         payroll.loan = loan
         return employeeList
     }
 
+    private List<PayrollEmployeeLoan> generateLoanItems(List<PayrollEmployee> payrollEmployees, PayrollLoan loan) {
+        List<PayrollEmployeeLoan> employeeList = []
+        List<PayrollLoanItem> payrollLoanItems = []
+
+        CompanySettings company = SecurityUtils.currentCompany()
+        List<LoanItemsDto> loanItems = getLoanItems(payrollEmployees)
+
+        payrollEmployees.each { PayrollEmployee payrollEmployee ->
+
+            PayrollEmployeeLoan employee = new PayrollEmployeeLoan()
+            if (payrollEmployee.payrollEmployeeLoan) {
+                employee = payrollEmployee.payrollEmployeeLoan
+                employee.loanItems.clear()
+            }
+
+            employee.status = PayrollEmployeeStatus.DRAFT
+            employee.payrollEmployee = payrollEmployee
+            employee.payrollLoan = loan
+            employee.company = company
+            employee = payrollEmployeeLoanRepository.save(employee)
+
+            List<LoanItemsDto> foundLoanItems = []
+            loanItems = loanItems.findAll { item ->
+                if (item.employee == payrollEmployee.employee.id) {
+                    foundLoanItems << item
+                    return false
+                } else {
+                    return true
+                }
+            }
+            foundLoanItems.each {
+                PayrollLoanItem payrollLoanItem = new PayrollLoanItem()
+                payrollLoanItem.employeeLoan = employee
+                payrollLoanItem.category = it.category
+                switch (it.category) {
+                    case EmployeeLoanCategory.CASH_ADVANCE:
+                        payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.cashAdvanceAmount
+                        break;
+                    case EmployeeLoanCategory.EQUIPMENT_LOAN:
+                        payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.equipmentLoanAmount
+                        break;
+                }
+
+                payrollLoanItem.status = true
+                payrollLoanItem.company = company
+                payrollLoanItems.push(payrollLoanItem)
+            }
+            employeeList.push(employee)
+        }
+        loan.employees = employeeList
+        payrollLoanItemRepository.saveAll(payrollLoanItems)
+        employeeList
+    }
+
     @Override
     void recalculateAllEmployee(Payroll payroll) {
-        payroll.loan.employees
+        generateLoanItems(payroll.payrollEmployees, payroll.loan)
+
     }
 
     @Override
@@ -206,7 +218,6 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
 
     @Override
     void removeEmployee(PayrollEmployee payrollEmployee, Payroll payrollModule) {
-
     }
 
 
@@ -217,14 +228,14 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
 
     @Override
     PayrollEmployeeLoan recalculateEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
-        PayrollEmployeeLoan employee = payrollEmployee.payrollEmployeeLoan
+        generateLoanItems([payrollEmployee], payroll.loan)
         return null
     }
 
 
 //============================================================UTILITY METHODS====================================================================
 
-    List<LoanItemsDto> generateLoanItems(List<PayrollEmployee> payrollEmployeeList) {
+    List<LoanItemsDto> getLoanItems(List<PayrollEmployee> payrollEmployeeList) {
         List<UUID> ids = []
         payrollEmployeeList.each {
             ids.push(it.employee.id)
