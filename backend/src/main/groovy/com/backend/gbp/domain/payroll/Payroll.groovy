@@ -61,6 +61,9 @@ class Payroll extends  PayrollAuditingEntity implements Serializable {
     @OneToOne(mappedBy = "payroll")
     Timekeeping timekeeping
 
+    @OneToOne(mappedBy = "payroll")
+    PayrollLoan loan
+
 //
 //
 //    @OneToOne(mappedBy = "payroll")

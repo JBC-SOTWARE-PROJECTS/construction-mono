@@ -85,7 +85,7 @@ class EmployeeLoanService {
     }
 
     @GraphQLQuery(name = "useGetLoanBalance")
-    BigDecimal useGetLoanBalance(
+    BigDecimal getLoanBalance(
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "category") EmployeeLoanCategory category
 
