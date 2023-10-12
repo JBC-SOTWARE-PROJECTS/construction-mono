@@ -9,6 +9,7 @@ import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollEmployeeSta
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.payroll.PayrollEmployeeLoanDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeLoanRepository
 import com.backend.gbp.repository.payroll.PayrollLoanItemRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
@@ -16,8 +17,11 @@ import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
+import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.jdbc.core.BeanPropertyRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
@@ -63,6 +67,79 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
     }
 
 
+    //=================================QUERY=================================\\
+
+    @GraphQLQuery(name = "getPayrollEmployeeLoan", description = "Gets the loan employees by payroll id")
+    Page<PayrollEmployeeLoanDto> getPayrollEmployeeLoan(
+            @GraphQLArgument(name = "payroll") UUID id,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+    ) {
+        Payroll payroll = payrollRepository.getOne(id)
+        return payrollEmployeeLoanRepository.getEmployeesPageable(
+                id,
+                filter,
+                status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
+//                SecurityUtils.currentCompanyId(),
+                PageRequest.of(page, size))
+    }
+
+
+    @GraphQLQuery(name = "testGetPayrollEmployeeLoan", description = "Gets the loan employees by payroll id")
+    List<PayrollEmployeeLoanDto> testGetPayrollEmployeeLoan(
+            @GraphQLArgument(name = "payroll") UUID id,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+    ) {
+        Payroll payroll = payrollRepository.getOne(id)
+        return payrollEmployeeLoanRepository.test(
+                id,
+                filter,
+                status.size() > 0 ? status : PayrollEmployeeStatus.values().toList())
+    }
+
+    //=================================MUTATIONS=================================\\
+
+
+    @GraphQLMutation(name = "updatePayrollLoanItemAmount")
+    GraphQLResVal<PayrollLoanItem> updatePayrollLoanItemAmount(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "amount") BigDecimal amount
+    ) {
+        PayrollLoanItem loanItem = payrollLoanItemRepository.findById(id).get()
+        if (!loanItem) return new GraphQLResVal<PayrollLoanItem>(null, false, "Failed to update employee loan status. Please try again later!")
+        else {
+            loanItem.amount = amount
+            payrollLoanItemRepository.save(loanItem)
+            return new GraphQLResVal<PayrollLoanItem>(loanItem, true, "Successfully updated employee loan status!")
+
+        }
+    }
+
+
+    @Override
+    @GraphQLMutation(name = "updatePayrollEmployeeLoanStatus")
+    GraphQLResVal<PayrollEmployeeLoan> updateEmployeeStatus(
+            @GraphQLArgument(name = "id", description = "ID of the module employee.") UUID id,
+            @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status
+    ) {
+        PayrollEmployeeLoan employee = null
+        payrollEmployeeLoanRepository.findById(id).ifPresent { employee = it }
+        if (!employee) return new GraphQLResVal<PayrollEmployeeLoan>(null, false, "Failed to update employee loan status. Please try again later!")
+        else {
+
+            def a
+        }
+        return new GraphQLResVal<PayrollEmployeeLoan>(employee, true, "Successfully updated employee loan status!")
+    }
+
+
+    //=========================== Interface Methods ============================
+
     @Override
     List<PayrollEmployeeLoan> addEmployees(List<PayrollEmployee> payrollEmployees, Payroll payroll) {
         CompanySettings company = SecurityUtils.currentCompany()
@@ -95,7 +172,15 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
                     PayrollLoanItem payrollLoanItem = new PayrollLoanItem()
                     payrollLoanItem.employeeLoan = employee
                     payrollLoanItem.category = it.category
-                    payrollLoanItem.amount = it.amount
+                    switch (it.category) {
+                        case EmployeeLoanCategory.CASH_ADVANCE:
+                            payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.cashAdvanceAmount
+                            break;
+                        case EmployeeLoanCategory.EQUIPMENT_LOAN:
+                            payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.equipmentLoanAmount
+                            break;
+                    }
+
                     payrollLoanItem.status = true
                     payrollLoanItem.company = company
                     payrollLoanItems.push(payrollLoanItem)
@@ -161,44 +246,6 @@ GROUP by l.employee, l.category;
     }
 
 
-//=================================QUERY=================================\\
-
-//    @GraphQLQuery(name = "getTimekeepingEmployees", description = "Gets the loan employees by payroll id")
-//    List<TimekeepingEmployeeDto> getTimekeepingEmployees(@GraphQLArgument(name = "id") UUID id) {
-//        Payroll payroll = payrollRepository.getOne(id)
-//        return payrollEmployeeLoanRepository.findByTimekeeping(payroll)
-//    }
-//
-//    @GraphQLQuery(name = "getTimekeepingEmployeesV2", description = "Gets all the ids of the employees of the loan")
-//    List<PayrollEmployeeLoan> getTimekeepingEmployeesV2(@GraphQLArgument(name = "id") UUID id) {
-//        return payrollEmployeeLoanRepository.findByTimekeepingId(id)
-//    }
-//
-//    @GraphQLQuery(name = "getTimekeepingEmployeeLogs", description = "Gets all the ids of the employees of the loan")
-//    List<AccumulatedLogs> getTimekeepingEmployeeLogs(@GraphQLArgument(name = "id") UUID id) {
-//        return accumulatedLogRepository.findByTimekeepingEmployee(id)?.sort({ it.date })
-//    }
-//
-//    List<PayrollEmployeeLoan> getByIds(@GraphQLArgument(name="getByIds") UUID id) {
-//        return payrollEmployeeLoanRepository.findByTimekeepingId(id)
-//    }
-
-    //=================================MUTATIONS=================================\\
-    @Override
-    @GraphQLMutation(name = "updatePayrollEmployeeLoanStatus")
-    GraphQLResVal<PayrollEmployeeLoan> updateEmployeeStatus(
-            @GraphQLArgument(name = "id", description = "ID of the module employee.") UUID id,
-            @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status
-    ) {
-        PayrollEmployeeLoan employee = null
-        payrollEmployeeLoanRepository.findById(id).ifPresent { employee = it }
-        if (!employee) return new GraphQLResVal<PayrollEmployeeLoan>(null, false, "Failed to update employee loan status. Please try again later!")
-        else {
-
-            def a
-        }
-        return new GraphQLResVal<PayrollEmployeeLoan>(employee, true, "Successfully updated employee loan status!")
-    }
 }
 
 

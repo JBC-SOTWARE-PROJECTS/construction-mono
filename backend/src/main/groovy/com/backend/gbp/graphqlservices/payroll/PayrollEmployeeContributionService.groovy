@@ -94,7 +94,6 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "department") UUID department,
             @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
     ) {
         if (payroll) {
