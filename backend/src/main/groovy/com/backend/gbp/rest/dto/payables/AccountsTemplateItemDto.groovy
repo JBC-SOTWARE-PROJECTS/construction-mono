@@ -1,4 +1,4 @@
-package com.hisd3.hismk2.rest.dto
+package com.backend.gbp.rest.dto.payables
 
 import groovy.transform.TupleConstructor
 

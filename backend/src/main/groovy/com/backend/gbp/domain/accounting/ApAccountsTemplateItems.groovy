@@ -1,7 +1,7 @@
-package com.hisd3.hismk2.domain.accounting
+package com.backend.gbp.domain.accounting
 
-import com.hisd3.hismk2.domain.AbstractAuditingEntity
-import com.hisd3.hismk2.domain.annotations.UpperCase
+import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.annotations.UpperCase
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type

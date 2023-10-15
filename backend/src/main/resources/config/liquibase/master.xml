@@ -341,4 +341,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/29_wilson_ap_accounts_template.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/29_wilson_ap_accounts_template_items.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

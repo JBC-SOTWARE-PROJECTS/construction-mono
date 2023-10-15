@@ -1,9 +1,10 @@
-package com.hisd3.hismk2.graphqlservices.accounting
+package com.backend.gbp.graphqlservices.accounting
 
-import com.hisd3.hismk2.domain.accounting.ApAccountsTemplateItems
-import com.hisd3.hismk2.graphqlservices.base.AbstractDaoService
-import com.hisd3.hismk2.rest.dto.AccountsTemplateItemDto
-import com.hisd3.hismk2.services.GeneratorService
+import com.backend.gbp.domain.accounting.ApAccountsTemplateItems
+import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.rest.dto.payables.AccountsTemplateItemDto
+import com.backend.gbp.services.GeneratorService
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -21,6 +22,9 @@ class ApAccountsTemplateItemServices extends AbstractDaoService<ApAccountsTempla
 
 	@Autowired
 	ApAccountsTemplateServices accountsTemplateServices
+
+	@Autowired
+	ObjectMapper objectMapper
 
     ApAccountsTemplateItemServices() {
 		super(ApAccountsTemplateItems.class)
