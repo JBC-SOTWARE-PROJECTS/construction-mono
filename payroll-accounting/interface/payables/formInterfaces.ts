@@ -1,4 +1,8 @@
-import { AccountsPayable, AccountsPayableDetails } from "@/graphql/gql/graphql";
+import {
+  AccountsPayable,
+  AccountsPayableDetails,
+  ApAccountsTemplateItems,
+} from "@/graphql/gql/graphql";
 import { Dayjs } from "dayjs";
 import { OptionsValue } from "@/utility/interfaces";
 
@@ -92,5 +96,9 @@ export interface IDisbursementApplication {
 
 export interface ExtendedAPTransactionDto extends AccountsPayableDetails {
   vatRate?: number | undefined | null;
+  isNew?: boolean;
+}
+
+export interface AccountsTemplateItemDto extends ApAccountsTemplateItems {
   isNew?: boolean;
 }

@@ -1,6 +1,6 @@
 import { ApAccountsTemplate } from "@/graphql/gql/graphql";
-import { FolderOpenOutlined } from "@ant-design/icons";
-import { Row, Col, Table, Pagination, Button, Tag } from "antd";
+import { EditOutlined, FolderOpenOutlined } from "@ant-design/icons";
+import { Row, Col, Table, Pagination, Button, Tag, Space } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { ReactNode } from "react";
 
@@ -10,6 +10,7 @@ interface IProps {
   totalElements: number;
   currentPage: number;
   handleOpen: (record: ApAccountsTemplate) => void;
+  handleOpenCreateAccounts: (record: ApAccountsTemplate) => void;
   changePage: (page: number) => void;
   getLabel: (e: string) => ReactNode;
 }
@@ -20,6 +21,7 @@ export default function AccountsTemplateTable({
   totalElements = 1,
   currentPage = 0,
   handleOpen,
+  handleOpenCreateAccounts,
   changePage,
   getLabel,
 }: IProps) {
@@ -34,12 +36,18 @@ export default function AccountsTemplateTable({
       title: "Supplier Types",
       dataIndex: "supplierType.supplierTypeDesc",
       key: "supplierType.supplierTypeDesc",
-      render: (text, record) => (
-        <span
-          key={
-            text
-          }>{`[${record.supplierType?.supplierTypeCode}] ${record.supplierType?.supplierTypeDesc}`}</span>
-      ),
+      render: (text, record) => {
+        if (record?.supplierType) {
+          return (
+            <span
+              key={
+                text
+              }>{`[${record.supplierType?.supplierTypeCode}] ${record.supplierType?.supplierTypeDesc}`}</span>
+          );
+        } else {
+          return "--";
+        }
+      },
     },
     {
       title: "Category",
@@ -63,16 +71,24 @@ export default function AccountsTemplateTable({
     {
       title: "#",
       key: "action",
-      width: 50,
+      width: 220,
       fixed: "right",
-      render: (text, record) => (
-        <Button
-          key={text}
-          type="dashed"
-          size="small"
-          onClick={() => handleOpen(record)}
-          icon={<FolderOpenOutlined />}
-        />
+      render: (_, record) => (
+        <Space>
+          <Button
+            type="dashed"
+            size="small"
+            onClick={() => handleOpen(record)}
+            icon={<EditOutlined />}
+          />
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => handleOpenCreateAccounts(record)}
+            icon={<FolderOpenOutlined />}>
+            Configure Accounts
+          </Button>
+        </Space>
       ),
     },
   ];

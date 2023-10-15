@@ -280,6 +280,19 @@ export type ApAccountsTemplate = {
   supplierType?: Maybe<SupplierType>;
 };
 
+export type ApAccountsTemplateItems = {
+  __typename?: 'ApAccountsTemplateItems';
+  accountType?: Maybe<Scalars['String']['output']>;
+  apAccountsTemplate?: Maybe<ApAccountsTemplate>;
+  code?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  desc?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+};
+
 export type ApAgingDetailedDto = {
   __typename?: 'ApAgingDetailedDto';
   ap_category?: Maybe<Scalars['String']['output']>;
@@ -2037,6 +2050,7 @@ export type Mutation = {
   /** A mutation to recalculate payroll module employee . */
   recalculatePayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
   remove2307?: Maybe<Wtx2307>;
+  removeAccountTemplateItem?: Maybe<ApAccountsTemplateItems>;
   removeApDetails?: Maybe<AccountsPayableDetails>;
   removeApLedger?: Maybe<ApLedger>;
   /** Remove */
@@ -2097,6 +2111,7 @@ export type Mutation = {
   updateTimekeepingEmployeeStatus?: Maybe<GraphQlResVal_TimekeepingEmployee>;
   updateTimekeepingStatus?: Maybe<GraphQlResVal_String>;
   upsert2307?: Maybe<Wtx2307>;
+  upsertAccountTemplateItem?: Maybe<ApAccountsTemplateItems>;
   upsertAddress?: Maybe<GraphQlRetVal_Boolean>;
   /** add allowance package */
   upsertAllAllowancePackage?: Maybe<GraphQlRetVal_AllowancePackage>;
@@ -2627,6 +2642,12 @@ export type MutationRemove2307Args = {
 
 
 /** Mutation root */
+export type MutationRemoveAccountTemplateItemArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationRemoveApDetailsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -2998,6 +3019,13 @@ export type MutationUpsert2307Args = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertAccountTemplateItemArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -5252,6 +5280,8 @@ export type Query = {
   ItemExpense?: Maybe<Array<Maybe<StockIssueItems>>>;
   /** Get User by login */
   account?: Maybe<Employee>;
+  /** Find Ap Accounts Template Items By Parent */
+  accountsItemsByParent?: Maybe<Array<Maybe<ApAccountsTemplateItems>>>;
   /** Get All Offices Active */
   activeOffices?: Maybe<Array<Maybe<Office>>>;
   /** Search Positions Active */
@@ -5266,6 +5296,7 @@ export type Query = {
   apAccountsTemplateById?: Maybe<ApAccountsTemplate>;
   /** Find Ap Accounts Template By Type */
   apAccountsTemplateByType?: Maybe<Array<Maybe<ApAccountsTemplate>>>;
+  apAccountsTemplateItemById?: Maybe<ApAccountsTemplateItems>;
   /** Accounts Template List */
   apAccountsTemplateList?: Maybe<Array<Maybe<ApAccountsTemplate>>>;
   /** Find Ap Accounts Template Others */
@@ -5769,6 +5800,12 @@ export type QueryItemExpenseArgs = {
 
 
 /** Query root */
+export type QueryAccountsItemsByParentArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryAllItemBySupplierArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -5798,6 +5835,12 @@ export type QueryApAccountsTemplateByIdArgs = {
 export type QueryApAccountsTemplateByTypeArgs = {
   category?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryApAccountsTemplateItemByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
