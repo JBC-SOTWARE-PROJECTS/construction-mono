@@ -55,6 +55,7 @@ export default function ChartOfAccountTabPane(props: ChartOfAccountTabPaneI) {
         columns={columns}
         size='small'
         loading={props?.loading}
+        pagination={false}
       />
     </Space>
   )

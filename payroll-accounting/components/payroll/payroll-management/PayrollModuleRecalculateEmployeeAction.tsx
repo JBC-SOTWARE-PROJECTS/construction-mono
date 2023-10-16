@@ -31,8 +31,9 @@ interface IProps {
   tooltipProps?: TooltipProps;
   refetch: () => void;
   allowedPermissions?: string[];
-  module: PayrollModule.Contribution;
+  module: PayrollModule;
   id: Maybe<string> | undefined;
+  children?: any;
 }
 
 function PayrollModuleRecalculateEmployeeAction({
@@ -85,7 +86,7 @@ function PayrollModuleRecalculateEmployeeAction({
           loading={loading}
           onClick={recalculatePayrollEmployee}
         >
-          {/* {props?.children} */}
+          {props?.children}
         </Button>
       </Tooltip>
     </AccessControl>

@@ -36,7 +36,13 @@ interface IProps {
   module: string;
   id: string;
 }
-function PayrollEmployeeStatusAction({ refetch, value, module, id }: any) {
+function PayrollEmployeeStatusAction({
+  refetch,
+  value,
+  module,
+  id,
+  ...props
+}: any) {
   const upsertCallback = (result: any) => {
     let { data } = result || {};
     if (data?.success) {
@@ -89,23 +95,22 @@ function PayrollEmployeeStatusAction({ refetch, value, module, id }: any) {
       {value === "FINALIZED" && (
         <Tooltip title="Draft">
           <Button
-            shape="circle"
             icon={<EditOutlined />}
-            type="primary"
-            ghost
+            type="default"
             loading={loading}
             style={{ marginLeft: 5 }}
             onClick={() =>
               updatePayrollModuleEmployeeStatus(id, PayrollEmployeeStatus.Draft)
             }
-          />
+          >
+            {props?.children}
+          </Button>
         </Tooltip>
       )}
 
       {value === "DRAFT" && (
         <Tooltip title="Finalize">
           <Button
-            shape="circle"
             icon={<CheckOutlined />}
             type="primary"
             ghost
@@ -117,7 +122,9 @@ function PayrollEmployeeStatusAction({ refetch, value, module, id }: any) {
                 PayrollEmployeeStatus.Finalized
               )
             }
-          />
+          >
+            {props?.children}
+          </Button>
         </Tooltip>
       )}
     </>

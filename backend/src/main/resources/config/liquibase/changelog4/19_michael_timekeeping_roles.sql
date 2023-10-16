@@ -1,0 +1,6 @@
+INSERT INTO t_authority (name)
+SELECT 'PAYROLL_TIMEKEEPING_USER'
+WHERE NOT EXISTS(
+    SELECT 1 FROM public.t_authority WHERE name = 'PAYROLL_TIMEKEEPING_USER'
+  );
+

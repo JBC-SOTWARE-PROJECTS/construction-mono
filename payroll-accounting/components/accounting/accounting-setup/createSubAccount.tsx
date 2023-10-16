@@ -116,6 +116,14 @@ export default function CreateSubAccount(props: CreateSubAccountI) {
       subType == 'default' ? DomainEnum.NO_DOMAIN : fields.sourceDomain
     ) as any
 
+    if (!fields.domainExcludes) fields.domainExcludes = []
+    else
+      fields.domainExcludes = fields.domainExcludes.map((de) => ({
+        value: de?.value,
+        label: de?.label,
+        key: de?.value,
+      }))
+
     updateInsert({
       variables: {
         id: record?.id,

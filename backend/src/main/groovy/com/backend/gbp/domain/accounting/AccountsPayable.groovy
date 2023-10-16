@@ -2,6 +2,7 @@ package com.backend.gbp.domain.accounting
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.inventory.ItemCategory
 import com.backend.gbp.domain.inventory.PaymentTerm
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.domain.inventory.Supplier
@@ -202,7 +203,7 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	//accounting integrate
 	@Override
 	String getDomain() {
-		return AccountsPayable.class.name
+		return IntegrationDomainEnum.ACCOUNTS_PAYABLE.name()
 	}
 
 	@Transient
@@ -242,7 +243,7 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	@Transient
 	BigDecimal ewt30Percent = BigDecimal.ZERO
 
-
-
+	@Transient
+	ItemCategory itemCategory
 }
 

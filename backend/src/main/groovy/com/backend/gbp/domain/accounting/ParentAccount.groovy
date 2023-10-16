@@ -114,7 +114,6 @@ class ParentAccount extends AbstractAuditingEntity implements Serializable {
 	Boolean isContra
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company_id", referencedColumnName = "id")
 	CompanySettings company

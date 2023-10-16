@@ -13,7 +13,12 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  mutation UpdateItem($id: UUID, $fields: Map_String_ObjectScalar) {\n    upsertFiscal(id: $id, fields: $fields) {\n      id\n    }\n  }\n": types.UpdateItemDocument,
+    "\n  mutation DeleteIntegration($integrationId: UUID) {\n    deleteIntegration(integrationId: $integrationId)\n  }\n": types.DeleteIntegrationDocument,
+    "\n  mutation DeleteIntegrationItem(\n    $integrationId: UUID\n    $integrationItemId: UUID\n  ) {\n    deleteIntegrationItem(\n      integrationId: $integrationId\n      integrationItemId: $integrationItemId\n    )\n  }\n": types.DeleteIntegrationItemDocument,
+    "\n  mutation AddSubAccount($id: UUID, $accountId: UUID) {\n    addSubAccountToIntegration(id: $id, accountId: $accountId)\n  }\n": types.AddSubAccountDocument,
+    "\n  mutation UpdateIntegrationItem(\n    $fields: Map_String_ObjectScalar\n    $integrationId: UUID\n    $integrationItemId: UUID\n  ) {\n    updateIntegrationItem(\n      fields: $fields\n      integrationId: $integrationId\n      integrationItemId: $integrationItemId\n    )\n  }\n": types.UpdateIntegrationItemDocument,
+    "\n  mutation TransferIntegration($id: UUID, $fields: Map_String_ObjectScalar) {\n    transferIntegration(id: $id, fields: $fields)\n  }\n": types.TransferIntegrationDocument,
+    "\n  mutation UpdateItem($fields: Map_String_ObjectScalar, $id: UUID) {\n    upsertIntegration(fields: $fields, id: $id)\n  }\n": types.UpdateItemDocument,
     "\n  mutation ChangePassword($username: String) {\n    newPassword: changePassword(username: $username)\n  }\n": types.ChangePasswordDocument,
 };
 
@@ -34,7 +39,27 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation UpdateItem($id: UUID, $fields: Map_String_ObjectScalar) {\n    upsertFiscal(id: $id, fields: $fields) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateItem($id: UUID, $fields: Map_String_ObjectScalar) {\n    upsertFiscal(id: $id, fields: $fields) {\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  mutation DeleteIntegration($integrationId: UUID) {\n    deleteIntegration(integrationId: $integrationId)\n  }\n"): (typeof documents)["\n  mutation DeleteIntegration($integrationId: UUID) {\n    deleteIntegration(integrationId: $integrationId)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteIntegrationItem(\n    $integrationId: UUID\n    $integrationItemId: UUID\n  ) {\n    deleteIntegrationItem(\n      integrationId: $integrationId\n      integrationItemId: $integrationItemId\n    )\n  }\n"): (typeof documents)["\n  mutation DeleteIntegrationItem(\n    $integrationId: UUID\n    $integrationItemId: UUID\n  ) {\n    deleteIntegrationItem(\n      integrationId: $integrationId\n      integrationItemId: $integrationItemId\n    )\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation AddSubAccount($id: UUID, $accountId: UUID) {\n    addSubAccountToIntegration(id: $id, accountId: $accountId)\n  }\n"): (typeof documents)["\n  mutation AddSubAccount($id: UUID, $accountId: UUID) {\n    addSubAccountToIntegration(id: $id, accountId: $accountId)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateIntegrationItem(\n    $fields: Map_String_ObjectScalar\n    $integrationId: UUID\n    $integrationItemId: UUID\n  ) {\n    updateIntegrationItem(\n      fields: $fields\n      integrationId: $integrationId\n      integrationItemId: $integrationItemId\n    )\n  }\n"): (typeof documents)["\n  mutation UpdateIntegrationItem(\n    $fields: Map_String_ObjectScalar\n    $integrationId: UUID\n    $integrationItemId: UUID\n  ) {\n    updateIntegrationItem(\n      fields: $fields\n      integrationId: $integrationId\n      integrationItemId: $integrationItemId\n    )\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation TransferIntegration($id: UUID, $fields: Map_String_ObjectScalar) {\n    transferIntegration(id: $id, fields: $fields)\n  }\n"): (typeof documents)["\n  mutation TransferIntegration($id: UUID, $fields: Map_String_ObjectScalar) {\n    transferIntegration(id: $id, fields: $fields)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateItem($fields: Map_String_ObjectScalar, $id: UUID) {\n    upsertIntegration(fields: $fields, id: $id)\n  }\n"): (typeof documents)["\n  mutation UpdateItem($fields: Map_String_ObjectScalar, $id: UUID) {\n    upsertIntegration(fields: $fields, id: $id)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

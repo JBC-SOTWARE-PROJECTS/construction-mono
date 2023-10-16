@@ -1,5 +1,6 @@
 package com.backend.gbp.domain.hrm.dto
 
+import java.beans.Transient
 import java.time.Instant
 
 
@@ -24,6 +25,7 @@ class HoursLog {
     BigDecimal regularSpecialHoliday = 0
     BigDecimal overtimeSpecialHoliday = 0
 
+    @Transient
     BigDecimal getTotalRegularHours() {
         regular +
                 regularHoliday +

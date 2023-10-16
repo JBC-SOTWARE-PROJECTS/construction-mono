@@ -6,12 +6,12 @@ import CircularProgress from "@/components/circularProgress";
 import AccessManager from "@/components/accessControl/AccessManager";
 import { IPageProps } from "@/utility/interfaces";
 
-const EmpProfile = dynamic(
-  () => import("@/routes/administrative/Employees/EmployeeDetails"),
-  {
-    loading: () => <CircularProgress />,
-  }
-);
+// const EmpProfile = dynamic(
+//   () => import("@/routes/administrative/Employees/EmployeeDetails"),
+//   {
+//     loading: () => <CircularProgress />,
+//   }
+// );
 
 const ViewEmployee = ({ account }: IPageProps) => {
   const router = useRouter();
@@ -24,7 +24,7 @@ const ViewEmployee = ({ account }: IPageProps) => {
       </Head>
       <AccessManager roles={["ROLE_USER", "ROLE_ADMIN"]}>
         <div className="gx-main-content-wrapper-full-width">
-          <EmpProfile account={account} id={empId} />
+          {/* <EmpProfile account={account} id={empId} /> */}
         </div>
       </AccessManager>
     </React.Fragment>

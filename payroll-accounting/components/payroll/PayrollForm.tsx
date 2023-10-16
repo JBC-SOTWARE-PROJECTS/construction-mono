@@ -104,7 +104,7 @@ function PayrollForm({ usage }: IProps) {
 
   const confirmStartPayroll = () => {
     Modal.confirm({
-      title: "Are you sure you want to logout?",
+      title: "Are you sure you start the payroll?",
       content: "Please click ok to continue",
       icon: <ExclamationCircleOutlined />,
       onOk() {

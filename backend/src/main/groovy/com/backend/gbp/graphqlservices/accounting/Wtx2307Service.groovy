@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.accounting.Wtx2307
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.SupplierService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -65,6 +66,7 @@ class Wtx2307Service extends AbstractDaoService<Wtx2307> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
+		def company = SecurityUtils.currentCompanyId()
 
 		String query = '''Select d from Wtx2307 d where
 						(lower(d.refNo) like lower(concat('%',:filter,'%')) )
@@ -97,6 +99,12 @@ class Wtx2307Service extends AbstractDaoService<Wtx2307> {
 			params.put("supplier", supplier)
 		}
 
+		if (company) {
+			query += ''' and (d.company = :company) '''
+			countQuery += ''' and (d.company = :company) '''
+			params.put("company", company)
+		}
+
 
 		query += ''' ORDER BY d.wtxDate DESC'''
 
@@ -111,8 +119,10 @@ class Wtx2307Service extends AbstractDaoService<Wtx2307> {
 			@GraphQLArgument(name = "id") UUID id,
 			@GraphQLArgument(name = "supplier") UUID supplier
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		upsertFromMap(id, fields, { Wtx2307 entity, boolean forInsert ->
 			if(forInsert){
+				entity.company = company
 				entity.wtxDate = entity.wtxDate
 				entity.supplier = supplierService.supById(supplier)
 				entity.process = false
