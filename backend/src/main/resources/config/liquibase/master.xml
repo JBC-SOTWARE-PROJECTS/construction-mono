@@ -311,6 +311,12 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/23_wtx_table.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/24_jeriah_alter_table_allowance_item.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/25_jeriah_alter_column_allowance_item.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_jeriah_alter_column.sql"
+             relativeToChangelogFile="false"/>
 
 
 </databaseChangeLog>

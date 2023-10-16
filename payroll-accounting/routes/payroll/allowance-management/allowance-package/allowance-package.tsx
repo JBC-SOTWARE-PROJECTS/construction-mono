@@ -6,8 +6,9 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Button, Input, message, Popconfirm, Table } from "antd";
+import { Button, Input, message, Popconfirm, Table, Typography } from "antd";
 
+import { useRouter } from "next/router";
 import UseDialog from "@/hooks/useDialog";
 import AllowancePackageModal from "./allowance-package-modal";
 import { useMutation, useQuery } from "@apollo/client";
@@ -26,10 +27,13 @@ interface DataSourceProps {
   status: boolean;
 }
 
+const { Text, Link } = Typography;
+
 function AllowancePackage() {
   const [, setIsModalOpen] = useState(false);
   const allowancePackageModal = UseDialog(AllowancePackageModal);
   const [selectedItem] = useState<DataSourceProps | null | string>();
+  const router = useRouter();
 
   const [state, setState] = useState({
     filter: "",
@@ -78,12 +82,29 @@ function AllowancePackage() {
     });
   };
 
+  const handleClick = (idx: string) => {
+    router?.push({
+      pathname: `/payroll/allowance-management/${idx}/allowance-item`,
+      query: { idx },
+    });
+  };
+
   const columns: ColumnsType<DataSourceProps> = [
     {
       title: "Name",
-      dataIndex: "name",
       key: "name",
       width: "150px",
+      render: (_, record) => {
+        return (
+          <Text
+            onClick={() => handleClick(record?.id)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {record?.name}
+          </Text>
+        );
+      },
     },
     {
       title: "Status",
@@ -182,5 +203,13 @@ function AllowancePackage() {
     </div>
   );
 }
+
+const handleMouseEnter = () => {
+  document.body.style.cursor = "pointer";
+};
+
+const handleMouseLeave = () => {
+  document.body.style.cursor = "auto";
+};
 
 export default AllowancePackage;

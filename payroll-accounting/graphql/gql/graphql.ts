@@ -232,6 +232,37 @@ export type AccumulatedLogsDto = {
   scheduleTitle?: Maybe<Scalars['String']['output']>;
 };
 
+export type Allowance = {
+  __typename?: 'Allowance';
+  allowanceType?: Maybe<Scalars['String']['output']>;
+  amount?: Maybe<Scalars['Float']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type AllowanceInput = {
+  allowanceType?: InputMaybe<Scalars['String']['input']>;
+  amount?: InputMaybe<Scalars['Float']['input']>;
+  createdDate?: InputMaybe<Scalars['Instant']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AllowancePackage = {
+  __typename?: 'AllowancePackage';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type ApLedger = {
   __typename?: 'ApLedger';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -1052,6 +1083,22 @@ export type GraphQlResVal_String = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlRetVal_Allowance = {
+  __typename?: 'GraphQLRetVal_Allowance';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<Allowance>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlRetVal_AllowancePackage = {
+  __typename?: 'GraphQLRetVal_AllowancePackage';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<AllowancePackage>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlRetVal_Boolean = {
   __typename?: 'GraphQLRetVal_Boolean';
   message?: Maybe<Scalars['String']['output']>;
@@ -1629,6 +1676,12 @@ export type Mutation = {
   closeShift?: Maybe<Shift>;
   createBillingProject?: Maybe<Billing>;
   delPOMonitoring?: Maybe<PoDeliveryMonitoring>;
+  /** Delete deleteAllowance */
+  deleteAllowance?: Maybe<GraphQlRetVal_String>;
+  /** Delete delete Allowance Item */
+  deleteAllowanceItem?: Maybe<GraphQlRetVal_String>;
+  /** Delete delete Allowance Package */
+  deleteAllowancePackage?: Maybe<GraphQlRetVal_String>;
   deleteBillingItem?: Maybe<BillingItem>;
   /** Delete one department schedule config. */
   deleteDepartmentSchedule?: Maybe<GraphQlRetVal_String>;
@@ -1715,6 +1768,12 @@ export type Mutation = {
   updateStiItemStatus?: Maybe<StockIssueItems>;
   upsert2307?: Maybe<Wtx2307>;
   upsertAddress?: Maybe<GraphQlRetVal_Boolean>;
+  /** add allowance item */
+  upsertAllAllowanceItem?: Maybe<GraphQlRetVal_String>;
+  /** add allowance package */
+  upsertAllAllowancePackage?: Maybe<GraphQlRetVal_AllowancePackage>;
+  /**  Add allowance type  */
+  upsertAllowanceType?: Maybe<GraphQlRetVal_Allowance>;
   upsertApLedger?: Maybe<ApLedger>;
   upsertApTransaction?: Maybe<ApTransaction>;
   upsertAsset?: Maybe<Assets>;
@@ -1948,6 +2007,24 @@ export type MutationCreateBillingProjectArgs = {
 
 /** Mutation root */
 export type MutationDelPoMonitoringArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteAllowanceArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteAllowanceItemArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteAllowancePackageArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -2477,6 +2554,27 @@ export type MutationUpsertAddressArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertAllAllowanceItemArgs = {
+  allowanceList?: InputMaybe<Array<InputMaybe<AllowanceInput>>>;
+  allowancePackage?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertAllAllowancePackageArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertAllowanceTypeArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -3263,6 +3361,44 @@ export type PoMonitoringDtoInput = {
 export type Page_AccountsPayable = {
   __typename?: 'Page_AccountsPayable';
   content?: Maybe<Array<Maybe<AccountsPayable>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_Allowance = {
+  __typename?: 'Page_Allowance';
+  content?: Maybe<Array<Maybe<Allowance>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_AllowancePackage = {
+  __typename?: 'Page_AllowancePackage';
+  content?: Maybe<Array<Maybe<AllowancePackage>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -4653,6 +4789,14 @@ export type Query = {
   /** Transaction List */
   exTransList?: Maybe<Array<Maybe<ExpenseTransaction>>>;
   expenseTypeById?: Maybe<ExpenseTransaction>;
+  /** get all fetch allowance */
+  fetchAllAllowance?: Maybe<Array<Maybe<Allowance>>>;
+  /** get all fetch allowance package */
+  fetchAllAllowancePackage?: Maybe<Array<Maybe<AllowancePackage>>>;
+  /** fetch all allowance package */
+  fetchAllowancePackagePageable?: Maybe<Page_AllowancePackage>;
+  /** get all allowance */
+  fetchAllowancePageable?: Maybe<Page_Allowance>;
   /** List of filtered quantity adjustment type */
   filterAdjustmentType?: Maybe<Array<Maybe<QuantityAdjustmentType>>>;
   findAllAssets?: Maybe<Array<Maybe<Assets>>>;
@@ -4695,7 +4839,6 @@ export type Query = {
   getEmployeeScheduleDetails?: Maybe<EmployeeScheduleDetailsDto>;
   /** Filter Event Calendar between two dates. */
   getEventsBetweenTwoDates?: Maybe<Array<Maybe<EventCalendar>>>;
-  getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
@@ -5378,6 +5521,22 @@ export type QueryExpenseTypeByIdArgs = {
 
 
 /** Query root */
+export type QueryFetchAllowancePackagePageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryFetchAllowancePageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryFilterAdjustmentTypeArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   is_active?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5453,9 +5612,10 @@ export type QueryGetAllAmountsArgs = {
 
 /** Query root */
 export type QueryGetAllChartOfAccountGenerateArgs = {
+  accountCategory?: InputMaybe<Scalars['String']['input']>;
+  accountName?: InputMaybe<Scalars['String']['input']>;
   accountType?: InputMaybe<Scalars['String']['input']>;
   department?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
   excludeMotherAccount?: InputMaybe<Scalars['Boolean']['input']>;
   motherAccountCode?: InputMaybe<Scalars['String']['input']>;
   subaccountType?: InputMaybe<Scalars['String']['input']>;
@@ -5490,7 +5650,6 @@ export type QueryGetBillingItemFilterActiveArgs = {
 
 
 /** Query root */
-export type QueryGetCoaByIdArgs = {
 export type QueryGetCoaByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
