@@ -189,23 +189,23 @@ function AllowanceItem() {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Typography.Link
+            <Button
+              type="primary"
               onClick={() => save(record.id)}
               style={{ marginRight: 8 }}
             >
               Save
-            </Typography.Link>
+            </Button>
             <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
+              <Button type="primary" danger>
+                Cancel
+              </Button>
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link
-            // disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
+          <Button type="primary" onClick={() => edit(record)}>
             Edit
-          </Typography.Link>
+          </Button>
         );
       },
     },

@@ -40,8 +40,6 @@ interface DataType {
 function AllowanceItemModal(props: propsTypes) {
   const { hide, idx, refetch, data: allowanceData } = props;
 
-  console.log("data item", allowanceData);
-
   const [state, setState] = useState({
     filter: "",
     page: 0,
