@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
 
 enum GeneratorType {
+	HEADER_GROUP_NO,
+
 	EMPLOYEE_NO,
 	PATIENT_NO,
 	CASE_NO,

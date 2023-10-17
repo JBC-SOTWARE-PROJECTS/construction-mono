@@ -24,6 +24,7 @@ import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
+import org.apache.http.message.HeaderGroup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.jdbc.core.JdbcTemplate
@@ -70,6 +71,9 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 
     @Autowired
     LedgerServices ledgerServices
+
+    @Autowired
+    HeaderGroupServices headerGroupServices
 
 	AccountsPayableServices() {
 		super(AccountsPayable.class)
@@ -635,6 +639,15 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         }
         //ewt rate
 
+        HeaderLedgerGroup group = new HeaderLedgerGroup()
+        group.company = SecurityUtils.currentCompany()
+        group.recordNo = generatorService.getNextValue(GeneratorType.HEADER_GROUP_NO, {
+            return  StringUtils.leftPad(it.toString(), 6, "0")
+        })
+        group.entity_name = actPay.supplier.supplierFullname
+        group.particulars = 'PAYABLE'
+        def newGroup = headerGroupServices.save(group)
+
         def headerLedger = integrationServices.generateAutoEntries(accountsPayable) { it, mul ->
             it.flagValue = actPay.transType?.flagValue
             //initialize
@@ -678,11 +691,11 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
         details["ACC_PAYABLE_ID"] = actPay.id.toString()
         details["SUPPLIER_ID"] = actPay.supplier.id.toString()
 
-//        headerLedger.transactionNo = ''
-//        headerLedger.transactionType = ''
+        headerLedger.transactionNo = actPay.apNo
+        headerLedger.transactionType = 'PAYABLE'
 //        headerLedger.referenceType = ''
 //        headerLedger.referenceNo = ''
-//        headerLedger.headerLedgerGroup = ''
+        headerLedger.headerLedgerGroup = newGroup.id
 
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",

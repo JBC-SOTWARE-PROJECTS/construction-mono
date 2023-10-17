@@ -91,6 +91,7 @@ class TransactionJournalDto{
 
 @Canonical
 class HeaderLedgerGroupDto{
+    String id
     String referenceNo
     String entityName
     String journalType
@@ -238,6 +239,8 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
                 .setParameter('approvedDatetime',Instant.now())
                 .executeUpdate();
     }
+
+
 
     void updateLedgerApproval(UUID headerId, String transactionDate, String login){
         entityManager.createNativeQuery("""
@@ -963,21 +966,22 @@ from HeaderLedger hl where
 
         String queryString = """ 
                 select 
-                hl.invoice_soa_reference as "referenceNo",
-                upper(hl.entity_name) as "entityName",
+                cast(hlg.id as text) as "id",
+                hlg.record_no as "referenceNo",
+                hlg.entity_name as "entityName",
                 hl.journal_type as "journalType",
-                'none' as "otherDetail",
                 cast(COUNT(CASE WHEN (hl.approved_by is null or hl.approved_by = '') THEN 1 ELSE NULL END) as varchar) AS "notApproved",
                 cast(COUNT(CASE WHEN (hl.approved_by is not null or hl.approved_by != '') THEN 1 ELSE NULL END) as varchar) AS "approved"
                 from accounting.header_ledger hl 
+                left join accounting.header_ledger_group hlg on hlg.id = hl.header_ledger_group_id
                 where 
                 hl.transaction_date_only >= :startDate
                 and
                 hl.transaction_date_only <= :endDate
                 and (case when :journalType = 'ALL' then true else hl.journal_type  = :journalType end)
                 and (hl.reversal is null or hl.reversal = false)
-                and (hl.entity_name like concat('%',:filter,'%') or hl.invoice_soa_reference like concat('%',:filter,'%'))
-                GROUP BY hl.invoice_soa_reference ,upper(hl.entity_name), journal_type
+                and (hlg.entity_name like concat('%',:filter,'%') or hlg.record_no like concat('%',:filter,'%'))
+                GROUP by hlg.record_no, hlg.entity_name, journal_type,hlg.id
         """
 
         if(!showAll)
@@ -1028,21 +1032,21 @@ from HeaderLedger hl where
                 coalesce(count(*),0)
                 from (
                 select 
-                    hl.invoice_soa_reference as "referenceNo",
-                    upper(hl.entity_name) as "entityName",
+                    hlg.record_no as "referenceNo",
+                    hlg.entity_name as "entityName",
                     hl.journal_type as "journalType",
-                    'none' as "otherDetail",
                     cast(COUNT(CASE WHEN (hl.approved_by is null or hl.approved_by = '') THEN 1 ELSE NULL END) as varchar) AS "notApproved",
                     cast(COUNT(CASE WHEN (hl.approved_by is not null or hl.approved_by != '') THEN 1 ELSE NULL END) as varchar) AS "approved"
                     from accounting.header_ledger hl 
+                    left join accounting.header_ledger_group hlg on hlg.id = hl.header_ledger_group_id
                     where 
                     hl.transaction_date_only >= :startDate
                     and
                     hl.transaction_date_only <= :endDate
                     and (case when :journalType = 'ALL' then true else hl.journal_type  = :journalType end)
                     and (hl.reversal is null or hl.reversal = false)
-                    and (hl.entity_name like concat('%',:filter,'%') or hl.invoice_soa_reference like concat('%',:filter,'%'))
-                    group by hl.invoice_soa_reference ,upper(hl.entity_name), journal_type
+                    and (hlg.entity_name like concat('%',:filter,'%') or hlg.record_no like concat('%',:filter,'%'))
+                    GROUP by hlg.record_no, hlg.entity_name, journal_type
         """
 
         if(!showAll)
@@ -1064,8 +1068,7 @@ from HeaderLedger hl where
     @GraphQLQuery(name = "transactionJournalGroupItemQuery", description = "Transaction Journals")
     List<HeaderLedgerGroupItemsDto> transactionJournalGroupItemQuery(
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "reference") String reference,
-            @GraphQLArgument(name = "entityName") String entityName,
+            @GraphQLArgument(name = "groupId") UUID groupId,
             @GraphQLArgument(name = "journalType") String journalType,
             @GraphQLArgument(name = "startDate") Instant startDateTime,
             @GraphQLArgument(name = "endDate") Instant endDateTime,
@@ -1093,9 +1096,9 @@ from HeaderLedger hl where
                 hl.journal_type as "journalType",
                 to_char(hl.transaction_date_only,'YYYY-MM-DD')  as "transactionDateOnly",
                 hl.transaction_type  as "docType",
-                hl.transaction_no  as "docNo",
+                hl.transaction_num  as "docNo",
                 hl.reference_type  as "refType",
-                hl.reference_no  as "refNo",
+                hl.reference_num  as "refNo",
                 hl.particulars,
                 hl.created_by as "createdBy",
                 coalesce(hl.approved_by,'') as "approvedBy",
@@ -1104,8 +1107,7 @@ from HeaderLedger hl where
                 from accounting.header_ledger hl 
                 left join accounting.ledger l on l."header" = hl.id 
                 where 
-                hl.invoice_soa_reference = :reference
-                and hl.entity_name = :entityName
+                hl.header_ledger_group_id = :groupId
                 and hl.transaction_date_only >= :startDate
                 and hl.transaction_date_only <= :endDate
                 and l.transaction_date_only >= :startDate
@@ -1114,15 +1116,14 @@ from HeaderLedger hl where
                 and (hl.reversal is null or hl.reversal = false)
                 and (hl.particulars like concat('%',:filter,'%'))
                 group by hl.id,hl.journal_type,to_char(hl.transaction_date_only,'YYYY-MM-DD'),hl.doctype,
-                hl.docnum,hl.particulars,hl.created_by,coalesce(hl.approved_by,''),hl.reference_type,hl.reference_no,
-                hl.transaction_type,hl.transaction_no
+                hl.docnum,hl.particulars,hl.created_by,coalesce(hl.approved_by,''),hl.reference_type,hl.reference_num,
+                hl.transaction_type,hl.transaction_num
                 order by hl.docnum desc;
         """)
                 .setParameter('journalType',journalType)
                 .setParameter('startDate',startDateLocal)
                 .setParameter('endDate',endDateLocal)
-                .setParameter('entityName',entityName)
-                .setParameter('reference',reference)
+                .setParameter('groupId',groupId)
                 .setParameter('filter',filter)
 
         return  headerLedgerList.unwrap(NativeQuery.class).setResultTransformer(Transformers.aliasToBean(HeaderLedgerGroupItemsDto.class)).getResultList()
