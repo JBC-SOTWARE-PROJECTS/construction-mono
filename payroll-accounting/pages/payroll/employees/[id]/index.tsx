@@ -39,6 +39,13 @@ const menuItems = [
     description: "Tracks employee loans and repayment deductions.",
     show: true,
   },
+  {
+    title: "Leave",
+    icon: <FieldTimeOutlined />,
+    link: "/leave",
+    description: "Tracks and manages employee leave requests .",
+    show: true,
+  },
   // {
   //   title: "Other Deduction",
   //   icon: <FieldTimeOutlined />,

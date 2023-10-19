@@ -16,12 +16,14 @@ select l from EmployeeLeave l
 where lower(l.employee.fullName) like lower(concat('%',:filter,'%'))
 and l.status in :leaveStatus
 and l.type in :leaveTypes
+and l.company.id = :company
 """,
             countQuery = """
-select count(l) from EmployeeLoan l 
+select count(l) from EmployeeLeave l 
 where lower(l.employee.fullName) like lower(concat('%',:filter,'%'))
 and l.status in :leaveStatus
 and l.type in :leaveTypes
+and l.company.id = :company
 """)
     Page<EmployeeLeave> findByFilterPageable(
             @Param("filter") String filter,
@@ -32,6 +34,6 @@ and l.type in :leaveTypes
 
     @Query(value = "select l from EmployeeLeave l where l.employee.id = :employeeId"
     )
-    List<EmployeeLeave> findByEmployeeId(@Param("id") UUID employeeId)
+    List<EmployeeLeave> findByEmployeeId(@Param("employeeId") UUID employeeId)
 
 }

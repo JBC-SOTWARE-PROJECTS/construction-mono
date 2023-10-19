@@ -32,6 +32,12 @@ function EmployeeManagementHeader({ title, children }: IParams) {
       path: `${basePath}/loans`,
       disabled: pathname === `${basePathName}/loans`,
     },
+    {
+      key: `${basePath}/leave`,
+      title: "Leave",
+      path: `${basePath}/leave`,
+      disabled: pathname === `${basePathName}/leave`,
+    },
   ];
 
   const routes = [

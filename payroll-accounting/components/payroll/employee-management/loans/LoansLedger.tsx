@@ -1,4 +1,4 @@
-import { EmployeeLoanLedgerItem } from "@/graphql/gql/graphql";
+import { EmployeeLoanLedgerDto } from "@/graphql/gql/graphql";
 import useGetEmployeeLoansLedger from "@/hooks/employee-loans/useGetEmployeeLoansLedger";
 import usePaginationState from "@/hooks/usePaginationState";
 import NumeralFormatter from "@/utility/numeral-formatter";
@@ -26,7 +26,7 @@ function LoansLedger() {
     router?.query?.id as string
   );
 
-  const columns: ColumnsType<EmployeeLoanLedgerItem> = [
+  const columns: ColumnsType<EmployeeLoanLedgerDto> = [
     {
       title: "Date",
       dataIndex: "createdDate",
@@ -66,7 +66,7 @@ function LoansLedger() {
       <Table
         size="small"
         columns={columns}
-        dataSource={data?.content as EmployeeLoanLedgerItem[]}
+        dataSource={data?.content as EmployeeLoanLedgerDto[]}
         loading={loading}
         onChange={onNextPage}
       />

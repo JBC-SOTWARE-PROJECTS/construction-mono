@@ -91,6 +91,8 @@ class EmployeeLeaveService {
             leave.employee = employeeRepository.findById(employeeId).get()
         }
         leave.status = LeaveStatus.valueOf(fields.get('status') as String)
+        leave.type = LeaveType.valueOf(fields.get('type') as String)
+
         leave.dates = dates
         if (leave.status == LeaveStatus.FINALIZED) {
             List<EmployeeSchedule> scheduleList = []
@@ -106,6 +108,8 @@ class EmployeeLeaveService {
                 employeeSchedule.label = "Leave"
                 employeeSchedule.title = "Leave"
                 employeeSchedule.withPay = leave.withPay
+                employeeSchedule.employee = leave.employee
+                employeeSchedule.company = company
                 scheduleList.push(employeeSchedule)
             }
             employeeScheduleRepository.saveAll(scheduleList)

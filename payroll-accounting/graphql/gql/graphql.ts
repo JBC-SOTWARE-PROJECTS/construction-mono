@@ -887,9 +887,9 @@ export type EmployeeLeave = {
   id?: Maybe<Scalars['UUID']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  leaveType?: Maybe<LeaveType>;
   reason?: Maybe<Scalars['String']['output']>;
   status?: Maybe<LeaveStatus>;
+  type?: Maybe<LeaveType>;
   withPay?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -3288,6 +3288,7 @@ export type MutationUpsertEmployeeAttendanceArgs = {
 /** Mutation root */
 export type MutationUpsertEmployeeLeaveArgs = {
   dates?: InputMaybe<Array<InputMaybe<SelectedDateInput>>>;
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -4168,6 +4169,25 @@ export type Page_CompanySettings = {
 export type Page_EmployeeAttendance = {
   __typename?: 'Page_EmployeeAttendance';
   content?: Maybe<Array<Maybe<EmployeeAttendance>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_EmployeeLeave = {
+  __typename?: 'Page_EmployeeLeave';
+  content?: Maybe<Array<Maybe<EmployeeLeave>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -5694,7 +5714,7 @@ export type Query = {
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
   getDocTypeById?: Maybe<DocumentTypes>;
   getEmployeeLeaveByEmp?: Maybe<Array<Maybe<EmployeeLeave>>>;
-  getEmployeeLeavePageable?: Maybe<Array<Maybe<EmployeeLeave>>>;
+  getEmployeeLeavePageable?: Maybe<Page_EmployeeLeave>;
   getEmployeeLoanConfig?: Maybe<EmployeeLoanConfig>;
   getEmployeeLoanLedger?: Maybe<Page_EmployeeLoanLedgerDto>;
   getEmployeeLoansByEmployee?: Maybe<Page_EmployeeLoan>;
@@ -6676,6 +6696,22 @@ export type QueryGetContributionEmployeesByPayrollIdArgs = {
 /** Query root */
 export type QueryGetDocTypeByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeLeaveByEmpArgs = {
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeLeavePageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  leaveTypes?: InputMaybe<Array<InputMaybe<LeaveType>>>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Array<InputMaybe<LeaveStatus>>>;
 };
 
 
