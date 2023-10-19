@@ -104,7 +104,7 @@ class EmployeeAttendanceService {
             attendance.originalType = attendance.type
             attendance.project = projectService.findOne(project_id)
             attendance = employeeAttendanceRepository.save(attendance)
-            return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully created employee attendance.")
+            return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully created employee attendance.", attendance.id)
         }
     }
 
@@ -131,6 +131,16 @@ class EmployeeAttendanceService {
         employeeAttendanceRepository.save(employeeAttendance)
 
         return new GraphQLRetVal<String>(null, true, """Successfully  ${employeeAttendance?.isIgnored ? 'ignored' : 'undo ignored'} attendance.""")
+    }
+
+    @GraphQLMutation(name = "syncAttendance")
+    List<EmployeeAttendance> syncAttendance(
+            @GraphQLArgument(name = "employeeAttendanceList") List<EmployeeAttendance> employeeAttendanceList
+    ) {
+
+            List<EmployeeAttendance> savedAttendance = employeeAttendanceRepository.saveAll(employeeAttendanceList);
+            return savedAttendance;
+
     }
 
     //===========================MUTATION=============================\\

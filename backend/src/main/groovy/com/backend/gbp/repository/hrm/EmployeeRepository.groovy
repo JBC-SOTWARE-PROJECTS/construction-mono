@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param
 
 interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
+    Employee findOneByPinCode(@Param("pinCode") String pinCode)
+
     @Query(
             value = "Select e from Employee e where lower(e.fullName) like lower(concat('%',:filter,'%'))",
             countQuery = "Select count(e) from Employee e where lower(e.fullName) like lower(concat('%',:filter,'%'))"

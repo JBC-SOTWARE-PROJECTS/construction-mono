@@ -1,0 +1,1 @@
+ALTER TABLE hrm.employee_attendance ADD COLUMN reference_id varchar default null;

@@ -231,4 +231,14 @@ class EmployeeService {
         return employeeRepository.save(employee)
 
     }
+
+    @GraphQLQuery(name = "isPinCodeUnique", description = "Check if pincode exists")
+    Boolean isPinCodeUnique(@GraphQLArgument(name = "pinCode") String pinCode) {
+        return !employeeRepository.findOneByPinCode(pinCode.toLowerCase())
+    }
+
+    @GraphQLQuery(name = "employeeByPinCode", description = "Get Employee By Pin Code")
+    Employee findByPinCode(@GraphQLArgument(name = "pinCode") String pinCode) {
+        return employeeRepository.findOneByPinCode(pinCode.toLowerCase())
+    }
 }
