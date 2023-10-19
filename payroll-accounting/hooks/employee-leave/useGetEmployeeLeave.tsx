@@ -13,6 +13,7 @@ const QUERY = gql`
         endDatetime
       }
       withPay
+      createdDate
     }
   }
 `;
@@ -21,7 +22,7 @@ function useGetEmployeeLeave(callBack?: (result: any) => void) {
   const router = useRouter();
   const { data, loading, refetch } = useQuery(QUERY, {
     variables: {
-      getEmployeeLeaveByEmp: router?.query.id,
+      employeeId: router?.query.id,
     },
     onCompleted: (result) => {
       if (callBack) callBack(result?.data);

@@ -1,14 +1,22 @@
 import { Calendar, Col, Row, Select } from "antd";
 import React from "react";
 
-function CustomCalender({ handleSelectDate, selectedDates }: any) {
+function CustomCalender({
+  handleSelectDate,
+  selectedDates,
+  readOnly = false,
+}: any) {
   return (
     <div>
       {" "}
       <Calendar
         className="custom_calender"
         fullscreen={false}
-        onSelect={handleSelectDate}
+        onSelect={(e, info) => {
+          if (!readOnly) {
+            handleSelectDate(e, info);
+          }
+        }}
         dateFullCellRender={(date) => {
           const style = selectedDates?.includes(date.startOf("day").format())
             ? { backgroundColor: "#47bb66 ", color: "white" }

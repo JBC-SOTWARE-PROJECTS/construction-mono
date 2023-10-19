@@ -52,7 +52,7 @@ class EmployeeLeaveService {
     List<EmployeeLeave> getEmployeeLeaveByEmp(
             @GraphQLArgument(name = "employeeId") UUID employeeId
     ) {
-        return employeeLeaveRepository.findByEmployeeId(employeeId)
+        return employeeLeaveRepository.findByEmployeeId(employeeId).sort({ it.createdDate }).reverse()
     }
 
     @GraphQLQuery(name = "getEmployeeLeavePageable")
@@ -93,9 +93,16 @@ class EmployeeLeaveService {
         leave.status = LeaveStatus.valueOf(fields.get('status') as String)
         leave.type = LeaveType.valueOf(fields.get('type') as String)
 
-        leave.dates = dates
+        leave.dates = dates.sort({ it.startDatetime })
+        leave = employeeLeaveRepository.save(leave)
         if (leave.status == LeaveStatus.FINALIZED) {
             List<EmployeeSchedule> scheduleList = []
+            List<String> dateStringList = []
+            dates.each {
+                dateStringList.push((it.startDatetime.toString() as String).substring(0, 10))
+            }
+            List<EmployeeSchedule> toDeleteSchedules = employeeScheduleRepository.findByDateString(dateStringList, employeeId)
+            employeeScheduleRepository.deleteAll(toDeleteSchedules)
 
             dates.each {
                 EmployeeSchedule employeeSchedule = new EmployeeSchedule()
@@ -115,7 +122,7 @@ class EmployeeLeaveService {
             employeeScheduleRepository.saveAll(scheduleList)
         }
 
-        leave = employeeLeaveRepository.save(leave)
+
         return new GraphQLResVal<EmployeeLeave>(leave, true, "Successfully ${id ? "updated" : "created"} employee leave.")
 
 
