@@ -7,10 +7,8 @@ import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
 
 import javax.persistence.Column
-import javax.persistence.ConstraintMode
 import javax.persistence.Entity
 import javax.persistence.FetchType
-import javax.persistence.ForeignKey
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.JoinColumn
@@ -19,8 +17,8 @@ import javax.persistence.Table
 import java.time.Instant
 
 @Entity
-@Table(name = "disbursement_check", schema = "accounting")
-class DisbursementCheck extends AbstractAuditingEntity implements Serializable {
+@Table(name = "release_checks", schema = "accounting")
+class ReleaseCheck extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
 	@Id
@@ -30,40 +28,34 @@ class DisbursementCheck extends AbstractAuditingEntity implements Serializable {
 	@Type(type = "pg-uuid")
 	UUID id
 
+	@GraphQLQuery
+	@Column(name = "release_date", columnDefinition = "date")
+	Instant releaseDate
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "disbursement", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	@JoinColumn(name = "disbursement", referencedColumnName = "id")
 	Disbursement disbursement
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "bank", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "bank", referencedColumnName = "id")
 	Bank bank
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "checks", referencedColumnName = "id")
+	DisbursementCheck check
+
 	@GraphQLQuery
-	@Column(name = "bank_branch", columnDefinition = "varchar")
+	@Column(name = "is_posted", columnDefinition = "bool")
 	@UpperCase
-	String bankBranch
+	Boolean isPosted
 
 	@GraphQLQuery
-	@Column(name = "check_no", columnDefinition = "varchar")
+	@Column(name = "release_by", columnDefinition = "varchar")
 	@UpperCase
-	String checkNo
+	String release_by
 
 	@GraphQLQuery
-	@Column(name = "check_date", columnDefinition = "date")
-	@UpperCase
-	Instant checkDate
-
-	@GraphQLQuery
-	@Column(name = "amount", columnDefinition = "numeric")
-	@UpperCase
-	BigDecimal amount
-
-	@GraphQLQuery
-	@Column(name = "releasing")
-	UUID releasing
-
-	@GraphQLQuery
-	@Column(name = "company")
+	@Column(name = "company", columnDefinition = "uuid")
 	UUID company
 
 

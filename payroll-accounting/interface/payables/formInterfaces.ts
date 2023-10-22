@@ -2,6 +2,11 @@ import {
   AccountsPayable,
   AccountsPayableDetails,
   ApAccountsTemplateItems,
+  DebitMemoDetails,
+  DisbursementAp,
+  DisbursementCheck,
+  DisbursementExpense,
+  DisbursementWtx,
 } from "@/graphql/gql/graphql";
 import { Dayjs } from "dayjs";
 import { OptionsValue } from "@/utility/interfaces";
@@ -57,7 +62,8 @@ export interface IFormDataCheckDetails {
 
 export interface IFormDisbursementExpense {
   transType: OptionsValue;
-  department: OptionsValue;
+  office: OptionsValue;
+  project: OptionsValue;
   amount: number;
   remarks: string;
 }
@@ -76,7 +82,8 @@ export interface IFormDisbursementWTX {
 
 export interface IFormDebitMemoDetails {
   transType: OptionsValue;
-  department: OptionsValue;
+  office: OptionsValue;
+  project: OptionsValue;
   type: string;
   percent: number;
   amount: number;
@@ -98,7 +105,23 @@ export interface ExtendedAPTransactionDto extends AccountsPayableDetails {
   vatRate?: number | undefined | null;
   isNew?: boolean;
 }
+export interface ICheckDetails extends DisbursementCheck {
+  isNew?: boolean;
+}
 
+export interface IDisbursementApplication extends DisbursementAp {
+  isNew?: boolean;
+}
+export interface IDisbursementExpense extends DisbursementExpense {
+  isNew?: boolean;
+}
+export interface IDisbursementWTX extends DisbursementWtx {
+  isNew?: boolean;
+}
+
+export interface IDebitMemoDetails extends DebitMemoDetails {
+  isNew?: boolean;
+}
 export interface AccountsTemplateItemDto extends ApAccountsTemplateItems {
   isNew?: boolean;
 }

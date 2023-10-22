@@ -242,6 +242,7 @@ export default function WTXEditConsolidatedModal(props: IProps) {
             name="wtxForm"
             layout="vertical"
             onFinish={onSubmit}
+            initialValues={{ remarks: record?.remarks }}
             onFinishFailed={onFinishFailed}>
             <FormTextArea
               label="Remarks/Notes"

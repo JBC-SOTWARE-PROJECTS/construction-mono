@@ -65,6 +65,7 @@ enum GeneratorType {
 	SUPPLIER_CODE,
 	SERVICE_CODE,
 	DM_NO,
+	DA_NO,
 	COMPANY_TYPE,
 	TNO,
 	SCHED_CODE,
@@ -99,7 +100,8 @@ enum GeneratorType {
 	PROJECT_CODE,
 	ASSET_CODE,
 	JOB_ITEM_REC,
-	COMPANY_CODE
+	COMPANY_CODE,
+	RPNO
 
 }
 

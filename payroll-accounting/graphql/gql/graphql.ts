@@ -435,6 +435,18 @@ export type Bank = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
 };
 
+export type BankInput = {
+  accountName?: InputMaybe<Scalars['String']['input']>;
+  accountNumber?: InputMaybe<Scalars['String']['input']>;
+  acquiringBank?: InputMaybe<Scalars['Boolean']['input']>;
+  bankAddress?: InputMaybe<Scalars['String']['input']>;
+  bankaccountId?: InputMaybe<Scalars['String']['input']>;
+  bankname?: InputMaybe<Scalars['String']['input']>;
+  branch?: InputMaybe<Scalars['String']['input']>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
 export type Barangay = {
   __typename?: 'Barangay';
   barangayName?: Maybe<Scalars['String']['output']>;
@@ -717,10 +729,426 @@ export type DashboardDto = {
   value?: Maybe<Scalars['Int']['output']>;
 };
 
+export type DebitMemo = {
+  __typename?: 'DebitMemo';
+  appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  bank?: Maybe<Bank>;
+  cashOnBank?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  debitCategory?: Maybe<Scalars['String']['output']>;
+  debitDate?: Maybe<Scalars['Instant']['output']>;
+  debitNo?: Maybe<Scalars['String']['output']>;
+  debitType?: Maybe<Scalars['String']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  discAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  discount?: Maybe<Scalars['BigDecimal']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  ewt1Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt2Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt3Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt4Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt5Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt7Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt10Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt15Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt18Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt30Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewtAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  memoAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  office?: Maybe<Office>;
+  posted?: Maybe<Scalars['Boolean']['output']>;
+  postedBy?: Maybe<Scalars['String']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
+  remarksNotes?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  supplier?: Maybe<Supplier>;
+  supplierAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  transType?: Maybe<ApTransaction>;
+  value_a?: Maybe<Scalars['BigDecimal']['output']>;
+  value_b?: Maybe<Scalars['BigDecimal']['output']>;
+  value_c?: Maybe<Scalars['BigDecimal']['output']>;
+  value_d?: Maybe<Scalars['BigDecimal']['output']>;
+  value_e?: Maybe<Scalars['BigDecimal']['output']>;
+  value_f?: Maybe<Scalars['BigDecimal']['output']>;
+  value_g?: Maybe<Scalars['BigDecimal']['output']>;
+  value_h?: Maybe<Scalars['BigDecimal']['output']>;
+  value_i?: Maybe<Scalars['BigDecimal']['output']>;
+  value_j?: Maybe<Scalars['BigDecimal']['output']>;
+  value_k?: Maybe<Scalars['BigDecimal']['output']>;
+  value_l?: Maybe<Scalars['BigDecimal']['output']>;
+  value_m?: Maybe<Scalars['BigDecimal']['output']>;
+  value_n?: Maybe<Scalars['BigDecimal']['output']>;
+  value_o?: Maybe<Scalars['BigDecimal']['output']>;
+  value_p?: Maybe<Scalars['BigDecimal']['output']>;
+  value_q?: Maybe<Scalars['BigDecimal']['output']>;
+  value_r?: Maybe<Scalars['BigDecimal']['output']>;
+  value_s?: Maybe<Scalars['BigDecimal']['output']>;
+  value_t?: Maybe<Scalars['BigDecimal']['output']>;
+  value_u?: Maybe<Scalars['BigDecimal']['output']>;
+  value_v?: Maybe<Scalars['BigDecimal']['output']>;
+  value_w?: Maybe<Scalars['BigDecimal']['output']>;
+  value_x?: Maybe<Scalars['BigDecimal']['output']>;
+  value_y?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z1?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z2?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z3?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z4?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z5?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z6?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z7?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z8?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z9?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z10?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z11?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z12?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z13?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z14?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z15?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z16?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z17?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z18?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z19?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z20?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z21?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z22?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z23?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z24?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z25?: Maybe<Scalars['BigDecimal']['output']>;
+  value_z26?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type DebitMemoDetails = {
+  __typename?: 'DebitMemoDetails';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  debitMemo?: Maybe<DebitMemo>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  office?: Maybe<Office>;
+  percent?: Maybe<Scalars['BigDecimal']['output']>;
+  project?: Maybe<Projects>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  transType?: Maybe<ExpenseTransaction>;
+  type?: Maybe<Scalars['String']['output']>;
+};
+
+export type DebitMemoInput = {
+  appliedAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  bank?: InputMaybe<BankInput>;
+  cashOnBank?: InputMaybe<Scalars['BigDecimal']['input']>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  debitCategory?: InputMaybe<Scalars['String']['input']>;
+  debitDate?: InputMaybe<Scalars['Instant']['input']>;
+  debitNo?: InputMaybe<Scalars['String']['input']>;
+  debitType?: InputMaybe<Scalars['String']['input']>;
+  discAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  discount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt1Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt2Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt3Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt4Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt5Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt7Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt10Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt15Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt18Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt30Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewtAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  flagValue?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  memoAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  office?: InputMaybe<OfficeInput>;
+  posted?: InputMaybe<Scalars['Boolean']['input']>;
+  postedBy?: InputMaybe<Scalars['String']['input']>;
+  postedLedger?: InputMaybe<Scalars['UUID']['input']>;
+  remarksNotes?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  supplier?: InputMaybe<SupplierInput>;
+  supplierAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  transType?: InputMaybe<ApTransactionInput>;
+  value_a?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_b?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_c?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_d?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_e?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_f?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_g?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_h?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_i?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_j?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_k?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_l?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_m?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_n?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_o?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_p?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_q?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_r?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_s?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_t?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_u?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_v?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_w?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_x?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_y?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z1?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z2?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z3?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z4?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z5?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z6?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z7?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z8?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z9?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z10?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z11?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z12?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z13?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z14?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z15?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z16?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z17?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z18?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z19?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z20?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z21?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z22?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z23?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z24?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z25?: InputMaybe<Scalars['BigDecimal']['input']>;
+  value_z26?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
 export enum Direction {
   Asc = 'ASC',
   Desc = 'DESC'
 }
+
+export type Disbursement = {
+  __typename?: 'Disbursement';
+  advancesSupplier?: Maybe<Scalars['BigDecimal']['output']>;
+  appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  bank?: Maybe<Bank>;
+  cash?: Maybe<Scalars['BigDecimal']['output']>;
+  cashOnBank?: Maybe<Scalars['BigDecimal']['output']>;
+  cashOnHand?: Maybe<Scalars['BigDecimal']['output']>;
+  checks?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  disDate?: Maybe<Scalars['Instant']['output']>;
+  disNo?: Maybe<Scalars['String']['output']>;
+  disType?: Maybe<Scalars['String']['output']>;
+  discAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  discountAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  ewt1Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt2Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt3Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt4Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt5Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt7Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt10Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt15Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt18Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt30Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewtAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isAdvance?: Maybe<Scalars['Boolean']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  payeeName?: Maybe<Scalars['String']['output']>;
+  paymentCategory?: Maybe<Scalars['String']['output']>;
+  posted?: Maybe<Scalars['Boolean']['output']>;
+  postedBy?: Maybe<Scalars['String']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
+  remarksNotes?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  supplier?: Maybe<Supplier>;
+  supplierAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  transType?: Maybe<ApTransaction>;
+  voucherAmount?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type DisbursementAp = {
+  __typename?: 'DisbursementAp';
+  appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  debitMemo?: Maybe<DebitMemo>;
+  disbursement?: Maybe<Disbursement>;
+  discount?: Maybe<Scalars['BigDecimal']['output']>;
+  ewtAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  ewtDesc?: Maybe<Scalars['String']['output']>;
+  ewtRate?: Maybe<Scalars['BigDecimal']['output']>;
+  grossAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  netAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  office?: Maybe<Office>;
+  payable?: Maybe<AccountsPayable>;
+  posted?: Maybe<Scalars['Boolean']['output']>;
+  project?: Maybe<Projects>;
+  reapplication?: Maybe<Scalars['UUID']['output']>;
+  vatAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  vatInclusive?: Maybe<Scalars['Boolean']['output']>;
+  vatRate?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type DisbursementApDtoInput = {
+  appliedAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  discount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewtAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewtDesc?: InputMaybe<Scalars['String']['input']>;
+  ewtRate?: InputMaybe<Scalars['BigDecimal']['input']>;
+  grossAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  isNew?: InputMaybe<Scalars['Boolean']['input']>;
+  netAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  payable?: InputMaybe<AccountsPayableInput>;
+  vatAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  vatInclusive?: InputMaybe<Scalars['Boolean']['input']>;
+  vatRate?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
+export type DisbursementCheck = {
+  __typename?: 'DisbursementCheck';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  bank?: Maybe<Bank>;
+  bankBranch?: Maybe<Scalars['String']['output']>;
+  checkDate?: Maybe<Scalars['Instant']['output']>;
+  checkNo?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  disbursement?: Maybe<Disbursement>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  releasing?: Maybe<Scalars['UUID']['output']>;
+};
+
+export type DisbursementDtoInput = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  bank?: InputMaybe<BankInput>;
+  bankBranch?: InputMaybe<Scalars['String']['input']>;
+  checkDate?: InputMaybe<Scalars['Instant']['input']>;
+  checkNo?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  isNew?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type DisbursementExpDtoInput = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  isNew?: InputMaybe<Scalars['Boolean']['input']>;
+  office?: InputMaybe<OfficeInput>;
+  project?: InputMaybe<ProjectsInput>;
+  remarks?: InputMaybe<Scalars['String']['input']>;
+  transType?: InputMaybe<ExpenseTransactionInput>;
+};
+
+export type DisbursementExpense = {
+  __typename?: 'DisbursementExpense';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  disbursement?: Maybe<Disbursement>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  office?: Maybe<Office>;
+  project?: Maybe<Projects>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  transType?: Maybe<ExpenseTransaction>;
+};
+
+export type DisbursementInput = {
+  advancesSupplier?: InputMaybe<Scalars['BigDecimal']['input']>;
+  appliedAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  bank?: InputMaybe<BankInput>;
+  cash?: InputMaybe<Scalars['BigDecimal']['input']>;
+  cashOnBank?: InputMaybe<Scalars['BigDecimal']['input']>;
+  cashOnHand?: InputMaybe<Scalars['BigDecimal']['input']>;
+  checks?: InputMaybe<Scalars['BigDecimal']['input']>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  disDate?: InputMaybe<Scalars['Instant']['input']>;
+  disNo?: InputMaybe<Scalars['String']['input']>;
+  disType?: InputMaybe<Scalars['String']['input']>;
+  discAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  discountAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt1Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt2Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt3Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt4Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt5Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt7Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt10Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt15Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt18Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt30Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewtAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  flagValue?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  isAdvance?: InputMaybe<Scalars['Boolean']['input']>;
+  payeeName?: InputMaybe<Scalars['String']['input']>;
+  paymentCategory?: InputMaybe<Scalars['String']['input']>;
+  posted?: InputMaybe<Scalars['Boolean']['input']>;
+  postedBy?: InputMaybe<Scalars['String']['input']>;
+  postedLedger?: InputMaybe<Scalars['UUID']['input']>;
+  remarksNotes?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  supplier?: InputMaybe<SupplierInput>;
+  supplierAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  transType?: InputMaybe<ApTransactionInput>;
+  voucherAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
+export type DisbursementWtx = {
+  __typename?: 'DisbursementWtx';
+  appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  disbursement?: Maybe<Disbursement>;
+  ewtAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  ewtDesc?: Maybe<Scalars['String']['output']>;
+  ewtRate?: Maybe<Scalars['BigDecimal']['output']>;
+  grossAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  netAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  vatAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  vatInclusive?: Maybe<Scalars['Boolean']['output']>;
+  vatRate?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type DisbursementWtxDtoInput = {
+  appliedAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewtAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewtDesc?: InputMaybe<Scalars['String']['input']>;
+  ewtRate?: InputMaybe<Scalars['BigDecimal']['input']>;
+  grossAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  isNew?: InputMaybe<Scalars['Boolean']['input']>;
+  netAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  vatAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  vatInclusive?: InputMaybe<Scalars['Boolean']['input']>;
+  vatRate?: InputMaybe<Scalars['Int']['input']>;
+};
 
 export type DiscountDetails = {
   __typename?: 'DiscountDetails';
@@ -733,6 +1161,18 @@ export type DiscountDetails = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   refBillItem?: Maybe<BillingItem>;
+};
+
+export type DmDetailsDtoInput = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  isNew?: InputMaybe<Scalars['Boolean']['input']>;
+  office?: InputMaybe<OfficeInput>;
+  percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  project?: InputMaybe<ProjectsInput>;
+  remarks?: InputMaybe<Scalars['String']['input']>;
+  transType?: InputMaybe<ExpenseTransactionInput>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DocumentTypes = {
@@ -1082,6 +1522,17 @@ export type ExpenseTransaction = {
   source?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
   type?: Maybe<Scalars['String']['output']>;
+};
+
+export type ExpenseTransactionInput = {
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  isReverse?: InputMaybe<Scalars['Boolean']['input']>;
+  remarks?: InputMaybe<Scalars['String']['input']>;
+  source?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Fiscal = {
@@ -1464,7 +1915,10 @@ export type Integration = {
 export enum IntegrationDomainEnum {
   AccountsPayable = 'ACCOUNTS_PAYABLE',
   BillingItem = 'BILLING_ITEM',
-  NoDomain = 'NO_DOMAIN'
+  DebitMemo = 'DEBIT_MEMO',
+  Disbursement = 'DISBURSEMENT',
+  NoDomain = 'NO_DOMAIN',
+  Reapplication = 'REAPPLICATION'
 }
 
 export type IntegrationGroup = {
@@ -2024,6 +2478,7 @@ export type Mutation = {
   deleteIntegrationItem?: Maybe<Scalars['Boolean']['output']>;
   deletePayroll?: Maybe<GraphQlResVal_String>;
   directExpenseMaterials?: Maybe<GraphQlRetVal_Boolean>;
+  disbursementUpsert?: Maybe<Disbursement>;
   employeeUpdateStatus?: Maybe<Employee>;
   expenseItemFromProjects?: Maybe<InventoryLedger>;
   ignoreAttendance?: Maybe<GraphQlRetVal_String>;
@@ -2034,16 +2489,23 @@ export type Mutation = {
   pettyCashPostVoid?: Maybe<PettyCash>;
   postAp?: Maybe<AccountsPayable>;
   postApManual?: Maybe<GraphQlRetVal_Boolean>;
+  postDM?: Maybe<DebitMemo>;
+  postDManual?: Maybe<GraphQlRetVal_Boolean>;
+  postDisbursement?: Maybe<Disbursement>;
+  postDsManual?: Maybe<GraphQlRetVal_Boolean>;
   postInventoryLedgerBegBalance?: Maybe<InventoryLedger>;
   postInventoryLedgerIssuance?: Maybe<InventoryLedger>;
   postInventoryLedgerMaterial?: Maybe<InventoryLedger>;
   postInventoryLedgerQtyAdjustment?: Maybe<InventoryLedger>;
   postInventoryLedgerRec?: Maybe<InventoryLedger>;
   postInventoryLedgerReturn?: Maybe<InventoryLedger>;
+  postReappManual?: Maybe<GraphQlRetVal_Boolean>;
+  postReapplication?: Maybe<Reapplication>;
   pushToBill?: Maybe<Billing>;
   pushToBillProject?: Maybe<Billing>;
   /** insert adj */
   quantityAdjustmentInsert?: Maybe<QuantityAdjustment>;
+  reapplicationUpsert?: Maybe<GraphQlRetVal_Boolean>;
   /** A mutation to recalculate all payroll module employee . */
   recalculateAllPayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
   recalculateOneDay?: Maybe<GraphQlResVal_String>;
@@ -2051,8 +2513,17 @@ export type Mutation = {
   recalculatePayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
   remove2307?: Maybe<Wtx2307>;
   removeAccountTemplateItem?: Maybe<ApAccountsTemplateItems>;
+  removeApApp?: Maybe<DisbursementAp>;
+  removeApAppList?: Maybe<DisbursementAp>;
   removeApDetails?: Maybe<AccountsPayableDetails>;
   removeApLedger?: Maybe<ApLedger>;
+  removeCheck?: Maybe<DisbursementCheck>;
+  removeCheckList?: Maybe<DisbursementCheck>;
+  removeDMAPDetails?: Maybe<DisbursementAp>;
+  removeDetailsDebitMemo?: Maybe<DebitMemoDetails>;
+  removeDmDetails?: Maybe<DebitMemoDetails>;
+  removeExpense?: Maybe<DisbursementExpense>;
+  removeExpenseByList?: Maybe<DisbursementExpense>;
   /** Remove */
   removeItemSupplier?: Maybe<SupplierItem>;
   removeJobItem?: Maybe<JobItems>;
@@ -2064,6 +2535,8 @@ export type Mutation = {
   removeRtsItem?: Maybe<ReturnSupplierItem>;
   removeServiceItem?: Maybe<ServiceItems>;
   removeStiItem?: Maybe<StockIssueItems>;
+  removeWtx?: Maybe<DisbursementWtx>;
+  removeWtxList?: Maybe<DisbursementWtx>;
   removedMaterial?: Maybe<ProjectUpdatesMaterials>;
   removedMaterialDirectExpense?: Maybe<ProjectUpdatesMaterials>;
   resetPassword?: Maybe<User>;
@@ -2075,7 +2548,9 @@ export type Mutation = {
   updateAPStatus?: Maybe<AccountsPayable>;
   updateBegBalStatus?: Maybe<BeginningBalance>;
   updateBilled?: Maybe<JobItems>;
+  updateCKStatus?: Maybe<Disbursement>;
   updateContributionTypeStatus?: Maybe<GraphQlResVal_PayrollContribution>;
+  updateDmStatus?: Maybe<DebitMemo>;
   updateEmployeeContributionStatus?: Maybe<GraphQlResVal_PayrollEmployeeContribution>;
   /** insert chartsOfAccounts */
   updateInsertParentAccount?: Maybe<GraphQlRetVal_ParentAccount>;
@@ -2085,6 +2560,7 @@ export type Mutation = {
   updateJobBilled?: Maybe<Job>;
   updateJobStatus?: Maybe<Job>;
   updateMPStatus?: Maybe<MaterialProduction>;
+  updateMemoAmount?: Maybe<DebitMemo>;
   updateMpItemStatus?: Maybe<MaterialProductionItem>;
   updatePOStatus?: Maybe<PurchaseOrder>;
   updatePRItemPO?: Maybe<PurchaseRequestItem>;
@@ -2098,8 +2574,10 @@ export type Mutation = {
   updatePrices?: Maybe<OfficeItem>;
   updateQtyAdjStatus?: Maybe<QuantityAdjustment>;
   updateRECStatus?: Maybe<ReceivingReport>;
+  updateRPStatus?: Maybe<Reapplication>;
   updateRTSStatus?: Maybe<ReturnSupplier>;
   updateReOrderQty?: Maybe<OfficeItem>;
+  updateReapply?: Maybe<Reapplication>;
   updateRecItemStatus?: Maybe<ReceivingReportItem>;
   updateReorder?: Maybe<OfficeItem>;
   updateRtsItemStatus?: Maybe<ReturnSupplierItem>;
@@ -2127,9 +2605,16 @@ export type Mutation = {
   upsertBillingItemByMisc?: Maybe<BillingItem>;
   upsertBillingItemByProject?: Maybe<BillingItem>;
   upsertChargeInvoice?: Maybe<ChargeInvoice>;
+  upsertCheck?: Maybe<DisbursementCheck>;
   upsertCompany?: Maybe<CompanySettings>;
   upsertConsolidated?: Maybe<Wtx2307Consolidated>;
   upsertCustomer?: Maybe<Customer>;
+  upsertDM?: Maybe<DebitMemo>;
+  upsertDebitMemo?: Maybe<DebitMemo>;
+  upsertDisAp?: Maybe<DisbursementAp>;
+  upsertDisDM?: Maybe<DisbursementAp>;
+  upsertDisReap?: Maybe<DisbursementAp>;
+  upsertDmDetials?: Maybe<DebitMemoDetails>;
   upsertEmployee?: Maybe<Employee>;
   upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
   /** create or update schedule config. */
@@ -2138,6 +2623,7 @@ export type Mutation = {
   upsertEventCalendar?: Maybe<GraphQlRetVal_EventCalendar>;
   /** insert TransType */
   upsertExTransType?: Maybe<GraphQlRetVal_Boolean>;
+  upsertExp?: Maybe<DisbursementExpense>;
   upsertFiscal?: Maybe<Fiscal>;
   upsertGenerics?: Maybe<Generic>;
   upsertGroupPolicy?: Maybe<GroupPolicy>;
@@ -2185,8 +2671,10 @@ export type Mutation = {
   /** Insert/Update QuantityAdjustmentType */
   upsertQuantityAdjustmentType?: Maybe<QuantityAdjustmentType>;
   upsertRTS?: Maybe<ReturnSupplier>;
+  upsertReapplication?: Maybe<Reapplication>;
   upsertRec?: Maybe<ReceivingReport>;
   upsertRecItem?: Maybe<ReceivingReportItem>;
+  upsertReleaseCheck?: Maybe<ReleaseCheck>;
   upsertRepairType?: Maybe<RepairType>;
   upsertRtsItem?: Maybe<ReturnSupplierItem>;
   upsertSSSContribution?: Maybe<GraphQlRetVal_SssContribution>;
@@ -2207,6 +2695,7 @@ export type Mutation = {
   /** insert TransType */
   upsertTransType?: Maybe<TransactionType>;
   upsertUnitMeasurement?: Maybe<UnitMeasurement>;
+  upsertWtx?: Maybe<DisbursementWtx>;
   voidLedgerById?: Maybe<InventoryLedger>;
   voidLedgerByRef?: Maybe<InventoryLedger>;
   voidLedgerByRefExpense?: Maybe<InventoryLedger>;
@@ -2481,6 +2970,17 @@ export type MutationDirectExpenseMaterialsArgs = {
 
 
 /** Mutation root */
+export type MutationDisbursementUpsertArgs = {
+  ap?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  checks?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  expense?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  wtx?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+};
+
+
+/** Mutation root */
 export type MutationEmployeeUpdateStatusArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2555,6 +3055,36 @@ export type MutationPostApManualArgs = {
 
 
 /** Mutation root */
+export type MutationPostDmArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationPostDManualArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  header?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationPostDisbursementArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationPostDsManualArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  header?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationPostInventoryLedgerBegBalanceArgs = {
   it?: InputMaybe<BeginningBalanceInput>;
 };
@@ -2595,6 +3125,21 @@ export type MutationPostInventoryLedgerReturnArgs = {
 
 
 /** Mutation root */
+export type MutationPostReappManualArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  header?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationPostReapplicationArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationPushToBillArgs = {
   jobId?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -2609,6 +3154,12 @@ export type MutationPushToBillProjectArgs = {
 /** Mutation root */
 export type MutationQuantityAdjustmentInsertArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationReapplicationUpsertArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -2648,6 +3199,19 @@ export type MutationRemoveAccountTemplateItemArgs = {
 
 
 /** Mutation root */
+export type MutationRemoveApAppArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  parent?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveApAppListArgs = {
+  parent?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationRemoveApDetailsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -2656,6 +3220,51 @@ export type MutationRemoveApDetailsArgs = {
 /** Mutation root */
 export type MutationRemoveApLedgerArgs = {
   ref?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveCheckArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveCheckListArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveDmapDetailsArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  parent?: InputMaybe<Scalars['UUID']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveDetailsDebitMemoArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveDmDetailsArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  parent?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveExpenseArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveExpenseByListArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -2715,6 +3324,18 @@ export type MutationRemoveServiceItemArgs = {
 
 /** Mutation root */
 export type MutationRemoveStiItemArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveWtxArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveWtxListArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -2794,9 +3415,23 @@ export type MutationUpdateBilledArgs = {
 
 
 /** Mutation root */
+export type MutationUpdateCkStatusArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpdateContributionTypeStatusArgs = {
   contributionType?: InputMaybe<ContributionTypes>;
   payrollId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpdateDmStatusArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -2846,6 +3481,14 @@ export type MutationUpdateJobStatusArgs = {
 export type MutationUpdateMpStatusArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpdateMemoAmountArgs = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -2940,6 +3583,13 @@ export type MutationUpdateRecStatusArgs = {
 
 
 /** Mutation root */
+export type MutationUpdateRpStatusArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpdateRtsStatusArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2950,6 +3600,14 @@ export type MutationUpdateRtsStatusArgs = {
 export type MutationUpdateReOrderQtyArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   value?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpdateReapplyArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
 };
 
 
@@ -3125,6 +3783,13 @@ export type MutationUpsertChargeInvoiceArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertCheckArgs = {
+  it?: InputMaybe<DisbursementDtoInput>;
+  parent?: InputMaybe<DisbursementInput>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertCompanyArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -3144,6 +3809,51 @@ export type MutationUpsertConsolidatedArgs = {
 export type MutationUpsertCustomerArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertDmArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertDebitMemoArgs = {
+  details?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertDisApArgs = {
+  it?: InputMaybe<DisbursementApDtoInput>;
+  parent?: InputMaybe<DisbursementInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertDisDmArgs = {
+  it?: InputMaybe<DisbursementApDtoInput>;
+  parent?: InputMaybe<DebitMemoInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertDisReapArgs = {
+  it?: InputMaybe<DisbursementApDtoInput>;
+  parent?: InputMaybe<ReapplicationInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertDmDetialsArgs = {
+  it?: InputMaybe<DmDetailsDtoInput>;
+  parent?: InputMaybe<DebitMemoInput>;
 };
 
 
@@ -3190,6 +3900,13 @@ export type MutationUpsertEventCalendarArgs = {
 export type MutationUpsertExTransTypeArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertExpArgs = {
+  it?: InputMaybe<DisbursementExpDtoInput>;
+  parent?: InputMaybe<DisbursementInput>;
 };
 
 
@@ -3536,6 +4253,12 @@ export type MutationUpsertRtsArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertReapplicationArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertRecArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -3549,6 +4272,14 @@ export type MutationUpsertRecItemArgs = {
   item?: InputMaybe<ItemInput>;
   refPoItem?: InputMaybe<PurchaseOrderItemsInput>;
   rr?: InputMaybe<ReceivingReportInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertReleaseCheckArgs = {
+  date?: InputMaybe<Scalars['Instant']['input']>;
+  fields?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -3673,6 +4404,13 @@ export type MutationUpsertTransTypeArgs = {
 export type MutationUpsertUnitMeasurementArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertWtxArgs = {
+  it?: InputMaybe<DisbursementWtxDtoInput>;
+  parent?: InputMaybe<DisbursementInput>;
 };
 
 
@@ -4007,6 +4745,63 @@ export type Page_Billing = {
 export type Page_CompanySettings = {
   __typename?: 'Page_CompanySettings';
   content?: Maybe<Array<Maybe<CompanySettings>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_DebitMemo = {
+  __typename?: 'Page_DebitMemo';
+  content?: Maybe<Array<Maybe<DebitMemo>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_Disbursement = {
+  __typename?: 'Page_Disbursement';
+  content?: Maybe<Array<Maybe<Disbursement>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_DisbursementCheck = {
+  __typename?: 'Page_DisbursementCheck';
+  content?: Maybe<Array<Maybe<DisbursementCheck>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -4365,9 +5160,47 @@ export type Page_PurchaseRequest = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_Reapplication = {
+  __typename?: 'Page_Reapplication';
+  content?: Maybe<Array<Maybe<Reapplication>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_ReceivingReport = {
   __typename?: 'Page_ReceivingReport';
   content?: Maybe<Array<Maybe<ReceivingReport>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_ReleaseCheck = {
+  __typename?: 'Page_ReleaseCheck';
+  content?: Maybe<Array<Maybe<ReleaseCheck>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -5305,9 +6138,13 @@ export type Query = {
   apAccountsTemplatePage?: Maybe<Page_ApAccountsTemplate>;
   apAgingDetailed?: Maybe<Array<Maybe<ApAgingDetailedDto>>>;
   apAgingSummary?: Maybe<Array<Maybe<ApAgingSummaryDto>>>;
+  apAppByDis?: Maybe<Array<Maybe<DisbursementAp>>>;
+  apApplicationById?: Maybe<DisbursementAp>;
   /** Find Ap that has beginning */
   apBeginning?: Maybe<Scalars['Boolean']['output']>;
+  apByDis?: Maybe<Array<Maybe<DisbursementAp>>>;
   apById?: Maybe<AccountsPayable>;
+  apDebitMemo?: Maybe<Array<Maybe<DisbursementAp>>>;
   apDetailsById?: Maybe<AccountsPayableDetails>;
   apLedger?: Maybe<Array<Maybe<ApLedgerDto>>>;
   apLedgerById?: Maybe<ApLedger>;
@@ -5327,6 +6164,7 @@ export type Query = {
   apListFilter?: Maybe<Page_AccountsPayable>;
   /** Find Ap posted */
   apListPosted?: Maybe<Array<Maybe<AccountsPayable>>>;
+  apReapplication?: Maybe<Array<Maybe<DisbursementAp>>>;
   /** Find Ap reference Type */
   apReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   /** Find Ap Transaction Active */
@@ -5369,6 +6207,8 @@ export type Query = {
   /** List of Charged Items */
   chargedItems?: Maybe<Array<Maybe<ChargeItemsDto>>>;
   checkBalancesByPO?: Maybe<Array<Maybe<PurchaseOrderItemsMonitoring>>>;
+  /** Filter Checks */
+  checksFilter?: Maybe<Page_DisbursementCheck>;
   cityByProvince?: Maybe<Array<Maybe<City>>>;
   cityFilter?: Maybe<Array<Maybe<City>>>;
   comById?: Maybe<CompanySettings>;
@@ -5384,8 +6224,29 @@ export type Query = {
   customerAssets?: Maybe<Array<Maybe<Customer>>>;
   customerList?: Maybe<Array<Maybe<Customer>>>;
   customerListAssets?: Maybe<Array<Maybe<Customer>>>;
+  debitMemoById?: Maybe<DebitMemo>;
+  /** List of DM Pageable */
+  debitMemoFilter?: Maybe<Page_DebitMemo>;
   /** Find Ap posted */
   detailsByAp?: Maybe<Array<Maybe<AccountsPayableDetails>>>;
+  disAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
+  disCheckById?: Maybe<DisbursementCheck>;
+  /** Find DisbursementCheck by Parent */
+  disCheckByParent?: Maybe<Array<Maybe<DisbursementCheck>>>;
+  disExpById?: Maybe<DisbursementExpense>;
+  /** Find DisbursementExpense by Parent */
+  disExpByParent?: Maybe<Array<Maybe<DisbursementExpense>>>;
+  disWtxById?: Maybe<DisbursementWtx>;
+  /** Find DisbursementWtx by Parent */
+  disWtxByParent?: Maybe<Array<Maybe<DisbursementWtx>>>;
+  disbursementById?: Maybe<Disbursement>;
+  /** List of Disbursement Pageable */
+  disbursementFilter?: Maybe<Page_Disbursement>;
+  /** List of AP Pageable By Supplier */
+  disbursementFilterPosted?: Maybe<Page_Disbursement>;
+  dmAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
+  dmDetailsById?: Maybe<DebitMemoDetails>;
+  dmDetials?: Maybe<Array<Maybe<DebitMemoDetails>>>;
   /** List of Document Type */
   documentTypeList?: Maybe<Array<Maybe<DocumentTypes>>>;
   /** Get Employee By Id */
@@ -5479,6 +6340,8 @@ export type Query = {
   getPrItemByPoId?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getPrItemInPO?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getProjectMaterialsByMilestone?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
+  /** Find Ap posted */
+  getReapplicationStatus?: Maybe<Array<Maybe<Reapplication>>>;
   /** get sss contributions */
   getSSSContributions?: Maybe<Array<Maybe<SssContribution>>>;
   /** Get the values of salary rate multiplier. */
@@ -5645,6 +6508,8 @@ export type Query = {
   prItemById?: Maybe<PurchaseRequestItem>;
   prItemByParent?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   prItemNoPo?: Maybe<Array<Maybe<PurchaseRequest>>>;
+  /** Filter Checks */
+  printChecks?: Maybe<Page_DisbursementCheck>;
   projectById?: Maybe<Projects>;
   projectByOffice?: Maybe<Array<Maybe<Projects>>>;
   projectByStatusCount?: Maybe<Array<Maybe<DashboardDto>>>;
@@ -5660,6 +6525,10 @@ export type Query = {
   quantityAdjustmentTypeList?: Maybe<Array<Maybe<QuantityAdjustmentType>>>;
   /** List of Quantity Adjustment by Item */
   quantityListByItem?: Maybe<Array<Maybe<QuantityAdjustment>>>;
+  reapplicationById?: Maybe<Reapplication>;
+  reapplicationPage?: Maybe<Page_Reapplication>;
+  reapplicationPageFilter?: Maybe<Page_Reapplication>;
+  reapplyAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
   recByFiltersPage?: Maybe<Page_ReceivingReport>;
   recById?: Maybe<ReceivingReport>;
   recItemById?: Maybe<ReceivingReportItem>;
@@ -5667,6 +6536,9 @@ export type Query = {
   regionFilter?: Maybe<Array<Maybe<Region>>>;
   /** Search all countries */
   regions?: Maybe<Array<Maybe<Region>>>;
+  releaseCheckById?: Maybe<ReleaseCheck>;
+  /** Filter Checks */
+  releaseChecksFilter?: Maybe<Page_ReleaseCheck>;
   repairTypeActive?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeAll?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeList?: Maybe<Array<Maybe<RepairType>>>;
@@ -5886,6 +6758,18 @@ export type QueryApAgingSummaryArgs = {
 
 
 /** Query root */
+export type QueryApAppByDisArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryApApplicationByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryApBeginningArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   supplier?: InputMaybe<Scalars['UUID']['input']>;
@@ -5893,7 +6777,19 @@ export type QueryApBeginningArgs = {
 
 
 /** Query root */
+export type QueryApByDisArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryApByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryApDebitMemoArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -5963,6 +6859,12 @@ export type QueryApListFilterArgs = {
   start?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
   supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryApReapplicationArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -6168,6 +7070,17 @@ export type QueryCheckBalancesByPoArgs = {
 
 
 /** Query root */
+export type QueryChecksFilterArgs = {
+  bank?: InputMaybe<Scalars['UUID']['input']>;
+  end?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  start?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
 export type QueryCityByProvinceArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -6218,7 +7131,115 @@ export type QueryCustomerListAssetsArgs = {
 
 
 /** Query root */
+export type QueryDebitMemoByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDebitMemoFilterArgs = {
+  end?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  start?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
 export type QueryDetailsByApArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisAccountViewArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisCheckByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisCheckByParentArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisExpByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisExpByParentArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisWtxByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisWtxByParentArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisbursementByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisbursementFilterArgs = {
+  end?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  start?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisbursementFilterPostedArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDmAccountViewArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Query root */
+export type QueryDmDetailsByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDmDetialsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -6596,6 +7617,13 @@ export type QueryGetPrItemInPoArgs = {
 /** Query root */
 export type QueryGetProjectMaterialsByMilestoneArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetReapplicationStatusArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -7306,6 +8334,18 @@ export type QueryPrItemByParentArgs = {
 
 
 /** Query root */
+export type QueryPrintChecksArgs = {
+  bank?: InputMaybe<Scalars['UUID']['input']>;
+  end?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  start?: InputMaybe<Scalars['String']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryProjectByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -7359,6 +8399,39 @@ export type QueryQuantityListByItemArgs = {
 
 
 /** Query root */
+export type QueryReapplicationByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryReapplicationPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryReapplicationPageFilterArgs = {
+  end?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  start?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryReapplyAccountViewArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Query root */
 export type QueryRecByFiltersPageArgs = {
   end?: InputMaybe<Scalars['String']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
@@ -7391,6 +8464,24 @@ export type QueryRecItemByParentArgs = {
 /** Query root */
 export type QueryRegionFilterArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryReleaseCheckByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryReleaseChecksFilterArgs = {
+  bank?: InputMaybe<Scalars['UUID']['input']>;
+  end?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  start?: InputMaybe<Scalars['String']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -7868,6 +8959,77 @@ export type QueryWtxListPageArgs = {
   supplier?: InputMaybe<Scalars['UUID']['input']>;
 };
 
+export type Reapplication = {
+  __typename?: 'Reapplication';
+  advanceAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  disbursement?: Maybe<Disbursement>;
+  disbursementAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  discAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  discountAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  ewt1Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt2Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt3Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt4Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt5Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt7Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt10Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt15Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt18Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewt30Percent?: Maybe<Scalars['BigDecimal']['output']>;
+  ewtAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  posted?: Maybe<Scalars['Boolean']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
+  prevApplied?: Maybe<Scalars['BigDecimal']['output']>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  rounding?: Maybe<Scalars['Int']['output']>;
+  rpNo?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  supplier?: Maybe<Supplier>;
+  transType?: Maybe<ApTransaction>;
+};
+
+export type ReapplicationInput = {
+  advanceAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  appliedAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  disbursement?: InputMaybe<DisbursementInput>;
+  disbursementAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  discAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  discountAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt1Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt2Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt3Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt4Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt5Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt7Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt10Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt15Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt18Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewt30Percent?: InputMaybe<Scalars['BigDecimal']['input']>;
+  ewtAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  flagValue?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  posted?: InputMaybe<Scalars['Boolean']['input']>;
+  postedLedger?: InputMaybe<Scalars['UUID']['input']>;
+  prevApplied?: InputMaybe<Scalars['BigDecimal']['input']>;
+  remarks?: InputMaybe<Scalars['String']['input']>;
+  rounding?: InputMaybe<Scalars['Int']['input']>;
+  rpNo?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  supplier?: InputMaybe<SupplierInput>;
+  transType?: InputMaybe<ApTransactionInput>;
+};
+
 export type ReceivingReport = {
   __typename?: 'ReceivingReport';
   account?: Maybe<Scalars['UUID']['output']>;
@@ -7994,6 +9156,22 @@ export type Region = {
   id?: Maybe<Scalars['UUID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   regionName?: Maybe<Scalars['String']['output']>;
+};
+
+export type ReleaseCheck = {
+  __typename?: 'ReleaseCheck';
+  bank?: Maybe<Bank>;
+  check?: Maybe<DisbursementCheck>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  disbursement?: Maybe<Disbursement>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isPosted?: Maybe<Scalars['Boolean']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  releaseDate?: Maybe<Scalars['Instant']['output']>;
+  release_by?: Maybe<Scalars['String']['output']>;
 };
 
 export type RepairType = {
