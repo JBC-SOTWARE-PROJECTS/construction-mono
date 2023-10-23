@@ -8,13 +8,17 @@ const QUERY = gql`
     $filter: String
     $leaveTypes: [LeaveType]
     $status: [LeaveStatus]
+    $position: UUID
+    $office: UUID
   ) {
-    page: getEmployeeLeavePageable(
+    getEmployeeLeavePageable(
       size: $size
       page: $page
       filter: $filter
       leaveTypes: $leaveTypes
       status: $status
+      position: $position
+      office: $office
     ) {
       content {
         id
@@ -26,6 +30,9 @@ const QUERY = gql`
           endDatetime
         }
         withPay
+        createdDate
+        employeeId
+        fullName
       }
       totalElements
     }
@@ -38,7 +45,12 @@ function useGetEmployeeLeavePageable(filterState: IPaginationFilters) {
     variables: filterState,
   });
 
-  return [data?.page?.content, loading, refetch, data?.page?.totalElements];
+  return [
+    data?.getEmployeeLeavePageable?.content,
+    loading,
+    refetch,
+    data?.getEmployeeLeavePageable?.totalElements,
+  ];
 }
 
 export default useGetEmployeeLeavePageable;

@@ -893,6 +893,19 @@ export type EmployeeLeave = {
   withPay?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export type EmployeeLeaveDto = {
+  __typename?: 'EmployeeLeaveDto';
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dates?: Maybe<Array<Maybe<SelectedDate>>>;
+  employeeId?: Maybe<Scalars['String']['output']>;
+  fullName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  reason?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<LeaveStatus>;
+  type?: Maybe<LeaveType>;
+  withPay?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type EmployeeLoan = {
   __typename?: 'EmployeeLoan';
   amount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -4185,9 +4198,9 @@ export type Page_EmployeeAttendance = {
   totalPages: Scalars['Int']['output'];
 };
 
-export type Page_EmployeeLeave = {
-  __typename?: 'Page_EmployeeLeave';
-  content?: Maybe<Array<Maybe<EmployeeLeave>>>;
+export type Page_EmployeeLeaveDto = {
+  __typename?: 'Page_EmployeeLeaveDto';
+  content?: Maybe<Array<Maybe<EmployeeLeaveDto>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -5714,7 +5727,7 @@ export type Query = {
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
   getDocTypeById?: Maybe<DocumentTypes>;
   getEmployeeLeaveByEmp?: Maybe<Array<Maybe<EmployeeLeave>>>;
-  getEmployeeLeavePageable?: Maybe<Page_EmployeeLeave>;
+  getEmployeeLeavePageable?: Maybe<Page_EmployeeLeaveDto>;
   getEmployeeLoanConfig?: Maybe<EmployeeLoanConfig>;
   getEmployeeLoanLedger?: Maybe<Page_EmployeeLoanLedgerDto>;
   getEmployeeLoansByEmployee?: Maybe<Page_EmployeeLoan>;
@@ -6709,7 +6722,9 @@ export type QueryGetEmployeeLeaveByEmpArgs = {
 export type QueryGetEmployeeLeavePageableArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   leaveTypes?: InputMaybe<Array<InputMaybe<LeaveType>>>;
+  office?: InputMaybe<Scalars['UUID']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+  position?: InputMaybe<Scalars['UUID']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<Array<InputMaybe<LeaveStatus>>>;
 };

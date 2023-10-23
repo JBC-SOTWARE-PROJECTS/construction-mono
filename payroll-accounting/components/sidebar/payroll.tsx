@@ -33,6 +33,12 @@ const payrollmenu: TDiverseTradeMenu[] = [
     path: "/payroll/payroll-management",
   },
   {
+    title: "Leave Management",
+    subtitle: "Manage employee leave requests",
+    icon: <CalendarOutlined className="diverse-trade-icon" />,
+    path: "/payroll/leave-management",
+  },
+  {
     title: "Allowance Management",
     subtitle: "Manage configuration for allowance management",
     icon: <MoneyCollectOutlined className="diverse-trade-icon" />,

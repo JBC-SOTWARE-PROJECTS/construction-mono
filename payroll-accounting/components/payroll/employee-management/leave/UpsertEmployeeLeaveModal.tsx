@@ -1,5 +1,10 @@
 import CustomCalender from "@/components/common/CustomCalender";
-import { EmployeeLeave, LeaveStatus, LeaveType } from "@/graphql/gql/graphql";
+import {
+  EmployeeLeave,
+  EmployeeLeaveDto,
+  LeaveStatus,
+  LeaveType,
+} from "@/graphql/gql/graphql";
 import useUpsertEmployeeLeave from "@/hooks/employee-leave/useUpsertEmployeeLeave";
 import {
   CheckCircleOutlined,
@@ -24,7 +29,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
 interface IParams {
-  record?: EmployeeLeave;
+  record?: EmployeeLeave | EmployeeLeaveDto;
   refetch: () => void;
 }
 

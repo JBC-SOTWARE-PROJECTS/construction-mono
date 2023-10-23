@@ -13,6 +13,7 @@ import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.hrm.EmployeeScheduleRepository
 import com.backend.gbp.repository.hrm.ScheduleTypeRepository
+import com.backend.gbp.repository.payroll.EmployeeLeaveDto
 import com.backend.gbp.repository.payroll.EmployeeLeaveRepository
 import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -28,6 +29,8 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+
+import java.time.Duration
 
 @TypeChecked
 @Component
@@ -56,11 +59,13 @@ class EmployeeLeaveService {
     }
 
     @GraphQLQuery(name = "getEmployeeLeavePageable")
-    Page<EmployeeLeave> getEmployeeLeavePageable(
+    Page<EmployeeLeaveDto> getEmployeeLeavePageable(
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "leaveTypes") List<LeaveType> leaveTypes,
+            @GraphQLArgument(name = "position") UUID position,
+            @GraphQLArgument(name = "office") UUID office,
             @GraphQLArgument(name = "status") List<LeaveStatus> status
     ) {
 
@@ -68,6 +73,8 @@ class EmployeeLeaveService {
                 SecurityUtils.currentCompanyId(),
                 leaveTypes.size() > 0 ? leaveTypes : LeaveType.values().toList(),
                 status.size() > 0 ? status : LeaveStatus.values().toList(),
+                office ? office.toString() : '',
+                position ? position.toString() : '',
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, 'createdDate')))
     }
 
@@ -99,7 +106,7 @@ class EmployeeLeaveService {
             List<EmployeeSchedule> scheduleList = []
             List<String> dateStringList = []
             dates.each {
-                dateStringList.push((it.startDatetime.toString() as String).substring(0, 10))
+                dateStringList.push(((it.startDatetime + Duration.ofHours(8)).toString() as String).substring(0, 10))
             }
             List<EmployeeSchedule> toDeleteSchedules = employeeScheduleRepository.findByDateString(dateStringList, employeeId)
             employeeScheduleRepository.deleteAll(toDeleteSchedules)
@@ -109,7 +116,7 @@ class EmployeeLeaveService {
 
                 employeeSchedule.dateTimeStart = it.startDatetime
                 employeeSchedule.dateTimeEnd = it.endDatetime
-                employeeSchedule.dateString = (it.startDatetime.toString() as String).substring(0, 10)
+                employeeSchedule.dateString = ((it.startDatetime + Duration.ofHours(8)).toString() as String).substring(0, 10)
                 employeeSchedule.isLeave = true
                 employeeSchedule.request = leave.id
                 employeeSchedule.label = "Leave"
