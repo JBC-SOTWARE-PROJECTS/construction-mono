@@ -36,6 +36,7 @@ import javax.transaction.Transactional
 import java.sql.Timestamp
 import java.sql.Types
 import java.text.SimpleDateFormat
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -147,7 +148,8 @@ class EmployeeScheduleService {
         Map<String, Map<String, List<ScheduleDto>>> employeeMap = new HashMap<>() // Initialize employeeMap
         results.each {
             String empId = it['emp_id'].toString()
-            Timestamp timestamp = (Timestamp) it['date_time_start'];
+//            Timestamp timestamp = (Timestamp) it['date_time_start'];
+            Timestamp timestamp = new Timestamp(((Timestamp) it['date_time_start']).getTime() + Duration.ofHours(8).toMillis());
             LocalDateTime dateTimeStart = timestamp.toLocalDateTime();
 
 

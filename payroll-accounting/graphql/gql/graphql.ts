@@ -877,6 +877,35 @@ export type EmployeeInput = {
   zipCode?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type EmployeeLeave = {
+  __typename?: 'EmployeeLeave';
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dates?: Maybe<Array<Maybe<SelectedDate>>>;
+  employee?: Maybe<Employee>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  reason?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<LeaveStatus>;
+  type?: Maybe<LeaveType>;
+  withPay?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type EmployeeLeaveDto = {
+  __typename?: 'EmployeeLeaveDto';
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dates?: Maybe<Array<Maybe<SelectedDate>>>;
+  employeeId?: Maybe<Scalars['String']['output']>;
+  fullName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  reason?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<LeaveStatus>;
+  type?: Maybe<LeaveType>;
+  withPay?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type EmployeeLoan = {
   __typename?: 'EmployeeLoan';
   amount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -1207,6 +1236,14 @@ export type GraphQlResVal_EmployeeAttendance = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlResVal_EmployeeLeave = {
+  __typename?: 'GraphQLResVal_EmployeeLeave';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<EmployeeLeave>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlResVal_EmployeeLoan = {
   __typename?: 'GraphQLResVal_EmployeeLoan';
   message?: Maybe<Scalars['String']['output']>;
@@ -1251,6 +1288,14 @@ export type GraphQlResVal_PayrollEmployeeLoan = {
   __typename?: 'GraphQLResVal_PayrollEmployeeLoan';
   message?: Maybe<Scalars['String']['output']>;
   response?: Maybe<PayrollEmployeeLoan>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlResVal_PayrollLoanItem = {
+  __typename?: 'GraphQLResVal_PayrollLoanItem';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<PayrollLoanItem>;
   returnId?: Maybe<Scalars['UUID']['output']>;
   success: Scalars['Boolean']['output'];
 };
@@ -1921,6 +1966,19 @@ export enum JournalType {
   Xxxx = 'XXXX'
 }
 
+export enum LeaveStatus {
+  Draft = 'DRAFT',
+  Finalized = 'FINALIZED'
+}
+
+export enum LeaveType {
+  InjuryRelated = 'INJURY_RELATED',
+  Maternity = 'MATERNITY',
+  Paternity = 'PATERNITY',
+  Sick = 'SICK',
+  Vacation = 'VACATION'
+}
+
 export type Ledger = {
   __typename?: 'Ledger';
   company?: Maybe<CompanySettings>;
@@ -2152,6 +2210,8 @@ export type Mutation = {
   updatePayrollDetails?: Maybe<GraphQlResVal_String>;
   updatePayrollEmployeeContributionStatus?: Maybe<GraphQlResVal_PayrollEmployeeContribution>;
   updatePayrollEmployeeLoanStatus?: Maybe<GraphQlResVal_PayrollEmployeeLoan>;
+  updatePayrollLoanItemAmount?: Maybe<GraphQlResVal_PayrollLoanItem>;
+  updatePayrollLoanStatus?: Maybe<GraphQlResVal_String>;
   /** A mutation for updating the status of module employee status. */
   updatePayrollModuleEmployeeStatus?: Maybe<GraphQlResVal_String>;
   updatePayrollStatus?: Maybe<GraphQlResVal_Payroll>;
@@ -2191,6 +2251,7 @@ export type Mutation = {
   upsertCustomer?: Maybe<Customer>;
   upsertEmployee?: Maybe<Employee>;
   upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
+  upsertEmployeeLeave?: Maybe<GraphQlResVal_EmployeeLeave>;
   upsertEmployeeLoan?: Maybe<GraphQlResVal_EmployeeLoan>;
   upsertEmployeeLoanConfig?: Maybe<GraphQlResVal_String>;
   /** create or update schedule config. */
@@ -2965,6 +3026,20 @@ export type MutationUpdatePayrollEmployeeLoanStatusArgs = {
 
 
 /** Mutation root */
+export type MutationUpdatePayrollLoanItemAmountArgs = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpdatePayrollLoanStatusArgs = {
+  payrollId?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollStatus>;
+};
+
+
+/** Mutation root */
 export type MutationUpdatePayrollModuleEmployeeStatusArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   module?: InputMaybe<PayrollModule>;
@@ -3220,6 +3295,15 @@ export type MutationUpsertEmployeeAttendanceArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   project_id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertEmployeeLeaveArgs = {
+  dates?: InputMaybe<Array<InputMaybe<SelectedDateInput>>>;
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -4098,6 +4182,25 @@ export type Page_CompanySettings = {
 export type Page_EmployeeAttendance = {
   __typename?: 'Page_EmployeeAttendance';
   content?: Maybe<Array<Maybe<EmployeeAttendance>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_EmployeeLeaveDto = {
+  __typename?: 'Page_EmployeeLeaveDto';
+  content?: Maybe<Array<Maybe<EmployeeLeaveDto>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -5623,6 +5726,8 @@ export type Query = {
   /** Get contribution by ID, this query is pagable */
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
   getDocTypeById?: Maybe<DocumentTypes>;
+  getEmployeeLeaveByEmp?: Maybe<Array<Maybe<EmployeeLeave>>>;
+  getEmployeeLeavePageable?: Maybe<Page_EmployeeLeaveDto>;
   getEmployeeLoanConfig?: Maybe<EmployeeLoanConfig>;
   getEmployeeLoanLedger?: Maybe<Page_EmployeeLoanLedgerDto>;
   getEmployeeLoansByEmployee?: Maybe<Page_EmployeeLoan>;
@@ -6604,6 +6709,24 @@ export type QueryGetContributionEmployeesByPayrollIdArgs = {
 /** Query root */
 export type QueryGetDocTypeByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeLeaveByEmpArgs = {
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeLeavePageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  leaveTypes?: InputMaybe<Array<InputMaybe<LeaveType>>>;
+  office?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  position?: InputMaybe<Scalars['UUID']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Array<InputMaybe<LeaveStatus>>>;
 };
 
 
@@ -8419,6 +8542,17 @@ export type ScheduleLock = {
   isLocked?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+};
+
+export type SelectedDate = {
+  __typename?: 'SelectedDate';
+  endDatetime?: Maybe<Scalars['Instant']['output']>;
+  startDatetime?: Maybe<Scalars['Instant']['output']>;
+};
+
+export type SelectedDateInput = {
+  endDatetime?: InputMaybe<Scalars['Instant']['input']>;
+  startDatetime?: InputMaybe<Scalars['Instant']['input']>;
 };
 
 export type ServiceCategory = {

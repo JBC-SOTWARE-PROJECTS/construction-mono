@@ -1,26 +1,23 @@
 import { Employee, Schedule } from "@/graphql/gql/graphql";
+import { useGetEmployeesByFilter } from "@/hooks/employee";
+import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
+import { IState } from "@/routes/administrative/Employees";
+import { transformDate } from "@/utility/helper";
 import {
   ExclamationCircleOutlined,
-  LeftCircleFilled,
   LeftCircleOutlined,
-  LeftOutlined,
   RightCircleOutlined,
-  RightOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
-import { Button, Modal, Space, Steps, Tag, message } from "antd";
-import AssignSchedStep1 from "./AssignSchedStep1";
-import { useState } from "react";
-import { ColumnsType, TableRowSelection } from "antd/es/table/interface";
 import { Key } from "@ant-design/pro-components";
-import { IState } from "@/routes/administrative/Employees";
-import { useGetEmployeesByFilter } from "@/hooks/employee";
-import AssignSchedStep2 from "./AssignSchedStep2";
-import dayjs, { Dayjs } from "dayjs";
+import { Button, Modal, Space, Steps, Tag, message } from "antd";
 import { SelectInfo } from "antd/es/calendar/generateCalendar";
+import { ColumnsType, TableRowSelection } from "antd/es/table/interface";
+import dayjs, { Dayjs } from "dayjs";
+import { useState } from "react";
+import AssignSchedStep1 from "./AssignSchedStep1";
+import AssignSchedStep2 from "./AssignSchedStep2";
 import AssignSchedStep3 from "./AssignSchedStep3";
-import { transformDate } from "@/utility/helper";
-import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 
 interface IProps {
   hide: (hideProps: any) => void;
