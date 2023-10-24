@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import {
   AccountsPayable,
+  ApAccountsTemplateItems,
   JournalEntryViewDto,
   Mutation,
   Query,
@@ -8,12 +9,13 @@ import {
 import { currency, responsiveColumn2 } from "@/utility/constant";
 import { NumberFormater, decimalRound2, requiredField } from "@/utility/helper";
 import {
+  DeleteOutlined,
   FileSearchOutlined,
   IssuesCloseOutlined,
   ReconciliationOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Col,
@@ -39,6 +41,8 @@ import {
 } from "@/graphql/payables/queries";
 import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import ChartOfAccountsComponentSelector from "@/components/chartOfAccounts/chartOfAccountsSelector";
+import { UseAccountsTemplate } from "@/hooks/payables/accountTemplates";
+import { GET_TEMPLATE_ACCOUNTS_ITEMS } from "@/graphql/payables/ledger-queries";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -48,11 +52,13 @@ interface IProps {
   supplierName?: string;
   refDate?: string;
   particulars?: string;
+  type?: string;
 }
 
 export default function APJournalEntries(props: IProps) {
   const { message } = App.useApp();
-  const { hide, id, status, refNo, supplierName, refDate, particulars } = props;
+  const { hide, id, status, refNo, supplierName, refDate, particulars, type } =
+    props;
   const [ledger, setLedger] = useState<JournalEntryViewDto[]>([]);
   const [manual, setManual] = useState<boolean>(false);
   const [editable, setEditable] = useState<any>({});
@@ -60,6 +66,11 @@ export default function APJournalEntries(props: IProps) {
   // ===================== Modals ==============================
   const showAccountSelector = useDialog(ChartOfAccountsComponentSelector);
   // ===================== Queries ==============================
+  const templates = UseAccountsTemplate({
+    type: type ?? "",
+    category: "AP",
+  });
+  // ===========================================
   const { loading } = useQuery<Query>(GET_AP_AUTO_ENTRIES, {
     fetchPolicy: "cache-and-network",
     variables: {
@@ -80,6 +91,28 @@ export default function APJournalEntries(props: IProps) {
       }
     },
   });
+  // ======================== LAZY ==========================
+  const [getAccounts, { loading: getLoadingAccounts }] = useLazyQuery<Query>(
+    GET_TEMPLATE_ACCOUNTS_ITEMS,
+    {
+      onCompleted: (data) => {
+        const result = data.accountsItemsByParent as ApAccountsTemplateItems[];
+        if (!_.isEmpty(result)) {
+          const mapped = (result || []).map((item) => {
+            return {
+              code: item?.code ?? "",
+              desc: item?.desc ?? "",
+              accountType: item?.accountType ?? "",
+              debit: 0.0,
+              credit: 0.0,
+            };
+          });
+          //=========================
+          setLedger(mapped);
+        }
+      },
+    }
+  );
   // ====================== Mutation ===============================
   const [postAccountPayable, { loading: upsertLoading }] =
     useMutation<Mutation>(POST_ACCOUNT_PAYABLE, {
@@ -191,6 +224,28 @@ export default function APJournalEntries(props: IProps) {
     setLedger(data);
   };
 
+  const onGetAccounts = (e: string) => {
+    if (e) {
+      getAccounts({
+        variables: {
+          id: e,
+        },
+      });
+    } else {
+      setLedger([]);
+    }
+  };
+
+  const onRemove = (code: string) => {
+    if (code) {
+      const filtered = _.filter(
+        ledger,
+        (obj: JournalEntryViewDto) => obj.code !== code
+      );
+      setLedger(filtered);
+    }
+  };
+
   const renderNumberInput = (record: any, el: string) => {
     return (
       <Form
@@ -293,6 +348,21 @@ export default function APJournalEntries(props: IProps) {
           </span>
         );
       },
+    },
+    {
+      title: "#",
+      dataIndex: "action",
+      key: "action",
+      width: 50,
+      align: "center",
+      render: (_, record) => (
+        <Button
+          size="small"
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => onRemove(record?.code as string)}
+        />
+      ),
     },
   ];
 
@@ -398,9 +468,13 @@ export default function APJournalEntries(props: IProps) {
                 <FormSelect
                   label="Load Accounts from Templates"
                   propsselect={{
+                    allowClear: true,
                     placeholder: "Select Templates",
                     style: { width: 500 },
-                    options: [],
+                    options: templates ?? [],
+                    onChange: (e) => {
+                      onGetAccounts(e);
+                    },
                   }}
                 />
               </div>
@@ -411,7 +485,7 @@ export default function APJournalEntries(props: IProps) {
           <Table
             rowKey="code"
             size="small"
-            loading={loading}
+            loading={loading || getLoadingAccounts}
             columns={columns}
             pagination={false}
             dataSource={ledger}

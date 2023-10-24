@@ -351,4 +351,16 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/32_michael_leave_tables.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/29_wilson_ap_accounts_template_items.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/30_wilson_disbursement_debit_memo.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/31_ap_ledger.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/32_realesed_checks.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/33_petty_cash.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/34_item_alter.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
