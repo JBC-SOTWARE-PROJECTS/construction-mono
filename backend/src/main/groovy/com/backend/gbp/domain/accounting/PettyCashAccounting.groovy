@@ -91,6 +91,10 @@ class PettyCashAccounting extends AbstractAuditingEntity implements Serializable
 	UUID postedLedger
 
 	@GraphQLQuery
+	@Column(name = "company", columnDefinition = "uuid")
+	UUID company
+
+	@GraphQLQuery
 	@Column(name = "remarks", columnDefinition = "varchar")
 	@UpperCase
 	String remarks

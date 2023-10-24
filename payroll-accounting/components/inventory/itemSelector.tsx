@@ -37,7 +37,7 @@ export default function ItemSelector(props: IProps) {
   const [selectedItems, setSelectedItems] = useState<Item[]>(defaultSelected);
   const [selectedRowkeys, setSelectedRowkeys] =
     useState<React.Key[]>(defaultKey);
-  const [office, setOffice] = useLocalStorage("office", {});
+  const [office, setOffice] = useLocalStorage("office", null);
   const [state, setState] = useState({
     filter: "",
     page: 0,

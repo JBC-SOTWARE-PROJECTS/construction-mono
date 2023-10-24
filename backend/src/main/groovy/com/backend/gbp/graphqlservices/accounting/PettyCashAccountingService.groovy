@@ -10,6 +10,7 @@ import com.backend.gbp.rest.dto.payables.PCVOthersDto
 import com.backend.gbp.rest.dto.payables.PettyCashName
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
+import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -18,6 +19,7 @@ import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -48,6 +50,9 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 	@Autowired
 	LedgerServices ledgerServices
 
+	@Autowired
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
 	PettyCashAccountingService() {
 		super(PettyCashAccounting.class)
 	}
@@ -64,12 +69,16 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 	List<PettyCashName> pettyCashName() {
 
 		List<PettyCashName> records = []
+		def company = SecurityUtils.currentCompanyId()
 
-		String query = '''select distinct pc.payee_name as payee from accounting.petty_cash pc where pc.payee_name is not null'''
+		String query = '''select distinct pc.payee_name as payee from accounting.petty_cash pc where pc.payee_name is not null '''
 
 
 		Map<String, Object> params = new HashMap<>()
-
+		if (company) {
+			query += ''' and (p.company = :company) '''
+			params.put("company", company)
+		}
 
 		def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
 
@@ -94,14 +103,14 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-
-		String query = '''Select d from PettyCash d where
+		def company = SecurityUtils.currentCompanyId()
+		String query = '''Select d from PettyCashAccounting d where
 						( lower(d.remarks) like lower(concat('%',:filter,'%'))
 						or lower(d.pcvNo) like lower(concat('%',:filter,'%')) )
 						and to_date(to_char(d.pcvDate, 'YYYY-MM-DD'),'YYYY-MM-DD')
              			between to_date(:start,'YYYY-MM-DD') and  to_date(:end,'YYYY-MM-DD') '''
 
-		String countQuery = '''Select count(d) from PettyCash d where
+		String countQuery = '''Select count(d) from PettyCashAccounting d where
 							( lower(d.remarks) like lower(concat('%',:filter,'%'))
 						or lower(d.pcvNo) like lower(concat('%',:filter,'%')) )
 						and to_date(to_char(d.pcvDate, 'YYYY-MM-DD'),'YYYY-MM-DD')
@@ -122,6 +131,12 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 			query += ''' and (d.posted = :status or d.posted is null) '''
 			countQuery += ''' and (d.posted = :status or d.posted is null) '''
 			params.put("status", !status)
+		}
+
+		if (company) {
+			query += ''' and (d.company = :company) '''
+			countQuery += ''' and (d.company = :company) '''
+			params.put("company", company)
 		}
 
 

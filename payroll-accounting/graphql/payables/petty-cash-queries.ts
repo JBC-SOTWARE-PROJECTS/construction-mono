@@ -141,9 +141,13 @@ export const GET_PCV_ITEMS = gql`
           unitDescription
         }
       }
-      department {
+      office {
         id
-        departmentName
+        officeDescription
+      }
+      project {
+        id
+        description
       }
       uou
       descLong
@@ -168,9 +172,13 @@ export const GET_PCV_ITEMS = gql`
         id
         description
       }
-      department {
+      office {
         id
-        departmentName
+        officeDescription
+      }
+      project {
+        id
+        description
       }
       amount
       remarks
