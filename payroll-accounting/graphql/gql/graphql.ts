@@ -244,6 +244,26 @@ export type AccumulatedLogs = {
   timekeepingEmployee?: Maybe<TimekeepingEmployee>;
 };
 
+export type AdjustmentCategory = {
+  __typename?: 'AdjustmentCategory';
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isDefault?: Maybe<Scalars['Boolean']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  operation?: Maybe<AdjustmentOperation>;
+  status?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export enum AdjustmentOperation {
+  Addition = 'ADDITION',
+  Subtraction = 'SUBTRACTION'
+}
+
 export type Allowance = {
   __typename?: 'Allowance';
   allowanceType?: Maybe<Scalars['String']['output']>;
@@ -1383,16 +1403,16 @@ export enum EmployeeLoanCategory {
 export type EmployeeLoanConfig = {
   __typename?: 'EmployeeLoanConfig';
   cashAdvanceAmount?: Maybe<Scalars['BigDecimal']['output']>;
-  cashAdvanceTerm?: Maybe<PaymentTerm>;
+  cashAdvanceTerm?: Maybe<LoanPaymentTerm>;
   equipmentLoanAmount?: Maybe<Scalars['BigDecimal']['output']>;
-  equipmentLoanTerm?: Maybe<PaymentTerm>;
+  equipmentLoanTerm?: Maybe<LoanPaymentTerm>;
 };
 
 export type EmployeeLoanConfigInput = {
   cashAdvanceAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
-  cashAdvanceTerm?: InputMaybe<PaymentTerm>;
+  cashAdvanceTerm?: InputMaybe<LoanPaymentTerm>;
   equipmentLoanAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
-  equipmentLoanTerm?: InputMaybe<PaymentTerm>;
+  equipmentLoanTerm?: InputMaybe<LoanPaymentTerm>;
 };
 
 export type EmployeeLoanLedgerDto = {
@@ -1692,6 +1712,14 @@ export type GenericInput = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type GraphQlResVal_AdjustmentCategory = {
+  __typename?: 'GraphQLResVal_AdjustmentCategory';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<AdjustmentCategory>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlResVal_EmployeeAttendance = {
   __typename?: 'GraphQLResVal_EmployeeAttendance';
   message?: Maybe<Scalars['String']['output']>;
@@ -1736,6 +1764,14 @@ export type GraphQlResVal_PayrollContribution = {
   __typename?: 'GraphQLResVal_PayrollContribution';
   message?: Maybe<Scalars['String']['output']>;
   response?: Maybe<PayrollContribution>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlResVal_PayrollEmployeeAdjustment = {
+  __typename?: 'GraphQLResVal_PayrollEmployeeAdjustment';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<PayrollEmployeeAdjustment>;
   returnId?: Maybe<Scalars['UUID']['output']>;
   success: Scalars['Boolean']['output'];
 };
@@ -2511,6 +2547,11 @@ export type LedgerTotalDebitCredit = {
   totalDebit?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
+export enum LoanPaymentTerm {
+  Monthly = 'MONTHLY',
+  SemiMonthly = 'SEMI_MONTHLY'
+}
+
 export type MaterialProduction = {
   __typename?: 'MaterialProduction';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -2707,7 +2748,9 @@ export type Mutation = {
   updatePRItemPO?: Maybe<PurchaseRequestItem>;
   updatePRStatus?: Maybe<PurchaseRequest>;
   updatePayableForRemove?: Maybe<AccountsPayable>;
+  updatePayrollAdjustmentStatus?: Maybe<GraphQlResVal_String>;
   updatePayrollDetails?: Maybe<GraphQlResVal_String>;
+  updatePayrollEmployeeAdjustmentStatus?: Maybe<GraphQlResVal_PayrollEmployeeAdjustment>;
   updatePayrollEmployeeContributionStatus?: Maybe<GraphQlResVal_PayrollEmployeeContribution>;
   updatePayrollEmployeeLoanStatus?: Maybe<GraphQlResVal_PayrollEmployeeLoan>;
   updatePayrollLoanItemAmount?: Maybe<GraphQlResVal_PayrollLoanItem>;
@@ -2736,6 +2779,7 @@ export type Mutation = {
   upsert2307?: Maybe<Wtx2307>;
   upsertAccountTemplateItem?: Maybe<ApAccountsTemplateItems>;
   upsertAddress?: Maybe<GraphQlRetVal_Boolean>;
+  upsertAdjustmentCategory?: Maybe<GraphQlResVal_AdjustmentCategory>;
   /** add allowance package */
   upsertAllAllowancePackage?: Maybe<GraphQlRetVal_AllowancePackage>;
   /**  Add allowance type  */
@@ -3722,9 +3766,23 @@ export type MutationUpdatePayableForRemoveArgs = {
 
 
 /** Mutation root */
+export type MutationUpdatePayrollAdjustmentStatusArgs = {
+  payrollId?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollStatus>;
+};
+
+
+/** Mutation root */
 export type MutationUpdatePayrollDetailsArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpdatePayrollEmployeeAdjustmentStatusArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollEmployeeStatus>;
 };
 
 
@@ -3910,6 +3968,13 @@ export type MutationUpsertAddressArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertAdjustmentCategoryArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -5866,6 +5931,7 @@ export type PaymentTermInput = {
 
 export type Payroll = {
   __typename?: 'Payroll';
+  adjustment?: Maybe<PayrollAdjustment>;
   company?: Maybe<CompanySettings>;
   contribution?: Maybe<PayrollContribution>;
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -5883,6 +5949,37 @@ export type Payroll = {
   status?: Maybe<PayrollStatus>;
   timekeeping?: Maybe<Timekeeping>;
   title?: Maybe<Scalars['String']['output']>;
+};
+
+export type PayrollAdjustment = {
+  __typename?: 'PayrollAdjustment';
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  deletedEnd?: Maybe<Scalars['Instant']['output']>;
+  employees?: Maybe<Array<Maybe<PayrollEmployeeAdjustment>>>;
+  finalizedBy?: Maybe<Employee>;
+  finalizedDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  payroll?: Maybe<Payroll>;
+  status?: Maybe<PayrollStatus>;
+};
+
+export type PayrollAdjustmentItem = {
+  __typename?: 'PayrollAdjustmentItem';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  category?: Maybe<AdjustmentCategory>;
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  employeeAdjustment?: Maybe<PayrollEmployeeAdjustment>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
 };
 
 export type PayrollContribution = {
@@ -5909,6 +6006,7 @@ export type PayrollEmployee = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   employee?: Maybe<Employee>;
+  employeeAdjustment?: Maybe<PayrollEmployeeAdjustment>;
   id?: Maybe<Scalars['UUID']['output']>;
   isOld?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
@@ -5918,6 +6016,22 @@ export type PayrollEmployee = {
   payrollEmployeeLoan?: Maybe<PayrollEmployeeLoan>;
   status?: Maybe<PayrollEmployeeStatus>;
   timekeepingEmployee?: Maybe<TimekeepingEmployee>;
+};
+
+export type PayrollEmployeeAdjustment = {
+  __typename?: 'PayrollEmployeeAdjustment';
+  adjustmentItems?: Maybe<Array<Maybe<PayrollAdjustmentItem>>>;
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  finalizedBy?: Maybe<Employee>;
+  finalizedDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  payrollAdjustment?: Maybe<PayrollAdjustment>;
+  payrollEmployee?: Maybe<PayrollEmployee>;
+  status?: Maybe<PayrollEmployeeStatus>;
 };
 
 export type PayrollEmployeeContribution = {
@@ -6834,6 +6948,7 @@ export type Query = {
   genericList?: Maybe<Array<Maybe<Generic>>>;
   getAccumulatedLogs?: Maybe<Array<Maybe<AccumulatedLogs>>>;
   getActiveProjects?: Maybe<Array<Maybe<Projects>>>;
+  getAdjustmentCategories?: Maybe<Array<Maybe<AdjustmentCategory>>>;
   getAllAmounts?: Maybe<Scalars['BigDecimal']['output']>;
   getAllCOAParent?: Maybe<Array<Maybe<DomainOptionDto>>>;
   getAllChartOfAccountGenerate?: Maybe<Array<Maybe<ChartOfAccountGenerate>>>;
@@ -6886,6 +7001,10 @@ export type Query = {
   getPOMonitoringByRec?: Maybe<Array<Maybe<PoDeliveryMonitoring>>>;
   /** Get getCoaById */
   getParentAccountList?: Maybe<Array<Maybe<ParentAccount>>>;
+  /** Get adjustment by ID */
+  getPayrollAdjustmentById?: Maybe<PayrollAdjustment>;
+  /** Get adjustment by ID */
+  getPayrollAdjustmentByPayrollId?: Maybe<PayrollAdjustment>;
   /** Get payroll by ID */
   getPayrollById?: Maybe<Payroll>;
   /** list of all allowances with pagination */
@@ -7945,6 +8064,12 @@ export type QueryGetAccumulatedLogsArgs = {
 
 
 /** Query root */
+export type QueryGetAdjustmentCategoriesArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetAllAmountsArgs = {
   type?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
@@ -8180,6 +8305,18 @@ export type QueryGetPoMonitoringByPoItemFilterArgs = {
 
 /** Query root */
 export type QueryGetPoMonitoringByRecArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetPayrollAdjustmentByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetPayrollAdjustmentByPayrollIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 

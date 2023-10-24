@@ -1,0 +1,5 @@
+INSERT INTO "payroll"."adjustment_category" ("id", "name", "description", "operation", "status", "is_default", "company", "created_by", "created_date", "last_modified_by", "last_modified_date", "deleted") VALUES
+('84da0ca7-0376-426d-92d9-7ad11659edd1', 'Cash Advance', 'Cash Advance Adjustment Addition', 'ADDITION', 't', 't', NULL, 'admin', '2023-10-24 06:38:13.36', 'admin', '2023-10-24 06:38:13.36', 'f'),
+('19e7669b-6b19-4d32-9e75-e425fe75ccd7', 'Cash Advance', 'Cash Advance Adjustment Subtraction', 'SUBTRACTION', 't', 't', NULL, 'admin', '2023-10-24 06:39:21.498', 'admin', '2023-10-24 06:39:21.498', 'f'),
+('e3e5123b-c096-4587-88ef-05664342b37a', 'Underpaid Salary', 'Underpaid Salary', 'SUBTRACTION', 't', 't', NULL, 'admin', '2023-10-24 06:40:00.377', 'admin', '2023-10-24 06:40:00.377', 'f'),
+('f6dfa272-292b-4fdd-b423-60df576935bf', 'Overpaid Salary', 'Overpaid Salary', 'ADDITION', 't', 't', NULL, 'admin', '2023-10-24 06:40:11.256', 'admin', '2023-10-24 06:40:11.256', 'f');
