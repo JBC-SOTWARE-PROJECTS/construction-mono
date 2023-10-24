@@ -109,7 +109,7 @@ ALTER TABLE accounting.petty_cash
 -- accounting.petty_cash_others foreign keys
 
 ALTER TABLE accounting.petty_cash_others
-    ADD CONSTRAINT petty_cash_others_office_fkey FOREIGN KEY (office) REFERENCES public.departments (id);
+    ADD CONSTRAINT petty_cash_others_office_fkey FOREIGN KEY (office) REFERENCES public.office (id);
 ALTER TABLE accounting.petty_cash_others
     ADD CONSTRAINT petty_cash_others_project_fkey FOREIGN KEY (project) REFERENCES projects.projects (id);
 ALTER TABLE accounting.petty_cash_others
@@ -121,7 +121,7 @@ ALTER TABLE accounting.petty_cash_others
 -- accounting.petty_cash_purchases foreign keys
 
 ALTER TABLE accounting.petty_cash_purchases
-    ADD CONSTRAINT petty_cash_purchases_department_fkey FOREIGN KEY (office) REFERENCES public.departments (id);
+    ADD CONSTRAINT petty_cash_purchases_department_fkey FOREIGN KEY (office) REFERENCES public.office (id);
 ALTER TABLE accounting.petty_cash_purchases
     ADD CONSTRAINT petty_cash_others_project_fkey FOREIGN KEY (project) REFERENCES projects.projects (id);
 ALTER TABLE accounting.petty_cash_purchases
