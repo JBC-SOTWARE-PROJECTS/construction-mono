@@ -16,6 +16,7 @@ import { useSupplierTypes } from "@/hooks/payables";
 import { useDialog } from "@/hooks";
 import APAccountsTemplateModal from "@/components/accounting/payables/dialogs/apAccountsTemplateModal";
 import AccountsTemplateTable from "@/components/accounting/payables/config/accountsTemplatesTable";
+import AccountTemplatesEntries from "@/components/accounting/payables/templates/accountsEntriesModal";
 
 const { Search } = Input;
 
@@ -23,6 +24,7 @@ export default function AccountsTemplateComponent() {
   const { message } = App.useApp();
   const types = useSupplierTypes();
   const modal = useDialog(APAccountsTemplateModal);
+  const accountModal = useDialog(AccountTemplatesEntries);
   const [supplierTypes, setSupplierType] = useState<string | null>(null);
   const [category, setCategory] = useState<string | null>(null);
 
@@ -64,6 +66,15 @@ export default function AccountsTemplateComponent() {
         } else {
           message.success("Transaction Type successfully added");
         }
+      }
+    });
+  };
+
+  const configureAccounts = (record?: ApAccountsTemplate) => {
+    accountModal({ id: record?.id }, (result: any) => {
+      if (result) {
+        refetch();
+        message.success("Accounts Template successfully updated");
       }
     });
   };
@@ -139,6 +150,7 @@ export default function AccountsTemplateComponent() {
           totalElements={data?.apTransactionPage?.totalElements as number}
           currentPage={data?.apTransactionPage?.number as number}
           handleOpen={(record) => upsertShowModal(record)}
+          handleOpenCreateAccounts={(record) => configureAccounts(record)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
           getLabel={getLabel}
         />

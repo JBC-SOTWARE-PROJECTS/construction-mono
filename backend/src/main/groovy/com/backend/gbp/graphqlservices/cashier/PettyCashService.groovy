@@ -58,7 +58,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
             @GraphQLArgument(name = "cashType") String cashType,
             @GraphQLArgument(name = "project") UUID project
     ) {
-        String query = '''Select e from PettyCash e where 
+        String query = '''Select e from PettyCashAccounting e where 
                           lower(concat(e.code,e.remarks)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
@@ -81,7 +81,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
     List<PettyCash> pettyCashListPosted(
             @GraphQLArgument(name = "shift") UUID shift
     ) {
-        String query = '''Select e from PettyCash e where 
+        String query = '''Select e from PettyCashAccounting e where 
                           e.shift.id = :shift and e.isPosted = true'''
         Map<String, Object> params = new HashMap<>()
         params.put("shift", shift)
@@ -93,7 +93,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
             @GraphQLArgument(name = "project") UUID project,
             @GraphQLArgument(name = "filter") String filter
     ) {
-        String query = '''Select e from PettyCash e where 
+        String query = '''Select e from PettyCashAccounting e where 
                           lower(concat(e.code,e.remarks)) like lower(concat('%',:filter,'%'))
                           and e.project.id = :project and e.isPosted = true'''
         Map<String, Object> params = new HashMap<>()
@@ -108,7 +108,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
             @GraphQLArgument(name = "end") String end,
             @GraphQLArgument(name = "filter") String filter
     ) {
-        String query = '''Select e from PettyCash e where 
+        String query = '''Select e from PettyCashAccounting e where 
                           lower(concat(e.code,e.remarks)) like lower(concat('%',:filter,'%'))
                           and to_date(to_char(e.dateTrans, 'YYYY-MM-DD'),'YYYY-MM-DD')
              			between to_date(:start,'YYYY-MM-DD') and  to_date(:end,'YYYY-MM-DD')
@@ -126,7 +126,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
             @GraphQLArgument(name = "start") String start,
             @GraphQLArgument(name = "end") String end
     ) {
-        String query = '''Select sum(e.amount) from PettyCash e where to_date(to_char(e.dateTrans, 'YYYY-MM-DD'),'YYYY-MM-DD')
+        String query = '''Select sum(e.amount) from PettyCashAccounting e where to_date(to_char(e.dateTrans, 'YYYY-MM-DD'),'YYYY-MM-DD')
              			between to_date(:start,'YYYY-MM-DD') and to_date(:end,'YYYY-MM-DD')
              			and e.isPosted = true and e.cashType = :type'''
         Map<String, Object> params = new HashMap<>()
@@ -142,7 +142,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
             @GraphQLArgument(name = "start") String start,
             @GraphQLArgument(name = "end") String end
     ) {
-        String query = '''Select sum(e.amount) from PettyCash e where to_date(to_char(e.dateTrans, 'YYYY-MM-DD'),'YYYY-MM-DD')
+        String query = '''Select sum(e.amount) from PettyCashAccounting e where to_date(to_char(e.dateTrans, 'YYYY-MM-DD'),'YYYY-MM-DD')
              			between to_date(:start,'YYYY-MM-DD') and to_date(:end,'YYYY-MM-DD')
              			and e.isPosted = true and e.cashType = :type'''
         Map<String, Object> params = new HashMap<>()
@@ -156,7 +156,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
     BigDecimal totalExpenseProject(
             @GraphQLArgument(name = "project") UUID project
     ) {
-        String query = '''Select sum(e.amount) from PettyCash e where
+        String query = '''Select sum(e.amount) from PettyCashAccounting e where
                      e.project.id = :project and e.isPosted = true'''
         Map<String, Object> params = new HashMap<>()
         params.put('project', project)
