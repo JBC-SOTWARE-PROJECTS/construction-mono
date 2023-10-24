@@ -351,4 +351,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/32_michael_leave_tables.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/33_michael_adjustments_tables.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
