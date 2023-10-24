@@ -7,6 +7,8 @@ import {
   DisbursementCheck,
   DisbursementExpense,
   DisbursementWtx,
+  PettyCashItem,
+  PettyCashOther,
 } from "@/graphql/gql/graphql";
 import { Dayjs } from "dayjs";
 import { OptionsValue } from "@/utility/interfaces";
@@ -101,6 +103,19 @@ export interface IDisbursementApplication {
   isNew?: boolean;
 }
 
+export interface ConfigVat {
+  vatRate: number;
+  vatInclusive: boolean;
+}
+
+export interface IFormPettyCashOthers {
+  transType: OptionsValue;
+  office: OptionsValue;
+  project: OptionsValue;
+  amount: number;
+  remarks: string;
+}
+
 export interface ExtendedAPTransactionDto extends AccountsPayableDetails {
   vatRate?: number | undefined | null;
   isNew?: boolean;
@@ -123,5 +138,13 @@ export interface IDebitMemoDetails extends DebitMemoDetails {
   isNew?: boolean;
 }
 export interface AccountsTemplateItemDto extends ApAccountsTemplateItems {
+  isNew?: boolean;
+}
+
+export interface PettyCashItemDto extends PettyCashItem {
+  isNew?: boolean;
+}
+
+export interface PettyCashOthersDto extends PettyCashOther {
   isNew?: boolean;
 }

@@ -46,7 +46,7 @@ class PettyCashOther extends AbstractAuditingEntity implements Serializable {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "petty_cash", referencedColumnName = "id")
-	PettyCash pettyCash
+	PettyCashAccounting pettyCash
 
 	@GraphQLQuery
 	@Column(name = "amount", columnDefinition = "numeric")

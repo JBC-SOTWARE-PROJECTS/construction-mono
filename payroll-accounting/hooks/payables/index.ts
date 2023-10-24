@@ -8,3 +8,4 @@ export { UseReferenceType as useReferenceType } from "./reference-type";
 export { UseTerminals as useTerminals } from "./terminals";
 export { UseAPTransactionTypeOthers as useAPTransactionTypeOthers } from "./transactionTypesOthers";
 export { UseAccountsTemplate as useAccountsTemplate } from "./accountTemplates";
+export { UsePettyCashNames as usePettyCashNames } from "./pettyCashName";

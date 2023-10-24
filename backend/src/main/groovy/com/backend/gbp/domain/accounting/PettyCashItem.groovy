@@ -16,6 +16,8 @@ import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.Table
+import javax.persistence.Transient
+import java.time.Instant
 
 
 @Entity
@@ -30,7 +32,6 @@ class PettyCashItem extends AbstractAuditingEntity implements Serializable {
 	@Type(type = "pg-uuid")
 	UUID id
 
-	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
@@ -43,9 +44,9 @@ class PettyCashItem extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "petty_cash", referencedColumnName = "id")
-	PettyCash pettyCash
+	PettyCashAccounting pettyCash
 
 	@GraphQLQuery
 	@Column(name = "qty", columnDefinition = "int")
@@ -56,6 +57,14 @@ class PettyCashItem extends AbstractAuditingEntity implements Serializable {
 	BigDecimal unitCost
 
 	@GraphQLQuery
+	@Column(name = "inventory_cost", columnDefinition = "numeric")
+	BigDecimal inventoryCost
+
+	@GraphQLQuery
+	@Column(name = "gross_amount", columnDefinition = "numeric")
+	BigDecimal grossAmount
+
+	@GraphQLQuery
 	@Column(name = "disc_rate", columnDefinition = "numeric")
 	BigDecimal discRate
 
@@ -64,8 +73,16 @@ class PettyCashItem extends AbstractAuditingEntity implements Serializable {
 	BigDecimal discAmount
 
 	@GraphQLQuery
-	@Column(name = "net_amount", columnDefinition = "numeric")
-	BigDecimal netAmount
+	@Column(name = "net_discount", columnDefinition = "numeric")
+	BigDecimal netDiscount
+
+	@GraphQLQuery
+	@Column(name = "expiration_date", columnDefinition = 'date')
+	Instant expirationDate
+
+	@GraphQLQuery
+	@Column(name = "lot_no", columnDefinition = 'date')
+	String lotNo
 
 	@GraphQLQuery
 	@Column(name = "is_vat", columnDefinition = "bool")
@@ -74,6 +91,32 @@ class PettyCashItem extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "vat_amount", columnDefinition = "numeric")
 	BigDecimal vatAmount
+
+	@GraphQLQuery
+	@Column(name = "net_amount", columnDefinition = "numeric")
+	BigDecimal netAmount
+
+	@GraphQLQuery
+	@Column(name = "is_posted", columnDefinition = 'bool')
+	Boolean isPosted
+
+	@GraphQLQuery(name = "unitMeasurement")
+	@Transient
+	String getUnitMeasurement() {
+		return "${item.unit_of_purchase?.unitDescription} (${item.item_conversion} ${item.unit_of_usage?.unitDescription})"
+	}
+
+	@GraphQLQuery(name = "uou")
+	@Transient
+	String getUou() {
+		return "${item.unit_of_usage?.unitDescription}"
+	}
+
+	@GraphQLQuery(name = "descLong")
+	@Transient
+	String getDescLong() {
+		return "${item.descLong}"
+	}
 
 	@GraphQLQuery
 	@Column(name = "company", columnDefinition = "uuid")

@@ -8,3 +8,7 @@ class ApReferenceDto {
 }
 
 
+@TupleConstructor
+class PettyCashName {
+    String name
+}

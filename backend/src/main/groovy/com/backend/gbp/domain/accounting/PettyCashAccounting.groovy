@@ -20,7 +20,7 @@ import java.time.Instant
 
 @Entity
 @Table(name = "petty_cash", schema = "accounting")
-class PettyCash extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
+class PettyCashAccounting extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
 
 	@GraphQLQuery
 	@Id
@@ -29,8 +29,8 @@ class PettyCash extends AbstractAuditingEntity implements Serializable, AutoInte
 	@Column(name = "id", columnDefinition = "uuid")
 	@Type(type = "pg-uuid")
 	UUID id
-	
-	
+
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "transaction_type", referencedColumnName = "id")
 	ApTransaction transType
@@ -48,6 +48,11 @@ class PettyCash extends AbstractAuditingEntity implements Serializable, AutoInte
 	@GraphQLQuery
 	@Column(name = "pcv_date", columnDefinition = "date")
 	Instant pcvDate
+
+	@GraphQLQuery
+	@Column(name = "pcv_category", columnDefinition = "varchar")
+	@UpperCase
+	String pcvCategory
 
 	@GraphQLQuery
 	@Column(name = "amount_issued", columnDefinition = "numeric")
@@ -84,10 +89,6 @@ class PettyCash extends AbstractAuditingEntity implements Serializable, AutoInte
 	@GraphQLQuery
 	@Column(name = "posted_ledger", columnDefinition = "uuid")
 	UUID postedLedger
-
-	@GraphQLQuery
-	@Column(name = "company", columnDefinition = "uuid")
-	UUID company
 
 	@GraphQLQuery
 	@Column(name = "remarks", columnDefinition = "varchar")

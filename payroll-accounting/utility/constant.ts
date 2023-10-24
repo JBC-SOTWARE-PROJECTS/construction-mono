@@ -24,6 +24,7 @@ export const col3 = {
   sm: 24,
   xs: 24,
 }
+
 // ===============end columns
 
 export const GENDER = [
@@ -120,6 +121,19 @@ export const responsiveColumn2 = {
   md: 12,
   lg: 12,
 }
+
+export const responsiveColumn18 = {
+  xs: 24,
+  sm: 24,
+  md: 12,
+  lg: 18,
+};
+export const responsiveColumn6 = {
+  xs: 24,
+  sm: 24,
+  md: 12,
+  lg: 6,
+};
 // ===============end columns
 // =============== default datasource accounts payable ============
 export const APTOTALS = [
@@ -198,6 +212,21 @@ export const RPTOTALS = [
     credit: null,
   },
 ]
+
+export const PETTYTOTALS = [
+  {
+    id: "amountIssued",
+    description: "Ammount Issued",
+    debit: 0,
+    credit: null,
+  },
+  {
+    id: "amountUsed",
+    description: "Ammount Used",
+    debit: null,
+    credit: 0,
+  },
+];
 //================ end
 
 export const AP_TRANSCTION_CATEGORY = [
@@ -416,3 +445,14 @@ export const DIS_TYPE = [
     value: 'CASH',
   },
 ]
+
+export const PC_CATEGORY = [
+  {
+    label: "ITEM PURCHASE",
+    value: "PURCHASE",
+  },
+  {
+    label: "OTHER TRASACTIONS",
+    value: "OTHERS",
+  },
+];
