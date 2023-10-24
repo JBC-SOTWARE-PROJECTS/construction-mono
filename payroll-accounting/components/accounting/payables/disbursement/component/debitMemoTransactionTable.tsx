@@ -75,8 +75,11 @@ export default function DebitMemoTransactionTable(props: IProps) {
                 transType: {
                   $set: result?.transType,
                 },
-                department: {
-                  $set: result?.department,
+                office: {
+                  $set: result?.office,
+                },
+                project: {
+                  $set: result?.project,
                 },
                 type: {
                   $set: result?.type,
@@ -144,11 +147,18 @@ export default function DebitMemoTransactionTable(props: IProps) {
       render: (_, record) => <span>{record?.transType?.description}</span>,
     },
     {
-      title: "Department",
-      dataIndex: "department.departmentName",
-      key: "department.departmentName",
+      title: "Office",
+      dataIndex: "office.officeDescription",
+      key: "office.officeDescription",
       width: 300,
-      render: (_, record) => <span>{record?.department?.departmentName}</span>,
+      render: (_, record) => <span>{record?.office?.officeDescription}</span>,
+    },
+    {
+      title: "Project",
+      dataIndex: "project.description",
+      key: "project.description",
+      width: 300,
+      render: (_, record) => <span>{record?.project?.description}</span>,
     },
     {
       title: "Remarks",
@@ -224,7 +234,7 @@ export default function DebitMemoTransactionTable(props: IProps) {
             setSize(size);
           },
         }}
-        scroll={{ x: 1400 }}
+        scroll={{ x: 1700 }}
         summary={() => (
           <DebitMemoTransactionSummaryFooter dataSource={dataSource} />
         )}

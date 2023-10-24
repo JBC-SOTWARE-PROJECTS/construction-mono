@@ -152,9 +152,13 @@ export const GET_DISBURSEMENT_EXPENSE = gql`
         id
         description
       }
-      department {
+      office {
         id
-        departmentName
+        officeDescription
+      }
+      project {
+        id
+        description
       }
       amount
       remarks
@@ -383,7 +387,6 @@ export const GET_CK_AUTO_ENTRIES = gql`
     }
   }
 `;
-
 
 export const POST_DISBURSEMENT_PAYABLE = gql`
   mutation ($id: UUID, $status: Boolean) {

@@ -205,7 +205,7 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
     ) {
         def company = SecurityUtils.currentCompanyId()
 
-        query = '''Select ap from AccountsPayable ap where ap.posted = true and
+        String query = '''Select ap from AccountsPayable ap where ap.posted = true and
 						(lower(ap.apNo) like lower(concat('%',:filter,'%')) or
 						lower(ap.invoiceNo) like lower(concat('%',:filter,'%'))) '''
 

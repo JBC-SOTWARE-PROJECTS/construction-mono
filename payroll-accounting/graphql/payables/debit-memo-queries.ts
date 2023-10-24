@@ -95,9 +95,13 @@ export const GET_DEBIT_MEMO_TRANSACTIONS = gql`
         id
         description
       }
-      department {
+      office {
         id
-        departmentName
+        officeDescription
+      }
+      project {
+        id
+        description
       }
       type
       percent

@@ -271,7 +271,7 @@ export default function DisbrusementExepnseTable(props: IProps) {
             setSize(size);
           },
         }}
-        scroll={{ x: 1400 }}
+        scroll={{ x: 1700 }}
         summary={() => <ExpenseSummaryFooter dataSource={dataSource} />}
       />
     </div>

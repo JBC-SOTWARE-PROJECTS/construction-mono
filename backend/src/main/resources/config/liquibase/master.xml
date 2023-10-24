@@ -349,4 +349,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/32_realesed_checks.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/33_petty_cash.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
