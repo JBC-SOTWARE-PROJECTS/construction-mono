@@ -1,16 +1,16 @@
 package com.backend.gbp.domain.hrm.dto
 
 
-enum PaymentTerm {
+enum LoanPaymentTerm {
     MONTHLY, SEMI_MONTHLY
 }
 
 class EmployeeLoanConfig {
 
-    PaymentTerm cashAdvanceTerm
+    LoanPaymentTerm cashAdvanceTerm
     BigDecimal cashAdvanceAmount
 
-    PaymentTerm equipmentLoanTerm
+    LoanPaymentTerm equipmentLoanTerm
     BigDecimal equipmentLoanAmount
 }
 

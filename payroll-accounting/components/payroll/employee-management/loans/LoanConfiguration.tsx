@@ -1,12 +1,12 @@
-import { EmployeeLoanCategory, PaymentTerm } from "@/graphql/gql/graphql";
+import { EmployeeLoanCategory, LoanPaymentTerm } from "@/graphql/gql/graphql";
 import useGetEmployeeLoanConfig from "@/hooks/employee-loans/useGetEmployeeLoanConfig";
 import useGetLoanBalance from "@/hooks/employee-loans/useGetLoanBalance";
 import useUpsertEmployeeLoanConfig from "@/hooks/employee-loans/useUpsertEmployeeLoanConfig";
 import NumeralFormatter from "@/utility/numeral-formatter";
 import { EditOutlined, SaveOutlined } from "@ant-design/icons";
-import { Button, Divider, Input, InputNumber, Radio, Spin } from "antd";
+import { Button, Divider, InputNumber, Radio, Spin } from "antd";
 import { round } from "lodash";
-import React, { useState } from "react";
+import { useState } from "react";
 
 function LoanConfiguration() {
   const [cashAdvance, setCashAdvance] = useState<number | null>(null);
@@ -33,7 +33,7 @@ function LoanConfiguration() {
     }
   };
 
-  const saveTerm = (term: PaymentTerm, category: EmployeeLoanCategory) => {
+  const saveTerm = (term: LoanPaymentTerm, category: EmployeeLoanCategory) => {
     if (category === EmployeeLoanCategory.CashAdvance) {
       upsert({ ...config, cashAdvanceTerm: term });
       setCashAdvance(null);
@@ -68,7 +68,7 @@ function LoanConfiguration() {
               buttonStyle="solid"
               onChange={(e) =>
                 saveTerm(
-                  e.target.value as PaymentTerm,
+                  e.target.value as LoanPaymentTerm,
                   EmployeeLoanCategory.CashAdvance
                 )
               }
@@ -150,7 +150,7 @@ function LoanConfiguration() {
               buttonStyle="solid"
               onChange={(e) =>
                 saveTerm(
-                  e.target.value as PaymentTerm,
+                  e.target.value as LoanPaymentTerm,
                   EmployeeLoanCategory.EquipmentLoan
                 )
               }

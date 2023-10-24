@@ -950,16 +950,16 @@ export enum EmployeeLoanCategory {
 export type EmployeeLoanConfig = {
   __typename?: 'EmployeeLoanConfig';
   cashAdvanceAmount?: Maybe<Scalars['BigDecimal']['output']>;
-  cashAdvanceTerm?: Maybe<PaymentTerm>;
+  cashAdvanceTerm?: Maybe<LoanPaymentTerm>;
   equipmentLoanAmount?: Maybe<Scalars['BigDecimal']['output']>;
-  equipmentLoanTerm?: Maybe<PaymentTerm>;
+  equipmentLoanTerm?: Maybe<LoanPaymentTerm>;
 };
 
 export type EmployeeLoanConfigInput = {
   cashAdvanceAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
-  cashAdvanceTerm?: InputMaybe<PaymentTerm>;
+  cashAdvanceTerm?: InputMaybe<LoanPaymentTerm>;
   equipmentLoanAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
-  equipmentLoanTerm?: InputMaybe<PaymentTerm>;
+  equipmentLoanTerm?: InputMaybe<LoanPaymentTerm>;
 };
 
 export type EmployeeLoanLedgerDto = {
@@ -2075,6 +2075,11 @@ export type LedgerTotalDebitCredit = {
   totalCredit?: Maybe<Scalars['BigDecimal']['output']>;
   totalDebit?: Maybe<Scalars['BigDecimal']['output']>;
 };
+
+export enum LoanPaymentTerm {
+  Monthly = 'MONTHLY',
+  SemiMonthly = 'SEMI_MONTHLY'
+}
 
 export type MaterialProduction = {
   __typename?: 'MaterialProduction';
@@ -4915,10 +4920,18 @@ export type PaymentItems = {
   transDate?: Maybe<Scalars['Instant']['output']>;
 };
 
-export enum PaymentTerm {
-  Monthly = 'MONTHLY',
-  SemiMonthly = 'SEMI_MONTHLY'
-}
+export type PaymentTerm = {
+  __typename?: 'PaymentTerm';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  paymentCode?: Maybe<Scalars['String']['output']>;
+  paymentDesc?: Maybe<Scalars['String']['output']>;
+  paymentNoDays?: Maybe<Scalars['Int']['output']>;
+};
 
 export type PaymentTermInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
