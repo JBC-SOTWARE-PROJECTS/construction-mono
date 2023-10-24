@@ -2,10 +2,8 @@ package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.payroll.AdjustmentCategory
-import com.backend.gbp.domain.payroll.PHICContribution
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
-import com.backend.gbp.graphqlservices.types.GraphQLRetVal
-import com.backend.gbp.repository.payroll.PHICContributionRepository
+import com.backend.gbp.repository.payroll.AdjustmentCategoryRepository
 import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -31,12 +29,21 @@ class AdjustmentCategoryService {
     @Autowired
     JdbcTemplate jdbcTemplate
 
+    @Autowired
+    AdjustmentCategoryRepository adjustmentCategoryRepository
 
 
     @GraphQLQuery(name = "getAdjustmentCategories")
-    List<AdjustmentCategory> getPHICContributions(@GraphQLArgument(name = "id") UUID id) {
-
-        return []
+    List<AdjustmentCategory> getAdjustmentCategories(
+            @GraphQLArgument(name = "filter") String filter
+    ) {
+        UUID companyId = SecurityUtils.currentCompanyId()
+        List<AdjustmentCategory> defaults = adjustmentCategoryRepository.getDefaults(filter)
+        List<AdjustmentCategory> categories = adjustmentCategoryRepository.getByCompanyId(companyId, filter)
+        List<AdjustmentCategory> merge = []
+        merge.addAll(defaults)
+        merge.addAll(categories)
+        return merge
     }
 
     @GraphQLMutation(name = "upsertAdjustmentCategory")
@@ -44,7 +51,19 @@ class AdjustmentCategoryService {
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "fields") Map<String, Object> fields
     ) {
-        return new GraphQLResVal<AdjustmentCategory>(null, true, "New row ${id ? "updated" : "added"} successfully.")
+
+        AdjustmentCategory category = new AdjustmentCategory()
+        if (id) {
+            category = adjustmentCategoryRepository.findById(id).get()
+            objectMapper.updateValue(category, fields)
+        } else {
+            category = objectMapper.convertValue(fields, AdjustmentCategory)
+        }
+        category.isDefault = false
+
+        adjustmentCategoryRepository.save(category)
+
+        return new GraphQLResVal<AdjustmentCategory>(null, true, "Adjustment Category ${id ? "updated" : "added"} successfully.")
 
     }
 }

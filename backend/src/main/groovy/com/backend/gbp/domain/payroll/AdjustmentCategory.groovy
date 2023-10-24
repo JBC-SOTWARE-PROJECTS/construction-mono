@@ -39,6 +39,9 @@ class AdjustmentCategory extends AbstractAuditingEntity implements Serializable 
     @Column(name = "status", columnDefinition = "bool")
     Boolean status
 
+    @GraphQLQuery
+    @Column(name = "is_default", columnDefinition = "bool")
+    Boolean isDefault
 
     @GraphQLQuery
     @NotFound(action = NotFoundAction.IGNORE)
