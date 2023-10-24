@@ -25,12 +25,6 @@ const administrativeMenu: TDiverseTradeMenu[] = [
     icon: <ControlOutlined className="diverse-trade-icon" />,
     path: "/administrative/positions",
   },
-  {
-    title: "Employee Database Center",
-    subtitle: "Effortlessly manage and maintain your list of employees.",
-    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
-    path: "/administrative/employees",
-  },
 ];
 
 export default administrativeMenu;

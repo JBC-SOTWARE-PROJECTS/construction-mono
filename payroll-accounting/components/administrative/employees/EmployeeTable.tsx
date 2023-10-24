@@ -1,5 +1,5 @@
 import { CompanySettings, Employee } from "@/graphql/gql/graphql";
-import { EditOutlined } from "@ant-design/icons";
+import { EyeOutlined } from "@ant-design/icons";
 import { Button, Col, Pagination, Row, Switch, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { TableRowSelection } from "antd/es/table/interface";
@@ -50,10 +50,10 @@ export default function EmployeeTable({
       render: (_, { id }) => {
         return (
           <Button
-            icon={<EditOutlined />}
-            type="text"
+            icon={<EyeOutlined />}
+            type="primary"
             onClick={() => {
-              router.push(`/administrative/employees/manage/${id}`);
+              router.push(`/payroll/employees/${id}`);
             }}
           />
         );

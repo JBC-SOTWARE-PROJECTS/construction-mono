@@ -51,6 +51,9 @@ class PayrollEmployee extends AbstractAuditingEntity implements Serializable {
 //
     @OneToOne(mappedBy = "payrollEmployee")
     TimekeepingEmployee timekeepingEmployee
+
+    @OneToOne(mappedBy = "payrollEmployee")
+    PayrollEmployeeLoan payrollEmployeeLoan
 //
 //    @OneToOne(mappedBy = "payrollEmployee")
 //    PayrollEmployeeAllowance allowanceEmployee
