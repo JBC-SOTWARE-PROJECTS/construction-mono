@@ -71,10 +71,10 @@ const accountingMenu: TDiverseTradeMenu[] = [
     path: '/accounting/transaction-journal/all',
   },
   {
-    title: 'Financial Reports',
+    title: 'Reports',
     subtitle: 'Effortlessly manage and maintain your list of employees.',
     icon: <UsergroupAddOutlined className='diverse-trade-icon' />,
-    path: '/accounting/employees',
+    path: '/accounting/reports/essential/general-ledger',
   },
 ]
 
