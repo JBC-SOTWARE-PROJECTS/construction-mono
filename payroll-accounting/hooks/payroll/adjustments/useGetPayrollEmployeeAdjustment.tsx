@@ -38,15 +38,39 @@ const useGetPayrollEmployeeAdjustment = ({
             id
             status
             employeeName
-            adjustmentItems {
-              id
-              description
-              amount
-              name
-              operation
+            employee {
+              items: adjustmentItems {
+                id
+                description
+                amount
+                name
+                operation
+              }
             }
           }
           totalElements
+        }
+      }
+    `,
+    {
+      variables: {
+        ...variables,
+        payroll: router?.query?.id,
+      },
+      onCompleted: (result) => {
+        if (onCompleted) onCompleted(result?.data);
+      },
+      fetchPolicy: "network-only",
+      // ...params,
+    }
+  );
+
+  const { data: dataList, loading: loadingList } = useQuery(
+    gql`
+      query ($payroll: UUID!) {
+        data: getAdjustmentEmployeesList(payroll: $payroll) {
+          id
+          employeeName
         }
       }
     `,
@@ -66,6 +90,7 @@ const useGetPayrollEmployeeAdjustment = ({
     data: data?.data,
     loading,
     refetch,
+    dataList: dataList?.data,
   };
 };
 

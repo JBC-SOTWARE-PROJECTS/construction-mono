@@ -37,8 +37,7 @@ export const PayrollEmployeeFilter = ({ onQueryChange }: any) => {
     );
   };
   return (
-    <Row gutter={[12, 12]}>
-      <Col md={8}></Col>
+    <Row gutter={[12, 12]} justify="end">
       <Col md={8}>
         <FormSearch
           label="Search Employee"
@@ -53,7 +52,7 @@ export const PayrollEmployeeFilter = ({ onQueryChange }: any) => {
         />
       </Col>
 
-      <Col md={8}>
+      <Col md={4}>
         <FormSelect
           label="Status"
           name="status"

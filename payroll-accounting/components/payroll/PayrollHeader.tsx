@@ -5,7 +5,7 @@ import useMemoizedPayrollHeaderBreadcrumb, {
 } from "@/hooks/payroll/useMemoizedPayrollHeadBreadcrumb";
 import { getStatusColor } from "@/utility/helper";
 import { PageHeader } from "@ant-design/pro-components";
-import { Tag } from "antd";
+import { Divider, Tag } from "antd";
 import { capitalize } from "lodash";
 import React, { ReactElement } from "react";
 
@@ -24,21 +24,24 @@ function PayrollHeader({ extra, module, showTitle = false, status }: IProps) {
     payroll?.title as string
   );
   return (
-    <PageHeader
-      title={
-        showTitle && (
-          <>
-            {payroll?.title} {capitalize(module)}{" "}
-            <Tag color={getStatusColor(status as string)}>{status}</Tag>
-          </>
-        )
-      }
-      breadcrumb={{
-        routes,
-        itemRender: payrollHeaderBreadcrumbRenderer,
-      }}
-      extra={extra as any}
-    />
+    <>
+      <PageHeader
+        title={
+          showTitle && (
+            <>
+              {payroll?.title} {capitalize(module)}{" "}
+              <Tag color={getStatusColor(status as string)}>{status}</Tag>
+            </>
+          )
+        }
+        breadcrumb={{
+          routes,
+          itemRender: payrollHeaderBreadcrumbRenderer,
+        }}
+        extra={extra as any}
+      />
+      <Divider style={{ margin: "5px 0px 16px" }} />
+    </>
   );
 }
 

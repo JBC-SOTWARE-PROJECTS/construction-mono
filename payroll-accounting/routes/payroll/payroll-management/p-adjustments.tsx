@@ -5,6 +5,7 @@ import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management
 import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
+  PayrollEmployeeAdjustmentDto,
   PayrollEmployeeLoanDto,
   PayrollLoanItem,
   PayrollModule,
@@ -21,12 +22,15 @@ import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
 import { CheckOutlined, EditOutlined } from "@ant-design/icons";
-import { InputNumber, Table, Tag } from "antd";
+import { Divider, InputNumber, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { capitalize } from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { recalculateButton } from "./p-contributions";
+import useGetPayrollEmployeeAdjustment from "@/hooks/payroll/adjustments/useGetPayrollEmployeeAdjustment";
+import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/PayrollEmployeeFilter";
+import AddAdjustmentItemsModal from "@/components/payroll/payroll-management/adjustments/AddAdjustmentItemsModal";
 
 const initialState: variables = {
   filter: "",
@@ -40,7 +44,7 @@ function PayrollLoans({ account }: IPageProps) {
   const [editing, setEditing] = useState<string | null>(null);
   const amountRef = useRef<any>(null);
   const [loan, loadingLoan, refetchLoan] = useGetPayrollLoan();
-  const { data, loading, refetch } = useGetPayrollEmployeeLoan({
+  const { data, loading, refetch, dataList } = useGetPayrollEmployeeAdjustment({
     variables: state,
   });
   const [updateAmount, loadingUpdateAmount] = useUpdateLoanItemAmount(() => {
@@ -66,14 +70,14 @@ function PayrollLoans({ account }: IPageProps) {
           <>
             <PayrollModuleRecalculateEmployeeAction
               id={value}
-              module={PayrollModule.Loans}
+              module={PayrollModule.Adjustment}
               buttonProps={recalculateButton}
               refetch={refetch}
               // allowedPermissions={[]}
             />
             <PayrollEmployeeStatusAction
               id={value}
-              module={PayrollModule.Loans}
+              module={PayrollModule.Adjustment}
               value={status}
               refetch={refetch}
             />
@@ -83,14 +87,17 @@ function PayrollLoans({ account }: IPageProps) {
     },
   ];
 
-  let expandedRowColumns: ColumnsType<PayrollLoanItem> = [
+  let expandedRowColumns: ColumnsType<PayrollEmployeeAdjustmentDto> = [
     {
-      title: "Category",
-      dataIndex: "category",
-      sortOrder: "ascend",
-      sorter: (a, b) =>
-        (a?.category?.length as number) - (b?.category?.length as number),
-      render: (value?) => capitalize(value?.replace("_", " ")),
+      title: "Name",
+      dataIndex: "name",
+    },
+    {
+      title: "Operation",
+      dataIndex: "operation",
+      render: (value) => (
+        <Tag color={value === "ADDITION" ? "green" : "red"}>{value}</Tag>
+      ),
     },
     {
       title: "Amount",
@@ -107,7 +114,7 @@ function PayrollLoans({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditing(id);
+              setEditing(id as string);
             }}
           >
             <NumeralFormatter value={value} /> <EditOutlined />
@@ -131,7 +138,7 @@ function PayrollLoans({ account }: IPageProps) {
   return (
     <>
       <PayrollHeader
-        module={PayrollModule.Loans}
+        module={PayrollModule.Adjustment}
         status={loan?.status}
         showTitle
         extra={
@@ -139,7 +146,7 @@ function PayrollLoans({ account }: IPageProps) {
             {loan?.status === PayrollStatus.Draft && (
               <PayrollModuleRecalculateAllEmployeeAction
                 id={router?.query?.id as string}
-                module={PayrollModule.Loans}
+                module={PayrollModule.Adjustment}
                 buttonProps={recalculateButton}
                 tooltipProps={{ placement: "topRight" }}
                 refetch={refetch}
@@ -165,6 +172,20 @@ function PayrollLoans({ account }: IPageProps) {
         }
       />
 
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "end",
+          width: "100%",
+        }}
+      >
+        <div style={{ width: "80%", marginRight: 10 }}>
+          <PayrollEmployeeFilter onQueryChange={onQueryChange} />
+        </div>
+
+        <AddAdjustmentItemsModal refetch={refetch} employeeList={dataList} />
+      </div>
+
       <TablePaginated
         columns={columns}
         loading={loading || loadingUpdateAmount || loadingLoan}
@@ -172,16 +193,15 @@ function PayrollLoans({ account }: IPageProps) {
         dataSource={data?.content}
         expandable={{
           expandedRowRender: (record) => {
-            console.log(record);
             return (
               <Table
                 pagination={false}
-                dataSource={record?.employee?.loanItems}
+                dataSource={record?.employee?.items}
                 columns={expandedRowColumns}
               />
             );
           },
-          rowExpandable: (record) => record?.employee?.loanItems.length > 0,
+          rowExpandable: (record) => record?.employee?.items.length > 0,
         }}
         total={data?.totalElements}
         pageSize={state.size}

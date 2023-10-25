@@ -12,7 +12,7 @@ import org.hibernate.annotations.Type
 import javax.persistence.*
 
 @Entity
-@Table(schema = "payroll", name = "payroll_loan_items")
+@Table(schema = "payroll", name = "payroll_adjustment_item")
 class PayrollAdjustmentItem extends AbstractAuditingEntity implements Serializable {
 
     @GraphQLQuery

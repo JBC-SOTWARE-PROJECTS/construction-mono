@@ -49,11 +49,10 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
     //=========================== QUERIES ============================
 
 
-
-
     @GraphQLMutation(name = "upsertAdjustmentItem")
     GraphQLResVal<PayrollAdjustmentItem> upsertAdjustmentItem(
             @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "employee") UUID employee,
             @GraphQLArgument(name = "category") UUID category,
             @GraphQLArgument(name = "amount") BigDecimal amount,
             @GraphQLArgument(name = "description") String description
@@ -64,7 +63,10 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
 
         item.category = adjustmentCategoryRepository.findById(category).get()
         item.amount = amount
+        item.employeeAdjustment = payrollEmployeeAdjustmentRepository.findById(employee).get()
         item.description = description ? description : item.category.description
+        item.company = SecurityUtils.currentCompany()
+        payrollAdjustmentItemRepository.save(item)
 
         return new GraphQLResVal<PayrollAdjustmentItem>(item, true, "Successfully updated employee adjustment status!")
     }
@@ -83,7 +85,7 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
 
 
     @GraphQLQuery(name = "getAdjustmentEmployees")
-    GraphQLResVal<Page<PayrollEmployeeAdjustmentDto>> getAdjustmentEmployees(
+    Page<PayrollEmployeeAdjustmentDto> getAdjustmentEmployees(
             @GraphQLArgument(name = "payroll") UUID payroll,
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
@@ -91,25 +93,24 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
             @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
     ) {
         if (payroll) {
-            Page<PayrollEmployeeAdjustmentDto> employees = payrollEmployeeAdjustmentRepository.getEmployeesPageable(
+            payrollEmployeeAdjustmentRepository.getEmployeesPageable(
                     payroll,
                     filter,
                     status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
                     PageRequest.of(page, size))
-
-            return new GraphQLResVal<Page<PayrollEmployeeAdjustmentDto>>(
-                    employees,
-                    true,
-                    "Successfully retrieved Payroll Other Deduction Employee List")
-        } else {
-            return new GraphQLResVal<Page<PayrollEmployeeAdjustmentDto>>(
-                    null,
-                    false,
-                    "No payroll id passed")
-        }
-
+        } else return null
     }
 
+
+    @GraphQLQuery(name = "getAdjustmentEmployeesList")
+    List<PayrollEmployeeAdjustmentDto> getAdjustmentEmployeesList(
+            @GraphQLArgument(name = "payroll") UUID payroll
+    ) {
+        if (payroll) {
+            payrollEmployeeAdjustmentRepository.getEmployeesList(
+                    payroll)
+        } else return null
+    }
 
     @Override
     PayrollEmployeeAdjustment addEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
