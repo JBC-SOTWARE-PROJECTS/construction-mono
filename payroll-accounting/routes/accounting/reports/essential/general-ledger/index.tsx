@@ -215,8 +215,8 @@ export default function GeneralLedgerRoute() {
             ],
           }}
         >
-          <Row justify='center' gutter={[16, 16]}>
-            <Col span={6}>
+          <Row justify='start' gutter={[16, 16]}>
+            {/* <Col span={6}>
               <FormSelect
                 label='Parent Accounts'
                 name='accounts'
@@ -244,7 +244,7 @@ export default function GeneralLedgerRoute() {
                   },
                 }}
               />
-            </Col>
+            </Col> */}
             <Col span={4}>
               <FormDateRange
                 label='Date Range'

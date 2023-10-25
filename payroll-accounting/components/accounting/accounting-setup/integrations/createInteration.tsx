@@ -9,7 +9,7 @@ interface IntegrationsI {
 }
 
 const UPSERT_RECORD = gql`
-  mutation UpdateItem($fields: Map_String_ObjectScalar, $id: UUID) {
+  mutation ($fields: Map_String_ObjectScalar, $id: UUID) {
     upsertIntegration(fields: $fields, id: $id)
   }
 `
