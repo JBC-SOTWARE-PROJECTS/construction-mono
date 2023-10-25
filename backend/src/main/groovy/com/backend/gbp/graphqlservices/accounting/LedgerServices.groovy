@@ -178,7 +178,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         entityManager.createNativeQuery(""" select 
             cast(l.id as varchar) as "id",
             l.journal_account ->> 'code' as "code",
-            l.journal_account ->> 'description' as "description",
+            l.journal_account ->> 'accountName' as "description",
             l.debit,
             l.credit
             from accounting.ledger l 

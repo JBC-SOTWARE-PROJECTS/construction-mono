@@ -615,7 +615,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
         List<GeneralLedgerDetailsListDto> listDto = []
         ledger.each {
             it ->
-                listDto.push(new GeneralLedgerDetailsListDto(it.id, it.code, it.account, new JsonSlurper().parseText(it.content)))
+                listDto.push(new GeneralLedgerDetailsListDto(it.id, it.code, it.account, new JsonSlurper().parseText(it.content) as List<Map<String, Object>>))
         }
 
         return listDto
