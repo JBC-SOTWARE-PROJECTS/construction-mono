@@ -22,4 +22,7 @@ interface AllowanceRepository extends JpaRepository<Allowance, UUID> {
     )
     Page<Allowance>getAllowancePageable(@Param("filter") String filter, Pageable pageable)
 
+    @Query(value = " Select a from Allowance a  ")
+    List<Allowance>fetchAllAllowance()
+
 }

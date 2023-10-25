@@ -2,6 +2,7 @@ package com.backend.gbp.domain.hrm
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.annotations.UpperCase
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -10,7 +11,6 @@ import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
 
-import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
@@ -22,11 +22,12 @@ import javax.persistence.OneToMany
 import javax.persistence.Table
 import java.time.Instant
 
+
 @Entity
-@Table(schema = "hrm", name = "allowance_package")
-@SQLDelete(sql = "UPDATE hrm.allowance_package SET deleted = true WHERE id = ?")
-@Where(clause = "deleted <> true or deleted is  null ")
-class AllowancePackage extends AbstractAuditingEntity implements Serializable {
+@Table(schema = "hrm", name = "allowance_item")
+//@SQLDelete(sql = "UPDATE hrm.allowance_item SET deleted = true WHERE id = ?")
+//@Where(clause = "deleted <> true or deleted is  null ")
+class AllowanceItem extends AbstractAuditingEntity implements Serializable{
 
     @GraphQLQuery
     @Id
@@ -41,12 +42,22 @@ class AllowancePackage extends AbstractAuditingEntity implements Serializable {
     String name
 
     @GraphQLQuery
-    @Column(name = "status", columnDefinition = "bool")
-    Boolean status
+    @Column(name = "allowance_type_name", columnDefinition = "varchar")
+    String allowanceTypeName
 
     @GraphQLQuery
-    @Column(name = "created_date", columnDefinition = "timestamp")
-    Instant createdDate
+    @Column(name = "amount", columnDefinition = "numeric")
+    BigDecimal amount
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "allowance_type", referencedColumnName = "id")
+    Allowance allowanceType
+
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "package", referencedColumnName = "id")
+    AllowancePackage allowancePackage
 
     @GraphQLQuery
     @NotFound(action = NotFoundAction.IGNORE)
@@ -54,6 +65,8 @@ class AllowancePackage extends AbstractAuditingEntity implements Serializable {
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
 
-    @OneToMany(mappedBy = "allowancePackage", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<AllowanceItem> allowanceItems = []
+    @GraphQLQuery
+    @Column(name = "created_date", columnDefinition = "timestamp")
+    Instant createdDate
+
 }

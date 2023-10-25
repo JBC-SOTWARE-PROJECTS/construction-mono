@@ -3,7 +3,10 @@ import dynamic from "next/dynamic";
 import React from "react";
 
 const AllowancePackageManagement = dynamic(
-  () => import("@/routes/payroll/allowance-management/allowance-package"),
+  () =>
+    import(
+      "@/routes/payroll/allowance-management/allowance-package/allowance-package"
+    ),
   {
     loading: () => <CircularProgress />,
   }

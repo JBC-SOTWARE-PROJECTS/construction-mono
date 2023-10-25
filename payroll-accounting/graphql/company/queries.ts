@@ -291,3 +291,80 @@ export const DELETE_ALLOWANCE_PACKAGE = gql`
     }
   }
 `;
+
+export const GET_ALL_ALLOWANCE = gql`
+  query {
+    data: fetchAllAllowance {
+      id
+      name
+      allowanceType
+      amount
+    }
+  }
+`;
+
+export const GET_ALL_ALLOWANCE_PACKAGE = gql`
+  query {
+    data: fetchAllAllowancePackage {
+      id
+      name
+    }
+  }
+`;
+
+export const UPSERT_ALLOWANCE_ITEM = gql`
+  mutation (
+    $allowancePackage: UUID
+    $allowanceList: [AllowanceInput]
+    $toDelete: [UUID]
+  ) {
+    data: upsertAllAllowanceItem(
+      allowancePackage: $allowancePackage
+      allowanceList: $allowanceList
+      toDelete: $toDelete
+    ) {
+      payload
+      message
+      success
+    }
+  }
+`;
+
+export const FETCH_ALLOWANCE_ITEM = gql`
+  query ($filter: String, $page: Int, $pageSize: Int, $allowancePackage: UUID) {
+    data: fetchAllowanceItemByPackagePageable(
+      filter: $filter
+      page: $page
+      pageSize: $pageSize
+      allowancePackage: $allowancePackage
+    ) {
+      content {
+        id
+        name
+        allowanceTypeName
+        amount
+        allowanceType {
+          id
+        }
+        allowancePackage {
+          id
+        }
+      }
+      totalElements
+      totalPages
+      number
+    }
+  }
+`;
+
+export const UPSERT_ALLOWANCE_PACKAGE_ITEM = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    data: upsertAllowanceItem(id: $id, fields: $fields) {
+      payload {
+        id
+      }
+      message
+      success
+    }
+  }
+`;

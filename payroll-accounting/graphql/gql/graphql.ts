@@ -287,6 +287,37 @@ export type AllowancePackage = {
   status?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export type Allowance = {
+  __typename?: 'Allowance';
+  allowanceType?: Maybe<Scalars['String']['output']>;
+  amount?: Maybe<Scalars['Float']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type AllowanceInput = {
+  allowanceType?: InputMaybe<Scalars['String']['input']>;
+  amount?: InputMaybe<Scalars['Float']['input']>;
+  createdDate?: InputMaybe<Scalars['Instant']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AllowancePackage = {
+  __typename?: 'AllowancePackage';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['Boolean']['output']>;
+}
+
 export type ApAccountsTemplate = {
   __typename?: 'ApAccountsTemplate';
   category?: Maybe<Scalars['String']['output']>;
@@ -1816,6 +1847,7 @@ export type GraphQlResVal_String = {
   success: Scalars['Boolean']['output'];
 };
 
+
 export type GraphQlResVal_Timekeeping = {
   __typename?: 'GraphQLResVal_Timekeeping';
   message?: Maybe<Scalars['String']['output']>;
@@ -2640,6 +2672,9 @@ export type Mutation = {
   delPOMonitoring?: Maybe<PoDeliveryMonitoring>;
   /** Delete deleteAllowance */
   deleteAllowance?: Maybe<GraphQlRetVal_String>;
+  /** Delete delete Allowance Item */
+  deleteAllowanceItem?: Maybe<GraphQlRetVal_String>;
+
   /** Delete delete Allowance Package */
   deleteAllowancePackage?: Maybe<GraphQlRetVal_String>;
   deleteBillingItem?: Maybe<BillingItem>;
@@ -2779,7 +2814,11 @@ export type Mutation = {
   upsert2307?: Maybe<Wtx2307>;
   upsertAccountTemplateItem?: Maybe<ApAccountsTemplateItems>;
   upsertAddress?: Maybe<GraphQlRetVal_Boolean>;
+
+  /** add allowance item */
+  upsertAllAllowanceItem?: Maybe<GraphQlRetVal_String>;
   upsertAdjustmentCategory?: Maybe<GraphQlResVal_AdjustmentCategory>;
+
   /** add allowance package */
   upsertAllAllowancePackage?: Maybe<GraphQlRetVal_AllowancePackage>;
   /**  Add allowance type  */
@@ -3101,6 +3140,12 @@ export type MutationDelPoMonitoringArgs = {
 
 /** Mutation root */
 export type MutationDeleteAllowanceArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteAllowanceItemArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -3972,9 +4017,15 @@ export type MutationUpsertAddressArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertAllAllowanceItemArgs = {
+  allowanceList?: InputMaybe<Array<InputMaybe<AllowanceInput>>>;
+  allowancePackage?: InputMaybe<Scalars['UUID']['input']>;
+}
+
 export type MutationUpsertAdjustmentCategoryArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+
 };
 
 
@@ -6924,6 +6975,10 @@ export type Query = {
   /** Transaction List */
   exTransList?: Maybe<Array<Maybe<ExpenseTransaction>>>;
   expenseTypeById?: Maybe<ExpenseTransaction>;
+  /** get all fetch allowance */
+  fetchAllAllowance?: Maybe<Array<Maybe<Allowance>>>;
+  /** get all fetch allowance package */
+  fetchAllAllowancePackage?: Maybe<Array<Maybe<AllowancePackage>>>;
   /** fetch all allowance package */
   fetchAllowancePackagePageable?: Maybe<Page_AllowancePackage>;
   /** get all allowance */
@@ -6982,6 +7037,7 @@ export type Query = {
   getEmployeeScheduleDetails?: Maybe<EmployeeScheduleDetailsDto>;
   /** Filter Event Calendar between two dates. */
   getEventsBetweenTwoDates?: Maybe<Array<Maybe<EventCalendar>>>;
+  getFlattenDepartment?: Maybe<Array<Maybe<Subaccountable>>>;
   getGeneralLedger?: Maybe<GeneralLedgerDtoContainer>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
