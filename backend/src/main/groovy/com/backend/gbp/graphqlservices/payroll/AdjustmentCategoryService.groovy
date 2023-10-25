@@ -60,7 +60,7 @@ class AdjustmentCategoryService {
             category = objectMapper.convertValue(fields, AdjustmentCategory)
         }
         category.isDefault = false
-
+        category.company = SecurityUtils.currentCompany()
         adjustmentCategoryRepository.save(category)
 
         return new GraphQLResVal<AdjustmentCategory>(null, true, "Adjustment Category ${id ? "updated" : "added"} successfully.")
