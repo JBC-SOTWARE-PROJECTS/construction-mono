@@ -60,7 +60,7 @@ const GET_RECORDS = gql`
 `
 
 const APPROVE_LEDGER_WITH_DATE = gql`
-  mutation UpdateItem($fields: [Map_String_ObjectScalar]) {
+  mutation ($fields: [Map_String_ObjectScalar]) {
     approveLedgerWithDate(fields: $fields)
   }
 `
