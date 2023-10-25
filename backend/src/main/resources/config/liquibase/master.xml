@@ -373,4 +373,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/34_item_alter.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_donss_alter_ledger.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
