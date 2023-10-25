@@ -5,7 +5,7 @@ import { Col, Row } from "antd";
 import { capitalize } from "lodash";
 import PayrollEmployeeStatusTag, {
   payrollEmployeeStatusColorGenerator,
-} from "../PayrollEmployeeStatusTag";
+} from "./PayrollEmployeeStatusTag";
 
 export const employeeStatusOptions = () => {
   let arr = Object.keys(PayrollEmployeeStatus)?.map((key: any) => {
@@ -19,7 +19,7 @@ export const employeeStatusOptions = () => {
   return arr;
 };
 
-export const PayrollContributionFilter = ({ onQueryChange }: any) => {
+export const PayrollEmployeeFilter = ({ onQueryChange }: any) => {
   const tagRenderStatus = ({ label, value, closable, onClose }: any): any => {
     const onPreventMouseDown = (event: any) => {
       event.preventDefault();
@@ -38,6 +38,7 @@ export const PayrollContributionFilter = ({ onQueryChange }: any) => {
   };
   return (
     <Row gutter={[12, 12]}>
+      <Col md={8}></Col>
       <Col md={8}>
         <FormSearch
           label="Search Employee"

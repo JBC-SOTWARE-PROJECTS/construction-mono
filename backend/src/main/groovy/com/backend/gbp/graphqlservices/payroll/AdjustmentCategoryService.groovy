@@ -27,9 +27,6 @@ class AdjustmentCategoryService {
     ObjectMapper objectMapper
 
     @Autowired
-    JdbcTemplate jdbcTemplate
-
-    @Autowired
     AdjustmentCategoryRepository adjustmentCategoryRepository
 
 

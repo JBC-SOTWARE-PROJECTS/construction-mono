@@ -46,7 +46,6 @@ const useGetContributionEmployees = ({ variables, onCompleted }: IParams) => {
         $size: Int!
         $filter: String
         $status: [PayrollEmployeeStatus]
-        $department: UUID
       ) {
         getContributionEmployeesByPayrollId(
           payroll: $payroll
@@ -54,14 +53,12 @@ const useGetContributionEmployees = ({ variables, onCompleted }: IParams) => {
           size: $size
           filter: $filter
           status: $status
-          department: $department
         ) {
           message
           success
           response {
             content {
               id
-              department
               employeeName
               total
               status

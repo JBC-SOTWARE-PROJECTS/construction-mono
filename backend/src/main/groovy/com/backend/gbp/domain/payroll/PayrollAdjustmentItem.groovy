@@ -44,4 +44,16 @@ class PayrollAdjustmentItem extends AbstractAuditingEntity implements Serializab
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
+
+    @GraphQLQuery
+    @Transient
+    String getName() {
+        return category.name
+    }
+
+    @GraphQLQuery
+    @Transient
+    String getOperation() {
+        return category.operation
+    }
 }

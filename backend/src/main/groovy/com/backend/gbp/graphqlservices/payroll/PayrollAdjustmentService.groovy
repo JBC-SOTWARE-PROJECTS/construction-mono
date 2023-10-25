@@ -53,8 +53,8 @@ class PayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAd
 
     //=================================QUERY=================================\\
 
-    @GraphQLQuery(name = "getPayrollAdjustmentById", description = "Get adjustment by ID")
-    PayrollAdjustment findById(@GraphQLArgument(name = "id") UUID id) {
+    @GraphQLQuery(name = "getPayrollAdjustmentById")
+    PayrollAdjustment getPayrollAdjustmentById(@GraphQLArgument(name = "id") UUID id) {
         if (id) {
             return payrollAdjustmentRepository.findById(id).get()
         } else {

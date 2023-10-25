@@ -1,8 +1,10 @@
+import CustomButton from "@/components/common/CustomButton";
 import TablePaginated from "@/components/common/TablePaginated";
 import PayrollHeader from "@/components/payroll/PayrollHeader";
+import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
+import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
-  PayrollEmployeeLoan,
   PayrollEmployeeLoanDto,
   PayrollLoanItem,
   PayrollModule,
@@ -10,8 +12,12 @@ import {
 } from "@/graphql/gql/graphql";
 import { variables } from "@/hooks/payroll/contributions/useGetContributionEmployees";
 import useGetPayrollEmployeeLoan from "@/hooks/payroll/loans/useGetPayrollEmployeeLoan";
+import useGetPayrollLoan from "@/hooks/payroll/loans/useGetPayrollLoan";
 import useUpdateLoanItemAmount from "@/hooks/payroll/loans/useUpdateLoanItemAmount";
+import useUpdatePayrollLoanStatus from "@/hooks/payroll/loans/useUpdatePayrollLoanStatus";
 import usePaginationState from "@/hooks/usePaginationState";
+import { statusMap } from "@/utility/constant";
+import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
 import { CheckOutlined, EditOutlined } from "@ant-design/icons";
@@ -21,14 +27,6 @@ import { capitalize } from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { recalculateButton } from "./p-contributions";
-import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
-import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
-import { getStatusColor } from "@/utility/helper";
-import useGetPayrollLoan from "@/hooks/payroll/loans/useGetPayrollLoan";
-import CustomButton from "@/components/common/CustomButton";
-import { statusMap } from "@/utility/constant";
-import useUpdatePayrollLoanStatus from "@/hooks/payroll/loans/useUpdatePayrollLoanStatus";
-import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/PayrollEmployeeFilter";
 
 const initialState: variables = {
   filter: "",
@@ -166,7 +164,6 @@ function PayrollLoans({ account }: IPageProps) {
           </>
         }
       />
-      <PayrollEmployeeFilter onQueryChange={onQueryChange} />
 
       <TablePaginated
         columns={columns}
