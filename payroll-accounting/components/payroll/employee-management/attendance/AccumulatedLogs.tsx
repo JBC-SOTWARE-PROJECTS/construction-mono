@@ -1,11 +1,8 @@
-import React from "react";
-import AccumulatedLogsTable from "../../AccumulatedLogsTable";
+import { FormDateRange } from "@/components/common";
 import useGetAccumulatedLogs from "@/hooks/attendance/useGetAccumulatedLogs";
 import useDateRangeState from "@/hooks/useDateRangeState";
-import { FormDateRange } from "@/components/common";
 import { useRouter } from "next/router";
-import { useGetEmployeeById } from "@/hooks/employee";
-import { Divider } from "antd";
+import AccumulatedLogsTable from "../../AccumulatedLogsTable";
 
 function AccumulatedLogs() {
   const router = useRouter();
@@ -15,24 +12,8 @@ function AccumulatedLogs() {
     startDate,
     endDate,
   });
-  const [employee, loadingEmployee] = useGetEmployeeById(router?.query?.id);
   return (
     <>
-      <table>
-        <tr>
-          <td>Name:</td>
-          <td style={{ paddingLeft: 10, fontWeight: "bold" }}>
-            {employee?.fullName}
-          </td>
-        </tr>
-        <tr>
-          <td>Position:</td>
-          <td style={{ paddingLeft: 10, fontWeight: "bold" }}>
-            {employee?.position?.description}
-          </td>
-        </tr>
-      </table>
-      <Divider />
       <FormDateRange
         name="dateRange"
         label="Date Range"
@@ -45,10 +26,7 @@ function AccumulatedLogs() {
         }}
       />
 
-      <AccumulatedLogsTable
-        dataSource={data}
-        loading={loading || loadingEmployee}
-      />
+      <AccumulatedLogsTable dataSource={data} loading={loading} />
     </>
   );
 }

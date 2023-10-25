@@ -13,6 +13,7 @@ import com.backend.gbp.repository.TimekeepingEmployeeRepository
 import com.backend.gbp.repository.TimekeepingRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -135,43 +136,53 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         timekeeping.status = status
 
         if (status == PayrollStatus.FINALIZED) {
-            Map<String, HoursLog> breakdownMap = new HashMap<>()
+//            TODO: generate salary amount based on accumulated logs and hourly rate
+            Map<String, HoursLog> timekeepingBreakdownMap = new HashMap<>()
             timekeeping.timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
                 timekeepingEmployee.status = PayrollEmployeeStatus.FINALIZED
+                Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
                 timekeepingEmployee.accumulatedLogs.each {
                     AccumulatedLogs accumulatedLogs ->
                         accumulatedLogs.projectBreakdown.each {
-                            HoursLog breakdown = breakdownMap.get(it.project as String)
-                            if (!breakdown) breakdown = new HoursLog()
-                            breakdown.project = it.project
-                            breakdown.projectName = it.projectName
-                            breakdown.late += it.late
-                            breakdown.underTime += it.underTime
-                            breakdown.absent += it.absent
-                            breakdown.regular += it.regular
-                            breakdown.overtime += it.overtime
-                            breakdown.regularHoliday += it.regularHoliday
-                            breakdown.overtimeHoliday += it.overtimeHoliday
-                            breakdown.regularDoubleHoliday += it.regularDoubleHoliday
-                            breakdown.overtimeDoubleHoliday += it.overtimeDoubleHoliday
-                            breakdown.regularSpecialHoliday += it.regularSpecialHoliday
-                            breakdown.overtimeSpecialHoliday += it.overtimeSpecialHoliday
-//                            if (breakdown) {
-                            breakdownMap.put(it.project as String, breakdown)
-//                            }
+                            consolidateProjectBreakdown(timekeepingBreakdownMap, it)
                         }
+                }
+                timekeepingEmployee.projectBreakdown = []
+                employeeBreakdownMap.keySet().each {
+                    timekeepingEmployee.projectBreakdown.push(employeeBreakdownMap.get(it.toString()))
                 }
             }
             timekeeping.projectBreakdown = []
-            breakdownMap.keySet().each {
-                timekeeping.projectBreakdown.push(breakdownMap.get(it.toString()))
+            timekeepingBreakdownMap.keySet().each {
+                timekeeping.projectBreakdown.push(timekeepingBreakdownMap.get(it.toString()))
             }
 
         }
         timekeepingEmployeeRepository.saveAll(timekeeping.timekeepingEmployees)
         timekeepingRepository.save(timekeeping)
 
-        return new GraphQLResVal<String>(null, true, "Successfully recalculated timekeeping employee.")
+        return new GraphQLResVal<String>(null, true, "Successfully updated Timekeeping status.")
+    }
+
+    static void consolidateProjectBreakdown(HashMap<String, HoursLog> breakdownMap, HoursLog it) {
+        HoursLog breakdown = breakdownMap.get(it.project as String)
+        if (!breakdown) breakdown = new HoursLog()
+        breakdown.project = it.project
+        breakdown.projectName = it.projectName
+        breakdown.late += it.late
+        breakdown.underTime += it.underTime
+        breakdown.absent += it.absent
+        breakdown.regular += it.regular
+        breakdown.overtime += it.overtime
+        breakdown.regularHoliday += it.regularHoliday
+        breakdown.overtimeHoliday += it.overtimeHoliday
+        breakdown.regularDoubleHoliday += it.regularDoubleHoliday
+        breakdown.overtimeDoubleHoliday += it.overtimeDoubleHoliday
+        breakdown.regularSpecialHoliday += it.regularSpecialHoliday
+        breakdown.overtimeSpecialHoliday += it.overtimeSpecialHoliday
+//                            if (breakdown) {
+        breakdownMap.put(it.project as String, breakdown)
+//                            }
     }
 
 
@@ -182,6 +193,7 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         Timekeeping timekeeping = new Timekeeping();
         timekeeping.payroll = payroll
         timekeeping.status = PayrollStatus.DRAFT
+        timekeeping.company = SecurityUtils.currentCompany()
         timekeeping = timekeepingRepository.save(timekeeping)
 
         payroll.timekeeping = timekeeping

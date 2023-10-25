@@ -1,21 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { Button, Divider, Drawer, Input, Select, Table, Tag } from "antd";
-import { Employee, TimekeepingEmployeeDto } from "@/graphql/gql/graphql";
-import { setFips } from "crypto";
+import { Employee } from "@/graphql/gql/graphql";
 import { getStatusColor } from "@/utility/helper";
+import { Button, Divider, Drawer, Input, Select, Table, Tag } from "antd";
+import { useEffect, useState } from "react";
 
 interface IProps {
   selectedEmployees: Employee[];
   loading: boolean;
   usage?: string;
-  setDisplayedEmployee?: (any: any) => void;
+  children: any;
+  icon?: any;
+  onSelect?: (any: any) => void;
+  selectedRowKeys?: string[];
 }
 
 const EmployeeDrawer = ({
   selectedEmployees = [],
   loading,
   usage,
-  setDisplayedEmployee,
+  onSelect,
+  children,
+  icon,
+  selectedRowKeys,
 }: IProps) => {
   const [open, setOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
@@ -67,16 +72,18 @@ const EmployeeDrawer = ({
   return (
     <>
       <div style={{ display: "flex", justifyContent: "end", marginBottom: 15 }}>
-        <Button type="primary" onClick={showDrawer} loading={loading}>
-          {usage === "TIMEKEEPING"
-            ? "Select Employee"
-            : `View Selected (
-          ${selectedEmployees?.length})`}
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          loading={loading}
+          icon={icon && icon}
+        >
+          {children}
         </Button>
       </div>
 
       <Drawer
-        title="Selected Employees"
+        title="Employees"
         placement="right"
         onClose={onClose}
         open={open}
@@ -116,12 +123,15 @@ const EmployeeDrawer = ({
           loading={loading}
           rowKey={({ id }) => id}
           rowSelection={
-            usage === "TIMEKEEPING"
+            usage === "TIMEKEEPING" || usage === "EMPLOYEE_SWITCHING"
               ? {
                   onSelect: (employee) => {
-                    setDisplayedEmployee && setDisplayedEmployee(employee);
+                    if (onSelect) onSelect(employee);
                   },
                   type: "radio",
+                  ...(selectedRowKeys
+                    ? { selectedRowKeys: selectedRowKeys }
+                    : {}),
                 }
               : (null as any)
           }

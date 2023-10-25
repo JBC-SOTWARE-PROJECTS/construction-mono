@@ -8,6 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
+interface EmployeeBasicDetails {
+    UUID getId()
+
+    String getFullName()
+
+    String getPosition()
+}
+
 interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
     @Query(
@@ -76,9 +84,14 @@ interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     )
 
 
-
     @Query(
             value = "Select e from Employee e where e.user.login = :username"
     )
     Optional<Employee> findOneByUsername(@Param("username") String username)
+
+
+    @Query(
+            value = "Select e.id as id, e.fullName as fullName from Employee e"
+    )
+    List<EmployeeBasicDetails> getAllEmployeesBasic()
 }

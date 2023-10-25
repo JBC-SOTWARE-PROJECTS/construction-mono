@@ -7,6 +7,7 @@ import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.PermissionRepository
 import com.backend.gbp.repository.PositionRepository
 import com.backend.gbp.repository.UserRepository
+import com.backend.gbp.repository.hrm.EmployeeBasicDetails
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.security.HISUser
 import com.backend.gbp.services.GeneratorService
@@ -75,6 +76,11 @@ class EmployeeService {
     @GraphQLQuery(name = "employees", description = "Get All Employees")
     List<Employee> findAll() {
         employeeRepository.findAll().sort { it.lastName }
+    }
+
+    @GraphQLQuery(name = "getAllEmployeesBasic", description = "Get All Employees")
+    List<EmployeeBasicDetails> getAllEmployeesBasic() {
+        employeeRepository.getAllEmployeesBasic().sort { it.fullName }
     }
 
     @GraphQLQuery(name = "searchEmployees", description = "Search employees")

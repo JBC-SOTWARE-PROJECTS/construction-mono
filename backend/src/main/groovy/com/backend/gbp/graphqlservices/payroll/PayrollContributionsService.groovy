@@ -11,6 +11,7 @@ import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.payroll.PayrollContributionRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeContributionRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -129,7 +130,9 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
         PayrollContribution contribution = new PayrollContribution();
         contribution.payroll = payroll
         contribution.status = PayrollStatus.ACTIVE
+        contribution.company = SecurityUtils.currentCompany()
         contribution = payrollContributionRepository.save(contribution)
+
         payroll.contribution = contribution
         payrollEmployeeContributionService.addEmployees(payroll.payrollEmployees, payroll)
         return contribution

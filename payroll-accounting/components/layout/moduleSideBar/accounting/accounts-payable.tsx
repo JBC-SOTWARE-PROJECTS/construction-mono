@@ -88,6 +88,16 @@ const AccountingAccountsPayableMenu = {
           },
         ],
       },
+      {
+        path: "/accounting/accounts-payable/templates",
+        name: "Accounts Templates",
+        routes: [
+          {
+            path: "/accounting/accounts-payable/templates/accounts",
+            name: "Templates",
+          },
+        ],
+      },
     ],
   },
   location: {

@@ -31,9 +31,28 @@ interface CreateAccountingPeriodI {
 }
 
 const UPDATE_INSERT_RECORD = gql`
-  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
-    upsertFiscal(id: $id, fields: $fields) {
-      id
+  query ($employeeId: UUID, $page: Int!, $size: Int!) {
+    getEmployeeLoansByEmployee(
+      employeeId: $employeeId
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        amount
+        employee {
+          id
+          fullName
+        }
+        description
+        category
+        status
+        isVoided
+      }
+      totalPages
+      size
+      number
+      __typename
     }
   }
 `;

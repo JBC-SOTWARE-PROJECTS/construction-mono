@@ -46,14 +46,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     List<IPayrollEmployeeBaseOperation> payrollEmployeeOperations
 //
     @Autowired
-    PayrollContributionsService payrollContributionsService
-//
-//    @Autowired
-//    PayrollAllowanceService payrollAllowanceService
-//
-//    @Autowired
-//    TimekeepingEmployeeService timekeepingEmployeeService
-//
+    PayrollLoanService payrollLoanService
+
     @Autowired
     PayrollEmployeeContributionService payrollEmployeeContributionService
 
@@ -192,7 +186,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             //TODO: actions for creating contributions and payroll employee contributions
 
 //            timekeepingService.startPayroll(payroll) //TODO: Temporary only, use the code below in the future
-//            payrollContributionsService.startPayroll(payroll)
+//            payrollLoanService.startPayroll(payroll)
             payrollOperations.each {
                 it.startPayroll(payroll)
             }

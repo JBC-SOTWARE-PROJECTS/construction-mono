@@ -160,6 +160,7 @@ export default function WTXConsolidatedModal(props: IProps) {
           <Form
             name="wtxForm"
             layout="vertical"
+            initialValues={{ remarks: "" }}
             onFinish={onSubmit}
             onFinishFailed={onFinishFailed}>
             <FormTextArea

@@ -1,8 +1,11 @@
-import React from "react";
-import { Tabs } from "antd";
-import type { TabsProps } from "antd";
-import RawLogs from "@/components/payroll/employee-management/attendance/RawLogs";
+import EmployeeDetails from "@/components/common/EmployeeDetails";
 import AccumulatedLogs from "@/components/payroll/employee-management/attendance/AccumulatedLogs";
+import RawLogs from "@/components/payroll/employee-management/attendance/RawLogs";
+import { useGetEmployeeById } from "@/hooks/employee";
+import { PageHeader } from "@ant-design/pro-components";
+import type { TabsProps } from "antd";
+import { Divider, Tabs } from "antd";
+import { useRouter } from "next/router";
 
 const onChange = (key: string) => {
   console.log(key);
@@ -21,8 +24,17 @@ const items: TabsProps["items"] = [
   },
 ];
 function EmployeeSchedulePage() {
+  const router = useRouter();
+  const [employee, loadingEmployee] = useGetEmployeeById(router?.query?.id);
+
   return (
     <>
+      <PageHeader title="Employee Allowance" onBack={() => router?.back()} />
+      <EmployeeDetails
+        fullName={employee?.fullName}
+        position={employee?.position?.description}
+      />
+      <Divider />
       <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
     </>
   );
