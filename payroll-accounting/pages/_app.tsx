@@ -8,6 +8,8 @@ import React from "react";
 
 import "@/styles/globals.css";
 import "@/styles/loader.css";
+import 'react-virtualized/styles.css'
+import "@/styles/virtualtable.css";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();

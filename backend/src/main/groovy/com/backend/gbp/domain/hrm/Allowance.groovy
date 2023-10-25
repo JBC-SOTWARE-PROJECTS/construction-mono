@@ -1,7 +1,7 @@
 package com.backend.gbp.domain.hrm
 
 import com.backend.gbp.domain.AbstractAuditingEntity
-
+import com.backend.gbp.domain.CompanySettings
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.*
 
@@ -34,6 +34,12 @@ class Allowance extends AbstractAuditingEntity {
 	@GraphQLQuery
 	@Column(name = "amount", columnDefinition = "numeric")
 	Double amount
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "company", referencedColumnName = "id")
+	CompanySettings company
 
 	@GraphQLQuery
 	@Column(name = "created_date", columnDefinition = "timestamp")

@@ -424,7 +424,9 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
                                               @GraphQLArgument(name = "details")  Map<String,String> details) {
 
 
-        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+        def coa =  subAccountSetupService.getAllChartOfAccountGenerate(null,null,"",null,null, null, true)
+
+
         // validate if code is on cOa
 
         List<EntryFull> entriesTarget = []
@@ -448,14 +450,21 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         String entityName = header.get("entityName")
         String particulars = header.get("particulars")
 
-
+        String transactionNo = header.get("transactionNo")
+        String transactionType = header.get("transactionType")
+        String referenceType = header.get("referenceType")
+        String referenceNo = header.get("referenceNo")
 
         def id = null
         try {
 
-            def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget)
+            def headerLedger  =  createDraftHeaderLedgerFull(entriesTarget)
 
             headerLedger.entityName = entityName
+            headerLedger.transactionNo = transactionNo
+            headerLedger.transactionType = transactionType
+            headerLedger.referenceType = referenceType
+            headerLedger.referenceNo = referenceNo
             validateEntries(headerLedger)
 
             def pHeader = persistHeaderLedger(headerLedger,
@@ -1528,6 +1537,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         headerLedger.docType = ledgerDocType
         headerLedger.journalType = journalType
         headerLedger.transactionDate = transactionDatetime
+        headerLedger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
         headerLedger.beginningBalance = begBalance
         headerLedger.custom = custom
         headerLedger.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){

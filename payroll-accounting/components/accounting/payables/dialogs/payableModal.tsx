@@ -7,7 +7,9 @@ import {
   Supplier,
 } from "@/graphql/gql/graphql";
 import {
+  GET_AP_ADVANCE_SUPPLIER,
   GET_AP_ITEMS,
+  POST_ACCOUNT_PAYABLE,
   REMOVE_AP_DETAILS,
   UPDATE_PAYABLE_STATUS,
   UPSERT_PAYABLE_RECORD,
@@ -22,7 +24,7 @@ import {
   RedoOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Col,
@@ -44,6 +46,7 @@ import APReferencesTable from "../payable/component/references";
 import {
   APCATEGORY,
   APTOTALS,
+  responsiveColumn2,
   responsiveColumn3,
   responsiveColumn3Last,
   vatRate,
@@ -56,7 +59,11 @@ import {
   FormTextArea,
 } from "@/components/common";
 import { ColumnsType } from "antd/es/table";
-import { useAPTransactionType, usePaymentTerms } from "@/hooks/payables";
+import {
+  useAPTransactionType,
+  usePaymentTerms,
+  useReferenceType,
+} from "@/hooks/payables";
 import dayjs from "dayjs";
 import PayableSummaryFooter from "../common/payableSummary";
 import {
@@ -68,6 +75,8 @@ import { useConfirmationPasswordHook, useDialog } from "@/hooks";
 import APJournalEntries from "../journalentries/apJournalEntries";
 import ViewJournalEntries from "../journalentries/viewJournalEntries";
 import { NumberFormater, requiredField, decimalRound2 } from "@/utility/helper";
+import FormAutoComplete from "@/components/common/formAutoComplete/formAutoComplete";
+import FormSwitch from "@/components/common/formSwitch/formSwitch";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -93,15 +102,32 @@ export default function PayableModal(props: IProps) {
   });
   const [items, setItems] = useState<AccountsPayableDetails[]>([]);
   const [saveCloseLoading, setSaveCloseLoading] = useState(false);
+  const [allowBeginning, setAllowBeginning] = useState(false);
   // ======================= Modal ===============================
   const journalEntries = useDialog(APJournalEntries);
   const viewEntries = useDialog(ViewJournalEntries);
   // ===================== Queries ==============================
   const paymentTermsList = usePaymentTerms();
+  const referenceTypes = useReferenceType();
   const transactionList = useAPTransactionType({
     type: supplier?.supplierTypes?.id,
     category: "AP",
   });
+
+  const { loading: beginningLoading } = useQuery<Query>(
+    GET_AP_ADVANCE_SUPPLIER,
+    {
+      fetchPolicy: "cache-and-network",
+      variables: {
+        supplier: supplier?.id,
+        id: record?.id,
+      },
+      onCompleted: (data) => {
+        let result = data?.apBeginning as boolean;
+        setAllowBeginning(result);
+      },
+    }
+  );
 
   const [getItems, { loading }] = useLazyQuery<Query>(GET_AP_ITEMS, {
     fetchPolicy: "cache-and-network",
@@ -137,6 +163,21 @@ export default function PayableModal(props: IProps) {
       }
     },
   });
+
+  const [postAccountPayable, { loading: upsertLoading }] =
+    useMutation<Mutation>(POST_ACCOUNT_PAYABLE, {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        const result = data.postAp as AccountsPayable;
+        if (result?.id) {
+          hide({
+            success: true,
+            message: "Account Payable successfully posted.",
+          });
+        }
+      },
+    });
+
   //================== functions ====================
   const onFinishFailed = () => {
     message.error("Something went wrong. Please contact administrator.");
@@ -151,7 +192,6 @@ export default function PayableModal(props: IProps) {
     } else {
       payload.transType = null;
     }
-    payload.rounding = 2;
     payload.apCategory = values.apCategory;
     payload.grossAmount = state.grossAmount;
     payload.discountAmount = state.discountAmount;
@@ -188,23 +228,34 @@ export default function PayableModal(props: IProps) {
                 });
               }
             } else if (action === "save_post") {
-              const payload = {
-                id: record?.id,
-                status: true,
-                refNo: record?.apNo,
-                supplierName: supplier?.supplierFullname,
-                refDate: dayjs(record?.apvDate).format("YYYY"),
-              };
-              journalEntries(payload, (e: any) => {
-                if (e) {
-                  hide({
-                    success: true,
-                    message: "Account Payable successfully posted.",
-                  });
-                } else {
-                  hide(false);
-                }
-              });
+              if (payload.isBeginningBalance) {
+                postAccountPayable({
+                  variables: {
+                    id: record?.id,
+                    status: false,
+                  },
+                });
+              } else {
+                const postPayload = {
+                  id: record?.id,
+                  status: true,
+                  refNo: record?.apNo,
+                  supplierName: supplier?.supplierFullname,
+                  refDate: dayjs(record?.apvDate).format("YYYY"),
+                  type: supplier?.supplierTypes?.id,
+                  particulars: payload.remarksNotes,
+                };
+                journalEntries(postPayload, (e: any) => {
+                  if (e) {
+                    hide({
+                      success: true,
+                      message: "Account Payable successfully posted.",
+                    });
+                  } else {
+                    hide(false);
+                  }
+                });
+              }
             }
           } else {
             message.error("Something went wrong. Cannot process request");
@@ -229,14 +280,25 @@ export default function PayableModal(props: IProps) {
   const onVoidTransaction = () => {
     if (_.isEmpty(record?.disbursement) && _.isEmpty(record?.dmRefNo)) {
       showPasswordConfirmation(() => {
-        journalEntries({ id: record?.id, status: false }, (e: any) => {
-          if (e) {
-            hide({
-              success: true,
-              message: "Account Payable successfully voided.",
-            });
-          }
-        });
+        if (record?.isBeginningBalance) {
+          postAccountPayable({
+            variables: {
+              id: record?.id,
+              status: true,
+            },
+          });
+        } else {
+          journalEntries({ id: record?.id, status: false }, (e: any) => {
+            if (e) {
+              hide({
+                success: true,
+                message: "Account Payable successfully voided.",
+              });
+            } else {
+              hide(false);
+            }
+          });
+        }
       });
     } else {
       message.error(
@@ -604,6 +666,7 @@ export default function PayableModal(props: IProps) {
               <Button
                 type="dashed"
                 size="large"
+                disabled={record?.isBeginningBalance ?? false}
                 onClick={onViewJournalEntries}
                 icon={<FileTextOutlined />}>
                 View Journal Entries
@@ -640,6 +703,7 @@ export default function PayableModal(props: IProps) {
                       size="large"
                       htmlType="submit"
                       form="upsertForm"
+                      loading={upsertLoading}
                       onClick={() => setAction("save_post")}
                       icon={<CarryOutOutlined />}
                       disabled={record?.posted || _.isEmpty(items)}>
@@ -676,12 +740,14 @@ export default function PayableModal(props: IProps) {
           dueDate: dayjs(record?.dueDate ?? new Date()),
           apCategory: record?.apCategory,
           transType: record?.transType?.id,
+          referenceType: record?.referenceType,
           invoiceNo: record?.invoiceNo,
           vatRate: record?.id
             ? record?.vatRate
             : supplier?.isVatable
             ? vatRate
             : 0,
+          isBeginningBalance: record?.isBeginningBalance ?? false,
           remarksNotes: record?.remarksNotes,
         }}>
         <Row>
@@ -731,17 +797,44 @@ export default function PayableModal(props: IProps) {
                 placeholder: "Select Payment Terms",
               }}
             />
-            <FormSelect
-              label="Transaction Type"
-              name="transType"
-              propsselect={{
-                options: transactionList,
-                allowClear: true,
-                placeholder: "Select Payment Terms",
-              }}
-            />
+            <Row gutter={[16, 0]}>
+              <Col {...responsiveColumn2}>
+                <FormSelect
+                  label="Transaction Type"
+                  name="transType"
+                  propsselect={{
+                    options: transactionList,
+                    allowClear: true,
+                    placeholder: "Select Payment Terms",
+                  }}
+                />
+              </Col>
+              {!beginningLoading && (
+                <Col {...responsiveColumn2}>
+                  <FormSwitch
+                    label="Beginning Balance Marker"
+                    name="isBeginningBalance"
+                    valuePropName="checked"
+                    switchprops={{
+                      disabled: disabled || !allowBeginning,
+                      checkedChildren: "Yes",
+                      unCheckedChildren: "No",
+                    }}
+                  />
+                </Col>
+              )}
+            </Row>
           </Col>
           <Col {...responsiveColumn3}>
+            <FormAutoComplete
+              label="Reference Type"
+              name="referenceType"
+              rules={requiredField}
+              propsinput={{
+                options: referenceTypes,
+                placeholder: "Reference No",
+              }}
+            />
             <FormInput
               label="Reference No"
               name="invoiceNo"
@@ -759,8 +852,9 @@ export default function PayableModal(props: IProps) {
               }}
             />
             <FormTextArea
-              label="Remarks/Notes"
+              label="Remarks/Notes (Particulars)"
               name="remarksNotes"
+              rules={requiredField}
               propstextarea={{
                 rows: 6,
                 placeholder: "Remarks/Notes",

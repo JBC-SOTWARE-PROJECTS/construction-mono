@@ -122,6 +122,14 @@ class Item extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "active")
 	Boolean active
 
+	@GraphQLQuery
+	@Column(name = "fix_asset")
+	Boolean fixAsset
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
+
 	@Transient
 	String getUnitMeasurement() {
 		return "${unit_of_purchase.unitDescription} (${item_conversion} ${unit_of_usage.unitDescription})"

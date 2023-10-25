@@ -25,7 +25,7 @@ enum LedgerDocType { //transactype
 	AJ, // PatientAdjustments
 	CS, // DisbursementCash
 	CK, // DisbursementCheck
-	PC, // PettyCash
+	PC, // PettyCashAccounting
 	CM, // CreditMemo
 	DM, // DebitMemo
 	// START: inventory transactions//

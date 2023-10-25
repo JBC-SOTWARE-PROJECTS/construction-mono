@@ -1,6 +1,5 @@
 package com.backend.gbp.repository.hrm
 
-import com.backend.gbp.domain.hrm.EmployeeAttendance
 import com.backend.gbp.domain.hrm.EmployeeSchedule
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -27,5 +26,10 @@ interface EmployeeScheduleRepository extends JpaRepository<EmployeeSchedule, UUI
             @Param("id") UUID id,
             @Param("startDate") Instant startDate,
             @Param("endDate") Instant endDate)
+
+
+    @Query(value = "select es from EmployeeSchedule es where es.dateString in :dateStringList  and es.employee.id = :employeeId")
+    List<EmployeeSchedule> findByDateString(@Param("dateStringList") List<String> dateStringList,
+                                            @Param("employeeId") UUID employeeId)
 
 }

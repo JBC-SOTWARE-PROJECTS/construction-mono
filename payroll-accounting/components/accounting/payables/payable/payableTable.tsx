@@ -76,7 +76,12 @@ export default function PayableTable({
       dataIndex: "supplier.supplierFullname",
       key: "supplier.supplierFullname",
       render: (text, record) => (
-        <span key={text}>{record.supplier?.supplierFullname}</span>
+        <span key={text}>
+          {record.supplier?.supplierFullname}{" "}
+          {record.isBeginningBalance && (
+            <Tag color="cyan">Beginning Marker</Tag>
+          )}
+        </span>
       ),
     },
     {

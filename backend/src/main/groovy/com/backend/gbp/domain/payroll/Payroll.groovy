@@ -15,7 +15,7 @@ import java.time.Instant
 @Table(schema = "payroll", name = "payrolls")
 //@SQLDelete(sql = "UPDATE payroll.timekeepings SET deleted = true WHERE id = ?")
 //@Where(clause = "deleted <> true or deleted is  null ")
-class Payroll extends  PayrollAuditingEntity implements Serializable {
+class Payroll extends PayrollAuditingEntity implements Serializable {
 
 
     @GraphQLQuery
@@ -35,7 +35,6 @@ class Payroll extends  PayrollAuditingEntity implements Serializable {
     String description
 
 
-
     @GraphQLQuery
     @Column(name = "start_date", columnDefinition = "timestamp")
     Instant dateStart
@@ -49,7 +48,6 @@ class Payroll extends  PayrollAuditingEntity implements Serializable {
 //    Boolean deleted
 
 
-
     @OneToMany(mappedBy = "payroll", orphanRemoval = true, cascade = CascadeType.ALL)
     List<PayrollEmployee> payrollEmployees = []
 
@@ -61,21 +59,26 @@ class Payroll extends  PayrollAuditingEntity implements Serializable {
     @OneToOne(mappedBy = "payroll")
     Timekeeping timekeeping
 
+    @OneToOne(mappedBy = "payroll")
+    PayrollLoan loan
+
+    @OneToOne(mappedBy = "payroll")
+    PayrollContribution contribution
+
+    @OneToOne(mappedBy = "payroll")
+    PayrollAdjustment adjustment
+
 //
 //
 //    @OneToOne(mappedBy = "payroll")
 //    PayrollOtherDeduction otherDeduction
-//
-//    @OneToOne(mappedBy = "payroll")
-//    Timekeeping timekeeping
+
 //
 //    @OneToOne(mappedBy = "payroll")
 //    PayrollAllowance allowance
 //
-    @OneToOne(mappedBy = "payroll")
-    PayrollContribution contribution
+
 //
-//    @OneToOne(mappedBy = "payroll")
-//    PayrollAdjustment adjustment
+
 
 }

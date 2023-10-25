@@ -1,4 +1,5 @@
 import CustomButton from "@/components/common/CustomButton";
+import EmployeeDetails from "@/components/common/EmployeeDetails";
 import AccumulatedLogsTable from "@/components/payroll/AccumulatedLogsTable";
 import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
 import LogsProjectBreakdownModal from "@/components/payroll/LogsProjectBreakdownModal";
@@ -16,6 +17,7 @@ import useGetTimekeeping from "@/hooks/payroll/timekeeping/useGetTimekeeping";
 import useGetTimekeepingEmployeeLogs from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployeeLogs";
 import useGetTimekeepingEmployees from "@/hooks/payroll/timekeeping/useGetTimekeepingEmployees";
 import useUpdateTimekeepingStatus from "@/hooks/payroll/timekeeping/useUpdateTimekeepingStatus";
+import { statusMap } from "@/utility/constant";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import {
@@ -56,10 +58,7 @@ function Timekeeping({ account }: IPageProps) {
     refetchTimekeeping();
     refetchEmployees();
   });
-  const statusMap: any = {
-    DRAFT: "FINALIZED",
-    FINALIZED: "DRAFT",
-  };
+
   const handleClickFinalize = () => {
     let countDraft = 0;
     selectedEmployees.forEach((item) => {
@@ -137,24 +136,18 @@ function Timekeeping({ account }: IPageProps) {
           <EmployeeDrawer
             selectedEmployees={selectedEmployees as Employee[]}
             loading={loadingPayrollEmployees}
-            setDisplayedEmployee={setDisplayedEmployee}
+            onSelect={setDisplayedEmployee}
             usage="TIMEKEEPING"
-          />
+          >
+            Select Employee
+          </EmployeeDrawer>
         }
         title={
           displayedEmployee ? (
             <>
-              <table
-                style={{
-                  fontSize: 16,
-                  color: "initial",
-                  margin: 10,
-                  marginBottom: 0,
-                }}
-              >
-                <tr>
-                  <td>Name:</td>
-                  <td style={{ paddingLeft: 10 }}>
+              <EmployeeDetails
+                fullName={
+                  <>
                     {displayedEmployee?.fullName}{" "}
                     <Tag
                       color={getStatusColor(
@@ -163,15 +156,10 @@ function Timekeeping({ account }: IPageProps) {
                     >
                       {displayedEmployee?.status}
                     </Tag>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Position:</td>
-                  <td style={{ paddingLeft: 10 }}>
-                    {displayedEmployee?.position?.description}
-                  </td>
-                </tr>
-              </table>
+                  </>
+                }
+                position={displayedEmployee?.position?.description as string}
+              />
               {timekeeping?.status === "DRAFT" && (
                 <>
                   {" "}
@@ -202,6 +190,17 @@ function Timekeeping({ account }: IPageProps) {
                       : "Draft"
                   }`}</PayrollEmployeeStatusAction>
                 </>
+              )}
+
+              {displayedEmployee?.status === "FINALIZED" && (
+                <LogsProjectBreakdownModal
+                  record={{
+                    projectBreakdown: displayedEmployee?.projectBreakdown,
+                  }}
+                  disabled={false}
+                >
+                  View Project Breakdown
+                </LogsProjectBreakdownModal>
               )}
             </>
           ) : (

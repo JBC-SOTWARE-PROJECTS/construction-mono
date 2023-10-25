@@ -5,6 +5,8 @@ import { ToWords } from "to-words";
 import { currency, dateFormat } from "./constant";
 import { v4 as uuidv4 } from "uuid";
 import roundHalfEven from "round-half-even";
+import { Disbursement } from "@/graphql/gql/graphql";
+import _ from "lodash";
 
 export const useLocalStorage = (key: string, initialValue: any) => {
   // State to store our value
@@ -142,4 +144,33 @@ export function getTimeFromDate(date: dayjs.Dayjs) {
 export function getStatusColor(status: string) {
   if (status === "DRAFT") return "orange";
   else if (status === "FINALIZED") return "green";
+}
+
+export const validateDisbursement = (
+  payload: Disbursement,
+  balance: number,
+  checks: any[],
+  application: any[],
+  expense: any[]
+): string => {
+  if (payload.paymentCategory === 'PAYABLE') {
+    if (_.isEmpty(checks) && _.isEmpty(application)) {
+      return 'Please supply check details or Accounts payable application to proceed'
+    }
+    if (!payload.isAdvance) {
+      if (Number(balance) !== 0) {
+        return 'Disbursement amount and Applied amount are not equals'
+      }
+    }
+  } else if (payload.paymentCategory === 'EXPENSE') {
+    if (_.isEmpty(checks) && _.isEmpty(expense)) {
+      return 'Please supply check details or expense transaction to proceed'
+    }
+    if (!payload.isAdvance) {
+      if (Number(balance) !== 0) {
+        return 'Disbursement amount and Applied amount are not equals'
+      }
+    }
+  }
+  return ''
 }

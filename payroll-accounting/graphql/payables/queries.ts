@@ -120,7 +120,6 @@ export const GET_RECORDS_PAYABLES = gql`
         ewtAmount
         netAmount
         remarksNotes
-        rounding
         postedLedger
         posted
         appliedAmount
@@ -129,6 +128,8 @@ export const GET_RECORDS_PAYABLES = gql`
         postedBy
         disbursement
         dmRefNo
+        referenceType
+        isBeginningBalance
       }
       totalElements
       size
@@ -272,5 +273,11 @@ export const POST_ACCOUNT_PAYABLE_MANUAL = gql`
       success
       message
     }
+  }
+`;
+
+export const GET_AP_ADVANCE_SUPPLIER = gql`
+  query ($supplier: UUID, $id: UUID) {
+    apBeginning(supplier: $supplier, id: $id)
   }
 `;

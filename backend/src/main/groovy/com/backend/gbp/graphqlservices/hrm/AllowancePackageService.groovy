@@ -1,10 +1,11 @@
 package com.backend.gbp.graphqlservices.hrm
 
-import com.backend.gbp.domain.hrm.Allowance
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.AllowancePackage
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.AllowancePackageRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -33,6 +34,11 @@ class AllowancePackageService extends AbstractDaoService<AllowancePackage> {
     AllowancePackageRepository allowancePackageRepository
 
 
+    @GraphQLQuery(name ="fetchAllAllowancePackage", description = "get all fetch allowance package")
+    List<AllowancePackage>fetchAllAllowancePackage(){
+        return allowancePackageRepository.fetchAllAllowancePackage()
+    }
+
     @GraphQLQuery(name ="fetchAllowancePackagePageable", description = "fetch all allowance package")
     Page<AllowancePackage> fetchAllowancePackagePageable(
             @GraphQLArgument(name ="filter") String filter,
@@ -48,13 +54,16 @@ class AllowancePackageService extends AbstractDaoService<AllowancePackage> {
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name ="fields") Map<String, Object> fields
     ){
+        CompanySettings companySettings = SecurityUtils.currentCompany()
         if(id){
             AllowancePackage allowancePackage = allowancePackageRepository.findById(id).get()
             allowancePackage = objectMapper.updateValue(allowancePackage, fields)
+            allowancePackage.company = companySettings
             allowancePackage = allowancePackageRepository.save(allowancePackage)
             return new GraphQLRetVal<AllowancePackage>(allowancePackage, true, 'Successfully Updated')
         }
         AllowancePackage allowancePackage = objectMapper.convertValue(fields, AllowancePackage)
+        allowancePackage.company = companySettings
         allowancePackage =allowancePackageRepository.save(allowancePackage)
         return  new GraphQLRetVal<AllowancePackage>(allowancePackage, true, 'Successfully Saved')
     }
