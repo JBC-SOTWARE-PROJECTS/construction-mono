@@ -9,6 +9,18 @@ const GET_EMPLOYEES = gql`
       fullName
       gender
       status
+      projectBreakdown {
+        project
+        projectName
+        regular
+        overtime
+        regularHoliday
+        overtimeHoliday
+        regularDoubleHoliday
+        overtimeDoubleHoliday
+        regularSpecialHoliday
+        overtimeSpecialHoliday
+      }
       position {
         description
       }

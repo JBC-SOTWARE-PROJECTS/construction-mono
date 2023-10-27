@@ -4,6 +4,9 @@ import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.Position
+import com.backend.gbp.domain.hrm.dto.EmployeeLoanConfig
+import com.backend.gbp.domain.hrm.dto.HoursLog
+import com.backend.gbp.domain.payroll.EmployeeLoan
 import com.backend.gbp.domain.types.JaversResolvable
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.backend.gbp.domain.User
@@ -206,6 +209,11 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Column(name = "is_active_hdmf", columnDefinition = "boolean")
 	Boolean isActiveHDMF
+
+	@Type(type = "jsonb")
+	@GraphQLQuery
+	@Column(name="employee_loan_config",columnDefinition = "jsonb")
+	EmployeeLoanConfig employeeLoanConfig
 
 	@Override
 	String resolveEntityForJavers() {

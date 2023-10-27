@@ -212,7 +212,9 @@ function PayrollForm({ usage }: IProps) {
               <EmployeeDrawer
                 selectedEmployees={selectedEmployees}
                 loading={loadingPayrollEmployees}
-              />
+              >
+                View Selected ({selectedEmployees?.length})
+              </EmployeeDrawer>
 
               <EmployeeTable
                 dataSource={employees as Employee[]}

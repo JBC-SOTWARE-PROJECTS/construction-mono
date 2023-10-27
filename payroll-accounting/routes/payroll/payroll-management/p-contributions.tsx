@@ -32,8 +32,7 @@ import useMemoizedPayrollHeaderBreadcrumb, {
 import PayrollHeader from "@/components/payroll/PayrollHeader";
 import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 
-const recalculateButton: ButtonProps = {
-  shape: "circle",
+export const recalculateButton: ButtonProps = {
   icon: <ReloadOutlined />,
   type: "primary",
   danger: true,

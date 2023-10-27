@@ -1,0 +1,2 @@
+ALTER TABLE payroll.timekeeping_employees
+ADD project_breakdown jsonb;

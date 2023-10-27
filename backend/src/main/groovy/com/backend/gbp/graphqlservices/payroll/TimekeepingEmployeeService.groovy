@@ -1,6 +1,8 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.AccumulatedLogs
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
@@ -17,6 +19,7 @@ import com.backend.gbp.repository.TimekeepingEmployeeRepository
 import com.backend.gbp.repository.TimekeepingRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
+import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -62,7 +65,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     @Override
     List<TimekeepingEmployee> addEmployees(List<PayrollEmployee> payrollEmployees, Payroll payroll) {
-
+        CompanySettings company = SecurityUtils.currentCompany()
         Timekeeping timekeeping = payroll.timekeeping
         List<TimekeepingEmployee> timekeepingEmployeeList = []
         if (payrollEmployees.size() > 0) {
@@ -72,6 +75,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
                     timekeepingEmployee.status = PayrollEmployeeStatus.DRAFT
                     timekeepingEmployee.payrollEmployee = it
                     timekeepingEmployee.timekeeping = timekeeping
+                    timekeepingEmployee.company = company
                     timekeepingEmployeeList.push(timekeepingEmployee)
                 }
             }
@@ -115,6 +119,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 //============================================================UTILITY METHODS====================================================================
 
     List<TimekeepingEmployee> generateAccumulatedLogs(List<TimekeepingEmployee> timekeepingEmployees, Payroll payroll) {
+        CompanySettings company = SecurityUtils.currentCompany()
         timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
             timekeepingEmployee.status = PayrollEmployeeStatus.DRAFT
             timekeepingEmployee.accumulatedLogs.clear()
@@ -124,6 +129,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
                     timekeepingEmployee.payrollEmployee.employee.id,
                     true)
             accumulatedLogs.each {
+                it.company = company
                 it.timekeepingEmployee = timekeepingEmployee
             }
             accumulatedLogRepository.saveAll(accumulatedLogs)
@@ -164,7 +170,22 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
         timekeepingEmployeeRepository.findById(id).ifPresent { employee = it }
         if (!employee) return new GraphQLResVal<TimekeepingEmployee>(null, false, "Failed to update employee timekeeping status. Please try again later!")
         else {
+
             employee = this.updateStatus(id, status)
+            Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
+
+            if (status == PayrollEmployeeStatus.FINALIZED) {
+                employee.accumulatedLogs.each {
+                    AccumulatedLogs accumulatedLogs ->
+                        accumulatedLogs.projectBreakdown.each {
+                            TimekeepingService.consolidateProjectBreakdown(employeeBreakdownMap, it)
+                        }
+                }
+                employee.projectBreakdown = []
+                employeeBreakdownMap.keySet().each {
+                    employee.projectBreakdown.push(employeeBreakdownMap.get(it.toString()))
+                }
+            }
             return new GraphQLResVal<TimekeepingEmployee>(employee, true, "Successfully updated employee timekeeping status!")
         }
     }
