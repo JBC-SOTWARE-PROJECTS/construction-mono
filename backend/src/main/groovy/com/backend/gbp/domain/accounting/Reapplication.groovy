@@ -56,6 +56,11 @@ class Reapplication extends AbstractAuditingEntity implements Serializable, Auto
 	BigDecimal discountAmount
 
 	@GraphQLQuery
+	@Column(name = "reference_no", columnDefinition = "varchar")
+	@UpperCase
+	String referenceNo
+
+	@GraphQLQuery
 	@Column(name = "ewt_amount", columnDefinition = "bool")
 	@UpperCase
 	BigDecimal ewtAmount

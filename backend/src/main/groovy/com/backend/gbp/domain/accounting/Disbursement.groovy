@@ -57,6 +57,16 @@ class Disbursement extends AbstractAuditingEntity implements Serializable, AutoI
 	String paymentCategory
 
 	@GraphQLQuery
+	@Column(name = "reference_no", columnDefinition = "varchar")
+	@UpperCase
+	String referenceNo
+
+	@GraphQLQuery
+	@Column(name = "reference_type", columnDefinition = "varchar")
+	@UpperCase
+	String referenceType
+
+	@GraphQLQuery
 	@Column(name = "dis_type", columnDefinition = "varchar")
 	@UpperCase
 	String disType

@@ -51,14 +51,12 @@ class ReceivingReport extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "user_fullname", columnDefinition = "varchar")
 	String userFullname
 
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "purchase_order", referencedColumnName = "id")
 	PurchaseOrder purchaseOrder
 	
@@ -70,22 +68,23 @@ class ReceivingReport extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "received_ref_date", columnDefinition = 'timestamp without time zone')
 	Instant receivedRefDate
+
+	@GraphQLQuery
+	@Column(name = "reference_type", columnDefinition = 'varchar')
+	String referenceType
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "received_office", referencedColumnName = "id")
 	Office receivedOffice
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "supplier", referencedColumnName = "id")
 	Supplier supplier
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "payment_terms", referencedColumnName = "id")
 	PaymentTerm paymentTerms
 	

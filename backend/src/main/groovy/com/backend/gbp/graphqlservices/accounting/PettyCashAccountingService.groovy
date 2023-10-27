@@ -5,6 +5,7 @@ import com.backend.gbp.domain.accounting.PettyCashAccounting
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
+import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.rest.dto.payables.PCVItemsDto
 import com.backend.gbp.rest.dto.payables.PCVOthersDto
 import com.backend.gbp.rest.dto.payables.PettyCashName
@@ -85,6 +86,29 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 		recordsRaw.each {
 			records << new PettyCashName(
 					name: StringUtils.upperCase( it.get("payee","") as String)
+			)
+		}
+
+		return records
+
+	}
+
+	@GraphQLQuery(name = "pcReferenceType", description = "Find Ap reference Type")
+	List<ApReferenceDto> pcReferenceType() {
+
+		List<ApReferenceDto> records = []
+
+		String query = '''select distinct p.reference_type as reference_type from accounting.petty_cash p where p.reference_type is not null '''
+
+
+		Map<String, Object> params = new HashMap<>()
+
+
+		def recordsRaw = namedParameterJdbcTemplate.queryForList(query, params)
+
+		recordsRaw.each {
+			records << new ApReferenceDto(
+					referenceType: StringUtils.upperCase(it.get("reference_type", "") as String)
 			)
 		}
 

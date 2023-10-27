@@ -55,6 +55,16 @@ class PettyCashAccounting extends AbstractAuditingEntity implements Serializable
 	String pcvCategory
 
 	@GraphQLQuery
+	@Column(name = "reference_no", columnDefinition = "varchar")
+	@UpperCase
+	String referenceNo
+
+	@GraphQLQuery
+	@Column(name = "reference_type", columnDefinition = "varchar")
+	@UpperCase
+	String referenceType
+
+	@GraphQLQuery
 	@Column(name = "amount_issued", columnDefinition = "numeric")
 	@UpperCase
 	BigDecimal amountIssued

@@ -6,6 +6,7 @@ import com.backend.gbp.domain.inventory.PurchaseRequestItem
 import com.backend.gbp.domain.inventory.ReturnSupplier
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseRtsDto
+import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -17,6 +18,7 @@ import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -42,6 +44,9 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
     @Autowired
     InventoryLedgerService inventoryLedgerService
 
+    @Autowired
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
 
     @GraphQLQuery(name = "rtsById")
     ReturnSupplier rtsById(
@@ -52,6 +57,23 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
         }else{
             null
         }
+    }
+
+    @GraphQLQuery(name = "returnGetReferenceType")
+    List<ApReferenceDto> returnGetReferenceType(){
+        List<ApReferenceDto> records = []
+
+        String query = '''select distinct p.reference_type as reference_type from inventory.return_supplier p where p.reference_type is not null '''
+        Map<String, Object> params = new HashMap<>()
+        def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
+
+        recordsRaw.each {
+            records << new ApReferenceDto(
+                    referenceType: StringUtils.upperCase( it.get("reference_type","") as String)
+            )
+        }
+
+        return records
     }
 
 

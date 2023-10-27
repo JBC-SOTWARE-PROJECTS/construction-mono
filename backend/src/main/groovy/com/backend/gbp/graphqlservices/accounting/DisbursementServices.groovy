@@ -9,6 +9,7 @@ import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.inventory.ReceivingRepository
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
+import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.rest.dto.payables.DisbursementApDto
 import com.backend.gbp.rest.dto.payables.DisbursementDto
 import com.backend.gbp.rest.dto.payables.DisbursementExpDto
@@ -25,6 +26,7 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -81,6 +83,9 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 	@Autowired
 	OfficeRepository officeRepository
 
+	@Autowired
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
     DisbursementServices() {
 		super(Disbursement.class)
 	}
@@ -90,6 +95,29 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 			@GraphQLArgument(name = "id") UUID id
 	) {
 		findOne(id)
+	}
+
+	@GraphQLQuery(name = "disReferenceType", description = "Find Ap reference Type")
+	List<ApReferenceDto> disReferenceType() {
+
+		List<ApReferenceDto> records = []
+
+		String query = '''select distinct p.reference_type as reference_type from accounting.disbursement p where p.reference_type is not null '''
+
+
+		Map<String, Object> params = new HashMap<>()
+
+
+		def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
+
+		recordsRaw.each {
+			records << new ApReferenceDto(
+					referenceType: StringUtils.upperCase( it.get("reference_type","") as String)
+			)
+		}
+
+		return records
+
 	}
 
 	@GraphQLQuery(name = "disbursementFilterPosted", description = "List of AP Pageable By Supplier")
