@@ -335,7 +335,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
            return new GraphQLRetVal<Boolean>(false,false,"Entries not Balanced. Debit [${totalDebit.toPlainString()}] Credit [${totalCredit.toPlainString()}]")
         }
 
-        def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget)
+        def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget, header.transactionDate)
 
 
         headerLedger.ledger.each {
@@ -387,7 +387,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
 
         try {
 
-            def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget)
+            def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget, transactionDate?:Instant.now())
 
             headerLedger.entityName = entityName
             validateEntries(headerLedger)
@@ -458,7 +458,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         def id = null
         try {
 
-            def headerLedger  =  createDraftHeaderLedgerFull(entriesTarget)
+            def headerLedger  =  createDraftHeaderLedgerFull(entriesTarget, ledgerDate)
 
             headerLedger.entityName = entityName
             headerLedger.transactionNo = transactionNo
@@ -1361,7 +1361,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
     }
 
 
-    HeaderLedger createDraftHeaderLedgerFull(List<EntryFull> entries){
+    HeaderLedger createDraftHeaderLedgerFull(List<EntryFull> entries, Instant transactionDatetime){
         HeaderLedger header = new HeaderLedger()
         entries.each { entry->
 
@@ -1371,6 +1371,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
                 throw  new Exception("Method: createDraftHeaderLedger will only accept journal record from getAllChartOfAccountGenerate")
             Ledger ledger = new Ledger()
             ledger.journalAccount = entry.journal
+            ledger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
             ledger.debit = entry.debit
             ledger.credit = entry.credit
             ledger.header = header

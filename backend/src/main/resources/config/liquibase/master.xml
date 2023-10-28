@@ -377,4 +377,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/35_references_alter.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/36_index_header_ledger_details.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

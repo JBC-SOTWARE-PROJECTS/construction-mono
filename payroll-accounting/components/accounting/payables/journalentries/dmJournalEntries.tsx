@@ -270,10 +270,7 @@ export default function RPJournalEntries(props: IProps) {
         onFinish={(formData) => {
           const { value } = formData;
           onChangeArray(el, record, Number(value));
-          setEditable((prev: any) => ({
-            ...prev,
-            [`${record.code}-${el}`]: false,
-          }));
+          setEditable({ [`${record.code}-${el}`]: false });
         }}
         initialValues={{
           value: record[el],
@@ -320,10 +317,7 @@ export default function RPJournalEntries(props: IProps) {
             if (!manual) {
               message.error("This Transaction is not Editable");
             } else {
-              setEditable((prev: any) => ({
-                ...prev,
-                [`${record.code}-debit`]: true,
-              }));
+              setEditable({ [`${record.code}-debit`]: true });
             }
           }, // double click row
         };
@@ -351,7 +345,7 @@ export default function RPJournalEntries(props: IProps) {
             if (!manual) {
               message.error("This Transaction is not Editable");
             } else {
-              setEditable({ ...editable, [`${record.code}-credit`]: true });
+              setEditable({ [`${record.code}-credit`]: true });
             }
           }, // double click row
         };
@@ -373,14 +367,18 @@ export default function RPJournalEntries(props: IProps) {
       key: "action",
       width: 50,
       align: "center",
-      render: (_, record) => (
-        <Button
-          size="small"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={() => onRemove(record?.code as string)}
-        />
-      ),
+      render: (_, record) => {
+        if (manual) {
+          return (
+            <Button
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => onRemove(record?.code as string)}
+            />
+          );
+        }
+      },
     },
   ];
 
