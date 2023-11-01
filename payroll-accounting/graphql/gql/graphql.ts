@@ -2185,6 +2185,7 @@ export type Mutation = {
   /** insert Integrations */
   deleteIntegrationItem?: Maybe<Scalars['Boolean']['output']>;
   deletePayroll?: Maybe<GraphQlResVal_String>;
+  deletePayrollAdjustmentItem?: Maybe<GraphQlResVal_String>;
   directExpenseMaterials?: Maybe<GraphQlRetVal_Boolean>;
   employeeUpdateStatus?: Maybe<Employee>;
   expenseItemFromProjects?: Maybe<InventoryLedger>;
@@ -2636,6 +2637,12 @@ export type MutationDeleteIntegrationItemArgs = {
 
 /** Mutation root */
 export type MutationDeletePayrollArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeletePayrollAdjustmentItemArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -3241,6 +3248,7 @@ export type MutationUpsertAdjustmentItemArgs = {
   amount?: InputMaybe<Scalars['BigDecimal']['input']>;
   category?: InputMaybe<Scalars['UUID']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
+  employee?: InputMaybe<Scalars['UUID']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -5017,7 +5025,7 @@ export type PayrollAdjustmentItem = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  operation?: Maybe<Scalars['String']['output']>;
+  operation?: Maybe<AdjustmentOperation>;
 };
 
 export type PayrollContribution = {
@@ -5078,6 +5086,7 @@ export type PayrollEmployeeAdjustmentDto = {
   employeeName?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
+  total?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type PayrollEmployeeContribution = {
@@ -5862,6 +5871,7 @@ export type Query = {
   getActiveProjects?: Maybe<Array<Maybe<Projects>>>;
   getAdjustmentCategories?: Maybe<Array<Maybe<AdjustmentCategory>>>;
   getAdjustmentEmployees?: Maybe<Page_PayrollEmployeeAdjustmentDto>;
+  getAdjustmentEmployeesList?: Maybe<Array<Maybe<PayrollEmployeeAdjustmentDto>>>;
   getAllAmounts?: Maybe<Scalars['BigDecimal']['output']>;
   getAllCOAParent?: Maybe<Array<Maybe<DomainOptionDto>>>;
   getAllChartOfAccountGenerate?: Maybe<Array<Maybe<ChartOfAccountGenerate>>>;
@@ -6807,6 +6817,12 @@ export type QueryGetAdjustmentEmployeesArgs = {
   payroll?: InputMaybe<Scalars['UUID']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<Array<InputMaybe<PayrollEmployeeStatus>>>;
+};
+
+
+/** Query root */
+export type QueryGetAdjustmentEmployeesListArgs = {
+  payroll?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
