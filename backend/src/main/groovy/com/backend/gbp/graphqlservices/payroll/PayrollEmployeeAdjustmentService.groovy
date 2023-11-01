@@ -125,6 +125,15 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
     }
 
 
+    @GraphQLMutation(name = "deletePayrollAdjustmentItem")
+    GraphQLResVal<String> deletePayrollAdjustmentItem(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        payrollAdjustmentItemRepository.deleteById(id)
+        return new GraphQLResVal<String>('Deleted', true, "Successfully deleted adjustment item!")
+
+    }
+    //=========================== Interface Methods ============================
     @Override
     PayrollEmployeeAdjustment addEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
         return null

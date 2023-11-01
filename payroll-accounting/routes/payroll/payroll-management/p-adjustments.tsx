@@ -25,13 +25,19 @@ import { statusMap } from "@/utility/constant";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { CheckOutlined, EditOutlined } from "@ant-design/icons";
-import { InputNumber, Select, Table, Tag } from "antd";
+import {
+  CheckOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
+import { InputNumber, Modal, Select, Table, Tag, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { recalculateButton } from "./p-contributions";
 import useGetAdjustmentCategories from "@/hooks/adjustment-category/useGetAdjustmentCategories";
+import useDeleteAdjustmentItem from "@/hooks/payroll/adjustments/useDeleteAdjustmentItem";
 
 const initialState: variables = {
   filter: "",
@@ -56,10 +62,15 @@ function PayrollLoans({ account }: IPageProps) {
     refetch();
   });
 
+  const [deleteItem, loadingDelete] = useDeleteAdjustmentItem(() => {
+    refetch();
+  });
+
   const [updateStatus, loadingUpdateStatus] = useUpdatePayrollLoanStatus(() => {
     refetchLoan();
     refetch();
   });
+
   const columns: ColumnsType<PayrollEmployeeAdjustmentDto> = [
     { title: "Name", dataIndex: "employeeName" },
     {
@@ -205,6 +216,24 @@ function PayrollLoans({ account }: IPageProps) {
           </div>
         ),
     },
+    {
+      title: "Action",
+      dataIndex: "id",
+      render: (value) => {
+        return (
+          <>
+            <CustomButton
+              id={value}
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => {
+                confirmDelete(value);
+              }}
+            />
+          </>
+        );
+      },
+    },
   ];
 
   const editAmount = (record: PayrollAdjustmentItem) => {
@@ -247,6 +276,18 @@ function PayrollLoans({ account }: IPageProps) {
       status: statusMap[loan?.status],
     });
   };
+
+  const confirmDelete = (id: string) => {
+    Modal.confirm({
+      content: "Are you sure you want to delete this item?",
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        deleteItem(id);
+      },
+      onCancel() {},
+    });
+  };
+
   return (
     <>
       <PayrollHeader
