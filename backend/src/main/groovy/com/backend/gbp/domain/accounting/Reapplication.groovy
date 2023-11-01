@@ -104,7 +104,7 @@ class Reapplication extends AbstractAuditingEntity implements Serializable, Auto
 	//accounting integrate
 	@Override
 	String getDomain() {
-		return Reapplication.class.name
+		return IntegrationDomainEnum.REAPPLICATION.name()
 	}
 
 	@Transient

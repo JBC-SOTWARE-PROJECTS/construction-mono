@@ -379,4 +379,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/36_index_header_ledger_details.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/37_office_tin_number_and_signaturies_2307.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

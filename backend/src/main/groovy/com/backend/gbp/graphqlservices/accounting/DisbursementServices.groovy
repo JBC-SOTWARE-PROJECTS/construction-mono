@@ -1,6 +1,10 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.Bank
 import com.backend.gbp.domain.accounting.Disbursement
+import com.backend.gbp.domain.accounting.Integration
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
+import com.backend.gbp.domain.accounting.IntegrationItem
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.domain.accounting.LedgerDocType
@@ -22,6 +26,7 @@ import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -404,13 +409,86 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 				}
 			}
 			//ewt rate end here
-
 			if(disburse.transType?.flagValue){
+				Integration match = integrationServices.getIntegrationByDomainAndTagValue(IntegrationDomainEnum.DISBURSEMENT, disburse.transType.flagValue)
+
 				def headerLedger = integrationServices.generateAutoEntries(disburse) {it, mul ->
 					it.flagValue = disburse.transType?.flagValue
-					List<Disbursement> mulChecks  = []
-					List<Disbursement> exp  = []
 
+					//initialize
+					Map<String, List<Disbursement>> finalAcc  = [:]
+					match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
+						if(!finalAcc.containsKey(entry.sourceColumn)){
+							finalAcc[entry.sourceColumn] = []
+						}
+					}
+					//loop checks
+					Map<Bank, BigDecimal> listChecks  = [:]
+					checks.each { a ->
+						if(!listChecks.containsKey(a.bank)) {
+							listChecks[a.bank] = 0.0
+						}
+						listChecks[a.bank] =  listChecks[a.bank] + a.amount
+					}
+
+					listChecks.each {k, v ->
+						if(v > 0){
+							finalAcc['cashOnBank'] << new Disbursement().tap {
+								it.bank = k
+								it.cashOnBank = status ? v.setScale(2, RoundingMode.HALF_EVEN) * -1 : v.setScale(2, RoundingMode.HALF_EVEN)
+							}
+						}
+					}
+
+					// ======================= expenses ==============================
+					if(disburse.paymentCategory.equalsIgnoreCase("EXPENSE")){
+						expense.each {a ->
+							//=== for normal ===//
+							if (a.office?.id) {
+								it.office = a.office
+							}
+							if (a.office?.id) {
+								it.project = a.project
+							}
+							if (a.transType.isReverse) {
+								it[a.transType.source] += status ? a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1 : a.amount.setScale(2, RoundingMode.HALF_EVEN)
+							} else {
+								it[a.transType.source] += status ? a.amount.setScale(2, RoundingMode.HALF_EVEN) : a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1
+							}
+
+						}
+					}else{
+						if(disburse.isAdvance){
+							// debit normal side no need to negative
+							it.advancesSupplier = status ? disburse.voucherAmount.setScale(2, RoundingMode.HALF_EVEN) : disburse.voucherAmount.setScale(2, RoundingMode.HALF_EVEN)  * -1
+						}else{
+							// credit normal side make it negative to debit
+							it.supplierAmount = status ? (disburse.voucherAmount.setScale(2, RoundingMode.HALF_EVEN) * -1) : disburse.voucherAmount.setScale(2, RoundingMode.HALF_EVEN)
+						}
+					}
+					// ====================== loop multiples ========================
+					finalAcc.each { key, items ->
+						mul << items
+					}
+					// ====================== not multiple here =====================
+					it.cashOnHand = status ? disburse.cash.setScale(2, RoundingMode.HALF_EVEN) * -1 : disburse.cash.setScale(2, RoundingMode.HALF_EVEN)
+					it.discAmount = status ? disburse.discountAmount.setScale(2, RoundingMode.HALF_EVEN) : disburse.discountAmount.setScale(2, RoundingMode.HALF_EVEN) * -1
+
+					it.ewt1Percent = status ? ewt1.setScale(2, RoundingMode.HALF_EVEN) : ewt1.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt2Percent = status ? ewt2.setScale(2, RoundingMode.HALF_EVEN) : ewt2.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt3Percent = status ? ewt3.setScale(2, RoundingMode.HALF_EVEN) : ewt3.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt4Percent = status ? ewt4.setScale(2, RoundingMode.HALF_EVEN) : ewt4.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt5Percent = status ? ewt5.setScale(2, RoundingMode.HALF_EVEN) : ewt5.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt7Percent = status ? ewt7.setScale(2, RoundingMode.HALF_EVEN) : ewt7.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt10Percent = status ? ewt10.setScale(2, RoundingMode.HALF_EVEN) : ewt10.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt15Percent = status ? ewt15.setScale(2, RoundingMode.HALF_EVEN) : ewt15.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt18Percent = status ? ewt18.setScale(2, RoundingMode.HALF_EVEN) : ewt18.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt30Percent = status ? ewt30.setScale(2, RoundingMode.HALF_EVEN) : ewt30.setScale(2, RoundingMode.HALF_EVEN) * -1
+
+					//sum ewt
+					def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+					def sumEwt = ewt.sum() as BigDecimal
+					it.cwt = status ? sumEwt.setScale(2, RoundingMode.HALF_EVEN) : sumEwt.setScale(2, RoundingMode.HALF_EVEN) * -1
 
 				}
 
@@ -437,6 +515,8 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 						)
 						result.add(list)
 					}
+				}else{
+					return []
 				}
 			}
 		}
@@ -583,8 +663,8 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 		Map<String, Object> headerLedger = header
 		headerLedger.put('transactionNo', dis.disNo)
 		headerLedger.put('transactionType', "DISBURSEMENT-${dis.paymentCategory}")
-		headerLedger.put('referenceType', "")
-		headerLedger.put('referenceNo', "")
+		headerLedger.put('referenceType', dis.referenceType)
+		headerLedger.put('referenceNo', dis.referenceNo)
 
 		def result = ledgerServices.addManualJVDynamic(headerLedger, entries, dis.disType.equalsIgnoreCase("CASH") ? LedgerDocType.CS : LedgerDocType.CK,
 				JournalType.DISBURSEMENT, dis.disDate, details)
@@ -745,12 +825,84 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 		}
 		//ewt rate
 
+		Integration match = integrationServices.getIntegrationByDomainAndTagValue(IntegrationDomainEnum.DISBURSEMENT, disburse.transType.flagValue)
 		def headerLedger = integrationServices.generateAutoEntries(disburse) {it, mul ->
 			it.flagValue = disburse.transType?.flagValue
-			List<Disbursement> mulChecks  = []
-			List<Disbursement> exp  = []
 
+			//initialize
+			Map<String, List<Disbursement>> finalAcc  = [:]
+			match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
+				if(!finalAcc.containsKey(entry.sourceColumn)){
+					finalAcc[entry.sourceColumn] = []
+				}
+			}
+			//loop checks
+			Map<Bank, BigDecimal> listChecks  = [:]
+			checks.each { a ->
+				if(!listChecks.containsKey(a.bank)) {
+					listChecks[a.bank] = 0.0
+				}
+				listChecks[a.bank] =  listChecks[a.bank] + a.amount
+			}
 
+			listChecks.each {k, v ->
+				if(v > 0){
+					finalAcc['cashOnBank'] << new Disbursement().tap {
+						it.bank = k
+						it.cashOnBank = v.setScale(2, RoundingMode.HALF_EVEN) * -1
+					}
+				}
+			}
+
+			// ======================= expenses ==============================
+			if(disburse.paymentCategory.equalsIgnoreCase("EXPENSE")){
+				expense.each {a ->
+					//=== for normal ===//
+					if (a.office?.id) {
+						it.office = a.office
+					}
+					if (a.office?.id) {
+						it.project = a.project
+					}
+					if (a.transType.isReverse) {
+						it[a.transType.source] += a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1
+					} else {
+						it[a.transType.source] += a.amount.setScale(2, RoundingMode.HALF_EVEN)
+					}
+
+				}
+			}else{
+				if(disburse.isAdvance){
+					// debit normal side no need to negative
+					it.advancesSupplier = disburse.voucherAmount.setScale(2, RoundingMode.HALF_EVEN)
+				}else{
+					// credit normal side make it negative to debit
+					it.supplierAmount = disburse.voucherAmount.setScale(2, RoundingMode.HALF_EVEN) * -1
+				}
+			}
+			// ====================== loop multiples ========================
+			finalAcc.each { key, items ->
+				mul << items
+			}
+			// ====================== not multiple here =====================
+			it.cashOnHand = disburse.cash.setScale(2, RoundingMode.HALF_EVEN) * -1
+			it.discAmount = disburse.discountAmount.setScale(2, RoundingMode.HALF_EVEN)
+
+			it.ewt1Percent = ewt1.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt2Percent = ewt2.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt3Percent = ewt3.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt4Percent = ewt4.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt5Percent = ewt5.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt7Percent = ewt7.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt10Percent = ewt10.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt15Percent = ewt15.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt18Percent = ewt18.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt30Percent = ewt30.setScale(2, RoundingMode.HALF_EVEN)
+
+			//sum ewt
+			def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+			def sumEwt = ewt.sum() as BigDecimal
+			it.cwt = sumEwt.setScale(2, RoundingMode.HALF_EVEN)
 
 		}
 
@@ -765,8 +917,8 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 
 		headerLedger.transactionNo = disburse.disNo
 		headerLedger.transactionType = "DISBURSEMENT-${disburse.paymentCategory}"
-		headerLedger.referenceType = ""
-		headerLedger.referenceNo = ""
+		headerLedger.referenceType = disburse.referenceType
+		headerLedger.referenceNo = disburse.referenceNo
 
 		def pHeader =	ledgerServices.persistHeaderLedger(headerLedger,
 				"${disburse.disDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${disburse.disNo}",

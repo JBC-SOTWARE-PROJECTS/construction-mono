@@ -493,6 +493,11 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                     it.ewt15Percent = status ? ewt15.setScale(2, RoundingMode.HALF_EVEN) : ewt15.setScale(2, RoundingMode.HALF_EVEN) * -1
                     it.ewt18Percent = status ? ewt18.setScale(2, RoundingMode.HALF_EVEN) : ewt18.setScale(2, RoundingMode.HALF_EVEN) * -1
                     it.ewt30Percent = status ? ewt30.setScale(2, RoundingMode.HALF_EVEN) : ewt30.setScale(2, RoundingMode.HALF_EVEN) * -1
+
+                    //sum ewt
+                    def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+                    def sumEwt = ewt.sum() as BigDecimal
+                    it.cwt = status ? sumEwt.setScale(2, RoundingMode.HALF_EVEN) : sumEwt.setScale(2, RoundingMode.HALF_EVEN) * -1
                 }
 
                 Set<Ledger> ledger = new HashSet<Ledger>(headerLedger.ledger);
@@ -730,6 +735,11 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             it.ewt15Percent = ewt15.setScale(2, RoundingMode.HALF_EVEN)
             it.ewt18Percent = ewt18.setScale(2, RoundingMode.HALF_EVEN)
             it.ewt30Percent = ewt30.setScale(2, RoundingMode.HALF_EVEN)
+
+            //sum ewt
+            def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+            def sumEwt = ewt.sum() as BigDecimal
+            it.cwt = sumEwt.setScale(2, RoundingMode.HALF_EVEN)
         }
         Map<String, String> details = [:]
 

@@ -813,6 +813,8 @@ export type DebitMemo = {
   posted?: Maybe<Scalars['Boolean']['output']>;
   postedBy?: Maybe<Scalars['String']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
+  referenceNo?: Maybe<Scalars['String']['output']>;
+  referenceType?: Maybe<Scalars['String']['output']>;
   remarksNotes?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
   supplier?: Maybe<Supplier>;
@@ -918,6 +920,8 @@ export type DebitMemoInput = {
   posted?: InputMaybe<Scalars['Boolean']['input']>;
   postedBy?: InputMaybe<Scalars['String']['input']>;
   postedLedger?: InputMaybe<Scalars['UUID']['input']>;
+  referenceNo?: InputMaybe<Scalars['String']['input']>;
+  referenceType?: InputMaybe<Scalars['String']['input']>;
   remarksNotes?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   supplier?: InputMaybe<SupplierInput>;
@@ -1022,6 +1026,8 @@ export type Disbursement = {
   posted?: Maybe<Scalars['Boolean']['output']>;
   postedBy?: Maybe<Scalars['String']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
+  referenceNo?: Maybe<Scalars['String']['output']>;
+  referenceType?: Maybe<Scalars['String']['output']>;
   remarksNotes?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
   supplier?: Maybe<Supplier>;
@@ -1157,6 +1163,8 @@ export type DisbursementInput = {
   posted?: InputMaybe<Scalars['Boolean']['input']>;
   postedBy?: InputMaybe<Scalars['String']['input']>;
   postedLedger?: InputMaybe<Scalars['UUID']['input']>;
+  referenceNo?: InputMaybe<Scalars['String']['input']>;
+  referenceType?: InputMaybe<Scalars['String']['input']>;
   remarksNotes?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   supplier?: InputMaybe<SupplierInput>;
@@ -4907,6 +4915,7 @@ export type Office = {
   officeDescription?: Maybe<Scalars['String']['output']>;
   officeMunicipality?: Maybe<Scalars['String']['output']>;
   officeProvince?: Maybe<Scalars['String']['output']>;
+  officeSecretary?: Maybe<Scalars['String']['output']>;
   officeStreet?: Maybe<Scalars['String']['output']>;
   officeType?: Maybe<Scalars['String']['output']>;
   officeZipcode?: Maybe<Scalars['String']['output']>;
@@ -4914,6 +4923,7 @@ export type Office = {
   provinceId?: Maybe<Scalars['UUID']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
   telNo?: Maybe<Scalars['String']['output']>;
+  tinNumber?: Maybe<Scalars['String']['output']>;
 };
 
 export type OfficeInput = {
@@ -4929,6 +4939,7 @@ export type OfficeInput = {
   officeDescription?: InputMaybe<Scalars['String']['input']>;
   officeMunicipality?: InputMaybe<Scalars['String']['input']>;
   officeProvince?: InputMaybe<Scalars['String']['input']>;
+  officeSecretary?: InputMaybe<Scalars['String']['input']>;
   officeStreet?: InputMaybe<Scalars['String']['input']>;
   officeType?: InputMaybe<Scalars['String']['input']>;
   officeZipcode?: InputMaybe<Scalars['String']['input']>;
@@ -4936,6 +4947,7 @@ export type OfficeInput = {
   provinceId?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
   telNo?: InputMaybe<Scalars['String']['input']>;
+  tinNumber?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type OfficeItem = {
@@ -6363,6 +6375,8 @@ export type PettyCashAccounting = {
   posted?: Maybe<Scalars['Boolean']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
   posted_by?: Maybe<Scalars['String']['output']>;
+  referenceNo?: Maybe<Scalars['String']['output']>;
+  referenceType?: Maybe<Scalars['String']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
   transType?: Maybe<ApTransaction>;
@@ -6387,6 +6401,8 @@ export type PettyCashAccountingInput = {
   posted?: InputMaybe<Scalars['Boolean']['input']>;
   postedLedger?: InputMaybe<Scalars['UUID']['input']>;
   posted_by?: InputMaybe<Scalars['String']['input']>;
+  referenceNo?: InputMaybe<Scalars['String']['input']>;
+  referenceType?: InputMaybe<Scalars['String']['input']>;
   remarks?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   transType?: InputMaybe<ApTransactionInput>;
@@ -7037,6 +7053,8 @@ export type Query = {
   disExpById?: Maybe<DisbursementExpense>;
   /** Find DisbursementExpense by Parent */
   disExpByParent?: Maybe<Array<Maybe<DisbursementExpense>>>;
+  /** Find Ap reference Type */
+  disReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   disWtxById?: Maybe<DisbursementWtx>;
   /** Find DisbursementWtx by Parent */
   disWtxByParent?: Maybe<Array<Maybe<DisbursementWtx>>>;
@@ -7048,6 +7066,8 @@ export type Query = {
   dmAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
   dmDetailsById?: Maybe<DebitMemoDetails>;
   dmDetials?: Maybe<Array<Maybe<DebitMemoDetails>>>;
+  /** Find Ap reference Type */
+  dmReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   /** List of Document Type */
   documentTypeList?: Maybe<Array<Maybe<DocumentTypes>>>;
   /** Get Employee By Id */
@@ -7312,6 +7332,8 @@ export type Query = {
   paymentsByShift?: Maybe<Array<Maybe<Payment>>>;
   /** Get All payroll */
   payrolls?: Maybe<Array<Maybe<Payroll>>>;
+  /** Find Ap reference Type */
+  pcReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   /** Get all Permissions */
   permissions?: Maybe<Array<Maybe<Permission>>>;
   pettyCashAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
@@ -7386,6 +7408,7 @@ export type Query = {
   repairTypeActive?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeAll?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeList?: Maybe<Array<Maybe<RepairType>>>;
+  returnGetReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   rtsByFiltersPage?: Maybe<Page_ReturnSupplier>;
   rtsById?: Maybe<ReturnSupplier>;
   rtsItemById?: Maybe<ReturnSupplierItem>;
@@ -7427,6 +7450,7 @@ export type Query = {
   signatureList?: Maybe<Array<Maybe<Signature>>>;
   /** List of Signature per type */
   signatureListFilter?: Maybe<Array<Maybe<Signature>>>;
+  srrGetReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   srrList?: Maybe<Array<Maybe<ReceivingReport>>>;
   stiByFiltersPage?: Maybe<Page_StockIssue>;
   stiById?: Maybe<StockIssue>;
@@ -10053,6 +10077,7 @@ export type Reapplication = {
   posted?: Maybe<Scalars['Boolean']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
   prevApplied?: Maybe<Scalars['BigDecimal']['output']>;
+  referenceNo?: Maybe<Scalars['String']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
   rounding?: Maybe<Scalars['Int']['output']>;
   rpNo?: Maybe<Scalars['String']['output']>;
@@ -10085,6 +10110,7 @@ export type ReapplicationInput = {
   posted?: InputMaybe<Scalars['Boolean']['input']>;
   postedLedger?: InputMaybe<Scalars['UUID']['input']>;
   prevApplied?: InputMaybe<Scalars['BigDecimal']['input']>;
+  referenceNo?: InputMaybe<Scalars['String']['input']>;
   remarks?: InputMaybe<Scalars['String']['input']>;
   rounding?: InputMaybe<Scalars['Int']['input']>;
   rpNo?: InputMaybe<Scalars['String']['input']>;
@@ -10123,6 +10149,7 @@ export type ReceivingReport = {
   receivedRemarks?: Maybe<Scalars['String']['output']>;
   receivedType?: Maybe<Scalars['String']['output']>;
   refAp?: Maybe<Scalars['UUID']['output']>;
+  referenceType?: Maybe<Scalars['String']['output']>;
   rrNo?: Maybe<Scalars['String']['output']>;
   supplier?: Maybe<Supplier>;
   totalDiscount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -10156,6 +10183,7 @@ export type ReceivingReportInput = {
   receivedRemarks?: InputMaybe<Scalars['String']['input']>;
   receivedType?: InputMaybe<Scalars['String']['input']>;
   refAp?: InputMaybe<Scalars['UUID']['input']>;
+  referenceType?: InputMaybe<Scalars['String']['input']>;
   rrNo?: InputMaybe<Scalars['String']['input']>;
   supplier?: InputMaybe<SupplierInput>;
   totalDiscount?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -10270,6 +10298,7 @@ export type ReturnSupplier = {
   receivedRefNo?: Maybe<Scalars['String']['output']>;
   received_by?: Maybe<Scalars['String']['output']>;
   refSrr?: Maybe<Scalars['String']['output']>;
+  referenceType?: Maybe<Scalars['String']['output']>;
   returnBy?: Maybe<Scalars['String']['output']>;
   returnDate?: Maybe<Scalars['Instant']['output']>;
   returnUser?: Maybe<Scalars['UUID']['output']>;
@@ -10286,6 +10315,7 @@ export type ReturnSupplierInput = {
   receivedRefNo?: InputMaybe<Scalars['String']['input']>;
   received_by?: InputMaybe<Scalars['String']['input']>;
   refSrr?: InputMaybe<Scalars['String']['input']>;
+  referenceType?: InputMaybe<Scalars['String']['input']>;
   returnBy?: InputMaybe<Scalars['String']['input']>;
   returnDate?: InputMaybe<Scalars['Instant']['input']>;
   returnUser?: InputMaybe<Scalars['UUID']['input']>;

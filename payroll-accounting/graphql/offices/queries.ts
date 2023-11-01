@@ -24,6 +24,8 @@ export const GET_OFFICE_RECORDS = gql`
         officeBarangay
         officeStreet
         officeZipcode
+        tinNumber
+        officeSecretary
         status
       }
       totalElements

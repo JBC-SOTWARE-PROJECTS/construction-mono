@@ -122,7 +122,7 @@ class DebitMemo extends AbstractAuditingEntity implements Serializable, AutoInte
 	//accounting integrate
 	@Override
 	String getDomain() {
-		return DebitMemo.class.name
+		return IntegrationDomainEnum.DEBIT_MEMO.name()
 	}
 
 	@Transient
