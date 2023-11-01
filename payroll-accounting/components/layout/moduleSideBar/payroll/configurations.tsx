@@ -22,6 +22,10 @@ const payrollConfigurationsMenu = {
             path: "/payroll/configurations/events-holiday",
             name: "Holiday & Events",
           },
+          {
+            path: "/payroll/configurations/adjustment-category",
+            name: "Adjustment Category",
+          },
         ],
       },
     ],

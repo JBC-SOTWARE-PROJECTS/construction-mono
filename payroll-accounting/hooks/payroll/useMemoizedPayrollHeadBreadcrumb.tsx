@@ -11,7 +11,7 @@ const useMemoizedPayrollHeaderBreadcrumb = (
 ) => {
   const router = useRouter();
 
-  const hastimekeepingRole = useHasRole("PAYROLL_TIMEKEEPING_USER");
+  const hastimekeepingRole = true;
   const hasContributionsRole = useHasRole("PAYROLL_CONTRIBUTIONS_USER");
   const hasOtherDeductionRole = true;
   const hasLoansRole = true;
@@ -46,13 +46,13 @@ const useMemoizedPayrollHeaderBreadcrumb = (
         disabled: pathname === `${basePathName}/p-other-deduction`,
         hasRole: hasOtherDeductionRole,
       },
-      // {
-      //   key: `${basePath}/p-adjustments`,
-      //   title: "Adjustments",
-      //   path: `${basePath}/p-adjustments`,
-      //   disabled: pathname === `${basePathName}/p-adjustments`,
-      //   hasRole: hasAdjustmentRole,
-      // },
+      {
+        key: `${basePath}/p-adjustments`,
+        title: "Adjustments",
+        path: `${basePath}/p-adjustments`,
+        disabled: pathname === `${basePathName}/p-adjustments`,
+        hasRole: hasAdjustmentRole,
+      },
       {
         key: `${basePath}/p-loans`,
         title: "Loans",
