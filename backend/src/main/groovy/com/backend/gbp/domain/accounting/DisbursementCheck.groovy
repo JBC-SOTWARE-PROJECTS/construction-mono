@@ -62,6 +62,10 @@ class DisbursementCheck extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "releasing")
 	UUID releasing
 
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
+
 
 }
 

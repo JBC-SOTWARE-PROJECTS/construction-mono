@@ -109,6 +109,16 @@ function AllowancePackageModal(props: typeProps) {
       >
         <Row>
           <Col span={24}>
+            <FormInput
+              label="Name"
+              name="name"
+              rules={requiredField}
+              propsinput={{
+                placeholder: "name",
+              }}
+            />
+          </Col>
+          <Col span={24}>
             <FormSwitch
               name="status"
               label="Status"
@@ -117,16 +127,6 @@ function AllowancePackageModal(props: typeProps) {
                 unCheckedChildren: "IN-ACTIVE",
                 checked: active,
                 onChange: onChange,
-              }}
-            />
-          </Col>
-          <Col span={24}>
-            <FormInput
-              label="Name"
-              name="name"
-              rules={requiredField}
-              propsinput={{
-                placeholder: "name",
               }}
             />
           </Col>

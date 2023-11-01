@@ -5,6 +5,7 @@ import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.BrandDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -54,9 +55,11 @@ class ItemService extends AbstractDaoService<Item> {
     List<Item> itemList(
             @GraphQLArgument(name = "filter") String filter
     ) {
-        String query = '''Select e from Item e where lower(concat(e.sku,e.itemCode,e.descLong)) like lower(concat('%',:filter,'%'))'''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Item e where lower(concat(e.sku,e.itemCode,e.descLong)) like lower(concat('%',:filter,'%')) and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.descLong }
     }
 
@@ -64,17 +67,21 @@ class ItemService extends AbstractDaoService<Item> {
     List<Item> getItemByName(
             @GraphQLArgument(name = "name") String name
     ) {
-        String query = '''Select e from Item e where lower(e.descLong) like lower(concat('%',:name,'%'))'''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Item e where lower(e.descLong) like lower(concat('%',:name,'%')) and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('name', name)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.descLong }
     }
 
     @GraphQLQuery(name = "itemListActive")
     List<Item> itemListActive() {
-        String query = '''Select e from Item e where e.active = :status'''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Item e where e.active = :status and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.descLong }
     }
 
@@ -91,7 +98,7 @@ class ItemService extends AbstractDaoService<Item> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-
+        def company = SecurityUtils.currentCompanyId()
 
 		String query = '''Select inv from Item inv where
 						(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
@@ -116,6 +123,12 @@ class ItemService extends AbstractDaoService<Item> {
 			params.put("category", category)
 		}
 
+        if (company) {
+            query += ''' and (inv.company = :company)'''
+            countQuery += ''' and (inv.company = :company)'''
+            params.put("company", company)
+        }
+
 		query += ''' ORDER BY inv.descLong ASC'''
 
 		Page<Item> result = getPageable(query, countQuery, page, size, params)
@@ -128,17 +141,19 @@ class ItemService extends AbstractDaoService<Item> {
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select inv from Item inv where
 						(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-						lower(inv.sku) like lower(concat('%',:filter,'%'))) and inv.active = :status'''
+						lower(inv.sku) like lower(concat('%',:filter,'%'))) and inv.active = :status and inv.company = :company'''
 
         String countQuery = '''Select count(inv) from Item inv where
 							(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-							lower(inv.sku) like lower(concat('%',:filter,'%'))) and inv.active = :status'''
+							lower(inv.sku) like lower(concat('%',:filter,'%'))) and inv.active = :status and inv.company = :company'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
         params.put('status', true)
+        params.put('company', company)
 
         query += ''' ORDER BY inv.descLong ASC'''
 
@@ -148,9 +163,11 @@ class ItemService extends AbstractDaoService<Item> {
 
     @GraphQLQuery(name = "itemActive")
     List<Item> itemActive() {
-        String query = '''Select e from Item e where e.isActive = :status'''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Item e where e.isActive = :status and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.descLong }
     }
 
@@ -161,6 +178,7 @@ class ItemService extends AbstractDaoService<Item> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         def result = new GraphQLRetVal<Boolean>(true,true,"Item Added")
         def name = fields['descLong'] as String;
         def checkPoint = this.getItemByName(name.toLowerCase())
@@ -168,7 +186,9 @@ class ItemService extends AbstractDaoService<Item> {
             result = new GraphQLRetVal<Boolean>(false,false,"Item with the same description already exist. Please try again.")
         }else{
             upsertFromMap(id, fields, { Item entity, boolean forInsert ->
-
+                if(forInsert){
+                    entity.company = company
+                }
             })
         }
         return result

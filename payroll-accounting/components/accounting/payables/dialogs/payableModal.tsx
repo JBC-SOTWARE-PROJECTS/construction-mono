@@ -242,6 +242,7 @@ export default function PayableModal(props: IProps) {
                   refNo: record?.apNo,
                   supplierName: supplier?.supplierFullname,
                   refDate: dayjs(record?.apvDate).format("YYYY"),
+                  type: supplier?.supplierTypes?.id,
                   particulars: payload.remarksNotes,
                 };
                 journalEntries(postPayload, (e: any) => {

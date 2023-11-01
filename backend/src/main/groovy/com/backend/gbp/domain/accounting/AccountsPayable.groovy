@@ -49,7 +49,7 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	@UpperCase
 	String apNo
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "supplier", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	Supplier supplier
 

@@ -48,6 +48,10 @@ class DisbursementAp extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "project", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	Projects project
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "debit_memo", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	DebitMemo debitMemo
+
 	@GraphQLQuery
 	@Column(name = "applied_amount", columnDefinition = "numeric")
 	BigDecimal appliedAmount
@@ -98,9 +102,7 @@ class DisbursementAp extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "reapplication", columnDefinition = "uuid")
 	UUID reapplication
 
-	@GraphQLQuery
-	@Column(name = "debit_memo", columnDefinition = "uuid")
-	UUID debitMemo
+
 
 	@GraphQLQuery
 	@Column(name = "posted", columnDefinition = "uuid")

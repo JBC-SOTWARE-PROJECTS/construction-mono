@@ -1,11 +1,12 @@
 package com.backend.gbp.graphqlservices.hrm
 
-
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Allowance
 import com.backend.gbp.domain.hrm.EventCalendar
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.AllowanceRepository
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -34,6 +35,11 @@ class AllowanceService  {
 
     //---------------------- Queries and Mutation ------------------------------------\\
 
+    @GraphQLQuery(name ="fetchAllAllowance", description = "get all fetch allowance")
+    List<Allowance>fetchAllAllowance(){
+        return allowanceRepository.fetchAllAllowance()
+    }
+
     @GraphQLQuery(name ="fetchAllowancePageable", description = "get all allowance")
     Page<Allowance>fetchAllowancePageable(
             @GraphQLArgument(name ="filter") String filter,
@@ -44,19 +50,21 @@ class AllowanceService  {
     }
 
 
-
     @GraphQLMutation(name = "upsertAllowanceType", description = " Add allowance type ")
     GraphQLRetVal<Allowance>upsertAllowanceType(
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name ="fields") Map<String, Object> fields
     ){
+        CompanySettings companySettings = SecurityUtils.currentCompany()
         if(id){
             Allowance allowance = allowanceRepository.findById(id).get()
             allowance = objectMapper.updateValue(allowance, fields)
+            allowance.company = companySettings
             allowance = allowanceRepository.save(allowance)
             return new GraphQLRetVal<Allowance>(allowance, true, 'Successfully Updated')
         }
         Allowance allowance = objectMapper.convertValue(fields, Allowance)
+        allowance.company = companySettings
         allowance =allowanceRepository.save(allowance)
         return  new GraphQLRetVal<Allowance>(allowance, true, 'Successfully Saved')
     }

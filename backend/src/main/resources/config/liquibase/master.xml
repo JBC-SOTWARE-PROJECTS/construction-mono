@@ -315,11 +315,17 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/23_wtx_table.sql"
              relativeToChangelogFile="false"/>
+
+    <include file="classpath:config/liquibase/changelog4/24_jeriah_alter_table_allowance_item.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/25_jeriah_alter_column_allowance_item.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_jeriah_alter_column.sql"
+             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/24_ap_ledger_table.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/25_disbursement.sql"
              relativeToChangelogFile="false"/>
-
 
     <include file="classpath:config/liquibase/changelog4/18_donss_create_integration_table.sql"
              relativeToChangelogFile="false"/>
@@ -356,5 +362,19 @@
     <include file="classpath:config/liquibase/changelog4/34_michael_adjustment_category_default.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/35_alter_adjustment_item_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/29_wilson_ap_accounts_template_items.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/30_wilson_disbursement_debit_memo.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/31_ap_ledger.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/32_realesed_checks.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/33_petty_cash.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/34_item_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_donss_alter_ledger.sql"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>
