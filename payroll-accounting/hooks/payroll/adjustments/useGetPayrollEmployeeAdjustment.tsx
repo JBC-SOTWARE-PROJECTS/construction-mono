@@ -39,7 +39,7 @@ const useGetPayrollEmployeeAdjustment = ({
             status
             employeeName
             employee {
-              items: adjustmentItems {
+              adjustmentItems {
                 id
                 description
                 amount

@@ -355,4 +355,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/34_michael_adjustment_category_default.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/35_alter_adjustment_item_table.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

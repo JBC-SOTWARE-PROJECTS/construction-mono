@@ -49,41 +49,6 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
     //=========================== QUERIES ============================
 
 
-    @GraphQLMutation(name = "upsertAdjustmentItem")
-    GraphQLResVal<PayrollAdjustmentItem> upsertAdjustmentItem(
-            @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "employee") UUID employee,
-            @GraphQLArgument(name = "category") UUID category,
-            @GraphQLArgument(name = "amount") BigDecimal amount,
-            @GraphQLArgument(name = "description") String description
-    ) {
-        PayrollAdjustmentItem item = new PayrollAdjustmentItem()
-        if (id)
-            item = payrollAdjustmentItemRepository.findById(id).get()
-
-        item.category = adjustmentCategoryRepository.findById(category).get()
-        item.amount = amount
-        item.employeeAdjustment = payrollEmployeeAdjustmentRepository.findById(employee).get()
-        item.description = description ? description : item.category.description
-        item.company = SecurityUtils.currentCompany()
-        payrollAdjustmentItemRepository.save(item)
-
-        return new GraphQLResVal<PayrollAdjustmentItem>(item, true, "Successfully updated employee adjustment status!")
-    }
-
-    @GraphQLMutation(name = "updatePayrollEmployeeAdjustmentStatus")
-    GraphQLResVal<PayrollEmployeeAdjustment> updateEmployeeStatus(
-            @GraphQLArgument(name = "id", description = "ID of the module employee.") UUID id,
-            @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status
-    ) {
-        PayrollEmployeeAdjustment employee = null
-        employee = this.updateStatus(id, status)
-
-        if (!employee) return new GraphQLResVal<PayrollEmployeeAdjustment>(null, false, "Failed to update employee adjustment status. Please try again later!")
-        return new GraphQLResVal<PayrollEmployeeAdjustment>(employee, true, "Successfully updated employee adjustment status!")
-    }
-
-
     @GraphQLQuery(name = "getAdjustmentEmployees")
     Page<PayrollEmployeeAdjustmentDto> getAdjustmentEmployees(
             @GraphQLArgument(name = "payroll") UUID payroll,
@@ -93,11 +58,13 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
             @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
     ) {
         if (payroll) {
-            payrollEmployeeAdjustmentRepository.getEmployeesPageable(
+            Page<PayrollEmployeeAdjustmentDto> pageRes = payrollEmployeeAdjustmentRepository.getEmployeesPageable(
                     payroll,
                     filter,
                     status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
                     PageRequest.of(page, size))
+
+            return pageRes
         } else return null
     }
 
@@ -111,6 +78,52 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
                     payroll)
         } else return null
     }
+
+    //=========================== MUTATIONS ============================
+
+    @GraphQLMutation(name = "upsertAdjustmentItem")
+    GraphQLResVal<PayrollAdjustmentItem> upsertAdjustmentItem(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "employee") UUID employee,
+            @GraphQLArgument(name = "category") UUID category,
+            @GraphQLArgument(name = "amount") BigDecimal amount,
+            @GraphQLArgument(name = "description") String description
+    ) {
+        PayrollAdjustmentItem item = new PayrollAdjustmentItem()
+        if (id) {
+            item = payrollAdjustmentItemRepository.findById(id).get()
+        }
+        if (employee)
+            item.employeeAdjustment = payrollEmployeeAdjustmentRepository.findById(employee).get()
+
+        if (category) {
+            item.category = adjustmentCategoryRepository.findById(category).get()
+            item.operation = item.category.operation
+        }
+
+        if (amount)
+            item.amount = amount
+
+        item.description = description ? description : item.category.description
+        item.company = SecurityUtils.currentCompany()
+        payrollAdjustmentItemRepository.save(item)
+
+        return new GraphQLResVal<PayrollAdjustmentItem>(item, true, "Successfully updated employee adjustment status!")
+    }
+
+
+    @GraphQLMutation(name = "updatePayrollEmployeeAdjustmentStatus")
+    GraphQLResVal<PayrollEmployeeAdjustment> updateEmployeeStatus(
+            @GraphQLArgument(name = "id", description = "ID of the module employee.") UUID id,
+            @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status
+    ) {
+        PayrollEmployeeAdjustment employee = null
+        employee = this.updateStatus(id, status)
+
+        if (!employee) return new GraphQLResVal<PayrollEmployeeAdjustment>(null, false, "Failed to update employee adjustment status. Please try again later!")
+        return new GraphQLResVal<PayrollEmployeeAdjustment>(employee, true, "Successfully updated employee adjustment status!")
+    }
+
 
     @Override
     PayrollEmployeeAdjustment addEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {

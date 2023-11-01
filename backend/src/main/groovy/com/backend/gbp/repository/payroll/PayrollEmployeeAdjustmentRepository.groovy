@@ -20,6 +20,8 @@ interface PayrollEmployeeAdjustmentDto {
 
     String getStatus()
 
+    BigDecimal getTotal()
+
 }
 
 interface PayrollEmployeeAdjustmentRepository extends JpaRepository<PayrollEmployeeAdjustment, UUID> {

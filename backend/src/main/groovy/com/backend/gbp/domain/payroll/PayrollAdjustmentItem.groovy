@@ -2,6 +2,7 @@ package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.payroll.enums.AdjustmentOperation
 import com.backend.gbp.domain.payroll.enums.EmployeeLoanCategory
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -51,9 +52,8 @@ class PayrollAdjustmentItem extends AbstractAuditingEntity implements Serializab
         return category.name
     }
 
-    @GraphQLQuery
-    @Transient
-    String getOperation() {
-        return category.operation
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation", columnDefinition = "varchar")
+    AdjustmentOperation operation
+
 }

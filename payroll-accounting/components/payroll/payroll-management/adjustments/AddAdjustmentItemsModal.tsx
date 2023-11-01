@@ -26,6 +26,7 @@ function AddAdjustmentItemsModal({ refetch, employeeList }: IParams) {
   const [upsert, loadingUpsert] = useUpsertAdjustmentItem(() => {
     setOpen(false);
     refetch();
+    form.resetFields();
   });
   const onSubmit = (values: any) => {
     upsert({
