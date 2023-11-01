@@ -11,15 +11,17 @@ import {
   AdjustmentOperation,
   PayrollAdjustmentItem,
   PayrollEmployeeAdjustmentDto,
-  PayrollEmployeeLoanDto,
+  PayrollEmployeeStatus,
   PayrollModule,
   PayrollStatus,
 } from "@/graphql/gql/graphql";
+import useGetAdjustmentCategories from "@/hooks/adjustment-category/useGetAdjustmentCategories";
+import useDeleteAdjustmentItem from "@/hooks/payroll/adjustments/useDeleteAdjustmentItem";
+import useGetPayrollAdjustment from "@/hooks/payroll/adjustments/useGetPayrollAdjustment";
 import useGetPayrollEmployeeAdjustment from "@/hooks/payroll/adjustments/useGetPayrollEmployeeAdjustment";
+import useUpdatePayrollAdjustmentStatus from "@/hooks/payroll/adjustments/useUpdatePayrollAdjustmentStatus";
 import useUpsertAdjustmentItem from "@/hooks/payroll/adjustments/useUpsertAdjustmentItem";
 import { variables } from "@/hooks/payroll/contributions/useGetContributionEmployees";
-import useGetPayrollLoan from "@/hooks/payroll/loans/useGetPayrollLoan";
-import useUpdatePayrollLoanStatus from "@/hooks/payroll/loans/useUpdatePayrollLoanStatus";
 import usePaginationState from "@/hooks/usePaginationState";
 import { statusMap } from "@/utility/constant";
 import { getStatusColor } from "@/utility/helper";
@@ -31,13 +33,11 @@ import {
   EditOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { InputNumber, Modal, Select, Table, Tag, message } from "antd";
+import { InputNumber, Modal, Select, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { recalculateButton } from "./p-contributions";
-import useGetAdjustmentCategories from "@/hooks/adjustment-category/useGetAdjustmentCategories";
-import useDeleteAdjustmentItem from "@/hooks/payroll/adjustments/useDeleteAdjustmentItem";
 
 const initialState: variables = {
   filter: "",
@@ -45,7 +45,7 @@ const initialState: variables = {
   page: 0,
   status: [],
 };
-function PayrollLoans({ account }: IPageProps) {
+function PayrollAdjustments({ account }: IPageProps) {
   const router = useRouter();
   const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
   const [editing, setEditing] = useState<string | null>(null);
@@ -53,7 +53,8 @@ function PayrollLoans({ account }: IPageProps) {
   const amountRef = useRef<any>(null);
   const descriptionRef = useRef<any>(null);
   const [categories, loadingCategories] = useGetAdjustmentCategories("");
-  const [loan, loadingLoan, refetchLoan] = useGetPayrollLoan();
+  const [adjustment, loadingAdjustment, refetchAdjustment] =
+    useGetPayrollAdjustment();
   const { data, loading, refetch, dataList } = useGetPayrollEmployeeAdjustment({
     variables: state,
   });
@@ -66,10 +67,12 @@ function PayrollLoans({ account }: IPageProps) {
     refetch();
   });
 
-  const [updateStatus, loadingUpdateStatus] = useUpdatePayrollLoanStatus(() => {
-    refetchLoan();
-    refetch();
-  });
+  const [updateStatus, loadingUpdateStatus] = useUpdatePayrollAdjustmentStatus(
+    () => {
+      refetchAdjustment();
+      refetch();
+    }
+  );
 
   const columns: ColumnsType<PayrollEmployeeAdjustmentDto> = [
     { title: "Name", dataIndex: "employeeName" },
@@ -271,10 +274,27 @@ function PayrollLoans({ account }: IPageProps) {
   };
 
   const handleClickFinalize = () => {
-    updateStatus({
-      payrollId: router?.query?.id as string,
-      status: statusMap[loan?.status],
+    let countDraft = 0;
+    data?.content?.forEach((item: PayrollEmployeeAdjustmentDto) => {
+      if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
     });
+    if (countDraft > 0) {
+      Modal.confirm({
+        title: "There still some DRAFT employees. Proceed?",
+        icon: <ExclamationCircleOutlined />,
+        onOk() {
+          updateStatus({
+            payrollId: router?.query?.id as string,
+            status: "FINALIZED",
+          });
+        },
+      });
+    } else {
+      updateStatus({
+        payrollId: router?.query?.id as string,
+        status: statusMap[adjustment?.status],
+      });
+    }
   };
 
   const confirmDelete = (id: string) => {
@@ -292,11 +312,11 @@ function PayrollLoans({ account }: IPageProps) {
     <>
       <PayrollHeader
         module={PayrollModule.Adjustment}
-        status={loan?.status}
+        status={adjustment?.status}
         showTitle
         extra={
           <>
-            {loan?.status === PayrollStatus.Draft && (
+            {adjustment?.status === PayrollStatus.Draft && (
               <PayrollModuleRecalculateAllEmployeeAction
                 id={router?.query?.id as string}
                 module={PayrollModule.Adjustment}
@@ -304,14 +324,14 @@ function PayrollLoans({ account }: IPageProps) {
                 tooltipProps={{ placement: "topRight" }}
                 refetch={refetch}
               >
-                Recalculate All Employee Loan
+                Recalculate All Employee Adjustment
               </PayrollModuleRecalculateAllEmployeeAction>
             )}
 
             <CustomButton
               type="primary"
               icon={
-                loan?.status === "FINALIZED" ? (
+                adjustment?.status === "FINALIZED" ? (
                   <EditOutlined />
                 ) : (
                   <CheckOutlined />
@@ -319,7 +339,7 @@ function PayrollLoans({ account }: IPageProps) {
               }
               onClick={handleClickFinalize}
             >
-              Set as {statusMap[loan?.status]}
+              Set as {statusMap[adjustment?.status]}
             </CustomButton>
           </>
         }
@@ -336,12 +356,20 @@ function PayrollLoans({ account }: IPageProps) {
           <PayrollEmployeeFilter onQueryChange={onQueryChange} />
         </div>
 
-        <AddAdjustmentItemsModal refetch={refetch} employeeList={dataList} />
+        {adjustment?.status === PayrollStatus.Draft && (
+          <AddAdjustmentItemsModal refetch={refetch} employeeList={dataList} />
+        )}
       </div>
 
       <TablePaginated
         columns={columns}
-        loading={loading || loadingUpsert || loadingLoan}
+        loading={
+          loading ||
+          loadingUpsert ||
+          loadingAdjustment ||
+          loadingDelete ||
+          loadingUpdateStatus
+        }
         size={"small"}
         dataSource={data?.content}
         expandable={{
@@ -369,4 +397,4 @@ function PayrollLoans({ account }: IPageProps) {
   );
 }
 
-export default PayrollLoans;
+export default PayrollAdjustments;

@@ -56,7 +56,7 @@ class PayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAd
     @GraphQLQuery(name = "getPayrollAdjustmentById")
     PayrollAdjustment getPayrollAdjustmentById(@GraphQLArgument(name = "id") UUID id) {
         if (id) {
-            return payrollAdjustmentRepository.findById(id).get()
+            return payrollAdjustmentRepository.findByPayrollId(id).get()
         } else {
             return null
         }
@@ -86,11 +86,11 @@ class PayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAd
             @GraphQLArgument(name = "status") PayrollStatus status
 
     ) {
-//        PayrollAdjustment payrollAdjustment = payrollAdjustmentRepository.findByPayrollId(payrollId).get()
-//        payrollAdjustment.status = status
-//        payrollAdjustmentRepository.save(payrollAdjustment)
+        PayrollAdjustment payrollAdjustment = payrollAdjustmentRepository.findByPayrollId(payrollId).get()
+        payrollAdjustment.status = status
+        payrollAdjustmentRepository.save(payrollAdjustment)
 ////        TODO: Additional operations when finalizing adjustment module
-//        return new GraphQLResVal<String>(null, true, "Successfully updated Payroll Adjustment status.")
+        return new GraphQLResVal<String>(null, true, "Successfully updated Payroll Adjustment status.")
     }
 
 
