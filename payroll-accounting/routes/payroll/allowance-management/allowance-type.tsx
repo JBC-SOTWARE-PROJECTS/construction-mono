@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from "react";
 
-import { PlusCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import {
+  PlusCircleOutlined,
+  CloseCircleOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import {
   PageContainer,
   ProCard,
@@ -80,19 +84,19 @@ function AllowanceType() {
     {
       title: "Name",
       dataIndex: "name",
-      key: "name",
       width: "150px",
     },
     {
       title: "Allowance Type",
       dataIndex: "allowanceType",
-      key: "allowanceType",
       width: "150px",
+      render: (value: string) => {
+        return value.replace("_", " ");
+      },
     },
     {
       title: "Amount",
       dataIndex: "amount",
-      key: "amount",
       width: "150px",
     },
     {
@@ -112,23 +116,9 @@ function AllowanceType() {
             <Button
               onClick={() => allownceTypeModal({ record }, closeCallBack)}
               type="primary"
-              icon={<PlusCircleOutlined />}
-            >
-              Edit
-            </Button>
-
-            <Popconfirm
-              title="Delete the task"
-              description="Are you sure to delete this task?"
-              onConfirm={() => handleDelete(record?.id)}
-              onCancel={onCancel}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button danger type="primary" icon={<CloseCircleOutlined />}>
-                Delete
-              </Button>
-            </Popconfirm>
+              icon={<EditOutlined />}
+              shape="circle"
+            />
           </div>
         );
       },

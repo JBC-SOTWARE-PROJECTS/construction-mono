@@ -3,11 +3,11 @@ import React from "react";
 import { requiredField } from "@/utility/helper";
 import { FormInput, FormInputNumber, FormSelect } from "@/components/common";
 import { Button, Col, Form, message, Modal, Row, Space } from "antd";
-import { AllowanceType } from "@/utility/constant";
 import _ from "lodash";
 import { SaveOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
 import { UPSERT_ALLOWANCE_TYPE } from "@/graphql/company/queries";
+import { AllowanceType } from "@/graphql/gql/graphql";
 
 interface typeProps {
   hide: (hideProps: any) => void;
@@ -114,7 +114,10 @@ function AllowanceTypeModal(props: typeProps) {
                 name="allowanceType"
                 rules={requiredField}
                 propsselect={{
-                  options: AllowanceType,
+                  options: Object.values(AllowanceType).map((item) => ({
+                    value: item,
+                    label: item.replace("_", " "),
+                  })),
                   allowClear: true,
                   placeholder: "allowance type",
                 }}

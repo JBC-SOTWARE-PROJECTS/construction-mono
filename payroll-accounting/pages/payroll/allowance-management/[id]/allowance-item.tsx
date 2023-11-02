@@ -173,7 +173,9 @@ function AllowanceItem() {
     {
       title: "Allowance Type",
       dataIndex: "allowanceTypeName",
-      key: "allowanceTypeName",
+      render: (value: string) => {
+        return value.replace("_", " ");
+      },
     },
     {
       title: "Amount",
