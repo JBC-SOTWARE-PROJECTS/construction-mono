@@ -341,9 +341,9 @@ export const FETCH_ALLOWANCE_ITEM = gql`
       content {
         id
         name
-        allowanceTypeName
+        allowanceType
         amount
-        allowanceType {
+        allowance {
           id
         }
         allowancePackage {
