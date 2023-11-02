@@ -9,7 +9,7 @@ import org.hibernate.annotations.*
 import javax.persistence.*
 
 @javax.persistence.Entity
-@javax.persistence.Table(schema = "hrm", name = "employee")
+@javax.persistence.Table(schema = "hrm", name = "employee_allowance")
 class EmployeeAllowance extends AbstractAuditingEntity {
 
 	@GraphQLQuery

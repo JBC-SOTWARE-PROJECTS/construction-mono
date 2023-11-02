@@ -71,6 +71,7 @@ class EmployeeAllowanceService {
             allowance.amount = it.amount
             allowance.company = company
             allowance.allowance = it.allowance.id
+            employeeAllowanceList.push(allowance)
         }
         employeeAllowanceRepository.saveAll(employeeAllowanceList)
         return new GraphQLResVal<String>('Success', true, 'Successfully Saved Employee Allowance')

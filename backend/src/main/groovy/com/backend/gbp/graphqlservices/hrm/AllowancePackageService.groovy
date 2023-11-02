@@ -33,10 +33,16 @@ class AllowancePackageService extends AbstractDaoService<AllowancePackage> {
     @Autowired
     AllowancePackageRepository allowancePackageRepository
 
+    //------------------------ Queries ------------------------
 
     @GraphQLQuery(name ="fetchAllAllowancePackage", description = "get all fetch allowance package")
     List<AllowancePackage>fetchAllAllowancePackage(){
         return allowancePackageRepository.fetchAllAllowancePackage()
+    }
+
+    @GraphQLQuery(name ="getAllowancePackageById")
+    AllowancePackage getAllowancePackageById( @GraphQLArgument(name ="id") UUID id){
+        return allowancePackageRepository.findById(id).get()
     }
 
     @GraphQLQuery(name ="fetchAllowancePackagePageable", description = "fetch all allowance package")
@@ -48,9 +54,10 @@ class AllowancePackageService extends AbstractDaoService<AllowancePackage> {
       return  allowancePackageRepository.getAllowancePackagePageable(filter, PageRequest.of(page, pageSize, Sort.Direction.ASC, 'createdDate'))
     }
 
+    //------------------------ Mutations ------------------------
 
-    @GraphQLMutation(name = "upsertAllAllowancePackage", description = "add allowance package")
-    GraphQLRetVal<AllowancePackage> upsertAllAllowancePackage(
+    @GraphQLMutation(name = "upsertAllowancePackage")
+    GraphQLRetVal<AllowancePackage> upsertAllowancePackage(
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name ="fields") Map<String, Object> fields
     ){
