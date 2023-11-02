@@ -351,7 +351,48 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 				def headerLedger = integrationServices.generateAutoEntries(dm) {it, mul ->
 					it.flagValue = dm.transType?.flagValue
 
-					List<DebitMemo> exp  = []
+					if(dm.debitType.equalsIgnoreCase("DEBIT_MEMO")){
+						it.supplierAmount = status ? dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 : dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN)//default credit side
+						trans.each { a ->
+							//=== for multiple  ===//
+
+							//=== for normal ===//
+							if (a.office?.id) {
+								it.office = a.office
+							}
+							if (a.project?.id) {
+								it.project = a.project
+							}
+							if (a.transType.isReverse) {
+								it[a.transType.source] += status ? a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1 : a.amount.setScale(2, RoundingMode.HALF_EVEN)
+								//credit default
+							} else {
+								it[a.transType.source] += status ? a.amount.setScale(2, RoundingMode.HALF_EVEN) : a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1
+								//credit default
+							}
+						}
+					}else{
+						it.supplierAmount = status ? dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 : dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) //default credit side
+						it.bank = dm.bank
+					}
+
+					it.cashOnBank = status ? dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN)* -1 : dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN) //default debit side
+					it.discAmount = status ? dm.discount.setScale(2, RoundingMode.HALF_EVEN) : dm.discount.setScale(2, RoundingMode.HALF_EVEN) * -1 //default debit side
+
+					it.ewt1Percent = status ? ewt1.setScale(2, RoundingMode.HALF_EVEN) : ewt1.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt2Percent = status ? ewt2.setScale(2, RoundingMode.HALF_EVEN) : ewt2.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt3Percent = status ? ewt3.setScale(2, RoundingMode.HALF_EVEN) : ewt3.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt4Percent = status ? ewt4.setScale(2, RoundingMode.HALF_EVEN) : ewt4.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt5Percent = status ? ewt5.setScale(2, RoundingMode.HALF_EVEN) : ewt5.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt7Percent = status ? ewt7.setScale(2, RoundingMode.HALF_EVEN) : ewt7.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt10Percent = status ? ewt10.setScale(2, RoundingMode.HALF_EVEN) : ewt10.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt15Percent = status ? ewt15.setScale(2, RoundingMode.HALF_EVEN) : ewt15.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt18Percent = status ? ewt18.setScale(2, RoundingMode.HALF_EVEN) : ewt18.setScale(2, RoundingMode.HALF_EVEN) * -1
+					it.ewt30Percent = status ? ewt30.setScale(2, RoundingMode.HALF_EVEN) : ewt30.setScale(2, RoundingMode.HALF_EVEN) * -1
+					//
+					def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+					def sumEwt = ewt.sum() as BigDecimal
+					it.cwt = status ? sumEwt.setScale(2, RoundingMode.HALF_EVEN) : sumEwt.setScale(2, RoundingMode.HALF_EVEN) * -1
 
 
 				}
@@ -527,10 +568,48 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 		def headerLedger = integrationServices.generateAutoEntries(debitMemo) { it, mul ->
 			it.flagValue = dm.transType?.flagValue
 
-			List<DebitMemo> exp  = []
+			if(dm.debitType.equalsIgnoreCase("DEBIT_MEMO")){
+				it.supplierAmount = dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 //default credit side
+				trans.each { a ->
+					//=== for multiple  ===//
 
+					//=== for normal ===//
+					if (a.office?.id) {
+						it.office = a.office
+					}
+					if (a.project?.id) {
+						it.project = a.project
+					}
+					if (a.transType.isReverse) {
+						it[a.transType.source] += a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1
+						//credit default
+					} else {
+						it[a.transType.source] += a.amount.setScale(2, RoundingMode.HALF_EVEN)
+						//credit default
+					}
+				}
+			}else{
+				it.supplierAmount = dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 //default credit side
+				it.bank = dm.bank
+			}
 
+			it.cashOnBank = dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN)* -1 //default debit side
+			it.discAmount = dm.discount.setScale(2, RoundingMode.HALF_EVEN) //default debit side
+
+			it.ewt1Percent = ewt1.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt2Percent = ewt2.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt3Percent = ewt3.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt4Percent = ewt4.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt5Percent = ewt5.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt7Percent = ewt7.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt10Percent = ewt10.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt15Percent = ewt15.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt18Percent = ewt18.setScale(2, RoundingMode.HALF_EVEN)
+			it.ewt30Percent = ewt30.setScale(2, RoundingMode.HALF_EVEN)
 			//
+			def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+			def sumEwt = ewt.sum() as BigDecimal
+			it.cwt = sumEwt.setScale(2, RoundingMode.HALF_EVEN)
 		}
 
 
@@ -545,8 +624,8 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 
 		def pHeader =	ledgerServices.persistHeaderLedger(headerLedger,
 				"${dm.debitDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${dm.debitNo}",
-				"${dm.debitNo}-${dm.supplier.supplierFullname}",
-				"${dm.debitNo}-${dm.remarksNotes}",
+				"${dm.supplier.supplierFullname}",
+				"${dm.remarksNotes}",
 				LedgerDocType.DM,
 				JournalType.GENERAL,
 				dm.debitDate,

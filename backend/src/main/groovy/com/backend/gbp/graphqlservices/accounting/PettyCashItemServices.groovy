@@ -3,7 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.PettyCashAccounting
 import com.backend.gbp.domain.accounting.PettyCashItem
-import com.backend.gbp.domain.projects.Projects
+import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.payables.PCVItemsDto
 import com.backend.gbp.security.SecurityUtils
@@ -69,10 +69,6 @@ class PettyCashItemServices extends AbstractDaoService<PettyCashItem> {
 		if(it.office){
 			def office = objectMapper.convertValue(it.office, Office.class)
 			upsert.office = office
-		}
-		if(it.project){
-			def project = objectMapper.convertValue(it.project, Projects.class)
-			upsert.project = project
 		}
 		upsert.pettyCash = parent
 		upsert.qty = it.qty

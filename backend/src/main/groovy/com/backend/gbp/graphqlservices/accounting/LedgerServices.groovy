@@ -375,7 +375,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
       }
 
 
-        String  = header.get("invoiceSoaReference")
+        String invoiceSoaReference = header.get("invoiceSoaReference")
         String entityName = header.get("entityName")
         String particulars = header.get("particulars")
 
@@ -445,7 +445,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
             entriesTarget << new EntryFull(match,debit,credit)
         }
 
-        
+        String invoiceSoaReference = header.get("invoiceSoaReference")
         String entityName = header.get("entityName")
         String particulars = header.get("particulars")
 
@@ -467,7 +467,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
             validateEntries(headerLedger)
 
             def pHeader = persistHeaderLedger(headerLedger,
-                    StringUtils.upperCase(referenceNo),
+                    StringUtils.upperCase(invoiceSoaReference),
                     StringUtils.upperCase(entityName),
                     StringUtils.upperCase(particulars),
                     docType,
@@ -890,7 +890,7 @@ SELECT entity_name,invoice_soa_reference,journal_type,shiftno,not_approved,appro
                  lower(hl.particulars) like lower(concat('%',:filter,'%'))
               )
       and
-      hl.beginningBalance = true   and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+      hl.beginningBalance = true   and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
  order by hl.transactionDate DESC
 """,
                     """ Select count(hl) 
@@ -900,7 +900,7 @@ from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transacti
             lower(hl.particulars) like lower(concat('%',:filter,'%'))
             )
    and
-   hl.beginningBalance = true  and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+   hl.beginningBalance = true  and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
 """,page,size,[
                     startDateTime:startDateTime,
                     endDateTime:endDateTime,
@@ -920,7 +920,7 @@ from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transacti
             lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  
             lower(hl.particulars) like lower(concat('%',:filter,'%'))  
           ) 
-             and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+             and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
 order by hl.transactionDate DESC
 """,
                         """ Select count(hl) 
@@ -930,7 +930,7 @@ from HeaderLedger hl where
         lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  
         lower(hl.particulars) like lower(concat('%',:filter,'%')) 
         )
-   and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+   and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
 """,page,size,[
                startDateTime:startDateTime,
                endDateTime:endDateTime,
@@ -1176,7 +1176,7 @@ from HeaderLedger hl where
                 lower(hl.particulars) like lower(concat('%',:filter,'%'))
             )
             and
-            hl.beginningBalance = true   and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+            hl.beginningBalance = true   and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
             order by hl.transactionDate DESC
             """,
                 """ Select count(hl) 
@@ -1186,7 +1186,7 @@ from HeaderLedger hl where
                 lower(hl.particulars) like lower(concat('%',:filter,'%'))
             )
             and
-            hl.beginningBalance = true  and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+            hl.beginningBalance = true  and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
             """,
                     page,
                     size,
@@ -1208,7 +1208,7 @@ from HeaderLedger hl where
                 lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  
                 lower(hl.particulars) like lower(concat('%',:filter,'%'))  
             ) 
-            and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+            and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
             order by hl.transactionDate DESC
             """,
                     """ Select count(hl) 
@@ -1218,7 +1218,7 @@ from HeaderLedger hl where
                 lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  
                 lower(hl.particulars) like lower(concat('%',:filter,'%')) 
             )
-            and lower(hl.entityName)=lower(:entityName) and lower(hl.referenceNo)=lower(:referenceNo)
+            and lower(hl.entityName)=lower(:entityName) and lower(hl.invoiceSoaReference)=lower(:referenceNo)
             """,
                     page,
                     size,
@@ -1257,7 +1257,7 @@ from HeaderLedger hl where
 
             getPageable("""from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transactionDate <= :endDateTime 
  and hl.fiscal = :fiscal and (lower(hl.entityName) like lower(concat('%',:filter,'%')) or lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  lower(hl.particulars) like lower(concat('%',:filter,'%'))
- or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
+ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
    )
    and
    hl.beginningBalance = true
@@ -1265,7 +1265,7 @@ from HeaderLedger hl where
 """,""" Select count(hl) 
 from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transactionDate <= :endDateTime   
 and hl.fiscal = :fiscal and (lower(hl.entityName) like lower(concat('%',:filter,'%')) or lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  lower(hl.particulars) like lower(concat('%',:filter,'%'))
-or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
+or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
   )
   and
    hl.beginningBalance = true
@@ -1283,13 +1283,13 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
 
                 getPageable("""from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transactionDate <= :endDateTime 
  and hl.fiscal = :fiscal and (lower(hl.entityName) like lower(concat('%',:filter,'%')) or lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  lower(hl.particulars) like lower(concat('%',:filter,'%'))
- or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
+ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
    )
  order by hl.transactionDate DESC
 """,""" Select count(hl) 
 from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transactionDate <= :endDateTime   
 and hl.fiscal = :fiscal and (lower(hl.entityName) like lower(concat('%',:filter,'%')) or lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  lower(hl.particulars) like lower(concat('%',:filter,'%'))
-or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
+or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
   )
 
 """,page,size,[
@@ -1302,13 +1302,13 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
             else {
                 getPageable("""from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transactionDate <= :endDateTime and
 hl.journalType = :journalType and hl.fiscal = :fiscal and (lower(hl.entityName) like lower(concat('%',:filter,'%')) or lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  lower(hl.particulars) like lower(concat('%',:filter,'%')) 
-or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
+or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
  )
 order by hl.transactionDate DESC
 """,""" Select count(hl) 
 from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transactionDate <= :endDateTime and
 hl.journalType = :journalType and hl.fiscal = :fiscal and (lower(hl.entityName) like lower(concat('%',:filter,'%')) or lower(hl.docnum) like lower(concat('%',:filter,'%'))  or  lower(hl.particulars) like lower(concat('%',:filter,'%'))
-or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
+or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
   )
 
 """,page,size,[journalType:journalType,
@@ -1531,8 +1531,10 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
 
 
         headerLedger.entityName = entity
-        headerLedger.referenceType = refType?:''
-        headerLedger.referenceNo = refNo
+        if(StringUtils.isNotBlank(refType) ){
+            headerLedger.referenceType = refType?:''
+        }
+        headerLedger.invoiceSoaReference = refNo
         headerLedger.particulars = particulars
         headerLedger.docType = ledgerDocType
         headerLedger.journalType = journalType
@@ -1566,6 +1568,7 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
         HeaderLedger reversal = new HeaderLedger()
         reversal.reversal = true
         reversal.fiscal = source.fiscal
+        reversal.invoiceSoaReference = source.invoiceSoaReference
         reversal.particulars = source.particulars
         reversal.transactionDate = Instant.now()
         reversal.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
@@ -1574,8 +1577,15 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
         reversal.docType = source.docType
         reversal.journalType = source.journalType
         reversal.custom = source.custom
-        reversal.parentLedger = source.parentLedger
+        reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
+        // ========== added by wilson ==============
+        reversal.company = source.company
+        reversal.referenceNo = source.referenceNo
+        reversal.referenceType = source.referenceType
+        reversal.transactionNo = source.transactionNo
+        reversal.transactionType = source.transactionType
+        reversal.headerLedgerGroup = source.headerLedgerGroup
 
 
         reversal.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1593,10 +1603,13 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
             Ledger l = new Ledger()
             l.header = reversal
 
+            l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+            l.company = source.company
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit
             l.credit = it.debit
+
 
             reversal.ledger << l
         }
@@ -1609,7 +1622,7 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
 
         HeaderLedger reversal = new HeaderLedger()
         reversal.reversal = true
-        reversal.referenceNo = source.referenceNo
+        reversal.invoiceSoaReference = source.invoiceSoaReference
         reversal.fiscal = source.fiscal
         reversal.particulars = source.particulars
         reversal.transactionDate = date
@@ -1619,8 +1632,15 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
         reversal.docType = source.docType
         reversal.journalType = source.journalType
         reversal.custom = source.custom
-        //reversal.parentLedger = source.parentLedger
+        reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
+        // ========== added by wilson ==============
+        reversal.company = source.company
+        reversal.referenceNo = source.referenceNo
+        reversal.referenceType = source.referenceType
+        reversal.transactionNo = source.transactionNo
+        reversal.transactionType = source.transactionType
+        reversal.headerLedgerGroup = source.headerLedgerGroup
 
 
         reversal.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1638,6 +1658,8 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
             Ledger l = new Ledger()
             l.header = reversal
 
+            l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+            l.company = source.company
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit
@@ -1693,7 +1715,7 @@ or  lower(hl.referenceNo) like lower(concat('%',:filter,'%'))
         coaList.each {coa ->
             results << new GeneralLedgerDto().tap {
                 it.code = coa.code
-                it.description = coa.description
+                it.description = coa.accountName
                 it.accountType = coa.accountType
                 it.normalSide = coa.motherAccount.normalSide
             }

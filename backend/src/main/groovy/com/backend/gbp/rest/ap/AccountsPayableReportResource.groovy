@@ -382,8 +382,9 @@ class AccountsPayableReportResource {
 			accounts = ledgerServices.findOne(dis.postedLedger)
 		}
 
-		CompanySettings company = companySettingsService.comById(SecurityUtils.currentCompanyId())
 		Employee emp = employeeRepository.findByUsername(SecurityUtils.currentLogin()).first()
+		CompanySettings company = companySettingsService.comById(SecurityUtils.currentCompanyId())
+		Office office = emp.office
 
 		def res = applicationContext?.getResource("classpath:/reports/ap/reapply.jasper")
 		def bytearray = new ByteArrayInputStream()
@@ -436,6 +437,12 @@ class AccountsPayableReportResource {
 				je.add(list)
 			}
 		}
+
+		//parameters
+		parameters.put("companyName", company.companyName.trim())
+		parameters.put("address", office.fullAddress ? office.fullAddress.trim() : "")
+		parameters.put("phone", office.phoneNo)
+		parameters.put("email", office.emailAdd)
 
 		if (logo.exists()) {
 			parameters.put("logo", logo?.getURL())
@@ -492,6 +499,7 @@ class AccountsPayableReportResource {
 
 		Employee emp = employeeRepository.findByUsername(SecurityUtils.currentLogin()).first()
 		CompanySettings company = companySettingsService.comById(SecurityUtils.currentCompanyId())
+		Office office = emp.office
 
 
 		def res = applicationContext?.getResource("classpath:/reports/ap/debit_advice.jasper")
@@ -548,6 +556,10 @@ class AccountsPayableReportResource {
 		}
 
 		parameters.put('title', dm.debitType.equalsIgnoreCase("DEBIT_MEMO") ? "Debit Memo Voucher" : "Debit Advice Voucher")
+		parameters.put("companyName", company.companyName.trim())
+		parameters.put("address", office.fullAddress ? office.fullAddress.trim() : "")
+		parameters.put("phone", office.phoneNo)
+		parameters.put("email", office.emailAdd)
 
 		if (logo.exists()) {
 			parameters.put("logo", logo?.getURL())

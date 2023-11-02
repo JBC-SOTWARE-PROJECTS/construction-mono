@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { accountingMenu } from "@/components/sidebar";
 import { post } from "@/utility/graphql-client";
 import qs from "qs";
+import invetoryMenu from "@/components/sidebar/inventory";
 
 export default function MainMenu({ account }: IPageProps) {
   const roles = account.user.roles;
@@ -76,7 +77,7 @@ export default function MainMenu({ account }: IPageProps) {
       />
       <Divider orientation="left">Inventory Module</Divider>
       <div className="w-full">
-        <MenuCard menus={[]} />
+        <MenuCard menus={invetoryMenu} />
       </div>
       <Divider orientation="left">Accounting Module</Divider>
       <div className="w-full">

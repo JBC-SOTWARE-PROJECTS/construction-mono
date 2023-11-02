@@ -381,4 +381,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/37_office_tin_number_and_signaturies_2307.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/38_header_ledger_alter_wilson.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/40_alter_realese_checks_wilson.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -232,6 +232,10 @@
 	<parameter name="logo" class="java.net.URL"/>
 	<parameter name="jeItems" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="title" class="java.lang.String"/>
+	<parameter name="email" class="java.lang.String"/>
+	<parameter name="phone" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
+	<parameter name="companyName" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -252,43 +256,6 @@
 				<reportElement x="10" y="0" width="65" height="48" uuid="94883631-a913-43e2-b182-ab8d77d0181e"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
-			<staticText>
-				<reportElement x="80" y="0" width="500" height="12" uuid="e622555d-198b-4ccd-a4a1-c59c53304058">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font fontName="DejaVu Sans" size="9" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Allied Care Expert(Ace) Medical Center-Bohol, Inc 0368 Carlos P. Garcia East Avenue, Mansasa District ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="80" y="12" width="205" height="12" uuid="c226e44d-3bb5-4145-b0b3-903bf1d79fde">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font fontName="DejaVu Sans" size="9" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Tagbilaran City, Bohol, Philippines 6300]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="80" y="24" width="205" height="12" uuid="b96f7183-44f8-43ad-ba60-43d8fbf50b6e">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font fontName="DejaVu Sans" size="9" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Phone No: (038) 412 8888]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="80" y="36" width="205" height="12" forecolor="#003CFF" uuid="fca77a31-3e42-4d92-b31c-3ba8e4bd3d35">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font fontName="DejaVu Sans" size="9" isBold="false"/>
-				</textElement>
-				<text><![CDATA[info@ace-mc-bohol.com]]></text>
-			</staticText>
 			<staticText>
 				<reportElement x="0" y="72" width="42" height="15" uuid="e9d5eaef-e148-446e-9163-ec9634dd0a5d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -358,6 +325,51 @@
 					<font fontName="DejaVu Sans" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{title}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="80" y="24" width="50" height="12" uuid="e3a82b84-cf14-498c-a515-4fcf3297b836">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="DejaVu Sans" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Phone No:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="0" width="500" height="12" uuid="1b048eec-bafe-4ae8-8acc-3c1a2e98b98a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="DejaVu Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="12" width="500" height="12" uuid="5ba19d3c-f7ca-4f1f-bb52-3b9ffd608077">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="DejaVu Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="24" width="450" height="12" uuid="f3ff85bc-97b5-463b-98eb-b568950ddc50">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="DejaVu Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{phone}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="36" width="500" height="12" forecolor="#003CFF" uuid="dc846a71-74d1-4d79-aa7c-d33ef59636c1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="DejaVu Sans" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{email}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -923,9 +935,9 @@
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="71">
+		<band height="61">
 			<staticText>
-				<reportElement x="23" y="0" width="80" height="8" uuid="020b73cb-ace8-496d-8aaa-07b4a852dff8">
+				<reportElement x="23" y="3" width="80" height="8" uuid="073686e5-0c94-4503-93f9-78001a51268d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -934,7 +946,7 @@
 				<text><![CDATA[Prepared by :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="23" y="8" width="90" height="8" uuid="f2b7ff10-e380-4c5f-8d7b-03f82692380a">
+				<reportElement x="23" y="11" width="90" height="8" uuid="382c2009-0580-488c-be3a-cc6930119242">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -943,7 +955,7 @@
 				<textFieldExpression><![CDATA[$F{employee}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="23" y="16" width="90" height="8" uuid="a8f4c852-5d62-4218-9005-9fcb487005aa">
+				<reportElement x="23" y="19" width="90" height="8" uuid="a278d239-2a7e-417f-aada-420dd70738c3">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -951,17 +963,8 @@
 				</textElement>
 				<text><![CDATA[Cash Disbursement Clerk]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="0" y="61" width="580" height="8" uuid="6cfca526-75db-4cb3-91d0-57cb0f73b2ed">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement>
-					<font fontName="DejaVu Sans" size="5" isItalic="true"/>
-				</textElement>
-				<text><![CDATA[This document is a property of Allied Care Experts Medical Center-Bohol and rhe contents are treated confidential. Therefore, unauthorized reproduction is strictly prohibited unless otherwise permitted by the ACEMCB Management]]></text>
-			</staticText>
 			<textField pattern="M/d/yy">
-				<reportElement x="113" y="8" width="50" height="8" uuid="97aed222-fb71-4a2b-b1f8-3c21a515f9de">
+				<reportElement x="113" y="11" width="50" height="8" uuid="22302ded-d0a3-4af1-b336-c3b16ccc91b5">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -970,7 +973,7 @@
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="172" y="0" width="80" height="8" uuid="1f147f36-79c6-4bed-bd7b-f3524ef70d59">
+				<reportElement x="172" y="3" width="80" height="8" uuid="311dfb4d-944b-4c72-830a-4a06140cd9e0">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -978,26 +981,17 @@
 				</textElement>
 				<text><![CDATA[Checked by :]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="172" y="8" width="80" height="8" uuid="07aabe99-4551-4da5-9601-3a07c3adf4a5">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="5" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["MA. ELISA S. CASTRODES"]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="172" y="16" width="90" height="8" uuid="9f3094cd-3da8-43b8-815c-86ac00e1310d">
+				<reportElement x="172" y="19" width="90" height="8" uuid="24d5d7d4-c949-4c59-a24e-6483e9132a20">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="6" isBold="false" isItalic="true"/>
 				</textElement>
-				<text><![CDATA[Chief Accountant]]></text>
+				<text><![CDATA[General Accountant]]></text>
 			</staticText>
 			<textField pattern="M/d/yy">
-				<reportElement x="252" y="8" width="34" height="8" uuid="d8c6baa6-09d9-48d9-9fd7-f7b04ece89ea">
+				<reportElement x="264" y="11" width="34" height="8" uuid="c6c0e597-8849-4c0b-bde9-b51c69b59590">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1006,7 +1000,7 @@
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="303" y="0" width="80" height="8" uuid="1ea60f7d-4700-4101-93a0-1978bdffa252">
+				<reportElement x="312" y="3" width="80" height="8" uuid="0ef52fc8-0312-44f9-8168-36b41ab047ec">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1014,17 +1008,8 @@
 				</textElement>
 				<text><![CDATA[Cleared for Release by :]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="303" y="8" width="60" height="8" uuid="19ec5f4c-de12-400c-aacb-c84e0272aed3">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="5" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["DEONELIZA SORIA"]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="303" y="16" width="90" height="8" uuid="101bd9d7-9199-4034-a37d-f09f065d5dd2">
+				<reportElement x="312" y="19" width="90" height="8" uuid="b9c8ffb6-649b-4916-a3f5-b2ee3be85bcb">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1033,7 +1018,7 @@
 				<text><![CDATA[Budget Officer]]></text>
 			</staticText>
 			<textField pattern="M/d/yy">
-				<reportElement x="363" y="8" width="50" height="8" uuid="5e6c9478-a54f-4acf-ba85-69e258ec2a42">
+				<reportElement x="372" y="11" width="50" height="8" uuid="70d810ab-6bef-4a58-82c5-12704f757130">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1041,17 +1026,8 @@
 				</textElement>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="423" y="8" width="82" height="8" uuid="0bb7d02d-1308-4e0f-ac6f-a2e506a7bee4">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="5" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["DR. EDGARDO Z. ANTONIO"]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="423" y="16" width="90" height="8" uuid="38f87210-6fb0-4e99-83a1-9e3047af4696">
+				<reportElement x="432" y="19" width="90" height="8" uuid="257a0750-4b37-443c-9bae-7edc7e6230f7">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1060,7 +1036,7 @@
 				<text><![CDATA[Chief Financial Officer]]></text>
 			</staticText>
 			<textField pattern="M/d/yy">
-				<reportElement x="505" y="8" width="50" height="8" uuid="790493fc-7e6c-4685-bc99-680770dac8cd">
+				<reportElement x="514" y="11" width="50" height="8" uuid="4fe2603c-345b-45ea-b3f9-ac9e49419355">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1069,7 +1045,7 @@
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="23" y="31" width="80" height="8" uuid="9ec75be5-139e-4a47-a83b-7338eac4d402">
+				<reportElement x="23" y="34" width="80" height="8" uuid="bf2cff07-fde8-4f22-98c9-906fd24bbc84">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1077,17 +1053,8 @@
 				</textElement>
 				<text><![CDATA[Approved by :]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="23" y="39" width="97" height="8" uuid="27c1ffd2-d346-467e-b9b8-395d1df5a16a">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="5" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["DR. MA. FERMINITA J. BERTULFO"]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="23" y="47" width="90" height="8" uuid="6422b23d-6666-4989-973e-ec0570d1a4db">
+				<reportElement x="23" y="50" width="90" height="8" uuid="7c6c0adf-03ba-4968-ad89-2ea4b131b26d">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1096,7 +1063,7 @@
 				<text><![CDATA[Treasurer]]></text>
 			</staticText>
 			<textField pattern="M/d/yy">
-				<reportElement x="120" y="39" width="50" height="8" uuid="663deedc-45e7-402c-bab6-ab320d7476a5">
+				<reportElement x="123" y="42" width="50" height="8" uuid="014972ae-2a5c-44ca-b79b-5e0f028b841b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1105,7 +1072,7 @@
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="174" y="33" width="80" height="8" uuid="472295c1-cb0c-4e60-abb4-3e277e09a14e">
+				<reportElement x="174" y="36" width="80" height="8" uuid="074daf43-57cb-457d-bdd4-0e0a1f36bab1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1113,17 +1080,8 @@
 				</textElement>
 				<text><![CDATA[Approved by :]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="174" y="41" width="78" height="8" uuid="ebb4f793-ee4f-4cfb-bc89-73cdb6578610">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="5" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["DR. RONALD L. RAMIRO"]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="174" y="49" width="90" height="8" uuid="60c0f03a-c59e-45d8-a5f8-461c9d0390e2">
+				<reportElement x="174" y="52" width="90" height="8" uuid="6c677c8f-e498-4562-ad38-0804dbb4d1d8">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1132,7 +1090,7 @@
 				<text><![CDATA[Chief Executive Officer]]></text>
 			</staticText>
 			<textField pattern="M/d/yy">
-				<reportElement x="252" y="41" width="50" height="8" uuid="ed6f751c-8298-43fe-a336-e6399d19d770">
+				<reportElement x="252" y="44" width="50" height="8" uuid="1bc6dc73-6cc5-4d45-ad0f-0ddc60c40d30">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1141,7 +1099,7 @@
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="350" y="31" width="80" height="8" uuid="70c8eb3d-1885-44e0-a457-a6fd27356b5e">
+				<reportElement x="350" y="34" width="80" height="8" uuid="1d666f24-2084-4737-862b-9b7fcf5dbfba">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1150,7 +1108,32 @@
 				<text><![CDATA[Received by :]]></text>
 			</staticText>
 			<line>
-				<reportElement x="380" y="53" width="133" height="1" uuid="5db3903a-b6e1-4bfc-af8a-3c95a2b38840">
+				<reportElement x="380" y="56" width="133" height="1" uuid="83afdc2f-7ab5-45f2-bf19-cf62c7f81b20">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="432" y="18" width="82" height="1" uuid="04ba97b7-907f-4c3d-8372-bfdffc77012d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="312" y="18" width="60" height="1" uuid="104cf5af-b892-4843-b027-0eba287903c0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="172" y="18" width="90" height="1" uuid="49ee3554-448f-4dac-b9ca-cf4991609825">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="174" y="51" width="78" height="1" uuid="03cb0fa5-6847-4186-b401-ba188e8a9119">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="23" y="49" width="90" height="1" uuid="e59d6ca3-3077-4ab7-b2e3-d6ee50fec664">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 			</line>

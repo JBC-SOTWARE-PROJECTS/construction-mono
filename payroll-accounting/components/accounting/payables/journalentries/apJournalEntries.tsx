@@ -423,7 +423,7 @@ export default function APJournalEntries(props: IProps) {
                 layout="vertical"
                 initialValues={{
                   invoiceSoaReference: `${refDate}-${refNo}`,
-                  entityName: `${refNo}-${supplierName}`,
+                  entityName: `${supplierName}`,
                   particulars: particulars ?? `${refNo}-${supplierName}`,
                 }}>
                 <Row gutter={[16, 0]}>

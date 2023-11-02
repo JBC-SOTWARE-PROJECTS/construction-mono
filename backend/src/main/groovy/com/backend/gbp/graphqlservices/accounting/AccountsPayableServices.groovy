@@ -757,8 +757,8 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",
-                "${actPay.apNo}-${actPay.supplier.supplierFullname}",
-                "${actPay.apNo}-${actPay.remarksNotes ?: ""}",
+                "${actPay.supplier.supplierFullname}",
+                "${actPay.remarksNotes ?: ""}",
                 LedgerDocType.AP,
                 JournalType.PURCHASES_PAYABLES,
                 actPay.apvDate,

@@ -41,6 +41,8 @@ export const GET_DEBIT_MEMO_RECORDS = gql`
           id
           bankname
         }
+        referenceType
+        referenceNo
         debitNo
         debitDate
         debitType

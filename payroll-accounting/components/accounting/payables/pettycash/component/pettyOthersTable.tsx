@@ -126,7 +126,7 @@ export default function PettyOthersTable(props: IProps) {
       title: "Transaction Type",
       dataIndex: "transType.description",
       key: "transType.description",
-      width: 150,
+      width: 300,
       render: (_, record) => <span>{record?.transType?.description}</span>,
     },
     {
@@ -217,7 +217,7 @@ export default function PettyOthersTable(props: IProps) {
             setSize(size);
           },
         }}
-        scroll={{ x: 1700 }}
+        scroll={{ x: 1850 }}
         summary={() => <PettyCashOthersSummaryFooter dataSource={dataSource} />}
       />
     </div>

@@ -125,7 +125,7 @@ class ReleaseCheckServices extends AbstractDaoService<ReleaseCheck> {
 				}
 			})
 			//update disbursement
-			disbursementServices.updateForRelease(obj.disbursement?.id)
+			//disbursementServices.updateForRelease(obj.disbursement?.id)
 			disbursementCheckServices.updateCheck(obj.check?.id, result.id)
 		}
 		return result

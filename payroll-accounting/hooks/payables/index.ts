@@ -12,3 +12,4 @@ export { UsePettyCashNames as usePettyCashNames } from "./pettyCashName";
 export { UseReferenceDisbursementType as useReferenceDisbursementType } from "./reference-type-disbursement";
 export { UseReferencePettyCashType as useReferencePettyCashType } from "./reference-type-pettycash";
 export { UseReferenceDebitMemoType as useReferenceDebitMemoType } from "./reference-type-debitmemo";
+export { UseProjects as useProjects } from "./projects";

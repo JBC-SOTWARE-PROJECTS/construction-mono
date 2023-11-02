@@ -922,8 +922,8 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 
 		def pHeader =	ledgerServices.persistHeaderLedger(headerLedger,
 				"${disburse.disDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${disburse.disNo}",
-				"${disburse.disNo}-${disburse.supplier.supplierFullname}",
-				"${disburse.disNo}-${disburse.remarksNotes}",
+				"${disburse.supplier.supplierFullname}",
+				"${disburse.remarksNotes}",
 				disburse.disType.equalsIgnoreCase("CASH") ? LedgerDocType.CS : LedgerDocType.CK, // CS = CASH , CK = CHECK
 				JournalType.DISBURSEMENT,
 				disburse.disDate,
