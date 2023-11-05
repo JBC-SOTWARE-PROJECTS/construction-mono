@@ -16,6 +16,7 @@ class EmployeeDetailsDto implements Serializable{
     public String lastName
     public String employeeType
     public String pinCode
+    public String facialData
 
     public EmployeeDetailsDto(){
 
@@ -24,7 +25,7 @@ class EmployeeDetailsDto implements Serializable{
     public EmployeeDetailsDto(
             UUID id, UUID companyId, String companyName,
             UUID officeId, UUID positionId, String officeName, String positionName,
-            String firstName, String lastName, String employeeType, String pinCode
+            String firstName, String lastName, String employeeType, String pinCode, String facialData
     ) {
         this.id = id;
         this.companyId = companyId;
@@ -37,6 +38,7 @@ class EmployeeDetailsDto implements Serializable{
         this.lastName = lastName;
         this.employeeType = employeeType;
         this.pinCode = pinCode;
+        this.facialData = facialData;
     }
 
     public String setPinCode(String pinCode){

@@ -165,7 +165,11 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Column(name = "pin_code", unique = true, columnDefinition = "varchar")
 	String pinCode
-	
+
+	@GraphQLQuery
+	@Column(name = "facial_data", columnDefinition = "varchar")
+	String facialData
+
 	@GraphQLQuery
 	@Column(name = "basic_salary")
 	@JsonFormat(shape = JsonFormat.Shape.STRING)

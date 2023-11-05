@@ -1,7 +1,10 @@
 package com.backend.gbp.rest
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
+import com.backend.gbp.domain.projects.Projects
+import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.hrm.EmployeeAttendanceService
 import com.backend.gbp.graphqlservices.hrm.EmployeeFilterService
 import com.backend.gbp.graphqlservices.hrm.EmployeeService
@@ -53,6 +56,9 @@ class EmployeeResource {
     @Autowired
     ProjectService projectService
 
+    @Autowired
+    CompanySettingsService companySettingsService
+
 
     @RequestMapping(method = RequestMethod.POST,value = ['/filter'])
     MobileInitializerDto empFilter() {
@@ -61,8 +67,9 @@ class EmployeeResource {
         String  filter = " ";
         UUID office = null;
         UUID position = null;
-
+        List<Projects> allProjects = projectService.projectList();
         List<Employee> empFilt = employeeFilterService.employeeByFilter(filter, status, office, position);
+        List<CompanySettings> companies = companySettingsService.companyList("");
 
         List<EmployeeDetailsDto> employeeDetailsDtos = new ArrayList<>();
 
@@ -78,16 +85,18 @@ class EmployeeResource {
                     employee.firstName,
                     employee.lastName,
                     employee.employeeType,
-                    employee.pinCode
+                    employee.pinCode,
+                    employee.facialData
             );
 
             employeeDetailsDtos.add(employeeDetailsDto);
         }
 
+
         MobileInitializerDto mobileInitializerDto = new MobileInitializerDto();
-        mobileInitializerDto.companies = null;
+        mobileInitializerDto.companies = companies;
         mobileInitializerDto.employees = employeeDetailsDtos;
-        mobileInitializerDto.projects = null;
+        mobileInitializerDto.projects = allProjects;
 
         return mobileInitializerDto;
     }
@@ -177,33 +186,48 @@ class EmployeeResource {
             @RequestParam(name = "company") UUID company,
             @RequestParam(name = "fields") String fields
     ){
-
-        // Check for existing pin code
-        Boolean isPinCodeUnique = employeeService.isPinCodeUnique(pinCode);
-
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> fieldMap = objectMapper.readValue(fields, Map.class);
-
-        // encrypt
-        // save pincode
 
         Employee upsertResult = new Employee();
         EmployeeDetailsDto employeeDetailsDto = new EmployeeDetailsDto();
 
-        if(isPinCodeUnique){
-             upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+        try {
+            if(pinCode != ""){
+                // Check for existing pin code
+                Boolean isPinCodeUnique = employeeService.isPinCodeUnique(pinCode);
+                if(isPinCodeUnique){
+                    upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
 
-            employeeDetailsDto = new EmployeeDetailsDto();
-            employeeDetailsDto.pinCode = upsertResult.pinCode;
-            employeeDetailsDto.id = upsertResult.id;
+                    employeeDetailsDto.pinCode = upsertResult.pinCode;
+                    employeeDetailsDto.id = upsertResult.id;
 
-             return new ResponseEntity<>(
-                     employeeDetailsDto,
-                    HttpStatus.OK);
-        }else{
+                    return new ResponseEntity<>(
+                            employeeDetailsDto,
+                            HttpStatus.OK);
+                }else{
+
+                    return new ResponseEntity<>(
+                            employeeDetailsDto,
+                            HttpStatus.CONFLICT)
+                }
+            }else{
+                upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+
+
+                employeeDetailsDto.facialData = upsertResult.facialData;
+                employeeDetailsDto.id = upsertResult.id;
+
+                return new ResponseEntity<>(
+                        employeeDetailsDto,
+                        HttpStatus.OK);
+            }
+        }catch(Exception e){
             return new ResponseEntity<>(
                     employeeDetailsDto,
-                    HttpStatus.CONFLICT)
+                    HttpStatus.EXPECTATION_FAILED);
         }
+
+
     }
 }
