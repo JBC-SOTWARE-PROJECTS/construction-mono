@@ -1,18 +1,34 @@
 import EmployeeManagementHeader from "@/components/administrative/employees/EmployeeManagementHeader";
 import EmployeeDetails from "@/components/common/EmployeeDetails";
 import UpsertEmployeeAllowanceModal from "@/components/payroll/employee-management/allowance/UpsertEmployeeAllowanceModal";
-import { EmployeeAllowance } from "@/graphql/gql/graphql";
+import { Employee } from "@/graphql/gql/graphql";
+import useEditEmployeeAllowanceAmount from "@/hooks/employee-allowance/useEditEmployeeAllowanceAmount";
 import useGetEmployeeAllowanceItems from "@/hooks/employee-allowance/useGetEmployeeAllowanceItems";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { Table } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import { InputNumber, Table } from "antd";
 
 import { useRouter } from "next/router";
+import { useRef, useState } from "react";
 
 function EmployeeAllowancePage() {
   const router = useRouter();
-  const [employee, loadingEmployee] = useGetEmployeeAllowanceItems(
+  const [editingKey, setEditingKey] = useState();
+  const [editingField, setEditingField] = useState<string | undefined>();
+  const [employee, loadingEmployee, refetch] = useGetEmployeeAllowanceItems(
     router?.query?.id
   );
+  const amountRef = useRef<any>();
+  const [updateAmount, loadingUpdateAmount] = useEditEmployeeAllowanceAmount(
+    () => {
+      refetch();
+    }
+  );
+
+  const resetEditing = () => {
+    setEditingField(undefined);
+    setEditingKey(undefined);
+  };
   const columns = [
     {
       title: "Name",
@@ -21,13 +37,38 @@ function EmployeeAllowancePage() {
     {
       title: "Amount",
       dataIndex: "amount",
-      render: (value: any) => (
-        <NumeralFormatter format={"0,0.[00]"} value={value} />
-      ),
+      render: (value: any, record: Employee) =>
+        editingKey === record.id && editingField === "amount" ? (
+          <InputNumber
+            size="small"
+            id="editable-amount"
+            autoFocus
+            onBlur={() => {
+              updateAmount({
+                id: record.id,
+                amount: amountRef?.current?.value,
+              });
+              resetEditing();
+            }}
+            ref={amountRef}
+            defaultValue={value}
+          />
+        ) : (
+          <div
+            onClick={() => {
+              setEditingKey(record.id);
+              setEditingField("amount");
+            }}
+          >
+            <NumeralFormatter format={"0,0.[00]"} value={value} />{" "}
+            <EditOutlined />
+          </div>
+        ),
     },
     {
       title: "Allowance Type",
       dataIndex: "allowanceType",
+      render: (value: string) => value?.replace("_", " "),
     },
   ];
   return (
@@ -39,7 +80,12 @@ function EmployeeAllowancePage() {
           loading={loadingEmployee}
         />
       </EmployeeManagementHeader>
-      <UpsertEmployeeAllowanceModal />
+      <UpsertEmployeeAllowanceModal
+        allowancePackageId={employee?.allowancePackageId}
+        refetch={refetch}
+        employeeAllowanceItems={employee?.allowanceItems}
+      />
+      <br />
       <Table
         columns={columns}
         dataSource={employee?.allowanceItems}

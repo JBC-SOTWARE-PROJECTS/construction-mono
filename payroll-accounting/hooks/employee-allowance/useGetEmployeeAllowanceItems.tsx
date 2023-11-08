@@ -18,7 +18,9 @@ const GET_RECORDS = gql`
         name
         allowanceType
         amount
+        allowanceId
       }
+      allowancePackageId
     }
   }
 `;
@@ -30,7 +32,7 @@ const useGetEmployeeAllowanceItems = (id: any) => {
     },
     fetchPolicy: "network-only",
   });
-  return [data?.data, loading, , refetch];
+  return [data?.data, loading, refetch];
 };
 
 export default useGetEmployeeAllowanceItems;

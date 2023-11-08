@@ -23,6 +23,7 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.Table
+import java.beans.Transient
 import java.time.Instant
 
 
@@ -58,6 +59,11 @@ class AllowanceItem extends AbstractAuditingEntity implements Serializable{
     @JoinColumn(name = "allowance", referencedColumnName = "id")
     Allowance allowance
 
+    @Transient
+    UUID getAllowanceId(){
+        return allowance.id
+    }
+
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "package", referencedColumnName = "id")
@@ -68,4 +74,8 @@ class AllowanceItem extends AbstractAuditingEntity implements Serializable{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
+
+
+
+
 }

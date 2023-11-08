@@ -289,6 +289,7 @@ export type AllowanceInput = {
 export type AllowanceItem = {
   __typename?: 'AllowanceItem';
   allowance?: Maybe<Allowance>;
+  allowanceId?: Maybe<Scalars['UUID']['output']>;
   allowancePackage?: Maybe<AllowancePackage>;
   allowanceType?: Maybe<AllowanceType>;
   amount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -1310,7 +1311,7 @@ export type Employee = {
 
 export type EmployeeAllowance = {
   __typename?: 'EmployeeAllowance';
-  allowance?: Maybe<Scalars['UUID']['output']>;
+  allowanceId?: Maybe<Scalars['UUID']['output']>;
   allowanceType?: Maybe<AllowanceType>;
   amount?: Maybe<Scalars['BigDecimal']['output']>;
   company?: Maybe<CompanySettings>;
@@ -1324,7 +1325,7 @@ export type EmployeeAllowance = {
 };
 
 export type EmployeeAllowanceInput = {
-  allowance?: InputMaybe<Scalars['UUID']['input']>;
+  allowanceId?: InputMaybe<Scalars['UUID']['input']>;
   allowanceType?: InputMaybe<AllowanceType>;
   amount?: InputMaybe<Scalars['BigDecimal']['input']>;
   company?: InputMaybe<CompanySettingsInput>;
@@ -2907,9 +2908,8 @@ export type Mutation = {
   /** add allowance item */
   upsertAllAllowanceItem?: Maybe<GraphQlRetVal_String>;
   /** add allowance package */
-  upsertAllAllowancePackage?: Maybe<GraphQlRetVal_AllowancePackage>;
-  /** add allowance package */
   upsertAllowanceItem?: Maybe<GraphQlRetVal_AllowanceItem>;
+  upsertAllowancePackage?: Maybe<GraphQlRetVal_AllowancePackage>;
   /**  Add allowance type  */
   upsertAllowanceType?: Maybe<GraphQlRetVal_Allowance>;
   upsertApAccountsTemplate?: Maybe<ApAccountsTemplate>;
@@ -4145,14 +4145,14 @@ export type MutationUpsertAllAllowanceItemArgs = {
 
 
 /** Mutation root */
-export type MutationUpsertAllAllowancePackageArgs = {
+export type MutationUpsertAllowanceItemArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
 /** Mutation root */
-export type MutationUpsertAllowanceItemArgs = {
+export type MutationUpsertAllowancePackageArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -7217,6 +7217,7 @@ export type Query = {
   getAllChartOfAccountGenerate?: Maybe<Array<Maybe<ChartOfAccountGenerate>>>;
   /** Get All Employees */
   getAllEmployeesBasic?: Maybe<Array<Maybe<EmployeeBasicDetails>>>;
+  getAllowancePackageById?: Maybe<AllowancePackage>;
   getAmounts?: Maybe<Scalars['BigDecimal']['output']>;
   getAmountsDeduct?: Maybe<Scalars['BigDecimal']['output']>;
   getAutoIntegrateableFromDomain?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -7234,6 +7235,7 @@ export type Query = {
   /** Get contribution by ID, this query is pagable */
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
   getDocTypeById?: Maybe<DocumentTypes>;
+  getEmployeeAllowance?: Maybe<Array<Maybe<EmployeeAllowance>>>;
   getEmployeeLeaveByEmp?: Maybe<Array<Maybe<EmployeeLeave>>>;
   getEmployeeLeavePageable?: Maybe<Page_EmployeeLeaveDto>;
   getEmployeeLoanConfig?: Maybe<EmployeeLoanConfig>;
@@ -8413,6 +8415,12 @@ export type QueryGetAllChartOfAccountGenerateArgs = {
 
 
 /** Query root */
+export type QueryGetAllowancePackageByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetAmountsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -8470,6 +8478,13 @@ export type QueryGetContributionEmployeesByPayrollIdArgs = {
 /** Query root */
 export type QueryGetDocTypeByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeAllowanceArgs = {
+  employeeId?: InputMaybe<Scalars['UUID']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
 };
 
 

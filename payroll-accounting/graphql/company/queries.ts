@@ -254,7 +254,7 @@ export const DELETE_ALLOWANCE = gql`
 
 export const UPSERT_ALLOWANCE_PACKAGE = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
-    data: upsertAllAllowancePackage(id: $id, fields: $fields) {
+    data: upsertAllowancePackage(id: $id, fields: $fields) {
       payload {
         id
       }

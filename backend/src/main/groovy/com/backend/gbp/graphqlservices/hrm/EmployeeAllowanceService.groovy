@@ -47,6 +47,13 @@ class EmployeeAllowanceService {
 
     //---------------------- Queries   ------------------------------------\\
 
+    @GraphQLQuery(name = "getEmployeeAllowance")
+    List<EmployeeAllowance> getEmployeeAllowance(
+            @GraphQLArgument(name = "employeeId") UUID employeeId,
+            @GraphQLArgument(name = "filter") String filter
+    ) {
+        return employeeAllowanceRepository.findByEmployeeId(employeeId,filter)
+    }
 
 
     //---------------------- Mutations   ------------------------------------\\
@@ -61,7 +68,7 @@ class EmployeeAllowanceService {
         AllowancePackage allowancePackage = allowancePackageRepository.findById(allowancePackageId).get()
 
         CompanySettings company = SecurityUtils.currentCompany()
-        employee.allowanceItems.clear()
+
         List<EmployeeAllowance> employeeAllowanceList = []
         allowancePackage.allowanceItems.each {
             EmployeeAllowance allowance = new EmployeeAllowance()
@@ -70,10 +77,21 @@ class EmployeeAllowanceService {
             allowance.allowanceType = it.allowanceType
             allowance.amount = it.amount
             allowance.company = company
-            allowance.allowance = it.allowance.id
+            allowance.allowanceId = it.allowance.id
             employeeAllowanceList.push(allowance)
         }
+        List<EmployeeAllowance> toDelete = getEmployeeAllowance(employeeId,"")
+        employeeAllowanceList.each{
+            EmployeeAllowance employeeAllowance = toDelete.find({EmployeeAllowance current ->it.allowanceId == current.allowanceId })
+            if(employeeAllowance){
+                it.amount = employeeAllowance.amount
+            }
+        }
         employeeAllowanceRepository.saveAll(employeeAllowanceList)
+        employee.allowancePackageId = allowancePackageId
+        employeeRepository.save(employee)
+
+        employeeAllowanceRepository.deleteAll(toDelete)
         return new GraphQLResVal<String>('Success', true, 'Successfully Saved Employee Allowance')
     }
 

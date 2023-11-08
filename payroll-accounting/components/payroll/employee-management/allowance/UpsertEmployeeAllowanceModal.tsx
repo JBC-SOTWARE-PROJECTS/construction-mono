@@ -1,4 +1,4 @@
-import { AllowanceItem } from "@/graphql/gql/graphql";
+import { AllowanceItem, EmployeeAllowance } from "@/graphql/gql/graphql";
 import useGetAllAllowancePackage from "@/hooks/allowance/useGetAllAllowancePackage";
 import useGetOneAllowancePackage from "@/hooks/allowance/useGetOneAllowancePackage";
 import useUpsertEmployeeAllowance from "@/hooks/employee-allowance/useUpsertEmployeeAllowance";
@@ -6,21 +6,56 @@ import NumeralFormatter from "@/utility/numeral-formatter";
 import { EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { Button, Modal, Select, Space, Spin, Table } from "antd";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+interface IProps {
+  allowancePackageId: any;
+  refetch: () => void;
+  employeeAllowanceItems: EmployeeAllowance[];
+}
 
-function UpsertEmployeeAllowanceModal() {
+interface AllowanceItemCustom extends AllowanceItem {
+  originalAmount: number;
+}
+
+function UpsertEmployeeAllowanceModal({
+  allowancePackageId,
+  refetch,
+  employeeAllowanceItems,
+}: IProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState();
 
   const [packageList, loadingPackageList] = useGetAllAllowancePackage();
-  const [allowancePackage, loadingPackage] =
-    useGetOneAllowancePackage(selectedId);
 
+  const [dataSource, setDataSource] = useState<AllowanceItemCustom[]>([]);
+  const [allowancePackage, loadingPackage] = useGetOneAllowancePackage(
+    selectedId,
+    (data) => {
+      generateDataSource(data?.allowanceItems as AllowanceItem[]);
+    }
+  );
+
+  const generateDataSource = (allowanceItems: AllowanceItem[]) => {
+    let arr: AllowanceItemCustom[] = [];
+    allowanceItems?.forEach((item) => {
+      let amount;
+      employeeAllowanceItems.map((item_2) => {
+        if (item_2?.allowanceId === item?.allowanceId) {
+          console.log(item_2, item);
+          amount = item_2.amount;
+        }
+      });
+      let obj = { ...item, originalAmount: item?.amount, amount };
+      arr?.push(obj);
+    });
+    setDataSource(arr);
+  };
   const [switchPackage, loadingSwitchPackage] = useUpsertEmployeeAllowance(
     (result) => {
       if (result?.success) {
         setOpen(false);
+        refetch();
       }
     }
   );
@@ -32,19 +67,37 @@ function UpsertEmployeeAllowanceModal() {
     });
   };
 
+  useEffect(() => {
+    setSelectedId(allowancePackageId);
+  }, [allowancePackageId]);
+
+  useEffect(() => {
+    generateDataSource(allowancePackage?.allowanceItems as AllowanceItem[]);
+  }, [employeeAllowanceItems]);
+
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
     },
     {
-      title: "Amount",
-      dataIndex: "amount",
+      title: "Original Amount",
+      dataIndex: "originalAmount",
       render: (value: number) => <NumeralFormatter value={value} />,
+    },
+    {
+      title: "Custom Amount",
+      dataIndex: "amount",
+      render: (value: number) => (
+        <b>
+          <NumeralFormatter value={value} />
+        </b>
+      ),
     },
     {
       title: "Allowance Type",
       dataIndex: "allowanceType",
+      render: (value: string) => value?.replace("_", " "),
     },
   ];
 
@@ -67,6 +120,7 @@ function UpsertEmployeeAllowanceModal() {
             setOpen(false);
           }}
           title="Employee Allowance"
+          width="80%"
           footer={
             <Space>
               <Button
@@ -92,13 +146,14 @@ function UpsertEmployeeAllowanceModal() {
             onChange={(value) => {
               setSelectedId(value);
             }}
+            defaultValue={allowancePackageId}
             allowClear
           />
           <br />
           <br />
           <Table
             size={"small"}
-            dataSource={allowancePackage?.allowanceItems as AllowanceItem[]}
+            dataSource={dataSource as AllowanceItemCustom[]}
             columns={columns}
             loading={loadingPackageList || loadingPackage}
           />

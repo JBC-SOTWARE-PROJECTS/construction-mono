@@ -45,6 +45,6 @@ class EmployeeAllowance extends AbstractAuditingEntity {
 
 	@GraphQLQuery
 	@Column(name = "allowance", columnDefinition = "uuid")
-	UUID allowance
+	UUID allowanceId
 
 }
