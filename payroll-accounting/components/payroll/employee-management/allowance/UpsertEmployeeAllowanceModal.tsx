@@ -6,7 +6,7 @@ import NumeralFormatter from "@/utility/numeral-formatter";
 import { EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { Button, Modal, Select, Space, Spin, Table } from "antd";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 interface IProps {
   allowancePackageId: any;
   refetch: () => void;
@@ -40,13 +40,16 @@ function UpsertEmployeeAllowanceModal({
     let arr: AllowanceItemCustom[] = [];
     allowanceItems?.forEach((item) => {
       let amount;
-      employeeAllowanceItems.map((item_2) => {
+      employeeAllowanceItems?.map((item_2) => {
         if (item_2?.allowanceId === item?.allowanceId) {
-          console.log(item_2, item);
           amount = item_2.amount;
         }
       });
-      let obj = { ...item, originalAmount: item?.amount, amount };
+      let obj = {
+        ...item,
+        originalAmount: item?.amount,
+        amount: amount || item?.amount,
+      };
       arr?.push(obj);
     });
     setDataSource(arr);
@@ -68,8 +71,9 @@ function UpsertEmployeeAllowanceModal({
   };
 
   useEffect(() => {
-    setSelectedId(allowancePackageId);
-  }, [allowancePackageId]);
+    if (open) setSelectedId(allowancePackageId);
+    else setSelectedId(undefined);
+  }, [open]);
 
   useEffect(() => {
     generateDataSource(allowancePackage?.allowanceItems as AllowanceItem[]);
@@ -146,7 +150,7 @@ function UpsertEmployeeAllowanceModal({
             onChange={(value) => {
               setSelectedId(value);
             }}
-            defaultValue={allowancePackageId}
+            value={selectedId}
             allowClear
           />
           <br />
