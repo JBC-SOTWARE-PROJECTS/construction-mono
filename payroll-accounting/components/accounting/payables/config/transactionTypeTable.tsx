@@ -40,11 +40,18 @@ export default function TransactionTypeTable({
       title: "Supplier Types",
       dataIndex: "supplierType.supplierTypeDesc",
       key: "supplierType.supplierTypeDesc",
-      render: (text, record) => (
-        <span
-          key={text}
-        >{`[${record.supplierType?.supplierTypeCode}] ${record.supplierType?.supplierTypeDesc}`}</span>
-      ),
+      render: (text, record) => {
+        if (record.supplierType?.supplierTypeCode) {
+          return (
+            <span
+              key={
+                text
+              }>{`[${record.supplierType?.supplierTypeCode}] ${record.supplierType?.supplierTypeDesc}`}</span>
+          );
+        } else {
+          return "--";
+        }
+      },
     },
     {
       title: "Category",

@@ -663,8 +663,8 @@ export default function PCVPurchaseTable(props: IProps) {
     },
     {
       title: "Office",
-      dataIndex: "department.departmentName",
-      key: "department.departmentName",
+      dataIndex: "office.officeDescription",
+      key: "office.officeDescription",
       width: 200,
       render: (_, record) => <span>{record?.office?.officeDescription}</span>,
     },

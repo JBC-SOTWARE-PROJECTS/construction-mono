@@ -98,7 +98,7 @@ export default function UpsertOfficeModal(props: IProps) {
       maskClosable={false}
       open={true}
       width={"100%"}
-      style={{ maxWidth: "700px" }}
+      style={{ maxWidth: "800px" }}
       onCancel={() => hide(false)}
       footer={
         <Space>
@@ -108,13 +108,11 @@ export default function UpsertOfficeModal(props: IProps) {
             htmlType="submit"
             form="upsertForm"
             loading={upsertLoading}
-            icon={<SaveOutlined />}
-          >
+            icon={<SaveOutlined />}>
             {`${record?.id ? "Save Changes" : "Save"} & Close`}
           </Button>
         </Space>
-      }
-    >
+      }>
       <Form
         name="upsertForm"
         layout="vertical"
@@ -133,9 +131,10 @@ export default function UpsertOfficeModal(props: IProps) {
           officeMunicipality: record?.officeMunicipality,
           officeBarangay: record?.officeBarangay,
           officeZipcode: record?.officeZipcode,
+          tinNumber: record?.tinNumber,
+          officeSecretary: record?.officeSecretary,
           status: record?.status ?? false,
-        }}
-      >
+        }}>
         <Row gutter={[8, 0]}>
           <Col span={24}>
             <FormInput
@@ -287,6 +286,27 @@ export default function UpsertOfficeModal(props: IProps) {
               label="Zip Code"
               propsinput={{
                 placeholder: "Zip Code",
+              }}
+            />
+          </Col>
+          <Divider plain>Other Configuration</Divider>
+          <Col {...colSpan2}>
+            <FormInput
+              name="tinNumber"
+              rules={requiredField}
+              label="Tin Number"
+              propsinput={{
+                placeholder: "Tin Number",
+              }}
+            />
+          </Col>
+          <Col {...colSpan2}>
+            <FormInput
+              name="officeSecretary"
+              rules={requiredField}
+              label="BIR 2307 Signatory"
+              propsinput={{
+                placeholder: "BIR 2307 Signatury",
               }}
             />
           </Col>

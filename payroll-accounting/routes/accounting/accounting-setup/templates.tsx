@@ -14,9 +14,9 @@ import { AP_TRANSCTION_CATEGORY } from "@/utility/constant";
 import _ from "lodash";
 import { useSupplierTypes } from "@/hooks/payables";
 import { useDialog } from "@/hooks";
-import APAccountsTemplateModal from "@/components/accounting/payables/dialogs/apAccountsTemplateModal";
-import AccountsTemplateTable from "@/components/accounting/payables/config/accountsTemplatesTable";
-import AccountTemplatesEntries from "@/components/accounting/payables/templates/accountsEntriesModal";
+import APAccountsTemplateModal from "@/components/accounting/accounting-setup/templates/apAccountsTemplateModal";
+import AccountsTemplateTable from "@/components/accounting/accounting-setup/accountsTemplatesTable";
+import AccountTemplatesEntries from "@/components/accounting/accounting-setup/templates/accountsEntriesModal";
 
 const { Search } = Input;
 
@@ -62,9 +62,9 @@ export default function AccountsTemplateComponent() {
       if (result) {
         refetch();
         if (record?.id) {
-          message.success("Transaction Type successfully updated");
+          message.success("Accounts Template successfully updated");
         } else {
-          message.success("Transaction Type successfully added");
+          message.success("Accounts Template successfully added");
         }
       }
     });
@@ -80,9 +80,9 @@ export default function AccountsTemplateComponent() {
   };
 
   return (
-    <PageContainer title="Accounts Payable Accounts Template">
+    <PageContainer title="Accounts Template">
       <ProCard
-        title="Accounts Template"
+        title="Accounts Template List"
         headStyle={{
           flexWrap: "wrap",
         }}

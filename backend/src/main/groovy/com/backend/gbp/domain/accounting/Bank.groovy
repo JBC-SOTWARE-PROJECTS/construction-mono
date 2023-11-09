@@ -2,6 +2,7 @@ package com.backend.gbp.domain.accounting
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.types.Subaccountable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
@@ -10,7 +11,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "bankaccounts", schema = "accounting")
-class Bank extends AbstractAuditingEntity {
+class Bank extends AbstractAuditingEntity implements Subaccountable {
 	
 	@GraphQLQuery
 	@Id
@@ -56,5 +57,20 @@ class Bank extends AbstractAuditingEntity {
 	@GraphQLQuery
 	@Column(name = "company", columnDefinition = "uuid")
 	UUID company
+
+	@Override
+	String getCode() {
+		return bankaccountId
+	}
+
+	@Override
+	String getAccountName() {
+		return bankname
+	}
+
+	@Override
+	String getDomain() {
+		return Bank.class.name
+	}
 
 }

@@ -1,0 +1,1 @@
+ALTER TABLE public.office add column tin_number varchar default null, add column office_secretary varchar default null;

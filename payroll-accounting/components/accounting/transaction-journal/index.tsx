@@ -365,6 +365,7 @@ export default function TransactionJournal(props: TransactionJournalI) {
           )
         }
         scroll={{ y: 400 }}
+        size='small'
       />
     </>
   )

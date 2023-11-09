@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from "@apollo/client";
 
 export const GET_DISBURSEMENT_RECORD = gql`
   query (
@@ -35,6 +35,8 @@ export const GET_DISBURSEMENT_RECORD = gql`
           id
           description
         }
+        referenceType
+        referenceNo
         payeeName
         disNo
         paymentCategory
@@ -58,7 +60,7 @@ export const GET_DISBURSEMENT_RECORD = gql`
       number
     }
   }
-`
+`;
 
 export const UPSERT_DISBURSEMENT_RECORD = gql`
   mutation (
@@ -80,7 +82,7 @@ export const UPSERT_DISBURSEMENT_RECORD = gql`
       id
     }
   }
-`
+`;
 
 export const GET_DISBURSEMENT_AP_APPLICATION = gql`
   query ($id: UUID) {
@@ -110,7 +112,7 @@ export const GET_DISBURSEMENT_AP_APPLICATION = gql`
       netAmount
     }
   }
-`
+`;
 
 export const REMOVE_DISBURSEMENT_AP = gql`
   mutation ($id: UUID, $parent: UUID) {
@@ -118,7 +120,7 @@ export const REMOVE_DISBURSEMENT_AP = gql`
       id
     }
   }
-`
+`;
 
 export const GET_DISBURSEMENT_CHECKS = gql`
   query ($id: UUID) {
@@ -134,7 +136,7 @@ export const GET_DISBURSEMENT_CHECKS = gql`
       amount
     }
   }
-`
+`;
 
 export const REMOVE_DISBURSEMENT_CHECK = gql`
   mutation ($id: UUID) {
@@ -142,7 +144,7 @@ export const REMOVE_DISBURSEMENT_CHECK = gql`
       id
     }
   }
-`
+`;
 
 export const GET_DISBURSEMENT_EXPENSE = gql`
   query ($id: UUID) {
@@ -164,7 +166,7 @@ export const GET_DISBURSEMENT_EXPENSE = gql`
       remarks
     }
   }
-`
+`;
 
 export const REMOVE_DISBURSEMENT_EXPENSE = gql`
   mutation ($id: UUID) {
@@ -172,7 +174,7 @@ export const REMOVE_DISBURSEMENT_EXPENSE = gql`
       id
     }
   }
-`
+`;
 
 export const GET_DISBURSEMENT_WTX = gql`
   query ($id: UUID) {
@@ -189,7 +191,7 @@ export const GET_DISBURSEMENT_WTX = gql`
       netAmount
     }
   }
-`
+`;
 
 export const REMOVE_DISBURSEMENT_WTX = gql`
   mutation ($id: UUID) {
@@ -197,7 +199,7 @@ export const REMOVE_DISBURSEMENT_WTX = gql`
       id
     }
   }
-`
+`;
 
 export const UPDATE_DISBURSEMENT_STATUS = gql`
   mutation ($id: UUID, $status: String) {
@@ -205,7 +207,7 @@ export const UPDATE_DISBURSEMENT_STATUS = gql`
       id
     }
   }
-`
+`;
 
 export const UPDATE_REAPPLICATION_STATUS = gql`
   mutation ($id: UUID, $status: String) {
@@ -213,7 +215,7 @@ export const UPDATE_REAPPLICATION_STATUS = gql`
       id
     }
   }
-`
+`;
 
 export const GET_REAPPLICATION_RECORD = gql`
   query (
@@ -260,6 +262,7 @@ export const GET_REAPPLICATION_RECORD = gql`
           voucherAmount
           appliedAmount
         }
+        referenceNo
         prevApplied
         discountAmount
         ewtAmount
@@ -275,7 +278,7 @@ export const GET_REAPPLICATION_RECORD = gql`
       number
     }
   }
-`
+`;
 
 export const GET_RECORDS_AP_REAPPLICATION = gql`
   query ($id: UUID) {
@@ -305,7 +308,7 @@ export const GET_RECORDS_AP_REAPPLICATION = gql`
       netAmount
     }
   }
-`
+`;
 
 export const UPSERT_REAPPLICATION_RECORD = gql`
   mutation ($id: UUID) {
@@ -315,7 +318,7 @@ export const UPSERT_REAPPLICATION_RECORD = gql`
       message
     }
   }
-`
+`;
 
 export const UPDATE_REAPPLICATION_RECORD = gql`
   mutation (
@@ -327,7 +330,7 @@ export const UPDATE_REAPPLICATION_RECORD = gql`
       id
     }
   }
-`
+`;
 
 export const PRINT_DISBURSEMENT_CHECKS = gql`
   query (
@@ -374,7 +377,7 @@ export const PRINT_DISBURSEMENT_CHECKS = gql`
       number
     }
   }
-`
+`;
 
 // ========================== post accounting =============================
 export const GET_CK_AUTO_ENTRIES = gql`
@@ -386,7 +389,7 @@ export const GET_CK_AUTO_ENTRIES = gql`
       credit
     }
   }
-`
+`;
 
 export const POST_DISBURSEMENT_PAYABLE = gql`
   mutation ($id: UUID, $status: Boolean) {
@@ -394,7 +397,7 @@ export const POST_DISBURSEMENT_PAYABLE = gql`
       id
     }
   }
-`
+`;
 
 export const POST_ACCOUNT_DISBURSEMENT_MANUAL = gql`
   mutation (
@@ -408,7 +411,7 @@ export const POST_ACCOUNT_DISBURSEMENT_MANUAL = gql`
       message
     }
   }
-`
+`;
 
 export const GET_RP_AUTO_ENTRIES = gql`
   query ($id: UUID, $status: Boolean) {
@@ -419,14 +422,14 @@ export const GET_RP_AUTO_ENTRIES = gql`
       credit
     }
   }
-`
+`;
 export const POST_REAPPLICATION_PAYABLE = gql`
   mutation ($id: UUID, $status: Boolean) {
     postReapplication(id: $id, status: $status) {
       id
     }
   }
-`
+`;
 
 export const POST_ACCOUNT_REAPPLICATION_MANUAL = gql`
   mutation (
@@ -440,4 +443,4 @@ export const POST_ACCOUNT_REAPPLICATION_MANUAL = gql`
       message
     }
   }
-`
+`;
