@@ -37,11 +37,21 @@ import {
   responsiveColumn3,
   responsiveColumn3Last,
 } from "@/utility/constant";
-import { FormDatePicker, FormSelect, FormTextArea } from "@/components/common";
+import {
+  FormAutoComplete,
+  FormDatePicker,
+  FormInput,
+  FormSelect,
+  FormTextArea,
+} from "@/components/common";
 import { NumberFormater, decimalRound2, requiredField } from "@/utility/helper";
 import dayjs from "dayjs";
 import { ColumnsType } from "antd/es/table";
-import { useAPTransactionType, useBanks } from "@/hooks/payables";
+import {
+  useAPTransactionType,
+  useBanks,
+  useReferenceDebitMemoType,
+} from "@/hooks/payables";
 import { useConfirmationPasswordHook, useDialog } from "@/hooks";
 import ViewJournalEntries from "../journalentries/viewJournalEntries";
 import { TabsProps } from "antd/lib";
@@ -93,6 +103,7 @@ export default function DebitMemoModal(props: IProps) {
   const journalEntries = useDialog(DMJournalEntries);
   const viewEntries = useDialog(ViewJournalEntries);
   // ===================== Queries ==============================
+  const referenceTypes = useReferenceDebitMemoType();
   const transactionList = useAPTransactionType({
     type: supplier?.supplierTypes?.id,
     category: type === "DEBIT_MEMO" ? "DM" : "DA",
@@ -617,6 +628,8 @@ export default function DebitMemoModal(props: IProps) {
           memoAmount: 0,
           bank: record?.bank?.id,
           transType: record?.transType?.id,
+          referenceType: record?.referenceType,
+          referenceNo: record?.referenceNo,
           remarksNotes: record?.remarksNotes,
         }}>
         <Row>
@@ -651,17 +664,6 @@ export default function DebitMemoModal(props: IProps) {
                 },
               }}
             />
-            <FormSelect
-              label="Transaction Type"
-              name="transType"
-              propsselect={{
-                options: transactionList,
-                allowClear: true,
-                placeholder: "Select Transaction Terms",
-              }}
-            />
-          </Col>
-          <Col {...responsiveColumn3}>
             {type === "DEBIT_ADVICE" && (
               <FormSelect
                 label="Bank"
@@ -674,6 +676,34 @@ export default function DebitMemoModal(props: IProps) {
                 }}
               />
             )}
+            <FormSelect
+              label="Transaction Type"
+              name="transType"
+              propsselect={{
+                options: transactionList,
+                allowClear: true,
+                placeholder: "Select Transaction Terms",
+              }}
+            />
+          </Col>
+          <Col {...responsiveColumn3}>
+            <FormAutoComplete
+              label="Reference Type"
+              name="referenceType"
+              rules={requiredField}
+              propsinput={{
+                options: referenceTypes,
+                placeholder: "Reference Type",
+              }}
+            />
+            <FormInput
+              label="Reference No"
+              name="referenceNo"
+              rules={requiredField}
+              propsinput={{
+                placeholder: "Reference No",
+              }}
+            />
             <FormTextArea
               label="Remarks/Notes (Particular)"
               name="remarksNotes"

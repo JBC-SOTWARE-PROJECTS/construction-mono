@@ -109,9 +109,9 @@ export default function ItemSelector(props: IProps) {
         return {
           id: randomId(),
           item: obj,
-          department: {
+          office: {
             id: office?.value,
-            departmentName: office?.label,
+            officeDescription: office?.label,
           },
           qty: 1,
           unitCost: 0,
@@ -257,9 +257,7 @@ export default function ItemSelector(props: IProps) {
             size="small"
             loading={loading}
             columns={columns}
-            dataSource={
-              _.get(data, "itemsByFilterOnly.content", []) as Item[]
-            }
+            dataSource={_.get(data, "itemsByFilterOnly.content", []) as Item[]}
             pagination={false}
             footer={() => (
               <Pagination
@@ -268,11 +266,7 @@ export default function ItemSelector(props: IProps) {
                 pageSize={10}
                 responsive={true}
                 total={
-                  _.get(
-                    data,
-                    "itemsByFilterOnly.totalElements",
-                    0
-                  ) as number
+                  _.get(data, "itemsByFilterOnly.totalElements", 0) as number
                 }
                 onChange={(e) => {
                   setState((prev) => ({ ...prev, page: e - 1 }));

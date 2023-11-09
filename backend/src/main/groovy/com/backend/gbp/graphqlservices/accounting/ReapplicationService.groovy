@@ -446,6 +446,11 @@ class ReapplicationService extends AbstractDaoService<Reapplication> {
 					it.ewt30Percent = status ? ewt30.setScale(2, RoundingMode.HALF_EVEN) : ewt30.setScale(2, RoundingMode.HALF_EVEN) * -1
 					//end ewt amount
 
+					//sum ewt
+					def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+					def sumEwt = ewt.sum() as BigDecimal
+					it.cwt = status ? sumEwt.setScale(2, RoundingMode.HALF_EVEN) : sumEwt.setScale(2, RoundingMode.HALF_EVEN) * -1
+
 				}
 
 				Set<Ledger> ledger = new HashSet<Ledger>(headerLedger.ledger);
@@ -551,6 +556,11 @@ class ReapplicationService extends AbstractDaoService<Reapplication> {
 			it.ewt30Percent = ewt30.setScale(2, RoundingMode.HALF_EVEN)
 			//
 
+			//sum ewt
+			def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+			def sumEwt = ewt.sum() as BigDecimal
+			it.cwt = sumEwt.setScale(2, RoundingMode.HALF_EVEN)
+
 		}
 
 		Map<String,String> details = [:]
@@ -563,10 +573,15 @@ class ReapplicationService extends AbstractDaoService<Reapplication> {
 		details["DISBURSEMENT_ID"] = parent.disbursement.id.toString()
 		details["SUPPLIER_ID"] = parent.supplier.id.toString()
 
+		headerLedger.transactionNo = parent.rpNo
+		headerLedger.transactionType = "DISBURSEMENT REAPPLICATION"
+		headerLedger.referenceType = "ACCOUNTS PAYABLE"
+		headerLedger.referenceNo = parent.referenceNo
+
 		def pHeader =	ledgerServices.persistHeaderLedger(headerLedger,
 				"${Instant.now().atZone(ZoneId.systemDefault()).format(yearFormat)}-${parent.disbursement.disNo}",
-				"${parent.disbursement.disNo}-${parent.supplier.supplierFullname}",
-				"${parent.disbursement.disNo}-${parent.remarks}",
+				"${parent.supplier.supplierFullname}",
+				"${parent.remarks}",
 				parent.disbursement.disType.equalsIgnoreCase("CASH") ? LedgerDocType.CS : LedgerDocType.CK, // CS = CASH , CK = CHECK
 				JournalType.DISBURSEMENT,
 				Instant.now(),
@@ -598,8 +613,14 @@ class ReapplicationService extends AbstractDaoService<Reapplication> {
 		details["DISBURSEMENT_ID"] = parent.disbursement.id.toString()
 		details["SUPPLIER_ID"] = parent.supplier.id.toString()
 
+		Map<String, Object> headerLedger = header
+		headerLedger.put('transactionNo', parent.rpNo)
+		headerLedger.put('transactionType', "DISBURSEMENT REAPPLICATION")
+		headerLedger.put('referenceType', "ACCOUNTS PAYABLE")
+		headerLedger.put('referenceNo', parent.referenceNo)
+
 		def result = ledgerServices.addManualJVDynamic(
-				header,
+				headerLedger,
 				entries,
 				parent.disbursement.disType.equalsIgnoreCase("CASH") ? LedgerDocType.CS : LedgerDocType.CK,
 				JournalType.DISBURSEMENT,

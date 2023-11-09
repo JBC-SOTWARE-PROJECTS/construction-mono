@@ -39,6 +39,10 @@ class ReturnSupplier extends AbstractAuditingEntity implements Serializable{
 	@GraphQLQuery
 	@Column(name = "ref_srr", columnDefinition = 'varchar')
 	String refSrr
+
+	@GraphQLQuery
+	@Column(name = "reference_type", columnDefinition = 'varchar')
+	String referenceType
 	
 	@GraphQLQuery
 	@Column(name = "received_ref_no", columnDefinition = 'varchar')

@@ -439,3 +439,14 @@ th.ant-table-cell {
 .virtual-table .ant-table-container:after {
   display: none;
 }
+
+.dev-flex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.relative {
+  position: relative !important;
+}

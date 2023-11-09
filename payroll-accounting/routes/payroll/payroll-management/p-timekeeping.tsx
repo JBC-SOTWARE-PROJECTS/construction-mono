@@ -130,7 +130,6 @@ function Timekeeping({ account }: IPageProps) {
           </>
         }
       />
-      <Divider />
       <PageHeader
         extra={
           <EmployeeDrawer

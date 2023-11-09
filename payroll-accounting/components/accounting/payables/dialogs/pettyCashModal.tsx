@@ -20,11 +20,12 @@ import FullScreenModal from "@/components/common/fullScreenModal/fullScreenModal
 import {
   PC_CATEGORY,
   PETTYTOTALS,
+  responsiveColumn2,
   responsiveColumn3,
   responsiveColumn3Last,
   vatRate,
 } from "@/utility/constant";
-import { FormSelect, FormTextArea } from "@/components/common";
+import { FormInput, FormSelect, FormTextArea } from "@/components/common";
 import {
   DateFormatter,
   NumberFormater,
@@ -36,6 +37,7 @@ import { ColumnsType } from "antd/es/table";
 import {
   useAPTransactionTypeOthers,
   usePettyCashNames,
+  useReferencePettyCashType,
 } from "@/hooks/payables";
 import { useConfirmationPasswordHook, useDialog } from "@/hooks";
 import ViewJournalEntries from "../journalentries/viewJournalEntries";
@@ -86,6 +88,7 @@ export default function PettyCashModal(props: IProps) {
   const transactionList = useAPTransactionTypeOthers({
     category: "PC",
   });
+  const referenceTypes = useReferencePettyCashType();
   const pettyCashNames = usePettyCashNames();
 
   const { loading, refetch } = useQuery<Query>(GET_PCV_ITEMS, {
@@ -451,6 +454,8 @@ export default function PettyCashModal(props: IProps) {
           pcvCategory: category,
           amountIssued: record?.amountIssued ?? 0,
           transType: record?.transType?.id,
+          referenceType: record?.referenceType,
+          referenceNo: record?.referenceNo,
           remarks: record?.remarks,
         }}>
         <Row gutter={[16, 0]}>
@@ -518,6 +523,29 @@ export default function PettyCashModal(props: IProps) {
                 },
               }}
             />
+            <Row gutter={[8, 0]}>
+              <Col {...responsiveColumn2}>
+                <FormAutoComplete
+                  label="Reference Type"
+                  name="referenceType"
+                  rules={requiredField}
+                  propsinput={{
+                    options: referenceTypes,
+                    placeholder: "Reference Type",
+                  }}
+                />
+              </Col>
+              <Col {...responsiveColumn2}>
+                <FormInput
+                  label="Reference No"
+                  name="referenceNo"
+                  rules={requiredField}
+                  propsinput={{
+                    placeholder: "Reference No",
+                  }}
+                />
+              </Col>
+            </Row>
             <FormTextArea
               label="Remarks/Notes"
               name="remarks"

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SaveOutlined, TransactionOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Modal, Row, Space, Typography } from "antd";
 import FormSelect from "@/components/common/formSelect/formSelect";
@@ -7,7 +7,11 @@ import {
   IDisbursementExpense,
   IFormDisbursementExpense,
 } from "@/interface/payables/formInterfaces";
-import { useOffices, useExpenseTransaction } from "@/hooks/payables";
+import {
+  useOffices,
+  useExpenseTransaction,
+  useProjects,
+} from "@/hooks/payables";
 import { FormTextArea } from "@/components/common";
 import _ from "lodash";
 import { randomId, requiredField, shapeOptionValue } from "@/utility/helper";
@@ -20,9 +24,13 @@ interface IProps {
 
 export default function DisbursementExpenseModal(props: IProps) {
   const { hide, record } = props;
+  const [selectedOffice, setOffice] = useState("");
+  const [form] = Form.useForm();
+  const { setFieldValue } = form;
   // ================== Queries =====================
   const banks = useExpenseTransaction({ type: "DISBURSE" });
   const offices = useOffices();
+  const projects = useProjects({ office: selectedOffice });
   //================== functions ====================
   const onSubmit = (data: IFormDisbursementExpense) => {
     const payload = {
@@ -103,6 +111,7 @@ export default function DisbursementExpenseModal(props: IProps) {
         </Space>
       }>
       <Form
+        form={form}
         name="expenseForm"
         layout="vertical"
         onFinish={onSubmit}
@@ -135,6 +144,10 @@ export default function DisbursementExpenseModal(props: IProps) {
                 labelInValue: true,
                 options: offices,
                 placeholder: "Select Office",
+                onChange: (e) => {
+                  setOffice(e?.value);
+                  setFieldValue("project", null);
+                },
               }}
             />
           </Col>
@@ -145,7 +158,7 @@ export default function DisbursementExpenseModal(props: IProps) {
               propsselect={{
                 showSearch: true,
                 labelInValue: true,
-                options: offices,
+                options: projects,
                 placeholder: "Select Project",
               }}
             />

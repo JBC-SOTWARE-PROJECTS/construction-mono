@@ -56,6 +56,11 @@ class Reapplication extends AbstractAuditingEntity implements Serializable, Auto
 	BigDecimal discountAmount
 
 	@GraphQLQuery
+	@Column(name = "reference_no", columnDefinition = "varchar")
+	@UpperCase
+	String referenceNo
+
+	@GraphQLQuery
 	@Column(name = "ewt_amount", columnDefinition = "bool")
 	@UpperCase
 	BigDecimal ewtAmount
@@ -99,7 +104,7 @@ class Reapplication extends AbstractAuditingEntity implements Serializable, Auto
 	//accounting integrate
 	@Override
 	String getDomain() {
-		return Reapplication.class.name
+		return IntegrationDomainEnum.REAPPLICATION.name()
 	}
 
 	@Transient
@@ -111,11 +116,35 @@ class Reapplication extends AbstractAuditingEntity implements Serializable, Auto
 	}
 
 	@Transient
-	BigDecimal advanceAmount, disbursementAmount, discAmount
+	BigDecimal advanceAmount = BigDecimal.ZERO
+	@Transient
+	BigDecimal disbursementAmount = BigDecimal.ZERO
+	@Transient
+	BigDecimal discAmount = BigDecimal.ZERO
 
 	@Transient
-	BigDecimal ewt1Percent,ewt2Percent,
-			   ewt3Percent,ewt4Percent,ewt5Percent,ewt7Percent,ewt10Percent,ewt15Percent,ewt18Percent,ewt30Percent
+	BigDecimal ewt1Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt2Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt3Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt4Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt5Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt7Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt10Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt15Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt18Percent = BigDecimal.ZERO
+	@Transient
+	BigDecimal ewt30Percent = BigDecimal.ZERO
+
+	@Transient
+	BigDecimal cwt = BigDecimal.ZERO
 
 	
 }

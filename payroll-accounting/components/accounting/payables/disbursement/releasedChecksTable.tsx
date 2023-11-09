@@ -46,7 +46,7 @@ export default function ReleasedChecksTable({
       title: "Check No",
       dataIndex: "disNo",
       key: "disNo",
-      width: 100,
+      width: 150,
       render: (text, record) => <span key={text}>{record.check?.checkNo}</span>,
     },
     {
@@ -112,7 +112,7 @@ export default function ReleasedChecksTable({
               }}
             />
           )}
-          scroll={{ x: 1400 }}
+          scroll={{ x: 1450 }}
         />
       </Col>
     </Row>
