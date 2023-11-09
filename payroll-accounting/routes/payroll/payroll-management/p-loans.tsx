@@ -28,6 +28,7 @@ import useGetPayrollLoan from "@/hooks/payroll/loans/useGetPayrollLoan";
 import CustomButton from "@/components/common/CustomButton";
 import { statusMap } from "@/utility/constant";
 import useUpdatePayrollLoanStatus from "@/hooks/payroll/loans/useUpdatePayrollLoanStatus";
+import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/PayrollEmployeeFilter";
 
 const initialState: variables = {
   filter: "",
@@ -165,6 +166,7 @@ function PayrollLoans({ account }: IPageProps) {
           </>
         }
       />
+      <PayrollEmployeeFilter onQueryChange={onQueryChange} />
 
       <TablePaginated
         columns={columns}
