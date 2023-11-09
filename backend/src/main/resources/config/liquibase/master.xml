@@ -391,4 +391,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/42_aging_report_company.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_jacky_employee_alter_added_pincode.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_jacky_employee_attendance_alter_added_reference_id.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/26_jacky_employee_alter_added_facial_data.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
