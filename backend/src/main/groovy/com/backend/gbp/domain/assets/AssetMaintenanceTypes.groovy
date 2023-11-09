@@ -13,8 +13,8 @@ import org.hibernate.annotations.Where
 import javax.persistence.*
 
 @Entity
-@Table(schema = "asset", name = "asset_maintenance_type")
-@SQLDelete(sql = "UPDATE asset.asset_maintenance_type SET deleted = true WHERE id = ?")
+@Table(schema = "asset", name = "asset_maintenance_types")
+@SQLDelete(sql = "UPDATE asset.asset_maintenance_types SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
 class AssetMaintenanceTypes extends AbstractAuditingEntity implements Serializable{
 
@@ -34,8 +34,8 @@ class AssetMaintenanceTypes extends AbstractAuditingEntity implements Serializab
 	@Column(name = "description")
 	String description
 
-	@GraphQLQuery
+	/*@GraphQLQuery
 	@Column(name = "category")
-	String category
+	String category*/
 
 }

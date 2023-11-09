@@ -44,7 +44,7 @@ class AssetPreventiveMaintenance extends AbstractAuditingEntity implements Seria
 	Assets asset
 
 	@GraphQLQuery
-	@Column(name = "maintenance_type")
-	AssetMaintenanceTypes maintenanceType
+	@Column(name = "asset_maintenance_type")
+	AssetMaintenanceTypes assetMaintenanceType
 
 }
