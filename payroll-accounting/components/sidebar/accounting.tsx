@@ -8,6 +8,9 @@ import {
   UsergroupAddOutlined,
   ReadOutlined,
   ProfileOutlined,
+  FormOutlined,
+  EuroCircleOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 
 const accountingMenu: TDiverseTradeMenu[] = [
@@ -32,7 +35,7 @@ const accountingMenu: TDiverseTradeMenu[] = [
   {
     title: "Accounts Receivable",
     subtitle: "Effortlessly manage and maintain your list of employees.",
-    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    icon: <EuroCircleOutlined className="diverse-trade-icon" />,
     path: "/accounting/accounts-receivable/invoice",
   },
   {
@@ -44,24 +47,25 @@ const accountingMenu: TDiverseTradeMenu[] = [
   {
     title: "Loan Management",
     subtitle: "Effortlessly manage and maintain your list of employees.",
-    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    icon: <FormOutlined className="diverse-trade-icon" />,
     path: "/accounting/employees",
   },
   {
     title: "Fixed Asset",
     subtitle: "Effortlessly manage and maintain your list of employees.",
-    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+    icon: <HomeOutlined className="diverse-trade-icon" />,
     path: "/accounting/employees",
   },
-  {
-    title: "Cash Advance",
-    subtitle: "Effortlessly manage and maintain your list of employees.",
-    icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
-    path: "/accounting/employees",
-  },
+  // {
+  //   title: "Cash Advance",
+  //   subtitle: "Effortlessly manage and maintain your list of employees.",
+  //   icon: <UsergroupAddOutlined className="diverse-trade-icon" />,
+  //   path: "/accounting/employees",
+  // },
   {
     title: "Accounting Setup",
-    subtitle: "Smooth Sailing: Easy Steps for Effective Accounting Configuration.",
+    subtitle:
+      "Smooth Sailing: Easy Steps for Effective Accounting Configuration.",
     icon: <SettingOutlined className="diverse-trade-icon" />,
     path: "/accounting/accounting-setup/accounting-period",
   },
@@ -74,7 +78,8 @@ const accountingMenu: TDiverseTradeMenu[] = [
   },
   {
     title: "Accounting Reports",
-    subtitle: "Financial Clarity: Quick and Simple Accounting Reports for Smart Business Choices.",
+    subtitle:
+      "Financial Clarity: Quick and Simple Accounting Reports for Smart Business Choices.",
     icon: <ReadOutlined className="diverse-trade-icon" />,
     path: "/accounting/reports/essential/general-ledger",
   },

@@ -385,4 +385,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/40_alter_realese_checks_wilson.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/41_wilson_all_payable_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/42_aging_report_company.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

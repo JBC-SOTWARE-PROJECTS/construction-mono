@@ -11,7 +11,7 @@ import {
   TableOutlined,
   WalletOutlined,
   ProjectOutlined,
-  GoldOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 
 const invetoryMenu: TDiverseTradeMenu[] = [
@@ -20,7 +20,7 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     subtitle:
       "Mastering Your Inventory: Configuration and Optimization of Item Masterfile.",
     icon: <FileDoneOutlined className="diverse-trade-icon" />,
-    path: "/inventory/masterfile",
+    path: "/inventory/masterfile/items/all",
   },
   {
     title: "Purchase Request and Orders",
@@ -85,7 +85,7 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     title: "Asset Management",
     subtitle:
       "Value in Simplicity: Clear and Practical Asset Management Approaches.",
-    icon: <GoldOutlined className="diverse-trade-icon" />,
+    icon: <CarOutlined className="diverse-trade-icon" />,
     path: "/inventory/monitoring",
   },
   {

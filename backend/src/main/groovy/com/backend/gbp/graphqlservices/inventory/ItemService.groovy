@@ -87,7 +87,8 @@ class ItemService extends AbstractDaoService<Item> {
 
     @GraphQLQuery(name = "getBrands")
     List<BrandDto> getBrands() {
-        inventoryResource.getBrands().sort{it.brand}
+        def company = SecurityUtils.currentCompanyId()
+        inventoryResource.getBrands(company).sort{it.brand}
     }
 
     @GraphQLQuery(name = "itemByFiltersPage")
@@ -95,6 +96,8 @@ class ItemService extends AbstractDaoService<Item> {
 			@GraphQLArgument(name = "filter") String filter,
 			@GraphQLArgument(name = "group") UUID group,
 			@GraphQLArgument(name = "category") List<UUID> category,
+            @GraphQLArgument(name = "brand") String brand,
+            @GraphQLArgument(name = "type") String type,
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
@@ -102,15 +105,17 @@ class ItemService extends AbstractDaoService<Item> {
 
 		String query = '''Select inv from Item inv where
 						(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-						lower(inv.sku) like lower(concat('%',:filter,'%')))'''
+						lower(inv.sku) like lower(concat('%',:filter,'%')) or
+						lower(inv.brand) like lower(concat('%',:brand,'%')))'''
 
 		String countQuery = '''Select count(inv) from Item inv where
 							(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-							lower(inv.sku) like lower(concat('%',:filter,'%')))'''
+							lower(inv.sku) like lower(concat('%',:filter,'%')) or
+						lower(inv.brand) like lower(concat('%',:brand,'%')))'''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
-
+        params.put('brand', brand)
 		if (group) {
 			query += ''' and (inv.item_group.id = :group)'''
 			countQuery += ''' and (inv.item_group.id = :group)'''
@@ -127,6 +132,26 @@ class ItemService extends AbstractDaoService<Item> {
             query += ''' and (inv.company = :company)'''
             countQuery += ''' and (inv.company = :company)'''
             params.put("company", company)
+        }
+
+        if (company) {
+            query += ''' and (inv.company = :company)'''
+            countQuery += ''' and (inv.company = :company)'''
+            params.put("company", company)
+        }
+
+        if (type.equalsIgnoreCase("medicine")) {
+            query += ''' and (inv.isMedicine = true)'''
+            countQuery += ''' and (inv.isMedicine = true)'''
+        }else if (type.equalsIgnoreCase("consignment")) {
+            query += ''' and (inv.consignment = true)'''
+            countQuery += ''' and (inv.consignment = true)'''
+        }else if (type.equalsIgnoreCase("production")) {
+            query += ''' and (inv.production = true)'''
+            countQuery += ''' and (inv.production = true)'''
+        }else if (type.equalsIgnoreCase("fix")) {
+            query += ''' and (inv.fixAsset = true)'''
+            countQuery += ''' and (inv.fixAsset = true)'''
         }
 
 		query += ''' ORDER BY inv.descLong ASC'''
