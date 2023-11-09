@@ -6,6 +6,7 @@
 #ENTRYPOINT ["java","-Djava.awt.headless=true","-jar","/app.jar"]
 FROM albertoclarit/hisd3base:1.0.3
 
+
 ARG PROJ_VERSION=1.0.3
 VOLUME /tmp
 WORKDIR /app
