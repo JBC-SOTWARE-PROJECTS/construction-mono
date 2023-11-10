@@ -3,5 +3,3 @@ export {
   UseFindLazyCustomers as useFindLazyCustomers,
   UseFindLazyDepartments as useFindLazyDepartments,
 } from './customers'
-
-export { default as useFindOneReference } from './useFindOneReference'

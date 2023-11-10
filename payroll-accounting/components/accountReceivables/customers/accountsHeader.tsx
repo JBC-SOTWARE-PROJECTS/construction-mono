@@ -1,30 +1,11 @@
 import { FIND_ONE_CUSTOMER } from '@/graphql/accountReceivables/customers'
-import { useFindOneReference } from '@/hooks/accountReceivables'
 import { getInitials, getRandomColor } from '@/hooks/accountReceivables/commons'
-import {
-  ContactsOutlined,
-  EditOutlined,
-  MoreOutlined,
-  RiseOutlined,
-  ToolOutlined,
-} from '@ant-design/icons'
+import { ContactsOutlined, RiseOutlined, ToolOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery } from '@apollo/client'
-import {
-  Avatar,
-  Button,
-  Card,
-  Col,
-  Divider,
-  Dropdown,
-  Menu,
-  MenuProps,
-  Row,
-  Space,
-  Typography,
-} from 'antd'
+import { Avatar, Col, Menu, MenuProps, Row, Space } from 'antd'
 import { useRouter } from 'next/router'
-import { ReactNode, useState } from 'react'
+import { ReactNode } from 'react'
 
 interface AccountsProfileHeaderI {
   id: string
@@ -36,19 +17,12 @@ export default function AccountsProfileHeader(props: AccountsProfileHeaderI) {
   const { push } = useRouter()
   const { id } = props
 
-  const [findReference, { loading: referenceLoading, data: referenceData }] =
-    useFindOneReference()
-
   const { data, loading, refetch } = useQuery(FIND_ONE_CUSTOMER, {
     variables: {
       id,
     },
     onCompleted: ({ customer }) => {
       const { customerType, referenceId, patientId } = customer
-      findReference({
-        id: referenceId,
-        type: customerType,
-      })
     },
   })
 

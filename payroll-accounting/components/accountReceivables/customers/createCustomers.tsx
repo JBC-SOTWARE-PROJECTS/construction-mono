@@ -1,17 +1,12 @@
 import { FormSelect } from '@/components/common'
 import FormColorPicker from '@/components/common/formColorPicker'
 import { CustomerTypeOptions } from '@/constant/accountReceivables'
-import {
-  CREATE_CUSTOMER,
-  REFERENCE_OPTION,
-} from '@/graphql/accountReceivables/customers'
+import { CREATE_CUSTOMER } from '@/graphql/accountReceivables/customers'
 import { ArCustomers, ChartOfAccountGenerate } from '@/graphql/gql/graphql'
 // import { ArCustomers } from '@/graphql/gql/graphql'
-import { useFindOneReference } from '@/hooks/accountReceivables'
 import { getRandomColor } from '@/hooks/accountReceivables/commons'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { Divider, Form, Input, Modal, Select, message } from 'antd'
-import { useEffect } from 'react'
 import { ACCOUNT_LIST } from '../configuration/dialog/invoiceItemForm'
 
 const { TextArea } = Input
