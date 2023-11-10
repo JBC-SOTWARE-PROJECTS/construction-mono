@@ -7,14 +7,10 @@ import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.*
 
 import javax.persistence.*
-import java.time.Instant
-
 
 @javax.persistence.Entity
-@javax.persistence.Table(schema = "hrm", name = "allowance")
-@SQLDelete(sql = "UPDATE hrm.allowance SET deleted = true WHERE id = ?")
-@Where(clause = "deleted <> true or deleted is  null ")
-class Allowance extends AbstractAuditingEntity {
+@javax.persistence.Table(schema = "hrm", name = "employee_allowance")
+class EmployeeAllowance extends AbstractAuditingEntity {
 
 	@GraphQLQuery
 	@Id
@@ -23,6 +19,10 @@ class Allowance extends AbstractAuditingEntity {
 	@Column(name = "id", columnDefinition = "uuid")
 	@Type(type = "pg-uuid")
 	UUID id
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "employee", referencedColumnName = "id", nullable = false)
+	Employee employee;
 
 	@GraphQLQuery
 	@Column(name = "name", columnDefinition = "varchar")
@@ -35,7 +35,7 @@ class Allowance extends AbstractAuditingEntity {
 
 	@GraphQLQuery
 	@Column(name = "amount", columnDefinition = "numeric")
-	Double amount
+	BigDecimal amount
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -44,8 +44,7 @@ class Allowance extends AbstractAuditingEntity {
 	CompanySettings company
 
 	@GraphQLQuery
-	@Column(name = "created_date", columnDefinition = "timestamp")
-	Instant createdDate
-
+	@Column(name = "allowance", columnDefinition = "uuid")
+	UUID allowanceId
 
 }

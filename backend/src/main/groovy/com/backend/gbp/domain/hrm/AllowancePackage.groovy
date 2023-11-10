@@ -45,10 +45,6 @@ class AllowancePackage extends AbstractAuditingEntity implements Serializable {
     Boolean status
 
     @GraphQLQuery
-    @Column(name = "created_date", columnDefinition = "timestamp")
-    Instant createdDate
-
-    @GraphQLQuery
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")

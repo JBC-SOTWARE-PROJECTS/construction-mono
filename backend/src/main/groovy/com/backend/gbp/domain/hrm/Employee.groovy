@@ -7,6 +7,7 @@ import com.backend.gbp.domain.Position
 import com.backend.gbp.domain.hrm.dto.EmployeeLoanConfig
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.EmployeeLoan
+import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import com.backend.gbp.domain.types.JaversResolvable
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.backend.gbp.domain.User
@@ -19,7 +20,8 @@ import java.time.LocalDateTime
 @javax.persistence.Entity
 @javax.persistence.Table(schema = "hrm", name = "employees")
 class Employee extends AbstractAuditingEntity implements JaversResolvable, Serializable {
-	
+
+
 	@GraphQLQuery
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -27,7 +29,7 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@Column(name = "id", columnDefinition = "uuid")
 	@Type(type = "pg-uuid")
 	UUID id
-	
+
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "`user`", referencedColumnName = "id")
@@ -56,15 +58,15 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Column(name = "first_name", columnDefinition = "varchar")
 	String firstName
-	
+
 	@GraphQLQuery
 	@Column(name = "last_name", columnDefinition = "varchar")
 	String lastName
-	
+
 	@GraphQLQuery
 	@Column(name = "middle_name", columnDefinition = "varchar")
 	String middleName
-	
+
 	@GraphQLQuery
 	@Column(name = "name_suffix", columnDefinition = "varchar")
 	String nameSuffix
@@ -72,23 +74,23 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Column(name = "title_initials", columnDefinition = "varchar")
 	String titleInitials
-	
+
 	@GraphQLQuery
 	@Column(name = "email_address", columnDefinition = "varchar")
 	String emailAddress
-	
+
 	@GraphQLQuery
 	@Column(name = "nationality", columnDefinition = "varchar")
 	String nationality
-	
+
 	@GraphQLQuery
 	@Column(name = "civil_status", columnDefinition = "varchar")
 	String civilStatus
-	
+
 	@GraphQLQuery
 	@Column(name = "gender", columnDefinition = "varchar")
 	String gender
-	
+
 	@GraphQLQuery
 	@Column(name = "dob", columnDefinition = "date")
 	LocalDateTime dob
@@ -120,39 +122,39 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Column(name = "zipcode", columnDefinition = "varchar")
 	String zipCode
-	
+
 	@GraphQLQuery
 	@Column(name = "emergency_contact_name", columnDefinition = "varchar")
 	String emergencyContactName
-	
+
 	@GraphQLQuery
 	@Column(name = "emergency_contact_address", columnDefinition = "varchar")
 	String emergencyContactAddress
-	
+
 	@Column(name = "emergency_contact_relationship", columnDefinition = "varchar")
 	String emergencyContactRelationship
-	
+
 	@GraphQLQuery
 	@Column(name = "emergency_contact_no", columnDefinition = "varchar")
 	String emergencyContactNo
 
-	
+
 	@GraphQLQuery
 	@Column(name = "employee_tel_no", columnDefinition = "varchar")
 	String employeeTelNo
-	
+
 	@GraphQLQuery
 	@Column(name = "employee_cel_no", columnDefinition = "varchar")
 	String employeeCelNo
-	
+
 	@GraphQLQuery
 	@Column(name = "philhealth_no", columnDefinition = "varchar")
 	String philhealthNo
-	
+
 	@GraphQLQuery
 	@Column(name = "sss_no", columnDefinition = "varchar")
 	String sssNo
-	
+
 	@GraphQLQuery
 	@Column(name = "tin_no", columnDefinition = "varchar")
 	String tinNo
@@ -177,11 +179,11 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@Column(name = "basic_salary")
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	BigDecimal basicSalary
-	
+
 	@GraphQLQuery
 	@Formula("concat(last_name , coalesce(', ' || nullif(first_name,'') , ''), coalesce(' ' || nullif(middle_name,'') , ''), coalesce(' ' || nullif(name_suffix,'') , ''))")
 	String fullName
-	
+
 	@GraphQLQuery
 	@Formula("concat(last_name , coalesce(', ' || nullif(first_name,'') , ''), coalesce(' ' || nullif(substring(middle_name, 1, 1),'') , ''), coalesce(' ' || nullif(name_suffix,'') , ''))")
 	String fullInitialName
@@ -189,15 +191,15 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Formula("concat(last_name , coalesce(', ' || nullif(first_name,'') , ''))")
 	String initialName
-	
+
 	@GraphQLQuery
 	@Formula("concat(coalesce(nullif(left(first_name,1),'') , '. '), coalesce('' || nullif(left(middle_name,1),'') , '. '), last_name)")
 	String shortName
-	
+
 	@GraphQLQuery
 	@Column(name = "is_active", columnDefinition = "boolean")
 	Boolean isActive
-	
+
 	@GraphQLQuery
 	@Formula("concat(first_name , coalesce(' ' || nullif(middle_name,'') , ''), coalesce(' ' || nullif(last_name,'') , ''), coalesce(' ' || nullif(name_suffix,'') , ''), coalesce(', ' || nullif(title_initials,'') , ''))")
 	String fullnameWithTitle
@@ -227,4 +229,10 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	String resolveEntityForJavers() {
 		return fullName
 	}
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employee")
+	List<EmployeeAllowance> allowanceItems = []
+
+	@GraphQLQuery
+	@Column(name = "allowance_package", columnDefinition = "uuid")
+	UUID allowancePackageId
 }
