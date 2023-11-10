@@ -17,11 +17,7 @@ interface PayrollEmployeeAllowanceDto {
 
     String getDepartment()
 
-    String getGender()
-
-    String getCivilStatus()
-
-    String getEmploymentStatus()
+    String getStatus()
 
     String getPosition()
 
@@ -41,6 +37,8 @@ e.firstName,
 e.lastName,
 e.middleName,
 e.nameSuffix ,
+pos.description as position,
+ae.status as status,
 COALESCE(sum(ai.amount),0) as total
 FROM PayrollEmployeeAllowance ae
 LEFT JOIN ae.allowanceItems ai
@@ -48,11 +46,12 @@ LEFT JOIN ae.allowance a
 LEFT JOIN a.payroll p
 LEFT JOIN ae.payrollEmployee pe
 LEFT JOIN pe.employee e
+Left JOIN e.position pos
 WHERE
 p.id = :payroll
 and upper(e.fullName) like upper(concat('%',:filter,'%'))
 and ae.status in :status
-GROUP BY ae.id, e.fullName, e.firstName, e.lastName, e.middleName, e.nameSuffix
+GROUP BY ae.id, e.fullName, e.firstName, e.lastName, e.middleName, e.nameSuffix, pos.description ,ae.status 
 HAVING (:withItems = false OR COALESCE(sum(ai.amount), 0) != 0)
 """,
             countQuery = """

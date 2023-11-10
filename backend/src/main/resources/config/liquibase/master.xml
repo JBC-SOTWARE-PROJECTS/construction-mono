@@ -379,4 +379,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/36_employee_allowance_table.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/37_michael_payroll_allowance_tables.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

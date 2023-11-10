@@ -121,17 +121,17 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
     }
 
 //
-//    @GraphQLMutation(name = "deletePayrollAllowanceItem")
-//    GraphQLResVal<Boolean> deletePayrollAllowanceItem(
-//            @GraphQLArgument(name = "id") UUID id
-//    ) {
-//        try {
-//            payrollAllowanceItemRepository.deleteById(id)
-//            return new GraphQLResVal<Boolean>(true, true, "Successfully deleted employee allowance item!")
-//        } catch (ignored) {
-//            return new GraphQLResVal<Boolean>(false, false, "Failed to delete employee allowance item!")
-//        }
-//    }
+    @GraphQLMutation(name = "deletePayrollAllowanceItem")
+    GraphQLResVal<Boolean> deletePayrollAllowanceItem(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        try {
+            payrollAllowanceItemRepository.deleteById(id)
+            return new GraphQLResVal<Boolean>(true, true, "Successfully deleted employee allowance item!")
+        } catch (ignored) {
+            return new GraphQLResVal<Boolean>(false, false, "Failed to delete employee allowance item!")
+        }
+    }
 
     @GraphQLMutation(name = "upsertPayrollAllowanceItem")
     GraphQLResVal<Boolean> upsertPayrollAllowanceItem(

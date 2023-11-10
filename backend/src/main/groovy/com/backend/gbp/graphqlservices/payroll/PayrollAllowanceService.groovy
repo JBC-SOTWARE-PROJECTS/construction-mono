@@ -105,7 +105,7 @@ class PayrollAllowanceService implements IPayrollModuleBaseOperations<PayrollAll
     PayrollAllowance startPayroll(Payroll payroll) {
         PayrollAllowance allowance = new PayrollAllowance();
         allowance.payroll = payroll
-        allowance.status = PayrollStatus.ACTIVE
+        allowance.status = PayrollStatus.DRAFT
         allowance = payrollAllowanceRepository.save(allowance)
         payroll.allowance = allowance
         payrollEmployeeAllowanceService.addEmployees(payroll.payrollEmployees, payroll)

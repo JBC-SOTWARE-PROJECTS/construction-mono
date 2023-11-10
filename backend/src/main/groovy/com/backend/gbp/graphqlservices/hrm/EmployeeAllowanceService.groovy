@@ -52,7 +52,15 @@ class EmployeeAllowanceService {
             @GraphQLArgument(name = "employeeId") UUID employeeId,
             @GraphQLArgument(name = "filter") String filter
     ) {
-        return employeeAllowanceRepository.findByEmployeeId(employeeId,filter)
+        return employeeAllowanceRepository.findByEmployeeId(employeeId, filter)
+    }
+
+    @GraphQLQuery(name = "getEmployeeAllowanceItemsInIds")
+    List<Employee> getEmployeeAllowanceItemsInIds(
+            @GraphQLArgument(name = "idList") List<UUID> idList) {
+        List<Employee> employees = employeeRepository.getEmployees(idList)
+        employeeAllowanceRepository.joinFetchEmployeeAllowance(idList)
+        return employees
     }
 
 
@@ -80,10 +88,10 @@ class EmployeeAllowanceService {
             allowance.allowanceId = it.allowance.id
             employeeAllowanceList.push(allowance)
         }
-        List<EmployeeAllowance> toDelete = getEmployeeAllowance(employeeId,"")
-        employeeAllowanceList.each{
-            EmployeeAllowance employeeAllowance = toDelete.find({EmployeeAllowance current ->it.allowanceId == current.allowanceId })
-            if(employeeAllowance){
+        List<EmployeeAllowance> toDelete = getEmployeeAllowance(employeeId, "")
+        employeeAllowanceList.each {
+            EmployeeAllowance employeeAllowance = toDelete.find({ EmployeeAllowance current -> it.allowanceId == current.allowanceId })
+            if (employeeAllowance) {
                 it.amount = employeeAllowance.amount
             }
         }

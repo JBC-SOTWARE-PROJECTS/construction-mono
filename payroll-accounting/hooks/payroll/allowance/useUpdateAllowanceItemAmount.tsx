@@ -11,13 +11,16 @@ const MUTATION = gql`
 `;
 
 interface params {
-  id: string;
+  id: string | undefined;
   amount: number;
 }
 function useUpdateAllowanceItemAmount(callBack?: (result: any) => void) {
   const [mutationFn, { loading }] = useMutation(MUTATION, {
     onCompleted: (result: any) => {
-      message.success(result?.data?.message);
+      message[result?.data?.success ? "success" : "error"](
+        result?.data?.message
+      );
+
       if (callBack) callBack(result?.data);
     },
   });

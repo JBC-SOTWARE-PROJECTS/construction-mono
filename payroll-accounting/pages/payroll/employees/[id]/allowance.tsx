@@ -44,12 +44,15 @@ function EmployeeAllowancePage() {
             id="editable-amount"
             autoFocus
             onBlur={() => {
+              const amount = amountRef?.current?.value;
+              resetEditing();
+              if (amount === "" || !amount) return;
               updateAmount({
                 id: record.id,
-                amount: amountRef?.current?.value,
+                amount,
               });
-              resetEditing();
             }}
+            min={1}
             ref={amountRef}
             defaultValue={value}
           />
