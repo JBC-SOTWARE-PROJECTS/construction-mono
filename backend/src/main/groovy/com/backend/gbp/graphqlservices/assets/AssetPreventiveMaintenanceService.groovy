@@ -45,9 +45,6 @@ class AssetPreventiveMaintenanceService extends AbstractDaoService<AssetPreventi
             @GraphQLArgument(name = "id") UUID id
     ){
         def project = upsertFromMap(id, fields, { AssetPreventiveMaintenance entity, boolean forInsert ->
-            if(forInsert){
-
-            }
         })
 
         return project
