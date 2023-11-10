@@ -397,4 +397,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/26_jacky_employee_alter_added_facial_data.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/43_donss_add_clients.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_donss_add_invoices.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
