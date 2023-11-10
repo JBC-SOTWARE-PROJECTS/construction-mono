@@ -1,12 +1,12 @@
 import React from 'react'
 import asyncComponent from '@/utility/asyncComponent'
 
-const AccountingPeriod = asyncComponent(
-  () => import('@/routes/accounting/accounting-setup/accounting-period')
+const ARInvoice = asyncComponent(
+  () => import('@/routes/accounting/accounts-receivable/invoice')
 )
 
-const AccountingPeriodPage = () => {
-  return <AccountingPeriod />
+const ARInvoicePAge = () => {
+  return <ARInvoice />
 }
 
-export default AccountingPeriodPage
+export default ARInvoicePAge

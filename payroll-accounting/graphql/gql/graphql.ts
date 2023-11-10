@@ -7389,6 +7389,7 @@ export type Query = {
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
   getDocTypeById?: Maybe<DocumentTypes>;
   getEmployeeAllowance?: Maybe<Array<Maybe<EmployeeAllowance>>>;
+  getEmployeeAllowanceItemsInIds?: Maybe<Array<Maybe<Employee>>>;
   getEmployeeLeaveByEmp?: Maybe<Array<Maybe<EmployeeLeave>>>;
   getEmployeeLeavePageable?: Maybe<Page_EmployeeLeaveDto>;
   getEmployeeLoanConfig?: Maybe<EmployeeLoanConfig>;
@@ -8645,6 +8646,12 @@ export type QueryGetDocTypeByIdArgs = {
 export type QueryGetEmployeeAllowanceArgs = {
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetEmployeeAllowanceItemsInIdsArgs = {
+  idList?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
 };
 
 

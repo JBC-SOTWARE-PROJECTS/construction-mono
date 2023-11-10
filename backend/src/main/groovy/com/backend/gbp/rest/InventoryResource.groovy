@@ -96,9 +96,9 @@ class InventoryResource {
 	}
 
 	@RequestMapping(method = [RequestMethod.POST], value = ["/api/getBrands"])
-	List<BrandDto> getBrands() {
+	List<BrandDto> getBrands(UUID company) {
 
-		String sql = "select distinct(i.brand) from inventory.item i;"
+		String sql = "select distinct(i.brand) from inventory.item i where i.brand is not null and i.company = "+"'"+company+"'"+";"
 		List<BrandDto> brands = jdbcTemplate.query(sql, new BeanPropertyRowMapper(BrandDto.class))
 		return brands
 	}

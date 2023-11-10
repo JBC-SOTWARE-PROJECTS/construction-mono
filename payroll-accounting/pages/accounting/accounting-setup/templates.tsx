@@ -2,11 +2,11 @@ import React from "react";
 import asyncComponent from "@/utility/asyncComponent";
 
 const AccountsTemplateComponent = asyncComponent(
-  () => import("@/routes/accounting/accounts-payable/templates/accounts")
+  () => import("@/routes/accounting/accounting-setup/templates")
 );
 
-const APTransactionTypes = () => {
+const AccountsTemplate = () => {
   return <AccountsTemplateComponent />;
 };
 
-export default APTransactionTypes;
+export default AccountsTemplate;

@@ -493,6 +493,11 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                     it.ewt15Percent = status ? ewt15.setScale(2, RoundingMode.HALF_EVEN) : ewt15.setScale(2, RoundingMode.HALF_EVEN) * -1
                     it.ewt18Percent = status ? ewt18.setScale(2, RoundingMode.HALF_EVEN) : ewt18.setScale(2, RoundingMode.HALF_EVEN) * -1
                     it.ewt30Percent = status ? ewt30.setScale(2, RoundingMode.HALF_EVEN) : ewt30.setScale(2, RoundingMode.HALF_EVEN) * -1
+
+                    //sum ewt
+                    def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+                    def sumEwt = ewt.sum() as BigDecimal
+                    it.cwt = status ? sumEwt.setScale(2, RoundingMode.HALF_EVEN) : sumEwt.setScale(2, RoundingMode.HALF_EVEN) * -1
                 }
 
                 Set<Ledger> ledger = new HashSet<Ledger>(headerLedger.ledger);
@@ -730,6 +735,11 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
             it.ewt15Percent = ewt15.setScale(2, RoundingMode.HALF_EVEN)
             it.ewt18Percent = ewt18.setScale(2, RoundingMode.HALF_EVEN)
             it.ewt30Percent = ewt30.setScale(2, RoundingMode.HALF_EVEN)
+
+            //sum ewt
+            def ewt = [ewt1, ewt2, ewt3, ewt4, ewt5, ewt7, ewt10, ewt15, ewt18, ewt30]
+            def sumEwt = ewt.sum() as BigDecimal
+            it.cwt = sumEwt.setScale(2, RoundingMode.HALF_EVEN)
         }
         Map<String, String> details = [:]
 
@@ -747,8 +757,8 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
 
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${actPay.apvDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${actPay.apNo}",
-                "${actPay.apNo}-${actPay.supplier.supplierFullname}",
-                "${actPay.apNo}-${actPay.remarksNotes ?: ""}",
+                "${actPay.supplier.supplierFullname}",
+                "${actPay.remarksNotes ?: ""}",
                 LedgerDocType.AP,
                 JournalType.PURCHASES_PAYABLES,
                 actPay.apvDate,
@@ -974,7 +984,7 @@ where date(ledger_date) between ?::date and ?::date and lower(ref_no) like lower
     ) {
         def company = SecurityUtils.currentCompanyId()
 
-        String sql = """select * from accounting.aging_report(?::date, ?) where supplier like '%%' """
+        String sql = """select * from accounting.aging_report('${filter}') where supplier like '%%' """
 
         if (posted != null) {
             sql += """ and (posted = ${posted} or posted is null) """
@@ -988,11 +998,14 @@ where date(ledger_date) between ?::date and ?::date and lower(ref_no) like lower
             sql += """ and supplier_id = '${supplier}' """
         }
 
+        if (company) {
+            sql += """ and company = '${company}' """
+        }
+
         sql += """ order by supplier;"""
 
         List<ApAgingDetailedDto> items = jdbcTemplate.query(sql,
-                new BeanPropertyRowMapper(ApAgingDetailedDto.class),
-                filter, company
+                new BeanPropertyRowMapper(ApAgingDetailedDto.class)
         )
         return items
     }
@@ -1007,7 +1020,7 @@ where date(ledger_date) between ?::date and ?::date and lower(ref_no) like lower
 
         String sql = """select supplier_id as id,supplier,supplier_type_id,supplier_type,sum(current_amount) as current_amount,
 sum(day_1_to_31) as day_1_to_31,sum(day_31_to_60) as day_31_to_60,sum(day_61_to_90) as day_61_to_90,sum(day_91_to_120) as day_91_to_120,
-sum(older) as older,sum(total) as total from accounting.aging_report(?::date, ?) where supplier like '%%' """
+sum(older) as older,sum(total) as total from accounting.aging_report('${filter}') where supplier like '%%' """
 
         if (posted != null) {
             sql += """ and (posted = ${posted} or posted is null) """
@@ -1017,11 +1030,18 @@ sum(older) as older,sum(total) as total from accounting.aging_report(?::date, ?)
             sql += """ and supplier_type_id = '${supplierTypes}' """
         }
 
+        if (supplierTypes) {
+            sql += """ and supplier_type_id = '${supplierTypes}' """
+        }
+
+        if (company) {
+            sql += """ and company = '${company}' """
+        }
+
         sql += """ group by supplier_id,supplier,supplier_type_id,supplier_type order by supplier;"""
 
         List<ApAgingSummaryDto> items = jdbcTemplate.query(sql,
-                new BeanPropertyRowMapper(ApAgingSummaryDto.class),
-                filter, company
+                new BeanPropertyRowMapper(ApAgingSummaryDto.class)
         )
         return items
     }

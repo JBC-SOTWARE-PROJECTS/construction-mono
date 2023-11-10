@@ -25,6 +25,8 @@ export const GET_PETTY_CASH_RECORDS = gql`
           id
           description
         }
+        referenceType
+        referenceNo
         payeeName
         pcvNo
         pcvDate

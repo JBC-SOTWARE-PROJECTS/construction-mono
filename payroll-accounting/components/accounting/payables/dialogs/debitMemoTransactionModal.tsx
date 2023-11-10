@@ -7,7 +7,11 @@ import {
   IDebitMemoDetails,
   IFormDebitMemoDetails,
 } from "@/interface/payables/formInterfaces";
-import { useOffices, useExpenseTransaction } from "@/hooks/payables";
+import {
+  useOffices,
+  useExpenseTransaction,
+  useProjects,
+} from "@/hooks/payables";
 import { FormTextArea } from "@/components/common";
 import _ from "lodash";
 import { randomId, requiredField, shapeOptionValue } from "@/utility/helper";
@@ -27,9 +31,11 @@ export default function DebitMemoTransactionModal(props: IProps) {
   const [calculationType, setCalculationType] = useState<string>(
     type === "DEBITADVICE" ? "FIX" : "PERCENTAGE"
   );
+  const [selectedOffice, setOffice] = useState("");
   // ================== Queries =====================
   const banks = useExpenseTransaction({ type: type });
   const offices = useOffices();
+  const projects = useProjects({ office: selectedOffice });
   //================== functions ====================
   const onSubmit = (data: IFormDebitMemoDetails) => {
     const payload = {
@@ -87,6 +93,11 @@ export default function DebitMemoTransactionModal(props: IProps) {
           record?.transType?.description,
           record?.transType?.id
         );
+      } else if (type === "project") {
+        return shapeOptionValue(
+          record?.project?.description,
+          record?.project?.id
+        );
       }
     }
   };
@@ -125,7 +136,8 @@ export default function DebitMemoTransactionModal(props: IProps) {
         onFinish={onSubmit}
         initialValues={{
           transType: selectInValueInit(record?.transType?.id, "transType"),
-          department: selectInValueInit(record?.office?.id, "office"),
+          office: selectInValueInit(record?.office?.id, "office"),
+          project: selectInValueInit(record?.project?.id, "project"),
           type: record?.type ?? calculationType,
           percent: record?.percent ?? 0,
           amount: record?.amount ?? 0,
@@ -154,6 +166,10 @@ export default function DebitMemoTransactionModal(props: IProps) {
                 labelInValue: true,
                 options: offices,
                 placeholder: "Select Office",
+                onChange: (e) => {
+                  setOffice(e?.value);
+                  setFieldValue("project", null);
+                },
               }}
             />
           </Col>
@@ -164,7 +180,7 @@ export default function DebitMemoTransactionModal(props: IProps) {
               propsselect={{
                 showSearch: true,
                 labelInValue: true,
-                options: offices,
+                options: projects,
                 placeholder: "Select Project",
               }}
             />

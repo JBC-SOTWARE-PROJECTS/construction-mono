@@ -89,6 +89,14 @@ class Office extends AbstractAuditingEntity {
 	String officeZipcode
 
 	@GraphQLQuery
+	@Column(name = "tin_number", columnDefinition = "varchar")
+	String tinNumber
+
+	@GraphQLQuery
+	@Column(name = "office_secretary", columnDefinition = "varchar")
+	String officeSecretary
+
+	@GraphQLQuery
 	@Column(name = "status", columnDefinition = "bool")
 	Boolean status
 
