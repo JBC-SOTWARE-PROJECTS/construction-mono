@@ -39,10 +39,6 @@ class PayrollAllowanceItem implements Serializable {
     BigDecimal amount
 
     @GraphQLQuery
-    @Column(name = "taxable", columnDefinition = "bool")
-    Boolean taxable
-
-    @GraphQLQuery
     @Column(name = "deleted", columnDefinition = "bool")
     Boolean deleted
 

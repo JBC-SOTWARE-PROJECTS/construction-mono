@@ -24,7 +24,7 @@ class PayrollEmployeeAllowance extends PayrollEmployeeAuditingEntity implements 
     PayrollAllowance allowance
 
     @GraphQLQuery
-    @Formula("(SELECT COALESCE(sum(i.amount),0) FROM payroll.payroll_employee_allowance_items i WHERE i.payroll_employee_allowance = employee)")
+    @Formula("(SELECT COALESCE(sum(i.amount),0) FROM payroll.payroll_allowance_items i WHERE i.payroll_employee_allowance = employee)")
     BigDecimal total
 
 

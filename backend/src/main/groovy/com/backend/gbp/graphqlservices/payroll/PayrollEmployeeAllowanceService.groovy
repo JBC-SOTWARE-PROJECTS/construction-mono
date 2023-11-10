@@ -12,9 +12,10 @@ import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollEmployeeSta
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.AllowanceRepository
+import com.backend.gbp.repository.hrm.EmployeeAllowanceRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.payroll.PayrollAllowanceItemRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeAllowanceDto
-import com.backend.gbp.repository.payroll.PayrollEmployeeAllowanceItemRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeAllowanceRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -46,7 +47,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
     }
 
     @Autowired
-    PayrollEmployeeAllowanceItemRepository payrollEmployeeAllowanceItemRepository
+    PayrollAllowanceItemRepository payrollAllowanceItemRepository
 
     @Autowired
     PayrollRepository payrollRepository
@@ -57,70 +58,36 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
     @Autowired
     AllowanceService allowanceService
 
+    @Autowired
+    EmployeeAllowanceRepository employeeAllowanceRepository
 //==============================================Queries==========================================
-    @GraphQLQuery(name = "getEmployeesByProfile", description = "Search employees based on allowance criteria")
-    List<PayrollEmployeeAllowanceDto> getEmployeesByProfile(
-            @GraphQLArgument(name = "department") String department,
-            @GraphQLArgument(name = "position") String position,
-            @GraphQLArgument(name = "employmentStatus") String employmentStatus,
-            @GraphQLArgument(name = "gender") String gender,
-            @GraphQLArgument(name = "civilStatus") String civilStatus,
-            @GraphQLArgument(name = "startDateBasis") String startDateBasis,
-            @GraphQLArgument(name = "duration") Integer duration,
-            @GraphQLArgument(name = "date") Instant date,
-            @GraphQLArgument(name = "payrollId") UUID payrollId
 
-    ) {
-        Instant now = Instant.now()
-        println('asd')
-        payrollEmployeeAllowanceRepository.getByEmployeeProfile(
-                department ? department : '',
-                position ? position : '',
-                employmentStatus,
-                gender,
-                civilStatus,
-                startDateBasis,
-                duration,
-                date,
-                payrollId
-        )
-    }
-
-    @GraphQLQuery
-    GraphQLResVal<Page<PayrollEmployeeAllowanceDto>> payrollAllowanceEmployees(
+    @GraphQLQuery(name = 'getPayrollEmployeeAllowance')
+    Page<PayrollEmployeeAllowanceDto> getPayrollEmployeeAllowance(
             @GraphQLArgument(name = "payroll") UUID payroll,
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "department") UUID department,
             @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status,
             @GraphQLArgument(name = "withItems") Boolean withItems
-
-
     ) {
         Payroll foundPayroll = null
         payrollRepository.findById(payroll).ifPresent { foundPayroll = it }
-        if (!foundPayroll) return new GraphQLResVal<Page<PayrollEmployeeAllowanceDto>>(
-                null,
-                false,
-                "Failed to get Payroll Other Deduction Employee List"
-        )
+//        if (!foundPayroll) return new GraphQLResVal<Page<PayrollEmployeeAllowanceDto>>(
+//                null,
+//                false,
+//                "Failed to get Payroll Other Deduction Employee List"
+//        )
 
         Page<PayrollEmployeeAllowanceDto> employees = payrollEmployeeAllowanceRepository.findAllByPayrollWithItemsWithTotal(
                 foundPayroll.id,
                 filter,
-                department ? department.toString() : "",
                 status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
                 withItems,
                 PageRequest.of(page, size))
 
-        return new GraphQLResVal<Page<PayrollEmployeeAllowanceDto>>(
-                employees,
-                true,
-                "Successfully retrieved Payroll Other Deduction Employee List"
-        )
+        return employees
     }
-
 
 
 //==============================================Mutations========================================
@@ -143,9 +110,9 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
             @GraphQLArgument(name = "amount") BigDecimal amount
     ) {
         try {
-            PayrollAllowanceItem allowanceItem = payrollEmployeeAllowanceItemRepository.findById(id).get()
+            PayrollAllowanceItem allowanceItem = payrollAllowanceItemRepository.findById(id).get()
             allowanceItem.amount = amount
-            payrollEmployeeAllowanceItemRepository.save(allowanceItem)
+            payrollAllowanceItemRepository.save(allowanceItem)
             return new GraphQLResVal<PayrollAllowanceItem>(allowanceItem, true, "Successfully updated employee allowance amount!")
         } catch (ignored) {
             return new GraphQLResVal<PayrollAllowanceItem>(null, false, "Failed to update employee allowance amount!")
@@ -153,46 +120,38 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
 
     }
 
+//
+//    @GraphQLMutation(name = "deletePayrollAllowanceItem")
+//    GraphQLResVal<Boolean> deletePayrollAllowanceItem(
+//            @GraphQLArgument(name = "id") UUID id
+//    ) {
+//        try {
+//            payrollAllowanceItemRepository.deleteById(id)
+//            return new GraphQLResVal<Boolean>(true, true, "Successfully deleted employee allowance item!")
+//        } catch (ignored) {
+//            return new GraphQLResVal<Boolean>(false, false, "Failed to delete employee allowance item!")
+//        }
+//    }
 
-    @GraphQLMutation(name = "deletePayrollAllowanceItem")
-    GraphQLResVal<Boolean> deletePayrollAllowanceItem(
-            @GraphQLArgument(name = "id") UUID id
-    ) {
-        try {
-            payrollEmployeeAllowanceItemRepository.deleteById(id)
-            return new GraphQLResVal<Boolean>(true, true, "Successfully deleted employee allowance item!")
-        } catch (ignored) {
-            return new GraphQLResVal<Boolean>(false, false, "Failed to delete employee allowance item!")
-        }
-    }
-
-    @GraphQLMutation(name = "manualCreateAllowanceItem")
-    GraphQLResVal<Boolean> manualCreateAllowanceItem(
-            @GraphQLArgument(name = "employeeIds") List<UUID> employeeIds,
+    @GraphQLMutation(name = "upsertPayrollAllowanceItem")
+    GraphQLResVal<Boolean> upsertPayrollAllowanceItem(
+            @GraphQLArgument(name = "employeeId") UUID employeeId,
             @GraphQLArgument(name = "allowanceId") UUID allowanceId,
             @GraphQLArgument(name = "amount") BigDecimal amount
 
     ) {
-        try {
-            Allowance allowance = allowanceRepository.findById(allowanceId).get()
-            List<PayrollEmployeeAllowance> employeeList = payrollEmployeeAllowanceRepository.findAllById(employeeIds)
-            List<PayrollAllowanceItem> allowanceItemList = []
+        Allowance allowance = allowanceRepository.findById(allowanceId).get()
+        PayrollEmployeeAllowance employee = payrollEmployeeAllowanceRepository.findById(employeeId).get()
 
-            employeeList.each {
-                PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
-                allowanceItem.allowance = allowance.id as UUID
-                allowanceItem.name = allowance.name
-                allowanceItem.amount = amount
-                allowanceItem.originalAmount = amount
-                allowanceItem.payrollEmployeeAllowance = it
-                allowanceItemList.push(allowanceItem)
-            }
-            payrollEmployeeAllowanceItemRepository.saveAll(allowanceItemList)
+        PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
+        allowanceItem.allowance = allowance.id as UUID
+        allowanceItem.name = allowance.name
+        allowanceItem.amount = amount
+        allowanceItem.originalAmount = allowance.amount
+        allowanceItem.payrollEmployeeAllowance = employee
+        payrollAllowanceItemRepository.save(allowanceItem)
+        return new GraphQLResVal<Boolean>(true, true, "Successfully created employee allowance items")
 
-            return new GraphQLResVal<Boolean>(true, true, "Successfully created employee allowance items")
-        } catch (ignored) {
-            return new GraphQLResVal<Boolean>(false, false, "Failed to create employee allowance items")
-        }
     }
 
 
@@ -213,7 +172,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
         }
         allowance.allowanceEmployees = payrollEmployeeAllowanceRepository.saveAll(payrollEmployeeAllowanceList)
 
-        payrollEmployeeAllowanceItemRepository.saveAll(generateAllowanceItems(allowance.allowanceEmployees, payroll.dateEnd))
+        payrollAllowanceItemRepository.saveAll(generateAllowanceItems(allowance.allowanceEmployees))
         payroll.allowance = allowance
         return payrollEmployeeAllowanceList
     }
@@ -226,7 +185,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
             it.status = PayrollEmployeeStatus.DRAFT
             it.allowanceItems.clear()
         }
-        payrollEmployeeAllowanceItemRepository.saveAll(generateAllowanceItems(payroll.allowance.allowanceEmployees, payroll.dateEnd))
+        payrollAllowanceItemRepository.saveAll(generateAllowanceItems(payroll.allowance.allowanceEmployees))
 
     }
 
@@ -250,32 +209,32 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
     PayrollEmployeeAllowance recalculateEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
         payrollEmployee.allowanceEmployee.allowanceItems.clear()
         payrollEmployee.allowanceEmployee.status = PayrollEmployeeStatus.DRAFT
-        payrollEmployeeAllowanceItemRepository.saveAll(generateAllowanceItems([payrollEmployee.allowanceEmployee], payroll.dateEnd))
+        payrollAllowanceItemRepository.saveAll(generateAllowanceItems([payrollEmployee.allowanceEmployee]))
 
         return null
     }
 
 
 //============================================================UTILITY METHODS====================================================================
-    private List<PayrollAllowanceItem> generateAllowanceItems(List<PayrollEmployeeAllowance> allowanceEmployees, Instant payrollEndDate) {
+    private List<PayrollAllowanceItem> generateAllowanceItems(List<PayrollEmployeeAllowance> allowanceEmployees) {
 
         List<PayrollAllowanceItem> allowanceItemList = []
 
         List<UUID> uuidList = allowanceEmployees.stream().map({ PayrollEmployeeAllowance e -> e.payrollEmployee.employee.id }).collect(Collectors.toList())
 
-        LinkedList<Map<String, Object>> employeeAllowances = allowanceService.getEmployeeAllowanceInId(uuidList, payrollEndDate)
-        while (!employeeAllowances.isEmpty()) {
-            Map<String, Object> element = employeeAllowances.poll()
-            PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
-            allowanceItem.allowance = element['allowance_id'] as UUID
-            allowanceItem.name = element['allowance']
-            allowanceItem.amount = element['amount'] as BigDecimal
-            allowanceItem.originalAmount = element['amount'] as BigDecimal
-            allowanceItem.taxable = element['taxable']
-            allowanceItem.payrollEmployeeAllowance = allowanceEmployees.stream().filter({ PayrollEmployeeAllowance e -> ((element['id'] as UUID) == e.payrollEmployee.employee.id) }).findFirst().get()
-            allowanceItemList.push(allowanceItem)
+        employeeAllowanceRepository.joinFetchEmployeeAllowance(uuidList)
+        allowanceEmployees.each { PayrollEmployeeAllowance employeeAllowance ->
+            employeeAllowance.payrollEmployee.employee.allowanceItems.each {
+                PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
+                allowanceItem.allowance = it.allowanceId
+                allowanceItem.name = it.name
+                allowanceItem.amount = it.amount
+                allowanceItem.originalAmount = it.amount
+//                allowanceItem.taxable = null
+                allowanceItem.payrollEmployeeAllowance = employeeAllowance
+                allowanceItemList.push(allowanceItem)
+            }
         }
-
         allowanceItemList
 
     }
