@@ -445,6 +445,20 @@ export type ApTransactionInput = {
   supplierType?: InputMaybe<SupplierTypeInput>;
 };
 
+export enum AssetStatus {
+  Active = 'ACTIVE',
+  Disposed = 'DISPOSED',
+  Idle = 'IDLE',
+  InRepair = 'IN_REPAIR',
+  InService = 'IN_SERVICE',
+  InTransit = 'IN_TRANSIT',
+  OutOfService = 'OUT_OF_SERVICE',
+  Reserved = 'RESERVED',
+  Retired = 'RETIRED',
+  UnderInspection = 'UNDER_INSPECTION',
+  UnderMaintenance = 'UNDER_MAINTENANCE'
+}
+
 export enum AssetType {
   ConstructionEquipment = 'CONSTRUCTION_EQUIPMENT',
   OfficeEquipment = 'OFFICE_EQUIPMENT',
@@ -469,7 +483,7 @@ export type Assets = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   model?: Maybe<Scalars['String']['output']>;
   plateNo?: Maybe<Scalars['String']['output']>;
-  status?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<AssetStatus>;
   type?: Maybe<AssetType>;
 };
 

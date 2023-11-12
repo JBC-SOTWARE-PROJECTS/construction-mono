@@ -1,4 +1,4 @@
-import { AssetType, Assets, Item } from "@/graphql/gql/graphql";
+import { AssetStatus, AssetType, Assets, Item } from "@/graphql/gql/graphql";
 import React, { useState } from "react";
 import {
   Button,
@@ -62,25 +62,33 @@ export default function UpsertAssetModal(props: IProps) {
     };
     payload.item = selectedItem?.id;
     payload.type = values.type as AssetType;
-    showPasswordConfirmation(() => {
-      upsert({
-        variables: {
-          fields: payload,
-          id: record?.id,
-        },
+    payload.status = values.status as AssetStatus;
+
+    if (selectedItem?.id) {
+      showPasswordConfirmation(() => {
+        upsert({
+          variables: {
+            fields: payload,
+            id: record?.id,
+          },
+        });
       });
-    });
+    }
   };
 
   const onFinishFailed = () => {
     message.error("Something went wrong. Please contact administrator.");
   };
 
-  const assetOptions = Object.values(AssetType).map((item) => ({
+  const assetTypeOptions = Object.values(AssetType).map((item) => ({
     value: item,
     label: item.replace(/_/g, " "),
-  }))
+  }));
 
+  const assetStatusOptions = Object.values(AssetStatus).map((item) => ({
+    value: item,
+    label: item.replace(/_/g, " "),
+  }));
   return (
     <Modal
       title={
@@ -188,9 +196,22 @@ export default function UpsertAssetModal(props: IProps) {
               label="Asset Type"
               rules={requiredField}
               propsselect={{
-                options: assetOptions,
+                options: assetTypeOptions,
                 allowClear: true,
                 placeholder: "Type",
+              }}
+            />
+          </Col>
+
+          <Col span={24}>
+            <FormSelect
+              name="status"
+              label="Asset Status"
+              rules={requiredField}
+              propsselect={{
+                options: assetStatusOptions,
+                allowClear: true,
+                placeholder: "Status",
               }}
             />
           </Col>

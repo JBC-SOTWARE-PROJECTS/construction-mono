@@ -2,6 +2,7 @@ package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.assets.enums.AssetStatus
 import com.backend.gbp.domain.assets.enums.AssetType
 import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -54,10 +55,10 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "image")
 	String image
-	
-	@GraphQLQuery
+
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
-	String status
+	AssetStatus status
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
