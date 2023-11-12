@@ -2,6 +2,7 @@ package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.assets.enums.AssetType
 import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -58,9 +59,9 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "status")
 	String status
 
-	@GraphQLQuery
+	@Enumerated(EnumType.STRING)
 	@Column(name = "type")
-	String type
+	AssetType type
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)

@@ -1,5 +1,5 @@
-import { Assets } from "@/graphql/gql/graphql";
-import React from "react";
+import { AssetType, Assets, Item } from "@/graphql/gql/graphql";
+import React, { useState } from "react";
 import {
   Button,
   Col,
@@ -17,7 +17,10 @@ import { FormCheckBox, FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { UPSERT_ASSET_RECORD } from "@/graphql/assets/queries";
 
+import ItemSelector from "@/components/inventory/itemSelector";
 import { useMutation, useQuery } from "@apollo/client";
+import { useDialog } from "@/hooks";
+import _ from "lodash";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -27,7 +30,8 @@ interface IProps {
 export default function UpsertAssetModal(props: IProps) {
   const { hide, record } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
-
+  const showItems = useDialog(ItemSelector);
+  const [selectedItem, setSelectedItem] = useState<Item>();
 
   const [upsert, { loading: upsertLoading }] = useMutation(
     UPSERT_ASSET_RECORD,
@@ -41,13 +45,23 @@ export default function UpsertAssetModal(props: IProps) {
     }
   );
 
+  const onOpenItemSelector = (record?: Assets) => {
+    showItems(
+      { defaultSelected: [], defaultKey: [], isSingleSelection: true },
+      (newItem: Item) => {
+        if (!_.isEmpty(newItem)) {
+          setSelectedItem(newItem);
+        }
+      }
+    );
+  };
 
   const onSubmit = (values: any) => {
-    
     let payload = {
-      ...values
+      ...values,
     };
-   
+    payload.item = selectedItem?.id;
+    payload.type = values.type as AssetType;
     showPasswordConfirmation(() => {
       upsert({
         variables: {
@@ -61,6 +75,11 @@ export default function UpsertAssetModal(props: IProps) {
   const onFinishFailed = () => {
     message.error("Something went wrong. Please contact administrator.");
   };
+
+  const assetOptions = Object.values(AssetType).map((item) => ({
+    value: item,
+    label: item.replace(/_/g, " "),
+  }))
 
   return (
     <Modal
@@ -96,30 +115,51 @@ export default function UpsertAssetModal(props: IProps) {
         onFinish={onSubmit}
         onFinishFailed={onFinishFailed}
         initialValues={{
-            assetCode: ""
+          assetCode: "",
         }}
       >
         <Row gutter={[8, 0]}>
+          <Col span={20}>
+            <FormInput
+              label="Item"
+              propsinput={{
+                placeholder: selectedItem?.descLong ?? "No item selected",
+                disabled: true,
+              }}
+            />
+          </Col>
+          <Col span={4} className="dev-right">
+            <Button
+              className="mt-6-5"
+              size="middle"
+              type="primary"
+              onClick={() => onOpenItemSelector()}
+            >
+              Select Item
+            </Button>
+          </Col>
           <Col span={12}>
             <FormInput
               name="code"
-              
               label="Asset Code"
               propsinput={{
-                placeholder: "Code",
+                placeholder: "Auto Generated",
+                disabled: true,
               }}
             />
           </Col>
+
           <Col span={12}>
             <FormInput
-              name="item"
+              name="model"
               rules={requiredField}
-              label="Item"
+              label="Asset Model"
               propsinput={{
-                placeholder: "Item",
+                placeholder: "Model",
               }}
             />
           </Col>
+
           <Col span={24}>
             <FormInput
               name="description"
@@ -141,23 +181,16 @@ export default function UpsertAssetModal(props: IProps) {
               }}
             />
           </Col>
+
           <Col span={12}>
-            <FormInput
+            <FormSelect
               name="type"
-              rules={requiredField}
               label="Asset Type"
-              propsinput={{
-                placeholder: "Type",
-              }}
-            />
-          </Col>
-          <Col span={24}>
-            <FormInput
-              name="model"
               rules={requiredField}
-              label="Asset Model"
-              propsinput={{
-                placeholder: "Model",
+              propsselect={{
+                options: assetOptions,
+                allowClear: true,
+                placeholder: "Type",
               }}
             />
           </Col>

@@ -11,12 +11,15 @@ import AssetTable from "@/components/inventory/assets/masterfile/assetTable";
 import { Assets } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import UpsertAssetModal from "@/components/inventory/assets/dialogs/upsertAssetModal";
+import ItemSelector from "@/components/inventory/itemSelector";
+import _ from "lodash";
 
 const { Search } = Input;
 type Props = {};
 
 export default function AssetsComponent({}: Props) {
   const modal = useDialog(UpsertAssetModal);
+  const showItems = useDialog(ItemSelector);
   let title = "All Assets";
 
   const onUpsertRecord = (record?: Assets) => {
@@ -29,6 +32,19 @@ export default function AssetsComponent({}: Props) {
         }
       }
     });
+
+    // showItems(
+    //   { defaultSelected: [], defaultKey: [] },
+    //   () => {
+    //     // if (!_.isEmpty(newItems)) {
+    //     //   if (_.isEmpty(dataSource)) {
+    //     //     setDataSource(newItems);
+    //     //   } else {
+    //     //     setDataSource((prev) => [...prev, ...newItems]);
+    //     //   }
+    //     // }
+    //   }
+    // );
   };
 
 

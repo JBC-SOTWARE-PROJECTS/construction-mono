@@ -445,6 +445,16 @@ export type ApTransactionInput = {
   supplierType?: InputMaybe<SupplierTypeInput>;
 };
 
+export enum AssetType {
+  ConstructionEquipment = 'CONSTRUCTION_EQUIPMENT',
+  OfficeEquipment = 'OFFICE_EQUIPMENT',
+  PersonalProtectiveEquipment = 'PERSONAL_PROTECTIVE_EQUIPMENT',
+  RealEstate = 'REAL_ESTATE',
+  SoftwareAndLicenses = 'SOFTWARE_AND_LICENSES',
+  Tool = 'TOOL',
+  Vehicle = 'VEHICLE'
+}
+
 export type Assets = {
   __typename?: 'Assets';
   assetCode?: Maybe<Scalars['String']['output']>;
@@ -454,11 +464,13 @@ export type Assets = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   image?: Maybe<Scalars['String']['output']>;
+  item?: Maybe<Item>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   model?: Maybe<Scalars['String']['output']>;
   plateNo?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<AssetType>;
 };
 
 export type Authority = {
