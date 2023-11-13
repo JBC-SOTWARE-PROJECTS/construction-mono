@@ -6,6 +6,7 @@ import { ColumnsType } from "antd/es/table";
 import { AssetStatus, Assets } from "@/graphql/gql/graphql";
 import DescLong from "../../desclong";
 import { AssetStatusColor } from "@/utility/constant";
+import { useRouter } from "next/router";
 
 type IProps = {
   dataSource: Assets[];
@@ -26,6 +27,7 @@ export default function AssetTable({
   handleSupplier,
   changePage,
 }: IProps) {
+  const router = useRouter();
   const columns: ColumnsType<Assets> = [
     {
       title: "Code",
@@ -45,14 +47,7 @@ export default function AssetTable({
       dataIndex: "model",
       key: "model",
       width: 50,
-    },
-    {
-      title: "Brand",
-      dataIndex: "brand",
-      key: "brand",
-      width: 100,
-    },
-    {
+    },{
       title: "Type",
       dataIndex: "type",
       key: "type",
@@ -60,6 +55,12 @@ export default function AssetTable({
       render: (_, record) => {
         return <Tag color="blue">{record?.type?.replace(/_/g, " ")}</Tag>;
       },
+    },
+    {
+      title: "Brand",
+      dataIndex: "brand",
+      key: "brand",
+      width: 100,
     },
     {
       title: "Status",
@@ -88,9 +89,9 @@ export default function AssetTable({
               <Button
                 icon={<EyeOutlined />}
                 type="primary"
-                // onClick={() => {
-                //   router.push(`/payroll/employees/${id}`);
-                // }}
+                onClick={() => {
+                  router.push(`/inventory/assets/${record?.id}`);
+                }}
               />
             </Col>
             <Col>
