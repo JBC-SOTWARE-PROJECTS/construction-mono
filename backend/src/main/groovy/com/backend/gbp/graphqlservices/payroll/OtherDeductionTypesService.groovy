@@ -31,20 +31,23 @@ class OtherDeductionTypesService {
         return otherDeductionTypesRepository.findAll()
     }
 
-    @GraphQLQuery(name ="fetchOtherDeductionPageable")
-    Page<OtherDeductionTypes>fetchOtherDeductionPageable(
+    @GraphQLQuery(name ="getOtherDeductionPageable")
+    Page<OtherDeductionTypes>getOtherDeductionPageable(
             @GraphQLArgument(name ="filter") String filter,
             @GraphQLArgument(name = 'page') Integer page,
-            @GraphQLArgument(name = 'pageSize') Integer pageSize
+            @GraphQLArgument(name = 'size') Integer size
     ){
-        otherDeductionTypesRepository.getPageable(filter, PageRequest.of(page, pageSize, Sort.Direction.ASC, 'createdDate'))
+        otherDeductionTypesRepository.getPageable(filter, PageRequest.of(page, size, Sort.Direction.ASC, 'createdDate'))
     }
 
 
     @GraphQLMutation(name = "upsertOtherDeductionType")
     GraphQLRetVal<OtherDeductionTypes>upsertOtherDeductionType(
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name ="name") String name
+            @GraphQLArgument(name ="name") String name,
+            @GraphQLArgument(name ="description") String description,
+            @GraphQLArgument(name ="status") Boolean status
+
     ){
         CompanySettings companySettings = SecurityUtils.currentCompany()
         OtherDeductionTypes type = new OtherDeductionTypes()
@@ -52,6 +55,8 @@ class OtherDeductionTypesService {
           type = otherDeductionTypesRepository.findById(id).get()
         }
         type.name = name
+        type.description = description
+        type.status = status
         type.company = companySettings
         type = otherDeductionTypesRepository.save(type)
         return  new GraphQLRetVal<OtherDeductionTypes>(type, true, 'Successfully Saved')

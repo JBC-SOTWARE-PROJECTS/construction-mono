@@ -407,5 +407,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/45_michael_deduction_category_config.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/46_michael_deduction_category_config_alter.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

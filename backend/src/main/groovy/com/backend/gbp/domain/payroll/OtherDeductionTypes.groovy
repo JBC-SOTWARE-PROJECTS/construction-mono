@@ -29,8 +29,16 @@ class OtherDeductionTypes extends AbstractAuditingEntity {
 	String name
 
 	@GraphQLQuery
+	@Column(name = "description", columnDefinition = "varchar")
+	String description
+
+	@GraphQLQuery
 	@Column(name = "code", columnDefinition = "varchar")
 	String code
+
+	@GraphQLQuery
+	@Column(name = "status", columnDefinition = "bool")
+	Boolean status
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)

@@ -46,7 +46,7 @@ function AddPayrollAllowanceItemModal({ refetch, employees }: IParams) {
         onCancel={() => {
           setOpen(false);
         }}
-        title="Adjustment Category"
+        title="Allowance Item"
         footer={
           <Space>
             <Button
