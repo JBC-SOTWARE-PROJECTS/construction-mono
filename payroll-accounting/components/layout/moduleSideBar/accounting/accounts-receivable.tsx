@@ -6,15 +6,19 @@ const AccountingSetupMenu = {
     routes: [
       {
         path: '/accounting/accounts-receivable',
-        name: 'Account Receivable',
+        name: 'Accounts Receivable',
         routes: [
+          {
+            path: '/accounting/accounts-receivable/clients',
+            name: 'Clients',
+          },
           {
             path: '/accounting/accounts-receivable/invoice',
             name: 'Invoice',
           },
           {
-            path: '/accounting/accounting-setup/mother-account',
-            name: 'Credit Note',
+            path: '/accounting/accounts-receivable/configurations',
+            name: 'Configurations',
           },
         ],
       },

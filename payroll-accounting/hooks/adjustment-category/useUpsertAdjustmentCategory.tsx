@@ -20,7 +20,7 @@ const MUTATION = gql`
 
 function useUpsertAdjustmentCategory(callback?: (any: EmployeeLoan) => void) {
   const [mutation, { loading }] = useMutation(MUTATION, {
-    onCompleted: (data) => {
+    onCompleted: ({ data }) => {
       if (data?.success) {
         message.success(data?.message || "Success!");
         if (callback) {

@@ -9,8 +9,15 @@ interface ExtendedSelectProps extends FormItemProps {
 const FormSelect = ({ ...props }: ExtendedSelectProps, ref: any) => {
   const { propsselect } = props
   return (
-    <Form.Item style={{ marginBottom: '6px' }} {...props}>
-      <Select {...propsselect} ref={ref} />
+    <Form.Item {...props} style={{ marginBottom: '6px' }}>
+      <Select
+        {...propsselect}
+        filterOption={(input, option) => {
+          let label: string = _.toString(option?.label ?? '')
+          return label.toLowerCase().includes(input.toLowerCase())
+        }}
+        ref={ref}
+      />
     </Form.Item>
   )
 }

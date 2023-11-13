@@ -3,8 +3,12 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.PettyCashAccounting
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.repository.accounting.PettyCashItemRepository
+import com.backend.gbp.rest.dto.LedgerDto
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
+import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.rest.dto.payables.PCVItemsDto
 import com.backend.gbp.rest.dto.payables.PCVOthersDto
 import com.backend.gbp.rest.dto.payables.PettyCashName
@@ -22,9 +26,12 @@ import org.springframework.data.domain.Page
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.LedgerDocType
 
 import java.math.RoundingMode
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -53,6 +60,12 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 
+	@Autowired
+	InventoryLedgerService inventoryLedgerService
+
+	@Autowired
+	PettyCashItemRepository pettyCashItemRepository
+
 	PettyCashAccountingService() {
 		super(PettyCashAccounting.class)
 	}
@@ -76,7 +89,7 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 
 		Map<String, Object> params = new HashMap<>()
 		if (company) {
-			query += ''' and (p.company = :company) '''
+			query += ''' and (pc.company = :company) '''
 			params.put("company", company)
 		}
 
@@ -85,6 +98,29 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 		recordsRaw.each {
 			records << new PettyCashName(
 					name: StringUtils.upperCase( it.get("payee","") as String)
+			)
+		}
+
+		return records
+
+	}
+
+	@GraphQLQuery(name = "pcReferenceType", description = "Find Ap reference Type")
+	List<ApReferenceDto> pcReferenceType() {
+
+		List<ApReferenceDto> records = []
+
+		String query = '''select distinct p.reference_type as reference_type from accounting.petty_cash p where p.reference_type is not null '''
+
+
+		Map<String, Object> params = new HashMap<>()
+
+
+		def recordsRaw = namedParameterJdbcTemplate.queryForList(query, params)
+
+		recordsRaw.each {
+			records << new ApReferenceDto(
+					referenceType: StringUtils.upperCase(it.get("reference_type", "") as String)
 			)
 		}
 
@@ -211,7 +247,6 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 	}
 
 
-	//post/void trigger
 	@Transactional(rollbackFor = Exception.class)
 	@GraphQLMutation(name = "postPettyCash")
 	PettyCashAccounting postPettyCash(
@@ -219,7 +254,8 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 			@GraphQLArgument(name = "status") Boolean status
 	) {
 		def parent = findOne(id)
-		if(status){ // reverse
+		def items = pettyCashItemServices.purchaseItemsByPetty(parent.id)
+		if (status) { // reverse
 			def header = ledgerServices.findOne(parent.postedLedger)
 			ledgerServices.reverseEntriesCustom(header, Instant.now())
 			//update Parent
@@ -228,8 +264,20 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 			parent.posted = false
 			save(parent)
 
-		}else{
+			if (parent.pcvCategory.equalsIgnoreCase("PURCHASE")) {
+				//void ledger inventory ledger
+				inventoryLedgerService.voidLedgerByRef(parent.pcvNo)
+				//update items
+				items.each {
+					def update = it
+					update.isPosted = false
+					pettyCashItemRepository.save(update)
+				}
+			}
+
+		} else {
 			postToLedgerAccounting(parent)
+
 		}
 
 		return parent
@@ -243,11 +291,11 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 	) {
 		def result = new ArrayList<JournalEntryViewDto>()
 		//ewt rate
-		if(id) { //post
+		if (id) { //post
 			def parent = findOne(id)
 			//ewt rate
-			if(parent.transType?.flagValue){
-				def headerLedger = integrationServices.generateAutoEntries(parent) {it, mul ->
+			if (parent.transType?.flagValue) {
+				def headerLedger = integrationServices.generateAutoEntries(parent) { it, mul ->
 					it.flagValue = parent.transType?.flagValue
 
 				}
@@ -261,8 +309,8 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 					)
 					result.add(list)
 				}
-			}else{ //reverse
-				if(parent.postedLedger){
+			} else { //reverse
+				if (parent.postedLedger) {
 					def header = ledgerServices.findOne(parent.postedLedger)
 					header.ledger.each {
 						def list = new JournalEntryViewDto(
@@ -282,35 +330,36 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 	//accounting post
 
 	@Transactional(rollbackFor = Exception.class)
-	PettyCashAccounting postToLedgerAccounting(PettyCashAccounting domain){
+	PettyCashAccounting postToLedgerAccounting(PettyCashAccounting domain) {
 		def yearFormat = DateTimeFormatter.ofPattern("yyyy")
 		def parent = super.save(domain) as PettyCashAccounting
+		def items = pettyCashItemServices.purchaseItemsByPetty(parent.id)
 		//ewt rate
 
-		def headerLedger = integrationServices.generateAutoEntries(parent) {it, mul ->
+		def headerLedger = integrationServices.generateAutoEntries(parent) { it, mul ->
 			it.flagValue = parent.transType?.flagValue
 
 		}
 
-		Map<String,String> details = [:]
+		Map<String, String> details = [:]
 
-		parent.details.each { k,v ->
+		parent.details.each { k, v ->
 			details[k] = v
 		}
 
 		details["PETTY_CASH_ID"] = parent.id.toString()
 		details["PETTY_CASH_CATEGORY"] = parent.pcvCategory.toUpperCase()
-		details["PAYEE_NAME"] =  parent.payeeName.toUpperCase()
+		details["PAYEE_NAME"] = parent.payeeName.toUpperCase()
 
 		headerLedger.transactionNo = parent.pcvNo
 		headerLedger.transactionType = "PETTY CASH"
-		headerLedger.referenceType = null
-		headerLedger.referenceNo = null
+		headerLedger.referenceType = parent.referenceType
+		headerLedger.referenceNo = parent.referenceNo
 
-		def pHeader =	ledgerServices.persistHeaderLedger(headerLedger,
+		def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
 				"${Instant.now().atZone(ZoneId.systemDefault()).format(yearFormat)}-${parent.pcvNo}",
-				"${parent.pcvNo}-${parent.payeeName}",
-				"${parent.pcvNo}-${parent.payeeName}",
+				"${parent.payeeName}",
+				"${parent.remarks}",
 				LedgerDocType.PC, // Petty Cash
 				JournalType.GENERAL,
 				parent.pcvDate,
@@ -318,6 +367,37 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 		parent.postedLedger = pHeader.id
 		parent.status = "POSTED"
 		parent.posted = true
+
+		if (parent.pcvCategory.equalsIgnoreCase("PURCHASE")) {
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault())
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault())
+			DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
+			//post ledger inventory ledger
+			items.each {
+				String localTime = timeFormatter.format(it.createdDate)
+				String date = "${formatDate.format(parent.pcvDate)} ${localTime}"
+				def localDateTime = LocalDateTime.parse(date, dateFormatter).atZone(ZoneId.of("Asia/Manila"))
+				def ledgerDate = localDateTime.toInstant()
+				LedgerDto ledger = new LedgerDto()
+				ledger.sourceOffice = it.office
+				ledger.destinationOffice = it.office
+				ledger.documentTypes = UUID.fromString("254a07d3-e33a-491c-943e-b3fe6792c5fc") // SRR DOCTYPE
+				ledger.item = it.item.id
+				ledger.referenceNo = parent.pcvNo
+				ledger.ledgerDate = ledgerDate
+				ledger.ledgerQtyIn = it.qty
+				ledger.ledgerQtyOut = 0
+				ledger.ledgerPhysical = 0
+				ledger.ledgerUnitCost = it.inventoryCost.setScale(2, RoundingMode.HALF_EVEN)
+				inventoryLedgerService.postInventoryGlobal(ledger)
+
+				//update petty cash item
+				def update = it
+				update.isPosted = true
+				pettyCashItemRepository.save(update)
+			}
+
+		}
 
 		save(parent)
 	}
@@ -327,31 +407,32 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 	@GraphQLMutation(name = "postPettyCashManual")
 	GraphQLRetVal<Boolean> postPettyCashManual(
 			@GraphQLArgument(name = "id") UUID id,
-			@GraphQLArgument(name = "header")  Map<String,Object>  header,
-			@GraphQLArgument(name = "entries")  List<Map<String,Object>>  entries
+			@GraphQLArgument(name = "header") Map<String, Object> header,
+			@GraphQLArgument(name = "entries") List<Map<String, Object>> entries
 	) {
 		def parent = findOne(id)
+		def items = pettyCashItemServices.purchaseItemsByPetty(parent.id)
 
-		Map<String,String> details = [:]
+		Map<String, String> details = [:]
 
-		parent.details.each { k,v ->
+		parent.details.each { k, v ->
 			details[k] = v
 		}
 
 		details["PETTY_CASH_ID"] = parent.id.toString()
 		details["PETTY_CASH_CATEGORY"] = parent.pcvCategory.toUpperCase()
-		details["PAYEE_NAME"] =  parent.payeeName.toUpperCase()
+		details["PAYEE_NAME"] = parent.payeeName.toUpperCase()
 
 		Map<String, Object> headerLedger = header
 		headerLedger.put('transactionNo', parent.pcvNo)
 		headerLedger.put('transactionType', "PETTY CASH")
-		headerLedger.put('referenceType', null)
-		headerLedger.put('referenceNo', null)
+		headerLedger.put('referenceType', parent.referenceType)
+		headerLedger.put('referenceNo', parent.referenceNo)
 
 		def result = ledgerServices.addManualJVDynamic(
 				headerLedger,
 				entries,
-				parent.disbursement.disType.equalsIgnoreCase("CASH") ? LedgerDocType.CS : LedgerDocType.CK,
+				LedgerDocType.PC, // Petty Cash
 				JournalType.GENERAL,
 				parent.pcvDate,
 				details
@@ -361,6 +442,39 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 		parent.postedLedger = result.returnId
 		parent.status = "POSTED"
 		parent.posted = true
+
+		if (parent.pcvCategory.equalsIgnoreCase("PURCHASE")) {
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault())
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS").withZone(ZoneId.systemDefault())
+			DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
+			//post ledger inventory ledger
+			items.each {
+				String localTime = timeFormatter.format(Instant.now())
+				String date = "${formatDate.format(parent.pcvDate)} ${localTime}"
+				def localDateTime = LocalDateTime.parse(date, dateFormatter).atZone(ZoneId.of("Asia/Manila"))
+				def ledgerDate = localDateTime.toInstant()
+				println("DateLedger ====> " + date)
+				LedgerDto ledger = new LedgerDto()
+				ledger.sourceOffice = it.office
+				ledger.destinationOffice = it.office
+				ledger.documentTypes = UUID.fromString("254a07d3-e33a-491c-943e-b3fe6792c5fc") // SRR DOCTYPE
+				ledger.item = it.item.id
+				ledger.referenceNo = parent.pcvNo
+				ledger.ledgerDate = ledgerDate
+				ledger.ledgerQtyIn = it.qty
+				ledger.ledgerQtyOut = 0
+				ledger.ledgerPhysical = 0
+				ledger.ledgerUnitCost = it.inventoryCost.setScale(2, RoundingMode.HALF_EVEN)
+				inventoryLedgerService.postInventoryGlobal(ledger)
+
+				//update petty cash item
+				def update = it
+				update.isPosted = true
+				pettyCashItemRepository.save(update)
+			}
+
+		}
+
 		save(parent)
 
 		return result

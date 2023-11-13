@@ -28,12 +28,13 @@ interface IProps {
   hide: (hideProps: any) => void;
   defaultSelected: Item[];
   defaultKey: React.Key[];
+  isSingleSelection: boolean;
 }
 
 const { Search } = Input;
 
 export default function ItemSelector(props: IProps) {
-  const { hide, defaultSelected, defaultKey } = props;
+  const { hide, defaultSelected, defaultKey, isSingleSelection} = props;
   const [selectedItems, setSelectedItems] = useState<Item[]>(defaultSelected);
   const [selectedRowkeys, setSelectedRowkeys] =
     useState<React.Key[]>(defaultKey);
@@ -63,6 +64,10 @@ export default function ItemSelector(props: IProps) {
         let mapKeys: React.Key[] = _.map(payloadSelected, "id");
         setSelectedRowkeys(mapKeys);
         setSelectedItems(payloadSelected);
+
+        if(isSingleSelection){
+          hide(record);
+        }
       } else {
         // ================ remove ===============================
         let filtered = _.filter(payloadSelected, function (o) {
@@ -103,15 +108,14 @@ export default function ItemSelector(props: IProps) {
         let findObj = _.find(defaultSelected, { id: e.id });
         return _.isEmpty(findObj);
       });
-
       // map values
       const newItems = (newSelected || []).map((obj) => {
         return {
           id: randomId(),
           item: obj,
-          department: {
+          office: {
             id: office?.value,
-            departmentName: office?.label,
+            officeDescription: office?.label,
           },
           qty: 1,
           unitCost: 0,
@@ -257,9 +261,7 @@ export default function ItemSelector(props: IProps) {
             size="small"
             loading={loading}
             columns={columns}
-            dataSource={
-              _.get(data, "itemsByFilterOnly.content", []) as Item[]
-            }
+            dataSource={_.get(data, "itemsByFilterOnly.content", []) as Item[]}
             pagination={false}
             footer={() => (
               <Pagination
@@ -268,11 +270,7 @@ export default function ItemSelector(props: IProps) {
                 pageSize={10}
                 responsive={true}
                 total={
-                  _.get(
-                    data,
-                    "itemsByFilterOnly.totalElements",
-                    0
-                  ) as number
+                  _.get(data, "itemsByFilterOnly.totalElements", 0) as number
                 }
                 onChange={(e) => {
                   setState((prev) => ({ ...prev, page: e - 1 }));

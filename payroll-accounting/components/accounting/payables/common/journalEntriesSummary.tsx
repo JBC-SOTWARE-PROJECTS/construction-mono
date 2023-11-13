@@ -31,10 +31,13 @@ export default function JournalEntriesSummary(props: IProps) {
           <span>{currency} </span>
           {NumberFormater(credit)}
         </Table.Summary.Cell>
+        <Table.Summary.Cell
+          index={4}
+          className="font-bold"></Table.Summary.Cell>
       </Table.Summary.Row>
       {debit !== credit && (
         <Table.Summary.Row>
-          <Table.Summary.Cell index={0} colSpan={4}>
+          <Table.Summary.Cell index={0} colSpan={5}>
             <Alert
               showIcon
               type="warning"

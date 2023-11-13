@@ -1,0 +1,1 @@
+ALTER TABLE hrm.employees ADD COLUMN pin_code varchar default null;

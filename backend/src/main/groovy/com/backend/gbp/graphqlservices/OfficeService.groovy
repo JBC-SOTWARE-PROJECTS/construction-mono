@@ -124,6 +124,8 @@ class OfficeService {
         op.officeBarangay = obj.officeBarangay
         op.officeStreet = obj.officeStreet
         op.officeZipcode = obj.officeZipcode
+        op.tinNumber = obj.tinNumber
+        op.officeSecretary = obj.officeSecretary
         op.status = obj.status
 
         officeRepository.save(op)

@@ -39,7 +39,7 @@ import {
   responsiveColumn3,
   responsiveColumn3Last,
 } from "@/utility/constant";
-import { FormSelect, FormTextArea } from "@/components/common";
+import { FormInput, FormSelect, FormTextArea } from "@/components/common";
 import {
   NumberFormater,
   decimalRound2,
@@ -452,6 +452,7 @@ export default function ReapplicationModal(props: IProps) {
         disabled={disabled}
         initialValues={{
           transType: record?.transType?.id,
+          referenceNo: record?.referenceNo,
           remarks: record?.remarks,
         }}>
         <Row>
@@ -540,6 +541,14 @@ export default function ReapplicationModal(props: IProps) {
                 options: transactionList,
                 allowClear: true,
                 placeholder: "Select Transaction Terms",
+              }}
+            />
+            <FormInput
+              label="Reference No"
+              name="referenceNo"
+              rules={requiredField}
+              propsinput={{
+                placeholder: "Reference No",
               }}
             />
             <FormTextArea

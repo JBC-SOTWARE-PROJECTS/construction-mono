@@ -7,6 +7,7 @@ import com.backend.gbp.domain.inventory.ReceivingReportItem
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseRecDto
 import com.backend.gbp.rest.dto.ReceivingAmountDto
+import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -18,6 +19,7 @@ import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -54,6 +56,9 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
     @Autowired
     PODeliveryMonitoringService poDeliveryMonitoringService
 
+    @Autowired
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
 
     @GraphQLQuery(name = "recById")
     ReceivingReport recById(
@@ -64,6 +69,23 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
         }else{
             null
         }
+    }
+
+    @GraphQLQuery(name = "srrGetReferenceType")
+    List<ApReferenceDto> srrGetReferenceType(){
+        List<ApReferenceDto> records = []
+
+        String query = '''select distinct p.reference_type as reference_type from inventory.receiving_report p where p.reference_type is not null '''
+        Map<String, Object> params = new HashMap<>()
+        def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
+
+        recordsRaw.each {
+            records << new ApReferenceDto(
+                    referenceType: StringUtils.upperCase( it.get("reference_type","") as String)
+            )
+        }
+
+        return records
     }
 
 

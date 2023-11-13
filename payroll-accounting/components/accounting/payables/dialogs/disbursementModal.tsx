@@ -50,6 +50,7 @@ import {
   responsiveColumn3Last,
 } from "@/utility/constant";
 import {
+  FormAutoComplete,
   FormDatePicker,
   FormInput,
   FormInputNumber,
@@ -64,7 +65,10 @@ import {
 } from "@/utility/helper";
 import dayjs from "dayjs";
 import { ColumnsType } from "antd/es/table";
-import { useAPTransactionType } from "@/hooks/payables";
+import {
+  useAPTransactionType,
+  useReferenceDisbursementType,
+} from "@/hooks/payables";
 import { useConfirmationPasswordHook, useDialog } from "@/hooks";
 import ViewJournalEntries from "../journalentries/viewJournalEntries";
 import FormSwitch from "@/components/common/formSwitch/formSwitch";
@@ -123,6 +127,7 @@ export default function DisbursementModal(props: IProps) {
   const journalEntries = useDialog(CKJournalEntries);
   const viewEntries = useDialog(ViewJournalEntries);
   // ===================== Queries ==============================
+  const referenceTypes = useReferenceDisbursementType();
   const transactionList = useAPTransactionType({
     type: supplier?.supplierTypes?.id,
     category: "DS",
@@ -726,6 +731,8 @@ export default function DisbursementModal(props: IProps) {
           payeeName: record?.payeeName ?? supplier?.supplierFullname,
           transType: record?.transType?.id,
           cash: record?.cash ?? 0,
+          referenceType: record?.referenceType,
+          referenceNo: record?.referenceNo,
           remarksNotes: record?.remarksNotes,
         }}>
         <Row>
@@ -824,6 +831,23 @@ export default function DisbursementModal(props: IProps) {
                 onChange: (e) => {
                   calculateAmount(Number(e), "CASH");
                 },
+              }}
+            />
+            <FormAutoComplete
+              label="Reference Type"
+              name="referenceType"
+              rules={requiredField}
+              propsinput={{
+                options: referenceTypes,
+                placeholder: "Reference Type",
+              }}
+            />
+            <FormInput
+              label="Reference No"
+              name="referenceNo"
+              rules={requiredField}
+              propsinput={{
+                placeholder: "Reference No",
               }}
             />
             <FormTextArea

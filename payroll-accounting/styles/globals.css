@@ -220,6 +220,10 @@ th.ant-table-cell {
   margin-top: 10px !important;
 }
 
+.mt-6-5 {
+  margin-top: 1.60rem !important;
+}
+
 .margin-0 {
   margin: 0 !important;
 }
@@ -438,4 +442,15 @@ th.ant-table-cell {
 .virtual-table .ant-table-container:before,
 .virtual-table .ant-table-container:after {
   display: none;
+}
+
+.dev-flex {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.relative {
+  position: relative !important;
 }

@@ -461,3 +461,18 @@ export const PC_CATEGORY = [
     value: "OTHERS",
   },
 ];
+
+export const AssetStatusColor = {
+  ACTIVE : 'blue',
+  DISPOSED : 'grey',
+  IDLE : 'warning',
+  IN_REPAIR : 'red',
+  IN_SERVICE : 'green',
+  IN_TRANSIT : 'purple',
+  OUT_OF_SERVICE : 'yellow',
+  RESERVED : 'cyan',
+  RETIRED : 'volcano',
+  UNDER_INSPECTION : 'magenta',
+  UNDER_MAINTENANCE : 'red',
+  NO_STATUS : 'gold'
+}

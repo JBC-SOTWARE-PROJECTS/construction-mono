@@ -21,7 +21,7 @@ bin
 *.iml
 *.ipr
 out/
-
+lib
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

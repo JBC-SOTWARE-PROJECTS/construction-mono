@@ -18,7 +18,8 @@ import javax.persistence.*
 enum DomainEnum {
     NO_DOMAIN("NO DOMAIN", ""),
     ITEM_CATEGORY("Item Category", "com.backend.gbp.domain.inventory.ItemCategory"),
-    SUPPLIER("Supplier", "com.backend.gbp.domain.inventory.Supplier")
+    SUPPLIER("Supplier", "com.backend.gbp.domain.inventory.Supplier"),
+    BANK("Bank", "com.backend.gbp.domain.accounting.Bank")
 
     String displayName
     String path

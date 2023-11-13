@@ -335,7 +335,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
            return new GraphQLRetVal<Boolean>(false,false,"Entries not Balanced. Debit [${totalDebit.toPlainString()}] Credit [${totalCredit.toPlainString()}]")
         }
 
-        def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget)
+        def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget, header.transactionDate)
 
 
         headerLedger.ledger.each {
@@ -387,7 +387,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
 
         try {
 
-            def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget)
+            def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget, transactionDate?:Instant.now())
 
             headerLedger.entityName = entityName
             validateEntries(headerLedger)
@@ -445,7 +445,6 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
             entriesTarget << new EntryFull(match,debit,credit)
         }
 
-
         String invoiceSoaReference = header.get("invoiceSoaReference")
         String entityName = header.get("entityName")
         String particulars = header.get("particulars")
@@ -458,7 +457,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         def id = null
         try {
 
-            def headerLedger  =  createDraftHeaderLedgerFull(entriesTarget)
+            def headerLedger  =  createDraftHeaderLedgerFull(entriesTarget, ledgerDate)
 
             headerLedger.entityName = entityName
             headerLedger.transactionNo = transactionNo
@@ -1361,7 +1360,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
     }
 
 
-    HeaderLedger createDraftHeaderLedgerFull(List<EntryFull> entries){
+    HeaderLedger createDraftHeaderLedgerFull(List<EntryFull> entries, Instant transactionDatetime){
         HeaderLedger header = new HeaderLedger()
         entries.each { entry->
 
@@ -1371,6 +1370,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
                 throw  new Exception("Method: createDraftHeaderLedger will only accept journal record from getAllChartOfAccountGenerate")
             Ledger ledger = new Ledger()
             ledger.journalAccount = entry.journal
+            ledger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
             ledger.debit = entry.debit
             ledger.credit = entry.credit
             ledger.header = header
@@ -1531,8 +1531,10 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
 
         headerLedger.entityName = entity
-        headerLedger.referenceType = refType?:''
-        headerLedger.referenceNo = refNo
+        if(StringUtils.isNotBlank(refType) ){
+            headerLedger.referenceType = refType?:''
+        }
+        headerLedger.invoiceSoaReference = refNo
         headerLedger.particulars = particulars
         headerLedger.docType = ledgerDocType
         headerLedger.journalType = journalType
@@ -1566,6 +1568,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         HeaderLedger reversal = new HeaderLedger()
         reversal.reversal = true
         reversal.fiscal = source.fiscal
+        reversal.invoiceSoaReference = source.invoiceSoaReference
         reversal.particulars = source.particulars
         reversal.transactionDate = Instant.now()
         reversal.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
@@ -1574,8 +1577,15 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         reversal.docType = source.docType
         reversal.journalType = source.journalType
         reversal.custom = source.custom
-        reversal.parentLedger = source.parentLedger
+        reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
+        // ========== added by wilson ==============
+        reversal.company = source.company
+        reversal.referenceNo = source.referenceNo
+        reversal.referenceType = source.referenceType
+        reversal.transactionNo = source.transactionNo
+        reversal.transactionType = source.transactionType
+        reversal.headerLedgerGroup = source.headerLedgerGroup
 
 
         reversal.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1593,10 +1603,13 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
             Ledger l = new Ledger()
             l.header = reversal
 
+            l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+            l.company = source.company
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit
             l.credit = it.debit
+
 
             reversal.ledger << l
         }
@@ -1619,8 +1632,15 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         reversal.docType = source.docType
         reversal.journalType = source.journalType
         reversal.custom = source.custom
-        reversal.parentLedger = source.parentLedger
+        reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
+        // ========== added by wilson ==============
+        reversal.company = source.company
+        reversal.referenceNo = source.referenceNo
+        reversal.referenceType = source.referenceType
+        reversal.transactionNo = source.transactionNo
+        reversal.transactionType = source.transactionType
+        reversal.headerLedgerGroup = source.headerLedgerGroup
 
 
         reversal.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1638,6 +1658,8 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
             Ledger l = new Ledger()
             l.header = reversal
 
+            l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+            l.company = source.company
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit
@@ -1693,7 +1715,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         coaList.each {coa ->
             results << new GeneralLedgerDto().tap {
                 it.code = coa.code
-                it.description = coa.description
+                it.description = coa.accountName
                 it.accountType = coa.accountType
                 it.normalSide = coa.motherAccount.normalSide
             }
