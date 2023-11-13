@@ -1,5 +1,5 @@
 import { AssetStatus, AssetType, Assets, Item } from "@/graphql/gql/graphql";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Col,
@@ -32,6 +32,13 @@ export default function UpsertAssetModal(props: IProps) {
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const showItems = useDialog(ItemSelector);
   const [selectedItem, setSelectedItem] = useState<Item>();
+
+  useEffect(() => {
+    if(record){
+      setSelectedItem(record?.item as Item);
+    }
+  }, [record])
+  
 
   const [upsert, { loading: upsertLoading }] = useMutation(
     UPSERT_ASSET_RECORD,
@@ -123,7 +130,7 @@ export default function UpsertAssetModal(props: IProps) {
         onFinish={onSubmit}
         onFinishFailed={onFinishFailed}
         initialValues={{
-          assetCode: "",
+          ...record
         }}
       >
         <Row gutter={[8, 0]}>
@@ -148,7 +155,7 @@ export default function UpsertAssetModal(props: IProps) {
           </Col>
           <Col span={12}>
             <FormInput
-              name="code"
+              name="assetCode"
               label="Asset Code"
               propsinput={{
                 placeholder: "Auto Generated",

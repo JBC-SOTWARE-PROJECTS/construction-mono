@@ -1,9 +1,9 @@
 import React from "react";
-import { FolderOpenOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
+import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { Assets } from "@/graphql/gql/graphql";
+import { AssetStatus, Assets } from "@/graphql/gql/graphql";
 import DescLong from "../../desclong";
 import { AssetStatusColor } from "@/utility/constant";
 
@@ -68,7 +68,42 @@ export default function AssetTable({
       width: 50,
       fixed: "right",
       render: (_, record) => {
-        return <Tag color={AssetStatusColor[record?.status ?? "NO_STATUS"]}>{record?.status ? record?.status?.replace(/_/g, " ") : "NO STATUS"}</Tag>;
+        return (
+          <Tag color={AssetStatusColor[record?.status ?? "NO_STATUS"]}>
+            {record?.status ? record?.status?.replace(/_/g, " ") : "NO STATUS"}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Action",
+      dataIndex: "brand",
+      key: "brand",
+      width: 30,
+      fixed: "right",
+      render: (_, record) => {
+        return (
+          <Row gutter={5}>
+            <Col>
+              <Button
+                icon={<EyeOutlined />}
+                type="primary"
+                // onClick={() => {
+                //   router.push(`/payroll/employees/${id}`);
+                // }}
+              />
+            </Col>
+            <Col>
+              <Button
+                icon={<EditOutlined />}
+                type="primary"
+                onClick={() => {
+                  handleOpen(record);
+                }}
+              />
+            </Col>
+          </Row>
+        );
       },
     },
   ];
@@ -88,10 +123,10 @@ export default function AssetTable({
               showSizeChanger={false}
               pageSize={10}
               responsive={true}
-              //   total={totalElements}
-              //   onChange={(e) => {
-              //     changePage(e - 1);
-              //   }}
+              total={totalElements}
+                onChange={(e) => {
+                  changePage(e - 1);
+                }}
             />
           )}
           scroll={{ x: 1400 }}

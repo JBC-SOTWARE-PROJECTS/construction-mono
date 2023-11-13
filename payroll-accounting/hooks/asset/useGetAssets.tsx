@@ -6,12 +6,13 @@ import React, { useState } from 'react';
 
 
 const GET_RECORDS = gql`
-query ($filter: String, $status: String, $page: Int, $size: Int) {
+query ($filter: String, $status: AssetStatus, $page: Int, $size: Int, $type: AssetType) {
     list: assetListPageable(
       filter: $filter
       status: $status
       page: $page
       size: $size
+      type: $type
     ) {
       content {
         id
@@ -39,7 +40,8 @@ const initialState: IAssetState = {
     filter: "",
     status: null,
     page: 0,
-    size: 10
+    size: 10,
+    type: null
   };
 
 export default function useGetAssets(props: QueryHookOptions) {
@@ -50,7 +52,8 @@ export default function useGetAssets(props: QueryHookOptions) {
         filter: filter?.filter,
         status: filter?.status,
         page: filter?.page,
-        size: filter?.size
+        size: filter?.size,
+        type: filter?.type,
       },
       fetchPolicy: "network-only",
       ...props,

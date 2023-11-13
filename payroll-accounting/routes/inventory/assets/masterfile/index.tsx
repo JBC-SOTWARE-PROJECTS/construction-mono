@@ -8,7 +8,7 @@ import { Input, Button, message, Row, Col, Select, Form } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { FormSelect } from "@/components/common";
 import AssetTable from "@/components/inventory/assets/masterfile/assetTable";
-import { AssetStatus, Assets } from "@/graphql/gql/graphql";
+import { AssetStatus, AssetType, Assets } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import UpsertAssetModal from "@/components/inventory/assets/dialogs/upsertAssetModal";
 import ItemSelector from "@/components/inventory/itemSelector";
@@ -23,25 +23,25 @@ export interface IAssetState {
   page: number;
   size: number;
   status: AssetStatus | null;
+  type: AssetType | null;
 }
 
 const initialState: IAssetState = {
   filter: "",
   status: null,
   page: 0,
-  size: 10
+  size: 10,
+  type: null,
 };
-
 
 export default function AssetsComponent({}: Props) {
   const modal = useDialog(UpsertAssetModal);
-  const showItems = useDialog(ItemSelector);
   const [state, setState] = useState(initialState);
   let title = "All Assets";
 
   const [data, loading, refetch] = useGetAssets({
     variables: state,
-    fetchPolicy: "network-only"
+    fetchPolicy: "network-only",
   });
 
   const onUpsertRecord = (record?: Assets) => {
@@ -53,15 +53,25 @@ export default function AssetsComponent({}: Props) {
         } else {
           message.success("Item successfully updated");
         }
-       
       }
     });
   };
 
+  console.log("state", state);
+  const assetStatusOptions = Object.values(AssetStatus).map((item) => ({
+    value: item,
+    label: item.replace(/_/g, " "),
+  }));
+
+  const assetTypeOptions = Object.values(AssetType).map((item) => ({
+    value: item,
+    label: item.replace(/_/g, " "),
+  }));
+
   return (
     <PageContainer
       title="Asset Masterfile"
-      content="Mastering Your Inventory: Configuration and Optimization of Item Masterfile."
+      content="Mastering Your Assets: Configuration and Optimization of Asset Masterfile."
     >
       <ProCard
         title={`${title} List`}
@@ -75,7 +85,7 @@ export default function AssetsComponent({}: Props) {
             <Search
               size="middle"
               placeholder="Search here.."
-              //  onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
               className="w-full"
             />
             <Button
@@ -93,32 +103,34 @@ export default function AssetsComponent({}: Props) {
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={8}>
                 <FormSelect
-                  label="Filter Item Brand"
+                  label="Filter Asset Status"
                   propsselect={{
                     showSearch: true,
-                    // value: state.brand,
-                    // options: brands,
-                    // allowClear: true,
-                    // placeholder: "Select Item Brand",
-                    // onChange: (newValue) => {
-                    //   setState((prev) => ({ ...prev, brand: newValue }));
-                    // },
+                    // mode: "tags",
+                    // value: category,
+                    options: assetStatusOptions,
+                    allowClear: true,
+                    // placeholder: "Select Item Category",
+                    onChange: (newValue) => {
+                      console.log("Change", newValue);
+                      setState((prev) => ({ ...prev, status: newValue }));
+                    },
                   }}
                 />
               </Col>
               <Col xs={24} sm={12} md={8}>
                 <FormSelect
-                  label="Filter Item Status"
+                  label="Filter Asset Type"
                   propsselect={{
                     showSearch: true,
-                    mode: "multiple",
+                    //mode: "tags",
                     // value: category,
-                    // options: categories,
-                    // allowClear: true,
+                    options: assetTypeOptions,
+                    allowClear: true,
                     // placeholder: "Select Item Category",
-                    // onChange: (newValue) => {
-                    //   setCategory(newValue);
-                    // },
+                    onChange: (newValue) => {
+                      setState((prev) => ({ ...prev, type: newValue }));
+                    },
                   }}
                 />
               </Col>
@@ -128,11 +140,13 @@ export default function AssetsComponent({}: Props) {
         <AssetTable
           dataSource={data?.content as Assets[]}
           loading={false}
-          totalElements={3 as number}
-          handleOpen={(record) => {}}
+          totalElements={data?.totalElements as number}
+          handleOpen={(record) => onUpsertRecord(record)}
           handleAssign={(record) => {}}
           handleSupplier={(record) => {}}
-          changePage={(page) => {}}
+          changePage={(page) => {
+            setState((prev) => ({ ...prev, page: page }));
+          }}
         />
       </ProCard>
     </PageContainer>
