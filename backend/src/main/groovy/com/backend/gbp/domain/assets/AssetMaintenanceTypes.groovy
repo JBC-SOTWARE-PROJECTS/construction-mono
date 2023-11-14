@@ -38,4 +38,7 @@ class AssetMaintenanceTypes extends AbstractAuditingEntity implements Serializab
 	@Column(name = "category")
 	String category*/
 
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 }

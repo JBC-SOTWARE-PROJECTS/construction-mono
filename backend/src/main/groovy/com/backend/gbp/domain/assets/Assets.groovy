@@ -70,4 +70,8 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
 
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
+
 }

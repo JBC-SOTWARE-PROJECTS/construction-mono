@@ -409,4 +409,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_donss_add_invoices.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_with_company.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
