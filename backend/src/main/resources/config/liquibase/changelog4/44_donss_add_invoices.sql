@@ -1,5 +1,5 @@
-CREATE TABLE accounting.ar_invoice (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS accounting.ar_invoice (
+	id uuid NOT NULL,
 	invoice_no varchar NULL,
 	ar_customers uuid NULL,
 	due_date date NULL,
@@ -32,8 +32,8 @@ CREATE INDEX ar_invoice_customer_index ON accounting.ar_invoice USING btree (ar_
 CREATE INDEX ar_invoice_deleted_index ON accounting.ar_invoice USING btree (deleted);
 
 
-CREATE TABLE accounting.ar_invoice_items (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+CREATE TABLE  IF NOT EXISTS accounting.ar_invoice_items (
+	id uuid NOT NULL,
 	record_no varchar NULL,
 	invoice_no varchar NULL,
 	ar_invoice_id uuid NULL,
@@ -77,8 +77,8 @@ CREATE INDEX ar_invoice_items_customer_index ON accounting.ar_invoice_items USIN
 CREATE INDEX ar_invoice_items_invoice_index ON accounting.ar_invoice_items USING btree (ar_invoice_id);
 CREATE INDEX ar_invoice_items_reference_transfer_id_index ON accounting.ar_invoice_items USING btree (reference_transfer_id);
 
-CREATE TABLE accounting.ar_invoice_particulars (
-	id uuid NOT NULL DEFAULT uuid_generate_v4(),
+CREATE TABLE  IF NOT EXISTS accounting.ar_invoice_particulars (
+	id uuid NOT NULL,
 	item_code varchar NULL,
 	item_name varchar NULL,
 	description varchar NULL,
