@@ -1,9 +1,8 @@
 import CustomButton from "@/components/common/CustomButton";
 import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
 import FormInput from "@/components/common/formInput/formInput";
-import FormSelect from "@/components/common/formSelect/formSelect";
-import { AdjustmentCategory, AdjustmentOperation } from "@/graphql/gql/graphql";
-import useUpsertAdjustmentCategory from "@/hooks/adjustment-category/useUpsertAdjustmentCategory";
+import { AdjustmentCategory, OtherDeductionTypes } from "@/graphql/gql/graphql";
+import useUpsertOtherDeductionType from "@/hooks/other-deduction-types/useUpsertOtherDeductionType";
 import { EditOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { Button, Form, Modal, Space, Spin } from "antd";
 import { useState } from "react";
@@ -16,7 +15,7 @@ interface IProps {
 function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState<boolean>(false);
-  const [upsert, loadingUpsert] = useUpsertAdjustmentCategory(() => {
+  const [upsert, loadingUpsert] = useUpsertOtherDeductionType(() => {
     setOpen(false);
     refetch();
     if (!record) {
@@ -24,8 +23,8 @@ function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
     }
   });
 
-  const onSubmit = (values: AdjustmentCategory) => {
-    upsert({ id: record?.id, fields: values });
+  const onSubmit = (values: OtherDeductionTypes | any) => {
+    upsert({ id: record?.id, ...values });
   };
   return (
     <>
@@ -36,7 +35,7 @@ function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
         shape={record ? "circle" : "default"}
         ghost
       >
-        {!record && " Add Adjustment Category"}
+        {!record && " Add Deduction Type"}
       </CustomButton>
       <Spin spinning={loadingUpsert}>
         <Modal
@@ -47,7 +46,7 @@ function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
               form.resetFields();
             }
           }}
-          title="Adjustment Category"
+          title="Deduction Type"
           footer={
             <Space>
               <Button
@@ -72,7 +71,6 @@ function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
               description: record?.description,
               name: record?.name,
               status: record?.status || true,
-              operation: record?.operation,
             }}
           >
             <FormInput
@@ -99,17 +97,6 @@ function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
               propscheckbox={{
                 defaultChecked: true,
               }}
-            />
-            <FormSelect
-              name="operation"
-              label="Operation"
-              propsselect={{
-                options: Object.values(AdjustmentOperation).map((item) => ({
-                  value: item,
-                  label: item.replace("_", " "),
-                })),
-              }}
-              rules={[{ required: true }]}
             />
           </Form>
         </Modal>

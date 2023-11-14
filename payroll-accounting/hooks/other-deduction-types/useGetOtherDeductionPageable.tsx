@@ -23,6 +23,8 @@ const useGetOtherDeductionPageable = (
           content {
             name
             id
+            description
+            status
           }
           totalElements
         }

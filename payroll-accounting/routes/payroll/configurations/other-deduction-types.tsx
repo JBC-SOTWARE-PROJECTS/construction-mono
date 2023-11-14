@@ -1,11 +1,9 @@
-import UpsertAdjustmentCategoryModal from "@/components/payroll/configurations/UpsertAdjustmentCategoryModal";
+import UpsertOtherDeductionTypeModal from "@/components/payroll/configurations/UpsertOtherDeductionTypeModal";
 import { AdjustmentCategory } from "@/graphql/gql/graphql";
-import useGetAdjustmentCategories from "@/hooks/adjustment-category/useGetAdjustmentCategories";
 import useGetOtherDeductionPageable from "@/hooks/other-deduction-types/useGetOtherDeductionPageable";
 import usePaginationState from "@/hooks/usePaginationState";
 import { Input, Space, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { useState } from "react";
 const { Search } = Input;
 
 interface variables {
@@ -18,7 +16,7 @@ const initialState: variables = {
   page: 0,
   filter: "",
 };
-function AdjustmentCategory() {
+function OtherDeductionTypes() {
   const [state, { onNextPage, onQueryChange }] = usePaginationState(
     initialState,
     0,
@@ -52,7 +50,7 @@ function AdjustmentCategory() {
       dataIndex: "id",
       render: (value, { isDefault, ...record }) =>
         !isDefault && (
-          <UpsertAdjustmentCategoryModal refetch={refetch} record={record} />
+          <UpsertOtherDeductionTypeModal refetch={refetch} record={record} />
         ),
     },
   ];
@@ -69,13 +67,13 @@ function AdjustmentCategory() {
         <Space>
           <Search
             onSearch={(val) => {
-              onQueryChange("filter");
+              onQueryChange("filter", val);
             }}
             allowClear
             style={{ width: "350px" }}
             placeholder="Search"
           />
-          <UpsertAdjustmentCategoryModal refetch={refetch} />
+          <UpsertOtherDeductionTypeModal refetch={refetch} />
         </Space>
       </div>
 
@@ -84,4 +82,4 @@ function AdjustmentCategory() {
   );
 }
 
-export default AdjustmentCategory;
+export default OtherDeductionTypes;

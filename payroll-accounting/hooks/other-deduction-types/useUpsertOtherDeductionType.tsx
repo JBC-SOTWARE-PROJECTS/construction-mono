@@ -2,14 +2,9 @@ import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
 
 const MUTATION = gql`
-  mutation (
-    $filter: String
-    $name: String
-    $description: String
-    $status: Boolean
-  ) {
+  mutation ($id: UUID, $name: String, $description: String, $status: Boolean) {
     data: upsertOtherDeductionType(
-      id: $filter
+      id: $id
       name: $name
       description: $description
       status: $status
@@ -23,6 +18,8 @@ const MUTATION = gql`
 interface params {
   id: string | undefined;
   name: string;
+  description: string;
+  status: boolean;
 }
 function useUpsertOtherDeductionType(callBack?: (result: any) => void) {
   const [mutationFn, { loading }] = useMutation(MUTATION, {
