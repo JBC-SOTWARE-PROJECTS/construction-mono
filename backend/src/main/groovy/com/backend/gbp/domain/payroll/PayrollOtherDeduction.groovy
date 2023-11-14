@@ -19,8 +19,8 @@ class PayrollOtherDeduction extends PayrollAuditingEntity implements Serializabl
     @Type(type = "pg-uuid")
     UUID id
 
-    @OneToMany(mappedBy = "payrollAdjustment")
-    List<PayrollEmployeeAdjustment> employees = []
+    @OneToMany(mappedBy = "payrollOtherDeduction")
+    List<PayrollEmployeeOtherDeduction> employees = []
 
     @Column(name = "deleted", columnDefinition = "bool")
     Boolean deleted

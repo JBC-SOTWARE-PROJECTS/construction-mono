@@ -7,6 +7,7 @@ import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollEmployeeSta
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.payroll.OtherDeductionTypesRepository
 import com.backend.gbp.repository.payroll.PayrollOtherDeductionItemRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeOtherDeductionDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeOtherDeductionRepository
@@ -41,7 +42,8 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
     @Autowired
     PayrollOtherDeductionItemRepository payrollOtherDeductionItemRepository
 
-
+    @Autowired
+    OtherDeductionTypesRepository otherDeductionTypesRepository
     //=========================== QUERIES ============================
 
 
@@ -95,8 +97,11 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
         if (amount)
             item.amount = amount
 
-        if (deductionType)
+        if (deductionType) {
+            OtherDeductionTypes type = otherDeductionTypesRepository.findById(deductionType).get()
             item.type = deductionType
+            item.name = type.name
+        }
 
 
         item.description = description ? description : item.description

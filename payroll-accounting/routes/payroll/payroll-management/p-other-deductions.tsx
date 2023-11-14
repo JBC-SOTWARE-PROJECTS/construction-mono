@@ -4,6 +4,7 @@ import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/P
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
   PayrollEmployeeOtherDeductionDto,
+  PayrollEmployeeStatus,
   PayrollModule,
   PayrollOtherDeductionItem,
 } from "@/graphql/gql/graphql";
@@ -19,6 +20,7 @@ import { recalculateButton } from "./p-contributions";
 import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 import { useRef, useState } from "react";
 import {
+  CheckOutlined,
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
@@ -29,6 +31,12 @@ import useDeleteOtherDeductionItem from "@/hooks/payroll/other-deductions/useDel
 import useGetPayrollOtherDeduction from "@/hooks/payroll/other-deductions/useGetPayrollOtherDeduction";
 import AddOtherDeductionItemsModal from "@/components/payroll/payroll-management/other-deductions/AddOtherDeductionItemsModal";
 import { PayrollStatus } from "@/hooks/payroll/useUpdatePayrollStatus";
+import { Table } from "antd/lib";
+import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
+import { useRouter } from "next/router";
+import { statusMap } from "@/utility/constant";
+import useUpdatePayrollAdjustmentStatus from "@/hooks/payroll/adjustments/useUpdatePayrollAdjustmentStatus";
+import useUpdatePayrollOtherDeductionStatus from "@/hooks/payroll/other-deductions/useUpdatePayrollOtherDeductionStatus";
 const initialState: variables = {
   filter: "",
   size: 25,
@@ -36,6 +44,7 @@ const initialState: variables = {
   status: [],
 };
 function OtherDeductions({ account }: IPageProps) {
+  const router = useRouter();
   const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
   const [editing, setEditing] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<String>("");
@@ -58,12 +67,11 @@ function OtherDeductions({ account }: IPageProps) {
     refetch();
   });
 
-  // const [updateStatus, loadingUpdateStatus] = useUpdatePayrollAdjustmentStatus(
-  //   () => {
-  //     refetchAdjustment();
-  //     refetch();
-  //   }
-  // );
+  const [updateStatus, loadingUpdateStatus] =
+    useUpdatePayrollOtherDeductionStatus(() => {
+      refetchOtherDeduction();
+      refetch();
+    });
 
   const editAmount = (record: PayrollOtherDeductionItem) => {
     const amount = amountRef?.current?.value;
@@ -91,10 +99,36 @@ function OtherDeductions({ account }: IPageProps) {
       content: "Are you sure you want to delete this item?",
       icon: <ExclamationCircleOutlined />,
       onOk() {
-        // deleteItem(id);
+        deleteItem(id);
       },
       onCancel() {},
     });
+  };
+
+  const handleClickFinalize = () => {
+    let countDraft = 0;
+    if (otherDeduction.status == PayrollStatus.DRAFT) {
+      data?.content?.forEach((item: PayrollEmployeeOtherDeductionDto) => {
+        if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
+      });
+    }
+    if (countDraft > 0) {
+      Modal.confirm({
+        title: "There still some DRAFT employees. Proceed?",
+        icon: <ExclamationCircleOutlined />,
+        onOk() {
+          updateStatus({
+            payrollId: router?.query?.id as string,
+            status: "FINALIZED",
+          });
+        },
+      });
+    } else {
+      updateStatus({
+        payrollId: router?.query?.id as string,
+        status: statusMap[otherDeduction?.status],
+      });
+    }
   };
 
   const columns: ColumnsType<PayrollEmployeeOtherDeductionDto> = [
@@ -142,7 +176,6 @@ function OtherDeductions({ account }: IPageProps) {
   ];
   let expandedRowColumns: ColumnsType<PayrollOtherDeductionItem> = [
     { title: "Name", dataIndex: "name" },
-
     {
       title: "Description",
       dataIndex: "description",
@@ -168,13 +201,6 @@ function OtherDeductions({ account }: IPageProps) {
             {value} <EditOutlined />
           </div>
         ),
-    },
-    {
-      title: "Operation",
-      dataIndex: "operation",
-      render: (value, record) => (
-        <Tag color={value === "ADDITION" ? "green" : "red"}>{value}</Tag>
-      ),
     },
     {
       title: "Amount",
@@ -223,7 +249,40 @@ function OtherDeductions({ account }: IPageProps) {
   ];
   return (
     <>
-      <PayrollHeader module={PayrollModule.OtherDeduction} extra={<></>} />
+      <PayrollHeader
+        module={PayrollModule.OtherDeduction}
+        status={otherDeduction?.status}
+        showTitle
+        extra={
+          <>
+            {otherDeduction?.status === PayrollStatus.DRAFT && (
+              <PayrollModuleRecalculateAllEmployeeAction
+                id={router?.query?.id as string}
+                module={PayrollModule.OtherDeduction}
+                buttonProps={recalculateButton}
+                tooltipProps={{ placement: "topRight" }}
+                refetch={refetch}
+              >
+                Recalculate All Employee Other Deduction
+              </PayrollModuleRecalculateAllEmployeeAction>
+            )}
+
+            <CustomButton
+              type="primary"
+              icon={
+                otherDeduction?.status === "FINALIZED" ? (
+                  <EditOutlined />
+                ) : (
+                  <CheckOutlined />
+                )
+              }
+              onClick={handleClickFinalize}
+            >
+              Set as {statusMap[otherDeduction?.status]}
+            </CustomButton>
+          </>
+        }
+      />
 
       <div
         style={{
@@ -249,19 +308,19 @@ function OtherDeductions({ account }: IPageProps) {
         loading={false}
         size={"small"}
         dataSource={data?.content}
-        // expandable={{
-        //   expandedRowRender: (record) => {
-        //     return (
-        //       <Table
-        //         pagination={false}
-        //         dataSource={record?.employee?.adjustmentItems}
-        //         columns={expandedRowColumns}
-        //       />
-        //     );
-        //   },
-        //   rowExpandable: (record) =>
-        //     record?.employee?.adjustmentItems.length > 0,
-        // }}
+        expandable={{
+          expandedRowRender: (record) => {
+            return (
+              <Table
+                pagination={false}
+                dataSource={record?.employee?.deductionItems}
+                columns={expandedRowColumns}
+              />
+            );
+          },
+          rowExpandable: (record) =>
+            record?.employee?.deductionItems.length > 0,
+        }}
         total={data?.totalElements}
         pageSize={state.size}
         onChange={onQueryChange}
