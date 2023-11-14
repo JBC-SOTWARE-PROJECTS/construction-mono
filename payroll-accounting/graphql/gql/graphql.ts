@@ -593,6 +593,7 @@ export type ArInvoiceWithOutstandingBal = {
 
 export type AssetMaintenanceTypes = {
   __typename?: 'AssetMaintenanceTypes';
+  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -645,6 +646,7 @@ export type Assets = {
   __typename?: 'Assets';
   assetCode?: Maybe<Scalars['String']['output']>;
   brand?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
@@ -6168,6 +6170,25 @@ export type Page_ArInvoiceParticulars = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_AssetMaintenanceTypes = {
+  __typename?: 'Page_AssetMaintenanceTypes';
+  content?: Maybe<Array<Maybe<AssetMaintenanceTypes>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_Assets = {
   __typename?: 'Page_Assets';
   content?: Maybe<Array<Maybe<Assets>>>;
@@ -8305,6 +8326,7 @@ export type Query = {
   assetById?: Maybe<Assets>;
   assetList?: Maybe<Array<Maybe<Assets>>>;
   assetListPageable?: Maybe<Page_Assets>;
+  assetMaintenanceTypeListPageable?: Maybe<Page_AssetMaintenanceTypes>;
   assetPreventiveMaintenanceById?: Maybe<AssetPreventiveMaintenance>;
   /** Get all Authorities */
   authorities?: Maybe<Array<Maybe<Authority>>>;
@@ -9137,6 +9159,14 @@ export type QueryAssetListPageableArgs = {
   size?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<AssetStatus>;
   type?: InputMaybe<AssetType>;
+};
+
+
+/** Query root */
+export type QueryAssetMaintenanceTypeListPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

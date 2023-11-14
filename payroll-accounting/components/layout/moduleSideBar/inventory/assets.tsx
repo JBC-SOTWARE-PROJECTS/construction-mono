@@ -11,6 +11,16 @@ const AccountingAccountsPayableMenu = {
               name: "All Assets",
             },
           ],
+        }, 
+        {
+          path: "/inventory/assets/configuration/maintenance-type",
+          name: "Configurations",
+          routes: [
+            {
+              path: "/inventory/assets/configuration/maintenance-type",
+              name: "Maintenance Type",
+            },
+          ],
         },
        
       ],
