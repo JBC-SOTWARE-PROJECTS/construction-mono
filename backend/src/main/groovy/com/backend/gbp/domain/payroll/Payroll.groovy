@@ -68,10 +68,9 @@ class Payroll extends PayrollAuditingEntity implements Serializable {
     @OneToOne(mappedBy = "payroll")
     PayrollAdjustment adjustment
 
-//
-//
-//    @OneToOne(mappedBy = "payroll")
-//    PayrollOtherDeduction otherDeduction
+    @OneToOne(mappedBy = "payroll")
+    PayrollOtherDeduction otherDeduction
+
     @OneToOne(mappedBy = "payroll")
     PayrollAllowance allowance
 }
