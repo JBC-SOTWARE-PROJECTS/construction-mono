@@ -19,4 +19,11 @@ interface OtherDeductionTypesRepository extends JpaRepository<OtherDeductionType
                     """
     )
     Page<OtherDeductionTypes>getPageable(@Param("filter") String filter, Pageable pageable)
+
+
+    @Query(value = """ select a from OtherDeductionTypes a where
+                       lower(a.name) like lower(concat('%',:filter,'%'))
+                    """
+    )
+    List<OtherDeductionTypes>getByFilter(@Param("filter") String filter)
 }

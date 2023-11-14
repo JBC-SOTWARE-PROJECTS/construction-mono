@@ -31,6 +31,14 @@ class OtherDeductionTypesService {
         return otherDeductionTypesRepository.findAll()
     }
 
+    @GraphQLQuery(name ="getOtherDeduction")
+    List<OtherDeductionTypes>getOtherDeduction(
+            @GraphQLArgument(name = "filter") String filter
+    ){
+        return otherDeductionTypesRepository.getByFilter(filter)
+    }
+
+
     @GraphQLQuery(name ="getOtherDeductionPageable")
     Page<OtherDeductionTypes>getOtherDeductionPageable(
             @GraphQLArgument(name ="filter") String filter,

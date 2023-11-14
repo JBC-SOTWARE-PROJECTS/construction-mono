@@ -1,7 +1,5 @@
 package com.backend.gbp.repository.payroll
 
-
-import com.backend.gbp.domain.payroll.PayrollEmployeeAdjustment
 import com.backend.gbp.domain.payroll.PayrollEmployeeOtherDeduction
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import org.springframework.data.domain.Page
@@ -15,7 +13,7 @@ interface PayrollEmployeeOtherDeductionDto {
 
     String getEmployeeName()
 
-    PayrollEmployeeAdjustment getEmployee()
+    PayrollEmployeeOtherDeduction getEmployee()
 
     String getStatus()
 
@@ -62,22 +60,22 @@ interface PayrollEmployeeOtherDeductionRepository extends JpaRepository<PayrollE
             @Param("status") List<PayrollEmployeeStatus> status,
             Pageable pageable)
 
-//    @Query(value = """
-//    SELECT
-//        ea.id as id,
-//        e.fullName as employeeName
-//    FROM PayrollEmployeeAdjustment ea
-//    LEFT JOIN ea.payrollAdjustment pa
-//    LEFT JOIN pa.payroll p
-//    LEFT JOIN ea.payrollEmployee pe
-//    LEFT JOIN pe.employee e
-//    WHERE
-//        p.id = :payroll
-//    GROUP BY
-//        ea.id,
-//        e.fullName
-//""")
-//    List<PayrollEmployeeOtherDeductionDto> getEmployeesList(
-//            @Param("payroll") UUID payroll
-//    )
+    @Query(value = """
+    SELECT
+        ea.id as id,
+        e.fullName as employeeName
+    FROM PayrollEmployeeOtherDeduction ea
+    LEFT JOIN ea.payrollOtherDeduction pa
+    LEFT JOIN pa.payroll p
+    LEFT JOIN ea.payrollEmployee pe
+    LEFT JOIN pe.employee e
+    WHERE
+        p.id = :payroll
+    GROUP BY
+        ea.id,
+        e.fullName
+""")
+    List<PayrollEmployeeOtherDeductionDto> getEmployeesList(
+            @Param("payroll") UUID payroll
+    )
 }

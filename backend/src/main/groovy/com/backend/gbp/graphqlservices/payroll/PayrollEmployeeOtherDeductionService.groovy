@@ -82,7 +82,8 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "employee") UUID employee,
             @GraphQLArgument(name = "amount") BigDecimal amount,
-            @GraphQLArgument(name = "description") String description
+            @GraphQLArgument(name = "description") String description,
+            @GraphQLArgument(name = "deductionType") UUID deductionType
     ) {
         PayrollOtherDeductionItem item = new PayrollOtherDeductionItem()
         if (id) {
@@ -91,9 +92,12 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
         if (employee)
             item.employeeOtherDeduction = payrollEmployeeOtherDeductionRepository.findById(employee).get()
 
-
         if (amount)
             item.amount = amount
+
+        if (deductionType)
+            item.type = deductionType
+
 
         item.description = description ? description : item.description
         item.company = SecurityUtils.currentCompany()

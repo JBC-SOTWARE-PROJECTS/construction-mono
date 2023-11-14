@@ -27,9 +27,9 @@ class PayrollOtherDeductionItem extends AbstractAuditingEntity implements Serial
     @JoinColumn(name = "employee", referencedColumnName = "employee")
     PayrollEmployeeOtherDeduction employeeOtherDeduction
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "other_deduction_type", referencedColumnName = "id", nullable = false)
-    OtherDeductionTypes type
+    @GraphQLQuery
+    @Column(name = "other_deduction_type", columnDefinition = "uuid")
+    UUID type
 
     @GraphQLQuery
     @Column(name = "name", columnDefinition = "varchar")

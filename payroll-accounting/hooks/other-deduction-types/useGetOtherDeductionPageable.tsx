@@ -33,7 +33,6 @@ const useGetOtherDeductionPageable = (
     {
       variables: {
         ...variables,
-        payroll: router?.query?.id,
       },
       onCompleted: (result) => {
         if (onCompleted) onCompleted(result?.data);
