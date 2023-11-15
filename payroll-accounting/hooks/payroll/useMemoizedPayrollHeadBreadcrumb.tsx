@@ -67,6 +67,13 @@ const useMemoizedPayrollHeaderBreadcrumb = (
         disabled: pathname === `${basePathName}/p-contributions`,
         hasRole: hasContributionsRole,
       },
+      {
+        key: `${basePath}/p-other-deductions`,
+        title: "Other Deductions",
+        path: `${basePath}/p-other-deductions`,
+        disabled: pathname === `${basePathName}/p-other-deductions`,
+        hasRole: hasOtherDeductionRole,
+      },
     ];
 
     const items = menus

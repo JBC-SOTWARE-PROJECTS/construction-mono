@@ -6,7 +6,7 @@ import CircularProgress from "@/components/circularProgress";
 import { IPageProps } from "@/utility/interfaces";
 
 const AdjustmentCategory = dynamic(
-  () => import("@/routes/payroll/configurations/adjustment-category"),
+  () => import("@/routes/payroll/configurations/other-deduction-types"),
   {
     loading: () => <CircularProgress />,
   }
@@ -15,7 +15,7 @@ const AdjustmentCategory = dynamic(
 const AdjustmentCategoryPage = ({ account }: IPageProps) => (
   <React.Fragment>
     <Head>
-      <title>Adjustment Category Management</title>
+      <title>Deduction Types Management</title>
     </Head>
     <AccessManager roles={["ROLE_ADMIN", "MANAGE_ADJUSMENT_CATEGORY_TYPES"]}>
       <div className="gx-main-content-wrapper-full-width">
