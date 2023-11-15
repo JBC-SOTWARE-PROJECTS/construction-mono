@@ -28,12 +28,13 @@ interface IProps {
   hide: (hideProps: any) => void;
   defaultSelected: Item[];
   defaultKey: React.Key[];
+  isSingleSelection: boolean;
 }
 
 const { Search } = Input;
 
 export default function ItemSelector(props: IProps) {
-  const { hide, defaultSelected, defaultKey } = props;
+  const { hide, defaultSelected, defaultKey, isSingleSelection} = props;
   const [selectedItems, setSelectedItems] = useState<Item[]>(defaultSelected);
   const [selectedRowkeys, setSelectedRowkeys] =
     useState<React.Key[]>(defaultKey);
@@ -63,6 +64,10 @@ export default function ItemSelector(props: IProps) {
         let mapKeys: React.Key[] = _.map(payloadSelected, "id");
         setSelectedRowkeys(mapKeys);
         setSelectedItems(payloadSelected);
+
+        if(isSingleSelection){
+          hide(record);
+        }
       } else {
         // ================ remove ===============================
         let filtered = _.filter(payloadSelected, function (o) {
@@ -103,7 +108,6 @@ export default function ItemSelector(props: IProps) {
         let findObj = _.find(defaultSelected, { id: e.id });
         return _.isEmpty(findObj);
       });
-
       // map values
       const newItems = (newSelected || []).map((obj) => {
         return {

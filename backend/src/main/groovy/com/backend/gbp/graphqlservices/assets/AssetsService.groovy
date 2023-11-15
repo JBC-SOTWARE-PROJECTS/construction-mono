@@ -1,6 +1,8 @@
 package com.backend.gbp.graphqlservices.assets
 
 import com.backend.gbp.domain.assets.Assets
+import com.backend.gbp.domain.assets.enums.AssetStatus
+import com.backend.gbp.domain.assets.enums.AssetType
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.projects.ProjectCostService
 import com.backend.gbp.services.GeneratorService
@@ -67,16 +69,17 @@ class AssetsService extends AbstractDaoService<Assets> {
     @GraphQLQuery(name = "assetListPageable")
     Page<Assets> assetListPageable(
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "status") String status,
+            @GraphQLArgument(name = "status") AssetStatus status,
             @GraphQLArgument(name = "page") Integer page,
-            @GraphQLArgument(name = "size") Integer size
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "type") AssetType type
     ) {
 
         String query = '''Select p from Assets p where
-						lower(concat(p.assetCode,p.description)) like lower(concat('%',:filter,'%'))'''
+						lower(concat(p.assetCode,p.description,p.brand, p.item.descLong)) like lower(concat('%',:filter,'%'))'''
 
         String countQuery = '''Select count(p) from Assets p where
-							lower(concat(p.assetCode,p.description)) like lower(concat('%',:filter,'%'))'''
+							lower(concat(p.assetCode,p.description,p.brand, p.item.descLong)) like lower(concat('%',:filter,'%'))'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
@@ -86,6 +89,12 @@ class AssetsService extends AbstractDaoService<Assets> {
             query += ''' and (p.status = :status)'''
             countQuery += ''' and (p.status = :status)'''
             params.put("status", status)
+        }
+
+        if (type) {
+            query += ''' and (p.type = :type)'''
+            countQuery += ''' and (p.type = :type)'''
+            params.put("type", type)
         }
 
         query += ''' ORDER BY p.assetCode DESC'''

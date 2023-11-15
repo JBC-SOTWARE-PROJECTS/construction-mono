@@ -591,6 +591,30 @@ export type ArInvoiceWithOutstandingBal = {
   reference?: Maybe<Scalars['String']['output']>;
 };
 
+export enum AssetStatus {
+  Active = 'ACTIVE',
+  Disposed = 'DISPOSED',
+  Idle = 'IDLE',
+  InRepair = 'IN_REPAIR',
+  InService = 'IN_SERVICE',
+  InTransit = 'IN_TRANSIT',
+  OutOfService = 'OUT_OF_SERVICE',
+  Reserved = 'RESERVED',
+  Retired = 'RETIRED',
+  UnderInspection = 'UNDER_INSPECTION',
+  UnderMaintenance = 'UNDER_MAINTENANCE'
+}
+
+export enum AssetType {
+  ConstructionEquipment = 'CONSTRUCTION_EQUIPMENT',
+  OfficeEquipment = 'OFFICE_EQUIPMENT',
+  PersonalProtectiveEquipment = 'PERSONAL_PROTECTIVE_EQUIPMENT',
+  RealEstate = 'REAL_ESTATE',
+  SoftwareAndLicenses = 'SOFTWARE_AND_LICENSES',
+  Tool = 'TOOL',
+  Vehicle = 'VEHICLE'
+}
+
 export type Assets = {
   __typename?: 'Assets';
   assetCode?: Maybe<Scalars['String']['output']>;
@@ -600,11 +624,13 @@ export type Assets = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   image?: Maybe<Scalars['String']['output']>;
+  item?: Maybe<Item>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   model?: Maybe<Scalars['String']['output']>;
   plateNo?: Maybe<Scalars['String']['output']>;
-  status?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<AssetStatus>;
+  type?: Maybe<AssetType>;
 };
 
 export type Authority = {
@@ -5395,6 +5421,7 @@ export type MutationUpsertOfficeItemArgs = {
 /** Mutation root */
 export type MutationUpsertOtherDeductionItemArgs = {
   amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  deductionType?: InputMaybe<Scalars['UUID']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   employee?: InputMaybe<Scalars['UUID']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -7284,6 +7311,7 @@ export type PayrollEmployee = {
   createdDate?: Maybe<Scalars['Instant']['output']>;
   employee?: Maybe<Employee>;
   employeeAdjustment?: Maybe<PayrollEmployeeAdjustment>;
+  employeeOtherDeduction?: Maybe<PayrollEmployeeOtherDeduction>;
   id?: Maybe<Scalars['UUID']['output']>;
   isOld?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
@@ -7504,7 +7532,7 @@ export type PayrollOtherDeduction = {
   createdDate?: Maybe<Scalars['Instant']['output']>;
   deleted?: Maybe<Scalars['Boolean']['output']>;
   deletedEnd?: Maybe<Scalars['Instant']['output']>;
-  employees?: Maybe<Array<Maybe<PayrollEmployeeAdjustment>>>;
+  employees?: Maybe<Array<Maybe<PayrollEmployeeOtherDeduction>>>;
   finalizedBy?: Maybe<Employee>;
   finalizedDate?: Maybe<Scalars['Instant']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
@@ -7526,7 +7554,7 @@ export type PayrollOtherDeductionItem = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  type?: Maybe<OtherDeductionTypes>;
+  type?: Maybe<Scalars['UUID']['output']>;
 };
 
 export enum PayrollStatus {
@@ -8609,6 +8637,7 @@ export type Query = {
   getMaterialByRefStockCard?: Maybe<ProjectUpdatesMaterials>;
   getOnHandByItem?: Maybe<Inventory>;
   getOneRawLog?: Maybe<EmployeeAttendance>;
+  getOtherDeduction?: Maybe<Array<Maybe<OtherDeductionTypes>>>;
   getOtherDeductionEmployees?: Maybe<Page_PayrollEmployeeOtherDeductionDto>;
   getOtherDeductionEmployeesList?: Maybe<Array<Maybe<PayrollEmployeeOtherDeductionDto>>>;
   getOtherDeductionPageable?: Maybe<Page_OtherDeductionTypes>;
@@ -9256,7 +9285,8 @@ export type QueryAssetListPageableArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
-  status?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<AssetStatus>;
+  type?: InputMaybe<AssetType>;
 };
 
 
@@ -10121,6 +10151,12 @@ export type QueryGetOnHandByItemArgs = {
 /** Query root */
 export type QueryGetOneRawLogArgs = {
   id: Scalars['UUID']['input'];
+};
+
+
+/** Query root */
+export type QueryGetOtherDeductionArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
 };
 
 
