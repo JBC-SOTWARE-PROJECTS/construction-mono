@@ -607,6 +607,7 @@ export type AssetPreventiveMaintenance = {
   __typename?: 'AssetPreventiveMaintenance';
   asset?: Maybe<Assets>;
   assetMaintenanceType?: Maybe<AssetMaintenanceTypes>;
+  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
@@ -615,7 +616,7 @@ export type AssetPreventiveMaintenance = {
   note?: Maybe<Scalars['String']['output']>;
   occurrence?: Maybe<Scalars['String']['output']>;
   reminderSchedule?: Maybe<Scalars['String']['output']>;
-  scheduleType?: Maybe<Scalars['String']['output']>;
+  scheduleType?: Maybe<PreventiveScheduleType>;
 };
 
 export enum AssetStatus {
@@ -7823,6 +7824,13 @@ export type PositionInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
 };
+
+export enum PreventiveScheduleType {
+  Daily = 'DAILY',
+  Monthly = 'MONTHLY',
+  Weekly = 'WEEKLY',
+  Yearly = 'YEARLY'
+}
 
 export type ProjectCost = {
   __typename?: 'ProjectCost';

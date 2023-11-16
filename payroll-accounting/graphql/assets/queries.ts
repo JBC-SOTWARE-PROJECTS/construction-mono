@@ -15,3 +15,13 @@ export const UPSERT_MAINTENANCE_TYPE_RECORD = gql`
     }
   }
 `;
+
+
+export const UPSERT_PREVENTIVE_MAINTENANCE_RECORD = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertAssetPreventiveMaintenance(id: $id, fields: $fields) {
+      id
+    }
+  }
+`;
+

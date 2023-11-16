@@ -1,8 +1,12 @@
 package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.assets.enums.PreventiveScheduleType
+import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
+import org.hibernate.annotations.NotFound
+import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
@@ -27,9 +31,9 @@ class AssetPreventiveMaintenance extends AbstractAuditingEntity implements Seria
 	@Column(name = "note")
 	String note
 
-	@GraphQLQuery
+	@Enumerated(EnumType.STRING)
 	@Column(name = "schedule_type")
-	String scheduleType
+	PreventiveScheduleType scheduleType
 
 	@GraphQLQuery
 	@Column(name = "occurrence")
@@ -40,11 +44,19 @@ class AssetPreventiveMaintenance extends AbstractAuditingEntity implements Seria
 	String reminderSchedule
 
 	@GraphQLQuery
-	@Column(name = "asset")
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset", referencedColumnName = "id")
 	Assets asset
 
 	@GraphQLQuery
-	@Column(name = "asset_maintenance_type")
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset_maintenance_type", referencedColumnName = "id")
 	AssetMaintenanceTypes assetMaintenanceType
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 
 }
