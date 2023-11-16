@@ -413,6 +413,4 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/47_michael_payroll_other_deduction_tables.sql"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/48_donss_add_extension.sql"
-             relativeToChangelogFile="false"/>
 </databaseChangeLog>

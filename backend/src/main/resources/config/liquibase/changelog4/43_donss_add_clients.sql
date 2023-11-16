@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE accounting.ar_customers (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	account_prefix varchar NULL,
