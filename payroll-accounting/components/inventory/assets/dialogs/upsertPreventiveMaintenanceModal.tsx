@@ -224,6 +224,11 @@ export default function UpsertPreventiveMaintenanceModal(props: IProps) {
     if (values?.scheduleType == "DAILY") {
       formattedOccurrence = values?.occurrence?.format("HH:mm:ss a");
     }
+
+    if (values?.scheduleType == "YEARLY") {
+      formattedOccurrence = values?.occurrence?.format("YYYY-MM-DD");
+    }
+    
     
     payload.occurrence = formattedOccurrence;
     payload.scheduleType = values?.scheduleType as AssetMaintenanceTypes;
@@ -321,7 +326,7 @@ export default function UpsertPreventiveMaintenanceModal(props: IProps) {
                 <FormInput
                   name="reminderSchedule"
                   rules={requiredField}
-                  label="Reminder Schedule"
+                  label="Reminder Schedule (Hrs/Days before the occurence)"
                   propsinput={{
                     placeholder: "Set reminder schedule",
                   }}

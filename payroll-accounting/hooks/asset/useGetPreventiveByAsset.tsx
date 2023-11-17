@@ -1,28 +1,35 @@
-import { gql, useQuery } from "@apollo/client";
+import { QueryHookOptions, gql, useQuery } from "@apollo/client";
 
 const GET_RECORDS = gql`
-  query ($id: UUID) {
-    data: preventiveByAsset(id: $id) {
-      id
-      scheduleType
-      occurrence
-      reminderSchedule
-      assetMaintenanceType{
-        id
-        description
-      }
+  query ($id: UUID, $filter: String,  $page: Int, $size: Int) {
+    list: preventiveByAsset(
+        id: $id
+        filter: $filter
+        page: $page
+        size: $size
+      ) {
+        content {
+          id
+          scheduleType
+          occurrence
+          reminderSchedule
+          assetMaintenanceType{
+            id
+            description
+          }
+        }
+        size
+        totalElements
+        number
     }
   }
 `;
 
-const useGetPreventiveByAsset = (id: any) => {
+const useGetPreventiveByAsset = (props: QueryHookOptions ) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
-    variables: {
-      id: id,
-    },
-    fetchPolicy: "network-only",
+    ...props
   });
-  return [data?.data , loading, refetch];
+  return [data?.list , loading, refetch];
 };
 
 export default useGetPreventiveByAsset;

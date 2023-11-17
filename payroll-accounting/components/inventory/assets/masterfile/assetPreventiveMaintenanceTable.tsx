@@ -3,10 +3,16 @@ import { EyeOutlined, EditOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { AssetPreventiveMaintenance, AssetStatus, Assets } from "@/graphql/gql/graphql";
+import {
+  AssetPreventiveMaintenance,
+  AssetStatus,
+  Assets,
+  PreventiveScheduleType,
+} from "@/graphql/gql/graphql";
 import DescLong from "../../desclong";
 import { AssetStatusColor } from "@/utility/constant";
 import { useRouter } from "next/router";
+import moment from "moment";
 
 type IProps = {
   dataSource: AssetPreventiveMaintenance[];
@@ -30,44 +36,73 @@ export default function AssetPreventiveMaintenanceTable({
   const router = useRouter();
   const columns: ColumnsType<AssetPreventiveMaintenance> = [
     {
+      title: "Maintenance Type",
+      dataIndex: "assetMaintenanceType.description",
+      key: "assetMaintenanceType",
+      width: 60,
+      render: (_, record) => <span>{record?.assetMaintenanceType?.description}</span>,
+    },
+    {
       title: "Schedule Type",
       dataIndex: "scheduleType",
       key: "scheduleType",
-      width: 100,
+      width: 50,
     },
     {
       title: "Occurrence",
       dataIndex: "occurrence",
       key: "occurrence",
-      width: 100,
+      width: 50,
+      render: (_, record) => {
+        switch (record?.scheduleType) {
+          case PreventiveScheduleType.Daily:
+            return record?.occurrence + " Hr/s";
+            break;
+          case PreventiveScheduleType.Yearly:
+            return <>{moment(record?.occurrence, "YYYY-MM-DD").format('MMM DD')}</>;
+            break;
+
+          default:
+            return record?.occurrence;
+            break;
+        }
+      },
     },
     {
-      title: "Reminder Schedule",
+      title: "Reminder Schedule (Before Occurence)",
       dataIndex: "reminderSchedule",
       key: "reminderSchedule",
       width: 100,
+      render: (_, record) => {
+        switch (record?.scheduleType) {
+          case PreventiveScheduleType.Daily:
+            return record?.reminderSchedule + " Hr/s";
+            break;
+
+          default:
+            return record?.reminderSchedule + " Day/s";
+            break;
+        }
+      },
     },
     {
       title: "Action",
       dataIndex: "",
       key: "",
-      width: 30,
+      width: 20,
       fixed: "right",
       render: (_, record) => {
         return (
-              <Button
-                icon={<EditOutlined />}
-                type="primary"
-                onClick={() => {
-                  handleOpen(record);
-                }}
-              />
-           
+          <Button
+            icon={<EditOutlined />}
+            type="primary"
+            onClick={() => {
+              handleOpen(record);
+            }}
+          />
         );
       },
-    }
-    
-    
+    },
   ];
 
   return (
@@ -86,9 +121,9 @@ export default function AssetPreventiveMaintenanceTable({
               pageSize={10}
               responsive={true}
               total={totalElements}
-                onChange={(e) => {
-                  changePage(e - 1);
-                }}
+              onChange={(e) => {
+                changePage(e - 1);
+              }}
             />
           )}
           scroll={{ x: 1400 }}

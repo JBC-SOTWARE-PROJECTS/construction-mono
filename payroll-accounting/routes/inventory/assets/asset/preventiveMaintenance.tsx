@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   PageContainer,
   ProCard,
@@ -16,26 +16,45 @@ import { AssetPreventiveMaintenance } from "@/graphql/gql/graphql";
 type Props = {};
 const { Search } = Input;
 
+export interface IPMState {
+  filter: string;
+  page: number;
+  size: number;
+}
+
+const initialState: IPMState = {
+  filter: "",
+  page: 0,
+  size: 10,
+};
+
 export default function PreventiveMaintenance({}: Props) {
-    const modal = useDialog(UpsertPreventiveMaintenanceModal);
-    const router = useRouter();
-    const [preventives, loadingAsset, refetch] = useGetPreventiveByAsset(router?.query?.id);
+  const modal = useDialog(UpsertPreventiveMaintenanceModal);
+  const router = useRouter();
+  const [state, setState] = useState(initialState);
 
-    const onUpsertRecord = (record?: any) => {
-        modal({ record: record }, (result: any) => {
-          if (result) {
-            refetch();
-            if (record?.id) {
-              message.success("Item successfully added");
-            } else {
-              message.success("Item successfully updated");
-            }
-          }
-        });
-      };
+  const [preventives, loadingAsset, refetch] = useGetPreventiveByAsset({
+    variables: {
+      ...state,
+      id: router?.query?.id,
+    },
+    fetchPolicy: "network-only",
+  });
 
-      
-    return (
+  const onUpsertRecord = (record?: any) => {
+    modal({ record: record }, (result: any) => {
+      if (result) {
+        refetch();
+        if (record?.id) {
+          message.success("Item successfully added");
+        } else {
+          message.success("Item successfully updated");
+        }
+      }
+    });
+  };
+
+  return (
     <>
       <ProCard
         title={``}
@@ -45,32 +64,32 @@ export default function PreventiveMaintenance({}: Props) {
         bordered
         headerBordered
         extra={
-            <ProFormGroup>
-              <Search
-                size="middle"
-                placeholder="Search here.."
-                //onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-                className="w-full"
-              />
-              <Button
-                type="primary"
-                icon={<PlusCircleOutlined />}
-                onClick={() => onUpsertRecord()}
-              >
-                Create New
-              </Button>
-            </ProFormGroup>
-          }
+          <ProFormGroup>
+            <Search
+              size="middle"
+              placeholder="Search here.."
+              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+              className="w-full"
+            />
+            <Button
+              type="primary"
+              icon={<PlusCircleOutlined />}
+              onClick={() => onUpsertRecord()}
+            >
+              Create New
+            </Button>
+          </ProFormGroup>
+        }
       >
         <AssetPreventiveMaintenanceTable
-          dataSource={preventives as AssetPreventiveMaintenance[]}
+          dataSource={preventives?.content as AssetPreventiveMaintenance[]}
           loading={false}
-          totalElements={0 as number}
+          totalElements={preventives?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           handleAssign={(record) => {}}
           handleSupplier={(record) => {}}
           changePage={(page) => {
-            // setState((prev) => ({ ...prev, page: page }));
+            setState((prev) => ({ ...prev, page: page }));
           }}
         />
       </ProCard>
