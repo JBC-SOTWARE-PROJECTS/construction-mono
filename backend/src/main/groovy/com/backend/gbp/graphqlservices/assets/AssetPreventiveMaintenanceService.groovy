@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.assets
 
+import com.backend.gbp.domain.assets.AssetMaintenanceTypes
 import com.backend.gbp.domain.assets.AssetPreventiveMaintenance
 import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
@@ -10,6 +11,7 @@ import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -39,14 +41,29 @@ class AssetPreventiveMaintenanceService extends AbstractDaoService<AssetPreventi
     }
 
     @GraphQLQuery(name = "preventiveByAsset")
-    List<AssetPreventiveMaintenance> preventiveByAsset(
-            @GraphQLArgument(name = "id") UUID id
+    Page<AssetPreventiveMaintenance> preventiveByAsset(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
     ) {
         if(id){
-            String query = '''Select e from AssetPreventiveMaintenance e where e.asset.id = :id'''
+            String query = '''Select p from AssetPreventiveMaintenance p where p.asset.id = :id
+            AND lower(concat(p.scheduleType,p.occurrence, p.reminderSchedule, p.assetMaintenanceType.description )) like lower(concat('%',:filter,'%'))
+            '''
+
+            String countQuery = '''Select count(p) from AssetPreventiveMaintenance p where p.asset.id = :id
+            AND lower(concat(p.scheduleType,p.occurrence, p.reminderSchedule, p.assetMaintenanceType.description )) like lower(concat('%',:filter,'%'))
+            '''
+
             Map<String, Object> params = new HashMap<>()
             params.put('id', id)
-            createQuery(query, params).resultList.sort { it.scheduleType }
+            params.put('filter', filter)
+
+            query += ''' ORDER BY p.assetMaintenanceType.description DESC'''
+
+            Page<AssetPreventiveMaintenance> result = getPageable(query, countQuery, page, size, params)
+            return result;
         }else{
             return null
         }
