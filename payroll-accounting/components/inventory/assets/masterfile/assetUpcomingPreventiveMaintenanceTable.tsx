@@ -6,6 +6,7 @@ import { ColumnsType } from "antd/es/table";
 import {
   AssetPreventiveMaintenance,
   AssetStatus,
+  AssetUpcomingPreventiveMaintenance,
   Assets,
   PreventiveScheduleType,
 } from "@/graphql/gql/graphql";
@@ -15,16 +16,16 @@ import { useRouter } from "next/router";
 import moment from "moment";
 
 type IProps = {
-  dataSource: AssetPreventiveMaintenance[];
+  dataSource: AssetUpcomingPreventiveMaintenance[];
   loading: boolean;
   totalElements: number;
-  handleOpen: (record: AssetPreventiveMaintenance) => void;
-  handleAssign: (record: AssetPreventiveMaintenance) => void;
-  handleSupplier: (record: AssetPreventiveMaintenance) => void;
+  handleOpen: (record: AssetUpcomingPreventiveMaintenance) => void;
+  handleAssign: (record: AssetUpcomingPreventiveMaintenance) => void;
+  handleSupplier: (record: AssetUpcomingPreventiveMaintenance) => void;
   changePage: (page: number) => void;
 };
 
-export default function AssetPreventiveMaintenanceTable({
+export default function AssetUpcomingPreventiveMaintenanceTable({
   dataSource,
   loading,
   totalElements = 1,
@@ -34,75 +35,64 @@ export default function AssetPreventiveMaintenanceTable({
   changePage,
 }: IProps) {
   const router = useRouter();
-  const columns: ColumnsType<AssetPreventiveMaintenance> = [
+  const columns: ColumnsType<AssetUpcomingPreventiveMaintenance> = [
+    {
+      title: "Asset",
+      dataIndex: "asset.item.descLong",
+      key: "asset.item.descLong",
+      width: '20%',
+      render: (_, record) => <span>{record?.asset?.item?.descLong}</span>,
+    },
     {
       title: "Maintenance Type",
       dataIndex: "assetMaintenanceType.name",
       key: "assetMaintenanceType",
-      width: 60,
+      width: '20%',
       render: (_, record) => <span>{record?.assetMaintenanceType?.name}</span>,
     },
     {
       title: "Schedule Type",
       dataIndex: "scheduleType",
       key: "scheduleType",
-      width: 50,
+      width: '20%',
     },
     {
-      title: "Occurrence",
-      dataIndex: "occurrence",
+      title: "Occurrence Date",
+      dataIndex: "occurrenceDate",
       key: "occurrence",
-      width: 50,
+      width: '20%',
       render: (_, record) => {
-        switch (record?.scheduleType) {
-          case PreventiveScheduleType.Daily:
-            return record?.occurrence + " Hr/s";
-            break;
-          case PreventiveScheduleType.Yearly:
-            return <>{moment(record?.occurrence, "YYYY-MM-DD").format('MMM DD')}</>;
-            break;
-
-          default:
-            return record?.occurrence;
-            break;
-        }
+        return <>{moment(record?.occurrenceDate, "YYYY-MM-DD").format('MMM DD, YYYY')}</>
       },
     },
     {
-      title: "Reminder Schedule (Before Occurence)",
-      dataIndex: "reminderSchedule",
-      key: "reminderSchedule",
-      width: 100,
+      title: "Reminder Date",
+      dataIndex: "reminderDate",
+      key: "reminderDate",
+      width: '20%',
       render: (_, record) => {
-        switch (record?.scheduleType) {
-          case PreventiveScheduleType.Daily:
-            return record?.reminderSchedule + " Hr/s";
-            break;
+        return <>{moment(record?.reminderDate, "YYYY-MM-DD").format('MMM DD, YYYY')}</>
+      },
+    },
 
-          default:
-            return record?.reminderSchedule + " Day/s";
-            break;
-        }
-      },
-    },
-    {
-      title: "Action",
-      dataIndex: "",
-      key: "",
-      width: 20,
-      fixed: "right",
-      render: (_, record) => {
-        return (
-          <Button
-            icon={<EditOutlined />}
-            type="primary"
-            onClick={() => {
-              handleOpen(record);
-            }}
-          />
-        );
-      },
-    },
+    // {
+    //   title: "Action",
+    //   dataIndex: "",
+    //   key: "",
+    //   width: 20,
+    //   fixed: "right",
+    //   render: (_, record) => {
+    //     return (
+    //       <Button
+    //         icon={<EditOutlined />}
+    //         type="primary"
+    //         onClick={() => {
+    //           handleOpen(record);
+    //         }}
+    //       />
+    //     );
+    //   },
+    // },
   ];
 
   return (

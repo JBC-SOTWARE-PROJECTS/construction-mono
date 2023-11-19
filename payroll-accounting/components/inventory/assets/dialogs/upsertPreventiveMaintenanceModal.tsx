@@ -222,7 +222,7 @@ export default function UpsertPreventiveMaintenanceModal(props: IProps) {
     var formattedOccurrence = values?.occurrence;
 
     if (values?.scheduleType == "DAILY") {
-      formattedOccurrence = values?.occurrence?.format("HH:mm:ss a");
+      formattedOccurrence = values?.occurrence?.format("hh:mm:ss a");
     }
 
     if (values?.scheduleType == "YEARLY") {

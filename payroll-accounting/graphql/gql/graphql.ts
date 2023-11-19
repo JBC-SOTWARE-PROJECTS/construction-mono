@@ -643,6 +643,20 @@ export enum AssetType {
   Vehicle = 'VEHICLE'
 }
 
+export type AssetUpcomingPreventiveMaintenance = {
+  __typename?: 'AssetUpcomingPreventiveMaintenance';
+  asset?: Maybe<Assets>;
+  assetMaintenanceType?: Maybe<AssetMaintenanceTypes>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  occurrence?: Maybe<Scalars['String']['output']>;
+  occurrenceDate?: Maybe<Scalars['Instant']['output']>;
+  reminderDate?: Maybe<Scalars['Instant']['output']>;
+  reminderSchedule?: Maybe<Scalars['String']['output']>;
+  scheduleType?: Maybe<PreventiveScheduleType>;
+};
+
 export type Assets = {
   __typename?: 'Assets';
   assetCode?: Maybe<Scalars['String']['output']>;
@@ -6190,6 +6204,44 @@ export type Page_AssetMaintenanceTypes = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_AssetPreventiveMaintenance = {
+  __typename?: 'Page_AssetPreventiveMaintenance';
+  content?: Maybe<Array<Maybe<AssetPreventiveMaintenance>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_AssetUpcomingPreventiveMaintenance = {
+  __typename?: 'Page_AssetUpcomingPreventiveMaintenance';
+  content?: Maybe<Array<Maybe<AssetUpcomingPreventiveMaintenance>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_Assets = {
   __typename?: 'Page_Assets';
   content?: Maybe<Array<Maybe<Assets>>>;
@@ -8739,6 +8791,7 @@ export type Query = {
   prItemById?: Maybe<PurchaseRequestItem>;
   prItemByParent?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   prItemNoPo?: Maybe<Array<Maybe<PurchaseRequest>>>;
+  preventiveByAsset?: Maybe<Page_AssetPreventiveMaintenance>;
   /** Filter Checks */
   printChecks?: Maybe<Page_DisbursementCheck>;
   projectById?: Maybe<Projects>;
@@ -8883,6 +8936,7 @@ export type Query = {
   unitMeasurementList?: Maybe<Array<Maybe<UnitMeasurement>>>;
   uopList?: Maybe<Array<Maybe<UnitMeasurement>>>;
   uouList?: Maybe<Array<Maybe<UnitMeasurement>>>;
+  upcomingMaintenance?: Maybe<Page_AssetUpcomingPreventiveMaintenance>;
   useGetLoanBalance?: Maybe<Scalars['BigDecimal']['output']>;
   /** List of Payments By shift ID */
   vatable_non?: Maybe<Scalars['BigDecimal']['output']>;
@@ -10971,6 +11025,15 @@ export type QueryPrItemByParentArgs = {
 
 
 /** Query root */
+export type QueryPreventiveByAssetArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryPrintChecksArgs = {
   bank?: InputMaybe<Scalars['UUID']['input']>;
   end?: InputMaybe<Scalars['String']['input']>;
@@ -11561,6 +11624,14 @@ export type QueryTransactionJournalWithPartitionArgs = {
 /** Query root */
 export type QueryUnitMeasurementListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryUpcomingMaintenanceArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

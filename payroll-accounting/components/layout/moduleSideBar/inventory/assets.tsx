@@ -4,11 +4,15 @@ const AccountingAccountsPayableMenu = {
       routes: [
         {
           path: "/inventory/assets/masterfile",
-          name: "Asset Masterfile",
+          name: "Assets",
           routes: [
             {
               path: "/inventory/assets/masterfile/all",
               name: "All Assets",
+            },
+            {
+              path: "/inventory/assets/masterfile/upcoming-maintenance",
+              name: "Upcoming Maintenance",
             },
           ],
         }, 

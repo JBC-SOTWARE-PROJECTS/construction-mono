@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.assets
 
 import com.backend.gbp.domain.assets.AssetMaintenanceTypes
 import com.backend.gbp.domain.assets.AssetPreventiveMaintenance
+import com.backend.gbp.domain.assets.AssetUpcomingPreventiveMaintenance
 import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
@@ -49,18 +50,18 @@ class AssetPreventiveMaintenanceService extends AbstractDaoService<AssetPreventi
     ) {
         if(id){
             String query = '''Select p from AssetPreventiveMaintenance p where p.asset.id = :id
-            AND lower(concat(p.scheduleType,p.occurrence, p.reminderSchedule, p.assetMaintenanceType.description )) like lower(concat('%',:filter,'%'))
+            AND lower(concat(p.scheduleType,p.occurrence, p.reminderSchedule, p.assetMaintenanceType.description, p.assetMaintenanceType.name)) like lower(concat('%',:filter,'%'))
             '''
 
             String countQuery = '''Select count(p) from AssetPreventiveMaintenance p where p.asset.id = :id
-            AND lower(concat(p.scheduleType,p.occurrence, p.reminderSchedule, p.assetMaintenanceType.description )) like lower(concat('%',:filter,'%'))
+            AND lower(concat(p.scheduleType,p.occurrence, p.reminderSchedule, p.assetMaintenanceType.description, p.assetMaintenanceType.name )) like lower(concat('%',:filter,'%'))
             '''
 
             Map<String, Object> params = new HashMap<>()
             params.put('id', id)
             params.put('filter', filter)
 
-            query += ''' ORDER BY p.assetMaintenanceType.description DESC'''
+            query += ''' ORDER BY p.assetMaintenanceType.name DESC'''
 
             Page<AssetPreventiveMaintenance> result = getPageable(query, countQuery, page, size, params)
             return result;

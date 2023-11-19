@@ -1,9 +1,8 @@
 import { QueryHookOptions, gql, useQuery } from "@apollo/client";
 
 const GET_RECORDS = gql`
-  query ($id: UUID, $filter: String,  $page: Int, $size: Int) {
-    list: preventiveByAsset(
-        id: $id
+  query ($filter: String,  $page: Int, $size: Int) {
+    list: upcomingMaintenance(
         filter: $filter
         page: $page
         size: $size
@@ -12,7 +11,15 @@ const GET_RECORDS = gql`
           id
           scheduleType
           occurrence
+          occurrenceDate
           reminderSchedule
+          reminderDate
+          asset{
+            item{
+              id
+              descLong
+            }
+          }
           assetMaintenanceType{
             id
             description
@@ -26,11 +33,13 @@ const GET_RECORDS = gql`
   }
 `;
 
-const useGetPreventiveByAsset = (props: QueryHookOptions ) => {
+const useGetUpcomingPreventive = (props: QueryHookOptions ) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     ...props
   });
+
+
   return [data?.list , loading, refetch];
 };
 
-export default useGetPreventiveByAsset;
+export default useGetUpcomingPreventive;
