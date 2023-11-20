@@ -57,7 +57,7 @@ export default function AssetsComponent({}: Props) {
     });
   };
 
-  console.log("state", state);
+
   const assetStatusOptions = Object.values(AssetStatus).map((item) => ({
     value: item,
     label: item.replace(/_/g, " "),

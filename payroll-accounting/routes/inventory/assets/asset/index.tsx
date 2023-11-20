@@ -9,13 +9,14 @@ import { AssetStatusColor } from "@/utility/constant";
 import { AssetStatus, AssetType } from "@/graphql/gql/graphql";
 import { Divider, Tabs } from "antd";
 import { TabsProps } from "antd/lib";
+import PreventiveMaintenance from "./preventiveMaintenance";
 
 type Props = {};
 const items: TabsProps["items"] = [
   {
     key: "1",
     label: "Preventive Maintenance",
-    children: <></>,
+    children: <PreventiveMaintenance/>,
   },
   {
     key: "2",
