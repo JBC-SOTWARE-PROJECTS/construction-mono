@@ -1,12 +1,15 @@
-import { Assets, Query } from "@/graphql/gql/graphql";
-import { IState } from "@/routes/administrative/Employees";
 import { IAssetState } from "@/routes/inventory/assets/masterfile";
 import { QueryHookOptions, gql, useQuery } from "@apollo/client";
-import React, { useState } from 'react';
-
+import { useState } from "react";
 
 const GET_RECORDS = gql`
-query ($filter: String, $status: AssetStatus, $page: Int, $size: Int, $type: AssetType) {
+  query (
+    $filter: String
+    $status: AssetStatus
+    $page: Int
+    $size: Int
+    $type: AssetType
+  ) {
     list: assetListPageable(
       filter: $filter
       status: $status
@@ -24,7 +27,7 @@ query ($filter: String, $status: AssetStatus, $page: Int, $size: Int, $type: Ass
         image
         status
         type
-        item{
+        item {
           id
           descLong
         }
@@ -37,40 +40,38 @@ query ($filter: String, $status: AssetStatus, $page: Int, $size: Int, $type: Ass
 `;
 
 const initialState: IAssetState = {
-    filter: "",
-    status: null,
-    page: 0,
-    size: 10,
-    type: null
-  };
+  filter: "",
+  status: null,
+  page: 0,
+  size: 10,
+  type: null,
+};
 
 export default function useGetAssets(props: QueryHookOptions) {
-  
-    const [filter, setFilters] = useState(initialState);
-    const { loading, data, refetch } = useQuery(GET_RECORDS, {
-      variables: {
-        filter: filter?.filter,
-        status: filter?.status,
-        page: filter?.page,
-        size: filter?.size,
-        type: filter?.type,
-      },
-      fetchPolicy: "network-only",
-      ...props,
-      onCompleted: (res) => {
-        if (props.onCompleted) {
-          return props.onCompleted(res.list);
-        }
-      },
-    });
+  const [filter, setFilters] = useState(initialState);
+  const { loading, data, refetch } = useQuery(GET_RECORDS, {
+    variables: {
+      filter: filter?.filter,
+      status: filter?.status,
+      page: filter?.page,
+      size: filter?.size,
+      type: filter?.type,
+    },
+    fetchPolicy: "network-only",
+    ...props,
+    onCompleted: (res) => {
+      if (props.onCompleted) {
+        return props.onCompleted(res.list);
+      }
+    },
+  });
 
+  //return [data?.list, loading, setFilters, refetch];
+  const returnValue: [any, boolean, () => void] = [
+    data?.list,
+    loading,
+    refetch,
+  ];
 
-    //return [data?.list, loading, setFilters, refetch];
-    const returnValue: [any, boolean, () => void] = [
-        data?.list,
-        loading,
-        refetch,
-      ];
-    
-      return returnValue;
+  return returnValue;
 }

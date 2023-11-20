@@ -1,8 +1,6 @@
-import { IState } from "@/routes/administrative/Employees";
-import { OptionsValue } from "@/utility/interfaces";
+import { IState } from "@/routes/payroll/employees";
 import { QueryHookOptions, gql, useQuery } from "@apollo/client";
-import React, { useState } from "react";
-import { useModal } from "react-modal-hook";
+import { useState } from "react";
 
 const GET_RECORDS = gql`
   query ($filter: String, $status: Boolean, $office: UUID, $position: UUID) {

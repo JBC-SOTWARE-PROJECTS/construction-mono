@@ -27,7 +27,7 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import { PageHeader } from "@ant-design/pro-components";
-import { Divider, Modal, Spin, Tag } from "antd";
+import { Modal, Space, Spin, Tag } from "antd";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -89,7 +89,7 @@ function Timekeeping({ account }: IPageProps) {
         status={timekeeping?.status}
         module={PayrollModule.Timekeeping}
         extra={
-          <>
+          <Space>
             <PayrollModuleRecalculateAllEmployeeAction
               id={router?.query?.id as string}
               module={PayrollModule.Timekeeping}
@@ -127,7 +127,7 @@ function Timekeeping({ account }: IPageProps) {
                 View Project Breakdown
               </LogsProjectBreakdownModal>
             )}
-          </>
+          </Space>
         }
       />
       <PageHeader
@@ -189,8 +189,7 @@ function Timekeeping({ account }: IPageProps) {
                       : "Draft"
                   }`}</PayrollEmployeeStatusAction>
                 </>
-              )}
-
+              )}{" "}
               {displayedEmployee?.status === "FINALIZED" && (
                 <LogsProjectBreakdownModal
                   record={{

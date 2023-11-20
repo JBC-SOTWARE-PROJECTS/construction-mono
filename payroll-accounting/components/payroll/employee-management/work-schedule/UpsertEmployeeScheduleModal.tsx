@@ -1,6 +1,6 @@
 import { EmployeeSchedule, Schedule } from "@/graphql/gql/graphql";
 import useGetEmployeeScheduleDetails from "@/hooks/employee-schedule/useGetEmployeeScheduleDetails";
-import { IState } from "@/routes/administrative/Employees";
+import { IState } from "@/routes/payroll/employees";
 import {
   Button,
   Card,
@@ -172,10 +172,13 @@ function UpsertEmployeeScheduleModal({
                 label="Project"
                 rules={requiredField}
                 propsselect={{
-                  options: projects?.list?.map((item: any) => ({
-                    value: item.id,
-                    label: item.description,
-                  })),
+                  options: [
+                    { value: null, label: "Office Based" },
+                    ...projects?.list?.map((item: any) => ({
+                      value: item.id,
+                      label: item.description,
+                    })),
+                  ],
                   allowClear: true,
                   placeholder: "Select Project",
                 }}
