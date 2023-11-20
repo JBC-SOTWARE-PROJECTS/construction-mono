@@ -57,7 +57,7 @@ SELECT *,
         WHEN schedule_type = 'DAILY' THEN
             (CURRENT_DATE + (occurrence::time - '00:00:00'::time))
         WHEN schedule_type = 'WEEKLY' then
-        	GetWeeklyDates(occurrence)
+        	GetWeeklyDatesService(occurrence)
 		WHEN schedule_type = 'MONTHLY' then
 			(DATE_TRUNC('month', CURRENT_DATE) + (occurrence::integer - EXTRACT(DAY FROM DATE_TRUNC('month', CURRENT_DATE))) * INTERVAL '1 DAY')::DATE
         WHEN schedule_type = 'YEARLY' then
@@ -69,7 +69,7 @@ SELECT *,
         WHEN schedule_type = 'DAILY' THEN
             CURRENT_DATE + (occurrence ::time) - INTERVAL '1 hour' * CAST(reminder_schedule AS INTEGER)
         WHEN schedule_type = 'WEEKLY' then
-        	GetWeeklyDates(occurrence) - CAST(reminder_schedule AS INTEGER)
+        	GetWeeklyDatesService(occurrence) - CAST(reminder_schedule AS INTEGER)
 		WHEN schedule_type = 'MONTHLY' then
 			(DATE_TRUNC('month', CURRENT_DATE) + (occurrence::integer - EXTRACT(DAY FROM DATE_TRUNC('month', CURRENT_DATE))) * INTERVAL '1 DAY')::DATE - CAST(reminder_schedule AS INTEGER)
 		WHEN schedule_type = 'YEARLY' then
@@ -86,8 +86,8 @@ WHERE
             AND (CURRENT_DATE + (occurrence::time - '00:00:00'::time))
         WHEN schedule_type = 'WEEKLY' then
         	CURRENT_DATE BETWEEN
-        	GetWeeklyDates(occurrence) - CAST(reminder_schedule AS INTEGER) AND
-		    GetWeeklyDates(occurrence)
+        	GetWeeklyDatesService(occurrence) - CAST(reminder_schedule AS INTEGER) AND
+		    GetWeeklyDatesService(occurrence)
 		WHEN schedule_type = 'MONTHLY' then
 			CURRENT_DATE BETWEEN
 			(DATE_TRUNC('month', CURRENT_DATE) + (occurrence::integer - EXTRACT(DAY FROM DATE_TRUNC('month', CURRENT_DATE))) * INTERVAL '1 DAY')::DATE - CAST(reminder_schedule AS INTEGER) and
