@@ -672,6 +672,7 @@ export type Assets = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   model?: Maybe<Scalars['String']['output']>;
   plateNo?: Maybe<Scalars['String']['output']>;
+  prefix?: Maybe<Scalars['String']['output']>;
   status?: Maybe<AssetStatus>;
   type?: Maybe<AssetType>;
 };

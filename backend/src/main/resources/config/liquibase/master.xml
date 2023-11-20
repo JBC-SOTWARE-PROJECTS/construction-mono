@@ -413,4 +413,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_create_view_asset_upcoming_preventive_maintenance.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_prefix.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

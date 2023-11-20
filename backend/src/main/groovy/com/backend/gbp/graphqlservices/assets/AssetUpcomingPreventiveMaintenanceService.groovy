@@ -45,7 +45,7 @@ class AssetUpcomingPreventiveMaintenanceService extends AbstractDaoService<Asset
             Map<String, Object> params = new HashMap<>()
             params.put('filter', filter)
 
-            query += ''' ORDER BY p.occurrenceDate DESC'''
+            query += ''' ORDER BY p.occurrenceDate ASC'''
 
             Page<AssetUpcomingPreventiveMaintenance> result = getPageable(query, countQuery, page, size, params)
             return result;

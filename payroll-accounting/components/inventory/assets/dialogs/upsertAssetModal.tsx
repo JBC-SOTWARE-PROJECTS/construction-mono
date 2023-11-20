@@ -34,11 +34,10 @@ export default function UpsertAssetModal(props: IProps) {
   const [selectedItem, setSelectedItem] = useState<Item>();
 
   useEffect(() => {
-    if(record){
+    if (record) {
       setSelectedItem(record?.item as Item);
     }
-  }, [record])
-  
+  }, [record]);
 
   const [upsert, { loading: upsertLoading }] = useMutation(
     UPSERT_ASSET_RECORD,
@@ -130,7 +129,7 @@ export default function UpsertAssetModal(props: IProps) {
         onFinish={onSubmit}
         onFinishFailed={onFinishFailed}
         initialValues={{
-          ...record
+          ...record,
         }}
       >
         <Row gutter={[8, 0]}>
@@ -174,25 +173,36 @@ export default function UpsertAssetModal(props: IProps) {
               }}
             />
           </Col>
-
-          <Col span={24}>
+          <Col span={12}>
             <FormInput
-              name="description"
+              name="prefix"
               rules={requiredField}
-              label="Description"
+              label="Asset Prefix"
               propsinput={{
-                placeholder: "Description",
+                placeholder: "prefix",
               }}
             />
           </Col>
-
+          <Col span={12}>
+            <FormSelect
+              name="status"
+              label="Asset Status"
+              rules={requiredField}
+              propsselect={{
+                options: assetStatusOptions,
+                allowClear: true,
+                placeholder: "Status",
+              }}
+            />
+          </Col>
           <Col span={12}>
             <FormInput
               name="brand"
-              rules={requiredField}
               label="Brand"
               propsinput={{
-                placeholder: "Brand",
+                placeholder: selectedItem?.brand ?? "No item selected",
+                disabled: true,
+                value : selectedItem?.brand ?? ""
               }}
             />
           </Col>
@@ -211,14 +221,12 @@ export default function UpsertAssetModal(props: IProps) {
           </Col>
 
           <Col span={24}>
-            <FormSelect
-              name="status"
-              label="Asset Status"
+            <FormInput
+              name="description"
               rules={requiredField}
-              propsselect={{
-                options: assetStatusOptions,
-                allowClear: true,
-                placeholder: "Status",
+              label="Description"
+              propsinput={{
+                placeholder: "Description",
               }}
             />
           </Col>

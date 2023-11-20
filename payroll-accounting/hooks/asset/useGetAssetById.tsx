@@ -12,6 +12,7 @@ const GET_RECORDS = gql`
       image
       status
       type
+      prefix
       item{
         id
         descLong
