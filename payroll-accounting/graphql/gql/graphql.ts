@@ -1864,16 +1864,20 @@ export type Employee = {
   fullName?: Maybe<Scalars['String']['output']>;
   fullnameWithTitle?: Maybe<Scalars['String']['output']>;
   gender?: Maybe<Scalars['String']['output']>;
+  hourlyRate?: Maybe<Scalars['BigDecimal']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   initialName?: Maybe<Scalars['String']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
   isActiveHDMF?: Maybe<Scalars['Boolean']['output']>;
   isActivePHIC?: Maybe<Scalars['Boolean']['output']>;
   isActiveSSS?: Maybe<Scalars['Boolean']['output']>;
+  isExcludedFromAttendance?: Maybe<Scalars['Boolean']['output']>;
+  isFixedRate?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   lastName?: Maybe<Scalars['String']['output']>;
   middleName?: Maybe<Scalars['String']['output']>;
+  monthlyRate?: Maybe<Scalars['BigDecimal']['output']>;
   nameSuffix?: Maybe<Scalars['String']['output']>;
   nationality?: Maybe<Scalars['String']['output']>;
   office?: Maybe<Office>;
@@ -1986,14 +1990,18 @@ export type EmployeeInput = {
   fullName?: InputMaybe<Scalars['String']['input']>;
   fullnameWithTitle?: InputMaybe<Scalars['String']['input']>;
   gender?: InputMaybe<Scalars['String']['input']>;
+  hourlyRate?: InputMaybe<Scalars['BigDecimal']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   initialName?: InputMaybe<Scalars['String']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isActiveHDMF?: InputMaybe<Scalars['Boolean']['input']>;
   isActivePHIC?: InputMaybe<Scalars['Boolean']['input']>;
   isActiveSSS?: InputMaybe<Scalars['Boolean']['input']>;
+  isExcludedFromAttendance?: InputMaybe<Scalars['Boolean']['input']>;
+  isFixedRate?: InputMaybe<Scalars['Boolean']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   middleName?: InputMaybe<Scalars['String']['input']>;
+  monthlyRate?: InputMaybe<Scalars['BigDecimal']['input']>;
   nameSuffix?: InputMaybe<Scalars['String']['input']>;
   nationality?: InputMaybe<Scalars['String']['input']>;
   office?: InputMaybe<OfficeInput>;
@@ -2085,6 +2093,26 @@ export type EmployeeLoanLedgerDto = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   runningBalance?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type EmployeeSalaryDto = {
+  __typename?: 'EmployeeSalaryDto';
+  absent?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  companyName?: Maybe<Scalars['String']['output']>;
+  late?: Maybe<Scalars['BigDecimal']['output']>;
+  overtime?: Maybe<Scalars['BigDecimal']['output']>;
+  overtimeDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  overtimeHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  overtimeSpecialHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  project?: Maybe<Scalars['UUID']['output']>;
+  projectName?: Maybe<Scalars['String']['output']>;
+  regular?: Maybe<Scalars['BigDecimal']['output']>;
+  regularDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  regularHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  regularSpecialHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  total?: Maybe<Scalars['BigDecimal']['output']>;
+  underTime?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type EmployeeSchedule = {
@@ -12699,6 +12727,7 @@ export type TimekeepingEmployee = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payrollEmployee?: Maybe<PayrollEmployee>;
   projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
+  salaryBreakdown?: Maybe<Array<Maybe<EmployeeSalaryDto>>>;
   status?: Maybe<PayrollEmployeeStatus>;
   timekeeping?: Maybe<Timekeeping>;
 };
@@ -12709,8 +12738,10 @@ export type TimekeepingEmployeeDto = {
   fullName?: Maybe<Scalars['String']['output']>;
   gender?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
+  isExcludedFromAttendance?: Maybe<Scalars['Boolean']['output']>;
   position?: Maybe<Position>;
   projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
+  salaryBreakdown?: Maybe<Array<Maybe<EmployeeSalaryDto>>>;
   status?: Maybe<Scalars['String']['output']>;
 };
 

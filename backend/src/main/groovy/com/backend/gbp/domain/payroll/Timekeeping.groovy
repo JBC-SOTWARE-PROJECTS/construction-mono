@@ -2,6 +2,7 @@ package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.hrm.dto.EmployeeSalaryDto
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -39,6 +40,11 @@ class Timekeeping extends PayrollAuditingEntity implements Serializable {
     @GraphQLQuery
     @Column(name="project_breakdown",columnDefinition = "jsonb")
     List<HoursLog> projectBreakdown
+
+    @Type(type = "jsonb")
+    @GraphQLQuery
+    @Column(name="salary_breakdown",columnDefinition = "jsonb")
+    List<EmployeeSalaryDto> salaryBreakdown
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "payroll", referencedColumnName = "id")

@@ -415,6 +415,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/47_michael_payroll_other_deduction_tables.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/48_michael_alter_employee_add_salary_rate_fields.sql"
+              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_with_company.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_create_view_asset_upcoming_preventive_maintenance.sql"
