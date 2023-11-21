@@ -5,6 +5,7 @@ import com.backend.gbp.domain.assets.enums.AssetStatus
 import com.backend.gbp.domain.assets.enums.AssetType
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.projects.ProjectCostService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -110,11 +111,13 @@ class AssetsService extends AbstractDaoService<Assets> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         def project = upsertFromMap(id, fields, { Assets entity, boolean forInsert ->
             if(forInsert){
                 entity.assetCode = generatorService.getNextValue(GeneratorType.ASSET_CODE, {
                     return "AT-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
+                entity.company = company
             }
         })
 

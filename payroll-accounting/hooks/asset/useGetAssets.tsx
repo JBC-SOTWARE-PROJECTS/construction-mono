@@ -24,6 +24,7 @@ query ($filter: String, $status: AssetStatus, $page: Int, $size: Int, $type: Ass
         image
         status
         type
+        prefix
         item{
           id
           descLong

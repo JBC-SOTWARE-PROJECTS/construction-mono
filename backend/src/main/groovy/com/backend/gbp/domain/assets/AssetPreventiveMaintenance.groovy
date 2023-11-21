@@ -1,9 +1,7 @@
 package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
-import com.backend.gbp.domain.annotations.UpperCase
-import com.backend.gbp.domain.assets.enums.AssetStatus
-import com.backend.gbp.domain.assets.enums.AssetType
+import com.backend.gbp.domain.assets.enums.PreventiveScheduleType
 import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -16,11 +14,11 @@ import org.hibernate.annotations.Where
 import javax.persistence.*
 
 @Entity
-@Table(schema = "asset", name = "assets")
-@SQLDelete(sql = "UPDATE asset.assets SET deleted = true WHERE id = ?")
+@Table(schema = "asset", name = "asset_preventive_maintenance")
+@SQLDelete(sql = "UPDATE asset.asset_preventive_maintenance SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class Assets extends AbstractAuditingEntity implements Serializable {
-	
+class AssetPreventiveMaintenance extends AbstractAuditingEntity implements Serializable{
+
 	@GraphQLQuery
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -30,49 +28,32 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	UUID id
 
 	@GraphQLQuery
-	@Column(name = "code")
-	String assetCode
-
-	@GraphQLQuery
-	@Column(name = "description")
-	@UpperCase
-	String description
-	
-	@GraphQLQuery
-	@Column(name = "brand")
-	@UpperCase
-	String brand
-
-	@GraphQLQuery
-	@Column(name = "make")
-	@UpperCase
-	String model
-
-	@GraphQLQuery
-	@Column(name = "plate_no")
-	String plateNo
-
-	@GraphQLQuery
-	@Column(name = "prefix")
-	String prefix
-
-	@GraphQLQuery
-	@Column(name = "image")
-	String image
+	@Column(name = "note")
+	String note
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "status")
-	AssetStatus status
+	@Column(name = "schedule_type")
+	PreventiveScheduleType scheduleType
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "type")
-	AssetType type
+	@GraphQLQuery
+	@Column(name = "occurrence")
+	String occurrence
+
+	@GraphQLQuery
+	@Column(name = "reminder_schedule")
+	String reminderSchedule
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "item", referencedColumnName = "id")
-	Item item
+	@JoinColumn(name = "asset", referencedColumnName = "id")
+	Assets asset
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset_maintenance_type", referencedColumnName = "id")
+	AssetMaintenanceTypes assetMaintenanceType
 
 	@GraphQLQuery
 	@Column(name = "company")

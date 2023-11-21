@@ -86,7 +86,7 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     subtitle:
       "Value in Simplicity: Clear and Practical Asset Management Approaches.",
     icon: <CarOutlined className="diverse-trade-icon" />,
-    path: "/inventory/assets/masterfile/all",
+    path: "/inventory/assets/masterfile/upcoming-maintenance",
   },
   {
     title: "Inventory Reports",
