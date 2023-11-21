@@ -20,7 +20,7 @@ function PayrollHeader({ extra, module, showTitle = false, status }: IProps) {
   const [payroll] = useGetOnePayroll();
 
   const routes = useMemoizedPayrollHeaderBreadcrumb(
-    `${capitalize(module)}`,
+    `${capitalize(module.replace("_", " "))}`,
     payroll?.title as string
   );
   return (
@@ -29,7 +29,7 @@ function PayrollHeader({ extra, module, showTitle = false, status }: IProps) {
         title={
           showTitle && (
             <>
-              {payroll?.title} {capitalize(module)}{" "}
+              {payroll?.title} {capitalize(module.replace("_", " "))}{" "}
               <Tag color={getStatusColor(status as string)}>{status}</Tag>
             </>
           )

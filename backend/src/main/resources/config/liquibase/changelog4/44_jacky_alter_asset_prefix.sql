@@ -1,0 +1,1 @@
+ALTER TABLE asset.assets  add column prefix varchar null;

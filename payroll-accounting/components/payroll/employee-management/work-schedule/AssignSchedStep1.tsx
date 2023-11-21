@@ -2,7 +2,7 @@ import EmployeeTable from "@/components/administrative/employees/EmployeeTable";
 import { Employee, Schedule } from "@/graphql/gql/graphql";
 import useGetScheduleTypes from "@/hooks/configurations/useGetScheduleTypes";
 import { useGetFilters } from "@/hooks/employee";
-import { filterOptions } from "@/routes/administrative/Employees";
+import { filterOptions } from "@/routes/payroll/employees";
 import { getTimeFromDate } from "@/utility/helper";
 import { ProCard, ProFormGroup } from "@ant-design/pro-components";
 import { Divider, Input, Select } from "antd";

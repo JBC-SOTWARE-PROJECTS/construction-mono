@@ -1,12 +1,14 @@
-import { HoursLog } from "@/graphql/gql/graphql";
+import { EmployeeSalaryDto, HoursLog } from "@/graphql/gql/graphql";
+import NumeralFormatter from "@/utility/numeral-formatter";
 import { CSSProperties } from "@ant-design/cssinjs/lib/hooks/useStyleRegister";
 import { Table } from "antd";
 import { round } from "lodash";
 import React from "react";
 
-function ProjectBreakdownTable({ dataSource }: any) {
+function ProjectBreakdownTable({ dataSource, toggleValue }: any) {
   const render = (value: any) => {
-    return value && round(value, 4);
+    if (toggleValue == "hours") return value && round(value, 4);
+    else if (toggleValue == "salary") return <NumeralFormatter value={value} />;
   };
   const onCellProps = (record: HoursLog, key: keyof HoursLog) => {
     const hours = record?.[key] || 0;
@@ -20,6 +22,9 @@ function ProjectBreakdownTable({ dataSource }: any) {
     {
       title: "Project",
       dataIndex: "projectName",
+      render: (value: any, record: EmployeeSalaryDto) => {
+        return value ? value : `Charge to ${record?.companyName}`;
+      },
     },
     {
       title: "Regular",
@@ -122,7 +127,7 @@ function ProjectBreakdownTable({ dataSource }: any) {
   return (
     <Table
       onHeaderRow={() => ({ style: { textAlignLast: "center" } })}
-      columns={columns}
+      columns={columns as any}
       dataSource={dataSource as HoursLog[]}
     />
   );

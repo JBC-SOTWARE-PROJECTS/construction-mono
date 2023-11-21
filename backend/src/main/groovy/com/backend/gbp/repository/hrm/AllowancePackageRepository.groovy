@@ -23,4 +23,5 @@ interface AllowancePackageRepository  extends JpaRepository<AllowancePackage, UU
     @Query(value = "select ap from AllowancePackage ap")
     List<AllowancePackage>fetchAllAllowancePackage()
 
+
 }

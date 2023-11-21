@@ -30,7 +30,7 @@ class SalaryRateMultiplierService {
 
     @GraphQLQuery(name = "getSalaryRateMultiplier", description = "Get the values of salary rate multiplier.")
     SalaryRateMultiplier getSalaryRateMultiplier(){
-        SalaryRateMultiplier salaryRateMultiplier = salaryRateMultiplierRepository.findAll().first()
+        SalaryRateMultiplier salaryRateMultiplier = salaryRateMultiplierRepository.getByCompany(SecurityUtils.currentCompanyId())
         return salaryRateMultiplier
     }
 

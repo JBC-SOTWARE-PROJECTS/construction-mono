@@ -26,6 +26,10 @@ const payrollConfigurationsMenu = {
             path: "/payroll/configurations/adjustment-category",
             name: "Adjustment Category",
           },
+          {
+            path: "/payroll/configurations/other-deduction-types",
+            name: "Deduction Types",
+          },
         ],
       },
     ],
