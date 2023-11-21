@@ -188,13 +188,13 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
     }
 
     static consolidateSalaryBreakdown(Map<String, EmployeeSalaryDto> breakdownMap, EmployeeSalaryDto it) {
-        EmployeeSalaryDto breakdown = breakdownMap.get(it.project as String)
+        EmployeeSalaryDto breakdown= breakdownMap.get((it?.project ? it.project : it.company) as String)
         if (!breakdown) breakdown = new EmployeeSalaryDto()
-        breakdown.project = it.project
-        breakdown.projectName = it.projectName
+        breakdown.project = it?.project
+        breakdown.projectName = it?.projectName
 
-        breakdown.company = it.company
-        breakdown.companyName = it.companyName
+        breakdown.company = it?.company
+        breakdown.companyName = it?.companyName
 
         breakdown.regular += it.regular
         breakdown.overtime += it.overtime
@@ -209,10 +209,14 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
     }
 
     static void consolidateProjectBreakdown(HashMap<String, HoursLog> breakdownMap, HoursLog it) {
-        HoursLog breakdown = breakdownMap.get(it.project as String)
+        HoursLog breakdown = breakdownMap.get((it?.project ? it.project : it.company) as String)
         if (!breakdown) breakdown = new HoursLog()
-        breakdown.project = it.project
-        breakdown.projectName = it.projectName
+        breakdown.project = it?.project
+        breakdown.projectName = it?.projectName
+
+        breakdown.company = it?.company
+        breakdown.companyName = it?.companyName
+
         breakdown.late += it.late
         breakdown.underTime += it.underTime
         breakdown.absent += it.absent
@@ -224,8 +228,10 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         breakdown.overtimeDoubleHoliday += it.overtimeDoubleHoliday
         breakdown.regularSpecialHoliday += it.regularSpecialHoliday
         breakdown.overtimeSpecialHoliday += it.overtimeSpecialHoliday
+        breakdownMap.put(it.project ? it.project as String : it.company as String, breakdown)
+
 //                            if (breakdown) {
-        breakdownMap.put(it.project as String, breakdown)
+//        breakdownMap.put(it.project as String, breakdown)
 //                            }
     }
 

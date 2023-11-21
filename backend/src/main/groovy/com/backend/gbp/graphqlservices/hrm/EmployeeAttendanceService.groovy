@@ -93,7 +93,7 @@ class EmployeeAttendanceService {
             EmployeeAttendance attendance = objectMapper.updateValue(selectedAttendance, fields)
             Employee selectedEmployee = employeeRepository.findById(employee).get()
             attendance.employee = selectedEmployee
-            attendance.project = projectService.findOne(project_id)
+            attendance.project = project_id ? projectService.findOne(project_id) : null
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully updated employee attendance.")
         } else {
@@ -102,7 +102,7 @@ class EmployeeAttendanceService {
             attendance.employee = selectedEmployee
             attendance.original_attendance_time = attendance.attendance_time
             attendance.originalType = attendance.type
-            attendance.project = projectService.findOne(project_id)
+            attendance.project = project_id ? projectService.findOne(project_id) : null
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully created employee attendance.", attendance.id)
         }
@@ -138,8 +138,8 @@ class EmployeeAttendanceService {
             @GraphQLArgument(name = "employeeAttendanceList") List<EmployeeAttendance> employeeAttendanceList
     ) {
 
-            List<EmployeeAttendance> savedAttendance = employeeAttendanceRepository.saveAll(employeeAttendanceList);
-            return savedAttendance;
+        List<EmployeeAttendance> savedAttendance = employeeAttendanceRepository.saveAll(employeeAttendanceList);
+        return savedAttendance;
 
     }
 

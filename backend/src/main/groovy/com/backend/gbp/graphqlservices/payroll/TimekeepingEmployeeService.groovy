@@ -133,7 +133,8 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
             List<AccumulatedLogs> accumulatedLogs = accumulatedLogsCalculator.getAccumulatedLogs(payroll.dateStart,
                     payroll.dateEnd,
                     timekeepingEmployee.payrollEmployee.employee.id,
-                    true)
+                    true,
+                    timekeepingEmployee.payrollEmployee.employee)
             accumulatedLogs.each {
                 it.company = company
                 it.timekeepingEmployee = timekeepingEmployee
@@ -206,7 +207,6 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
     }
 
 
-
     static EmployeeSalaryDto calculateSalaryBreakdown(SalaryRateMultiplier multiplier, HoursLog hoursLog, Employee employee) {
         EmployeeSalaryDto salaryBreakDown = new EmployeeSalaryDto()
         Integer daysInCutoff = 12
@@ -224,8 +224,14 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
         } else {
             hourlyRate = employee.hourlyRate
         }
-        salaryBreakDown.project = hoursLog.project
-        salaryBreakDown.projectName = hoursLog.projectName
+
+        if(hoursLog.project) {
+            salaryBreakDown.project = hoursLog.project
+            salaryBreakDown.projectName = hoursLog.projectName
+        }else{
+            salaryBreakDown.company = hoursLog.company
+            salaryBreakDown.companyName = hoursLog.companyName
+        }
 
         salaryBreakDown.regular = ((hourlyRate * hoursLog.regular * multiplier.regular) as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
         salaryBreakDown.overtime = ((hourlyRate * hoursLog.overtime) * multiplier.regularOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
@@ -246,7 +252,8 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
                                             @GraphQLArgument(name = "endDate") Instant endDate,
                                             @GraphQLArgument(name = "employeeId") UUID employeeId) {
         AccumulatedLogs accumulatedLogs = accumulatedLogRepository.findById(id).get()
-        List<AccumulatedLogs> list = accumulatedLogsCalculator.getAccumulatedLogs(startDate, endDate, employeeId, true)
+        List<AccumulatedLogs> list = accumulatedLogsCalculator.getAccumulatedLogs(startDate, endDate, employeeId, true,
+                accumulatedLogs.timekeepingEmployee.payrollEmployee.employee)
         list[0].timekeepingEmployee = accumulatedLogs.timekeepingEmployee
         accumulatedLogRepository.delete(accumulatedLogs)
         accumulatedLogRepository.save(list[0])
