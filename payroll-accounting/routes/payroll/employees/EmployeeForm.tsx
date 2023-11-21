@@ -80,6 +80,7 @@ const GET_RECORDS = gql`
       monthlyRate
       hourlyRate
       isFixedRate
+      isExcludedFromAttendance
       user {
         login
         password
@@ -717,7 +718,18 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
+                  <FormCheckBox
+                    name="isExcludedFromAttendance"
+                    valuePropName="checked"
+                    checkBoxLabel="Exclude from attendance"
+                    initialValue={_.get(data, "emp.isExcludedFromAttendance")}
+                    propscheckbox={{
+                      defaultChecked: true,
+                    }}
+                  />
+                </Col>
+                <Col {...col4}>
                   <FormCheckBox
                     name="isActiveSSS"
                     valuePropName="checked"
@@ -728,7 +740,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormCheckBox
                     name="isActivePHIC"
                     valuePropName="checked"
@@ -739,7 +751,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormCheckBox
                     name="isActiveHDMF"
                     initialValue={_.get(data, "emp.isActiveHDMF")}

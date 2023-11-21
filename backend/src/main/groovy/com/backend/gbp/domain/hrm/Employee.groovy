@@ -235,4 +235,23 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Column(name = "allowance_package", columnDefinition = "uuid")
 	UUID allowancePackageId
+
+	@GraphQLQuery
+	@Column(name = "is_fixed_rate", columnDefinition = "bool")
+	Boolean isFixedRate
+
+	@GraphQLQuery
+	@Column(name = "is_excluded_from_attendance", columnDefinition = "bool")
+	Boolean isExcludedFromAttendance
+
+	@GraphQLQuery
+    @Column(name = "monthly_rate_amount", columnDefinition = "numeric")
+    BigDecimal monthlyRate
+
+	@GraphQLQuery
+	@Column(name = "hourly_rate_amount", columnDefinition = "numeric")
+	BigDecimal hourlyRate
+
+
+
 }

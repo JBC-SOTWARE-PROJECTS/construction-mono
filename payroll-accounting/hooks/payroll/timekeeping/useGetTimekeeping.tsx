@@ -17,6 +17,21 @@ const QUERY = gql`
         regularSpecialHoliday
         overtimeSpecialHoliday
       }
+
+      salaryBreakdown {
+        project
+        projectName
+        company
+        companyName
+        regular
+        overtime
+        regularHoliday
+        overtimeHoliday
+        regularDoubleHoliday
+        overtimeDoubleHoliday
+        regularSpecialHoliday
+        overtimeSpecialHoliday
+      }
       status
     }
   }

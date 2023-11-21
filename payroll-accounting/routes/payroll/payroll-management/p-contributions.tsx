@@ -88,6 +88,7 @@ function PayrollContributionsPage() {
     useUpdateContributionTypeStatus(() => refetchContribution());
 
   function NumeralDisabledComponent({ active, text, type }: params) {
+    if (!contribution) return;
     const key = `isActive${type}`;
     return active && contribution[key as keyof typeof contribution] ? (
       <NumeralFormatter value={text} format="0,0.00" />

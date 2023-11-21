@@ -148,10 +148,12 @@ function UpsertScheduleType(props: IProps) {
               propsselect={{
                 options: [
                   { value: null, label: "Office Based" },
-                  ...projects?.list?.map((item: any) => ({
-                    value: item.id,
-                    label: item.description,
-                  })),
+                  ...(projects
+                    ? projects?.list?.map((item: any) => ({
+                        value: item.id,
+                        label: item.description,
+                      }))
+                    : []),
                 ],
                 allowClear: true,
                 placeholder: "Select Project",

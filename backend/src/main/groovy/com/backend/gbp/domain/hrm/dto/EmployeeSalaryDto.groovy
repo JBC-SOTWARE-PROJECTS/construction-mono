@@ -4,10 +4,13 @@ import java.beans.Transient
 import java.time.Instant
 
 
-class HoursLog {
+class EmployeeSalaryDto {
 
     UUID project
     String projectName
+
+    UUID company
+    String companyName
 
     BigDecimal late = 0
     BigDecimal underTime = 0
@@ -26,7 +29,7 @@ class HoursLog {
     BigDecimal overtimeSpecialHoliday = 0
 
     @Transient
-    BigDecimal getTotalRegularHours() {
+    BigDecimal getTotal() {
         regular +
                 regularHoliday +
                 regularDoubleHoliday +
@@ -36,39 +39,3 @@ class HoursLog {
 }
 
 
-class AccumulatedLogsDto {
-
-    Instant date
-    Instant scheduleStart
-    Instant scheduleEnd
-    String scheduleTitle
-    Instant inTime
-    Instant outTime
-    String message
-    Boolean isError
-    Boolean isRestDay = false
-    Boolean isLeave = false
-
-    HoursLog hours
-    List<HoursLog> projectBreakdown
-
-}
-
-class ScheduleDto {
-    UUID id
-    UUID emp_id
-    String label
-    String title
-
-    Instant date_time_start
-    Instant date_time_end
-    Instant meal_break_start
-    Instant meal_break_end
-    UUID project
-    Boolean is_multi_project
-    String schedule_date
-    Boolean is_custom
-    Boolean is_overtime
-    Boolean is_rest_day
-
-}

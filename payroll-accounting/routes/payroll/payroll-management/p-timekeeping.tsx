@@ -9,6 +9,7 @@ import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payr
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
   Employee,
+  EmployeeSalaryDto,
   PayrollEmployeeStatus,
   PayrollModule,
   TimekeepingEmployeeDto,
@@ -27,7 +28,7 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import { PageHeader } from "@ant-design/pro-components";
-import { Modal, Space, Spin, Tag } from "antd";
+import { Empty, Modal, Space, Spin, Tag, Typography, message } from "antd";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -64,17 +65,10 @@ function Timekeeping({ account }: IPageProps) {
     selectedEmployees.forEach((item) => {
       if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
     });
-    if (countDraft > 0) {
-      Modal.confirm({
-        title: "There still some DRAFT employees. Proceed?",
-        icon: <ExclamationCircleOutlined />,
-        onOk() {
-          updateStatus({
-            payrollId: router?.query?.id as string,
-            status: "FINALIZED",
-          });
-        },
-      });
+    if (countDraft > 0 && timekeeping.status === "DRAFT") {
+      message.error(
+        "There are still some DRAFT employees. Please finalize all employees first"
+      );
     } else {
       updateStatus({
         payrollId: router?.query?.id as string,
@@ -90,21 +84,23 @@ function Timekeeping({ account }: IPageProps) {
         module={PayrollModule.Timekeeping}
         extra={
           <Space>
-            <PayrollModuleRecalculateAllEmployeeAction
-              id={router?.query?.id as string}
-              module={PayrollModule.Timekeeping}
-              buttonProps={{
-                shape: "circle",
-                icon: <ReloadOutlined />,
-                type: "primary",
-                danger: true,
-              }}
-              tooltipProps={{ placement: "topRight" }}
-              refetch={() => {
-                refetch();
-                refetchEmployees();
-              }}
-            />
+            {timekeeping?.status === "DRAFT" && (
+              <PayrollModuleRecalculateAllEmployeeAction
+                id={router?.query?.id as string}
+                module={PayrollModule.Timekeeping}
+                buttonProps={{
+                  shape: "circle",
+                  icon: <ReloadOutlined />,
+                  type: "primary",
+                  danger: true,
+                }}
+                tooltipProps={{ placement: "topRight" }}
+                refetch={() => {
+                  refetch();
+                  refetchEmployees();
+                }}
+              />
+            )}
             <CustomButton
               type="primary"
               icon={
@@ -122,6 +118,7 @@ function Timekeeping({ account }: IPageProps) {
             {timekeeping?.status === "FINALIZED" && (
               <LogsProjectBreakdownModal
                 record={{ projectBreakdown: timekeeping?.projectBreakdown }}
+                salaryBreakdown={timekeeping?.salaryBreakdown}
                 disabled={false}
               >
                 View Project Breakdown
@@ -162,21 +159,23 @@ function Timekeeping({ account }: IPageProps) {
               {timekeeping?.status === "DRAFT" && (
                 <>
                   {" "}
-                  <PayrollModuleRecalculateEmployeeAction
-                    id={displayedEmployee?.id}
-                    module={PayrollModule.Timekeeping}
-                    buttonProps={{
-                      danger: true,
-                      ghost: true,
-                      icon: <ReloadOutlined />,
-                    }}
-                    refetch={refetch}
-                    allowedPermissions={[
-                      "recalculate_one_contributions_employee",
-                    ]}
-                  >
-                    Recalculate Employee
-                  </PayrollModuleRecalculateEmployeeAction>
+                  {displayedEmployee?.status === "DRAFT" && (
+                    <PayrollModuleRecalculateEmployeeAction
+                      id={displayedEmployee?.id}
+                      module={PayrollModule.Timekeeping}
+                      buttonProps={{
+                        danger: true,
+                        ghost: true,
+                        icon: <ReloadOutlined />,
+                      }}
+                      refetch={refetch}
+                      allowedPermissions={[
+                        "recalculate_one_contributions_employee",
+                      ]}
+                    >
+                      Recalculate Employee
+                    </PayrollModuleRecalculateEmployeeAction>
+                  )}
                   <PayrollEmployeeStatusAction
                     id={displayedEmployee?.id}
                     module={PayrollModule.Timekeeping}
@@ -195,6 +194,9 @@ function Timekeeping({ account }: IPageProps) {
                   record={{
                     projectBreakdown: displayedEmployee?.projectBreakdown,
                   }}
+                  salaryBreakdown={
+                    displayedEmployee?.salaryBreakdown as EmployeeSalaryDto[]
+                  }
                   disabled={false}
                 >
                   View Project Breakdown
@@ -206,15 +208,30 @@ function Timekeeping({ account }: IPageProps) {
           )
         }
       />
-
-      <AccumulatedLogsTable
-        displayedEmployee={displayedEmployee}
-        isTimekeeping
-        showBreakdown
-        refetch={refetch}
-        dataSource={data}
-        loading={loadingPayrollEmployees || loading}
-      />
+      {displayedEmployee?.isExcludedFromAttendance ? (
+        <Empty
+          description={
+            <Typography.Title level={4}>
+              This employee is excluded from attendance
+            </Typography.Title>
+          }
+        />
+      ) : displayedEmployee ? (
+        <AccumulatedLogsTable
+          displayedEmployee={displayedEmployee}
+          isTimekeeping
+          showBreakdown
+          refetch={refetch}
+          dataSource={data}
+          loading={loadingPayrollEmployees || loading}
+        />
+      ) : (
+        <Empty
+          description={
+            <Typography.Title level={4}>No Employee Selected</Typography.Title>
+          }
+        />
+      )}
     </Spin>
   );
 }
