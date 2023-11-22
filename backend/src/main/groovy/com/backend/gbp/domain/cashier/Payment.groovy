@@ -1,8 +1,12 @@
 package com.backend.gbp.domain.cashier
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.accounting.Bank
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
 import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.billing.BillingItem
+import com.backend.gbp.domain.types.AutoIntegrateable
+import com.backend.gbp.graphqlservices.cashier.PaymentTarget
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -14,11 +18,24 @@ import org.hibernate.annotations.Where
 import javax.persistence.*
 import java.time.Instant
 
+enum PaymentType {
+	CASH,
+	CHECK,
+	CARD, //CREDIT/DEBIT
+	BANKDEPOSIT,
+	EWALLET
+}
+
+enum ReceiptType {
+	AR,
+	OR
+}
+
 @Entity
 @Table(schema = "cashier", name = "payments")
 @SQLDelete(sql = "UPDATE cashier.payments SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class Payment extends AbstractAuditingEntity {
+class Payment extends AbstractAuditingEntity implements AutoIntegrateable{
 
 	@GraphQLQuery
 	@Id
@@ -43,6 +60,14 @@ class Payment extends AbstractAuditingEntity {
 	@GraphQLQuery
 	@Column(name = "totalcard")
 	BigDecimal totalCard
+
+	@GraphQLQuery
+	@Column(name = "total_deposit", columnDefinition = "numeric")
+	BigDecimal totalDeposit
+
+	@GraphQLQuery
+	@Column(name = "total_e_wallet", columnDefinition = "numeric")
+	BigDecimal totalEWallet
 
 	@GraphQLQuery
 	@Column(name = "ornumber")
@@ -97,5 +122,83 @@ class Payment extends AbstractAuditingEntity {
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "payment")
 	List<PaymentDetial> paymentDetails = []
+
+	@GraphQLQuery
+	@Column(name = "posted_ledger_id")
+	UUID postedLedgerId
+
+	@GraphQLQuery
+	@Column(name = "payor_name")
+	String payorName
+
+	@GraphQLQuery
+	@Column(name = "ar_customer_id", columnDefinition = "uuid")
+	UUID arCustomerId
+
+	@Transient
+	List<PaymentTarget> paymentTargets = []
+
+	@Override
+	String getDomain() {
+		return IntegrationDomainEnum.PAYMENT.name()
+	}
+
+	@Transient
+	String flagValue
+
+	@Override
+	Map<String, String> getDetails() {
+		return [:]
+	}
+
+	@Transient
+	Terminal cashierTerminal
+	Terminal getCashierTerminal()
+	{
+		return shift.terminal
+	}
+
+	@Transient
+	Bank bankForCashDeposit
+
+	@Transient
+	Bank  bankForCreditCard
+
+	@Transient
+	BigDecimal  amountForCreditCard
+
+	@Transient
+	BigDecimal  amountForCashDeposit
+
+
+
+	@Transient
+	BigDecimal erPayments
+
+
+	@Transient
+	BigDecimal opdPayments
+
+	@Transient
+	BigDecimal ipdPayments
+
+	@Transient
+	BigDecimal otcPayments
+
+
+	@Transient
+	BigDecimal pfPaymentsAll
+
+
+	@Transient
+	BigDecimal advancesFromPatients
+
+	@Transient
+	String investorNo
+
+	//Investors
+	@Transient
+	BigDecimal subscribedShareCapital, subscriptionReceivable, additionalPaidInCapital, discountOnShareCapital,
+			   advancesFromInvestors, shareCapital, payableToInvestor
 
 }

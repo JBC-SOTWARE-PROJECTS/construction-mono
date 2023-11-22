@@ -7,16 +7,15 @@ import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
-import java.time.Instant
 
-enum AR_INVOICE_FLAG  {
-    AR_CLAIMS_INVOICE,
-    AR_REGULAR_INVOICE
+enum AR_CREDIT_NOTE_FLAG  {
+    AR_CREDIT_NOTE,
+    AR_CREDIT_NOTE_TRANSFER
 }
 
 @Entity
-@Table(schema = "accounting", name = "ar_invoice")
-class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
+@Table(schema = "accounting", name = "ar_credit_note")
+class ArCreditNote extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
 
     @GraphQLQuery
     @Id
@@ -27,31 +26,31 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     UUID id
 
     @GraphQLQuery
-    @Column(name = "invoice_no", unique = true)
-    String invoiceNo
+    @Column(name = "credit_note_no", unique = true)
+    String creditNoteNo
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ar_customers", referencedColumnName = "id")
     ArCustomers arCustomer
 
     @GraphQLQuery
-    @Column(name = "due_date")
-    Date dueDate
+    @Column(name = "credit_note_date")
+    Date creditNoteDate
 
     @GraphQLQuery
-    @Column(name = "invoice_date")
-    Date invoiceDate
+    @Column(name = "cwt_rate")
+    BigDecimal cwtRate
 
     @GraphQLQuery
-    @Column(name = "billing_address")
-    String billingAddress
+    @Column(name = "discount_percentage")
+    BigDecimal discountPercentage
 
     @GraphQLQuery
     @Column(name = "discount_amount")
     BigDecimal discountAmount
 
     @GraphQLQuery
-    @Column(name = "cwt_amount")
+    @Column(name = "total_cwt_amount")
     BigDecimal cwtAmount
 
     @GraphQLQuery
@@ -59,11 +58,7 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     Boolean isCWT
 
     @GraphQLQuery
-    @Column(name = "cwt_rate")
-    BigDecimal cwtRate
-
-    @GraphQLQuery
-    @Column(name = "vat_amount")
+    @Column(name = "total_vat_amount")
     BigDecimal vatAmount
 
     @GraphQLQuery
@@ -75,16 +70,16 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     BigDecimal totalAmountDue
 
     @GraphQLQuery
-    @Column(name = "total_credit_note")
-    BigDecimal totalCreditNote
-
-    @GraphQLQuery
-    @Column(name = "total_payments")
-    BigDecimal totalPayments
+    @Column(name = "credit_note_type")
+    String creditNoteType
 
     @GraphQLQuery
     @Column(name = "invoice_type")
     String invoiceType
+
+    @GraphQLQuery
+    @Column(name = "billing_address")
+    String billingAddress
 
     @GraphQLQuery
     @Column(name = "reference")
@@ -102,18 +97,9 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     @Column(name = "ledger_id")
     UUID ledgerId
 
-    @GraphQLQuery
-    @Column(name = "approved_by")
-    UUID approvedBy
-
-    @GraphQLQuery
-    @Column(name = "approved_date")
-    Instant approvedDate
-
-
     @Override
     String getDomain() {
-        return ArInvoice.class.name
+        return IntegrationDomainEnum.CREDIT_NOTE.name()
     }
 
     @Override
@@ -125,34 +111,35 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     String flagValue
 
     @Transient
-    BigDecimal netTotalAmount
-    BigDecimal getNetTotalAmount() {
-        BigDecimal credit =  totalCreditNote?:0.00
-        BigDecimal payments = totalPayments?:0.00
-        BigDecimal totalCredits  = payments + credit
-        BigDecimal total = totalAmountDue?:0.00
-        BigDecimal netTotal =  total - totalCredits
-        return  netTotal
+    BigDecimal negativeCwtAmount
+    BigDecimal getNegativeCwtAmount() {
+        if(cwtAmount) return cwtAmount.negate()
+        return 0.00
     }
+
+    @Transient
+    BigDecimal negativeVatAmount
+    BigDecimal getNegativeVatAmount() {
+        if(vatAmount) return vatAmount.negate()
+        return 0.00
+    }
+
 
     @Transient
     BigDecimal negativeTotalAmountDue
     BigDecimal getNegativeTotalAmountDue() {
-        return totalAmountDue.negate()
+        if(totalAmountDue) return totalAmountDue.negate()
+        return 0.00
     }
 
     @Transient
     BigDecimal negativeCWTAmount
     BigDecimal getNegativeCWTAmount() {
-        return cwtAmount.negate()
+        if(cwtAmount) return cwtAmount.negate()
+        return 0.00
     }
 
     @Transient
-    BigDecimal negativeVATAmount
-    BigDecimal getNegativeVATAmount() {
-        return vatAmount.negate()
-    }
+    BigDecimal totalDiscount , totalTransfer, negativeTotalAmount, totalHCICreditNote, totalPFCreditNote
 
-    @Transient
-    BigDecimal payment,electricity, rental, others, unitPrice, quantity, totalAmount, negativeTotalAmount, totalHCIVat, totalHCITax
 }

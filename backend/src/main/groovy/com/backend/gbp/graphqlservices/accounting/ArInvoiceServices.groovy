@@ -43,6 +43,16 @@ class ArInvoiceWithOutstandingBal {
     BigDecimal payment
 }
 
+@Canonical
+class ArInvoiceWithOutstandingBalForCreditNote {
+    String id
+    String invoiceNo
+    String invoiceDate
+    String dueDate
+    BigDecimal totalAmount
+    BigDecimal totalAmountDue
+    BigDecimal allocatedAmount
+}
 
 @Service
 @GraphQLApi
@@ -403,7 +413,7 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
     HeaderLedger addHeaderManualEntries(HeaderLedger headerLedger, List<Map<String,Object>>  entries){
         Map<String, Ledger> existingAccount = [:]
         List<EntryFull> entriesTarget = []
-        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","","")
 
         for (Map<String,Object> entry in entries ){
             String code = entry.get("code")
@@ -614,6 +624,56 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
 
         return  new GraphQLResVal<ArInvoice>(invoice, true, "Invoice ${invoice.invoiceNo} has been voided.")
 
+    }
+
+
+
+    @GraphQLQuery(name="findAllInvoiceOutstandingBalForCreditNote")
+    List<ArInvoiceWithOutstandingBalForCreditNote> findAllInvoiceOutstandingBalForCreditNote(
+            @GraphQLArgument(name = "customerId") UUID customerId,
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "filterType") String filterType = '',
+            @GraphQLArgument(name = "hasBalance") Boolean hasBalance = true
+    ){
+        try{
+            String filterStr = ''
+            switch (filterType){
+                case 'REFERENCE':
+                    filterStr += """ and (ai.reference like concat('%',:filter,'%')) """
+                    break
+                default:
+                    filterStr += """ and (ai.invoice_no like concat('%',:filter,'%')) """
+                    break
+            }
+
+            if(hasBalance)
+                filterStr += """ and (coalesce(ai.total_amount_due,0) - (coalesce(ai.total_payments,0) + coalesce(ai.total_credit_note,0))) > 0"""
+
+            if(customerId) entityManager.createNativeQuery("""
+                select
+                cast(ai.id as text) as "id",
+                ai.invoice_no as "invoiceNo",
+                to_char(date(ai.invoice_date),'YYYY-MM-DD') as "invoiceDate",
+                to_char(date(ai.due_date),'YYYY-MM-DD') as "dueDate",
+                coalesce(total_amount_due,0) as "totalAmount",
+                (coalesce(total_amount_due,0) - (coalesce(total_payments,0) + coalesce(total_credit_note,0))) as "totalAmountDue",
+                cast(coalesce(null,0) as numeric) as "allocatedAmount"
+                from accounting.ar_invoice ai 
+                where ai.ar_customers = :customerId 
+                and ai.status != 'DRAFT'
+                ${filterStr}
+                order by ai.due_date;
+            """)
+                    .setParameter('customerId',customerId)
+                    .setParameter('filter',filter)
+                    .unwrap(NativeQuery.class)
+                    .setResultTransformer(Transformers.aliasToBean(ArInvoiceWithOutstandingBalForCreditNote.class))
+                    .getResultList()
+            else return []
+        }
+        catch (ignored) {
+            return []
+        }
     }
 
 }

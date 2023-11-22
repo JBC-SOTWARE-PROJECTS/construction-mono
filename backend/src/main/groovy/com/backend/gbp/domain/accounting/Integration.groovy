@@ -14,6 +14,8 @@ import javax.persistence.*
 
 enum IntegrationDomainEnum {
     NO_DOMAIN("NO DOMAIN", ""),
+    CREDIT_NOTE("Credit Note", "com.backend.gbp.domain.accounting.ArCreditNote"),
+    PAYMENT("Payment", "com.backend.gbp.domain.cashier.Payment"),
     BILLING_ITEM("Billing Item", "com.backend.gbp.domain.billing.BillingItem"),
     ACCOUNTS_PAYABLE("Accounts Payable", "com.backend.gbp.domain.accounting.AccountsPayable"),
     DISBURSEMENT("Disbursement", "com.backend.gbp.domain.accounting.Disbursement"),

@@ -300,7 +300,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         def header = findOne(headerId)
 
 
-        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","")
         List<EntryFull> entriesTarget = []
 
         for (Map<String,Object> entry in entries ){
@@ -354,7 +354,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
                                        @GraphQLArgument(name = "transactionDate")  Instant transactionDate) {
 
 
-       def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+       def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","")
 
         // validate if code is on cOa
 
@@ -1326,7 +1326,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
     }*/
 
 
-    HeaderLedger createDraftHeaderLedger(List<Entry> entries){
+    HeaderLedger createDraftHeaderLedger(List<Entry> entries, Instant transactionDatetime = Instant.now()){
         HeaderLedger header = new HeaderLedger()
         entries.each { entry->
 
@@ -1337,6 +1337,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
 
             Ledger ledger = new Ledger()
+            ledger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
             ledger.journalAccount = entry.journal
             ledger.debit = 0.0
             ledger.credit = 0.0
