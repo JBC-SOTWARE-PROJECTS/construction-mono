@@ -112,6 +112,8 @@ class EmployeeResource {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> fieldMap = objectMapper.readValue(fields, Map.class);
 
+        projectId = projectId.equals("") ? null : projectId;
+
         GraphQLResVal<EmployeeAttendance> empAttendance = employeeAttendanceService.upsertEmployeeAttendance(null, employee, projectId,fieldMap );
 
 
@@ -141,9 +143,16 @@ class EmployeeResource {
             attendance.original_attendance_time = attTime;
             attendance.type = reAtt.type;
             attendance.originalType = reAtt.type;
-            attendance.project = projectService.findOne(reAtt.project);
+           // attendance.project = projectService.findOne(reAtt.project);
             attendance.additionalNote = reAtt.additionalNote;
             attendance.referenceId = reAtt.referenceId;
+
+            if(reAtt.project.equals("")){
+                attendance.project = projectService.findOne(reAtt.project);
+            }else{
+                attendance.project = null;
+            }
+
 
             empAttendance.add(attendance);
 
