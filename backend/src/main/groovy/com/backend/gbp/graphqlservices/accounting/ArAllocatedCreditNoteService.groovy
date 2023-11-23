@@ -57,12 +57,10 @@ class ArAllocatedCreditNoteService extends  ArAbstractFormulaHelper<ArAllocatedC
         BigDecimal totalAmount = invoice.totalAmountDue?:0.00
         def invoiceItems = arInvoiceItemServices.findAllInvoiceItemsByInvoice(invoiceId)
         invoiceItems.each {
-            if(it.itemType.equalsIgnoreCase('HCI')) {
                 BigDecimal amount = it.totalAmountDue ?: 0.00
                 BigDecimal allocated = ((amount / totalAmount) * (allocatedAmount ?: 0.00)) ?: 0.00
                 it.creditNote = (it.creditNote ?: 0.00) + allocated
                 arInvoiceItemServices.save(it)
-            }
         }
 
         invoice.totalCreditNote = (invoice.totalCreditNote?:0.00) + allocatedAmount
@@ -92,19 +90,24 @@ class ArAllocatedCreditNoteService extends  ArAbstractFormulaHelper<ArAllocatedC
             @GraphQLArgument(name = "creditNoteId") UUID creditNoteId,
             @GraphQLArgument(name = "fields") List<Map<String,Object>> fields = []
     ) {
-        def creditNote = arCreditNoteService.findOne(creditNoteId)
-        if(fields.size() > 0){
-            fields.each {
-                ArAllocatedCreditNote allocated = new ArAllocatedCreditNote()
-                updateFromMap(allocated, it)
-                def saved =  save(allocated)
-                allocateInvoiceItemAmount(creditNote,saved.invoice.id,saved.amountAllocate)
+        try{
+            def creditNote = arCreditNoteService.findOne(creditNoteId)
+            if(fields.size() > 0){
+                fields.each {
+                    ArAllocatedCreditNote allocated = new ArAllocatedCreditNote()
+                    updateFromMap(allocated, it)
+                    def saved =  save(allocated)
+                    allocateInvoiceItemAmount(creditNote,saved.invoice.id,saved.amountAllocate)
+                }
             }
+            creditNote.status = 'POSTED'
+            arCreditNoteService.save(creditNote)
+            arCreditNoteService.creditNotePosting(creditNote)
+            return new GraphQLResVal<ArCreditNote>(creditNote, true, "Credit Note transaction completed successfully")
+        }catch (e){
+            return new GraphQLResVal<ArCreditNote>(null, false, "Credit Note transaction completed successfully")
         }
-        creditNote.status = 'POSTED'
-        arCreditNoteService.save(creditNote)
-        arCreditNoteService.creditNoteDiscountPosting(creditNote)
-        return new GraphQLResVal<ArCreditNote>(creditNote, true, "Credit Note transaction completed successfully")
+
     }
 
     @GraphQLQuery(name='findInvoiceCreditNote')

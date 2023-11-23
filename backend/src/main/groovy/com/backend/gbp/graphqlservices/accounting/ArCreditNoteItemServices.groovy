@@ -246,15 +246,12 @@ class ArCreditNoteItemServices extends ArAbstractFormulaHelper<ArCreditNoteItems
 
     @GraphQLQuery(name="findCreditNoteItemsByCNIdByItemType")
     List<ArCreditNoteItems> findCreditNoteItemsByCNIdByItemType(
-            @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "itemType") List<String> itemType
+            @GraphQLArgument(name = "id") UUID id
     ){
         try{
             return entityManager.createQuery(""" Select c from ArCreditNoteItems c 
-                    where c.arCreditNote.id = :id  
-                    and c.itemType in :itemType  """)
+                    where c.arCreditNote.id = :id """)
                     .setParameter('id',id)
-                    .setParameter('itemType',itemType)
                     .resultList
         }
         catch (ignored){

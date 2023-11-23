@@ -81,7 +81,8 @@ class ArTransactionLedgerServices extends  AbstractDaoService<ArTransactionLedge
             return StringUtils.leftPad(it.toString(), 6, "0")
         })
         ledger.docNo = invoice.invoiceNo
-        ledger.docType = reverse ? invoice?.isBeginningBalance ? 'BEGINNING BALANCE - VOIDED' : 'INVOICE-VOIDED' : invoice?.isBeginningBalance ? 'BEGINNING BALANCE' : 'INVOICE'
+//        ledger.docType = reverse ? invoice?.isBeginningBalance ? 'BEGINNING BALANCE - VOIDED' : 'INVOICE-VOIDED' : invoice?.isBeginningBalance ? 'BEGINNING BALANCE' : 'INVOICE'
+        ledger.docType = reverse ?  'INVOICE-VOIDED' :  'INVOICE'
         ledger.referenceNo = invoice.arCustomer.accountNo
         ledger.referenceType = 'CUSTOMER'
 
@@ -116,11 +117,11 @@ class ArTransactionLedgerServices extends  AbstractDaoService<ArTransactionLedge
 
         ledger.ledgerDate = creditNote.createdDate
         ledger.docDate = reverse ? Date.from(creditNote.lastModifiedDate) : creditNote.creditNoteDate
-        ledger.totalCwtAmount = reverse ?  (creditNote.cwtAmount?:0.00).negate() : creditNote.cwtAmount?:0.00
-        ledger.totalVatAmount = reverse ?  (creditNote.vatAmount?:0.00).negate() : creditNote.vatAmount?:0.00
-        ledger.totalAmountDue = reverse ?  (creditNote.totalAmountDue?:0.00).negate() : creditNote.totalAmountDue?:0.00
+        ledger.totalCwtAmount = reverse ?  creditNote.cwtAmount?:0.00 : (creditNote.cwtAmount?:0.00).negate()
+        ledger.totalVatAmount = reverse ?  creditNote.vatAmount?:0.00 : (creditNote.vatAmount?:0.00).negate()
+        ledger.totalAmountDue = reverse ?  (creditNote.totalAmountDue?:0.00) : (creditNote.totalAmountDue?:0.00).negate()
 
-        ledger.remainingBalance = (balanceDto?.remainingBalanceSum?:0.00) - ledger.totalAmountDue
+        ledger.remainingBalance = (balanceDto?.remainingBalanceSum?:0.00) + ledger.totalAmountDue
         save(ledger)
     }
 

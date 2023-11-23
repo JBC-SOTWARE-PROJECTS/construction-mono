@@ -9,6 +9,7 @@ import {
 } from '@/constant/accountReceivables'
 import { ArCreditNote } from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
+import { apiUrlPrefix } from '@/shared/settings'
 import {
   FolderOpenOutlined,
   InfoCircleOutlined,
@@ -71,14 +72,14 @@ export default function CreditNote() {
   const allocateCreditDialog = useDialog(CnAllocateCredit)
 
   const onNewCreditNote = () => {
-    creditNoteDialog({}, () => {})
+    creditNoteDialog({}, () => refetch())
   }
 
   const onSearch = (search: string) => {
-    // refetch({
-    //   search,
-    //   page: 0,
-    // })
+    refetch({
+      search,
+      page: 0,
+    })
   }
 
   const handleOpen = (record: ArCreditNote) => {
@@ -89,10 +90,10 @@ export default function CreditNote() {
         })
         break
       case 'POSTED':
-        // window.open(
-        //   apiUrlPrefix + '/arreports/arcreditnote?id=' + record?.id,
-        //   'creditnote'
-        // )
+        window.open(
+          apiUrlPrefix + '/arreports/arcreditnote?id=' + record?.id,
+          'creditnote'
+        )
         break
       default:
         creditNoteDialog(

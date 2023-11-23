@@ -1,6 +1,6 @@
 import { CustomModalTitle } from '@/components/accountReceivables/common/modalPageHeader'
-import { INVOICE_PARTICULAR_LIST_GQL } from '@/components/accountReceivables/configuration/invoiceItems'
 import {
+  ACCOUNT_OPTIONS_GQL,
   ADD_CREDIT_NOTE_ITEMS,
   CREATE_CREDIT_NOTE,
   CREDIT_NOTE_POSTING,
@@ -8,6 +8,7 @@ import {
   FIND_ONE_CREDIT_NOTE,
   GENERATE_CREDIT_NOTE_TAX,
   GENERATE_CREDIT_NOTE_VAT,
+  INVOICE_PARTICULAR_OPTIONS_GQL,
   REMOVE_CREDIT_NOTE_ITEM,
 } from '@/graphql/accountReceivables/creditNote'
 import { ArCreditNoteItems } from '@/graphql/gql/graphql'
@@ -138,7 +139,10 @@ export default function CreditNCreateDialog(props: CreditNCreateProps) {
   // LazyQuery
 
   const [lazyQueryItemParticular, { loading: lazyQueryItemParticularLoading }] =
-    useLazyQuery(INVOICE_PARTICULAR_LIST_GQL)
+    useLazyQuery(INVOICE_PARTICULAR_OPTIONS_GQL)
+
+  const [lazyQueryAccountList, { loading: lazyQueryAccountListLoading }] =
+    useLazyQuery(ACCOUNT_OPTIONS_GQL)
 
   // Mutation
 
@@ -176,6 +180,7 @@ export default function CreditNCreateDialog(props: CreditNCreateProps) {
   // Regroup
   const lazyQuery = {
     lazyQueryItemParticular,
+    lazyQueryAccountList,
   }
 
   const mutation = {
@@ -198,6 +203,7 @@ export default function CreditNCreateDialog(props: CreditNCreateProps) {
     creditNoteItem: creditNoteRecordItemLoading,
 
     lazyQueryItemParticular: lazyQueryItemParticularLoading,
+    lazyQueryAccountList: lazyQueryAccountListLoading,
 
     createCreditNote: creditNoteCreateLoading,
     generateTax: generateTaxLoading,

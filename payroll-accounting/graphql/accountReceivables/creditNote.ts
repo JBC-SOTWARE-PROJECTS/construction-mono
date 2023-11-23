@@ -4,6 +4,7 @@ export const FIND_ONE_CREDIT_NOTE = gql`
   query ($id: UUID) {
     creditNote: findOneCreditNote(id: $id) {
       id
+      billingAddress
       arCustomer {
         id
         customerName
@@ -114,6 +115,10 @@ export const FIND_ALL_CREDIT_NOTE_ITEMS_BY_CNID = gql`
       cwtAmount
       vatAmount
       reference
+      accountCode {
+        label
+        value
+      }
       invoiceParticulars {
         itemName
         description
@@ -241,6 +246,11 @@ export const ADD_CREDIT_NOTE_ITEMS = gql`
     creditNote: addCreditNoteClaimsItem(id: $id, fields: $fields) {
       response {
         id
+        invoiceParticulars {
+          itemName
+          description
+          salePrice
+        }
       }
       success
       message
@@ -302,6 +312,46 @@ export const GENERATE_CREDIT_NOTE_VAT = gql`
       response
       success
       message
+    }
+  }
+`
+
+export const INVOICE_PARTICULAR_OPTIONS_GQL = gql`
+  query ($search: String, $page: Int, $size: Int) {
+    particulars: findAllInvoiceParticulars(
+      search: $search
+      page: $page
+      size: $size
+    ) {
+      content {
+        value: id
+        label: itemName
+      }
+    }
+  }
+`
+
+export const ACCOUNT_OPTIONS_GQL = gql`
+  query (
+    $accountType: String
+    $motherAccountCode: String
+    $accountCategory: String
+    $subaccountType: String
+    $accountName: String
+    $department: String
+    $excludeMotherAccount: Boolean
+  ) {
+    coaList: getAllChartOfAccountGenerate(
+      accountType: $accountType
+      motherAccountCode: $motherAccountCode
+      subaccountType: $subaccountType
+      accountCategory: $accountCategory
+      accountName: $accountName
+      department: $department
+      excludeMotherAccount: $excludeMotherAccount
+    ) {
+      value: code
+      label: accountName
     }
   }
 `

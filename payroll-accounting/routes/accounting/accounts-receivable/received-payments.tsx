@@ -59,7 +59,9 @@ export default function ReceivedPayments() {
   })
 
   const onNewPayment = () => {
-    paymentDialog({ type: 'OR' }, () => {})
+    paymentDialog({ type: 'OR' }, () => {
+      refetch()
+    })
   }
 
   const columns: ColumnsType<any> = [

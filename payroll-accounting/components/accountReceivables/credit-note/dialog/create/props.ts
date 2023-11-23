@@ -9,7 +9,7 @@ export const CnCreateModalProps = {
   closable: false,
   width: '100%',
   style: ModalStyles.style,
-  styles: ModalStyles.maskStyle,
+  maskStyle: ModalStyles.maskStyle,
   className: 'full-page-modal',
 }
 

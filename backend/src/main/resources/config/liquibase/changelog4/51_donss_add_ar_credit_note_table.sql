@@ -4,7 +4,7 @@
 
 -- DROP TABLE accounting.ar_credit_note;
 
-CREATE TABLE accounting.ar_credit_note (
+CREATE TABLE IF NOT EXISTS accounting.ar_credit_note (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	credit_note_no varchar NULL,
 	ar_customers uuid NULL,
@@ -34,10 +34,10 @@ CREATE TABLE accounting.ar_credit_note (
     deleted bool NULL,
 	CONSTRAINT ar_credit_note_pkey PRIMARY KEY (id)
 );
-CREATE INDEX ar_credit_note_approved_by_index ON accounting.ar_credit_note USING btree (approved_by);
-CREATE INDEX ar_credit_note_customer_index ON accounting.ar_credit_note USING btree (ar_customers);
-CREATE INDEX ar_credit_note_deleted_index ON accounting.ar_credit_note USING btree (deleted);
-CREATE INDEX ar_credit_note_ledger_id_index ON accounting.ar_credit_note USING btree (ledger_id);
+CREATE INDEX IF NOT EXISTS ar_credit_note_approved_by_index ON accounting.ar_credit_note USING btree (approved_by);
+CREATE INDEX IF NOT EXISTS ar_credit_note_customer_index ON accounting.ar_credit_note USING btree (ar_customers);
+CREATE INDEX IF NOT EXISTS ar_credit_note_deleted_index ON accounting.ar_credit_note USING btree (deleted);
+CREATE INDEX IF NOT EXISTS ar_credit_note_ledger_id_index ON accounting.ar_credit_note USING btree (ledger_id);
 
 
 -- accounting.ar_credit_note_allocated_invoice definition
@@ -46,7 +46,7 @@ CREATE INDEX ar_credit_note_ledger_id_index ON accounting.ar_credit_note USING b
 
 -- DROP TABLE accounting.ar_credit_note_allocated_invoice;
 
-CREATE TABLE accounting.ar_credit_note_allocated_invoice (
+CREATE TABLE IF NOT EXISTS accounting.ar_credit_note_allocated_invoice (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	credit_note_no varchar NULL,
 	date_applied date NULL,
@@ -72,7 +72,7 @@ CREATE TABLE accounting.ar_credit_note_allocated_invoice (
 
 -- DROP TABLE accounting.ar_credit_note_items;
 
-CREATE TABLE accounting.ar_credit_note_items (
+CREATE TABLE IF NOT EXISTS accounting.ar_credit_note_items (
 	id uuid NOT NULL DEFAULT uuid_generate_v4(),
 	record_no varchar NULL,
 	credit_note_no varchar NULL,
@@ -119,8 +119,11 @@ CREATE TABLE accounting.ar_credit_note_items (
     deleted bool NULL,
 	CONSTRAINT ar_credit_note_items_pkey PRIMARY KEY (id)
 );
-CREATE INDEX ar_credit_note_items_credit_note_index ON accounting.ar_credit_note_items USING btree (ar_credit_note_id);
-CREATE INDEX ar_credit_note_items_customer_index ON accounting.ar_credit_note_items USING btree (ar_customers);
-CREATE INDEX ar_credit_note_items_invoice_index ON accounting.ar_credit_note_items USING btree (ar_invoice);
-CREATE INDEX ar_credit_note_items_invoice_item_index ON accounting.ar_credit_note_items USING btree (ar_invoice_item_id);
-CREATE INDEX ar_credit_note_items_recipient_invoice_index ON accounting.ar_credit_note_items USING btree (recipient_invoice);
+CREATE INDEX IF NOT EXISTS ar_credit_note_items_credit_note_index ON accounting.ar_credit_note_items USING btree (ar_credit_note_id);
+CREATE INDEX IF NOT EXISTS ar_credit_note_items_customer_index ON accounting.ar_credit_note_items USING btree (ar_customers);
+CREATE INDEX IF NOT EXISTS ar_credit_note_items_invoice_index ON accounting.ar_credit_note_items USING btree (ar_invoice);
+CREATE INDEX IF NOT EXISTS ar_credit_note_items_invoice_item_index ON accounting.ar_credit_note_items USING btree (ar_invoice_item_id);
+CREATE INDEX IF NOT EXISTS ar_credit_note_items_recipient_invoice_index ON accounting.ar_credit_note_items USING btree (recipient_invoice);
+
+ALTER TABLE accounting.ar_credit_note_items
+ADD COLUMN IF NOT EXISTS account_code jsonb NULL default '{}'::jsonb;

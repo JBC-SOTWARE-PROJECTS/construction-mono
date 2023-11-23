@@ -23,16 +23,14 @@ export const GovernmentIDOptions = [
 ]
 
 export const CustomerTypeOptions = [
-  { value: 'HMO', label: 'Third-Party Payer Accounts' },
-  { value: 'CORPORATE', label: 'Corporate Client Accounts' },
-  { value: 'PERSONAL', label: 'Lessee Accounts' },
+  { value: 'PRIVATE', label: 'Private' },
+  { value: 'GOVERNMENT', label: 'Government' },
 ]
 
 export const CustomerTypeOptionsFilter = [
   { value: 'ALL', label: 'All customers' },
-  { value: 'HMO', label: 'Third-Party Payer Accounts' },
-  { value: 'CORPORATE', label: 'Corporate Client Accounts' },
-  { value: 'PERSONAL', label: 'Lessee Accounts' },
+  { value: 'PRIVATE', label: 'Private Accounts' },
+  { value: 'GOVERNMENT', label: 'Government Accounts' },
 ]
 
 export const InvoiceTransactionModeOptions = [

@@ -94,6 +94,13 @@ export default function CNBodyContainer(props: CreditNCreateContextProps) {
       ...getColumnSearchProps('description'),
     },
     {
+      title: 'Account',
+      dataIndex: 'accountCode',
+      editable: true,
+      className: 'SEARCH',
+      render: (text: { label: string }) => text?.label ?? '',
+    },
+    {
       title: 'Qty',
       dataIndex: 'quantity',
       className: 'NUMBER',

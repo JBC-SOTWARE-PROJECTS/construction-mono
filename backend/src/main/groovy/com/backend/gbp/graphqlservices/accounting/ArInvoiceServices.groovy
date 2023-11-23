@@ -1,9 +1,12 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.AR_INVOICE_FLAG
 import com.backend.gbp.domain.accounting.ArInvoice
 import com.backend.gbp.domain.accounting.ArInvoiceItems
 import com.backend.gbp.domain.accounting.HeaderLedger
+import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.UserRepository
 import com.backend.gbp.services.EntityObjectMapperService
@@ -82,8 +85,8 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
     LedgerServices ledgerServices
 
 
-//    @Autowired
-//    ArTransactionLedgerServices arTransactionLedgerServices
+    @Autowired
+    ArTransactionLedgerServices arTransactionLedgerServices
 
     @Autowired
     ArInvoiceItemServices arInvoiceItemServices
@@ -94,11 +97,9 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
     @Autowired
     SubAccountSetupService subAccountSetupService
 
-//    @Autowired
-//    ArCreditNoteItemServices arCreditNoteItemServices
+    @Autowired
+    ArCreditNoteItemServices arCreditNoteItemServices
 
-//    @Autowired
-//    BillingItemServices billingItemServices
 
     @GraphQLQuery(name="findOneInvoice")
     ArInvoice findOneInvoice(
@@ -237,9 +238,9 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
     ){
             def invoice = upsertFromMap(id, fields)
             if (fields['billingAddress'] == null) {
-                def address = invoice.arCustomer.otherDetails.billingContact
+                def address = invoice.arCustomer.address
                 if (address) {
-                    invoice.billingAddress = "${address?.street?:''} ${address?.barangay?:''}, ${address?.city?:''}, ${address?.province?:''}, ${address?.zipcode?:''} ${address?.country?:''}"
+                    invoice.billingAddress = address
                 }
                 save(invoice)
             }
@@ -413,7 +414,7 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
     HeaderLedger addHeaderManualEntries(HeaderLedger headerLedger, List<Map<String,Object>>  entries){
         Map<String, Ledger> existingAccount = [:]
         List<EntryFull> entriesTarget = []
-        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","","")
+        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","")
 
         for (Map<String,Object> entry in entries ){
             String code = entry.get("code")
@@ -437,6 +438,7 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
             }else {
                 Ledger ledger = new Ledger()
                 ledger.journalAccount = entryFull.journal
+                ledger.transactionDateOnly = headerLedger.transactionDateOnly
                 ledger.debit = entryFull.debit
                 ledger.credit = entryFull.credit
                 ledger.header = headerLedger
@@ -506,9 +508,6 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
         def yearFormat = DateTimeFormatter.ofPattern("yyyy")
         def headerLedger =	integrationServices.generateAutoEntries(invoice){it, nul ->
             it.flagValue = AR_INVOICE_FLAG.AR_REGULAR_INVOICE.name()
-//            it.electricity = invoiceItemAmountSum(it.id,['electricity'])
-//            it.rental = invoiceItemAmountSum(it.id,['rental'])
-//            it.others = invoiceItemAmountSum(it.id,['custom','affiliation'])
             it.totalAmount = (it.totalAmountDue?:0.00) + (it.vatAmount?:0.00) + (it.cwtAmount?:0.00)
         }
 
@@ -575,12 +574,8 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
             return  new GraphQLResVal<ArInvoice>(null, false, 'Transaction failed: Calculation error. Please check your input and try again.')
 
         if(entryPosting) {
-//            if (invoice.invoiceType.equalsIgnoreCase('claims') && invoice.totalHCIAmount > 0)
-//                claimsInvoicePosting(invoice)
-//            if (invoice.invoiceType.equalsIgnoreCase('regular'))
-//                personalInvoicePosting(invoice)
-
-//            arTransactionLedgerServices.insertArInvoiceTransactionLedger(invoice)
+            personalInvoicePosting(invoice)
+            arTransactionLedgerServices.insertArInvoiceTransactionLedger(invoice)
             invoice.status = 'PENDING'
         }
         return  new GraphQLResVal<ArInvoice>(invoice, true, 'Invoice transaction completed successfully.')
@@ -596,22 +591,6 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
             return  new GraphQLResVal<ArInvoice>(null, false, 'Transaction failed: Please check your input and try again.')
 
         def invoiceItems = arInvoiceItemServices.findAllInvoiceItemsByInvoice(id)
-        if(invoiceItems){
-            invoiceItems.each {
-                if (it.claimsItem && it?.billing_item_id) {
-                    def billingItem = billingItemServices.findOne(it.billing_item_id)
-                    billingItem.arBilled = false
-                    billingItemServices.save(billingItem)
-                }
-                if (it.reference_transfer_id) {
-                    def creditNoteItems = arCreditNoteItemServices.findOne(it.reference_transfer_id)
-                    if (creditNoteItems) {
-                        creditNoteItems.recipientInvoice = null
-                        arCreditNoteItemServices.save(creditNoteItems)
-                    }
-                }
-            }
-        }
 
         invoice.status = 'VOIDED'
         save(invoice)

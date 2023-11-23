@@ -1,10 +1,14 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.AR_CREDIT_NOTE_FLAG
 import com.backend.gbp.domain.accounting.ArCreditNote
 import com.backend.gbp.domain.accounting.ArCreditNoteItems
 import com.backend.gbp.domain.accounting.ArInvoice
 import com.backend.gbp.domain.accounting.ArInvoiceItems
 import com.backend.gbp.domain.accounting.HeaderLedger
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.Ledger
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.services.GeneratorService
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -138,57 +142,14 @@ class ArCreditNoteService extends  ArAbstractFormulaHelper<ArCreditNote>{
             return null
     }
 
-
-    HeaderLedger creditNoteDiscountPosting(ArCreditNote arCreditNote){
-            def dateFormat = DateTimeFormatter.ofPattern("yyyy-MM")
-
-            List<ArCreditNoteItems> discountList = arCreditNoteItemServices.findCreditNoteItemsByCNIdByItemType(arCreditNote.id, ['HCI'])
-            if (discountList) {
+    @Transactional
+    HeaderLedger creditNotePosting(ArCreditNote arCreditNote){
+        def dateFormat = DateTimeFormatter.ofPattern("yyyy-MM")
+        try{
+            List<ArCreditNoteItems> cnList = arCreditNoteItemServices.findCreditNoteItemsByCNIdByItemType(arCreditNote.id)
+            if (cnList) {
                 def headerLedger = integrationServices.generateAutoEntries(arCreditNote) { it, mul ->
-                    def companyAccount = companyAccountServices.findOne(it.arCustomer.referenceId)
-                    List<ArCreditNote> multipleCN = []
-                    Map<String, Object> creditNoteMap = [:]
-
-                    BigDecimal totalHCIVat = 0.00
-                    BigDecimal totalPFVat = 0.00
-                    BigDecimal totalHCICwt = 0.00
-                    BigDecimal totalPFCwt = 0.00
-                    discountList.each {
-                        discount ->
-                                String deptId =  'cc110554-460f-414e-a2fc-aeb145033c99'
-                                if (creditNoteMap[deptId] != null) {
-                                    creditNoteMap[deptId]['totalDiscount'] += discount.totalAmountDue
-                                } else {
-                                    creditNoteMap[deptId] = [:]
-                                    creditNoteMap[deptId]['discount'] = discountsService.findOne(UUID.fromString('ecd01a44-668b-4335-aa74-f9c71ab9c1bb'))
-                                    creditNoteMap[deptId]['department'] = departmentService.findById(UUID.fromString('cc110554-460f-414e-a2fc-aeb145033c99'))
-                                    creditNoteMap[deptId]['totalDiscount'] = discount.totalAmountDue
-                                }
-
-                                if(discount.totalHCIAmount > 0) {
-                                    totalHCIVat += discount?.vatAmount?:0.00
-                                    totalHCICwt += discount?.cwtAmount?:0.00
-                                }
-
-                                if(discount.totalPFAmount > 0){
-                                    totalPFVat += discount?.vatAmount?:0.00
-                                    totalPFCwt += discount?.cwtAmount?:0.00
-                                }
-                    }
-
-                    creditNoteMap.each { k, v ->
-                        multipleCN << new ArCreditNote().tap {
-                            note ->
-//                                note.discount = v['discount'] as Discount
-//                                note.department = v['department'] as Department
-                                note.totalDiscount = v['totalDiscount'] as BigDecimal
-                        }
-                    }
-
-                    mul << multipleCN
                     it.flagValue = AR_CREDIT_NOTE_FLAG.AR_CREDIT_NOTE.name()
-                    it.totalHCICreditNote = (it?.totalHCIAmount?:0.00 + totalHCIVat?:0.00 + totalHCICwt?:0.00).negate()
-                    it.totalPFCreditNote = (it?.totalPFAmount?:0.00 + totalPFVat?:0.00 + totalPFCwt?:0.00).abs()
                 }
 
                 Map<String, String> details = [:]
@@ -198,23 +159,38 @@ class ArCreditNoteService extends  ArAbstractFormulaHelper<ArCreditNote>{
 
                 details["CREDIT_NOTE_ID"] = arCreditNote.id.toString()
 
-
                 Date dateTime = arCreditNote.creditNoteDate
 
                 def transactionDate
                 transactionDate = dateToInstantConverter(dateTime)
+
+                List<Map<String,Object>>  entries = []
+                Map<String,Object> salesAccount = [:]
+                salesAccount['code'] = arCreditNote.arCustomer.discountAndPenalties.salesAccountCode
+                salesAccount['debit'] = 0.00
+                salesAccount['credit'] = (arCreditNote.totalAmountDue?:0.00) + (arCreditNote.vatAmount?:0.00) + (arCreditNote.cwtAmount?:0.00)
+                entries.push(salesAccount)
+
+                cnList.each {
+                    Map<String,Object> itemsAccount = [:]
+                    itemsAccount['code'] = it.accountCode.value
+                    itemsAccount['debit'] = it.totalAmountDue?:0.00
+                    itemsAccount['credit'] = 0.00
+                    entries.push(itemsAccount)
+                }
+
+                headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger,entries)
 
                 headerLedger.transactionNo = arCreditNote.creditNoteNo
                 headerLedger.transactionType = 'CREDIT NOTE'
                 headerLedger.referenceNo = arCreditNote.reference
                 headerLedger.referenceType = arCreditNote?.reference ? 'INVOICE' : ''
 
-
                 def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                         arCreditNote.creditNoteNo,
                         "${arCreditNote.arCustomer.customerName}",
                         "CLAIMS CREDIT NOTE",
-                        LedgerDocType.INV,
+                        LedgerDocType.CN,
                         JournalType.GENERAL,
                         transactionDate,
                         details)
@@ -222,28 +198,12 @@ class ArCreditNoteService extends  ArAbstractFormulaHelper<ArCreditNote>{
                 save(arCreditNote)
                 return pHeader
             }
-
-    }
-
-    Boolean updateInvoiceItemCreditNoteTotal(UUID creditNote){
-        if(creditNote) {
-            Map<String,UUID> invoiceID = [:]
-            List<ArCreditNoteItems> creditNoteItems = arCreditNoteItemServices.findCreditNoteItemsByCNId(creditNote)
-            creditNoteItems.each {
-                cnItem ->
-                    ArInvoiceItems items = arInvoiceItemServices.findOne(cnItem.arInvoiceItem.id)
-                    items.creditNote = (items.creditNote?:0.00) + cnItem.totalAmountDue
-                    if(!invoiceID[items.arInvoice.id.toString()]) invoiceID[items.arInvoice.id.toString()] = items.arInvoice.id
-                    arInvoiceItemServices.save(items)
-            }
-            invoiceID.each {
-                it->
-                    arInvoiceServices.updateInvoiceTotals(it.value)
-            }
-
+        }catch (e){
+            return null
         }
-        return true
+
     }
+
 
     @GraphQLMutation(name="createCreditNote")
     GraphQLResVal<ArCreditNote> createCreditNote(
@@ -251,6 +211,12 @@ class ArCreditNoteService extends  ArAbstractFormulaHelper<ArCreditNote>{
         @GraphQLArgument(name = "fields") Map<String,Object> fields
     ){
             def creditNote = upsertFromMap(id, fields)
+            if (fields['billingAddress'] == null) {
+                def address = creditNote.arCustomer.address
+                creditNote.billingAddress = address ?: ''
+                save(creditNote)
+            }
+
             if(!creditNote.creditNoteNo){
                 def formatter = DateTimeFormatter.ofPattern("yyyy")
                 String year = creditNote.createdDate.atZone(ZoneId.systemDefault()).format(formatter)
@@ -260,10 +226,8 @@ class ArCreditNoteService extends  ArAbstractFormulaHelper<ArCreditNote>{
                 save(creditNote)
             }
 
-            if (fields['billingAddress'] == null) {
-                creditNote.billingAddress = creditNote?.arCustomer?.address ?: ''
-                save(creditNote)
-            }
+
+
       
             if (creditNote.status.equalsIgnoreCase('UNAPPLIED')) {
 //                creditNoteDiscountPosting(creditNote)

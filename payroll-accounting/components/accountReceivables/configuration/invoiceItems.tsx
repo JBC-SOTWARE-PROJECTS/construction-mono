@@ -7,6 +7,8 @@ import type { ColumnsType } from 'antd/es/table'
 import numeral from 'numeral'
 import styled from 'styled-components'
 import InvoiceItemsForm from './dialog/invoiceItemForm'
+import { CardLayout } from '../common'
+import { CommonTableCSS } from '../common/styles'
 
 const actionItems: MenuProps['items'] = [
   {
@@ -45,6 +47,13 @@ export default function InvoiceItems() {
       size: 10,
     },
   })
+
+  const onSearch = (search: string) => {
+    refetch({
+      search,
+      page: 0,
+    })
+  }
 
   const onHandleClickRowMenu = (key: string, record: any) => {
     switch (key) {
@@ -113,17 +122,15 @@ export default function InvoiceItems() {
 
   return (
     <Space direction='vertical' style={{ width: '100%' }}>
-      <Card
-        bordered={false}
-        extra={[
-          <Space key='controls' split={<Divider type='vertical' />}>
-            <Button type='text' icon={<FilterOutlined />} />
-            <Button type='text' icon={<SearchOutlined />} />
-            <Button onClick={() => onHandleClickNewItem()}>Create New</Button>
-          </Space>,
-        ]}
+      <CardLayout
+        onSearch={onSearch}
+        extra={
+          <Button onClick={onHandleClickNewItem}>
+            New Invoice Product/Service
+          </Button>
+        }
       >
-        <TableCSS>
+        <CommonTableCSS>
           <Table
             rowKey='id'
             columns={columns}
@@ -132,8 +139,8 @@ export default function InvoiceItems() {
             loading={loading}
             scroll={{ x: 1200 }}
           />
-        </TableCSS>
-      </Card>
+        </CommonTableCSS>
+      </CardLayout>
     </Space>
   )
 }

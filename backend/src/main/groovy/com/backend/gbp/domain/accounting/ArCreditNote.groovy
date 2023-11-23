@@ -9,8 +9,7 @@ import org.hibernate.annotations.Type
 import javax.persistence.*
 
 enum AR_CREDIT_NOTE_FLAG  {
-    AR_CREDIT_NOTE,
-    AR_CREDIT_NOTE_TRANSFER
+    AR_CREDIT_NOTE
 }
 
 @Entity

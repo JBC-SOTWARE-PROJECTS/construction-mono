@@ -1,11 +1,18 @@
 package com.backend.gbp.domain.accounting
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
+
+@Canonical
+class AccountOpt {
+    String label
+    String value
+}
 
 @Entity
 @Table(schema = "accounting", name = "ar_credit_note_items")
@@ -112,17 +119,17 @@ class ArCreditNoteItems extends AbstractAuditingEntity implements Serializable {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-
     @JoinColumn(name = "recipient_customer", referencedColumnName = "id")
     ArCustomers recipientCustomer
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "discount_department", referencedColumnName = "id")
-//    Department discountDepartment
 
     @GraphQLQuery
     @Column(name = "recipient_invoice")
     UUID recipientInvoice
+
+    @GraphQLQuery
+    @Type(type = "jsonb")
+    @Column(name="account_code",columnDefinition = "jsonb")
+    AccountOpt accountCode
 
     @GraphQLQuery
     @Column(name = "reference")
@@ -131,6 +138,5 @@ class ArCreditNoteItems extends AbstractAuditingEntity implements Serializable {
     @GraphQLQuery
     @Column(name = "status")
     String status
-
 
 }

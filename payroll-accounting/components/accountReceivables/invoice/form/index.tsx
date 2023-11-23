@@ -3,20 +3,19 @@ import {
   FIND_ALL_INVOICE_ITEMS,
   FIND_ONE_INVOICE,
 } from '@/graphql/accountReceivables/invoices'
+import { ArInvoiceItems } from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
-import { FieldTimeOutlined } from '@ant-design/icons'
-import { useLazyQuery, useMutation } from '@apollo/client'
-import { Avatar, Badge, Form, Modal, Space, Tag, Typography } from 'antd'
-import { useReducer, useEffect, useMemo } from 'react'
+import { useMutation, useQuery } from '@apollo/client'
+import { Form, Modal, Space } from 'antd'
+import Decimal from 'decimal.js'
+import { useMemo, useReducer } from 'react'
+import { CustomModalTitle } from '../../common/modalPageHeader'
 import CustomerClaims from '../../customers/claims'
 import FormBody from './body'
 import FormFooter from './footer'
 import InvoiceFooterActions from './footer/actions'
 import FormHeader from './header'
-import { assignFormValues, invoiceTypeDetails, textStatus } from './helper'
-import Decimal from 'decimal.js'
-import { CustomModalTitle } from '../../common/modalPageHeader'
-import { ArInvoiceItems } from '@/graphql/gql/graphql'
+import { assignFormValues, invoiceTypeDetails } from './helper'
 
 export interface AmountSummaryDetailI {
   total: number
@@ -98,50 +97,26 @@ export default function InvoiceForm(props: InvoiceFormI) {
   const [onMutateInvoice, { loading: loadingCreateInvoice }] =
     useMutation(CREATE_INVOICE)
 
-  const [
-    onFindOneInvoice,
-    { loading: findOneInvLoading, refetch: invoiceRefetch },
-  ] = useLazyQuery(FIND_ONE_INVOICE, {
-    onCompleted: ({ findOne }) => assignFormValues(findOne, form, dispatch),
-  })
+  const { loading: findOneInvLoading, refetch: invoiceRefetch } = useQuery(
+    FIND_ONE_INVOICE,
+    {
+      variables: { id: state?.id },
+      skip: !state?.id,
+      onCompleted: ({ findOne }) => assignFormValues(findOne, form, dispatch),
+    }
+  )
 
-  const [
-    onFindAllInvoiceItems,
-    { loading: findAllInvItemLoading, refetch: invoiceItemRefetch },
-  ] = useLazyQuery(FIND_ALL_INVOICE_ITEMS)
+  const { loading: findAllInvItemLoading, refetch: invoiceItemRefetch } =
+    useQuery(FIND_ALL_INVOICE_ITEMS, {
+      variables: { invoiceId: state?.id },
+      skip: !state?.id,
+      onCompleted: ({ invoiceItems }) =>
+        dispatch({ type: 'new-set-item', payload: invoiceItems }),
+    })
 
   const seeMoreDialog = () => {
     claimsDialog({}, () => {})
   }
-
-  const handleFindInvoice = (id: string) => {
-    onFindOneInvoice({
-      variables: { id },
-      onCompleted: ({ findOne }) => assignFormValues(findOne, form, dispatch),
-    })
-  }
-
-  const handleFindInvoiceItems = (id: string) => {
-    onFindAllInvoiceItems({
-      variables: { invoiceId: id },
-      onCompleted: ({ invoiceItems }) =>
-        dispatch({ type: 'new-set-item', payload: invoiceItems }),
-    })
-  }
-
-  useEffect(() => {
-    if (id) {
-      onFindOneInvoice({
-        variables: { id },
-        onCompleted: ({ findOne }) => assignFormValues(findOne, form, dispatch),
-      })
-      onFindAllInvoiceItems({
-        variables: { invoiceId: id },
-        onCompleted: ({ invoiceItems }) =>
-          dispatch({ type: 'new-set-item', payload: invoiceItems }),
-      })
-    }
-  }, [id, form, onFindOneInvoice, onFindAllInvoiceItems])
 
   const tableLoader =
     loadingCreateInvoice || findOneInvLoading || findAllInvItemLoading
@@ -240,8 +215,6 @@ export default function InvoiceForm(props: InvoiceFormI) {
             onMutateInvoice,
             invoiceRefetch,
             invoiceItemRefetch,
-            handleFindInvoice,
-            handleFindInvoiceItems,
           }}
         />
         <FormBody

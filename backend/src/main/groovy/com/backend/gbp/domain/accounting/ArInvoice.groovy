@@ -110,10 +110,9 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     @Column(name = "approved_date")
     Instant approvedDate
 
-
     @Override
     String getDomain() {
-        return ArInvoice.class.name
+        return IntegrationDomainEnum.INVOICE.name()
     }
 
     @Override

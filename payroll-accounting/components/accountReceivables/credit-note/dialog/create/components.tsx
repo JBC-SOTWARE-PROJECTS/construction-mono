@@ -65,23 +65,35 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
   const [products, setProducts] = useState<any[]>([])
 
   const onSearch = (search: string) => {
-    lazyQuery.lazyQueryItemParticular({
-      variables: {
-        search,
-        page: 0,
-        size: 10,
-      },
-      onCompleted: ({ particulars }: { particulars: any }) => {
-        setProducts([...(particulars?.content ?? [])])
-      },
-    })
-  }
-
-  useEffect(() => {
-    if (fieldType == 'SEARCH') {
+    if (dataIndex == 'accountCode') {
+      console.log(search, 'search')
+      lazyQuery.lazyQueryAccountList({
+        fetchPolicy: 'cache-and-network',
+        variables: {
+          accountCategory: '',
+          accountType: '',
+          motherAccountCode: '',
+          subaccountType: '',
+          accountName: search,
+          department: '',
+          excludeMotherAccount: true,
+        },
+        onCompleted: ({ coaList }: { coaList: any }) => {
+          setProducts([...(coaList ?? [])])
+        },
+        onError: (error) => {
+          if (error) {
+            setProducts([])
+            // message.error(
+            //   'Something went wrong. Cannot generate Chart of Accounts'
+            // )
+          }
+        },
+      })
+    } else
       lazyQuery.lazyQueryItemParticular({
         variables: {
-          search: '',
+          search,
           page: 0,
           size: 10,
         },
@@ -89,6 +101,45 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
           setProducts([...(particulars?.content ?? [])])
         },
       })
+  }
+
+  useEffect(() => {
+    if (fieldType == 'SEARCH') {
+      if (dataIndex == 'accountCode') {
+        lazyQuery.lazyQueryAccountList({
+          fetchPolicy: 'cache-and-network',
+          variables: {
+            accountCategory: '',
+            accountType: '',
+            motherAccountCode: '',
+            subaccountType: '',
+            description: '',
+            department: '',
+            excludeMotherAccount: true,
+          },
+          onCompleted: ({ coaList }: { coaList: any }) => {
+            setProducts([...(coaList ?? [])])
+          },
+          onError: (error) => {
+            if (error) {
+              setProducts([])
+              // message.error(
+              //   'Something went wrong. Cannot generate Chart of Accounts'
+              // )
+            }
+          },
+        })
+      } else
+        lazyQuery.lazyQueryItemParticular({
+          variables: {
+            search: '',
+            page: 0,
+            size: 10,
+          },
+          onCompleted: ({ particulars }: { particulars: any }) => {
+            setProducts([...(particulars?.content ?? [])])
+          },
+        })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -118,10 +169,7 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
             onSearch={onSearch}
             onBlur={save}
             onSelect={save}
-            options={(products ?? []).map((items: any) => ({
-              label: items.itemName,
-              value: items.id,
-            }))}
+            options={products ?? []}
           />
         )
       default:

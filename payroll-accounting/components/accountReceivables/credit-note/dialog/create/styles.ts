@@ -7,7 +7,7 @@ export const ModalStyles = {
     boxShadow: 'none',
     marginBottom: 100,
   },
-  maskStyle: { mask: { background: '#f2f3f4' } },
+  maskStyle: { background: '#f2f3f4' },
 }
 
 export const CNFormCommonStyles = {

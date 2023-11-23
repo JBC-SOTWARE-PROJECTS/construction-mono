@@ -1,4 +1,5 @@
-import { Button, Select, Space, Table } from 'antd'
+import { PlusCircleOutlined } from '@ant-design/icons'
+import { Button, Space, Table } from 'antd'
 import styled from 'styled-components'
 import { CnTablePropsI } from '.'
 import { InvoiceTypeT, StateI } from '..'
@@ -8,8 +9,6 @@ import {
   CnMutation,
   CnRefetchI,
 } from '../CreditNCreate'
-import { PlusCircleOutlined } from '@ant-design/icons'
-import { InvoiceTypeOption } from '@/constant/accountReceivables'
 import { onHandleCnAddClaimsItems } from '../components'
 import { onHandleCnAdd, onSelectInvoiceType } from '../functions'
 
@@ -71,15 +70,6 @@ export default function CnBodyTable(props: CnBodyTableI) {
             Add Record
           </Button>
         )}
-
-        {/* {state.creditNoteType == 'INVOICE' && (
-          <Select
-            options={InvoiceTypeOption}
-            value={state.invoiceType}
-            onChange={(e: InvoiceTypeT) => onHandleSelectInvoiceType(e)}
-            disabled={state?.dataSource.length > 0}
-          />
-        )} */}
       </Space>
       <EditableTableCSS>
         <Table
