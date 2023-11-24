@@ -1,5 +1,4 @@
 import { Assets, Query } from "@/graphql/gql/graphql";
-import { IState } from "@/routes/administrative/Employees";
 import { IAssetMaintenanceTypeState } from "@/routes/inventory/assets/configuration/MaintenanceTypeConfig";
 import { IAssetState } from "@/routes/inventory/assets/masterfile";
 import { QueryHookOptions, gql, useQuery } from "@apollo/client";
