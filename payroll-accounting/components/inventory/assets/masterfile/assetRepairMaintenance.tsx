@@ -18,7 +18,7 @@ type IProps = {
   loading: boolean;
   totalElements: number;
   handleOpen: (record: AssetRepairMaintenance) => void;
-  handleAssign: (record: AssetRepairMaintenance) => void;
+  handleView: (record: AssetRepairMaintenance) => void;
   handleSupplier: (record: AssetRepairMaintenance) => void;
   changePage: (page: number) => void;
 };
@@ -28,7 +28,7 @@ export default function AssetRepairMaintenanceTable({
   loading,
   totalElements = 1,
   handleOpen,
-  handleAssign,
+  handleView,
   handleSupplier,
   changePage,
 }: IProps) {
@@ -39,8 +39,8 @@ export default function AssetRepairMaintenanceTable({
       dataIndex: "serviceClassification",
       key: "serviceClassification",
       width: "10%",
-    //  render: (_, record) => <span>{record?.serviceClassification}</span>,
-    }, 
+      //  render: (_, record) => <span>{record?.serviceClassification}</span>,
+    },
     {
       title: "Description",
       dataIndex: "workDescription",
@@ -52,14 +52,16 @@ export default function AssetRepairMaintenanceTable({
       dataIndex: "serviceType",
       key: "serviceType",
       width: "25%",
-      render: (_, record) => <span>{record?.serviceType?.replace(/_/g, " ")}</span>,
+      render: (_, record) => (
+        <span>{record?.serviceType?.replace(/_/g, " ")}</span>
+      ),
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
       width: "25%",
-    }, 
+    },
     {
       title: "Action",
       dataIndex: "",
@@ -68,13 +70,26 @@ export default function AssetRepairMaintenanceTable({
       fixed: "right",
       render: (_, record) => {
         return (
-          <Button
-            icon={<EditOutlined />}
-            type="primary"
-            onClick={() => {
-              handleOpen(record);
-            }}
-          />
+          <Row gutter={5}>
+            <Col>
+              <Button
+                icon={<EyeOutlined />}
+                type="primary"
+                onClick={() => {
+                  handleView(record);
+                }}
+              />
+            </Col>
+            <Col>
+              <Button
+                icon={<EditOutlined />}
+                type="primary"
+                onClick={() => {
+                  handleOpen(record);
+                }}
+              />
+            </Col>
+          </Row>
         );
       },
     },

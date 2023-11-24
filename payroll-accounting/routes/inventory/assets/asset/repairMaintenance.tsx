@@ -15,6 +15,7 @@ import { AssetPreventiveMaintenance, AssetRepairMaintenance } from "@/graphql/gq
 import AssetRepairMaintenanceTable from "@/components/inventory/assets/masterfile/assetRepairMaintenance";
 import useGetAssetRepairMaintenance from "@/hooks/asset/useGetAssetRepairMaintenance";
 import UpsertRepairMaintenanceModal from "@/components/inventory/assets/dialogs/upsertAssetRepairMaintenance";
+import ViewRepairMaintenance from "@/components/inventory/assets/dialogs/viewRepairMaintenance";
 
 type Props = {};
 const { Search } = Input;
@@ -32,7 +33,8 @@ const initialState: IPMState = {
 };
 
 export default function AssetRepairMaintenanceComponent({}: Props) {
-  const modal = useDialog(UpsertRepairMaintenanceModal);
+  const modalUpsert = useDialog(UpsertRepairMaintenanceModal);
+  const modalViewRM = useDialog(ViewRepairMaintenance);
   const router = useRouter();
   const [state, setState] = useState(initialState);
 
@@ -45,7 +47,7 @@ export default function AssetRepairMaintenanceComponent({}: Props) {
   });
 
   const onUpsertRecord = (record?: any) => {
-    modal({ record: record }, (result: any) => {
+    modalUpsert({ record: record }, (result: any) => {
       if (result) {
         refetch();
         if (record?.id) {
@@ -56,6 +58,10 @@ export default function AssetRepairMaintenanceComponent({}: Props) {
       }
     });
   };
+
+  const viewRepairMaintenance = (record?: any) => {
+    modalViewRM({ record: record });
+  }
 
   return (
     <>
@@ -89,7 +95,7 @@ export default function AssetRepairMaintenanceComponent({}: Props) {
           loading={false}
           totalElements={data?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
-          handleAssign={(record) => {}}
+          handleView={(record) => viewRepairMaintenance(record)}
           handleSupplier={(record) => {}}
           changePage={(page) => {
             setState((prev) => ({ ...prev, page: page }));

@@ -62,7 +62,7 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
       key: "occurrence",
       width: '20%',
       render: (_, record) => {
-        return <>{moment(record?.occurrenceDate, "YYYY-MM-DD").format('MMM DD, YYYY')}</>
+        return <>{moment(record?.occurrenceDate, "YYYY-MM-DD").format('MMM DD, YYYY') + (record?.scheduleType == PreventiveScheduleType.Daily ? " " +record?.occurrence + " " : " " )}</>
       },
     },
     {
@@ -71,7 +71,17 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
       key: "reminderDate",
       width: '20%',
       render: (_, record) => {
-        return <>{moment(record?.reminderDate, "YYYY-MM-DD").format('MMM DD, YYYY')}</>
+
+        var orgDate = "";
+        var convertedTime = "";
+
+        if(record?.scheduleType == PreventiveScheduleType.Daily){
+           orgDate = moment.utc(record?.reminderDate).format('HH:mm:ss');
+           convertedTime = moment(orgDate, 'HH:mm:ss').format('hh:mm:ss A');
+        }
+
+
+        return <>{moment(record?.reminderDate, "YYYY-MM-DD").format('MMM DD, YYYY') + (record?.scheduleType == PreventiveScheduleType.Daily ? " " + convertedTime + " " : " " )}</>
       },
     },
 

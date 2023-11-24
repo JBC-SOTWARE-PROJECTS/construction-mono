@@ -36,6 +36,7 @@ import { useDialog } from "@/hooks";
 import _ from "lodash";
 import FormDatePicker from "@/components/common/formDatePicker/formDatePicker";
 import dayjs from "dayjs";
+import { useRouter } from "next/router";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -56,6 +57,7 @@ export default function UpsertRepairMaintenanceModal(props: IProps) {
   const { hide, record } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [initialRecord, setInitialRecord] = useState<any | null>(null);
+  const router = useRouter();
 
   const [upsert, { loading: upsertLoading }] = useMutation(
     UPSERT_REPAIR_MAINTENANCE_RECORD,
@@ -90,6 +92,7 @@ export default function UpsertRepairMaintenanceModal(props: IProps) {
     payload.serviceClassification =
       values?.serviceClassification as RepairServiceClassification;
     payload.status = values?.status as RepairMaintenanceStatus;
+    payload.asset = router?.query?.id
 
     showPasswordConfirmation(() => {
       upsert({

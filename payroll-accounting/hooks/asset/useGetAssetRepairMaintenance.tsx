@@ -19,6 +19,13 @@ const GET_RECORDS = gql`
           status
           rmImage
           inspectionRemarks
+          asset{
+            id
+            description
+            item {
+              descLong
+            }
+          }
         }
         size
         totalElements
@@ -31,7 +38,7 @@ const useGetAssetRepairMaintenance = (props: QueryHookOptions ) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     ...props
   });
-  console.log("woow", data)
+
   return [data?.list , loading, refetch];
 };
 
