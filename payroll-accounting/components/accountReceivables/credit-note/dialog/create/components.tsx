@@ -196,7 +196,11 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
             onSelect={save}
             options={products ?? []}
             loading={onSearchItemLoading || onSearchAccountsLoading}
-            notFoundContent={<Spin size='small' />}
+            notFoundContent={
+              onSearchItemLoading || onSearchAccountsLoading ? (
+                <Spin size='small' />
+              ) : null
+            }
           />
         )
       default:
