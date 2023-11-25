@@ -1,4 +1,7 @@
-import { MutationType } from '@/components/accountReceivables/common/types'
+import {
+  LazyQueryType,
+  MutationType,
+} from '@/components/accountReceivables/common/types'
 import { CreditNoteStatusEnum } from '@/constant/accountReceivables'
 import { ArCreditNote, ArCreditNoteItems } from '@/graphql/gql/graphql'
 import { apiUrlPrefix } from '@/shared/settings'
@@ -123,11 +126,19 @@ export const onHandleClickCWT = (props: HandleChangeCnCwtI) => {
     isApply,
   }
 
-  onAsyncMutationWithLoader({
-    mutationFunc: mutation?.generateTax,
-    variables,
-    refetch,
-    messageApi,
+  mutation?.creditNoteItemMultiUpdate({
+    variables: {
+      id: state?.id,
+      fields: state.dataSource,
+    },
+    onCompleted: () => {
+      onAsyncMutationWithLoader({
+        mutationFunc: mutation?.generateTax,
+        variables,
+        refetch,
+        messageApi,
+      })
+    },
   })
 }
 
@@ -188,11 +199,19 @@ export const onHandleClickVat = (props: HandleClickCnVatI) => {
     vatValue: vat,
     isVatable,
   }
-  onAsyncMutationWithLoader({
-    mutationFunc: mutation?.generateVat,
-    variables,
-    refetch,
-    messageApi,
+  mutation?.creditNoteItemMultiUpdate({
+    variables: {
+      id: state?.id,
+      fields: state.dataSource,
+    },
+    onCompleted: () => {
+      onAsyncMutationWithLoader({
+        mutationFunc: mutation?.generateVat,
+        variables,
+        refetch,
+        messageApi,
+      })
+    },
   })
 }
 
@@ -265,15 +284,11 @@ export interface extendARItems extends ArCreditNoteItems {
   [key: string]: any // Adjust this to the appropriate type if possible
 }
 
-export const onHandleCnSave = (values: CnTableHandleSaveI) => {
-  const {
-    record,
-    fields: fieldsValues,
-    dataIndex,
-    state,
-    dispatch,
-    mutation,
-  } = values
+export const onHandleCnSave = (
+  values: CnTableHandleSaveI,
+  findItem: LazyQueryType
+) => {
+  const { record, fields: fieldsValues, dataIndex, state, dispatch } = values
   var row = { ...record }
   var fields = { ...fieldsValues }
 
@@ -290,8 +305,6 @@ export const onHandleCnSave = (values: CnTableHandleSaveI) => {
       totalAmountDue = parseFloat(
         new Decimal(item?.unitPrice ?? 0).times(fieldValueQty).toString()
       )
-      fields.totalHCIAmount = totalAmountDue
-      row.totalHCIAmount = totalAmountDue
       fields.totalAmountDue = totalAmountDue
       row.totalAmountDue = totalAmountDue
 
@@ -301,8 +314,6 @@ export const onHandleCnSave = (values: CnTableHandleSaveI) => {
       totalAmountDue = parseFloat(
         new Decimal(item?.quantity ?? 0).times(fieldValuePrice).toString()
       )
-      fields.totalHCIAmount = totalAmountDue
-      row.totalHCIAmount = totalAmountDue
       fields.totalAmountDue = totalAmountDue
       row.totalAmountDue = totalAmountDue
       break
@@ -310,12 +321,8 @@ export const onHandleCnSave = (values: CnTableHandleSaveI) => {
       let fieldValueTotal = new Decimal(actualValue)
       const quantity = new Decimal(item?.quantity ?? 0)
       const unitPrice = fieldValueTotal.dividedBy(quantity)
-      fields.totalHCIAmount = totalAmountDue
-      row.totalHCIAmount = totalAmountDue
       fields.unitPrice = unitPrice
       row.unitPrice = unitPrice
-      fields.totalHCIAmount = totalAmountDue
-      row.totalHCIAmount = totalAmountDue
     default:
       break
   }
@@ -353,79 +360,102 @@ export const onHandleCnSave = (values: CnTableHandleSaveI) => {
       ...row,
     })
     dispatch({ type: 'new-set-item', payload: newData })
-
-    mutation?.createCreditNoteItem({
-      variables: {
-        id: row?.id,
-        fields,
-      },
-      onCompleted: ({
-        creditNote,
-      }: {
-        creditNote: {
-          success: boolean
-          response: ArCreditNoteItems
-          message: string
-        }
-      }) => {
-        const {
-          success,
-          response,
-          message: messageText,
-        } = creditNote || { success: false }
-        if (!success) {
-          const oldData = [...dataSource]
-          const index = oldData.findIndex((item) => row.id === item.id)
-          const item = oldData[index]
-
-          if (response) {
-            oldData.splice(index, 1, {
+    if (row?.invoiceParticulars?.id && isArray)
+      if (dataIndex[0] == 'itemName')
+        findItem({
+          variables: {
+            id: row?.invoiceParticulars?.id,
+          },
+          onCompleted: ({ particulars }) => {
+            fields = {}
+            row.unitPrice = particulars?.salePrice
+            row.description = particulars?.description
+            row.quantity = 1
+            const totalAmountDue = parseFloat(
+              new Decimal(row.unitPrice ?? 0)
+                .times(new Decimal(row?.quantity ?? 0))
+                .toString()
+            )
+            row.totalAmountDue = totalAmountDue
+            newData.splice(index, 1, {
               ...item,
-              ...response,
+              ...row,
             })
-          }
+            dispatch({ type: 'new-set-item', payload: newData })
+          },
+        })
+    // mutation?.createCreditNoteItem({
+    //   variables: {
+    //     id: row?.id,
+    //     fields,
+    //   },
+    //   onCompleted: ({
+    //     creditNote,
+    //   }: {
+    //     creditNote: {
+    //       success: boolean
+    //       response: ArCreditNoteItems
+    //       message: string
+    //     }
+    //   }) => {
+    //     const {
+    //       success,
+    //       response,
+    //       message: messageText,
+    //     } = creditNote || { success: false }
+    //     if (!success) {
+    //       const oldData = [...dataSource]
+    //       const index = oldData.findIndex((item) => row.id === item.id)
+    //       const item = oldData[index]
 
-          dispatch({
-            type: 'new-set-item',
-            payload: oldData,
-          })
-          message.error(messageText)
-        } else {
-          const isArray = Array.isArray(dataIndex)
-          if (isArray) {
-            if (dataIndex.includes('itemName')) {
-              fields = {}
-              row.unitPrice = response?.invoiceParticulars?.salePrice
-              row.description = response?.invoiceParticulars?.description
-              row.quantity = 1
-              const totalAmountDue = parseFloat(
-                new Decimal(row.unitPrice ?? 0)
-                  .times(new Decimal(row?.quantity ?? 0))
-                  .toString()
-              )
+    //       if (response) {
+    //         oldData.splice(index, 1, {
+    //           ...item,
+    //           ...response,
+    //         })
+    //       }
 
-              fields.unitPrice = row.unitPrice
-              fields.description = row.description
-              fields.quantity = 1
-              row.totalHCIAmount = totalAmountDue
-              row.totalAmountDue = totalAmountDue
+    //       dispatch({
+    //         type: 'new-set-item',
+    //         payload: oldData,
+    //       })
+    //       message.error(messageText)
+    //     } else {
+    //       const isArray = Array.isArray(dataIndex)
+    //       if (isArray) {
+    //         if (dataIndex.includes('itemName')) {
+    //           fields = {}
+    //           row.unitPrice = response?.invoiceParticulars?.salePrice
+    //           row.description = response?.invoiceParticulars?.description
+    //           row.quantity = 1
+    //           const totalAmountDue = parseFloat(
+    //             new Decimal(row.unitPrice ?? 0)
+    //               .times(new Decimal(row?.quantity ?? 0))
+    //               .toString()
+    //           )
 
-              newData.splice(index, 1, {
-                ...item,
-                ...row,
-              })
-              dispatch({ type: 'new-set-item', payload: newData })
-              mutation?.createCreditNoteItem({
-                variables: {
-                  id: row?.id,
-                  fields,
-                },
-              })
-            }
-          }
-        }
-      },
-    })
+    //           fields.unitPrice = row.unitPrice
+    //           fields.description = row.description
+    //           fields.quantity = 1
+    //           row.totalHCIAmount = totalAmountDue
+    //           row.totalAmountDue = totalAmountDue
+
+    //           newData.splice(index, 1, {
+    //             ...item,
+    //             ...row,
+    //           })
+    //           dispatch({ type: 'new-set-item', payload: newData })
+    //           mutation?.createCreditNoteItem({
+    //             variables: {
+    //               id: row?.id,
+    //               fields,
+    //             },
+    //           })
+    //         }
+    //       }
+    //     }
+    //   },
+    // })
   }
 }
 

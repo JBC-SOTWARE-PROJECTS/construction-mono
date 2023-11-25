@@ -270,6 +270,12 @@ export const CREDIT_NOTE_POSTING = gql`
   }
 `
 
+export const ADD_MULTIPLE_CN_ITEMS = gql`
+  mutation ($id: UUID, $fields: [Map_String_ObjectScalar]) {
+    multiUpdate: updateMultipleCreditNoteItem(id: $id, fields: $fields)
+  }
+`
+
 export const REMOVE_CREDIT_NOTE_ITEM = gql`
   mutation ($id: UUID) {
     creditNoteItem: removeCreditNoteItem(id: $id) {
@@ -312,6 +318,17 @@ export const GENERATE_CREDIT_NOTE_VAT = gql`
       response
       success
       message
+    }
+  }
+`
+
+export const FIND_ONE_INVOICE_PARTICULAR = gql`
+  query ($id: UUID) {
+    particulars: findOneArInvoiceParticulars(id: $id) {
+      id
+      itemName
+      description
+      salePrice
     }
   }
 `

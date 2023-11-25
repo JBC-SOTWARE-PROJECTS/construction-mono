@@ -2,10 +2,12 @@ import { CustomModalTitle } from '@/components/accountReceivables/common/modalPa
 import {
   ACCOUNT_OPTIONS_GQL,
   ADD_CREDIT_NOTE_ITEMS,
+  ADD_MULTIPLE_CN_ITEMS,
   CREATE_CREDIT_NOTE,
   CREDIT_NOTE_POSTING,
   FIND_ALL_CREDIT_NOTE_ITEMS_BY_CNID,
   FIND_ONE_CREDIT_NOTE,
+  FIND_ONE_INVOICE_PARTICULAR,
   GENERATE_CREDIT_NOTE_TAX,
   GENERATE_CREDIT_NOTE_VAT,
   INVOICE_PARTICULAR_OPTIONS_GQL,
@@ -144,7 +146,14 @@ export default function CreditNCreateDialog(props: CreditNCreateProps) {
   const [lazyQueryAccountList, { loading: lazyQueryAccountListLoading }] =
     useLazyQuery(ACCOUNT_OPTIONS_GQL)
 
+  const [lazyQueryFindItem, { loading: lazyQueryFindItemLoading }] =
+    useLazyQuery(FIND_ONE_INVOICE_PARTICULAR)
   // Mutation
+
+  const [
+    mutateCreditNoteItemMultiUpdate,
+    { loading: creditNoteMultiUpdateLoading },
+  ] = useMutation(ADD_MULTIPLE_CN_ITEMS)
 
   const [mutateCreateCreditNote, { loading: creditNoteCreateLoading }] =
     useMutation(CREATE_CREDIT_NOTE)
@@ -181,6 +190,7 @@ export default function CreditNCreateDialog(props: CreditNCreateProps) {
   const lazyQuery = {
     lazyQueryItemParticular,
     lazyQueryAccountList,
+    lazyQueryFindItem,
   }
 
   const mutation = {
@@ -191,6 +201,7 @@ export default function CreditNCreateDialog(props: CreditNCreateProps) {
 
     createCreditNoteItem: mutateCreateCreditNoteItem,
     removeCreditNoteItem: mutateRemoveCreditNoteItem,
+    creditNoteItemMultiUpdate: mutateCreditNoteItemMultiUpdate,
   }
 
   const refetch = {
@@ -204,6 +215,7 @@ export default function CreditNCreateDialog(props: CreditNCreateProps) {
 
     lazyQueryItemParticular: lazyQueryItemParticularLoading,
     lazyQueryAccountList: lazyQueryAccountListLoading,
+    lazyQueryFindItem: lazyQueryFindItemLoading,
 
     createCreditNote: creditNoteCreateLoading,
     generateTax: generateTaxLoading,

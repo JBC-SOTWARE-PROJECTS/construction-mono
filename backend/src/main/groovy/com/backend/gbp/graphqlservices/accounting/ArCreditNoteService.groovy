@@ -225,14 +225,8 @@ class ArCreditNoteService extends  ArAbstractFormulaHelper<ArCreditNote>{
                 }
                 save(creditNote)
             }
-
-
-
       
             if (creditNote.status.equalsIgnoreCase('UNAPPLIED')) {
-//                creditNoteDiscountPosting(creditNote)
-//                creditNoteTransferPosting(creditNote)
-//                arTransactionLedgerServices.insertArCreditNoteTransactionLedger(creditNote)
                     updateCreditNoteTotals(creditNote.id)
             }
 

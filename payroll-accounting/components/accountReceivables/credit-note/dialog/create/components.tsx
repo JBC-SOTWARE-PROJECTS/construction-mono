@@ -10,13 +10,16 @@ import {
   InputRef,
   Select,
   SelectProps,
+  Skeleton,
   Space,
+  Spin,
 } from 'antd'
 import React, { useState, useRef, useContext, useEffect } from 'react'
 import { CnEditableFieldTypeProps } from './props'
 import {
   CnDispatch,
   CnLazyQuery,
+  CnLoadingI,
   CnMutation,
   CnRefetchI,
 } from './CreditNCreate'
@@ -27,6 +30,17 @@ import { ColumnType } from 'antd/es/table'
 import { SearchOutlined } from '@ant-design/icons'
 import { FilterConfirmProps } from 'antd/lib/table/interface'
 import { StateI } from '.'
+import { LazyQueryType } from '@/components/accountReceivables/common/types'
+import {
+  LazyQueryResultTuple,
+  OperationVariables,
+  useLazyQuery,
+} from '@apollo/client'
+import {
+  ACCOUNT_OPTIONS_GQL,
+  FIND_ONE_INVOICE_PARTICULAR,
+  INVOICE_PARTICULAR_OPTIONS_GQL,
+} from '@/graphql/accountReceivables/creditNote'
 
 // FOR TABLE ROW
 
@@ -34,16 +48,23 @@ export interface EditableRowProps {
   index: number
 }
 
-const EditableContext = React.createContext<FormInstance<any> | null>(null)
+interface EditableContextI {
+  form: FormInstance<any>
+  findOneItem: LazyQueryResultTuple<any, OperationVariables>
+}
+
+const EditableContext = React.createContext<EditableContextI | null>(null)
 
 export const EditableRow: React.FC<EditableRowProps> = ({
   index,
   ...props
 }) => {
   const [form] = Form.useForm()
+  const findOneItem = useLazyQuery(FIND_ONE_INVOICE_PARTICULAR)
+
   return (
     <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
+      <EditableContext.Provider value={{ form, findOneItem }}>
         <tr {...props} />
       </EditableContext.Provider>
     </Form>
@@ -61,6 +82,13 @@ export interface EditableFieldTypeI {
 
 export const EditableFieldType = (props: EditableFieldTypeI) => {
   const { dataIndex, save, fieldType, inputRef, lazyQuery } = props
+
+  const [onSearchItem, { loading: onSearchItemLoading }] = useLazyQuery(
+    INVOICE_PARTICULAR_OPTIONS_GQL
+  )
+
+  const [onSearchAccounts, { loading: onSearchAccountsLoading }] =
+    useLazyQuery(ACCOUNT_OPTIONS_GQL)
 
   const [products, setProducts] = useState<any[]>([])
 
@@ -91,7 +119,7 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
         },
       })
     } else
-      lazyQuery.lazyQueryItemParticular({
+      onSearchItem({
         variables: {
           search,
           page: 0,
@@ -106,7 +134,7 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
   useEffect(() => {
     if (fieldType == 'SEARCH') {
       if (dataIndex == 'accountCode') {
-        lazyQuery.lazyQueryAccountList({
+        onSearchAccounts({
           fetchPolicy: 'cache-and-network',
           variables: {
             accountCategory: '',
@@ -123,9 +151,6 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
           onError: (error) => {
             if (error) {
               setProducts([])
-              // message.error(
-              //   'Something went wrong. Cannot generate Chart of Accounts'
-              // )
             }
           },
         })
@@ -170,6 +195,8 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
             onBlur={save}
             onSelect={save}
             options={products ?? []}
+            loading={onSearchItemLoading || onSearchAccountsLoading}
+            notFoundContent={<Spin size='small' />}
           />
         )
       default:
@@ -193,7 +220,7 @@ export const EditableFieldType = (props: EditableFieldTypeI) => {
 }
 
 export interface CnTableHandleSaveI {
-  record: any
+  record: ArCreditNoteItems
   state: StateI
   fields?: any
   dataIndex?: any
@@ -207,7 +234,7 @@ export interface EditableCellProps {
   dataIndex: any
   record: any
   fieldType: 'DATE' | 'TEXT' | 'NUMBER' | 'OPTIONS' | 'SEARCH'
-  handleSave: (values: CnTableHandleSaveI) => void
+  handleSave: (values: CnTableHandleSaveI, findItem: LazyQueryType) => void
   style: any
   lazyQuery: CnLazyQuery
   state: StateI
@@ -231,7 +258,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const [editing, setEditing] = useState(false)
   const inputRef = useRef<InputRef>(null)
-  const form = useContext(EditableContext)!
+  const { form, findOneItem } = useContext(EditableContext)!
+  const [onFindOneItem, { loading: onFindOneItemLoading }] = findOneItem
 
   useEffect(() => {
     if (editing) {
@@ -253,32 +281,38 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
       toggleEdit()
       if (fieldType == 'DATE')
-        handleSave({
-          record: { ...record, [dataIndex]: dayjs(values[dataIndex]) },
-          fields: { [dataIndex]: dayjs(values[dataIndex]) },
-          state,
-          dispatch,
-          mutation,
-        })
+        handleSave(
+          {
+            record: { ...record, [dataIndex]: dayjs(values[dataIndex]) },
+            fields: { [dataIndex]: dayjs(values[dataIndex]) },
+            state,
+            dispatch,
+          },
+          onFindOneItem
+        )
       else {
         if (isArray) {
-          handleSave({
-            record: { ...record },
-            fields: { ...values },
-            dataIndex,
-            state,
-            dispatch,
-            mutation,
-          })
+          handleSave(
+            {
+              record: { ...record },
+              fields: { ...values },
+              dataIndex,
+              state,
+              dispatch,
+            },
+            onFindOneItem
+          )
         } else
-          handleSave({
-            record: { ...record, ...values },
-            fields: { ...values },
-            dataIndex,
-            state,
-            dispatch,
-            mutation,
-          })
+          handleSave(
+            {
+              record: { ...record, ...values },
+              fields: { ...values },
+              dataIndex,
+              state,
+              dispatch,
+            },
+            onFindOneItem
+          )
       }
     } catch (errInfo) {
       console.log('Save failed:', errInfo)
@@ -287,26 +321,30 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
   let childNode = children
 
-  if (editable) {
-    childNode = editing ? (
-      <EditableFieldType
-        {...{
-          inputRef,
-          dataIndex,
-          save,
-          fieldType,
-          lazyQuery,
-        }}
-      />
-    ) : (
-      <div
-        className='editable-cell-value-wrap'
-        style={{ paddingRight: 0, paddingLeft: 0 }}
-        onClick={toggleEdit}
-      >
-        {children}
-      </div>
-    )
+  if (onFindOneItemLoading && dataIndex !== undefined) {
+    childNode = <Skeleton.Input active={true} size={'small'} block />
+  } else {
+    if (editable) {
+      childNode = editing ? (
+        <EditableFieldType
+          {...{
+            inputRef,
+            dataIndex,
+            save,
+            fieldType,
+            lazyQuery,
+          }}
+        />
+      ) : (
+        <div
+          className='editable-cell-value-wrap'
+          style={{ paddingRight: 0, paddingLeft: 0 }}
+          onClick={toggleEdit}
+        >
+          {children}
+        </div>
+      )
+    }
   }
 
   return (

@@ -26,21 +26,30 @@ export default function CNFooter(props: CreditNCreateContextProps) {
   const confirmApprove = (e?: React.MouseEvent<HTMLElement>) => {
     showPasswordConfirmation(() => {
       const values = form?.getFieldsValue()
-      mutation?.createCreditNote({
+
+      mutation?.creditNoteItemMultiUpdate({
         variables: {
           id: state?.id,
-          fields: {
-            ...values,
-            status: CreditNoteStatusEnum.UNAPPLIED,
-          },
+          fields: state.dataSource,
         },
-        onCompleted: ({
-          creditNote: { success, message: messageText },
-        }: any) => {
-          if (success) message.success(messageText)
-          else message.error(messageText)
+        onCompleted: () => {
+          mutation?.createCreditNote({
+            variables: {
+              id: state?.id,
+              fields: {
+                ...values,
+                status: CreditNoteStatusEnum.UNAPPLIED,
+              },
+            },
+            onCompleted: ({
+              creditNote: { success, message: messageText },
+            }: any) => {
+              if (success) message.success(messageText)
+              else message.error(messageText)
 
-          props.hide(false)
+              props.hide(false)
+            },
+          })
         },
       })
     })
@@ -50,15 +59,23 @@ export default function CNFooter(props: CreditNCreateContextProps) {
     switch (key) {
       case 'submit-approval':
         const values = form?.getFieldsValue()
-        mutation?.createCreditNote({
+        mutation?.creditNoteItemMultiUpdate({
           variables: {
             id: state?.id,
-            fields: {
-              ...values,
-              status: CreditNoteStatusEnum.APPROVAL_IN_PROGRESS,
-            },
+            fields: state.dataSource,
           },
-          onCompleted: () => props.hide(false),
+          onCompleted: () => {
+            mutation?.createCreditNote({
+              variables: {
+                id: state?.id,
+                fields: {
+                  ...values,
+                  status: CreditNoteStatusEnum.APPROVAL_IN_PROGRESS,
+                },
+              },
+              onCompleted: () => props.hide(false),
+            })
+          },
         })
       default:
         return null
@@ -67,14 +84,23 @@ export default function CNFooter(props: CreditNCreateContextProps) {
 
   const handleSaveClose = () => {
     const values = form?.getFieldsValue()
-    mutation?.createCreditNote({
+
+    mutation?.creditNoteItemMultiUpdate({
       variables: {
         id: state?.id,
-        fields: {
-          ...values,
-        },
+        fields: state.dataSource,
       },
-      onCompleted: () => props.hide(false),
+      onCompleted: () => {
+        mutation?.createCreditNote({
+          variables: {
+            id: state?.id,
+            fields: {
+              ...values,
+            },
+          },
+          onCompleted: () => props.hide(false),
+        })
+      },
     })
   }
 

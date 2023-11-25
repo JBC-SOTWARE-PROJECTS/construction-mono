@@ -21,6 +21,7 @@ import {
 export interface CnLazyQuery {
   lazyQueryItemParticular: LazyQueryType
   lazyQueryAccountList: LazyQueryType
+  lazyQueryFindItem: LazyQueryType
 }
 export interface CnMutation {
   createCreditNote: MutationType
@@ -30,6 +31,7 @@ export interface CnMutation {
 
   createCreditNoteItem: MutationType
   removeCreditNoteItem: MutationType
+  creditNoteItemMultiUpdate: MutationType
 }
 export interface CnRefetchI {
   creditNote: RefetchType
@@ -42,6 +44,7 @@ export interface CnLoadingI {
 
   lazyQueryItemParticular: boolean
   lazyQueryAccountList: boolean
+  lazyQueryFindItem: boolean
 
   createCreditNote: boolean
   generateTax: boolean

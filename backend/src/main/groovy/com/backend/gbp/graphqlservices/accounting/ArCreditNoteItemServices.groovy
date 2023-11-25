@@ -65,16 +65,10 @@ class ArCreditNoteItemServices extends ArAbstractFormulaHelper<ArCreditNoteItems
                         return StringUtils.leftPad(it.toString(), 6, "0")
                     })
 
-
                     return entity
-
                 }
-
-
                 return entity
             })
-
-            arCreditNoteService.updateCreditNoteTotals(creditNoteItem.arCreditNote.id)
 
             return new GraphQLResVal<ArCreditNoteItems>(creditNoteItem, true, "Credit Note transaction completed successfully")
         }
@@ -83,62 +77,26 @@ class ArCreditNoteItemServices extends ArAbstractFormulaHelper<ArCreditNoteItems
         }
     }
 
-    @GraphQLMutation(name="upsertCreditNoteClaimsItem")
-    GraphQLResVal<ArCreditNoteItems> upsertCreditNoteClaimsItem(
-            @GraphQLArgument(name = "creditNoteId") UUID creditNoteId,
-            @GraphQLArgument(name = "invoiceItemId") UUID invoiceItemId
+
+    @GraphQLMutation(name="updateMultipleCreditNoteItem")
+    Boolean updateMultipleCreditNoteItem(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "fields") List<Map<String,Object>> fields = []
     ){
         try{
-
-            def arInvoiceItems = arInvoiceItemServices.findOne(invoiceItemId)
-            def creditNote = arCreditNoteService.findOne(creditNoteId)
-            ArCreditNoteItems arCreditNoteItems = new ArCreditNoteItems()
-            if(arInvoiceItems){
-                arCreditNoteItems.creditNoteNo = creditNote.creditNoteNo
-                arCreditNoteItems.recordNo = generatorService.getNextValue(GeneratorType.AR_CREDIT_NOTE_ITEMS, {
-                    return StringUtils.leftPad(it.toString(), 6, "0")
-                })
-                arCreditNoteItems.arInvoiceItemRecordNo = arInvoiceItems.recordNo
-                arCreditNoteItems.arInvoiceItem = arInvoiceItems
-                arCreditNoteItems.arInvoiceNo = arInvoiceItems.invoiceNo
-                arCreditNoteItems.arInvoiceId = arInvoiceItems.arInvoice.id
-                arCreditNoteItems.arCreditNote = creditNote
-                arCreditNoteItems.arCustomer = creditNote.arCustomer
-                arCreditNoteItems.arCustomer = creditNote.arCustomer
-                arCreditNoteItems.itemName = arInvoiceItems.itemName
-                arCreditNoteItems.description = arInvoiceItems.description
-                arCreditNoteItems.itemType = arInvoiceItems.itemType
-                arCreditNoteItems.unitPrice = arInvoiceItems.netTotalAmount
-                arCreditNoteItems.quantity = 1
-                arCreditNoteItems.discountPercentage = 0
-                arCreditNoteItems.cwtAmount = 0
-                arCreditNoteItems.isCWT = false
-                arCreditNoteItems.cwtRate = 0
-                arCreditNoteItems.vatAmount = 0
-                arCreditNoteItems.isVatable = 0
-                arCreditNoteItems.discountAmount = 0
-                arCreditNoteItems.totalHCIAmount = arInvoiceItems.itemType == 'HCI' ? arInvoiceItems.netTotalAmount : 0.00
-                arCreditNoteItems.totalPFAmount = arInvoiceItems.itemType == 'PF' ? arInvoiceItems.netTotalAmount : 0.00
-                arCreditNoteItems.totalAmountDue = arInvoiceItems.netTotalAmount
-                arCreditNoteItems.claimsItem = arInvoiceItems.claimsItem
-                arCreditNoteItems.patient_name = arInvoiceItems.patient_name
-                arCreditNoteItems.approval_code = arInvoiceItems.approval_code
-                arCreditNoteItems.patient_id = arInvoiceItems.patient_id
-                arCreditNoteItems.pf_name = arInvoiceItems.pf_name
-                arCreditNoteItems.pf_id = arInvoiceItems.pf_id
-                save(arCreditNoteItems)
-                arCreditNoteService.updateCreditNoteTotals(creditNote.id)
-
+            if(fields.size() > 0){
+                fields.each {
+                    upsertFromMap(UUID.fromString(it['id'].toString()) , it)
+                }
             }
+            arCreditNoteService.updateCreditNoteTotals(id)
 
-            return new GraphQLResVal<ArCreditNoteItems>(arCreditNoteItems, true, "Credit Note transaction completed successfully")
+            return true
         }
         catch (ignore){
-            return new GraphQLResVal<ArCreditNoteItems>(null, false, 'Unable to complete credit note transaction. Please contact support for assistance.')
+            return false
         }
     }
-
-
 
     @GraphQLQuery(name="findCreditNoteItems")
     Page<ArCreditNoteItems> findCreditNoteItems(
@@ -375,60 +333,5 @@ class ArCreditNoteItemServices extends ArAbstractFormulaHelper<ArCreditNoteItems
         }catch(ignored){
             return  new GraphQLResVal<Boolean>(false, false, 'Transaction failed: Calculation error. Please check your input and try again.')
         }
-    }
-
-    @Transactional
-    @GraphQLMutation(name = "forwardedPaymentPostingDisc")
-    GraphQLResVal<Boolean> forwardedPaymentPostingDisc(
-            @GraphQLArgument(name = "paymentPostingId") UUID paymentPostingId
-    ){
-        ARPaymentPosting arPaymentPosting = arPaymentPostingService.findOne(paymentPostingId)
-        List<ARPaymentPostingItems> arPaymentPostingItems = arPaymentPostingItemService.findAllPaymentPostingItemDiscByPaymentPostingId(paymentPostingId)
-
-        ArCreditNote creditNote = new ArCreditNote()
-        def formatter = DateTimeFormatter.ofPattern("yyyy")
-
-        creditNote.arCustomer = arCustomerServices.findOne(arPaymentPosting.arCustomerId)
-        creditNote.reference = arPaymentPosting.invoiceNo
-        creditNote.billingAddress = creditNote.arCustomer.address
-        creditNote.totalHCIAmount = arPaymentPosting.discountAmount
-        creditNote.totalAmountDue = arPaymentPosting.discountAmount
-        creditNote.creditNoteType = 'INVOICE'
-        creditNote.invoiceType = 'CLAIMS'
-
-        creditNote.status = 'DRAFT'
-        def newSave = arCreditNoteService.save(creditNote)
-        String year = newSave.createdDate.atZone(ZoneId.systemDefault()).format(formatter)
-        newSave.creditNoteNo = generatorService.getNextGeneratorFeatPrefix("ar_cn_${year}") {
-            it -> return "RCN${year}-${StringUtils.leftPad(it.toString(), 6, "0")}"
-        }
-        arCreditNoteService.save(newSave)
-        arPaymentPosting.referenceCn = newSave.id
-        arPaymentPostingService.save(arPaymentPosting)
-
-        arPaymentPostingItems.each {
-            it ->
-                ArCreditNoteItems creditNoteItems = new ArCreditNoteItems()
-                creditNoteItems.arCreditNote = newSave
-                creditNoteItems.recordNo = generatorService.getNextValue(GeneratorType.AR_CREDIT_NOTE_ITEMS, {
-                    return StringUtils.leftPad(it.toString(), 6, "0")
-                })
-                creditNoteItems.itemType = it.itemType
-                creditNote.creditNoteNo = creditNote.creditNoteNo
-                creditNoteItems.arCustomer = creditNote.arCustomer
-                creditNoteItems.itemName = it.itemName
-                creditNoteItems.description = it.description
-                creditNoteItems.approval_code = it.reference
-                creditNoteItems.patient_name = it.patientName
-                creditNoteItems.arInvoiceId = it.invoiceId
-                creditNoteItems.arInvoiceItem = arInvoiceItemServices.findOne(it.invoiceItemId)
-                creditNoteItems.arInvoiceItemRecordNo = creditNoteItems.arInvoiceItem.invoiceNo
-                creditNoteItems.unitPrice = it.appliedDiscount
-                creditNoteItems.quantity = 1
-                creditNoteItems.totalHCIAmount = it.appliedDiscount
-                creditNoteItems.totalAmountDue = it.appliedDiscount
-                save(creditNoteItems)
-        }
-        return new GraphQLResVal<Boolean>(true, true, 'Successfully forwarded.')
     }
 }

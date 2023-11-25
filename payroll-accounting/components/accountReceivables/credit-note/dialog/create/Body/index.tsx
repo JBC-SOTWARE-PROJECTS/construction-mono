@@ -105,7 +105,7 @@ export default function CNBodyContainer(props: CreditNCreateContextProps) {
       dataIndex: 'quantity',
       className: 'NUMBER',
       align: 'right',
-      width: 100,
+      width: 150,
       editable: true,
       sorter: (a: any, b: any) => a.quantity - b.quantity,
     },
@@ -134,7 +134,7 @@ export default function CNBodyContainer(props: CreditNCreateContextProps) {
       render: (text: number) => numeral(text).format('0,0.00'),
     },
     {
-      title: ' ',
+      title: '#',
       dataIndex: 'id',
       align: 'center',
       fixed: 'right',
@@ -178,6 +178,7 @@ export default function CNBodyContainer(props: CreditNCreateContextProps) {
         state,
         mutation,
         dispatch,
+        loading,
       }),
     }
   })
