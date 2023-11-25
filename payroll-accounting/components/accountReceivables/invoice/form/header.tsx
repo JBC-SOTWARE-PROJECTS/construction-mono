@@ -57,8 +57,6 @@ interface FormHeaderI {
     variables: any
     onCompleted?: (value: any) => void
   }) => void
-  handleFindInvoice: any
-  handleFindInvoiceItems: any
 }
 
 export default function FormHeader(props: FormHeaderI) {
@@ -72,8 +70,6 @@ export default function FormHeader(props: FormHeaderI) {
     onMutateInvoice,
     invoiceRefetch,
     invoiceItemRefetch,
-    handleFindInvoice,
-    handleFindInvoiceItems,
   } = props
 
   const [messageApi, contextHolder] = message.useMessage()
@@ -106,8 +102,8 @@ export default function FormHeader(props: FormHeaderI) {
       variables,
       onCompleted: () => {
         messageApi.destroy()
-        handleFindInvoice(state?.id)
-        handleFindInvoiceItems(state?.id)
+        invoiceRefetch({ id: state?.id })
+        invoiceItemRefetch({ id: state?.id })
       },
     })
   }
@@ -175,8 +171,9 @@ export default function FormHeader(props: FormHeaderI) {
         },
       },
       onCompleted: ({ createInvoice: { response } }: any) => {
-        console.log(response, 'response')
-        dispatch({ type: 'invoice-id', payload: response?.id })
+        invoiceRefetch({ id: response?.id }).then(({ data: { findOne } }) =>
+          assignFormValues(findOne, form, dispatch)
+        )
       },
     })
   }
@@ -184,7 +181,7 @@ export default function FormHeader(props: FormHeaderI) {
   const onRefreshAddress = () => {
     onMutateInvoice({
       variables: {
-        id,
+        id: state?.id,
         fields: { billingAddress: null },
       },
       onCompleted: ({ createInvoice: { response } }: any) => {

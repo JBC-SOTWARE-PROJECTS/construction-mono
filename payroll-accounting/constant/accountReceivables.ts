@@ -13,6 +13,12 @@ export const GovernmentIDOptions = [
   { value: 'GSIS', label: 'GSIS (Government Service Insurance System)' },
   { value: 'PRC', label: 'PRC (Professional Regulation Commission ID)' },
   { value: 'Passport', label: 'Passport' },
+
+  { value: 'VotersID', label: 'Voters ID' },
+  { value: 'SeniorCitizenID', label: 'Senior Citizen ID' },
+  { value: 'PWDID', label: 'PWD ID' },
+  { value: 'PostalID', label: 'Postal ID' },
+
   // Add more options as needed
 ]
 
@@ -241,6 +247,7 @@ export enum InvoiceStatusEnum {
 export enum CreditNoteStatusEnum {
   DRAFT = 'DRAFT',
   APPROVAL_IN_PROGRESS = 'APPROVAL_IN_PROGRESS',
+  UNAPPLIED = 'UNAPPLIED',
   POSTED = 'POSTED',
 }
 
@@ -264,6 +271,15 @@ export enum InvoiceStatusColorEnum {
 export enum CreditNoteStatusColorEnum {
   DRAFT = 'orange',
   POSTED = 'teal',
+  APPROVAL_IN_PROGRESS = '#3b5998',
+  UNAPPLIED = 'red',
+}
+
+export enum CreditNoteStatusLabelEnum {
+  DRAFT = 'Draft',
+  APPROVAL_IN_PROGRESS = 'Approval in progress',
+  UNAPPLIED = 'Unapplied',
+  POSTED = 'Posted',
 }
 
 export enum PaymentPostingStatusLabelEnum {
@@ -302,8 +318,8 @@ export const arReportsGroup = [
     groupTitle: 'Customer Activity Report',
     data: [
       {
-        title: 'Customer Account Statements',
-        path: '/',
+        title: 'Customer Statement of Account',
+        path: '/receivables-collections/accounts-receivable/reports/statement-of-account',
       },
       {
         title: 'Customer Transaction History',
@@ -312,57 +328,57 @@ export const arReportsGroup = [
     ],
   },
 
-  {
-    groupTitle: 'Invoice, Credit Note and Payment Reports',
-    data: [
-      {
-        title: 'Invoices Report',
-        path: '/',
-      },
-      {
-        title: 'Credit Note Report',
-        path: '/',
-      },
-      {
-        title: 'Invoice Reconciliation Report',
-        path: '/',
-      },
-      {
-        title: 'Cash Receipts Journal',
-        path: '/',
-      },
-    ],
-  },
-  {
-    groupTitle: 'Executive Reports',
-    data: [
-      {
-        title: 'Receivable Summary Report',
-        path: '/',
-      },
-    ],
-  },
-  {
-    groupTitle: 'Billing Folio Reports',
-    data: [
-      {
-        title: 'In-patient Aging Report',
-        path: '/',
-      },
-      {
-        title: 'Out-patient Aging Report',
-        path: '/',
-      },
-      {
-        title: 'ERD-patient Aging Report',
-        path: '/',
-      },
-      {
-        title: 'OTC Aging Report',
-        path: '/',
-      },
-    ],
-  },
+  // {
+  //   groupTitle: 'Invoice, Credit Note and Payment Reports',
+  //   data: [
+  //     {
+  //       title: 'Invoices Report',
+  //       path: '/',
+  //     },
+  //     {
+  //       title: 'Credit Note Report',
+  //       path: '/',
+  //     },
+  //     {
+  //       title: 'Invoice Reconciliation Report',
+  //       path: '/',
+  //     },
+  //     {
+  //       title: 'Cash Receipts Journal',
+  //       path: '/',
+  //     },
+  //   ],
+  // },
+  // {
+  //   groupTitle: 'Executive Reports',
+  //   data: [
+  //     {
+  //       title: 'Receivable Summary Report',
+  //       path: '/',
+  //     },
+  //   ],
+  // },
+  // {
+  //   groupTitle: 'Billing Folio Reports',
+  //   data: [
+  //     {
+  //       title: 'In-patient Aging Report',
+  //       path: '/',
+  //     },
+  //     {
+  //       title: 'Out-patient Aging Report',
+  //       path: '/',
+  //     },
+  //     {
+  //       title: 'ERD-patient Aging Report',
+  //       path: '/',
+  //     },
+  //     {
+  //       title: 'OTC Aging Report',
+  //       path: '/',
+  //     },
+  //   ],
+  // },
 ]
 
 export const InvoiceItemCategory = [
@@ -418,15 +434,3 @@ export enum PaymentMethodStatusColorEnum {
   CHECK = 'yellow',
   EWALLET = 'pink',
 }
-
-export const addressType = [
-  { label: 'HOME', value: 'HOME' },
-  { label: 'WORK', value: 'WORK' },
-  { label: 'BILLING', value: 'BILLING' },
-]
-
-export const collateralType = [
-  { label: 'Lot', value: 'LOT' },
-  { label: 'Vehicle', value: 'VEHICLE' },
-  { label: 'Other', value: 'OTHER' },
-]

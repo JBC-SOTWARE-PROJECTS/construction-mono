@@ -1,9 +1,25 @@
 import { FIND_ONE_CUSTOMER } from '@/graphql/accountReceivables/customers'
 import { getInitials, getRandomColor } from '@/hooks/accountReceivables/commons'
-import { ContactsOutlined, RiseOutlined, ToolOutlined } from '@ant-design/icons'
+import {
+  ContactsOutlined,
+  EnvironmentOutlined,
+  FieldNumberOutlined,
+  RiseOutlined,
+  TeamOutlined,
+  ToolOutlined,
+} from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery } from '@apollo/client'
-import { Avatar, Col, Menu, MenuProps, Row, Space } from 'antd'
+import {
+  Avatar,
+  Col,
+  Divider,
+  Menu,
+  MenuProps,
+  Row,
+  Space,
+  Typography,
+} from 'antd'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 
@@ -11,6 +27,22 @@ interface AccountsProfileHeaderI {
   id: string
   children: ReactNode
   activeMenu: string
+}
+
+interface DetailsAndIconI {
+  label: string
+  icon?: ReactNode
+}
+
+const DetailsAndIcon = ({ label, icon }: DetailsAndIconI) => {
+  return (
+    <Typography.Link>
+      <Space>
+        {icon}
+        {label}
+      </Space>
+    </Typography.Link>
+  )
 }
 
 export default function AccountsProfileHeader(props: AccountsProfileHeaderI) {
@@ -73,42 +105,17 @@ export default function AccountsProfileHeader(props: AccountsProfileHeaderI) {
             {customerName}
           </Space>
         ),
-        // extra: [
-        //   <Button key='1' type='primary' icon={<EditOutlined />}>
-        //     Edit
-        //   </Button>,
-        //   <Dropdown
-        //     key='dropdown'
-        //     trigger={['click']}
-        //     menu={{
-        //       items: [
-        //         {
-        //           label: 'Create Invoice',
-        //           key: '1',
-        //         },
-        //         {
-        //           label: 'Create Credit Note',
-        //           key: '2',
-        //         },
-        //         {
-        //           label: 'Create Payments',
-        //           key: '3',
-        //         },
-        //       ],
-        //     }}
-        //   >
-        //     <Button key='4' style={{ padding: '0 8px' }}>
-        //       <MoreOutlined />
-        //     </Button>
-        //   </Dropdown>,
-        // ],
       }}
       content={
-        <Row>
+        <Row gutter={[8, 8]}>
           <Col span={24}>
-            <Space>
-              <p>{customerType}</p>
-              <p>{address}</p>
+            <Space split={<Divider type='vertical' />}>
+              <DetailsAndIcon label={customerType} icon={<TeamOutlined />} />
+              <DetailsAndIcon
+                label={accountNo}
+                icon={<FieldNumberOutlined />}
+              />
+              <DetailsAndIcon label={address} icon={<EnvironmentOutlined />} />
             </Space>
           </Col>
           <Col span={24}>

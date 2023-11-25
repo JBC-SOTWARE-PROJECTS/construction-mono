@@ -1,4 +1,6 @@
+import { CardLayout } from '@/components/accountReceivables/common'
 import CustomPageTitle from '@/components/accountReceivables/common/customPageTitle'
+import { CommonTableCSS } from '@/components/accountReceivables/common/styles'
 import {
   ActionInvoiceItem,
   CreateInvoiceMenu,
@@ -17,19 +19,14 @@ import {
 import { useDialog } from '@/hooks'
 import ConfirmationPasswordHook from '@/hooks/promptPassword'
 import { apiUrlPrefix } from '@/shared/settings'
-import {
-  FilterOutlined,
-  InfoCircleOutlined,
-  SearchOutlined,
-} from '@ant-design/icons'
+import { InfoCircleOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery } from '@apollo/client'
 import type { MenuProps } from 'antd'
 import {
   Button,
-  Card,
-  Divider,
   Dropdown,
+  Pagination,
   Space,
   Table,
   Tag,
@@ -39,7 +36,6 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import numeral from 'numeral'
-import styled from 'styled-components'
 
 export default function Invoice() {
   const invoiceFormDialog = useDialog(InvoiceForm)
@@ -209,6 +205,13 @@ export default function Invoice() {
     },
   ]
 
+  const onSearch = (search: string) => {
+    refetch({
+      search,
+      page: 0,
+    })
+  }
+
   return (
     <PageContainer
       title={
@@ -218,39 +221,34 @@ export default function Invoice() {
         />
       }
     >
-      <Space direction='vertical' style={{ width: '100%' }}>
-        <Card
-          extra={[
-            <Space key='controls' split={<Divider type='vertical' />}>
-              <Button type='text' icon={<FilterOutlined />} />
-              <Button type='text' icon={<SearchOutlined />} />
-              {/* <Dropdown menu={createMenuProps} placement='bottomRight'> */}
-              <Button onClick={handleCreateInvoiceClick}>New Invoice</Button>
-              {/* </Dropdown> */}
-            </Space>,
-          ]}
-        >
-          <InvoiceTableCSS>
-            <Table
-              rowKey='id'
-              columns={columns}
-              dataSource={data?.invoices?.content ?? []}
-              size='small'
-              loading={loading}
-              scroll={{ x: 1200 }}
-            />
-          </InvoiceTableCSS>
-        </Card>
-      </Space>
+      <CardLayout
+        onSearch={onSearch}
+        extra={<Button onClick={handleCreateInvoiceClick}>New Invoice</Button>}
+      >
+        <CommonTableCSS>
+          <Table
+            rowKey='id'
+            columns={columns}
+            dataSource={data?.invoices?.content ?? []}
+            size='small'
+            loading={loading}
+            scroll={{ x: 1200 }}
+            pagination={false}
+            footer={() => (
+              <Pagination
+                current={data?.payments?.number + 1}
+                showSizeChanger={false}
+                pageSize={10}
+                responsive={true}
+                total={data?.payments?.totalElements}
+                onChange={(e) => {
+                  refetch({ page: e - 1 })
+                }}
+              />
+            )}
+          />
+        </CommonTableCSS>
+      </CardLayout>
     </PageContainer>
   )
 }
-
-const InvoiceTableCSS = styled.div`
-  th.ant-table-cell {
-    background: #fff !important;
-    color: teal !important;
-    padding-bottom: 6px !important;
-    border-bottom: 4px solid #f0f0f0 !important;
-  }
-`

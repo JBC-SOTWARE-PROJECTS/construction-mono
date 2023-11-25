@@ -85,6 +85,18 @@ export const FIND_ONE_CUSTOMER = gql`
   }
 `
 
+export const FIND_ONE_CUSTOMER_CONTACTS = gql`
+  query ($id: UUID) {
+    customer: findOneCustomer(id: $id) {
+      id
+      contactPerson
+      contactNo
+      contactEmail
+      address
+    }
+  }
+`
+
 export const FIND_ONE_CUSTOMER_SETTINGS = gql`
   query ($id: UUID) {
     customer: findOneCustomer(id: $id) {

@@ -177,10 +177,8 @@ export default function AccountSettings(props: AccountSettingsI) {
           <FormCheckBox
             name='blockOnCreditLimit'
             valuePropName='checked'
-            propscheckbox={{
-              children:
-                'Stop producing new invoices upon reaching the credit limit.',
-            }}
+            propscheckbox={{}}
+            checkBoxLabel='Stop producing new invoices upon reaching the credit limit.'
           />
         </Form>
         <Divider orientation='left' dashed plain style={{ marginTop: 50 }}>
@@ -250,9 +248,8 @@ export default function AccountSettings(props: AccountSettingsI) {
             <FormCheckBox
               name='autoDiscountInPayment'
               valuePropName='checked'
-              propscheckbox={{
-                children: 'Auto calculate discount in payment posting.',
-              }}
+              propscheckbox={{}}
+              checkBoxLabel='Auto calculate discount in payment posting.'
             />
           </Form>
         </div>
