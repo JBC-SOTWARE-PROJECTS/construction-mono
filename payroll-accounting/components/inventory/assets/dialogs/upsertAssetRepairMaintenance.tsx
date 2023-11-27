@@ -130,7 +130,7 @@ export default function UpsertRepairMaintenanceModal(props: IProps) {
         <Typography.Title level={4}>
           <Space align="center">{`${
             record?.id ? "Edit" : "Add"
-          } Maintenance Type`}</Space>
+          } Repair/Maintenance`}</Space>
         </Typography.Title>
       }
       destroyOnClose={true}

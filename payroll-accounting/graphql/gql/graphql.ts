@@ -641,6 +641,46 @@ export type AssetRepairMaintenance = {
   workedByEmployees?: Maybe<Scalars['String']['output']>;
 };
 
+export type AssetRepairMaintenanceInput = {
+  asset?: InputMaybe<AssetsInput>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  findings?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  inspectionRemarks?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<ProjectsInput>;
+  rmImage?: InputMaybe<Scalars['String']['input']>;
+  serviceClassification?: InputMaybe<RepairServiceClassification>;
+  serviceDatetimeFinished?: InputMaybe<Scalars['Instant']['input']>;
+  serviceDatetimeStart?: InputMaybe<Scalars['Instant']['input']>;
+  serviceType?: InputMaybe<RepairServiceType>;
+  status?: InputMaybe<RepairMaintenanceStatus>;
+  workDescription?: InputMaybe<Scalars['String']['input']>;
+  workedByEmployees?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AssetRepairMaintenanceItems = {
+  __typename?: 'AssetRepairMaintenanceItems';
+  assetRepairMaintenance?: Maybe<AssetRepairMaintenance>;
+  basePrice?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  item?: Maybe<Item>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  quantity?: Maybe<Scalars['Int']['output']>;
+};
+
+export type AssetRepairMaintenanceItemsInput = {
+  assetRepairMaintenance?: InputMaybe<AssetRepairMaintenanceInput>;
+  basePrice?: InputMaybe<Scalars['BigDecimal']['input']>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  item?: InputMaybe<ItemInput>;
+  quantity?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export enum AssetStatus {
   Active = 'ACTIVE',
   Disposed = 'DISPOSED',
@@ -697,6 +737,21 @@ export type Assets = {
   prefix?: Maybe<Scalars['String']['output']>;
   status?: Maybe<AssetStatus>;
   type?: Maybe<AssetType>;
+};
+
+export type AssetsInput = {
+  assetCode?: InputMaybe<Scalars['String']['input']>;
+  brand?: InputMaybe<Scalars['String']['input']>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  image?: InputMaybe<Scalars['String']['input']>;
+  item?: InputMaybe<ItemInput>;
+  model?: InputMaybe<Scalars['String']['input']>;
+  plateNo?: InputMaybe<Scalars['String']['input']>;
+  prefix?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<AssetStatus>;
+  type?: InputMaybe<AssetType>;
 };
 
 export type Authority = {
@@ -3697,6 +3752,7 @@ export type Mutation = {
   upsertAssetMaintenanceType?: Maybe<AssetMaintenanceTypes>;
   upsertAssetPreventiveMaintenance?: Maybe<AssetPreventiveMaintenance>;
   upsertAssetRepairMaintenance?: Maybe<AssetRepairMaintenance>;
+  upsertAssetRepairMaintenanceItem?: Maybe<AssetRepairMaintenanceItems>;
   upsertBanks?: Maybe<Bank>;
   upsertBegQty?: Maybe<BeginningBalance>;
   upsertBillingItemByJob?: Maybe<BillingItem>;
@@ -5161,6 +5217,14 @@ export type MutationUpsertAssetRepairMaintenanceArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertAssetRepairMaintenanceItemArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  rmList?: InputMaybe<Array<InputMaybe<AssetRepairMaintenanceItemsInput>>>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertBanksArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -6374,6 +6438,25 @@ export type Page_AssetPreventiveMaintenance = {
 export type Page_AssetRepairMaintenance = {
   __typename?: 'Page_AssetRepairMaintenance';
   content?: Maybe<Array<Maybe<AssetRepairMaintenance>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_AssetRepairMaintenanceItems = {
+  __typename?: 'Page_AssetRepairMaintenanceItems';
+  content?: Maybe<Array<Maybe<AssetRepairMaintenanceItems>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -8653,6 +8736,8 @@ export type Query = {
   assetMaintenanceTypeListPageable?: Maybe<Page_AssetMaintenanceTypes>;
   assetPreventiveMaintenanceById?: Maybe<AssetPreventiveMaintenance>;
   assetRepairMaintenanceById?: Maybe<AssetRepairMaintenance>;
+  assetRepairMaintenanceItemById?: Maybe<AssetRepairMaintenanceItems>;
+  assetRepairMaintenanceItemListPageable?: Maybe<Page_AssetRepairMaintenanceItems>;
   assetRepairMaintenanceListPageable?: Maybe<Page_AssetRepairMaintenance>;
   /** Get all Authorities */
   authorities?: Maybe<Array<Maybe<Authority>>>;
@@ -8756,6 +8841,7 @@ export type Query = {
   filterAdjustmentType?: Maybe<Array<Maybe<QuantityAdjustmentType>>>;
   findAllAssetPreventiveMaintenance?: Maybe<Array<Maybe<AssetPreventiveMaintenance>>>;
   findAllAssetRepairMaintenance?: Maybe<Array<Maybe<AssetRepairMaintenance>>>;
+  findAllAssetRepairMaintenanceItems?: Maybe<Array<Maybe<AssetRepairMaintenanceItems>>>;
   findAllAssets?: Maybe<Array<Maybe<Assets>>>;
   findAllCustomers?: Maybe<Page_ArCustomers>;
   findAllInvoice?: Maybe<Page_ArInvoice>;
@@ -9516,6 +9602,21 @@ export type QueryAssetPreventiveMaintenanceByIdArgs = {
 /** Query root */
 export type QueryAssetRepairMaintenanceByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryAssetRepairMaintenanceItemByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryAssetRepairMaintenanceItemListPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  rmId?: InputMaybe<Scalars['UUID']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

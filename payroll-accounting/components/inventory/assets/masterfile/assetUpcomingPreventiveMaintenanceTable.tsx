@@ -40,27 +40,27 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
       title: "Asset",
       dataIndex: "asset.item.descLong",
       key: "asset.item.descLong",
-      width: '20%',
+      width: 100,
       render: (_, record) => <span>{record?.asset?.item?.descLong}</span>,
     },
     {
       title: "Maintenance Type",
       dataIndex: "assetMaintenanceType.name",
       key: "assetMaintenanceType",
-      width: '20%',
+      width: 80,
       render: (_, record) => <span>{record?.assetMaintenanceType?.name}</span>,
     },
     {
       title: "Schedule Type",
       dataIndex: "scheduleType",
       key: "scheduleType",
-      width: '20%',
+      width: 80,
     },
     {
       title: "Occurrence Date",
       dataIndex: "occurrenceDate",
       key: "occurrence",
-      width: '20%',
+      width: 50,
       render: (_, record) => {
         return <>{moment(record?.occurrenceDate, "YYYY-MM-DD").format('MMM DD, YYYY') + (record?.scheduleType == PreventiveScheduleType.Daily ? " " +record?.occurrence + " " : " " )}</>
       },
@@ -69,7 +69,7 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
       title: "Reminder Date",
       dataIndex: "reminderDate",
       key: "reminderDate",
-      width: '20%',
+      width: 50,
       render: (_, record) => {
 
         var orgDate = "";
@@ -126,7 +126,6 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
               }}
             />
           )}
-          scroll={{ x: 1400 }}
         />
       </Col>
     </Row>

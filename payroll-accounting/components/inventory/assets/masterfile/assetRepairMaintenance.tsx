@@ -116,7 +116,6 @@ export default function AssetRepairMaintenanceTable({
               }}
             />
           )}
-          scroll={{ x: 1400 }}
         />
       </Col>
     </Row>
