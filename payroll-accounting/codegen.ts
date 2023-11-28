@@ -1,22 +1,22 @@
-import { CodegenConfig } from "@graphql-codegen/cli";
+import { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
   schema: [
     {
-      "http://localhost:5827/graphql": {
+      'http://localhost:5827/graphql': {
         headers: {
-          Cookie: "SESSION=MjY4NTU4MjctOWY3Yi00N2RjLTkxOWMtMzZiNTdkMjE5YzQ2",
+          Cookie: 'SESSION=MTNmNzNmNGItYmY3NC00ZWQ2LWJjYTAtYWRlZTI5MmI3N2I4',
         },
       },
     },
   ],
-  documents: ["*/**/*.tsx"],
+  documents: ['*/**/*.tsx'],
   ignoreNoDocuments: true, // for better experience with the watcher
   generates: {
-    "./graphql/gql/": {
-      preset: "client",
+    './graphql/gql/': {
+      preset: 'client',
     },
   },
-};
+}
 
-export default config;
+export default config

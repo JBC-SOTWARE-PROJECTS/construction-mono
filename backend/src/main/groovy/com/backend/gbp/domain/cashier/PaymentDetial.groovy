@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.cashier
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.accounting.Bank
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -74,5 +75,9 @@ class PaymentDetial extends AbstractAuditingEntity {
     @GraphQLQuery
     @Column(name = "voided")
     Boolean voided
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bank_id", referencedColumnName = "id")
+    Bank bankEntity
 
 }

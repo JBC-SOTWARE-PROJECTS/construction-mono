@@ -4,6 +4,7 @@ import com.backend.gbp.domain.accounting.ArInvoice
 import com.backend.gbp.domain.accounting.ArInvoiceItems
 import com.backend.gbp.graphqlservices.hrm.EmployeeService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
+import com.backend.gbp.rest.dto.ARInvoiceDto
 import com.backend.gbp.services.EntityObjectMapperService
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
@@ -502,31 +503,23 @@ class ArInvoiceItemServices extends  ArAbstractFormulaHelper<ArInvoiceItems> {
         }
     }
 
-//    @GraphQLQuery(name="getARInvoiceItemPerPatientGroupById")
-//    List<ARInvoiceDto> getARInvoiceItemPerPatientGroupById(
-//            @GraphQLArgument(name="id") UUID id
-//    ){
-//        def invoiceItems = entityManager.createNativeQuery("""
-//                select
-//				cast(case
-//					when aii.admission_date is not null
-//					then aii.admission_date
-//					when aii.discharge_date is not null
-//					then aii.discharge_date
-//				end AS varchar) as "invoiceDate",
-//				coalesce(aii.soa_no,'') as "soa_no",
-//				coalesce(aii.patient_name,'') as "itemName",
-//				coalesce(aii.approval_code,'') as "approvalCode",
-//				coalesce(sum(aii.total_hci_amount),0) as "totalHCIAmount",
-//				coalesce(sum(aii.total_pf_amount),0) as "totalPFAmount",
-//				coalesce(sum(aii.total_amount_due)) as "totalAmountDue"
-//				from accounting.ar_invoice_items aii
-//				where
-//				aii.ar_invoice_id  = CAST(:id AS uuid)
-//				group by aii.admission_date , aii.discharge_date ,aii.patient_name,  aii.approval_code ,aii.soa_no
-//                """).setParameter("id", id)
-//        return invoiceItems.unwrap(NativeQuery.class).setResultTransformer(Transformers.aliasToBean(ARInvoiceDto.class)).getResultList()
-//    }
+    @GraphQLQuery(name="getARInvoiceItemPerId")
+    List<ARInvoiceDto> getARInvoiceItemPerId(
+            @GraphQLArgument(name="id") UUID id
+    ){
+        def invoiceItems = entityManager.createNativeQuery("""
+                select
+				coalesce(aii.item_name,'') as "itemName",
+				coalesce(aii.description,'') as "description",
+				coalesce(aii.quantity,0) as "qty",
+				coalesce(aii.unit_price,0) as "unit_price",
+				coalesce(aii.total_amount_due,0) as "amount"
+				from accounting.ar_invoice_items aii
+				where
+				aii.ar_invoice_id  = CAST(:id AS uuid)
+                """).setParameter("id", id)
+        return invoiceItems.unwrap(NativeQuery.class).setResultTransformer(Transformers.aliasToBean(ARInvoiceDto.class)).getResultList()
+    }
 
 
 }

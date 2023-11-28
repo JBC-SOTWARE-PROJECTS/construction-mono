@@ -9,6 +9,9 @@ class HoursLog {
     UUID project
     String projectName
 
+    UUID company
+    String companyName
+
     BigDecimal late = 0
     BigDecimal underTime = 0
     BigDecimal absent = 0

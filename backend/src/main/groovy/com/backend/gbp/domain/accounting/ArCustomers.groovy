@@ -46,6 +46,19 @@ class ArCustomers extends AbstractAuditingEntity implements Serializable, Subacc
     @Column(name = "address")
     String address
 
+    @GraphQLQuery
+    @Column(name = "contact_person")
+    String contactPerson
+
+    @GraphQLQuery
+    @Column(name = "contact_no")
+    String contactNo
+
+    @GraphQLQuery
+    @Column(name = "contact_email")
+    String contactEmail
+
+
     @Enumerated(EnumType.STRING)
     @GraphQLQuery
     @Column(name = "type")

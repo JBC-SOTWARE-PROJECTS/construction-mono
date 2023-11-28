@@ -17,6 +17,14 @@ const AccountingSetupMenu = {
             name: 'Invoice',
           },
           {
+            path: '/accounting/accounts-receivable/credit-note',
+            name: 'Credit Note',
+          },
+          {
+            path: '/accounting/accounts-receivable/received-payments',
+            name: 'Received Payments',
+          },
+          {
             path: '/accounting/accounts-receivable/configurations',
             name: 'Configurations',
           },

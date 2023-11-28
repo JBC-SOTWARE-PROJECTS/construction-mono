@@ -144,8 +144,8 @@ function UpsertScheduleType(props: IProps) {
             <FormSelect
               name="project_id"
               label="Project"
-              rules={requiredField}
               propsselect={{
+                defaultValue: null,
                 options: [
                   { value: null, label: "Office Based" },
                   ...(projects

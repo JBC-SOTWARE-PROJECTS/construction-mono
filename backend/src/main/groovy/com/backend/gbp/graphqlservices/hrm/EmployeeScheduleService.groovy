@@ -265,7 +265,7 @@ class EmployeeScheduleService {
                     employeeSchedule.employee = employee
                     employeeSchedule.company = company
                     employeeSchedule.dateString = date
-                    employeeSchedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
+                    employeeSchedule.project = fields.get('project_id') ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null
                     scheduleList.push(employeeSchedule)
 
                 }
@@ -285,7 +285,7 @@ class EmployeeScheduleService {
             employeeSchedule.dateString = (fields.get('dateTimeStart') as String).substring(0, 10)
             employeeSchedule.employee = employeeRepository.findById(employeeId).get()
             employeeSchedule.company = SecurityUtils.currentCompany()
-            employeeSchedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
+            employeeSchedule.project = fields.get('project_id') ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null
             employeeScheduleRepository.save(employeeSchedule)
 
         }

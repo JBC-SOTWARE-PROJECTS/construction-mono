@@ -13,6 +13,8 @@ const GET_EMPLOYEES = gql`
       projectBreakdown {
         project
         projectName
+        company
+        companyName
         regular
         overtime
         regularHoliday
