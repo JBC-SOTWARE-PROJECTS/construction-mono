@@ -4,13 +4,13 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, message, Row, Col, Select, Form } from "antd";
+import { Input, Button, message, Row, Col, Form } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { Item, Query } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
 import { GET_ITEM_RECORDS } from "@/graphql/inventory/masterfile-queries";
-import UpsertOfficeModal from "@/components/administrative/office/dialogs/upsertOfficeModal";
+import UpsertItemModal from "@/components/inventory/masterfile/items/dialogs/upsertItem";
 import ItemTable from "@/components/inventory/masterfile/items/itemTable";
 import { FormSelect } from "@/components/common";
 import {
@@ -22,7 +22,7 @@ import {
 const { Search } = Input;
 
 export default function ItemComponent({ type }: { type: string }) {
-  const modal = useDialog(UpsertOfficeModal);
+  const modal = useDialog(UpsertItemModal);
   const [category, setCategory] = useState<string[]>([]);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [state, setState] = useState({
@@ -53,9 +53,9 @@ export default function ItemComponent({ type }: { type: string }) {
     modal({ record: record }, (result: any) => {
       if (result) {
         if (record?.id) {
-          message.success("Item successfully added");
-        } else {
           message.success("Item successfully updated");
+        } else {
+          message.success("Item successfully added");
         }
         refetch();
       }

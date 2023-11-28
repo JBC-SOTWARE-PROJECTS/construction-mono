@@ -391,4 +391,14 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/42_aging_report_company.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/43_inventory_masterfile_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_inventory_transaction_type_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/45_inventory_quantity_adjustment_type_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/46_inventory_signature_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/47_inventory_signature_company.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

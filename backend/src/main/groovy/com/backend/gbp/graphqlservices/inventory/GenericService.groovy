@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.inventory
 
 import com.backend.gbp.domain.inventory.Generic
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -37,17 +38,33 @@ class GenericService extends AbstractDaoService<Generic> {
     List<Generic> genericList(
             @GraphQLArgument(name = "filter") String filter
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         String query = '''Select e from Generic e where lower(concat(e.genericCode,e.genericDescription)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
+
         createQuery(query, params).resultList.sort { it.genericCode }
     }
 
     @GraphQLQuery(name = "genericActive")
     List<Generic> genericActive() {
+        def company = SecurityUtils.currentCompanyId()
+
         String query = '''Select e from Generic e where e.isActive = :status'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
+
         createQuery(query, params).resultList.sort { it.genericCode }
     }
 
@@ -58,11 +75,14 @@ class GenericService extends AbstractDaoService<Generic> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         upsertFromMap(id, fields, { Generic entity, boolean forInsert ->
             if(forInsert){
                 entity.genericCode = generatorService.getNextValue(GeneratorType.GENERIC, {
                     return "GEN-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
+                entity.company = company
             }
         })
     }
