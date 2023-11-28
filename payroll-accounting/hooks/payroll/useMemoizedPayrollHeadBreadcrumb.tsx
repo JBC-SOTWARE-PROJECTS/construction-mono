@@ -40,13 +40,6 @@ const useMemoizedPayrollHeaderBreadcrumb = (
         hasRole: hasallowanceRole,
       },
       {
-        key: `${basePath}/p-other-deductions`,
-        title: "Other Deduction",
-        path: `${basePath}/p-other-deduction`,
-        disabled: pathname === `${basePathName}/p-other-deduction`,
-        hasRole: hasOtherDeductionRole,
-      },
-      {
         key: `${basePath}/p-adjustments`,
         title: "Adjustments",
         path: `${basePath}/p-adjustments`,

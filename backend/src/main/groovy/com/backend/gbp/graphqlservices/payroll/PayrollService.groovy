@@ -1,12 +1,16 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.Timekeeping
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.graphqlservices.accounting.IntegrationServices
+import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollStatusService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
@@ -25,6 +29,11 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+
+import java.math.RoundingMode
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @TypeChecked
 @Component
@@ -53,6 +62,12 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
     @Autowired
     ObjectMapper objectMapper
+
+    @Autowired
+    IntegrationServices integrationServices
+
+    @Autowired
+    LedgerServices ledgerServices
 
     @Autowired
     PayrollService(EmployeeRepository employeeRepository) {
@@ -231,6 +246,48 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         return new GraphQLResVal<String>("OK", true, "Successfully deleted payroll")
     }
 
+//    @Transactional(rollbackFor = Exception.class)
+//    Payroll postToLedgerAccounting(Payroll payroll) {
+//        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
+//        def actPay = super.save(payroll) as Payroll
+//
+//        def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
+//            it.flagValue = ""
+//            //initialize
+//
+//
+//        }
+//        Map<String, String> details = [:]
+//
+//        actPay.details.each { k, v ->
+//            details[k] = v
+//        }
+//
+//        details["PAYROLL_ID"] = actPay.id.toString()
+//        details["PAYROLL_CODE"] = ''
+//
+//        headerLedger.transactionNo = ''
+//        headerLedger.transactionType = ''
+//        headerLedger.referenceType = ''
+//        headerLedger.referenceNo = ''
+//
+//        def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+//                "${Instant.now().atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
+//                payroll.description,
+//                "${payroll.description ?: ""}",
+//                LedgerDocType.PRL,
+//                JournalType.GENERAL,
+//                Instant.now(),
+//                details)
+//
+//        actPay.postedLedger = pHeader.id
+//        actPay.status = PayrollStatus.FINALIZED
+//        actPay.posted = true
+//        actPay.postedBy = SecurityUtils.currentLogin()
+//
+//        save(actPay)
+//
+//    }
 
 }
 

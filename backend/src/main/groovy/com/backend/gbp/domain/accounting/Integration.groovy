@@ -19,7 +19,8 @@ enum IntegrationDomainEnum {
     DISBURSEMENT("Disbursement", "com.backend.gbp.domain.accounting.Disbursement"),
     REAPPLICATION("Disbursement Reapplication", "com.backend.gbp.domain.accounting.Reapplication"),
     DEBIT_MEMO("Debit Memo", "com.backend.gbp.domain.accounting.DebitMemo"),
-    PETTY_CASH("Petty Cash", "com.backend.gbp.domain.accounting.PettyCashAccounting")
+    PETTY_CASH("Petty Cash", "com.backend.gbp.domain.accounting.PettyCashAccounting"),
+    PAYROLL("Petty Cash", "com.backend.gbp.domain.payroll.Payroll")
 
     String displayName
     String path
