@@ -18,31 +18,9 @@ export const assignFormValues = (
   })
 
   const { isCWT, isVatable, id, arCustomer, status } = values
-  const { street, barangay, city, province, country, zipcode } = arCustomer
-    ?.otherDetails?.billingContact ?? {
-    street: '',
-    barangay: '',
-    city: '',
-    province: '',
-    country: '',
-    zipcode: '',
-  }
 
   if (!values?.billingAddress) {
-    form.setFieldValue(
-      'billingAddress',
-      street +
-        ' ' +
-        barangay +
-        ', ' +
-        city +
-        ', ' +
-        province +
-        ', ' +
-        country +
-        ' ' +
-        zipcode
-    )
+    form.setFieldValue('billingAddress', arCustomer?.address)
   }
 
   if (isCWT) dispatch({ type: 'set-CWT', payload: isCWT })

@@ -110,10 +110,9 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     @Column(name = "approved_date")
     Instant approvedDate
 
-
     @Override
     String getDomain() {
-        return ArInvoice.class.name
+        return IntegrationDomainEnum.INVOICE.name()
     }
 
     @Override
@@ -133,18 +132,6 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
         BigDecimal total = totalAmountDue?:0.00
         BigDecimal netTotal =  total - totalCredits
         return  netTotal
-    }
-
-    @Transient
-    BigDecimal negativeTotalHCIAmount
-    BigDecimal getNegativeTotalHCIAmount() {
-        return totalHCIAmount.negate()
-    }
-
-    @Transient
-    BigDecimal negativeTotalPFAmount
-    BigDecimal getNegativeTotalPFAmount() {
-        return totalPFAmount.negate()
     }
 
     @Transient

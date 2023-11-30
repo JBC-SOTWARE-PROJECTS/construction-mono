@@ -4,6 +4,7 @@ export const FIND_ONE_CREDIT_NOTE = gql`
   query ($id: UUID) {
     creditNote: findOneCreditNote(id: $id) {
       id
+      billingAddress
       arCustomer {
         id
         customerName
@@ -14,8 +15,6 @@ export const FIND_ONE_CREDIT_NOTE = gql`
       creditNoteNo
       creditNoteDate
       discountAmount
-      totalHCIAmount
-      totalPFAmount
       totalAmountDue
       cwtAmount
       cwtRate
@@ -53,8 +52,6 @@ export const FIND_ALL_CREDIT_NOTE = gql`
         creditNoteNo
         creditNoteDate
         discountAmount
-        totalHCIAmount
-        totalPFAmount
         totalAmountDue
         cwtAmount
         isCWT
@@ -81,7 +78,6 @@ export const CHECK_EXISTING_CREDIT_NOTE = gql`
         arCustomer {
           id
           customerName
-          referenceId
           customerType
         }
       }
@@ -116,22 +112,24 @@ export const FIND_ALL_CREDIT_NOTE_ITEMS_BY_CNID = gql`
       discountPercentage
       discountAmount
       totalAmountDue
-      totalPFAmount
-      totalHCIAmount
       cwtAmount
       vatAmount
       reference
+      accountCode {
+        label
+        value
+      }
+      invoiceParticulars {
+        itemName
+        description
+        salePrice
+      }
       arInvoiceItem {
         id
-      }
-      discountDepartment {
-        id
-        departmentName
       }
       recipientCustomer {
         id
         customerName
-        referenceId
         customerType
       }
     }
@@ -157,8 +155,6 @@ export const FIND_ALL_CREDIT_NOTE_ITEMS = gql`
         discountPercentage
         discountAmount
         totalAmountDue
-        totalPFAmount
-        totalHCIAmount
         cwtAmount
         vatAmount
         reference
@@ -169,7 +165,6 @@ export const FIND_ALL_CREDIT_NOTE_ITEMS = gql`
         recipientCustomer {
           id
           customerName
-          referenceId
           customerType
         }
       }
@@ -185,8 +180,6 @@ export const FIND_POSTED_CN_PER_INVOICE = gql`
       id
       creditNoteDate
       discountAmount
-      totalHCIAmount
-      totalPFAmount
       totalAmountDue
       cwtAmount
       isCWT
@@ -227,8 +220,6 @@ export const FIND_ALL_CREDIT_NOTE_ITEMS_BY_RECIPIENT_CUSTOMER = gql`
         patient_name
         description
         itemType
-        totalHCIAmount
-        totalPFAmount
         totalAmountDue
       }
       totalPages
@@ -252,9 +243,14 @@ export const CREATE_CREDIT_NOTE = gql`
 
 export const ADD_CREDIT_NOTE_ITEMS = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
-    addCreditNoteClaimsItem(id: $id, fields: $fields) {
+    creditNote: addCreditNoteClaimsItem(id: $id, fields: $fields) {
       response {
         id
+        invoiceParticulars {
+          itemName
+          description
+          salePrice
+        }
       }
       success
       message
@@ -271,6 +267,12 @@ export const CREDIT_NOTE_POSTING = gql`
       success
       message
     }
+  }
+`
+
+export const ADD_MULTIPLE_CN_ITEMS = gql`
+  mutation ($id: UUID, $fields: [Map_String_ObjectScalar]) {
+    multiUpdate: updateMultipleCreditNoteItem(id: $id, fields: $fields)
   }
 `
 
@@ -316,6 +318,57 @@ export const GENERATE_CREDIT_NOTE_VAT = gql`
       response
       success
       message
+    }
+  }
+`
+
+export const FIND_ONE_INVOICE_PARTICULAR = gql`
+  query ($id: UUID) {
+    particulars: findOneArInvoiceParticulars(id: $id) {
+      id
+      itemName
+      description
+      salePrice
+    }
+  }
+`
+
+export const INVOICE_PARTICULAR_OPTIONS_GQL = gql`
+  query ($search: String, $page: Int, $size: Int) {
+    particulars: findAllInvoiceParticulars(
+      search: $search
+      page: $page
+      size: $size
+    ) {
+      content {
+        value: id
+        label: itemName
+      }
+    }
+  }
+`
+
+export const ACCOUNT_OPTIONS_GQL = gql`
+  query (
+    $accountType: String
+    $motherAccountCode: String
+    $accountCategory: String
+    $subaccountType: String
+    $accountName: String
+    $department: String
+    $excludeMotherAccount: Boolean
+  ) {
+    coaList: getAllChartOfAccountGenerate(
+      accountType: $accountType
+      motherAccountCode: $motherAccountCode
+      subaccountType: $subaccountType
+      accountCategory: $accountCategory
+      accountName: $accountName
+      department: $department
+      excludeMotherAccount: $excludeMotherAccount
+    ) {
+      value: code
+      label: accountName
     }
   }
 `

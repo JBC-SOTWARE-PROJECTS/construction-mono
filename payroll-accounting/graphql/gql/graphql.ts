@@ -3608,6 +3608,7 @@ export type Mutation = {
   setCounter?: Maybe<Counter>;
   setToCompleted?: Maybe<PurchaseOrder>;
   syncAttendance?: Maybe<Array<Maybe<EmployeeAttendance>>>;
+  testPayrollAccounting?: Maybe<GraphQlResVal_String>;
   transferIntegration?: Maybe<Scalars['Boolean']['output']>;
   update2307?: Maybe<Wtx2307>;
   updateAPStatus?: Maybe<AccountsPayable>;
@@ -4653,6 +4654,12 @@ export type MutationSetToCompletedArgs = {
 /** Mutation root */
 export type MutationSyncAttendanceArgs = {
   employeeAttendanceList?: InputMaybe<Array<InputMaybe<EmployeeAttendanceInput>>>;
+};
+
+
+/** Mutation root */
+export type MutationTestPayrollAccountingArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -7380,6 +7387,10 @@ export type Payroll = {
   loan?: Maybe<PayrollLoan>;
   otherDeduction?: Maybe<PayrollOtherDeduction>;
   payrollEmployees?: Maybe<Array<Maybe<PayrollEmployee>>>;
+  posted?: Maybe<Scalars['Boolean']['output']>;
+  postedBy?: Maybe<Scalars['String']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
+  salariesPayableTotal?: Maybe<Scalars['BigDecimal']['output']>;
   status?: Maybe<PayrollStatus>;
   timekeeping?: Maybe<Timekeeping>;
   title?: Maybe<Scalars['String']['output']>;
