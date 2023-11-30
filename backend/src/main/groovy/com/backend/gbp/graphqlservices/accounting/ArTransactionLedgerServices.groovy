@@ -5,6 +5,7 @@ import com.backend.gbp.domain.accounting.ArCreditNote
 import com.backend.gbp.domain.accounting.ArInvoice
 import com.backend.gbp.domain.accounting.ArTransactionLedger
 import com.backend.gbp.domain.cashier.Payment
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
@@ -29,7 +30,7 @@ class ArTransactionLedgerRemainingBalanceDto {
 @Service
 @GraphQLApi
 @Transactional(rollbackOn = Exception.class)
-class ArTransactionLedgerServices extends  AbstractDaoService<ArTransactionLedger> {
+class ArTransactionLedgerServices extends  AbstractDaoCompanyService<ArTransactionLedger> {
 
     ArTransactionLedgerServices(){
         super(ArTransactionLedger.class)

@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.ArAllocatedCreditNote
 import com.backend.gbp.domain.accounting.ArCreditNote
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.services.GeneratorService
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -16,7 +17,7 @@ import javax.transaction.Transactional
 @Service
 @GraphQLApi
 @Transactional(rollbackOn = Exception.class)
-class ArAllocatedCreditNoteService extends  ArAbstractFormulaHelper<ArAllocatedCreditNote>{
+class ArAllocatedCreditNoteService extends  AbstractDaoCompanyService<ArAllocatedCreditNote> {
 
     ArAllocatedCreditNoteService(){
         super(ArAllocatedCreditNote.class)
@@ -143,6 +144,7 @@ class ArAllocatedCreditNoteService extends  ArAbstractFormulaHelper<ArAllocatedC
         }catch (ignored){
             return []
         }
-
     }
+
+
 }

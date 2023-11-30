@@ -79,6 +79,10 @@ class ArCustomers extends AbstractAuditingEntity implements Serializable, Subacc
     @Column(name="discount_and_penalties",columnDefinition = "jsonb")
     CompanyDiscountAndPenalties discountAndPenalties
 
+    @GraphQLQuery
+    @Column(name = "company_id")
+    UUID companyId
+
     @Override
     String getDomain() {
         return ArCustomers.class.name

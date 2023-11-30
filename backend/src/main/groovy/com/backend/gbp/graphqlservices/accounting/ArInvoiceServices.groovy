@@ -9,6 +9,7 @@ import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.UserRepository
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.EntityObjectMapperService
 import com.backend.gbp.services.GeneratorService
 import groovy.transform.Canonical
@@ -272,10 +273,11 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "status") String status
     ){
-        String queryStr = """ where ( lower(c.invoiceNo) like lower(concat('%',:search,'%')) ) and c.status != 'VOIDED'
+        String queryStr = """ where c.companyId = :companyId and ( lower(c.invoiceNo) like lower(concat('%',:search,'%')) ) and c.status != 'VOIDED'
                             """
         Map<String,Object> params = [:]
         params['search'] = search
+        params['companyId'] = SecurityUtils.currentCompanyId()
 
         if(customerId){
             queryStr += "and c.arCustomer.id = :customerId "
@@ -639,10 +641,12 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
                 cast(coalesce(null,0) as numeric) as "allocatedAmount"
                 from accounting.ar_invoice ai 
                 where ai.ar_customers = :customerId 
+                and ai.company_id = :companyId
                 and ai.status != 'DRAFT'
                 ${filterStr}
                 order by ai.due_date;
             """)
+                    .setParameter('companyId',SecurityUtils.currentCompanyId())
                     .setParameter('customerId',customerId)
                     .setParameter('filter',filter)
                     .unwrap(NativeQuery.class)
