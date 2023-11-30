@@ -5,8 +5,10 @@ import com.backend.gbp.domain.accounting.ARPaymentPostingItems
 import com.backend.gbp.domain.accounting.ArInvoice
 import com.backend.gbp.domain.accounting.HeaderLedger
 import com.backend.gbp.domain.cashier.Payment
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.EntityObjectMapperService
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
@@ -35,7 +37,7 @@ class CustomGraphQLError extends RuntimeException {
 
 @Component
 @GraphQLApi
-class ARPaymentPostingService extends AbstractDaoService<ARPaymentPosting> {
+class ARPaymentPostingService extends AbstractDaoCompanyService<ARPaymentPosting> {
 
 	ARPaymentPostingService() {
 		super(ARPaymentPosting.class)
@@ -153,11 +155,14 @@ class ARPaymentPostingService extends AbstractDaoService<ARPaymentPosting> {
 		try{
 			createQuery("""
 				Select p from ARPaymentPosting p
-				where p.invoiceId = :invoiceId
+				where 
+				p.companyId = :companyId and
+				p.invoiceId = :invoiceId
 				and p.status != 'VOIDED'
 				order by p.createdDate
 			""")
-				.setParameter('invoiceId',invoiceId)
+					.setParameter('invoiceId',invoiceId)
+					.setParameter('companyId', SecurityUtils.currentCompanyId())
 				.resultList
 		}catch (e){
 			return []

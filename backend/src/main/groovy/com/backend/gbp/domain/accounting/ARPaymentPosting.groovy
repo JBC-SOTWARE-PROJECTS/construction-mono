@@ -79,4 +79,7 @@ class ARPaymentPosting extends AbstractAuditingEntity implements Serializable{
 	@Column(name = "reference_cn", columnDefinition = "uuid")
 	UUID referenceCn
 
+	@GraphQLQuery
+	@Column(name = "company_id")
+	UUID companyId
 }

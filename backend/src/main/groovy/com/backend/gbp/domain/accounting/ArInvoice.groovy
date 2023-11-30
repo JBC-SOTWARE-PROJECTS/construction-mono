@@ -110,6 +110,10 @@ class ArInvoice extends AbstractAuditingEntity implements Serializable, AutoInte
     @Column(name = "approved_date")
     Instant approvedDate
 
+    @GraphQLQuery
+    @Column(name = "company_id")
+    UUID companyId
+
     @Override
     String getDomain() {
         return IntegrationDomainEnum.INVOICE.name()

@@ -96,6 +96,10 @@ class ArCreditNote extends AbstractAuditingEntity implements Serializable, AutoI
     @Column(name = "ledger_id")
     UUID ledgerId
 
+    @GraphQLQuery
+    @Column(name = "company_id")
+    UUID companyId
+
     @Override
     String getDomain() {
         return IntegrationDomainEnum.CREDIT_NOTE.name()

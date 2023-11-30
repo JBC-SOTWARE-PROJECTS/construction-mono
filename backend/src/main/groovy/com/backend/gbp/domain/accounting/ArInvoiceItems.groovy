@@ -126,6 +126,9 @@ class ArInvoiceItems extends AbstractAuditingEntity implements Serializable {
         return  netTotal
     }
 
+    @GraphQLQuery
+    @Column(name = "company_id")
+    UUID companyId
 
     @Transient
     BigDecimal discountPercentage, amountToApply

@@ -55,4 +55,8 @@ class ArAllocatedCreditNote extends AbstractAuditingEntity implements Serializab
     @Column(name = "status")
     String status
 
+    @GraphQLQuery
+    @Column(name = "company_id")
+    UUID companyId
+
 }
