@@ -80,4 +80,7 @@ class ArTransactionLedger extends AbstractAuditingEntity implements Serializable
     @Column(name = "remaining_balance")
     BigDecimal remainingBalance
 
+    @GraphQLQuery
+    @Column(name = "company_id")
+    UUID companyId
 }

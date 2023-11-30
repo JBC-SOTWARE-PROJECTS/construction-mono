@@ -1,7 +1,9 @@
 package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.ArInvoice
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import groovy.transform.Canonical
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -14,7 +16,7 @@ class ArAmountSummaryVariable {
 }
 
 
-abstract class ArAbstractFormulaHelper <T extends  Serializable> extends AbstractDaoService<T> {
+abstract class ArAbstractFormulaHelper <T extends  Serializable> extends AbstractDaoCompanyService<T> {
 
 
     ArAbstractFormulaHelper(Class<T> domain){
@@ -23,9 +25,6 @@ abstract class ArAbstractFormulaHelper <T extends  Serializable> extends Abstrac
 
     @Autowired
     ArInvoiceServices invoiceServices
-//
-//    @Autowired
-//    ArTransactionLedgerServices arTransactionLedgerServices
 
     T applyCWT(UUID id, Boolean isCWT= false, BigDecimal withholdingTaxPercentage){
         def result = findOne(id)

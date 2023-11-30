@@ -10,6 +10,7 @@ import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -80,10 +81,11 @@ class ArCreditNoteService extends  ArAbstractFormulaHelper<ArCreditNote>{
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ){
-        String queryStr = """ from ArCreditNote c where ( lower(c.reference) like concat('%',lower(:search),'%') or  c.creditNoteNo like concat('%',:search,'%'))
+        String queryStr = """ from ArCreditNote c where c.companyId = :companyId and ( lower(c.reference) like concat('%',lower(:search),'%') or  c.creditNoteNo like concat('%',:search,'%'))
                             """
         Map<String,Object> params = [:]
         params['search'] = search
+        params['companyId'] = SecurityUtils.currentCompanyId()
 
         if(status != 'ALL') {
             queryStr += "and c.status = :status "

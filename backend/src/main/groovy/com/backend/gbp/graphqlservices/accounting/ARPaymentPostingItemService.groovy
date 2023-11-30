@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.ARPaymentPostingItems
 import com.backend.gbp.domain.accounting.ArCustomers
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.services.EntityObjectMapperService
@@ -22,7 +23,7 @@ import java.time.temporal.ChronoUnit
 @Component
 @GraphQLApi
 @Transactional(rollbackOn = Exception.class)
-class ARPaymentPostingItemService extends AbstractDaoService<ARPaymentPostingItems> {
+class ARPaymentPostingItemService extends AbstractDaoCompanyService<ARPaymentPostingItems> {
 
 	ARPaymentPostingItemService() {
 		super(ARPaymentPostingItems.class)

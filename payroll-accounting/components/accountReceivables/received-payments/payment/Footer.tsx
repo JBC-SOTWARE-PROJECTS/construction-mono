@@ -13,6 +13,8 @@ export default function ReceivePayFooter(props: ReceivePayCreateContextProps) {
   const [mutateSubmit, { loading }] = useMutation(SUBMIT_PAYMENT)
 
   const onConfirmApprove = () => {
+    const { customerId, orNumber } = props?.form?.getFieldsValue()
+
     if (!props.state.customerId)
       return props.messageApi?.error(
         'No customer selected. Please choose a customer before processing payment.'
@@ -27,6 +29,8 @@ export default function ReceivePayFooter(props: ReceivePayCreateContextProps) {
     if ((props?.totalPayment ?? 0) <= 0)
       return props.messageApi?.error('Payment amount cannot be zero.')
 
+    if (!orNumber) return props.messageApi?.error('OR # cannot be empty.')
+
     showPasswordConfirmation(() => {
       props?.messageApi?.open({
         type: 'loading',
@@ -36,7 +40,6 @@ export default function ReceivePayFooter(props: ReceivePayCreateContextProps) {
 
       const { transactions } = props.state
       const { shiftId } = props?.cashierData ?? { shiftId: null }
-      const { customerId, orNumber } = props?.form?.getFieldsValue()
 
       let paymentMethod = ''
       const tendered = props.state.paymentMethod.map((pay) => {

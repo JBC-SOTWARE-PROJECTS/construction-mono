@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.ArInvoiceParticulars
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
+import com.backend.gbp.security.SecurityUtils
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -55,10 +56,11 @@ class ArInvoiceParticularsServices extends  ArAbstractFormulaHelper<ArInvoicePar
     ){
         Map<String,Object> params = [:]
         params['search'] = search
+        params['companyId'] = SecurityUtils.currentCompanyId()
 
         getPageable(
-                """ Select c from ArInvoiceParticulars c where ( lower(c.itemCode) like lower(concat('%',:search,'%')) or lower(c.itemName) like lower(concat('%',:search,'%')) ) order by c.itemName desc""",
-                """ Select COUNT(c) from ArInvoiceParticulars c where ( lower(c.itemCode) like lower(concat('%',:search,'%')) or lower(c.itemName) like lower(concat('%',:search,'%')) )""",
+                """ Select c from ArInvoiceParticulars c where c.companyId = :companyId and ( lower(c.itemCode) like lower(concat('%',:search,'%')) or lower(c.itemName) like lower(concat('%',:search,'%')) ) order by c.itemName desc""",
+                """ Select COUNT(c) from ArInvoiceParticulars c where c.companyId = :companyId and ( lower(c.itemCode) like lower(concat('%',:search,'%')) or lower(c.itemName) like lower(concat('%',:search,'%')) )""",
                 page,
                 size,
                 params
