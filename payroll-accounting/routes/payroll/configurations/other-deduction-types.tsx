@@ -1,6 +1,10 @@
 import UpsertOtherDeductionTypeModal from "@/components/payroll/configurations/UpsertOtherDeductionTypeModal";
-import { AdjustmentCategory } from "@/graphql/gql/graphql";
+import {
+  AdjustmentCategory,
+  ChartOfAccountGenerate,
+} from "@/graphql/gql/graphql";
 import useGetOtherDeductionPageable from "@/hooks/other-deduction-types/useGetOtherDeductionPageable";
+import useGetChartOfAccounts from "@/hooks/useGetChartOfAccounts";
 import usePaginationState from "@/hooks/usePaginationState";
 import { Input, Space, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
@@ -26,6 +30,7 @@ function OtherDeductionTypes() {
     state,
     () => {}
   );
+  const [expenses, loadingExpenses] = useGetChartOfAccounts("EXPENSES");
 
   const columns: ColumnsType<AdjustmentCategory> = [
     {
@@ -35,6 +40,18 @@ function OtherDeductionTypes() {
     {
       title: "Description",
       dataIndex: "description",
+    },
+    {
+      title: "Sub-account",
+      dataIndex: "subaccountCode",
+      render: (code) => {
+        console.log(code);
+        return (
+          expenses?.filter(
+            (item: ChartOfAccountGenerate) => item.code === code
+          )[0]?.accountName || ""
+        );
+      },
     },
     {
       title: "Status",
@@ -50,7 +67,11 @@ function OtherDeductionTypes() {
       dataIndex: "id",
       render: (value, { isDefault, ...record }) =>
         !isDefault && (
-          <UpsertOtherDeductionTypeModal refetch={refetch} record={record} />
+          <UpsertOtherDeductionTypeModal
+            refetch={refetch}
+            record={record}
+            expenses={expenses}
+          />
         ),
     },
   ];
@@ -73,11 +94,18 @@ function OtherDeductionTypes() {
             style={{ width: "350px" }}
             placeholder="Search"
           />
-          <UpsertOtherDeductionTypeModal refetch={refetch} />
+          <UpsertOtherDeductionTypeModal
+            refetch={refetch}
+            expenses={expenses}
+          />
         </Space>
       </div>
 
-      <Table columns={columns} dataSource={data} loading={loading} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={loading || loadingExpenses}
+      />
     </>
   );
 }

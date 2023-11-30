@@ -423,4 +423,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_prefix.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/49_michael_add_subaccount_code_to_tables.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/50_michael_edit_adjustment_category_default_val.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

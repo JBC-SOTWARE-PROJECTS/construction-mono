@@ -259,6 +259,7 @@ export type AdjustmentCategory = {
   name?: Maybe<Scalars['String']['output']>;
   operation?: Maybe<AdjustmentOperation>;
   status?: Maybe<Scalars['Boolean']['output']>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
 };
 
 export enum AdjustmentOperation {
@@ -277,6 +278,7 @@ export type Allowance = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
 };
 
 export type AllowanceInput = {
@@ -286,6 +288,7 @@ export type AllowanceInput = {
   createdDate?: InputMaybe<Scalars['Instant']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subaccountCode?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AllowanceItem = {
@@ -1897,6 +1900,7 @@ export type Employee = {
 
 export type EmployeeAllowance = {
   __typename?: 'EmployeeAllowance';
+  allowance?: Maybe<Allowance>;
   allowanceId?: Maybe<Scalars['UUID']['output']>;
   allowanceType?: Maybe<AllowanceType>;
   amount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -1911,7 +1915,7 @@ export type EmployeeAllowance = {
 };
 
 export type EmployeeAllowanceInput = {
-  allowanceId?: InputMaybe<Scalars['UUID']['input']>;
+  allowance?: InputMaybe<AllowanceInput>;
   allowanceType?: InputMaybe<AllowanceType>;
   amount?: InputMaybe<Scalars['BigDecimal']['input']>;
   company?: InputMaybe<CompanySettingsInput>;
@@ -2835,6 +2839,8 @@ export type HeaderLedgerGroupItemsDto = {
 export type HoursLog = {
   __typename?: 'HoursLog';
   absent?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  companyName?: Maybe<Scalars['String']['output']>;
   late?: Maybe<Scalars['BigDecimal']['output']>;
   overtime?: Maybe<Scalars['BigDecimal']['output']>;
   overtimeDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
@@ -2895,6 +2901,7 @@ export enum IntegrationDomainEnum {
   DebitMemo = 'DEBIT_MEMO',
   Disbursement = 'DISBURSEMENT',
   NoDomain = 'NO_DOMAIN',
+  Payroll = 'PAYROLL',
   PettyCash = 'PETTY_CASH',
   Reapplication = 'REAPPLICATION'
 }
@@ -3347,6 +3354,7 @@ export enum LedgerDocType {
   Or = 'OR',
   Pa = 'PA',
   Pc = 'PC',
+  Prl = 'PRL',
   Qa = 'QA',
   Rm = 'RM',
   Rr = 'RR',
@@ -5522,6 +5530,7 @@ export type MutationUpsertOtherDeductionTypeArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
+  subaccountCode?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -6044,6 +6053,7 @@ export type OtherDeductionTypes = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
 };
 
 export type PcvItemsDtoInput = {
@@ -7359,8 +7369,11 @@ export type Payroll = {
   dateEnd?: Maybe<Scalars['Instant']['output']>;
   dateStart?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
   finalizedBy?: Maybe<Employee>;
   finalizedDate?: Maybe<Scalars['Instant']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
@@ -12710,6 +12723,7 @@ export type Timekeeping = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
   projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
+  salaryBreakdown?: Maybe<Array<Maybe<EmployeeSalaryDto>>>;
   status?: Maybe<PayrollStatus>;
   timekeepingEmployees?: Maybe<Array<Maybe<TimekeepingEmployee>>>;
 };
