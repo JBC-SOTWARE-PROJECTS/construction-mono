@@ -403,7 +403,7 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
     HeaderLedger addHeaderManualEntries(HeaderLedger headerLedger, List<Map<String,Object>>  entries){
         Map<String, Ledger> existingAccount = [:]
         List<EntryFull> entriesTarget = []
-        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","")
 
         for (Map<String,Object> entry in entries ){
             String code = entry.get("code")

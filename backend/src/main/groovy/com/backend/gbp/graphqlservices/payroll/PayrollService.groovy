@@ -9,6 +9,7 @@ import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.Timekeeping
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.graphqlservices.accounting.ArInvoiceServices
 import com.backend.gbp.graphqlservices.accounting.IntegrationServices
 import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollStatusService
@@ -65,6 +66,9 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
     @Autowired
     IntegrationServices integrationServices
+
+    @Autowired
+    ArInvoiceServices arInvoiceServices
 
     @Autowired
     LedgerServices ledgerServices
@@ -194,14 +198,6 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         Payroll payroll = updateStatus(id, PayrollStatus.valueOf(status))
 
         if (status == 'ACTIVE') {
-            //TODO: actions for creating timekeeping, timekeeping employee, accumulated logs summary and accumulated logs.
-
-
-            //TODO: actions for creating allowance, payroll employee allowance, payroll employee allowance item.
-            //TODO: actions for creating contributions and payroll employee contributions
-
-//            timekeepingService.startPayroll(payroll) //TODO: Temporary only, use the code below in the future
-//            payrollLoanService.startPayroll(payroll)
             payrollOperations.each {
                 it.startPayroll(payroll)
             }
@@ -246,48 +242,77 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         return new GraphQLResVal<String>("OK", true, "Successfully deleted payroll")
     }
 
-//    @Transactional(rollbackFor = Exception.class)
-//    Payroll postToLedgerAccounting(Payroll payroll) {
-//        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
-//        def actPay = super.save(payroll) as Payroll
-//
-//        def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
-//            it.flagValue = ""
-//            //initialize
-//
-//
-//        }
-//        Map<String, String> details = [:]
-//
-//        actPay.details.each { k, v ->
-//            details[k] = v
-//        }
-//
-//        details["PAYROLL_ID"] = actPay.id.toString()
-//        details["PAYROLL_CODE"] = ''
-//
-//        headerLedger.transactionNo = ''
-//        headerLedger.transactionType = ''
-//        headerLedger.referenceType = ''
-//        headerLedger.referenceNo = ''
-//
-//        def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
-//                "${Instant.now().atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
-//                payroll.description,
-//                "${payroll.description ?: ""}",
-//                LedgerDocType.PRL,
-//                JournalType.GENERAL,
-//                Instant.now(),
-//                details)
-//
-//        actPay.postedLedger = pHeader.id
-//        actPay.status = PayrollStatus.FINALIZED
-//        actPay.posted = true
-//        actPay.postedBy = SecurityUtils.currentLogin()
-//
-//        save(actPay)
-//
-//    }
+    @Transactional(rollbackFor = Exception.class)
+    @GraphQLMutation
+    GraphQLResVal<String> testPayrollAccounting(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        Payroll payroll = payrollRepository.findById(id).get()
+        postToLedgerAccounting(payroll)
+        return new GraphQLResVal<String>("OK", true, "Successfully deleted payroll")
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    Payroll postToLedgerAccounting(Payroll payroll) {
+        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
+        def actPay = super.save(payroll) as Payroll
+        List<Map<String, Object>> entries = []
+//        Map<String,BigDecimal> map = new HashMap<>()
+        BigDecimal totalAllowance = 0
+        payroll.allowance.allowanceEmployees.each {
+            it.allowanceItems.each { items ->
+                Map<String, Object> itemsAccount = [:]
+                itemsAccount['code'] = '511-27-0000'
+                itemsAccount['debit'] = items.amount
+                itemsAccount['credit'] = 0.00
+                totalAllowance += items.amount
+                entries.push(itemsAccount)
+            }
+        }
+
+
+        def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
+            it.flagValue = "PAYROLL_PROCESSING"
+            it.salariesPayableTotal = totalAllowance
+
+
+            //initialize
+
+        }
+
+
+        headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger, entries)
+        Map<String, String> details = [:]
+
+        actPay.details.each { k, v ->
+            details[k] = v
+        }
+
+        details["PAYROLL_ID"] = actPay.id.toString()
+        details["PAYROLL_CODE"] = ''
+
+        headerLedger.transactionNo = ''
+        headerLedger.transactionType = ''
+        headerLedger.referenceType = ''
+        headerLedger.referenceNo = ''
+
+        def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+                "${Instant.now().atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
+                payroll.description,
+                "${payroll.description ?: ""}",
+                LedgerDocType.PRL,
+                JournalType.GENERAL,
+                Instant.now(),
+                details)
+
+        actPay.postedLedger = pHeader.id
+        actPay.status = PayrollStatus.FINALIZED
+        actPay.posted = true
+        actPay.postedBy = SecurityUtils.currentLogin()
+
+        save(actPay)
+
+    }
 
 }
 

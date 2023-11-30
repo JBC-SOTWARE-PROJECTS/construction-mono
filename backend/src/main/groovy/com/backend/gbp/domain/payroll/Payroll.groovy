@@ -77,19 +77,19 @@ class Payroll extends PayrollAuditingEntity implements Serializable, AutoIntegra
     @OneToOne(mappedBy = "payroll")
     PayrollAllowance allowance
 
-//    @GraphQLQuery
-//    @Column(name = "posted_ledger", columnDefinition = "uuid")
-//    UUID postedLedger
-//
-//    @GraphQLQuery
-//    @Column(name = "posted", columnDefinition = "bool")
-//    @UpperCase
-//    Boolean posted
-//
-//    @GraphQLQuery
-//    @Column(name = "posted_by", columnDefinition = "varchar")
-//    @UpperCase
-//    String postedBy
+    @GraphQLQuery
+    @Column(name = "posted_ledger", columnDefinition = "uuid")
+    UUID postedLedger
+
+    @GraphQLQuery
+    @Column(name = "posted", columnDefinition = "bool")
+    @UpperCase
+    Boolean posted
+
+    @GraphQLQuery
+    @Column(name = "posted_by", columnDefinition = "varchar")
+    @UpperCase
+    String postedBy
 
 
     @Override
@@ -104,4 +104,8 @@ class Payroll extends PayrollAuditingEntity implements Serializable, AutoIntegra
     Map<String, String> getDetails() {
         return [:]
     }
+
+    @Transient
+    BigDecimal salariesPayableTotal
+
 }
