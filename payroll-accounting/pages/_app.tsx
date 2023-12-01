@@ -10,6 +10,7 @@ import "@/styles/globals.css";
 import "@/styles/loader.css";
 import 'react-virtualized/styles.css'
 import "@/styles/virtualtable.css";
+import TawkToChat from "@/components/thirdParty/tawkToSupport";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -34,6 +35,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         <ApolloProvider client={client}>
           <AuthManager>
             <Component {...pageProps} />
+            <TawkToChat/>
           </AuthManager>
         </ApolloProvider>
       </React.Fragment>
