@@ -1,10 +1,10 @@
 package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
-import com.backend.gbp.domain.annotations.UpperCase
-import com.backend.gbp.domain.assets.enums.AssetStatus
-import com.backend.gbp.domain.assets.enums.AssetType
+import com.backend.gbp.domain.assets.enums.RepairMaintenanceItemType
+import com.backend.gbp.domain.assets.enums.RepairServiceClassification
 import com.backend.gbp.domain.inventory.Item
+import com.backend.gbp.domain.inventory.Supplier
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -13,14 +13,13 @@ import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
 
-import javax.annotation.Nullable
 import javax.persistence.*
 
 @Entity
-@Table(schema = "asset", name = "assets")
-@SQLDelete(sql = "UPDATE asset.assets SET deleted = true WHERE id = ?")
+@Table(schema = "asset", name = "asset_repair_maintenance_items")
+@SQLDelete(sql = "UPDATE asset.asset_repair_maintenance_items SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class Assets extends AbstractAuditingEntity implements Serializable {
+class AssetRepairMaintenanceItems extends AbstractAuditingEntity implements Serializable {
 	
 	@GraphQLQuery
 	@Id
@@ -31,50 +30,39 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	UUID id
 
 	@GraphQLQuery
-	@Column(name = "code")
-	String assetCode
+	@Column(name = "quantity")
+	Integer quantity
 
 	@GraphQLQuery
 	@Column(name = "description")
-	@UpperCase
 	String description
-	
-	@GraphQLQuery
-	@Nullable
-	@Column(name = "brand")
-	@UpperCase
-	String brand
 
 	@GraphQLQuery
-	@Column(name = "make")
-	@UpperCase
-	String model
-
-	@GraphQLQuery
-	@Column(name = "plate_no")
-	String plateNo
-
-	@GraphQLQuery
-	@Column(name = "prefix")
-	String prefix
-
-	@GraphQLQuery
-	@Column(name = "image")
-	String image
+	@Column(name = "base_price")
+	BigDecimal basePrice
 
 	@Enumerated(EnumType.STRING)
-	@Column(name = "status")
-	AssetStatus status
+	@Column(name = "item_type")
+	RepairMaintenanceItemType itemType
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "type")
-	AssetType type
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset_repair_maintenance", referencedColumnName = "id")
+	AssetRepairMaintenance assetRepairMaintenance
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "supplier", referencedColumnName = "id")
+	Supplier supplier
+
 
 	@GraphQLQuery
 	@Column(name = "company")
