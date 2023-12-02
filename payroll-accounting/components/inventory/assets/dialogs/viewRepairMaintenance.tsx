@@ -1,21 +1,12 @@
 import React from "react";
 import {
   Button,
-  Col,
-  Row,
   Space,
-  Input,
-  Table,
   Modal,
-  Typography,
-  Pagination,
-  Tag,
-  Select,
   Divider,
 } from "antd";
 import { AssetRepairMaintenance } from "@/graphql/gql/graphql";
 import RepairMaintenanceDetails from "../displays/RepairMaintenanceDetails";
-import AssetRepairMaintenanceItemTable from "../masterfile/assetRepairMaintenanceItem";
 import AssetRepairMaintenanceItemsComponent from "@/routes/inventory/assets/asset/repairMaintenanceItems";
 
 interface IProps {
@@ -53,7 +44,7 @@ export default function ViewRepairMaintenance(props: IProps) {
       <>
         <RepairMaintenanceDetails data={record} loading={false} />
         <Divider />
-       <AssetRepairMaintenanceItemsComponent rmId={record?.id}/>
+        <AssetRepairMaintenanceItemsComponent rmId={record?.id}/>
       </>
     </Modal>
   );

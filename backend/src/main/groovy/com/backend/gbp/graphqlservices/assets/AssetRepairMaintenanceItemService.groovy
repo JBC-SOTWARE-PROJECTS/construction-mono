@@ -65,17 +65,16 @@ class AssetRepairMaintenanceItemService extends AbstractDaoService<AssetRepairMa
             @GraphQLArgument(name = "size") Integer size
     ) {
 
-        String query = '''Select p from AssetRepairMaintenanceItems p where p.assetRepairMaintenance.id = :rmId AND
-						lower(concat(p.item.descLong)) like lower(concat('%',:filter,'%'))'''
 
-        String countQuery = '''Select count(p) from AssetRepairMaintenanceItems p where p.assetRepairMaintenance.id = :rmId AND
-							lower(concat(p.item.descLong)) like lower(concat('%',:filter,'%'))'''
+        String query = '''Select p from AssetRepairMaintenanceItems p where p.assetRepairMaintenance.id = :rmId '''
+
+        String countQuery = '''Select count(p) from AssetRepairMaintenanceItems p where p.assetRepairMaintenance.id = :rmId '''
 
         Map<String, Object> params = new HashMap<>()
         params.put('rmId', rmId)
-        params.put('filter', filter)
+        //params.put('filter', filter
 
-        query += '''ORDER BY p.item.descLong DESC'''
+        //  query += '''ORDER BY p.item.descLong DESC'''
 
         Page<AssetRepairMaintenanceItems> result = getPageable(query, countQuery, page, size, params)
         return result
@@ -119,6 +118,8 @@ class AssetRepairMaintenanceItemService extends AbstractDaoService<AssetRepairMa
                     upsert = findOne(item.id)
                 }
                 upsert.quantity = item.quantity
+                upsert.itemType = item.itemType
+                upsert.description = item.description
                 upsert.item = itemService.itemById(item.item)
                 upsert.basePrice = item.basePrice
                 upsert.assetRepairMaintenance = assetRepairMaintenanceService.assetRepairMaintenanceById(item.assetRepairMaintenance)

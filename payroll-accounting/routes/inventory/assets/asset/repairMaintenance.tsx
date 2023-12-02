@@ -1,20 +1,13 @@
 import React, { useState } from "react";
 import {
-  PageContainer,
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import AssetPreventiveMaintenanceTable from "@/components/inventory/assets/masterfile/assetPreventiveMaintenanceTable";
-import { Input, Button, message, Row, Col, Select, Form } from "antd";
+import { Input, Button, message} from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useDialog } from "@/hooks";
-import UpsertPreventiveMaintenanceModal from "@/components/inventory/assets/dialogs/upsertPreventiveMaintenanceModal";
-import useGetPreventiveByAsset from "@/hooks/asset/useGetPreventiveByAsset";
 import { useRouter } from "next/router";
-import {
-  AssetPreventiveMaintenance,
-  AssetRepairMaintenance,
-} from "@/graphql/gql/graphql";
+import {AssetRepairMaintenance,} from "@/graphql/gql/graphql";
 import AssetRepairMaintenanceTable from "@/components/inventory/assets/masterfile/assetRepairMaintenance";
 import useGetAssetRepairMaintenance from "@/hooks/asset/useGetAssetRepairMaintenance";
 import UpsertRepairMaintenanceModal from "@/components/inventory/assets/dialogs/upsertAssetRepairMaintenance";

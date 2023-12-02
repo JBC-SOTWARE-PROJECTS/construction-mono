@@ -427,4 +427,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/49_jacky_asset_repair_maintenance_items.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_repair_maintenance_item_item_type.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_repair_maintenance_item_description.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

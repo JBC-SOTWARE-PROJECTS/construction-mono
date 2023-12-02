@@ -1,7 +1,10 @@
 package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.assets.enums.RepairMaintenanceItemType
+import com.backend.gbp.domain.assets.enums.RepairServiceClassification
 import com.backend.gbp.domain.inventory.Item
+import com.backend.gbp.domain.inventory.Supplier
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -31,8 +34,16 @@ class AssetRepairMaintenanceItems extends AbstractAuditingEntity implements Seri
 	Integer quantity
 
 	@GraphQLQuery
+	@Column(name = "description")
+	String description
+
+	@GraphQLQuery
 	@Column(name = "base_price")
 	BigDecimal basePrice
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "item_type")
+	RepairMaintenanceItemType itemType
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -45,6 +56,13 @@ class AssetRepairMaintenanceItems extends AbstractAuditingEntity implements Seri
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "supplier", referencedColumnName = "id")
+	Supplier supplier
+
 
 	@GraphQLQuery
 	@Column(name = "company")

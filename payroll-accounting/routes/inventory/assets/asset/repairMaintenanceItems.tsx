@@ -4,7 +4,7 @@ import { Input, Button, App } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useDialog } from "@/hooks";
 import { useRouter } from "next/router";
-import { AssetRepairMaintenanceItems, Item } from "@/graphql/gql/graphql";
+import { AssetRepairMaintenanceItems, Item, RepairMaintenanceItemType } from "@/graphql/gql/graphql";
 import UpsertRepairMaintenanceModal from "@/components/inventory/assets/dialogs/upsertAssetRepairMaintenance";
 import ViewRepairMaintenance from "@/components/inventory/assets/dialogs/viewRepairMaintenance";
 import AssetRepairMaintenanceItemTable from "@/components/inventory/assets/masterfile/assetRepairMaintenanceItem";
@@ -17,6 +17,7 @@ import {
 } from "@/graphql/assets/queries";
 import { useMutation } from "@apollo/client";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
+import UpsertRepairMaintenenceServiceModal from "@/components/inventory/assets/dialogs/upsertRepairMaintenenceServiceModal";
 
 type Props = {
   rmId: string | null;
@@ -40,6 +41,7 @@ const initialState: IPMState = {
 export default function AssetRepairMaintenanceItemsComponent({ rmId }: Props) {
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const showItems = useDialog(ItemSelector);
+  const showUpsertService = useDialog(UpsertRepairMaintenenceServiceModal);
   const router = useRouter();
   const [state, setState] = useState(initialState);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -66,8 +68,7 @@ export default function AssetRepairMaintenanceItemsComponent({ rmId }: Props) {
       ignoreResults: false,
       onCompleted: (data) => {
         if (data) {
-          // console.log("result", data);
-          // refetch();
+          setIsUpdating(false)
           message.success("Items successfully added");
         }
       },
@@ -89,14 +90,23 @@ export default function AssetRepairMaintenanceItemsComponent({ rmId }: Props) {
                 id: null,
                 quantity: 1,
                 item: n?.item,
+                itemType: RepairMaintenanceItemType.Material,
                 basePrice: n.actualUnitCost,
               });
 
               setItemList([...itemList]);
             }
           });
+
+          setIsUpdating(true);
         }
       }
+    });
+  };
+
+  const onUpsertService = (record?: AssetRepairMaintenanceItems) => {
+    showUpsertService({ rmId}, (data: any) => {
+      refetch();
     });
   };
 
@@ -109,6 +119,8 @@ export default function AssetRepairMaintenanceItemsComponent({ rmId }: Props) {
         quantity: item.quantity,
         item: item.item?.id,
         basePrice: item.basePrice,
+        itemType: item?.itemType,
+        description: item?.description,
         assetRepairMaintenance: rmId,
       });
     });
@@ -144,13 +156,20 @@ export default function AssetRepairMaintenanceItemsComponent({ rmId }: Props) {
               icon={<PlusCircleOutlined />}
               onClick={() => onOpenItemSelector()}
             >
-              Add New
+              Add Items
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusCircleOutlined />}
+              onClick={() => onUpsertService()}
+            >
+              Add Service
             </Button>
             <Button type="default" onClick={() => setIsUpdating(!isUpdating)}>
               {isUpdating ? "Read Only" : "Update"}
             </Button>
             {isUpdating ? (
-              <Button type="default" onClick={() => onSave()}>
+              <Button type="primary" onClick={() => onSave()}>
                 Save
               </Button>
             ) : (

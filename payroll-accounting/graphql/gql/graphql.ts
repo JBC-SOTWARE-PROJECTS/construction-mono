@@ -641,23 +641,6 @@ export type AssetRepairMaintenance = {
   workedByEmployees?: Maybe<Scalars['String']['output']>;
 };
 
-export type AssetRepairMaintenanceInput = {
-  asset?: InputMaybe<AssetsInput>;
-  company?: InputMaybe<Scalars['UUID']['input']>;
-  findings?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  inspectionRemarks?: InputMaybe<Scalars['String']['input']>;
-  project?: InputMaybe<ProjectsInput>;
-  rmImage?: InputMaybe<Scalars['String']['input']>;
-  serviceClassification?: InputMaybe<RepairServiceClassification>;
-  serviceDatetimeFinished?: InputMaybe<Scalars['Instant']['input']>;
-  serviceDatetimeStart?: InputMaybe<Scalars['Instant']['input']>;
-  serviceType?: InputMaybe<RepairServiceType>;
-  status?: InputMaybe<RepairMaintenanceStatus>;
-  workDescription?: InputMaybe<Scalars['String']['input']>;
-  workedByEmployees?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type AssetRepairMaintenanceItems = {
   __typename?: 'AssetRepairMaintenanceItems';
   assetRepairMaintenance?: Maybe<AssetRepairMaintenance>;
@@ -665,20 +648,14 @@ export type AssetRepairMaintenanceItems = {
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   item?: Maybe<Item>;
+  itemType?: Maybe<RepairMaintenanceItemType>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   quantity?: Maybe<Scalars['Int']['output']>;
-};
-
-export type AssetRepairMaintenanceItemsInput = {
-  assetRepairMaintenance?: InputMaybe<AssetRepairMaintenanceInput>;
-  basePrice?: InputMaybe<Scalars['BigDecimal']['input']>;
-  company?: InputMaybe<Scalars['UUID']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  item?: InputMaybe<ItemInput>;
-  quantity?: InputMaybe<Scalars['Int']['input']>;
+  supplier?: Maybe<Supplier>;
 };
 
 export enum AssetStatus {
@@ -737,21 +714,6 @@ export type Assets = {
   prefix?: Maybe<Scalars['String']['output']>;
   status?: Maybe<AssetStatus>;
   type?: Maybe<AssetType>;
-};
-
-export type AssetsInput = {
-  assetCode?: InputMaybe<Scalars['String']['input']>;
-  brand?: InputMaybe<Scalars['String']['input']>;
-  company?: InputMaybe<Scalars['UUID']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  image?: InputMaybe<Scalars['String']['input']>;
-  item?: InputMaybe<ItemInput>;
-  model?: InputMaybe<Scalars['String']['input']>;
-  plateNo?: InputMaybe<Scalars['String']['input']>;
-  prefix?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<AssetStatus>;
-  type?: InputMaybe<AssetType>;
 };
 
 export type Authority = {
@@ -3555,6 +3517,7 @@ export type Mutation = {
   applyDefaultsPrice?: Maybe<OfficeItem>;
   approveLedger?: Maybe<Scalars['Boolean']['output']>;
   approveLedgerWithDate?: Maybe<Scalars['Boolean']['output']>;
+  assetRepairMaintenanceItemDeletedById?: Maybe<AssetRepairMaintenanceItems>;
   /** insert BEG */
   beginningBalanceInsert?: Maybe<BeginningBalance>;
   calculateAllAccumulatedLogs?: Maybe<GraphQlResVal_Timekeeping>;
@@ -3801,6 +3764,7 @@ export type Mutation = {
   upsertJobOrderItems?: Maybe<JobOrderItems>;
   upsertJobStatus?: Maybe<JobStatus>;
   upsertMP?: Maybe<MaterialProduction>;
+  upsertMPAssetRepairMaintenanceItem?: Maybe<AssetRepairMaintenanceItems>;
   upsertManyMaterials?: Maybe<GraphQlRetVal_Boolean>;
   upsertMpItem?: Maybe<MaterialProductionItem>;
   upsertOffice?: Maybe<Office>;
@@ -4018,6 +3982,12 @@ export type MutationApproveLedgerArgs = {
 /** Mutation root */
 export type MutationApproveLedgerWithDateArgs = {
   fields?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+};
+
+
+/** Mutation root */
+export type MutationAssetRepairMaintenanceItemDeletedByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -5220,7 +5190,6 @@ export type MutationUpsertAssetRepairMaintenanceArgs = {
 export type MutationUpsertAssetRepairMaintenanceItemArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
-  rmList?: InputMaybe<Array<InputMaybe<AssetRepairMaintenanceItemsInput>>>;
 };
 
 
@@ -5563,6 +5532,12 @@ export type MutationUpsertJobStatusArgs = {
 export type MutationUpsertMpArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+  items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertMpAssetRepairMaintenanceItemArgs = {
   items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
 };
 
@@ -12341,6 +12316,11 @@ export type ReleaseCheck = {
   releaseDate?: Maybe<Scalars['Instant']['output']>;
   release_by?: Maybe<Scalars['String']['output']>;
 };
+
+export enum RepairMaintenanceItemType {
+  Material = 'MATERIAL',
+  Service = 'SERVICE'
+}
 
 export enum RepairMaintenanceStatus {
   Completed = 'COMPLETED',

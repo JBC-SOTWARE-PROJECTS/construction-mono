@@ -12,6 +12,8 @@ const GET_RECORDS = gql`
           id
           quantity
           basePrice
+          itemType
+          description
           item {
             id
             descLong
