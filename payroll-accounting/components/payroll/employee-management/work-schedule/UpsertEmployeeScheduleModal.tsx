@@ -170,7 +170,6 @@ function UpsertEmployeeScheduleModal({
               <FormSelect
                 name="project_id"
                 label="Project"
-                rules={requiredField}
                 propsselect={{
                   options: [
                     { value: null, label: "Office Based" },

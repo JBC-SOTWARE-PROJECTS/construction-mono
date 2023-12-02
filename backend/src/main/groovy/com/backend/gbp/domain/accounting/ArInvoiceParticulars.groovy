@@ -58,4 +58,7 @@ class ArInvoiceParticulars extends AbstractAuditingEntity implements Serializabl
     @Column(name = "sales_account")
     String salesAccountCode
 
+    @GraphQLQuery
+    @Column(name = "company_id")
+    UUID companyId
 }

@@ -431,4 +431,16 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_repair_maintenance_item_description.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/49_donss_add_ar_payment_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/50_donss_alter_customer_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/51_donss_add_ar_credit_note_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/52_donss_add_ar_transaction_ledger_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/53_donss_insert_integration_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/54_donss_update_receivable_tables.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

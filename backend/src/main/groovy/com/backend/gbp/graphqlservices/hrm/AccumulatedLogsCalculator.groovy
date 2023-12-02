@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.hrm
 
+import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
 import com.backend.gbp.domain.hrm.EmployeeSchedule
@@ -65,11 +66,29 @@ class AccumulatedLogsCalculator {
     ObjectMapper objectMapper
 
     @GraphQLQuery(name = "getAccumulatedLogs")
-    List<AccumulatedLogs> getAccumulatedLogs(
+    List<AccumulatedLogs> getAccumulatedLogsGraphql(
             @GraphQLArgument(name = "startDate") Instant startDate,
             @GraphQLArgument(name = "endDate") Instant endDate,
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "generateBreakdown") Boolean generateBreakdown
+
+    ) {
+        getAccumulatedLogs(
+                startDate,
+                endDate,
+                id,
+                generateBreakdown,
+                null
+        )
+
+    }
+
+    List<AccumulatedLogs> getAccumulatedLogs(
+            Instant startDate,
+            Instant endDate,
+            UUID id,
+            Boolean generateBreakdown,
+            Employee employee
 
 
     ) {
@@ -116,7 +135,7 @@ class AccumulatedLogsCalculator {
                 accumulatedLogs.inTime = firstIn
                 accumulatedLogs.outTime = out
                 if (generateBreakdown) {
-                    accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList, holidays)
+                    accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList, holidays, employee.currentCompany)
                     accumulatedLogs.projectBreakdown.each {
                         hoursLog.regular += it.regular
                         hoursLog.overtime += it.overtime
@@ -199,12 +218,18 @@ class AccumulatedLogsCalculator {
             EmployeeSchedule regularSchedule,
             EmployeeSchedule overtimeSchedule,
             List<EmployeeAttendance> attendanceList,
-            List<EventCalendar> holidays) {
+            List<EventCalendar> holidays,
+            CompanySettings company) {
         List<HoursLog> hoursLogList = []
         for (int i = 1; i < attendanceList.size(); i++) {
             HoursLog hoursLog = new HoursLog()
-            hoursLog.project = attendanceList[i - 1].project.id
-            hoursLog.projectName = attendanceList[i - 1].project.description
+            if (attendanceList[i - 1]?.project?.id) {
+                hoursLog.project = attendanceList[i - 1].project.id
+                hoursLog.projectName = attendanceList[i - 1].project.description
+            } else {
+                hoursLog.company = company.id
+                hoursLog.companyName = company.companyName
+            }
             Instant timeIn = attendanceList[i - 1].attendance_time
             Instant timeOut = attendanceList[i].attendance_time
             BigDecimal overtimeHours = 0

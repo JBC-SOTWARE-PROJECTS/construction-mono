@@ -205,7 +205,7 @@ export default function FormBody(props: FormBodyI) {
       dataIndex: 'transactionDate',
       className: 'DATE',
       width: 180,
-      editable: invoiceType == 'CLAIMS' ? false : true,
+      editable: true,
       ...getColumnSearchProps('transactionDate'),
       sorter: (a: any, b: any) => {
         if (a.transactionDate && b.transactionDate) {
@@ -218,30 +218,15 @@ export default function FormBody(props: FormBodyI) {
       render: (text: any) => (text ? dayjs(text).format(' YYYY-MM-DD') : null),
     },
     {
-      title: invoiceType == 'CLAIMS' ? 'Particular' : 'Product/Services',
-      dataIndex:
-        invoiceType == 'CLAIMS'
-          ? (['itemName'] as any)
-          : (['invoiceParticulars', 'itemName'] as any),
+      title: 'Product/Services',
+      dataIndex: ['invoiceParticulars', 'itemName'],
       className: 'SEARCH',
       width: 300,
-      editable: invoiceType == 'CLAIMS' ? false : true,
-      render: (text: string, record: ArInvoiceItems) => (
-        <a>
-          {text}{' '}
-          {invoiceType == 'CLAIMS'
-            ? `-${record?.approval_code ?? ''} (${record?.itemType})`
-            : ''}
-        </a>
-      ),
+      editable: true,
       sorter: (a: any, b: any) =>
         sortArrayText(a.itemName as string, b.itemName as string),
       defaultSortOrder: ['ascend'],
-      ...getColumnSearchProps(
-        invoiceType == 'CLAIMS'
-          ? (['itemName'] as any)
-          : (['invoiceParticulars', 'itemName'] as any)
-      ),
+      ...getColumnSearchProps(['invoiceParticulars', 'itemName'] as any),
     },
     {
       title: 'Description',
@@ -255,7 +240,7 @@ export default function FormBody(props: FormBodyI) {
       className: 'NUMBER',
       align: 'right',
       width: 100,
-      editable: invoiceType == 'CLAIMS' ? false : true,
+      editable: true,
       sorter: (a: any, b: any) => a.quantity - b.quantity,
     },
     {
@@ -264,7 +249,7 @@ export default function FormBody(props: FormBodyI) {
       align: 'right',
       className: 'NUMBER',
       width: 150,
-      editable: invoiceType == 'CLAIMS' ? false : true,
+      editable: true,
       sorter: (a: any, b: any) => a.unitPrice - b.unitPrice,
       render: (text: number) => new Decimal(text ?? 0).toString(),
     },

@@ -1,12 +1,12 @@
-import React from "react";
-import asyncComponent from "@/utility/asyncComponent";
+import React from 'react'
+import asyncComponent from '@/utility/asyncComponent'
 
 const TerminalSetupComponent = asyncComponent(
-  () => import("@/routes/accounting/cashier/accounts")
-);
+  () => import('@/routes/accounting/cashier/terminals')
+)
 
 const TerminalSetup = () => {
-  return <TerminalSetupComponent />;
-};
+  return <TerminalSetupComponent />
+}
 
-export default TerminalSetup;
+export default TerminalSetup

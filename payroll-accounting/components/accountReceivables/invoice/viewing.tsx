@@ -18,7 +18,12 @@ import {
   FIND_ONE_INVOICE,
 } from '@/graphql/accountReceivables/invoices'
 import { gql, useQuery } from '@apollo/client'
-import { ArInvoice, ArInvoiceItems } from '@/graphql/gql/graphql'
+import {
+  ArAllocatedCreditNote,
+  ArInvoice,
+  ArInvoiceItems,
+  ArPaymentPosting,
+} from '@/graphql/gql/graphql'
 import dayjs from 'dayjs'
 import numeral from 'numeral'
 import styled from 'styled-components'
@@ -26,6 +31,7 @@ import type { ColumnsType } from 'antd/es/table'
 import Decimal from 'decimal.js'
 import { SubSummary, TotalSummary } from '../common/summaryComponent'
 import { FormTextArea } from '@/components/common'
+import { CommonTableCSS } from '../common/styles'
 
 const INVOICE_PAYMENTS = gql`
   query ($invoiceId: UUID) {
@@ -33,6 +39,17 @@ const INVOICE_PAYMENTS = gql`
       id
       orNumber
       paymentAmount
+    }
+  }
+`
+
+const INVOICE_CREDIT_NOTE = gql`
+  query ($invoiceId: UUID) {
+    creditNote: findInvoiceCreditNote(invoiceId: $invoiceId) {
+      id
+      creditNoteNo
+      creditNoteDate
+      amountAllocate
     }
   }
 `
@@ -62,6 +79,14 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
     }
   )
 
+  const { data: creditNoteInvData, loading: creditNoteInvLoading } = useQuery(
+    INVOICE_CREDIT_NOTE,
+    {
+      variables: {
+        invoiceId: id,
+      },
+    }
+  )
   const {
     data: invoiceItemsData,
     loading: findAllInvItemLoading,
@@ -98,20 +123,9 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
     },
     {
       title: invoiceType == 'CLAIMS' ? 'Particular' : 'Product/Services',
-      dataIndex:
-        invoiceType == 'CLAIMS'
-          ? (['itemName'] as any)
-          : (['invoiceParticulars', 'itemName'] as any),
+      dataIndex: ['invoiceParticulars', 'itemName'],
       className: 'SEARCH',
       width: 300,
-      render: (text, record: ArInvoiceItems) => (
-        <a>
-          {text}{' '}
-          {invoiceType == 'CLAIMS'
-            ? `-${record?.approval_code} (${record?.itemType})`
-            : ''}
-        </a>
-      ),
     },
     {
       title: 'Description',
@@ -223,7 +237,7 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
             {numeral(vatAmount).format('0,0.00')}
           </Descriptions.Item>
         </Descriptions>
-        <InvoiceTableCSS>
+        <CommonTableCSS>
           <Table
             rowKey='id'
             columns={columns}
@@ -233,7 +247,7 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
             scroll={{ x: 1600 }}
             pagination={false}
           />
-        </InvoiceTableCSS>
+        </CommonTableCSS>
         <Row style={{ marginTop: 25 }}>
           <Col flex={20}>
             <Form layout='vertical'>
@@ -287,7 +301,7 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
               }}
             />
 
-            {/* <Space
+            <Space
               direction='vertical'
               style={{ marginTop: 20, marginBottom: 20, width: '100%' }}
             >
@@ -302,12 +316,12 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
                             ? `Full payment -  OR# ${
                                 payment.orNumber
                               } - ${dayjs(payment.paymentDatetime).format(
-                                'd MMM YYYY'
+                                'D MMM YYYY'
                               )}`
                             : `Partial payment - OR# ${
                                 payment.orNumber
                               } - ${dayjs(payment.paymentDatetime).format(
-                                'd MMM YYYY'
+                                'D MMM YYYY'
                               )}`}
                         </Typography.Link>
                       ),
@@ -320,9 +334,31 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
                   />
                 )
               )}
-            </Space> */}
+              {(creditNoteInvData?.creditNote ?? []).map(
+                (creditNote: ArAllocatedCreditNote) => (
+                  <SubSummary
+                    key={creditNote.id}
+                    {...{
+                      label: (
+                        <Typography.Link>
+                          {`Credit Note # ${creditNote.creditNoteNo} - ${dayjs(
+                            creditNote.creditNoteDate
+                          ).format('D MMM YYYY')}`}
+                        </Typography.Link>
+                      ),
+                      value: (
+                        <Typography.Link>
+                          {numeral(creditNote.amountAllocate).format('0,0.00')}
+                        </Typography.Link>
+                      ),
+                    }}
+                  />
+                )
+              )}
+            </Space>
 
-            {(paymentInvData?.payments ?? []).length > 0 && (
+            {((paymentInvData?.payments ?? []).length > 0 ||
+              (creditNoteInvData?.creditNote ?? []).length > 0) && (
               <TotalSummary
                 {...{
                   label: 'AMOUNT DUE',
@@ -339,12 +375,3 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
     </Modal>
   )
 }
-
-const InvoiceTableCSS = styled.div`
-  th.ant-table-cell {
-    background: #fff !important;
-    color: teal !important;
-    padding-bottom: 6px !important;
-    border-bottom: 4px solid #f0f0f0 !important;
-  }
-`

@@ -2,9 +2,11 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.ArCustomers
 import com.backend.gbp.domain.accounting.CustomerType
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.SupplierService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import groovy.transform.Canonical
@@ -28,7 +30,7 @@ class OptionsDto {
 @Service
 @GraphQLApi
 @Transactional(rollbackOn = Exception.class)
-class ArCustomerServices extends  AbstractDaoService<ArCustomers> {
+class ArCustomerServices extends  AbstractDaoCompanyService<ArCustomers> {
     ArCustomerServices (){
         super(ArCustomers.class)
     }
@@ -96,12 +98,15 @@ class ArCustomerServices extends  AbstractDaoService<ArCustomers> {
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ){
-        String queryStr = """ from ArCustomers c where (
+        String queryStr = """ from ArCustomers c where 
+                    c.companyId = :companyId and
+                    (
 						lower(c.accountNo) like lower(concat('%',:search,'%')) or 
 						lower(c.customerName) like lower(concat('%',:search,'%'))
               		) """
         Map<String,Object> params = [:]
         params['search'] = search
+        params['companyId'] = SecurityUtils.currentCompanyId()
 
         if(type) {
             queryStr += """ and c.customerType in :type"""

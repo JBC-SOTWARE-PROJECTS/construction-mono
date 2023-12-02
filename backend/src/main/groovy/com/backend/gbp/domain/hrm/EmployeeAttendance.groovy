@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.*
 import javax.persistence.*
+import java.time.Duration
 import java.time.Instant
 import javax.persistence.Table
 import javax.persistence.Entity
@@ -73,10 +74,9 @@ class EmployeeAttendance extends AbstractAuditingEntity {
     @Column(name = "is_transfer", columnDefinition = "bool")
     Boolean isTransfer
 
-
     @Transient
     String getDateString() {
-        return attendance_time.toString().substring(0, 10)
+        return (attendance_time + Duration.ofHours(8)).toString().substring(0, 10)
     }
 
 

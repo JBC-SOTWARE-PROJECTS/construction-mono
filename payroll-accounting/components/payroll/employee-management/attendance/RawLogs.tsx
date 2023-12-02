@@ -89,6 +89,9 @@ function RawLogs({
       title: "Project",
       dataIndex: ["project", "description"],
       key: "project",
+      render: (value) => {
+        return value || "Office Based";
+      },
     },
     {
       title: "Action",
