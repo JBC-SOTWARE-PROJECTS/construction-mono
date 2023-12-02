@@ -1,0 +1,1 @@
+ALTER TABLE asset.asset_repair_maintenance_items  add column description varchar null;

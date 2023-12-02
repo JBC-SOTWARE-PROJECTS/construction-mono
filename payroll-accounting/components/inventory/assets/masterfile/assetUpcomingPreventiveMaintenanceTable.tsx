@@ -40,38 +40,48 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
       title: "Asset",
       dataIndex: "asset.item.descLong",
       key: "asset.item.descLong",
-      width: '20%',
+      width: 100,
       render: (_, record) => <span>{record?.asset?.item?.descLong}</span>,
     },
     {
       title: "Maintenance Type",
       dataIndex: "assetMaintenanceType.name",
       key: "assetMaintenanceType",
-      width: '20%',
+      width: 80,
       render: (_, record) => <span>{record?.assetMaintenanceType?.name}</span>,
     },
     {
       title: "Schedule Type",
       dataIndex: "scheduleType",
       key: "scheduleType",
-      width: '20%',
+      width: 80,
     },
     {
       title: "Occurrence Date",
       dataIndex: "occurrenceDate",
       key: "occurrence",
-      width: '20%',
+      width: 50,
       render: (_, record) => {
-        return <>{moment(record?.occurrenceDate, "YYYY-MM-DD").format('MMM DD, YYYY')}</>
+        return <>{moment(record?.occurrenceDate, "YYYY-MM-DD").format('MMM DD, YYYY') + (record?.scheduleType == PreventiveScheduleType.Daily ? " " +record?.occurrence + " " : " " )}</>
       },
     },
     {
       title: "Reminder Date",
       dataIndex: "reminderDate",
       key: "reminderDate",
-      width: '20%',
+      width: 50,
       render: (_, record) => {
-        return <>{moment(record?.reminderDate, "YYYY-MM-DD").format('MMM DD, YYYY')}</>
+
+        var orgDate = "";
+        var convertedTime = "";
+
+        if(record?.scheduleType == PreventiveScheduleType.Daily){
+           orgDate = moment.utc(record?.reminderDate).format('HH:mm:ss');
+           convertedTime = moment(orgDate, 'HH:mm:ss').format('hh:mm:ss A');
+        }
+
+
+        return <>{moment(record?.reminderDate, "YYYY-MM-DD").format('MMM DD, YYYY') + (record?.scheduleType == PreventiveScheduleType.Daily ? " " + convertedTime + " " : " " )}</>
       },
     },
 
@@ -116,7 +126,6 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
               }}
             />
           )}
-          scroll={{ x: 1400 }}
         />
       </Col>
     </Row>

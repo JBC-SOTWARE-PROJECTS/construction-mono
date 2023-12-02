@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import {
-  PageContainer,
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import AssetPreventiveMaintenanceTable from "@/components/inventory/assets/masterfile/assetPreventiveMaintenanceTable";
-import { Input, Button, message, Row, Col, Select, Form } from "antd";
+import { Input, Button, message} from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useDialog } from "@/hooks";
-import UpsertPreventiveMaintenanceModal from "@/components/inventory/assets/dialogs/upsertPreventiveMaintenanceModal";
-import useGetPreventiveByAsset from "@/hooks/asset/useGetPreventiveByAsset";
 import { useRouter } from "next/router";
-import { AssetPreventiveMaintenance } from "@/graphql/gql/graphql";
+import {AssetRepairMaintenance,} from "@/graphql/gql/graphql";
+import AssetRepairMaintenanceTable from "@/components/inventory/assets/masterfile/assetRepairMaintenance";
+import useGetAssetRepairMaintenance from "@/hooks/asset/useGetAssetRepairMaintenance";
+import UpsertRepairMaintenanceModal from "@/components/inventory/assets/dialogs/upsertAssetRepairMaintenance";
+import ViewRepairMaintenance from "@/components/inventory/assets/dialogs/viewRepairMaintenance";
 
 type Props = {};
 const { Search } = Input;
@@ -28,21 +28,22 @@ const initialState: IPMState = {
   size: 10,
 };
 
-export default function PreventiveMaintenance({}: Props) {
-  const modal = useDialog(UpsertPreventiveMaintenanceModal);
+export default function AssetRepairMaintenanceComponent({}: Props) {
+  const modalUpsert = useDialog(UpsertRepairMaintenanceModal);
+  const modalViewRM = useDialog(ViewRepairMaintenance);
   const router = useRouter();
   const [state, setState] = useState(initialState);
 
-  const [preventives, loadingAsset, refetch] = useGetPreventiveByAsset({
+  const [data, loading, refetch] = useGetAssetRepairMaintenance({
     variables: {
       ...state,
-      id: router?.query?.id,
+      // id: router?.query?.id,
     },
     fetchPolicy: "network-only",
   });
 
   const onUpsertRecord = (record?: any) => {
-    modal({ record: record }, (result: any) => {
+    modalUpsert({ record: record }, (result: any) => {
       if (result) {
         refetch();
         if (record?.id) {
@@ -54,10 +55,14 @@ export default function PreventiveMaintenance({}: Props) {
     });
   };
 
+  const viewRepairMaintenance = (record?: any) => {
+    modalViewRM({ record: record });
+  };
+
   return (
     <>
       <ProCard
-        title={`All Preventive Maintenance`}
+        title={`All Repairs and Maintenance`}
         headStyle={{
           flexWrap: "wrap",
         }}
@@ -81,12 +86,12 @@ export default function PreventiveMaintenance({}: Props) {
           </ProFormGroup>
         }
       >
-        <AssetPreventiveMaintenanceTable
-          dataSource={preventives?.content as AssetPreventiveMaintenance[]}
+        <AssetRepairMaintenanceTable
+          dataSource={data?.content as AssetRepairMaintenance[]}
           loading={false}
-          totalElements={preventives?.totalElements as number}
+          totalElements={data?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
-          handleAssign={(record) => {}}
+          handleView={(record) => viewRepairMaintenance(record)}
           handleSupplier={(record) => {}}
           changePage={(page) => {
             setState((prev) => ({ ...prev, page: page }));
