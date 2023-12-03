@@ -224,6 +224,14 @@ th.ant-table-cell {
   margin: 0 !important;
 }
 
+.mt-10 {
+  margin-top: 40px;
+}
+
+.mt-5 {
+  margin-top: 20px;
+}
+
 .my-5 {
   margin-top: 10px;
   margin-bottom: 10px;

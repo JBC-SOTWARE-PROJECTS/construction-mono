@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Item } from "@/graphql/gql/graphql";
-import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { SaveOutlined } from "@ant-design/icons";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   Button,
   Col,
@@ -15,25 +14,25 @@ import {
   message,
 } from "antd";
 import _ from "lodash";
-import {
-  GET_RECORDS_ADDRESS,
-  UPSER_OFFICE_RECORD,
-} from "@/graphql/offices/queries";
+import { UPSERT_RECORD_ITEM } from "@/graphql/inventory/masterfile-queries";
 import { requiredField } from "@/utility/helper";
 import {
   FormAutoComplete,
   FormCheckBox,
   FormInput,
   FormSelect,
+  FormInputNumber,
 } from "@/components/common";
-import { useCompany } from "@/hooks/administrative";
+import { responsiveColumn2, responsiveColumn4 } from "@/utility/constant";
 import {
-  OFFICETYPE,
-  responsiveColumn2,
-  responsiveColumn3,
-  responsiveColumn4,
-} from "@/utility/constant";
-import FormInputNumber from "@/components/common/formInputNumber/formInputNumber";
+  useItemBrands,
+  useItemCategory,
+  useItemGenerics,
+  useItemGroups,
+  useItemSubAccount,
+  useUnitOfPurchase,
+  useUnitOfUsage,
+} from "@/hooks/inventory";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -42,49 +41,73 @@ interface IProps {
 
 export default function UpsertItemModal(props: IProps) {
   const { hide, record } = props;
-  const [showPasswordConfirmation] = ConfirmationPasswordHook();
+  const [form] = Form.useForm();
+  const [groupId, setGroupId] = useState<string | null>(record?.item_group ? record?.item_group?.id : null);
+  const { setFieldValue } = form;
   // ===================== Queries ==============================
-
-  const { loading, data } = useQuery(GET_RECORDS_ADDRESS, {
-    variables: {
-      provice: null,
-      city: null,
-    },
+  const groups = useItemGroups();
+  const categories = useItemCategory({ groupId: groupId });
+  const brands = useItemBrands();
+  const oup = useUnitOfPurchase();
+  const uou = useUnitOfUsage();
+  const generics = useItemGenerics();
+  const assetSubAccounts = useItemSubAccount({
+    type: ["ASSET", "FIXED_ASSET"],
   });
+  const expenseSubAccounts = useItemSubAccount({ type: ["EXPENSE"] });
 
-  const [upsert, { loading: upsertLoading }] = useMutation(
-    UPSER_OFFICE_RECORD,
+  const [upsertRecord, { loading: upsertLoading }] = useMutation(
+    UPSERT_RECORD_ITEM,
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        if (data) {
-          hide(data);
+        if (data?.upsertItem?.success) {
+          hide(data?.upsertItem?.message);
+        }else{
+          message.error(data?.upsertItem?.message)
         }
       },
     }
   );
 
   //================== functions ====================
+  const onGenerateItemDescription = () => {
+    const { setFieldValue, getFieldsValue } = form;
+    const { item_generics, brand, specification } = getFieldsValue();
+    const generated = `${item_generics?.label} ${
+      specification ? specification + " " : ""
+    }${brand ?? ""}`;
+    setFieldValue("descLong", _.toUpper(generated));
+  };
+
   const onFinishFailed = () => {
     message.error("Something went wrong. Please contact administrator.");
   };
 
-  const onSubmit = (values: any) => {
-    let payload = {
-      ...values,
-      company: { id: values?.company },
-      provinceId: null,
-      cityId: null,
-      status: values.status ?? false,
-    };
-    console.log("payload", payload);
-    showPasswordConfirmation(() => {
-      upsert({
-        variables: {
-          fields: payload,
-          id: record?.id,
-        },
-      });
+  const onSubmit = (data: any) => {
+    let payload = _.clone(data);
+    payload.descLong = _.trim(data?.descLong);
+    payload.brand = _.trim(data?.brand) || null;
+    payload.specification = _.trim(data?.specification) || null;
+    payload.isMedicine = data.isMedicine || false;
+    payload.vatable = data.vatable || false;
+    payload.discountable = data.discountable || false;
+    payload.production = data.production || false;
+    payload.consignment = data.consignment || false;
+    payload.item_group = { id: data.item_group };
+    payload.item_category = { id: data.item_category };
+    payload.unit_of_purchase = { id: data.unit_of_purchase };
+    payload.unit_of_usage = { id: data.unit_of_usage };
+    payload.item_generics = { id: data.item_generics?.value };
+    payload.assetSubAccount = { id: data.assetSubAccount };
+    payload.expenseSubAccount = { id: data.expenseSubAccount };
+    payload.active = data.active || false;
+
+    upsertRecord({
+      variables: {
+        id: record?.id,
+        fields: payload,
+      },
     });
   };
 
@@ -115,12 +138,32 @@ export default function UpsertItemModal(props: IProps) {
         </Space>
       }>
       <Form
+        form={form}
         name="upsertForm"
         layout="vertical"
         onFinish={onSubmit}
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
+          item_group: record?.item_group ? record?.item_group?.id : null,
+          item_category: record?.item_category
+            ? record?.item_category?.id
+            : null,
+          unit_of_purchase: record?.unit_of_purchase
+            ? record?.unit_of_purchase?.id
+            : null,
+          unit_of_usage: record?.unit_of_usage
+            ? record?.unit_of_usage?.id
+            : null,
+          item_generics: record?.item_generics
+            ? record?.item_generics?.id
+            : null,
+          assetSubAccount: record?.assetSubAccount
+            ? record?.assetSubAccount?.id
+            : null,
+          expenseSubAccount: record?.expenseSubAccount
+            ? record?.expenseSubAccount?.id
+            : null,
           item_conversion: record?.item_conversion ?? 1,
           item_maximum: record?.item_maximum ?? 0,
           active: record?.active ?? false,
@@ -157,9 +200,13 @@ export default function UpsertItemModal(props: IProps) {
               label="Item Group"
               rules={requiredField}
               propsselect={{
-                options: OFFICETYPE,
+                options: groups,
                 allowClear: true,
                 placeholder: "Select Item Group",
+                onChange: (newValue) => {
+                  setGroupId(newValue);
+                  setFieldValue("item_category", []);
+                },
               }}
             />
           </Col>
@@ -169,70 +216,89 @@ export default function UpsertItemModal(props: IProps) {
               label="Item Category"
               rules={requiredField}
               propsselect={{
-                options: OFFICETYPE,
+                options: categories,
                 allowClear: true,
                 placeholder: "Select Item Category",
+              }}
+            />
+          </Col>
+          <Col {...responsiveColumn2}>
+            <FormSelect
+              name="item_generics"
+              label="Generic Name"
+              rules={requiredField}
+              propsselect={{
+                showSearch: true,
+                labelInValue: true,
+                options: generics,
+                allowClear: true,
+                placeholder: "Select Generic Name",
+                onChange: () => {
+                  onGenerateItemDescription();
+                },
+              }}
+            />
+          </Col>
+          <Col {...responsiveColumn2}>
+            <FormAutoComplete
+              name="brand"
+              label="Item Brand"
+              propsinput={{
+                options: brands,
+                placeholder: "Item Brand",
+                onChange: () => {
+                  onGenerateItemDescription();
+                },
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              name="specification"
+              label="Specification (Composed of sizes, weight, grade, shapes, capacity, etc. excluding Brand name)"
+              propsinput={{
+                placeholder: "e.g sizes, weight, grade, shapes, capacity",
+                onChange: () => {
+                  onGenerateItemDescription();
+                },
               }}
             />
           </Col>
           <Col span={24}>
             <FormInput
               name="descLong"
-              rules={requiredField}
-              label="Item Description"
+              label="Generated Item Description"
               propsinput={{
+                readOnly: true,
                 placeholder: "Item Description",
               }}
             />
           </Col>
-          <Col {...responsiveColumn3}>
-            <FormAutoComplete
-              name="brand"
-              rules={requiredField}
-              label="Item Brand"
-              propsinput={{
-                options: [],
-                placeholder: "Item Brand",
-              }}
-            />
-          </Col>
-          <Col {...responsiveColumn3}>
+          <Col {...responsiveColumn4}>
             <FormSelect
               name="unit_of_purchase"
               label="Unit of Purchase"
               rules={requiredField}
               propsselect={{
-                options: OFFICETYPE,
+                options: oup,
                 allowClear: true,
                 placeholder: "Select Unit of Purchase",
               }}
             />
           </Col>
-          <Col {...responsiveColumn3}>
+          <Col {...responsiveColumn4}>
             <FormSelect
               name="unit_of_usage"
               label="Unit of Usage"
               rules={requiredField}
               propsselect={{
-                options: OFFICETYPE,
+                options: uou,
                 allowClear: true,
                 placeholder: "Select Unit of Usage",
               }}
             />
           </Col>
-          <Col span={24}>
-            <FormSelect
-              name="item_generics"
-              label="Generic Name"
-              rules={requiredField}
-              propsselect={{
-                options: OFFICETYPE,
-                allowClear: true,
-                placeholder: "Select Generic Name",
-              }}
-            />
-          </Col>
-          <Col {...responsiveColumn2}>
+          <Col {...responsiveColumn4}>
             <FormInputNumber
               name="item_conversion"
               rules={requiredField}
@@ -242,7 +308,7 @@ export default function UpsertItemModal(props: IProps) {
               }}
             />
           </Col>
-          <Col {...responsiveColumn2}>
+          <Col {...responsiveColumn4}>
             <FormInputNumber
               name="item_maximum"
               rules={requiredField}
@@ -255,11 +321,11 @@ export default function UpsertItemModal(props: IProps) {
           <Divider plain>Accounting Integration</Divider>
           <Col {...responsiveColumn2}>
             <FormSelect
-              name="asset_category"
+              name="assetSubAccount"
               label="Asset Category Subaccount"
               rules={requiredField}
               propsselect={{
-                options: OFFICETYPE,
+                options: assetSubAccounts,
                 allowClear: true,
                 placeholder: "Select Asset Category",
               }}
@@ -267,11 +333,11 @@ export default function UpsertItemModal(props: IProps) {
           </Col>
           <Col {...responsiveColumn2}>
             <FormSelect
-              name="expense_category"
+              name="expenseSubAccount"
               label="Expense Category Subaccount"
               rules={requiredField}
               propsselect={{
-                options: OFFICETYPE,
+                options: expenseSubAccounts,
                 allowClear: true,
                 placeholder: "Select Expense Category",
               }}

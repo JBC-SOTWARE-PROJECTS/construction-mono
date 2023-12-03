@@ -34,6 +34,7 @@ export const GET_ITEM_RECORDS = gql`
         descLong
         brand
         unitMeasurement
+        specification
         unit_of_purchase {
           id
           unitDescription
@@ -46,6 +47,14 @@ export const GET_ITEM_RECORDS = gql`
           id
           genericDescription
         }
+        assetSubAccount {
+          id
+          subAccountDescription
+        }
+        expenseSubAccount {
+          id
+          subAccountDescription
+        }
         item_conversion
         item_maximum
         item_demand_qty
@@ -57,12 +66,23 @@ export const GET_ITEM_RECORDS = gql`
         consignment
         discountable
         production
+        fixAsset
         active
       }
       totalElements
       totalPages
       size
       number
+    }
+  }
+`;
+
+export const UPSERT_RECORD_ITEM = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertItem(id: $id, fields: $fields) {
+      payload
+      success
+      message
     }
   }
 `;
@@ -119,6 +139,7 @@ export const GET_RECORDS_SUPPLER = gql`
         secondaryTelphone
         secondaryContactPerson
         secondaryFax
+        atcNo
         isActive
       }
       totalElements
@@ -328,6 +349,28 @@ export const GET_RECORDS_SIGNATURES = gql`
 export const UPSERT_RECORD_SIGNATURES = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     upsertSignature(id: $id, fields: $fields) {
+      id
+    }
+  }
+`;
+
+export const GET_RECORDS_ITEM_SUB_ACCOUNT = gql`
+  query ($filter: String, $type: String!) {
+    itemSubAccountList(filter: $filter, type: $type) {
+      id
+      subAccountCode
+      subAccountDescription
+      accountType
+      sourceColumn
+      isActive
+      isFixedAsset
+    }
+  }
+`;
+
+export const UPSERT_RECORD_ITEM_SUB_ACCOUNT = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertItemSubAccount(id: $id, fields: $fields) {
       id
     }
   }

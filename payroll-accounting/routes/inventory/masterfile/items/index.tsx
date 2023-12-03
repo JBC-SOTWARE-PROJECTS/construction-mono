@@ -50,13 +50,9 @@ export default function ItemComponent({ type }: { type: string }) {
   });
 
   const onUpsertRecord = (record?: Item) => {
-    modal({ record: record }, (result: any) => {
-      if (result) {
-        if (record?.id) {
-          message.success("Item successfully updated");
-        } else {
-          message.success("Item successfully added");
-        }
+    modal({ record: record }, (msg: string) => {
+      if (msg) {
+        message.success(msg);
         refetch();
       }
     });

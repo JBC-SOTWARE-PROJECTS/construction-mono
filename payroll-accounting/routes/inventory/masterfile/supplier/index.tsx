@@ -10,13 +10,13 @@ import { Query, Supplier } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
 import { GET_RECORDS_SUPPLER } from "@/graphql/inventory/masterfile-queries";
-import UpsertItemModal from "@/components/inventory/masterfile/items/dialogs/upsertItem";
+import UpsertSupplierModal from "@/components/inventory/masterfile/supplier/dialogs/upsertSupplier";
 import SupplierTable from "@/components/inventory/masterfile/supplier/supplierTable";
 
 const { Search } = Input;
 
 export default function SupplierComponent() {
-  const modal = useDialog(UpsertItemModal);
+  const modal = useDialog(UpsertSupplierModal);
   const [state, setState] = useState({
     filter: "",
     page: 0,

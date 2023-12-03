@@ -91,8 +91,8 @@ const AccountingAccountsPayableMenu = {
             name: "Item Category",
           },
           {
-            path: "/inventory/masterfile/other-configurations/accounting-category",
-            name: "Accounting Sub Account Category",
+            path: "/inventory/masterfile/other-configurations/subaccount-category",
+            name: "Item Subaccount Category",
           },
           {
             path: "/inventory/masterfile/other-configurations/measurements",

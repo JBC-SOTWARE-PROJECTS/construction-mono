@@ -62,6 +62,9 @@ export default function SupplierTable({
       dataIndex: "atcNo",
       key: "atcNo",
       width: 140,
+      render: (atcNo) => {
+        return atcNo ?? "--";
+      },
     },
     {
       title: "Status",
@@ -87,7 +90,7 @@ export default function SupplierTable({
       render: (_, record) => {
         const items: MenuProps["items"] = [
           {
-            label: "Supplier Item",
+            label: "View Supplier Item",
             onClick: () => handleAssign(record),
             key: "1",
           },

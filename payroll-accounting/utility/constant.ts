@@ -23,7 +23,7 @@ export const col3 = {
   md: 12,
   sm: 24,
   xs: 24,
-}
+};
 
 // ===============end columns
 
@@ -120,7 +120,7 @@ export const responsiveColumn2 = {
   sm: 24,
   md: 12,
   lg: 12,
-}
+};
 
 export const responsiveColumn18 = {
   xs: 24,
@@ -211,7 +211,7 @@ export const RPTOTALS = [
     debit: 0,
     credit: null,
   },
-]
+];
 
 export const PETTYTOTALS = [
   {
@@ -460,4 +460,14 @@ export const PC_CATEGORY = [
     label: "OTHER TRASACTIONS",
     value: "OTHERS",
   },
+];
+
+export const SUP_EN_TYPE = [
+  { label: "PERSONAL", value: "PERSONAL" },
+  { label: "CORPORATE", value: "CORPORATE" },
+];
+
+export const VAT_CON = [
+  { label: "VATABLE", value: "true" },
+  { label: "NON-VATABLE", value: "false" },
 ];
