@@ -62,7 +62,7 @@ export default function ItemTable({
       title: "Category",
       dataIndex: "item_category.categoryDescription",
       key: "item_category.categoryDescription",
-      width: 140,
+      width: 250,
       render: (_, record) => (
         <span>{record?.item_category?.categoryDescription}</span>
       ),

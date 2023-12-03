@@ -434,7 +434,7 @@ export default function PayableModal(props: IProps) {
       //ewt
       let ewt = 0;
       if (vatRate <= 0) {
-        ewt = netOfdiscount * vatRate;
+        ewt = netOfdiscount * (ewtRate / 100);
       } else {
         if (item?.vatInclusive) {
           ewt = (netOfdiscount / (vatRate + 1)) * (ewtRate / 100);

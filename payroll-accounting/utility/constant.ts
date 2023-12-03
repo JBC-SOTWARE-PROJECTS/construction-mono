@@ -23,7 +23,7 @@ export const col3 = {
   md: 12,
   sm: 24,
   xs: 24,
-}
+};
 
 // ===============end columns
 
@@ -461,6 +461,17 @@ export const PC_CATEGORY = [
     value: "OTHERS",
   },
 ];
+
+export const SUP_EN_TYPE = [
+  { label: "PERSONAL", value: "PERSONAL" },
+  { label: "CORPORATE", value: "CORPORATE" },
+];
+
+export const VAT_CON = [
+  { label: "VATABLE", value: "true" },
+  { label: "NON-VATABLE", value: "false" },
+];
+
 
 export const AssetStatusColor = {
   ACTIVE : 'blue',

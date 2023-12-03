@@ -72,6 +72,10 @@ const AccountingAccountsPayableMenu = {
             path: "/inventory/masterfile/transaction-types/production",
             name: "Material Production",
           },
+          {
+            path: "/inventory/masterfile/transaction-types/quantity-adjustments",
+            name: "Quantity Adjustment",
+          },
         ],
       },
       {
@@ -87,8 +91,8 @@ const AccountingAccountsPayableMenu = {
             name: "Item Category",
           },
           {
-            path: "/inventory/masterfile/other-configurations/accounring-category",
-            name: "Accounting Sub Account Category",
+            path: "/inventory/masterfile/other-configurations/subaccount-category",
+            name: "Item Subaccount Category",
           },
           {
             path: "/inventory/masterfile/other-configurations/measurements",

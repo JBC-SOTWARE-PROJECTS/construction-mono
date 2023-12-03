@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.inventory
 
 import com.backend.gbp.domain.inventory.PaymentTerm
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -37,17 +38,27 @@ class PaymentTermService extends AbstractDaoService<PaymentTerm> {
     List<PaymentTerm> paymentTermList(
             @GraphQLArgument(name = "filter") String filter
     ) {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select e from PaymentTerm e where lower(concat(e.paymentCode,e.paymentDesc)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
         createQuery(query, params).resultList.sort { it.paymentCode }
     }
 
     @GraphQLQuery(name = "paymentTermActive")
     List<PaymentTerm> paymentTermActive() {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select e from PaymentTerm e where e.isActive = :status'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
         createQuery(query, params).resultList.sort { it.paymentCode }
     }
 
@@ -58,11 +69,13 @@ class PaymentTermService extends AbstractDaoService<PaymentTerm> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         upsertFromMap(id, fields, { PaymentTerm entity, boolean forInsert ->
             if(forInsert){
                 entity.paymentCode = generatorService.getNextValue(GeneratorType.PTCODE, {
                     return "PT-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
+                entity.company = company
             }
         })
     }

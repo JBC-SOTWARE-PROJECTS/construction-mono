@@ -51,7 +51,7 @@ class SignatureService extends AbstractDaoService<Signature> {
 			@GraphQLArgument(name = "fields") Map<String, Object> fields,
 			@GraphQLArgument(name = "id") UUID id
 	) {
-
+		def company = SecurityUtils.currentCompanyId()
 		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
 		Employee employee = employeeRepository.findOneByUser(user)
 		def forInsert = objectMapper.convertValue(fields, Signature)
@@ -88,6 +88,7 @@ class SignatureService extends AbstractDaoService<Signature> {
 				upsert.signaturePosition = forInsert.signaturePosition
 				upsert.currentUsers = forInsert.currentUsers
                 upsert.sequence = forInsert.sequence
+				upsert.company = company
                 save(upsert)
 				return upsert
 
@@ -117,6 +118,7 @@ class SignatureService extends AbstractDaoService<Signature> {
 				upsert.signaturePosition = forInsert.signaturePosition
                 upsert.currentUsers = forInsert.currentUsers
                 upsert.sequence = forInsert.sequence
+				upsert.company = company
                 save(upsert)
 				return upsert
 			}
@@ -132,27 +134,42 @@ class SignatureService extends AbstractDaoService<Signature> {
 	List<Signature> signatureList(
 			@GraphQLArgument(name = "type") String type
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
 		Employee employee = employeeRepository.findOneByUser(user)
-		createQuery("Select f from Signature f where f.signatureType = :type and f.office.id = :office",
-						 [
-								 type:type,
-								 office:employee.office.id,
-						 ] as Map<String, Object>).resultList.sort { it.sequence }
+
+		String query = '''Select f from Signature f where f.signatureType = :type and f.office.id = :office'''
+		Map<String, Object> params = new HashMap<>()
+		params.put('type', type)
+		params.put('office', employee.office.id)
+
+		if (company) {
+			query += ''' and (f.company = :company)'''
+			params.put("company", company)
+		}
+
+		createQuery(query,params).resultList.sort { it.sequence }
 	}
 
 	@GraphQLQuery(name = "signatureListFilter", description = "List of Signature per type")
 	List<Signature> signatureListFilter(@GraphQLArgument(name = "type") String type, @GraphQLArgument(name = "filter") String filter) {
+		def company = SecurityUtils.currentCompanyId()
 		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
 		Employee employee = employeeRepository.findOneByUser(user)
-		createQuery("Select f from Signature f where f.signatureType = :type and f.office.id = :office " +
-				"and (lower(f.signaturePerson) like lower(concat('%',:filter,'%')) or " +
-				"lower(f.signatureHeader) like lower(concat('%',:filter,'%')))",
-				[
-						type:type,
-						office:employee.office.id,
-						filter:filter,
-				] as Map<String, Object>).resultList.sort { it.sequence }
+
+		String query = '''Select f from Signature f where f.signatureType = :type and f.office.id = :office
+						and (lower(f.signaturePerson) like lower(concat('%',:filter,'%')) or
+						lower(f.signatureHeader) like lower(concat('%',:filter,'%')))'''
+		Map<String, Object> params = new HashMap<>()
+		params.put('type', type)
+		params.put('office', employee.office.id)
+		params.put('filter', filter)
+		if (company) {
+			query += ''' and (f.company = :company)'''
+			params.put("company", company)
+		}
+
+		createQuery(query,params).resultList.sort { it.sequence }
 	}
 
 	@GraphQLQuery(name = "findOneSignature", description = "find signature by id")

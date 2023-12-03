@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.inventory
 
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.backend.gbp.domain.inventory.QuantityAdjustmentType
@@ -37,6 +38,7 @@ class QuantityAdjustmentTypeService extends AbstractDaoService<QuantityAdjustmen
 			@GraphQLArgument(name = "fields") Map<String, Object> fields,
 			@GraphQLArgument(name = "id") UUID id
 	) {
+		def company = SecurityUtils.currentCompanyId()
 
 		def forInsert = objectMapper.convertValue(fields, QuantityAdjustmentType)
 		QuantityAdjustmentType upsert = new QuantityAdjustmentType()
@@ -52,6 +54,8 @@ class QuantityAdjustmentTypeService extends AbstractDaoService<QuantityAdjustmen
 			upsert.description = forInsert.description
 			upsert.is_active = forInsert.is_active
 			upsert.flagValue = forInsert.flagValue
+			upsert.sourceColumn = forInsert.sourceColumn
+			upsert.company = company
 			save(upsert)
 
 		} catch (Exception e) {
@@ -62,7 +66,17 @@ class QuantityAdjustmentTypeService extends AbstractDaoService<QuantityAdjustmen
 
 	@GraphQLQuery(name = "quantityAdjustmentTypeList", description = "List of quantity adjustment type")
 	List<QuantityAdjustmentType> quantityAdjustmentTypeList() {
-		createQuery("Select q from QuantityAdjustmentType q").resultList.sort { it.createdDate }
+		def company = SecurityUtils.currentCompanyId()
+
+		String query = '''Select q from QuantityAdjustmentType q'''
+		Map<String, Object> params = new HashMap<>()
+
+		if (company) {
+			query += ''' and (q.company = :company)'''
+			params.put("company", company)
+		}
+
+		createQuery(query).resultList.sort { it.createdDate }
 	}
 
 	@GraphQLQuery(name = "findOneAdjustmentType", description = "find Adjustment Type")
@@ -72,24 +86,38 @@ class QuantityAdjustmentTypeService extends AbstractDaoService<QuantityAdjustmen
 
 	@GraphQLQuery(name = "quantityAdjustmentTypeFilter", description = "List of quantity adjustment type")
 	List<QuantityAdjustmentType> quantityAdjustmentTypeList(@GraphQLArgument(name = "filter")String filter) {
-		createQuery("Select q from QuantityAdjustmentType q where" +
-				"(lower(q.code) like lower(concat('%',:filter,'%')) or lower(q.description) like lower(concat('%',:filter,'%')))"
-				,
-				[
-						filter:filter
-				] as Map<String, Object>).resultList.sort { it.createdDate}
+		def company = SecurityUtils.currentCompanyId()
+
+		String query = '''Select q from QuantityAdjustmentType q where 
+						(lower(q.code) like lower(concat('%',:filter,'%')) or lower(q.description) like lower(concat('%',:filter,'%')))'''
+		Map<String, Object> params = new HashMap<>()
+		params.put("filter", filter)
+
+		if (company) {
+			query += ''' and (q.company = :company)'''
+			params.put("company", company)
+		}
+
+		createQuery(query, params).resultList.sort { it.createdDate}
 	}
 
 	@GraphQLQuery(name = "filterAdjustmentType", description = "List of filtered quantity adjustment type")
 	List<QuantityAdjustmentType> filterAdjustmentType(@GraphQLArgument(name = "is_active")Boolean is_active,
                                                       @GraphQLArgument(name = "filter")String filter) {
-		createQuery("Select q from QuantityAdjustmentType q where q.is_active = :is_active and " +
-				"(lower(q.code) like lower(concat('%',:filter,'%')) or lower(q.description) like lower(concat('%',:filter,'%')))"
-				,
-				[
-						is_active:is_active,
-						filter:filter
-				] as Map<String, Object>).resultList.sort { it.createdDate}
+		def company = SecurityUtils.currentCompanyId()
+
+		String query = '''Select q from QuantityAdjustmentType q where q.is_active = :is_active and 
+						(lower(q.code) like lower(concat('%',:filter,'%')) or lower(q.description) like lower(concat('%',:filter,'%')))'''
+		Map<String, Object> params = new HashMap<>()
+		params.put("filter", filter)
+		params.put("is_active", is_active)
+
+		if (company) {
+			query += ''' and (q.company = :company)'''
+			params.put("company", company)
+		}
+
+		createQuery(query, params).resultList.sort { it.createdDate}
 	}
 
 }

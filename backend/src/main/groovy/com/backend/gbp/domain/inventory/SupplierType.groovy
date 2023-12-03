@@ -36,5 +36,9 @@ class SupplierType extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "is_active")
 	Boolean isActive
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 }
