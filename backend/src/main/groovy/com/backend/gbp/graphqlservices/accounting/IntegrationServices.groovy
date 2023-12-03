@@ -39,6 +39,14 @@ interface AutoIntegrateableInitilizer<T extends AutoIntegrateable> {
     def void init(T autoIntegrateable,List<List<T>> multiple)
 
 }
+
+
+interface AutoIntegrateAbleInitializerForMultiple<T extends AutoIntegrateable> {
+
+    def void init(T autoIntegrateable,Map<String,List<T>> multiple)
+
+}
+
 @Service
 @GraphQLApi
 class IntegrationServices extends AbstractDaoService<Integration> {
@@ -630,5 +638,218 @@ class IntegrationServices extends AbstractDaoService<Integration> {
     static List<DomainOptionDto> integrationDomains(){
         return IntegrationDomainEnum.values().findAll { it != IntegrationDomainEnum.NO_DOMAIN } .collect { [label: it.displayName, value: it.name()] as DomainOptionDto }
     }
+
+    def  <T extends AutoIntegrateable>  HeaderLedger generateAutoEntriesEnhance(T autoIntegrateable,AutoIntegrateAbleInitializerForMultiple<T> init){
+
+
+        Map<String,List<T>> multipleData = [:]
+        init.init(autoIntegrateable,multipleData)
+
+        String tagValue = autoIntegrateable.flagValue
+
+
+        if(StringUtils.isBlank(tagValue))
+            throw  new Exception("TagValue is not found")
+
+
+//        List<Integration> matchList = getIntegrationByDomainAndTagValueList(autoIntegrateable.domain,autoIntegrateable.flagValue)
+        Integration match = getIntegrationByDomainAndTagValue(IntegrationDomainEnum.valueOf(autoIntegrateable.domain),autoIntegrateable.flagValue)
+        if(!match)
+            throw  new Exception("No Integration Rules for ${autoIntegrateable.domain} and ${autoIntegrateable.flagValue}")
+
+
+        //validating entries
+
+        match.integrationItems.findAll { BooleanUtils.isNotTrue(it.multiple) }. each { item->
+
+
+            // validate sourceColumn
+            if(StringUtils.isBlank(item.sourceColumn)){
+                throw new Exception("Source Column not specified for ${item.journalAccount.subAccountName}")
+            }
+
+
+            // validate if source column is not null
+            Object srcColValue = autoIntegrateable[item.sourceColumn]
+            if(srcColValue==null){
+                throw new Exception("Source Column Value for ${item.journalAccount.subAccountName} is null")
+            }
+
+
+            String subAccountCode =  item.journalAccount?.subAccount?.code
+            if(StringUtils.equalsIgnoreCase(subAccountCode,"####")){
+                // needs parameter
+                String domain = item.journalAccount.subAccount.domain
+
+//                if(!StringUtils.equalsIgnoreCase(domain,Department.class.name)){
+//                    // its not a department will look for a parameter
+//                    String param = item.details[domain]
+//                    if(StringUtils.isBlank(param))
+//                    {
+//                        throw new Exception("Parameter required for ${domain}")
+//                    }
+//
+//                    Object paramValue = autoIntegrateable[param]
+//
+//                    if(!paramValue){
+//                        throw new Exception("Parameter ${param} needs a Value")
+//                    }
+//                }else {
+                    String param = item.details[domain]
+                    if(param){
+                        Object paramValue = autoIntegrateable[param]
+
+                        if(!paramValue){
+                            throw new Exception("Parameter ${param} needs a Value")
+                        }
+                    }
+//                }
+            }
+
+
+
+
+            String subSubAccountCode = item.journalAccount?.subSubAccount?.code
+            if(StringUtils.equalsIgnoreCase(subSubAccountCode,"####")){
+                // needs parameter
+                String domain = item.journalAccount.subSubAccount.domain
+
+//                if(!StringUtils.equalsIgnoreCase(domain,Department.class.name)){
+//                    // its not a department will look for a parameter
+//                    String param = item.details[domain]
+//                    if(StringUtils.isBlank(param))
+//                    {
+//                        throw new Exception("Parameter required for ${domain}")
+//                    }
+//
+//                    Object paramValue = autoIntegrateable[param]
+//
+//                    if(!paramValue){
+//                        throw new Exception("Parameter ${param} needs a Value")
+//                    }
+//                }else {
+                    String param = item.details[domain]
+                    if(param){
+                        Object paramValue = autoIntegrateable[param]
+
+                        if(!paramValue){
+                            throw new Exception("Parameter ${param} needs a Value")
+                        }
+                    }
+//                }
+            }
+
+        }
+
+
+        // Generate the entries
+
+        HeaderLedger header = new HeaderLedger()
+        header.transactionDate = Instant.now()
+        header.transactionDateOnly = header.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+
+        // Values correspond to Temporary Entry
+        header.docType = LedgerDocType.XX
+        header.journalType = JournalType.XXXX
+        header.docnum = "AUTO"
+
+        autoIntegrateable.details.each { k,v ->
+            header.details.put(k,v)
+        }
+
+
+        match.integrationItems.findAll { BooleanUtils.isNotTrue(it.multiple) }.each { item ->
+            Ledger ledger = new Ledger()
+
+            def coa =   createCoaFromItem(autoIntegrateable,item)
+
+            ledger.debit = 0.0
+            ledger.credit = 0.0
+
+            String normalSide = item.journalAccount.motherAccount.normalSide
+            BigDecimal value = (BigDecimal)autoIntegrateable[item.sourceColumn]
+            if(normalSide == "DEBIT"){
+                if(value >= 0){
+                    ledger.debit = value
+                }
+                else {
+                    ledger.credit = value.abs()
+                }
+            }
+            else {
+                if(value >= 0){
+                    ledger.credit = value
+                }
+                else {
+                    ledger.debit = value.abs()
+                }
+            }
+
+            ledger.journalAccount = coa
+
+            ledger.header = header
+
+            if(!(ledger.debit == 0.0 && ledger.credit == 0.0))
+                header.ledger << ledger
+        }
+
+
+
+        match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
+            // def iii = entry
+            //println( "entry => " + entry.sourceColumn)
+            //println( "condition => " + "${i < multipleData.size()}")
+            //println( "size => " + multipleData.size())
+            if(i < multipleData[entry.sourceColumn].size()){
+
+                def dataForItem = multipleData[entry.sourceColumn]
+
+
+                dataForItem.each {tmpAutoIntegrateable ->
+
+                    Ledger ledger = new Ledger()
+
+                    def coa =   createCoaFromItem(tmpAutoIntegrateable,entry)
+
+                    ledger.debit = 0.0
+                    ledger.credit = 0.0
+
+                    String normalSide = entry.journalAccount.motherAccount.normalSide
+                    BigDecimal value = (BigDecimal)tmpAutoIntegrateable[entry.sourceColumn]
+                    //println(coa.code + " : => " + value.toPlainString() + " : " + normalSide + " - " + entry.sourceColumn)
+                    if(normalSide == "DEBIT"){
+                        if(value >= 0){
+                            ledger.debit = value
+                        }
+                        else {
+                            ledger.credit = value.abs()
+                        }
+                    }
+                    else {
+                        if(value >= 0){
+                            ledger.credit = value
+                        }
+                        else {
+                            ledger.debit = value.abs()
+                        }
+                    }
+
+                    ledger.journalAccount = coa
+
+                    ledger.header = header
+
+                    if(!(ledger.debit == 0.0 && ledger.credit == 0.0))
+                        header.ledger << ledger
+
+                }
+
+
+
+            }
+        }
+
+        return  header
+    }
+
 
 }

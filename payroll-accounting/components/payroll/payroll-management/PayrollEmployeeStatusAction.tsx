@@ -89,7 +89,6 @@ function PayrollEmployeeStatusAction({
 
     return items;
   }, [value, updatePayrollModuleEmployeeStatus, id]);
-  console.log(value);
   return (
     <>
       {value === "FINALIZED" && (

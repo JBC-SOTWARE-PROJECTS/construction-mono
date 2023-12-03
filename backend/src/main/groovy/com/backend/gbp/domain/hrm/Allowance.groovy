@@ -2,6 +2,7 @@ package com.backend.gbp.domain.hrm
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.hrm.enums.AllowanceType
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.*
 
@@ -28,8 +29,9 @@ class Allowance extends AbstractAuditingEntity {
 	String name
 
 	@GraphQLQuery
+	@Enumerated(EnumType.STRING)
 	@Column(name = "allowance_type", columnDefinition = "varchar")
-	String allowanceType
+	AllowanceType allowanceType
 
 	@GraphQLQuery
 	@Column(name = "amount", columnDefinition = "numeric")

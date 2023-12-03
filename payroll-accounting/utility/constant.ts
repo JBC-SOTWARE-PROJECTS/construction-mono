@@ -120,7 +120,7 @@ export const responsiveColumn2 = {
   sm: 24,
   md: 12,
   lg: 12,
-};
+}
 
 export const responsiveColumn18 = {
   xs: 24,
@@ -211,7 +211,7 @@ export const RPTOTALS = [
     debit: 0,
     credit: null,
   },
-];
+]
 
 export const PETTYTOTALS = [
   {
@@ -471,3 +471,19 @@ export const VAT_CON = [
   { label: "VATABLE", value: "true" },
   { label: "NON-VATABLE", value: "false" },
 ];
+
+
+export const AssetStatusColor = {
+  ACTIVE : 'blue',
+  DISPOSED : 'grey',
+  IDLE : 'warning',
+  IN_REPAIR : 'red',
+  IN_SERVICE : 'green',
+  IN_TRANSIT : 'purple',
+  OUT_OF_SERVICE : 'yellow',
+  RESERVED : 'cyan',
+  RETIRED : 'volcano',
+  UNDER_INSPECTION : 'magenta',
+  UNDER_MAINTENANCE : 'red',
+  NO_STATUS : 'gold'
+}

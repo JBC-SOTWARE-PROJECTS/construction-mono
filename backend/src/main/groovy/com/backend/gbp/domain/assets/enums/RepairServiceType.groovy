@@ -1,0 +1,8 @@
+package com.backend.gbp.domain.assets.enums
+
+enum RepairServiceType {
+    INHOUSE_WITH_MATERIALS,
+    INHOUSE_SERVICE_ONLY,
+    OUTSOURCED_SERVICE_AND_MATERIALS,
+    OUTSOURCED_SERVICE_WITH_INHOUSE_MATERIALS
+}

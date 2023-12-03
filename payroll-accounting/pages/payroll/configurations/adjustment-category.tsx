@@ -15,7 +15,7 @@ const AdjustmentCategory = dynamic(
 const AdjustmentCategoryPage = ({ account }: IPageProps) => (
   <React.Fragment>
     <Head>
-      <title>Construction IMS Employees</title>
+      <title>Adjustment Category Management</title>
     </Head>
     <AccessManager roles={["ROLE_ADMIN", "MANAGE_ADJUSMENT_CATEGORY_TYPES"]}>
       <div className="gx-main-content-wrapper-full-width">

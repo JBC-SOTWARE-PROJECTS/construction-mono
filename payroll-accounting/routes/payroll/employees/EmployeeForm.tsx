@@ -1,6 +1,7 @@
 import { FormInput, FormSelect } from "@/components/common";
 import FormButton from "@/components/common/formButton/formButton";
 import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
+import FormRadioButton from "@/components/common/formRadioButton";
 import { UseCompanySelection } from "@/hooks/companySelection";
 import { CIVIL, EMPSTATUS, GENDER, col2, col3, col4 } from "@/utility/constant";
 import { IPageProps } from "@/utility/interfaces";
@@ -76,6 +77,10 @@ const GET_RECORDS = gql`
       isActivePHIC
       isActiveSSS
       isActiveHDMF
+      monthlyRate
+      hourlyRate
+      isFixedRate
+      isExcludedFromAttendance
       user {
         login
         password
@@ -161,6 +166,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
   const companyList = UseCompanySelection();
   const id = router?.query?.id;
   const [formError, setFormError] = useState({});
+  const [isFixedRate, setIsFixedRate] = useState<boolean | undefined>();
   const [state, setState] = useState({
     province: null,
     city: null,
@@ -175,6 +181,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
     },
     fetchPolicy: "network-only",
     onCompleted: (res) => {
+      setIsFixedRate(res.data.isFixedRate);
       setState({
         ...state,
         city: res.data.cityMunicipality,
@@ -619,10 +626,9 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
-
                 {/* 7th Row */}
                 <Divider>Employee Details</Divider>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormInput
                     label={"PhilHealth #"}
                     initialValue={_.get(data, "emp.philhealthNo")}
@@ -630,7 +636,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{ placeholder: "PhilHealth #" }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormInput
                     label={"SSS #"}
                     initialValue={_.get(data, "emp.sssNo")}
@@ -638,7 +644,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{ placeholder: "SSS #" }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormInput
                     label={"Tin #"}
                     initialValue={_.get(data, "emp.tinNo")}
@@ -647,7 +653,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                   />
                 </Col>
                 {/* 8th Row */}
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormInput
                     label={"Pag-Ibig #"}
                     initialValue={_.get(data, "emp.pagIbigId")}
@@ -655,7 +661,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{ placeholder: "Pag-Ibig #" }}
                   />
                 </Col>
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormInput
                     label={"Blood Type"}
                     initialValue={_.get(data, "emp.bloodType")}
@@ -663,16 +669,67 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{ placeholder: "Blood Type" }}
                   />
                 </Col>
-                <Col {...col3}>
-                  <FormInput
-                    label={"Basic Salary"}
-                    initialValue={_.get(data, "emp.basicSalary")}
-                    name="basicSalary"
-                    propsinput={{ placeholder: "Basic Salary", type: "number" }}
+                <Col {...col4}>
+                  <FormRadioButton
+                    label="Has Fixed Monthly Rate?"
+                    name="isFixedRate"
+                    initialValue={_.get(data, "emp.isFixedRate") || false}
+                    propsradiobutton={{
+                      options: [
+                        {
+                          label: "Yes",
+                          value: true,
+                        },
+                        {
+                          label: "No",
+                          value: false,
+                        },
+                      ],
+                      optionType: "button",
+                      buttonStyle: "solid",
+                      onChange: (e) => {
+                        setIsFixedRate(e.target.value);
+                      },
+                    }}
                   />
                 </Col>
+                <Col {...col4}>
+                  <FormInput
+                    label={"Monthly Rate"}
+                    initialValue={_.get(data, "emp.monthlyRate") || 0}
+                    name="monthlyRate"
+                    propsinput={{
+                      placeholder: "Monthly Rate",
+                      type: "number",
 
-                <Col {...col3}>
+                      disabled: !isFixedRate,
+                    }}
+                  />
+                </Col>
+                <Col {...col4}>
+                  <FormInput
+                    label={"Hourly Rate"}
+                    initialValue={_.get(data, "emp.hourlyRate") || 0}
+                    name="hourlyRate"
+                    propsinput={{
+                      placeholder: "Houry Rate",
+                      type: "number",
+                      disabled: isFixedRate,
+                    }}
+                  />
+                </Col>
+                <Col {...col4}>
+                  <FormCheckBox
+                    name="isExcludedFromAttendance"
+                    valuePropName="checked"
+                    checkBoxLabel="Exclude from attendance"
+                    initialValue={_.get(data, "emp.isExcludedFromAttendance")}
+                    propscheckbox={{
+                      defaultChecked: true,
+                    }}
+                  />
+                </Col>
+                <Col {...col4}>
                   <FormCheckBox
                     name="isActiveSSS"
                     valuePropName="checked"
@@ -683,8 +740,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
-
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormCheckBox
                     name="isActivePHIC"
                     valuePropName="checked"
@@ -695,8 +751,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
-
-                <Col {...col3}>
+                <Col {...col4}>
                   <FormCheckBox
                     name="isActiveHDMF"
                     initialValue={_.get(data, "emp.isActiveHDMF")}
@@ -707,7 +762,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
-
                 {/* 9th Row */}
                 <Divider>In Case of Emergency</Divider>
                 <Col {...col2}>

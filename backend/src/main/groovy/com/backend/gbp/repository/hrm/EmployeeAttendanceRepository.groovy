@@ -35,9 +35,8 @@ interface EmployeeAttendanceRepository extends JpaRepository<EmployeeAttendance,
 
     @Query(
             value = """Select e from EmployeeAttendance e 
-				join fetch e.employee emp
-				where emp.id = :id
-				and e.isIgnored <> true or e.isIgnored is null
+				where e.employee.id = :id
+				and (e.isIgnored <> true or e.isIgnored is null)
 				and (e.attendance_time >= :startDate and e.attendance_time <= :endDate)"""
     )
     List<EmployeeAttendance> getEmployeeAttendanceList(

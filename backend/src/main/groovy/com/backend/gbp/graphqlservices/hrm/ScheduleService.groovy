@@ -66,7 +66,7 @@ class ScheduleService {
         } else {
             Schedule schedule = objectMapper.convertValue(fields, Schedule)
             schedule.company = SecurityUtils.currentCompany()
-            schedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
+            schedule.project = fields.get('project_id') as String ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null
             scheduleTypeRepository.save(schedule)
             return new GraphQLResVal<Schedule>(schedule, true, "Successfully created department schedule")
         }

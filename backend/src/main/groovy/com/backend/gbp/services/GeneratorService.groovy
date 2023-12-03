@@ -73,6 +73,7 @@ enum GeneratorType {
 	SCHED_CODE,
 	APP_CODE,
 
+	HEADER_GROUP,
 	JOURNAL_VOUCHER,
 	CLAIM_BATCHNO,
 	COLLECTION_DEPOSIT,
@@ -103,8 +104,13 @@ enum GeneratorType {
 	ASSET_CODE,
 	JOB_ITEM_REC,
 	COMPANY_CODE,
-	RPNO
+	RPNO,
 
+	AR_CUSTOMER,
+	AR_INVOICE_ITEMS,
+	AR_PAYMENT_POSTING_ITEMS,
+	AR_TRANS_LEDGER,
+	AR_CREDIT_NOTE_ITEMS
 }
 
 @Service
@@ -205,5 +211,38 @@ class GeneratorService {
 		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
 		return closure(nextVal)
 	}
-	
+
+	// Generator  with Prefix
+	private Boolean checkCounterExist(String prefixYear) {
+		def name = prefixYear.toLowerCase() + "_gen"
+
+		def count = jdbcTemplate.queryForObject(" SELECT count(*) FROM pg_class where relkind='S' and relname = ? ",
+				Long,
+				name
+		)
+		return count > 0
+	}
+
+	String getNextGeneratorFeatPrefix(String prefixYear, Closure closure) {
+		initGeneratorFeatPrefix(prefixYear)
+
+		def name = prefixYear.toLowerCase()
+		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
+		return closure(nextVal)
+	}
+
+	private void initGeneratorFeatPrefix(String prefixYear) {
+
+		def name = prefixYear.toLowerCase() + "_gen"
+		def count = checkCounterExist(prefixYear)
+
+		if (!count) {
+			try {
+				jdbcTemplate.execute(" CREATE SEQUENCE ${name} INCREMENT 1  MINVALUE 1 START 1")
+			} catch (Exception e) {
+				e.printStackTrace()
+			}
+		}
+	}
+
 }

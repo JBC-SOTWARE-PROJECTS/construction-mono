@@ -2,12 +2,18 @@ package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.assets.enums.AssetStatus
+import com.backend.gbp.domain.assets.enums.AssetType
+import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
+import org.hibernate.annotations.NotFound
+import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
 
+import javax.annotation.Nullable
 import javax.persistence.*
 
 @Entity
@@ -34,6 +40,7 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	String description
 	
 	@GraphQLQuery
+	@Nullable
 	@Column(name = "brand")
 	@UpperCase
 	String brand
@@ -48,11 +55,29 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	String plateNo
 
 	@GraphQLQuery
+	@Column(name = "prefix")
+	String prefix
+
+	@GraphQLQuery
 	@Column(name = "image")
 	String image
-	
-	@GraphQLQuery
+
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
-	String status
+	AssetStatus status
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "type")
+	AssetType type
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "item", referencedColumnName = "id")
+	Item item
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 
 }

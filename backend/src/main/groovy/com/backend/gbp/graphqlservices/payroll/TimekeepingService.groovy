@@ -1,5 +1,7 @@
 package com.backend.gbp.graphqlservices.payroll
 
+import com.backend.gbp.domain.hrm.SalaryRateMultiplier
+import com.backend.gbp.domain.hrm.dto.EmployeeSalaryDto
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.AccumulatedLogs
 import com.backend.gbp.domain.payroll.Payroll
@@ -8,6 +10,7 @@ import com.backend.gbp.domain.payroll.Timekeeping
 import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.graphqlservices.hrm.SalaryRateMultiplierService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.TimekeepingEmployeeRepository
 import com.backend.gbp.repository.TimekeepingRepository
@@ -49,6 +52,8 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
     @Autowired
     PayrollEmployeeRepository payrollEmployeeRepository
 
+    @Autowired
+    SalaryRateMultiplierService salaryRateMultiplierService
 
     @Autowired
     ObjectMapper objectMapper
@@ -134,41 +139,84 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
     ) {
         Timekeeping timekeeping = timekeepingRepository.findByPayrollId(payrollId).get()
         timekeeping.status = status
-
+        timekeeping.salaryBreakdown = []
+        SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
         if (status == PayrollStatus.FINALIZED) {
 //            TODO: generate salary amount based on accumulated logs and hourly rate
-            Map<String, HoursLog> timekeepingBreakdownMap = new HashMap<>()
+            Map<String, HoursLog> timekeepingHoursBreakdownMap = new HashMap<>()
+            Map<String, EmployeeSalaryDto> timekeepingSalaryBreakdownMap = new HashMap<>()
+
             timekeeping.timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
                 timekeepingEmployee.status = PayrollEmployeeStatus.FINALIZED
-                Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
+//                Map<String, HoursLog> employeeHoursBreakdownMap = new HashMap<>()
                 timekeepingEmployee.accumulatedLogs.each {
                     AccumulatedLogs accumulatedLogs ->
                         accumulatedLogs.projectBreakdown.each {
-                            consolidateProjectBreakdown(timekeepingBreakdownMap, it)
+                            consolidateProjectBreakdown(timekeepingHoursBreakdownMap, it)
+//                            consolidateProjectBreakdown(employeeHoursBreakdownMap, it)
                         }
                 }
-                timekeepingEmployee.projectBreakdown = []
-                employeeBreakdownMap.keySet().each {
-                    timekeepingEmployee.projectBreakdown.push(employeeBreakdownMap.get(it.toString()))
+//                timekeepingEmployee.projectBreakdown = []
+//                employeeHoursBreakdownMap.keySet().each {
+//                    HoursLog hoursLog = employeeHoursBreakdownMap.get(it.toString())
+//                    timekeepingEmployee.projectBreakdown.push(hoursLog)
+
+                timekeepingEmployee.salaryBreakdown.each {
+                    consolidateSalaryBreakdown(timekeepingSalaryBreakdownMap, it)
                 }
+
+//                    timekeepingEmployee.salaryBreakdown.push(TimekeepingEmployeeService.calculateSalaryBreakdown(multiplier, hoursLog, timekeepingEmployee.payrollEmployee.employee))
+//                }
             }
             timekeeping.projectBreakdown = []
-            timekeepingBreakdownMap.keySet().each {
-                timekeeping.projectBreakdown.push(timekeepingBreakdownMap.get(it.toString()))
+            timekeepingHoursBreakdownMap.keySet().each {
+                HoursLog hoursLog = timekeepingHoursBreakdownMap.get(it.toString())
+                timekeeping.projectBreakdown.push(hoursLog)
+
             }
 
+            timekeepingSalaryBreakdownMap.keySet().each {
+                EmployeeSalaryDto salary = timekeepingSalaryBreakdownMap.get(it.toString())
+                timekeeping.salaryBreakdown.push(salary)
+            }
         }
-        timekeepingEmployeeRepository.saveAll(timekeeping.timekeepingEmployees)
+
+//        timekeepingEmployeeRepository.saveAll(timekeeping.timekeepingEmployees)
         timekeepingRepository.save(timekeeping)
 
         return new GraphQLResVal<String>(null, true, "Successfully updated Timekeeping status.")
     }
 
+    static consolidateSalaryBreakdown(Map<String, EmployeeSalaryDto> breakdownMap, EmployeeSalaryDto it) {
+        EmployeeSalaryDto breakdown= breakdownMap.get((it?.project ? it.project : it.company) as String)
+        if (!breakdown) breakdown = new EmployeeSalaryDto()
+        breakdown.project = it?.project
+        breakdown.projectName = it?.projectName
+
+        breakdown.company = it?.company
+        breakdown.companyName = it?.companyName
+
+        breakdown.regular += it.regular
+        breakdown.overtime += it.overtime
+        breakdown.regularHoliday += it.regularHoliday
+        breakdown.overtimeHoliday += it.overtimeHoliday
+        breakdown.regularDoubleHoliday += it.regularDoubleHoliday
+        breakdown.overtimeDoubleHoliday += it.overtimeDoubleHoliday
+        breakdown.regularSpecialHoliday += it.regularSpecialHoliday
+        breakdown.overtimeSpecialHoliday += it.overtimeSpecialHoliday
+        breakdownMap.put(it.project ? it.project as String : it.company as String, breakdown)
+
+    }
+
     static void consolidateProjectBreakdown(HashMap<String, HoursLog> breakdownMap, HoursLog it) {
-        HoursLog breakdown = breakdownMap.get(it.project as String)
+        HoursLog breakdown = breakdownMap.get((it?.project ? it.project : it.company) as String)
         if (!breakdown) breakdown = new HoursLog()
-        breakdown.project = it.project
-        breakdown.projectName = it.projectName
+        breakdown.project = it?.project
+        breakdown.projectName = it?.projectName
+
+        breakdown.company = it?.company
+        breakdown.companyName = it?.companyName
+
         breakdown.late += it.late
         breakdown.underTime += it.underTime
         breakdown.absent += it.absent
@@ -180,8 +228,10 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         breakdown.overtimeDoubleHoliday += it.overtimeDoubleHoliday
         breakdown.regularSpecialHoliday += it.regularSpecialHoliday
         breakdown.overtimeSpecialHoliday += it.overtimeSpecialHoliday
+        breakdownMap.put(it.project ? it.project as String : it.company as String, breakdown)
+
 //                            if (breakdown) {
-        breakdownMap.put(it.project as String, breakdown)
+//        breakdownMap.put(it.project as String, breakdown)
 //                            }
     }
 

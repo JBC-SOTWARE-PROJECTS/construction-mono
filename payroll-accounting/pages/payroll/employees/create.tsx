@@ -6,7 +6,7 @@ import AccessManager from "@/components/accessControl/AccessManager";
 import { IPageProps } from "@/utility/interfaces";
 
 const EmployeeForm = dynamic(
-  () => import("@/routes/administrative/Employees/EmployeeForm"),
+  () => import("@/routes/payroll/employees/EmployeeForm"),
   {
     loading: () => <CircularProgress />,
   }
