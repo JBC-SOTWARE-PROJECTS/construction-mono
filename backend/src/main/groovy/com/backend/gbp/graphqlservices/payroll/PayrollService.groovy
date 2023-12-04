@@ -15,6 +15,7 @@ import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollStatusService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.payroll.PayrollAllowanceRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.backend.gbp.security.SecurityUtils
@@ -59,7 +60,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     PayrollLoanService payrollLoanService
 
     @Autowired
-    PayrollEmployeeContributionService payrollEmployeeContributionService
+    PayrollAllowanceRepository payrollAllowanceRepository
 
     @Autowired
     ObjectMapper objectMapper
@@ -257,19 +258,18 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         def yearFormat = DateTimeFormatter.ofPattern("yyyy")
         def actPay = super.save(payroll) as Payroll
         List<Map<String, Object>> entries = []
-//        Map<String,BigDecimal> map = new HashMap<>()
         BigDecimal totalAllowance = 0
-        payroll.allowance.allowanceEmployees.each {
-            it.allowanceItems.each { items ->
-                Map<String, Object> itemsAccount = [:]
-                itemsAccount['code'] = '511-27-0000'
-                itemsAccount['debit'] = items.amount
-                itemsAccount['credit'] = 0.00
-                totalAllowance += items.amount
-                entries.push(itemsAccount)
-            }
-        }
+        payrollAllowanceRepository.joinFetchAllowanceItems(payroll.id)
 
+
+        payroll.allowance.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = [:]
+            itemsAccount['code'] = it.subaccountCode
+            itemsAccount['debit'] = it.amount
+            itemsAccount['credit'] = 0.00
+            totalAllowance += it.amount
+            entries.push(itemsAccount)
+        }
 
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"

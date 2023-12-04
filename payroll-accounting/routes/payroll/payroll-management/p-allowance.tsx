@@ -8,8 +8,8 @@ import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll
 import AddPayrollAllowanceItemModal from "@/components/payroll/payroll-management/allowance/AddPayrollAllowanceItemModal";
 import {
   PayrollAllowanceItem,
-  PayrollEmployeeAllowance,
   PayrollEmployeeAllowanceDto,
+  PayrollEmployeeStatus,
   PayrollModule,
 } from "@/graphql/gql/graphql";
 import { variables } from "@/hooks/payroll/adjustments/useGetPayrollEmployeeAdjustment";
@@ -17,10 +17,12 @@ import useDeletePayrollAllowanceItem from "@/hooks/payroll/allowance/useDeletePa
 import useGetPayrollAllowance from "@/hooks/payroll/allowance/useGetPayrollAllowance";
 import useGetPayrollEmployeeAllowance from "@/hooks/payroll/allowance/useGetPayrollEmployeeAllowance";
 import useUpdateAllowanceItemAmount from "@/hooks/payroll/allowance/useUpdateAllowanceItemAmount";
+import useUpdatePayrollAllowanceStatus from "@/hooks/payroll/allowance/useUpdatePayrollAllowanceStatus";
 import { PayrollStatus } from "@/hooks/payroll/useUpdatePayrollStatus";
 import useLoadingState from "@/hooks/useLoadingState";
 import usePaginationState from "@/hooks/usePaginationState";
 import { statusMap } from "@/utility/constant";
+import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
 import {
@@ -29,7 +31,7 @@ import {
   EditOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { Divider, InputNumber, Modal, Table } from "antd";
+import { InputNumber, Modal, Table, Tag, message } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { capitalize } from "lodash";
 import { useRouter } from "next/router";
@@ -58,6 +60,13 @@ function PayrollAllowance({ account }: IPageProps) {
       refetchEmployees();
     }
   );
+  const [updateStatus, loadingUpdateStatus] = useUpdatePayrollAllowanceStatus(
+    () => {
+      refetchEmployees();
+      refetchAllowance();
+    }
+  );
+
   const [deleteItem, loadingDeletItem] = useDeletePayrollAllowanceItem(() => {
     refetchEmployees();
   });
@@ -83,20 +92,25 @@ function PayrollAllowance({ account }: IPageProps) {
       onCancel() {},
     });
   };
-  const columns: ColumnsType<PayrollEmployeeAllowanceDto> = [
-    {
-      title: "Name",
-      dataIndex: "employeeName",
-    },
-    {
-      title: "Position",
-      dataIndex: "position",
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      render: (value) => <NumeralFormatter value={value} />,
-    },
+
+  const handleClickFinalize = () => {
+    let countDraft = 0;
+    employees.forEach((item: any) => {
+      if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
+    });
+    if (countDraft > 0 && allowance.status === "DRAFT") {
+      message.error(
+        "There are still some DRAFT employees. Please finalize all employees first"
+      );
+    } else {
+      updateStatus({
+        payrollId: router?.query?.id as string,
+        status: statusMap[allowance?.status],
+      });
+    }
+  };
+
+  const action: ColumnsType<PayrollEmployeeAllowanceDto> = [
     {
       title: "Action",
       dataIndex: "id",
@@ -119,6 +133,27 @@ function PayrollAllowance({ account }: IPageProps) {
         );
       },
     },
+  ];
+  const columns: ColumnsType<PayrollEmployeeAllowanceDto> = [
+    {
+      title: "Name",
+      dataIndex: "employeeName",
+    },
+    {
+      title: "Position",
+      dataIndex: "position",
+    },
+    {
+      title: "Total",
+      dataIndex: "total",
+      render: (value) => <NumeralFormatter value={value} />,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (value) => <Tag color={getStatusColor(value)}>{value}</Tag>,
+    },
+    ...(allowance?.status === PayrollStatus.DRAFT ? action : []),
   ];
 
   let expandedRowColumns: ColumnsType<PayrollAllowanceItem> = [
@@ -208,7 +243,7 @@ function PayrollAllowance({ account }: IPageProps) {
                   <CheckOutlined />
                 )
               }
-              // onClick={handleClickFinalize}
+              onClick={handleClickFinalize}
               loading={loading}
             >
               Set as {statusMap[allowance?.status]}

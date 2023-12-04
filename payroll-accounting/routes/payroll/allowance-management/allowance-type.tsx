@@ -31,7 +31,7 @@ interface DataSourceProps {
 
 function AllowanceType() {
   const [, setIsModalOpen] = useState(false);
-  const [expenses, loadingExpenses] = useGetChartOfAccounts("EXPENSES");
+  const [expenses, loadingExpenses] = useGetChartOfAccounts("EXPENSE");
   const [selectedItem] = useState<DataSourceProps | null | string>();
   const [state, setState] = useState({
     filter: "",
