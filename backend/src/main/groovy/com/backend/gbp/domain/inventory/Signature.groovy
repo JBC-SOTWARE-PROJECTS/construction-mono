@@ -51,4 +51,8 @@ class Signature extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "sequence", columnDefinition = 'int')
 	Integer sequence
 
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
+
 }

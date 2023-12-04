@@ -53,17 +53,28 @@ class SupplierService extends AbstractDaoService<Supplier> {
     List<Supplier> supplierList(
             @GraphQLArgument(name = "filter") String filter
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         String query = '''Select e from Supplier e where lower(concat(e.supplierCode,e.supplierFullname)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
         createQuery(query, params).resultList.sort { it.supplierCode }
     }
 
     @GraphQLQuery(name = "supplierActive")
     List<Supplier> supplierActive() {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select e from Supplier e where e.isActive = :status'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
         createQuery(query, params).resultList.sort { it.supplierCode }
     }
 
@@ -95,6 +106,34 @@ class SupplierService extends AbstractDaoService<Supplier> {
         return result
     }
 
+    @GraphQLQuery(name = "supplier_list_pageable", description = "List of Suppliers")
+    Page<Supplier> allSupplierPageable(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "page") Integer page
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+
+        String query = '''Select s from Supplier s where
+            (lower(s.supplierFullname) like lower (concat('%',:filter,'%')) or 
+            lower(s.supplierCode) like lower (concat('%',:filter,'%')))
+            and s.company = :company '''
+
+        String countQuery = '''Select count(s) from Supplier s where
+            (lower(s.supplierFullname) like lower (concat('%',:filter,'%')) or 
+            lower(s.supplierCode) like lower (concat('%',:filter,'%')))
+            and s.company = :company '''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        params.put('company', company)
+
+        query += ''' ORDER BY s.supplierFullname ASC'''
+
+        Page<Supplier> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertSupplier")
     @Transactional
@@ -102,11 +141,14 @@ class SupplierService extends AbstractDaoService<Supplier> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         upsertFromMap(id, fields, { Supplier entity, boolean forInsert ->
             if(forInsert){
                 entity.supplierCode = generatorService.getNextValue(GeneratorType.SUPPLIER_CODE, {
                     return "SUP-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
+                entity.company = company
             }
         })
     }

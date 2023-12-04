@@ -42,7 +42,15 @@ class QuantityAdjustmentType extends AbstractAuditingEntity implements Serializa
 	String flagValue
 
 	@GraphQLQuery
+	@Column(name = "source_column", columnDefinition = 'varchar')
+	String sourceColumn
+
+	@GraphQLQuery
 	@Column(name = "is_active", columnDefinition = 'bool')
 	Boolean is_active
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 
 }

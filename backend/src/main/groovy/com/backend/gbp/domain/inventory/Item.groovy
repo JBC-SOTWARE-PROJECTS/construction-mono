@@ -4,8 +4,6 @@ import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
-import org.hibernate.annotations.NotFound
-import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
@@ -35,13 +33,11 @@ class Item extends AbstractAuditingEntity implements Serializable {
 	String itemCode
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_group", referencedColumnName = "id")
 	ItemGroup item_group
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_category", referencedColumnName = "id")
 	ItemCategory item_category
@@ -57,22 +53,34 @@ class Item extends AbstractAuditingEntity implements Serializable {
 	String brand
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
+	@Column(name = "specification")
+	@UpperCase
+	String specification
+
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "unit_of_purchase", referencedColumnName = "id")
 	UnitMeasurement unit_of_purchase
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "unit_of_usage", referencedColumnName = "id")
 	UnitMeasurement unit_of_usage
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_generics", referencedColumnName = "id")
 	Generic item_generics
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset_sub_account", referencedColumnName = "id")
+	ItemSubAccount assetSubAccount
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "expense_sub_account", referencedColumnName = "id")
+	ItemSubAccount expenseSubAccount
 
 	@GraphQLQuery
 	@Column(name = "item_conversion")
