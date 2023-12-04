@@ -7,6 +7,7 @@ import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.Timekeeping
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.accounting.ArInvoiceServices
@@ -261,23 +262,46 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         BigDecimal totalAllowance = 0
         payrollAllowanceRepository.joinFetchAllowanceItems(payroll.id)
 
-
         payroll.allowance.totalsBreakdown.each {
             Map<String, Object> itemsAccount = [:]
             itemsAccount['code'] = it.subaccountCode
-            itemsAccount['debit'] = it.amount
-            itemsAccount['credit'] = 0.00
+
+            if (it.entryType == AccountingEntryType.DEBIT) {
+                itemsAccount['debit'] = it.amount
+                itemsAccount['credit'] = 0.00
+            } else if (it.entryType == AccountingEntryType.CREDIT) {
+                itemsAccount['debit'] = 0.00
+                itemsAccount['credit'] = it.amount
+            }
+
             totalAllowance += it.amount
+            entries.push(itemsAccount)
+        }
+
+        BigDecimal totalAdjustmentDebit = 0
+        BigDecimal totalAdjustmentCredit = 0
+        payroll.adjustment.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = [:]
+            itemsAccount['code'] = it.subaccountCode
+
+            if (it.entryType == AccountingEntryType.DEBIT) {
+                itemsAccount['debit'] = it.amount
+                itemsAccount['credit'] = 0.00
+                totalAdjustmentCredit += it.amount
+            } else if (it.entryType == AccountingEntryType.CREDIT) {
+                itemsAccount['debit'] = 0.00
+                itemsAccount['credit'] = it.amount
+                totalAdjustmentDebit += it.amount
+
+            }
+
             entries.push(itemsAccount)
         }
 
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotal = totalAllowance
-
-
-            //initialize
-
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit
+            it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
         }
 
 

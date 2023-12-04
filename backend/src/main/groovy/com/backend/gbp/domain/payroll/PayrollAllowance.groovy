@@ -1,13 +1,12 @@
 package com.backend.gbp.domain.payroll
 
-import com.backend.gbp.domain.hrm.dto.EmployeeSalaryDto
+
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
-import com.backend.gbp.graphqlservices.payroll.AllowanceTotalDto
+import com.backend.gbp.graphqlservices.payroll.SubAccountBreakdownDto
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
-import java.time.Instant
 
 @Entity
 @Table(schema = "payroll", name = "payroll_allowances")
@@ -33,6 +32,6 @@ class PayrollAllowance extends PayrollAuditingEntity implements Serializable {
     @Type(type = "jsonb")
     @GraphQLQuery
     @Column(name="totals_breakdown",columnDefinition = "jsonb")
-    List<AllowanceTotalDto> totalsBreakdown
+    List<SubAccountBreakdownDto> totalsBreakdown
 
 }

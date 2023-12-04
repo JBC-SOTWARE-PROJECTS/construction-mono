@@ -106,6 +106,10 @@ class Payroll extends PayrollAuditingEntity implements Serializable, AutoIntegra
     }
 
     @Transient
-    BigDecimal salariesPayableTotal
+    BigDecimal salariesPayableTotalCredit
+
+    @Transient
+    BigDecimal salariesPayableTotalDebit
+
 
 }

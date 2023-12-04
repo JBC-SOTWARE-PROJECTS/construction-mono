@@ -1,11 +1,11 @@
 package com.backend.gbp.graphqlservices.payroll
 
-import com.backend.gbp.domain.hrm.dto.EmployeeSalaryDto
-import com.backend.gbp.domain.hrm.dto.HoursLog
+
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollAllowance
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.PayrollEmployeeAllowance
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.payroll.PayrollAllowanceRepository
@@ -26,9 +26,10 @@ import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
 
-class AllowanceTotalDto {
+class SubAccountBreakdownDto {
     String subaccountCode
     BigDecimal amount = 0
+    AccountingEntryType entryType
 }
 
 @TypeChecked
@@ -117,21 +118,22 @@ class PayrollAllowanceService implements IPayrollModuleBaseOperations<PayrollAll
             payrollAllowance.total = 0
 
             payrollAllowanceRepository.joinFetchAllowanceItems(payrollAllowance.id)
-            Map<String, AllowanceTotalDto> allowanceMap = new HashMap<>()
+            Map<String, SubAccountBreakdownDto> allowanceMap = new HashMap<>()
 
             payrollAllowance.allowanceEmployees.each { employee ->
                 employee.allowanceItems.each {
-                    AllowanceTotalDto allowance = allowanceMap.get(it.allowance.subaccountCode)
-                    if (!allowance) allowance = new AllowanceTotalDto()
+                    SubAccountBreakdownDto allowance = allowanceMap.get(it.allowance.subaccountCode)
+                    if (!allowance) allowance = new SubAccountBreakdownDto()
                     allowance.subaccountCode = it.allowance.subaccountCode
                     allowance.amount += it.amount
+                    allowance.entryType = AccountingEntryType.DEBIT
                     payrollAllowance.total += it.amount
                     allowanceMap.put(allowance.subaccountCode, allowance)
                 }
             }
             payrollAllowance.totalsBreakdown = []
             allowanceMap.keySet().each {
-                AllowanceTotalDto allowance = allowanceMap.get(it.toString())
+                SubAccountBreakdownDto allowance = allowanceMap.get(it.toString())
                 payrollAllowance.totalsBreakdown.push(allowance)
             }
 
