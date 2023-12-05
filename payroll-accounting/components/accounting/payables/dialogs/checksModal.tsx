@@ -8,7 +8,7 @@ import {
   IFormDataCheckDetails,
 } from "@/interface/payables/formInterfaces";
 import { useBanks } from "@/hooks/payables";
-import { DisbursementCheck } from "@/graphql/gql/graphql";
+import { Bank, DisbursementCheck } from "@/graphql/gql/graphql";
 import { FormDatePicker, FormInput } from "@/components/common";
 import dayjs from "dayjs";
 import _ from "lodash";
@@ -34,7 +34,7 @@ export default function DisbursementChecksModal(props: IProps) {
         bank: {
           id: data?.bank?.value ?? "",
           bankname: data?.bank?.label ?? "",
-        },
+        } as Bank,
         bankBranch: data.bankBranch,
         checkNo: data.checkNo,
         checkDate: data.checkDate,
