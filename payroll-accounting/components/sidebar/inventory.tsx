@@ -79,7 +79,7 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     title: "Project Management",
     subtitle: "Task Tracker: Easy Project Management for Productive Teams.",
     icon: <ProjectOutlined className="diverse-trade-icon" />,
-    path: "/inventory/monitoring",
+    path: "/inventory/projects",
   },
   {
     title: "Asset Management",
