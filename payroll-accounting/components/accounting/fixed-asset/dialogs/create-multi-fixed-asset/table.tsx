@@ -6,18 +6,21 @@ import numeral from 'numeral'
 import styled from 'styled-components'
 import TableCell from './table-components'
 import dayjs from 'dayjs'
+import { DeleteOutlined } from '@ant-design/icons'
+import { FixedAssetItems, Office } from '@/graphql/gql/graphql'
 const EditableContext = React.createContext<FormInstance<any> | null>(null)
 
-interface Item {
-  key: string
-  name: string
-  age: string
-  address: string
+interface FormFields {
+  itemName: { value: string; label: string } | null
+  office: { value: string; label: string } | null
 }
-
 interface EditableRowProps {
   index: number
 }
+
+const StyledTD = styled.td<{ $active?: boolean }>`
+  border: ${(props) => (props.$active ? '1px solid teal!important' : 'none')};
+`
 
 const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
   const [form] = Form.useForm()
@@ -34,9 +37,9 @@ interface EditableCellProps {
   title: React.ReactNode
   editable: boolean
   children: React.ReactNode
-  dataIndex: keyof Item
-  record: Item
-  handleSave: (record: Item) => void
+  dataIndex: keyof FixedAssetItems
+  record: FixedAssetItems
+  handleSave: (record: FixedAssetItems) => void
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
@@ -50,7 +53,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const [editing, setEditing] = useState(false)
   const inputRef = useRef<InputRef>(null)
-  const form = useContext(EditableContext)!
+  const form: FormInstance<FormFields> = useContext(EditableContext)!
 
   // useEffect(() => {
   //   if (editing) {
@@ -60,15 +63,59 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
   const toggleEdit = () => {
     setEditing(!editing)
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] })
+    switch (dataIndex) {
+      case 'itemName':
+        form.setFieldsValue({
+          itemName: {
+            label: record?.itemName as string,
+            value: record?.itemId as string,
+          },
+        })
+        break
+      case 'office':
+        form.setFieldsValue({
+          office: {
+            label: record?.office?.officeDescription as string,
+            value: record?.office?.id as string,
+          },
+        })
+        break
+      default:
+        form.setFieldsValue({ [dataIndex]: record[dataIndex] })
+        break
+    }
   }
 
   const save = async () => {
     try {
       const values = await form.validateFields()
+      let newRecord = { ...record }
+      switch (dataIndex) {
+        case 'itemName':
+          var FormField = values[dataIndex]
+          newRecord = {
+            ...newRecord,
+            itemId: FormField?.value,
+            itemName: FormField?.label,
+          }
+          break
+        case 'office':
+          var FormField = values[dataIndex]
+          newRecord = {
+            ...newRecord,
+            office: {
+              id: FormField?.value,
+              officeDescription: FormField?.label,
+            },
+          }
+          break
+        default:
+          newRecord = { ...newRecord, ...(values as FixedAssetItems) }
+          break
+      }
 
       toggleEdit()
-      handleSave({ ...record, ...values })
+      handleSave({ ...newRecord })
     } catch (errInfo) {
       console.log('Save failed:', errInfo)
     }
@@ -90,7 +137,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
     )
   }
 
-  return <td {...restProps}>{childNode}</td>
+  return (
+    <StyledTD {...restProps} $active={editing}>
+      {childNode}
+    </StyledTD>
+  )
 }
 
 type EditableTableProps = Parameters<typeof Table>[0]
@@ -144,25 +195,39 @@ export default function MultiFixedAssetItemTable() {
     {
       title: 'Serial No.',
       dataIndex: 'serialNo',
-      width: 100,
+      width: 140,
       editable: true,
     },
     {
       title: 'Asset Name',
-      dataIndex: 'assetName',
+      dataIndex: 'itemName',
       width: 150,
       editable: true,
     },
     {
+      title: 'Office',
+      dataIndex: 'office',
+      width: 150,
+      editable: true,
+      render: (text: Office) => text?.officeDescription ?? '',
+    },
+    {
       title: 'Depreciation Start Date',
       dataIndex: 'depreciationStartDate',
-      width: 80,
+      width: 120,
+      editable: true,
+      render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+    },
+    {
+      title: 'Purchase Date',
+      dataIndex: 'purchaseDate',
+      width: 120,
       editable: true,
       render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
     },
     {
       title: 'Purchase Price',
-      dataIndex: 'purchase_price',
+      dataIndex: 'purchasePrice',
       align: 'right',
       width: 120,
       editable: true,
@@ -188,13 +253,16 @@ export default function MultiFixedAssetItemTable() {
     {
       title: '#',
       dataIndex: 'operation',
+      align: 'center',
       fixed: 'right',
-      width: 40,
+      width: 50,
       render: (value: any, record: any, index: number) =>
         dataSource.length >= 1 ? (
-          <Button type='link' onClick={() => handleDelete(record.key)}>
-            Delete
-          </Button>
+          <Button
+            type='link'
+            onClick={() => handleDelete(record.key)}
+            icon={<DeleteOutlined />}
+          />
         ) : null,
     },
   ]
@@ -246,14 +314,14 @@ export default function MultiFixedAssetItemTable() {
 
   return (
     <Row gutter={[8, 8]}>
-      <Col flex='auto'>
-        <Button onClick={handleAdd} type='primary' style={{ marginBottom: 16 }}>
-          Add a row
-        </Button>
-      </Col>
       <Col flex='100%'>
         <StyledWrapper>
           <Table
+            title={() => (
+              <Button onClick={handleAdd} type='primary'>
+                Add a row
+              </Button>
+            )}
             size='small'
             bordered
             components={components}

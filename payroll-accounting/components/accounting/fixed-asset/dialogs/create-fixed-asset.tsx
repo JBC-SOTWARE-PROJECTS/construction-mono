@@ -24,11 +24,17 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
       okText='Save'
     >
       <Form form={form} layout='vertical'>
+        <Divider dashed orientation='left' orientationMargin={0} plain>
+          Details
+        </Divider>
         <Row gutter={[8, 8]}>
           <Col flex='50%'>
             <FormInput name='serialNo' label='Serial No.' bold />
           </Col>
           <Col flex='50%'>
+            <FormInput name='assetNo' label='Asset No.' bold />
+          </Col>
+          <Col flex='100%'>
             <FormSelect
               name='serialNo'
               label='Asset name'
@@ -39,15 +45,20 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
           <Col flex='100%'>
             <FormTextarea name='description' label='Description' bold />
           </Col>
-        </Row>
-        <Divider dashed style={{ marginBottom: 8 }} />
-        <Row gutter={[8, 8]}>
+          <Col flex='100%'>
+            <FormSelect name='officeId' label='Office' bold propsselect={{}} />
+          </Col>
           <Col flex='50%'>
             <FormInputNumber name='purchasePrice' label='Purchase price' bold />
           </Col>
           <Col flex='50%'>
-            <FormInputNumber name='salvageValue' label='Salvage value' bold />
+            <FormDatePicker name='purchaseDate' label='Purchase date' bold />
           </Col>
+        </Row>
+        <Divider dashed orientation='left' orientationMargin={0} plain>
+          Depreciation details
+        </Divider>
+        <Row gutter={[8, 8]}>
           <Col flex='50%'>
             <FormDatePicker
               name='depreciationStartDate'
@@ -56,7 +67,31 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
             />
           </Col>
           <Col flex='50%'>
-            <FormInputNumber name='usefulLife' label='Useful life' bold />
+            <FormSelect
+              label='Depreciation Method'
+              name='depreciationMethod'
+              bold
+              propsselect={{}}
+            />
+          </Col>
+          <Col flex='50%'>
+            <FormInputNumber name='salvageValue' label='Salvage value' bold />
+          </Col>
+          <Col flex='50%'>
+            <FormInputNumber
+              name='usefulLife'
+              label='Useful life (Years)'
+              bold
+            />
+          </Col>
+        </Row>
+        <Row gutter={[8, 8]}>
+          <Col flex='100%'>
+            <FormInputNumber
+              name='accumulatedDepreciation'
+              label='Accumulated Depreciation as at 31 Dec 2022'
+              bold
+            />
           </Col>
         </Row>
       </Form>

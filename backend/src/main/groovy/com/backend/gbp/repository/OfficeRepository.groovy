@@ -28,6 +28,11 @@ interface OfficeRepository extends JpaRepository<Office, UUID> {
 	List<Office> activeOffices()
 
 	@Query(
+			value = '''Select o from Office o where o.status = true and o.company.id = :company'''
+	)
+	List<Office> companyActiveOffices(@Param("company") UUID company)
+
+	@Query(
 			value = '''Select o from Office o where (lower(o.officeCode) like lower(concat('%',:filter,'%')) or 
 						lower(o.officeDescription) like lower(concat('%',:filter,'%')))''',
 			countQuery = '''Select count(o) from Office o where (lower(o.officeCode) like lower(concat('%',:filter,'%')) or 
