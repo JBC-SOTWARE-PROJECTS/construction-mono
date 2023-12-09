@@ -13,6 +13,7 @@ import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
 
+import javax.annotation.Nullable
 import javax.persistence.*
 
 @Entity
@@ -39,6 +40,7 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	String description
 	
 	@GraphQLQuery
+	@Nullable
 	@Column(name = "brand")
 	@UpperCase
 	String brand

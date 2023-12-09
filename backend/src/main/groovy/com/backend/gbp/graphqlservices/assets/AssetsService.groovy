@@ -118,6 +118,7 @@ class AssetsService extends AbstractDaoService<Assets> {
                     return "AT-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
                 entity.company = company
+                entity.brand = ""
             }
         })
 

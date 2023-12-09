@@ -61,7 +61,7 @@ export default function ReceivePayBody(props: ReceivePayCreateContextProps) {
       collapsible: 'header',
       extra: [
         <Space key={1}>
-          {props.transactionType !== 'PROMISSORY_NOTE' && (
+          {/* {props.transactionType !== 'PROMISSORY_NOTE' && (
             <Select
               options={InvoiceTypeOption}
               value={props.state.invoiceType}
@@ -69,7 +69,7 @@ export default function ReceivePayBody(props: ReceivePayCreateContextProps) {
                 props.dispatch({ type: 'set-invoiceType', payload: e })
               }
             />
-          )}
+          )} */}
           <Button
             type='primary'
             onClick={onClickAddPendingTransaction}

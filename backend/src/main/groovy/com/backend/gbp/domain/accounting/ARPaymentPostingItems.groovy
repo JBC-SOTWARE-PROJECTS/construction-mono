@@ -93,4 +93,8 @@ class ARPaymentPostingItems extends AbstractAuditingEntity implements Serializab
 	@GraphQLQuery
 	@Column(name = "amount_paid")
 	BigDecimal amountPaid
+
+	@GraphQLQuery
+	@Column(name = "company_id")
+	UUID companyId
 }

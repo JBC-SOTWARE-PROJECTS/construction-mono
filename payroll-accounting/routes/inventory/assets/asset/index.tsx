@@ -10,6 +10,8 @@ import { AssetStatus, AssetType } from "@/graphql/gql/graphql";
 import { Divider, Tabs } from "antd";
 import { TabsProps } from "antd/lib";
 import PreventiveMaintenance from "./preventiveMaintenance";
+import AssetRepairMaintenance from "./repairMaintenance";
+import AssetRepairMaintenanceComponent from "./repairMaintenance";
 
 type Props = {};
 const items: TabsProps["items"] = [
@@ -21,7 +23,7 @@ const items: TabsProps["items"] = [
   {
     key: "2",
     label: "Repairs and Maintenance",
-    children: <></>,
+    children: <AssetRepairMaintenanceComponent/>,
   },
   {
     key: "3",

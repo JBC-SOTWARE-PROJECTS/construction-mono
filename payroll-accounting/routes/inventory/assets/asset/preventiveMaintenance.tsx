@@ -57,7 +57,7 @@ export default function PreventiveMaintenance({}: Props) {
   return (
     <>
       <ProCard
-        title={``}
+        title={`All Preventive Maintenance`}
         headStyle={{
           flexWrap: "wrap",
         }}

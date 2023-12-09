@@ -1,8 +1,8 @@
-import { Assets, Query } from '@/graphql/gql/graphql'
-import { IAssetMaintenanceTypeState } from '@/routes/inventory/assets/configuration/MaintenanceTypeConfig'
-import { IAssetState } from '@/routes/inventory/assets/masterfile'
-import { QueryHookOptions, gql, useQuery } from '@apollo/client'
-import React, { useState } from 'react'
+import { Assets, Query } from "@/graphql/gql/graphql";
+import { IAssetMaintenanceTypeState } from "@/routes/inventory/assets/configuration/MaintenanceTypeConfig";
+import { IAssetState } from "@/routes/inventory/assets/masterfile";
+import { QueryHookOptions, gql, useQuery } from "@apollo/client";
+import React, { useState } from "react";
 
 const GET_RECORDS = gql`
   query ($filter: String, $page: Int, $size: Int) {

@@ -115,9 +115,13 @@ class Supplier extends AbstractAuditingEntity implements Serializable, Subaccoun
 	@Column(name = "is_active")
 	Boolean isActive
   
-  @GraphQLQuery
+  	@GraphQLQuery
 	@Column(name = "company")
 	UUID company
+
+	@GraphQLQuery
+	@Column(name = "atc_no")
+	String atcNo
 
 	@Override
 	String getCode() {

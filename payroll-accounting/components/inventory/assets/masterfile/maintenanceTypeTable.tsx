@@ -85,7 +85,6 @@ export default function MaintenanceTypeTable({
                 }}
             />
           )}
-          scroll={{ x: 1400 }}
         />
       </Col>
     </Row>

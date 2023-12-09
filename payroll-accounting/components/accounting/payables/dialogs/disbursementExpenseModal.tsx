@@ -16,6 +16,7 @@ import { FormTextArea } from "@/components/common";
 import _ from "lodash";
 import { randomId, requiredField, shapeOptionValue } from "@/utility/helper";
 import { decimalRound2 } from "@/utility/helper";
+import { ExpenseTransaction, Office, Projects } from "@/graphql/gql/graphql";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -47,19 +48,19 @@ export default function DisbursementExpenseModal(props: IProps) {
       payload.office = {
         id: data?.office?.value,
         officeDescription: data?.office?.label,
-      };
+      } as Office;
     }
     payload.project = null;
     if (data.project) {
       payload.project = {
         id: data?.project?.value,
         description: data?.project?.label,
-      };
+      } as Projects;
     }
     payload.transType = {
       id: data?.transType?.value,
       description: data?.transType?.label,
-    };
+    } as ExpenseTransaction;
     payload.amount = decimalRound2(data?.amount);
     payload.isNew = true;
     hide(payload);
