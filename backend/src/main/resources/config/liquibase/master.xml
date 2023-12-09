@@ -437,4 +437,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/52_donss_add_ar_transaction_ledger_table.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/53_michael_add_total_to_payroll_submodules.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -28,6 +28,7 @@ import javax.persistence.PersistenceContext
 
 class SubAccountBreakdownDto {
     String subaccountCode
+    String description
     BigDecimal amount = 0
     AccountingEntryType entryType
 }

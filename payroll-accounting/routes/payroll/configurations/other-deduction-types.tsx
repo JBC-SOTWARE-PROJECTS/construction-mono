@@ -30,7 +30,7 @@ function OtherDeductionTypes() {
     state,
     () => {}
   );
-  const [expenses, loadingExpenses] = useGetChartOfAccounts("EXPENSES");
+  const [expenses, loadingExpenses] = useGetChartOfAccounts("EXPENSE");
 
   const columns: ColumnsType<AdjustmentCategory> = [
     {

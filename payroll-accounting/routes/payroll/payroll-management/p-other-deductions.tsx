@@ -14,7 +14,7 @@ import usePaginationState from "@/hooks/usePaginationState";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { InputNumber, Modal, Select, Tag } from "antd";
+import { InputNumber, Modal, Select, Tag, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { recalculateButton } from "./p-contributions";
 import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
@@ -112,17 +112,10 @@ function OtherDeductions({ account }: IPageProps) {
         if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
       });
     }
-    if (countDraft > 0) {
-      Modal.confirm({
-        title: "There still some DRAFT employees. Proceed?",
-        icon: <ExclamationCircleOutlined />,
-        onOk() {
-          updateStatus({
-            payrollId: router?.query?.id as string,
-            status: "FINALIZED",
-          });
-        },
-      });
+    if (countDraft > 0 && otherDeduction.status === "DRAFT") {
+      message.error(
+        "There are still some DRAFT employees. Please finalize all employees first"
+      );
     } else {
       updateStatus({
         payrollId: router?.query?.id as string,

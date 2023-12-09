@@ -2,6 +2,8 @@ package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollOtherDeduction
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
+import com.backend.gbp.domain.payroll.enums.AdjustmentOperation
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.payroll.PayrollOtherDeductionRepository
@@ -85,6 +87,31 @@ class PayrollOtherDeductionService implements IPayrollModuleBaseOperations<Payro
 
     ) {
         PayrollOtherDeduction payrollOtherDeduction = payrollOtherDeductionRepository.findByPayrollId(payrollId).get()
+
+        if (status == PayrollStatus.FINALIZED) {
+            Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
+            payrollOtherDeduction.employees.each { employee ->
+                employee.deductionItems.each {
+                    SubAccountBreakdownDto deduction = breakdownMap.get(it.type.subaccountCode)
+                    if (!deduction) deduction = new SubAccountBreakdownDto()
+
+
+                    deduction.amount = it.amount
+                    deduction.entryType = AccountingEntryType.CREDIT
+                    deduction.subaccountCode = it.type.subaccountCode
+
+                    breakdownMap.put(it.type.subaccountCode, deduction)
+                }
+            }
+            payrollOtherDeduction.totalsBreakdown = []
+            breakdownMap.keySet().each {
+                SubAccountBreakdownDto deduction = breakdownMap.get(it.toString())
+                payrollOtherDeduction.totalsBreakdown.push(deduction)
+            }
+
+        }
+
+
         payrollOtherDeduction.status = status
         payrollOtherDeductionRepository.save(payrollOtherDeduction)
 ////        TODO: Additional operations when finalizing otherDeduction module

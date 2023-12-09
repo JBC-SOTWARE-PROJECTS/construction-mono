@@ -263,17 +263,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         payrollAllowanceRepository.joinFetchAllowanceItems(payroll.id)
 
         payroll.allowance.totalsBreakdown.each {
-            Map<String, Object> itemsAccount = [:]
-            itemsAccount['code'] = it.subaccountCode
-
-            if (it.entryType == AccountingEntryType.DEBIT) {
-                itemsAccount['debit'] = it.amount
-                itemsAccount['credit'] = 0.00
-            } else if (it.entryType == AccountingEntryType.CREDIT) {
-                itemsAccount['debit'] = 0.00
-                itemsAccount['credit'] = it.amount
-            }
-
+            Map<String, Object> itemsAccount = generateEntry(it)
             totalAllowance += it.amount
             entries.push(itemsAccount)
         }
@@ -281,26 +271,31 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         BigDecimal totalAdjustmentDebit = 0
         BigDecimal totalAdjustmentCredit = 0
         payroll.adjustment.totalsBreakdown.each {
-            Map<String, Object> itemsAccount = [:]
-            itemsAccount['code'] = it.subaccountCode
-
-            if (it.entryType == AccountingEntryType.DEBIT) {
-                itemsAccount['debit'] = it.amount
-                itemsAccount['credit'] = 0.00
+            Map<String, Object> itemsAccount = generateEntry(it)
+            if (it.entryType == AccountingEntryType.DEBIT)
                 totalAdjustmentCredit += it.amount
-            } else if (it.entryType == AccountingEntryType.CREDIT) {
-                itemsAccount['debit'] = 0.00
-                itemsAccount['credit'] = it.amount
+            else if (it.entryType == AccountingEntryType.CREDIT)
                 totalAdjustmentDebit += it.amount
+            entries.push(itemsAccount)
+        }
 
-            }
+        BigDecimal totalOtherDeduction = 0
+        payroll.otherDeduction.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = generateEntry(it)
+            totalOtherDeduction += it.amount
+            entries.push(itemsAccount)
+        }
 
+        BigDecimal totalLoan = 0
+        payroll.loan.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = generateEntry(it)
+            totalLoan += it.amount
             entries.push(itemsAccount)
         }
 
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit - totalOtherDeduction - totalLoan
             it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
         }
 
@@ -336,6 +331,20 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
         save(actPay)
 
+    }
+
+    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it) {
+        Map<String, Object> itemsAccount = [:]
+        itemsAccount['code'] = it.subaccountCode
+
+        if (it.entryType == AccountingEntryType.DEBIT) {
+            itemsAccount['debit'] = it.amount
+            itemsAccount['credit'] = 0.00
+        } else if (it.entryType == AccountingEntryType.CREDIT) {
+            itemsAccount['debit'] = 0.00
+            itemsAccount['credit'] = it.amount
+        }
+        return itemsAccount
     }
 
 }

@@ -4,6 +4,7 @@ import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payr
 import {
   PayrollEmployeeLoan,
   PayrollEmployeeLoanDto,
+  PayrollEmployeeStatus,
   PayrollLoanItem,
   PayrollModule,
   PayrollStatus,
@@ -15,7 +16,7 @@ import usePaginationState from "@/hooks/usePaginationState";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
 import { CheckOutlined, EditOutlined } from "@ant-design/icons";
-import { InputNumber, Table, Tag } from "antd";
+import { InputNumber, Table, Tag, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { capitalize } from "lodash";
 import { useRouter } from "next/router";
@@ -53,13 +54,8 @@ function PayrollLoans({ account }: IPageProps) {
     refetchLoan();
     refetch();
   });
-  const columns: ColumnsType<PayrollEmployeeLoanDto> = [
-    { title: "Name", dataIndex: "employeeName" },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (value) => <Tag color={getStatusColor(value)}>{value}</Tag>,
-    },
+
+  const action: ColumnsType<PayrollEmployeeLoanDto> = [
     {
       title: "Action",
       dataIndex: "id",
@@ -83,6 +79,16 @@ function PayrollLoans({ account }: IPageProps) {
         );
       },
     },
+  ];
+
+  const columns: ColumnsType<PayrollEmployeeLoanDto> = [
+    { title: "Name", dataIndex: "employeeName" },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (value) => <Tag color={getStatusColor(value)}>{value}</Tag>,
+    },
+    ...(loan?.status === PayrollStatus.Draft ? action : []),
   ];
 
   let expandedRowColumns: ColumnsType<PayrollLoanItem> = [
@@ -125,10 +131,20 @@ function PayrollLoans({ account }: IPageProps) {
   };
 
   const handleClickFinalize = () => {
-    updateStatus({
-      payrollId: router?.query?.id as string,
-      status: statusMap[loan?.status],
+    let countDraft = 0;
+    data?.content?.forEach((item: any) => {
+      if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
     });
+    if (countDraft > 0 && loan.status === "DRAFT") {
+      message.error(
+        "There are still some DRAFT employees. Please finalize all employees first"
+      );
+    } else {
+      updateStatus({
+        payrollId: router?.query?.id as string,
+        status: statusMap[loan?.status],
+      });
+    }
   };
   return (
     <>
