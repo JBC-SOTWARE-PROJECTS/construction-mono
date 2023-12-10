@@ -200,7 +200,7 @@ class ProjectService extends AbstractDaoService<Projects> {
         def project = upsertFromMap(id, fields, { Projects entity, boolean forInsert ->
             if (forInsert) {
                 entity.projectCode = generatorService.getNextValue(GeneratorType.PROJECT_CODE, {
-                    return "PROJ-" + StringUtils.leftPad(it.toString(), 6, "0")
+                    return "PRJ-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
                 entity.company = company
             }

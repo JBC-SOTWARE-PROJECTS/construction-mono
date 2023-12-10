@@ -4,8 +4,8 @@ import { OptionsValue } from "@/utility/interfaces";
 
 const GET_RECORDS = gql`
   query {
-    jobStatusActive{
-      value: id
+    jobStatusActive {
+      value: description
       label: description
     }
   }

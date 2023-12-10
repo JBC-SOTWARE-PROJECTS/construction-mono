@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { ProList } from "@ant-design/pro-components";
 import { Avatar, Button, Empty, Progress, Tag } from "antd";
 import { Projects } from "@/graphql/gql/graphql";
-import { NumberFormater } from "../../../utility/helper";
+import { NumberFormater, stringDateFull } from "../../../utility/helper";
+import dayjs from "dayjs";
 
 interface IProps {
   dataSource?: Projects[];
@@ -10,6 +11,7 @@ interface IProps {
   totalElements: number;
   handleOpen: (record: Projects) => void;
   changePage: (page: number) => void;
+  onRefresh: () => void;
 }
 
 export default function ProjectList({
@@ -18,6 +20,7 @@ export default function ProjectList({
   totalElements = 1,
   handleOpen,
   changePage,
+  onRefresh,
 }: IProps) {
   return (
     <>
@@ -28,7 +31,7 @@ export default function ProjectList({
         style={{ minHeight: 500 }}
         toolBarRender={() => {
           return [
-            <Button key="3" type="primary">
+            <Button key="3" type="primary" onClick={onRefresh}>
               Refresh
             </Button>,
           ];
@@ -52,6 +55,12 @@ export default function ProjectList({
                 <>
                   <p>{record?.location?.fullAddress} </p>
                   <p>
+                    Project Started:{" "}
+                    <span className="font-bold">
+                      {stringDateFull(dayjs(record?.projectStarted))}
+                    </span>
+                  </p>
+                  <p>
                     Total Project Grant:{" "}
                     <span className="text-green font-bold">
                       {NumberFormater(record?.totals)}
@@ -65,7 +74,7 @@ export default function ProjectList({
             render: (_, record) => {
               return (
                 <Avatar
-                  size={64}
+                  size={70}
                   style={{
                     backgroundColor: record?.projectColor ?? "",
                     verticalAlign: "middle",
@@ -88,18 +97,21 @@ export default function ProjectList({
                   style={{
                     width: "200px",
                   }}>
-                  <div>Project Progress</div>
-                  <Progress percent={80} />
+                  <div className="font-bold">Project Progress</div>
+                  <Progress percent={0} />
                 </div>
               </div>
             ),
           },
           actions: {
-            render: () => {
+            render: (_, record) => {
               return (
                 <div className="flex-column">
-                  <Button size="small" type="primary">
-                    Edit Project
+                  <Button
+                    size="small"
+                    type="primary"
+                    onClick={() => handleOpen(record)}>
+                    Project Information
                   </Button>
                   <Button size="small" type="dashed">
                     View Project Details

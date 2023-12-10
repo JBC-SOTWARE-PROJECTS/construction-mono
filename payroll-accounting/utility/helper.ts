@@ -123,6 +123,11 @@ export const stringEndDate = (date: Dayjs) => {
   return endOfDay.format(dateFormat);
 };
 
+export const stringDateFull = (date: Dayjs) => {
+  const endOfDay = dayjs(date).endOf("day");
+  return endOfDay.format("MMMM DD, YYYY");
+};
+
 export const shapeOptionValue = (
   label?: ReactNode,
   value?: string | number

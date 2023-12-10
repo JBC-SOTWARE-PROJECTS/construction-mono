@@ -10,3 +10,4 @@ export { UseClients as useClients } from "./customerList";
 export { UseProjectStatus as useProjectStatus } from "./projectStatus";
 export { UseSupplier as useSupplier } from "./supplierList";
 export { UseSupplierObject as useSupplierObject } from "./supplierObject";
+export { UseProjectStatusList as useProjectStatusList } from "./projectStatusList";
