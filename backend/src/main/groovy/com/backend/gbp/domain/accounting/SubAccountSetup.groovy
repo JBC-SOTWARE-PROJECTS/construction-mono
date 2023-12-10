@@ -19,7 +19,8 @@ enum DomainEnum {
     NO_DOMAIN("NO DOMAIN", ""),
     ITEM_CATEGORY("Item Category", "com.backend.gbp.domain.inventory.ItemCategory"),
     SUPPLIER("Supplier", "com.backend.gbp.domain.inventory.Supplier"),
-    BANK("Bank", "com.backend.gbp.domain.accounting.Bank")
+    BANK("Bank", "com.backend.gbp.domain.accounting.Bank"),
+    PROJECTS("Projects", "com.backend.gbp.domain.projects.Projects")
 
     String displayName
     String path

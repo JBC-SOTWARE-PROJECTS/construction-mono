@@ -1,7 +1,7 @@
 import { Supplier } from "@/graphql/gql/graphql";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
+import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 
 interface IProps {
@@ -47,6 +47,9 @@ export default function SupplierTable({
       dataIndex: "supplierEmail",
       key: "supplierEmail",
       width: 200,
+      render: (txt) => {
+        return <span className="text-blue">{txt}</span>;
+      },
     },
     {
       title: "Supplier Type",

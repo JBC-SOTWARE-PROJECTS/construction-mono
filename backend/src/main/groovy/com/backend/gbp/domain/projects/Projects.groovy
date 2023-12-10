@@ -2,8 +2,9 @@ package com.backend.gbp.domain.projects
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.accounting.ArCustomers
 import com.backend.gbp.domain.annotations.UpperCase
-import com.backend.gbp.domain.billing.Customer
+import com.backend.gbp.domain.types.Subaccountable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -19,7 +20,7 @@ import java.time.Instant
 @Table(schema = "projects", name = "projects")
 @SQLDelete(sql = "UPDATE projects.projects SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class Projects extends AbstractAuditingEntity implements Serializable {
+class Projects extends AbstractAuditingEntity implements Serializable, Subaccountable {
 	
 	@GraphQLQuery
 	@Id
@@ -50,7 +51,7 @@ class Projects extends AbstractAuditingEntity implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "customer", referencedColumnName = "id")
-	Customer customer
+	ArCustomers customer
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -78,4 +79,18 @@ class Projects extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "disabled_editing")
 	Boolean disabledEditing
 
+	@Override
+	String getCode() {
+		return projectCode
+	}
+
+	@Override
+	String getAccountName() {
+		return description
+	}
+
+	@Override
+	String getDomain() {
+		return Projects.class.name
+	}
 }

@@ -2,6 +2,7 @@ package com.backend.gbp.domain.billing
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.accounting.ArCustomers
 import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.hrm.Employee
 import com.sun.org.apache.xpath.internal.operations.Bool
@@ -116,7 +117,7 @@ class Job extends AbstractAuditingEntity implements Serializable{
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer", referencedColumnName = "id")
-	Customer customer
+	ArCustomers customer
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)

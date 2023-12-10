@@ -459,4 +459,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/50_alter_table_item_sub_account.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/56_wilson_project_updates.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/57_wilson_alter_project.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
