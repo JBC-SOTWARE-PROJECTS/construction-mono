@@ -7,7 +7,7 @@ import {
 import { Input, Button, Row, Col, Form, message } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { FormSelect } from "@/components/common";
-import ProjectList from "@/components/inventory/projects/purchaseList";
+import ProjectList from "@/components/inventory/projects/projectItemList";
 import { useDialog } from "@/hooks";
 import UpsertSupplierModal from "@/components/inventory/masterfile/supplier/dialogs/upsertSupplier";
 import { useQuery } from "@apollo/client";

@@ -36,6 +36,9 @@ export const GET_PROJECTS_RECORDS = gql`
         remarks
         totals
         disabledEditing
+        prefixShortName
+        projectColor
+        projectStatusColor
         status
       }
       size

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ProList } from "@ant-design/pro-components";
 import { Avatar, Button, Empty, Progress, Tag } from "antd";
 import { Projects } from "@/graphql/gql/graphql";
-import { NumberFormater } from '../../../utility/helper';
+import { NumberFormater } from "../../../utility/helper";
 
 interface IProps {
   dataSource?: Projects[];
@@ -36,22 +36,43 @@ export default function ProjectList({
         metas={{
           title: {
             render: (_, record) => {
-              return record?.description;
+              return (
+                <>
+                  {record?.description}{" "}
+                  <Tag color={record?.projectStatusColor ?? "default"}>
+                    {record?.status}
+                  </Tag>
+                </>
+              );
             },
           },
           description: {
             render: (_, record) => {
               return (
                 <>
-                  <p>{record?.location?.fullAddress}</p>
-                  <p>Total Project Grant: <span className="text-green font-bold">{NumberFormater(record?.totals)}</span></p>
+                  <p>{record?.location?.fullAddress} </p>
+                  <p>
+                    Total Project Grant:{" "}
+                    <span className="text-green font-bold">
+                      {NumberFormater(record?.totals)}
+                    </span>
+                  </p>
                 </>
               );
             },
           },
           avatar: {
             render: (_, record) => {
-              return <Avatar size={45} />;
+              return (
+                <Avatar
+                  size={64}
+                  style={{
+                    backgroundColor: record?.projectColor ?? "",
+                    verticalAlign: "middle",
+                  }}>
+                  {record?.prefixShortName}
+                </Avatar>
+              );
             },
           },
           content: {
@@ -67,9 +88,7 @@ export default function ProjectList({
                   style={{
                     width: "200px",
                   }}>
-                  <div>
-                    Project Progress <Tag color="green">{record?.status}</Tag>
-                  </div>
+                  <div>Project Progress</div>
                   <Progress percent={80} />
                 </div>
               </div>
@@ -77,7 +96,16 @@ export default function ProjectList({
           },
           actions: {
             render: () => {
-              return [<a key="init">View Details</a>];
+              return (
+                <div className="flex-column">
+                  <Button size="small" type="primary">
+                    Edit Project
+                  </Button>
+                  <Button size="small" type="dashed">
+                    View Project Details
+                  </Button>
+                </div>
+              );
             },
           },
         }}

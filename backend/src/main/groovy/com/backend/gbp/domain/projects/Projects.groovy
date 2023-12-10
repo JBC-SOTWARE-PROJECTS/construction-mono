@@ -31,6 +31,11 @@ class Projects extends AbstractAuditingEntity implements Serializable, Subaccoun
 	UUID id
 
 	@GraphQLQuery
+	@Column(name = "prefix_short_name")
+	@UpperCase
+	String prefixShortName
+
+	@GraphQLQuery
 	@Column(name = "code")
 	String projectCode
 	
@@ -78,6 +83,20 @@ class Projects extends AbstractAuditingEntity implements Serializable, Subaccoun
 	@GraphQLQuery
 	@Column(name = "disabled_editing")
 	Boolean disabledEditing
+
+	@GraphQLQuery
+	@Column(name = "project_color", columnDefinition = 'varchar')
+	@UpperCase
+	String projectColor
+
+	@GraphQLQuery
+	@Column(name = "project_status_color", columnDefinition = 'varchar')
+	@UpperCase
+	String projectStatusColor
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 
 	@Override
 	String getCode() {

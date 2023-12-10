@@ -8,7 +8,7 @@ import {
 import { ConfigProvider, Divider, Space, Tabs, TabsProps, message } from "antd";
 import { useState } from "react";
 import enUS from "antd/locale/en_US";
-import { password, username } from "@/defaultaccount";
+import { devpassword, devusername } from "@/shared/devsettings";
 import { ICredentials } from "@/utility/interfaces";
 import { post } from "@/utility/graphql-client";
 import qs from "qs";
@@ -59,8 +59,7 @@ export default function SingIn() {
           style={{
             backgroundColor: "white",
             height: "100vh",
-          }}
-        >
+          }}>
           <LoginFormPage
             backgroundImageUrl="/images/banner.svg"
             logo="/images/DTLogo.svg"
@@ -69,8 +68,8 @@ export default function SingIn() {
             onFinish={onLogin}
             onFinishFailed={onFinishFailed}
             initialValues={{
-              username: username,
-              password: password,
+              username: devusername,
+              password: devpassword,
             }}
             submitter={{
               searchConfig: {
@@ -89,16 +88,14 @@ export default function SingIn() {
                   justifyContent: "center",
                   alignItems: "center",
                   flexDirection: "column",
-                }}
-              >
+                }}>
                 <Divider plain>
                   <span
                     style={{
                       color: "#CCC",
                       fontWeight: "normal",
                       fontSize: 14,
-                    }}
-                  >
+                    }}>
                     DiverseTrade Suite
                   </span>
                 </Divider>
@@ -108,16 +105,14 @@ export default function SingIn() {
                       color: "#CCC",
                       fontWeight: "normal",
                       fontSize: 14,
-                    }}
-                  >
+                    }}>
                     By Signing In, you can access all information and documents.
                     Please be advised that you should carry this information
                     with outmost confidentiality.
                   </p>
                 </Space>
               </div>
-            }
-          >
+            }>
             <Tabs
               centered
               activeKey={loginType}
