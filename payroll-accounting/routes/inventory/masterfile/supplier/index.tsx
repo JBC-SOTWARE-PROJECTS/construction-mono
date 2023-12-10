@@ -12,11 +12,13 @@ import { useQuery } from "@apollo/client";
 import { GET_RECORDS_SUPPLER } from "@/graphql/inventory/masterfile-queries";
 import UpsertSupplierModal from "@/components/inventory/masterfile/supplier/dialogs/upsertSupplier";
 import SupplierTable from "@/components/inventory/masterfile/supplier/supplierTable";
+import { useRouter } from "next/router";
 
 const { Search } = Input;
 
 export default function SupplierComponent() {
   const modal = useDialog(UpsertSupplierModal);
+  const router = useRouter();
   const [state, setState] = useState({
     filter: "",
     page: 0,
@@ -79,7 +81,9 @@ export default function SupplierComponent() {
           loading={loading}
           totalElements={data?.supplier_list_pageable?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
-          handleAssign={(record) => onUpsertRecord(record)}
+          handleAssign={(record) =>
+            router.push(`/inventory/masterfile/supplier/${record?.id}/items`)
+          }
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
         />
       </ProCard>

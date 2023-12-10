@@ -26,6 +26,7 @@ import { ColumnsType } from "antd/es/table";
 import { useSupplier } from "@/hooks/inventory";
 import ColTitlePopUp from "@/components/inventory/colTitlePopUp";
 import { responsiveColumn2 } from "@/utility/constant";
+import { confirmDelete } from "@/hooks";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -125,21 +126,13 @@ export default function UpsertAssignSupplierItemModal(props: IProps) {
   };
 
   const _delete = (id: string) => {
-    // confirm({
-    //   title: "Do you want to delete these supplier?",
-    //   icon: <ExclamationCircleOutlined />,
-    //   content: "Please click ok to proceed.",
-    //   onOk() {
-    //     removeRecord({
-    //       variables: {
-    //         id: id,
-    //       },
-    //     });
-    //   },
-    //   onCancel() {
-    //     console.log("Cancel");
-    //   },
-    // });
+    confirmDelete("Click Yes if you want to proceed", () => {
+      removeRecord({
+        variables: {
+          id: id,
+        },
+      });
+    });
   };
 
   const columns: ColumnsType<SupplierItem> = [
@@ -177,7 +170,7 @@ export default function UpsertAssignSupplierItemModal(props: IProps) {
               onChangeUnitCost(payload, newValue);
               setEditable({ ...editable, [payload.id]: false });
             }}
-            style={{ width: 150 }}
+            style={{ width: "100%" }}
           />
         ) : (
           <span>
