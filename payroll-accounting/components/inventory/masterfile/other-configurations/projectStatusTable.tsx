@@ -28,6 +28,9 @@ export default function ProjectStatusTable({
       title: "Description",
       dataIndex: "description",
       key: "description",
+      render: (text, record) => {
+        return <Tag color={record?.statusColor ?? "default"}>{text}</Tag>;
+      },
     },
     {
       title: "Disabled Editing ?",
