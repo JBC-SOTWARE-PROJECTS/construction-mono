@@ -9,7 +9,7 @@ import { PlusCircleOutlined } from "@ant-design/icons";
 import { FormSelect } from "@/components/common";
 import ProjectList from "@/components/inventory/projects/projectItemList";
 import { useDialog } from "@/hooks";
-import UpsertSupplierModal from "@/components/inventory/masterfile/supplier/dialogs/upsertSupplier";
+import UpsertProject from "@/components/inventory/projects/dialogs/upsertProject";
 import { useQuery } from "@apollo/client";
 import { Projects, Query } from "@/graphql/gql/graphql";
 import { GET_PROJECTS_RECORDS } from "@/graphql/inventory/project-queries";
@@ -19,7 +19,7 @@ import { useClients, useProjectStatus } from "@/hooks/inventory";
 const { Search } = Input;
 
 export default function ProjectComponent() {
-  const modal = useDialog(UpsertSupplierModal);
+  const modal = useDialog(UpsertProject);
 
   const [customer, setCustomer] = useState(null);
   const [location, setLocation] = useState(null);
@@ -59,6 +59,10 @@ export default function ProjectComponent() {
     });
   };
 
+  const onRefresh = () => {
+    refetch();
+  };
+
   return (
     <PageContainer
       title="Projects"
@@ -75,7 +79,7 @@ export default function ProjectComponent() {
             <Button
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={() => console.log()}>
+              onClick={() => onUpsertRecord()}>
               Create New Project
             </Button>
           </ProFormGroup>
@@ -110,7 +114,6 @@ export default function ProjectComponent() {
                   label="Filter By Status"
                   propsselect={{
                     showSearch: true,
-                    mode: "multiple",
                     options: statusList,
                     allowClear: true,
                     placeholder: "Filter By Status",
@@ -146,6 +149,7 @@ export default function ProjectComponent() {
           totalElements={data?.projectListPageable?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
+          onRefresh={onRefresh}
         />
       </ProCard>
     </PageContainer>

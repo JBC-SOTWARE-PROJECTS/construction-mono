@@ -1,5 +1,5 @@
 import React from "react";
-import { Item, ItemGroup, OfficeItem } from "@/graphql/gql/graphql";
+import { Item, OfficeItem } from "@/graphql/gql/graphql";
 import { SaveOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@apollo/client";
 import {
@@ -20,7 +20,7 @@ import {
   UPSERT_RECORD_LOCATION_ITEM,
 } from "@/graphql/inventory/masterfile-queries";
 import { requiredField } from "@/utility/helper";
-import { FormCheckBox, FormInput, FormSelect } from "@/components/common";
+import { FormSelect } from "@/components/common";
 import { ColumnsType } from "antd/es/table";
 import { useOffices } from "@/hooks/payables";
 
@@ -31,6 +31,7 @@ interface IProps {
 
 export default function UpsertAssignItemLocationModal(props: IProps) {
   const { hide, record } = props;
+  const [form] = Form.useForm();
   // ===================== Queries ==============================
   const offices = useOffices();
   const { loading, data, refetch } = useQuery(GET_RECORDS_LOCATION_ITEM, {
@@ -46,10 +47,11 @@ export default function UpsertAssignItemLocationModal(props: IProps) {
       ignoreResults: false,
       onCompleted: (data) => {
         if (!_.isEmpty(data?.upsertOfficeItem?.id)) {
-          message.success("Item Successfully assigned");
+          message.success("Success");
           refetch({
             id: record?.id,
           });
+          form.resetFields();
         }
         if (_.isEmpty(data?.upsertOfficeItem)) {
           message.error(
@@ -159,8 +161,10 @@ export default function UpsertAssignItemLocationModal(props: IProps) {
       open={true}
       width={"100%"}
       style={{ maxWidth: "800px" }}
-      onCancel={() => hide(false)}>
+      onCancel={() => hide(false)}
+      footer={false}>
       <Form
+        form={form}
         name="upsertForm"
         layout="vertical"
         onFinish={onSubmit}
@@ -183,6 +187,7 @@ export default function UpsertAssignItemLocationModal(props: IProps) {
               type="primary"
               htmlType="submit"
               block
+              icon={<SaveOutlined />}
               loading={upsertLoading}>
               Add Location
             </Button>

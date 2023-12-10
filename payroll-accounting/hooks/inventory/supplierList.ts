@@ -4,15 +4,15 @@ import { OptionsValue } from "@/utility/interfaces";
 
 const GET_RECORDS = gql`
   query {
-    jobStatusActive {
-      value: description
-      label: description
+    supplierActive {
+      value: id
+      label: supplierFullname
     }
   }
 `;
 
-export function UseProjectStatus() {
+export function UseSupplier() {
   const { data } = useQuery<Query>(GET_RECORDS);
-  const options = data?.jobStatusActive as OptionsValue[];
+  const options = data?.supplierActive as OptionsValue[];
   return options;
 }

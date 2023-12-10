@@ -48,12 +48,10 @@ export const GET_PROJECTS_RECORDS = gql`
   }
 `;
 
-export const UPSERT_RECORD_ITEM = gql`
+export const UPSERT_RECORD_PROJECT = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
-    upsertItem(id: $id, fields: $fields) {
-      payload
-      success
-      message
+    upsertProject(id: $id, fields: $fields) {
+      id
     }
   }
 `;

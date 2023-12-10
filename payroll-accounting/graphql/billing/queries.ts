@@ -19,7 +19,7 @@ export const GET_BILLING_RECORDS = gql`
         }
         customer {
           id
-          fullName
+          accountName
         }
         otcName
         locked
