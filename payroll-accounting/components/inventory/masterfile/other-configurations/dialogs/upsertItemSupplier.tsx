@@ -51,7 +51,6 @@ export default function UpsertItemSupplierModal(props: IProps) {
     let payload = _.clone(data);
     payload.supplier = { id: id };
     payload.item = { id: data?.item };
-    console.log("payload", payload);
 
     upsertRecord({
       variables: {
