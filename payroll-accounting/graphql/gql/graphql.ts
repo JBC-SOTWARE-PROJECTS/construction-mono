@@ -9384,6 +9384,7 @@ export type Query = {
   findAllAssetRepairMaintenanceItems?: Maybe<Array<Maybe<AssetRepairMaintenanceItems>>>;
   findAllAssets?: Maybe<Array<Maybe<Assets>>>;
   findAllCreditNote?: Maybe<Page_ArCreditNote>;
+  findAllCustomerList?: Maybe<Array<Maybe<ArCustomers>>>;
   findAllCustomers?: Maybe<Page_ArCustomers>;
   findAllInvoice?: Maybe<Page_ArInvoice>;
   findAllInvoiceItemUUIDById?: Maybe<Array<Maybe<Scalars['UUID']['output']>>>;
@@ -10627,6 +10628,12 @@ export type QueryFindAllCreditNoteArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryFindAllCustomerListArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 

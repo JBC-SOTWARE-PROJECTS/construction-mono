@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.billing
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.accounting.ArCustomers
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -45,7 +46,7 @@ class Billing extends AbstractAuditingEntity implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer", referencedColumnName = "id")
-	Customer customer
+	ArCustomers customer
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)

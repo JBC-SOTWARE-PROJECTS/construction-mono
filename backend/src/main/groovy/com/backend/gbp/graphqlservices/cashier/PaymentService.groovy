@@ -197,7 +197,7 @@ class PaymentService {
 			pay.totalCash = paymentVal.totalCash
 			pay.totalCheck = paymentVal.totalCheck
 			pay.orNumber = paymentVal.orNumber
-			pay.description = paymentVal.receiptType+' #' + paymentVal.orNumber + ' - ' + (billObject.customer?.fullName ? billObject.customer?.fullName : billObject.otcName)
+			pay.description = paymentVal.receiptType+' #' + paymentVal.orNumber + ' - ' + (billObject.customer?.accountName ? billObject.customer?.accountName : billObject.otcName)
 			pay.remarks = paymentVal.remarks
 			pay.billing = billObject
 			pay.billingItem = bill_item
