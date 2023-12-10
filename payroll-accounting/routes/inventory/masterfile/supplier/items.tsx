@@ -71,7 +71,7 @@ export default function SupplierItemComponent() {
     }
   );
 
-  const onUpsertRecord = (record?: Supplier) => {
+  const onUpsertRecord = () => {
     modal({ id: id }, (result: any) => {
       if (result) {
         message.success(result);

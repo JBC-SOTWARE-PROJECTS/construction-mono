@@ -1,5 +1,4 @@
 import React from "react";
-import { ItemGroup } from "@/graphql/gql/graphql";
 import { SaveOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
 import {
@@ -16,15 +15,9 @@ import _ from "lodash";
 import {
   GET_AVTIVE_ITEM,
   UPSERT_RECORD_ITEM_BY_SUPPLIER,
-  UPSERT_RECORD_ITEM_GROUP,
 } from "@/graphql/inventory/masterfile-queries";
 import { requiredField } from "@/utility/helper";
-import {
-  FormCheckBox,
-  FormDebounceSelect,
-  FormInput,
-  FormInputNumber,
-} from "@/components/common";
+import { FormDebounceSelect, FormInputNumber } from "@/components/common";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -42,6 +35,8 @@ export default function UpsertItemSupplierModal(props: IProps) {
       onCompleted: (data) => {
         if (!_.isEmpty(data?.upsertSupplierItem?.id)) {
           hide("Item successfully assigned");
+        } else {
+          message.error("Item already assigned");
         }
       },
     }
@@ -56,6 +51,7 @@ export default function UpsertItemSupplierModal(props: IProps) {
     let payload = _.clone(data);
     payload.supplier = { id: id };
     payload.item = { id: data?.item };
+    console.log("payload", payload);
 
     upsertRecord({
       variables: {
@@ -110,7 +106,7 @@ export default function UpsertItemSupplierModal(props: IProps) {
                 placeholder: "Select Item",
                 fetchOptions: GET_AVTIVE_ITEM,
                 onChange: (newValue) => {
-                  form.setFieldValue("item", newValue);
+                  form.setFieldValue("item", newValue?.value);
                 },
               }}
             />
