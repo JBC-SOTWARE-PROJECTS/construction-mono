@@ -410,3 +410,43 @@ export const UPSERT_RECORD_LOCATION_ITEM = gql`
     }
   }
 `;
+
+export const GET_RECORDS_SUPPLIER_BY_ITEM = gql`
+  query ($id: UUID) {
+    allSupplierByItem(id: $id) {
+      id
+      supplier {
+        id
+        supplierFullname
+      }
+      cost
+      costPurchase
+    }
+  }
+`;
+
+export const UPSERT_RECORD_SUPPLIER_BY_ITEM = gql`
+  mutation (
+    $fields: Map_String_ObjectScalar
+    $itemId: UUID
+    $supId: UUID
+    $id: UUID
+  ) {
+    upsertSupplierItem(
+      fields: $fields
+      itemId: $itemId
+      supId: $supId
+      id: $id
+    ) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_SUPPLIER_BY_ITEM = gql`
+  mutation ($id: UUID) {
+    removeItemSupplier(id: $id) {
+      id
+    }
+  }
+`;

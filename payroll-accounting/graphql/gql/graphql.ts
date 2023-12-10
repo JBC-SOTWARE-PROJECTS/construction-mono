@@ -6550,6 +6550,7 @@ export type OfficeItem = {
   __typename?: 'OfficeItem';
   actualCost?: Maybe<Scalars['BigDecimal']['output']>;
   allow_trade?: Maybe<Scalars['Boolean']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   is_assign?: Maybe<Scalars['Boolean']['output']>;
   item?: Maybe<Item>;
@@ -8898,6 +8899,7 @@ export type Projects = {
   __typename?: 'Projects';
   accountName?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   customer?: Maybe<ArCustomers>;
@@ -8927,6 +8929,7 @@ export type Projects = {
 };
 
 export type ProjectsInput = {
+  company?: InputMaybe<Scalars['UUID']['input']>;
   customer?: InputMaybe<ArCustomersInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   disabledEditing?: InputMaybe<Scalars['Boolean']['input']>;
@@ -13665,7 +13668,9 @@ export type SupplierInventory = {
 export type SupplierItem = {
   __typename?: 'SupplierItem';
   brand?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
   cost?: Maybe<Scalars['BigDecimal']['output']>;
+  costPurchase?: Maybe<Scalars['BigDecimal']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   descLong?: Maybe<Scalars['String']['output']>;
