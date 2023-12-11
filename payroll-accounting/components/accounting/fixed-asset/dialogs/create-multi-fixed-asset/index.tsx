@@ -5,11 +5,12 @@ import { useForm } from 'antd/lib/form/Form'
 import numeral from 'numeral'
 import MultiFixedAssetItemTable from './table'
 import { useGetFixedAssetItems } from '@/hooks/fixed-asset'
-import { createContext } from 'react'
+import { createContext, useState } from 'react'
 import { ApolloError } from '@apollo/client'
-import { Item, Maybe, Office } from '@/graphql/gql/graphql'
+import { FixedAssetItems, Item, Maybe, Office } from '@/graphql/gql/graphql'
 import { useGetCompanyActiveOffices } from '@/hooks/public'
 import { CustomHooksQueryList } from '@/interface/common/graphql-hooks'
+import MultiFixedAssetItemFooter from './footer'
 
 interface CreateMultiFixedAssetI {
   hide: () => void
@@ -26,6 +27,8 @@ export const MultiFixedAssetContext = createContext<MultiFixedAssetI | null>(
 
 export default function CreateMultiFixedAsset(props: CreateMultiFixedAssetI) {
   const [form] = useForm()
+  const [isBegBal, setIsBegBal] = useState(true)
+  const [dataSource, setDataSource] = useState<FixedAssetItems[]>([])
 
   const fixedAssetItemList = useGetFixedAssetItems()
   const companyOffices = useGetCompanyActiveOffices()
@@ -34,14 +37,21 @@ export default function CreateMultiFixedAsset(props: CreateMultiFixedAssetI) {
     <Modal
       title={<Header $bold='bolder'>Create Multiple Fixed Asset Items</Header>}
       open
-      onCancel={props.hide}
-      okText='Save'
+      okText='Create'
       width='100%'
+      footer={<></>}
+      maskStyle={{ background: '#f2f3f4' }}
+      closeIcon={false}
     >
       <MultiFixedAssetContext.Provider
         value={{ fixedAssetItemList, companyOffices }}
       >
-        <MultiFixedAssetItemTable />
+        <MultiFixedAssetItemTable
+          {...{ isBegBal, dataSource, setDataSource }}
+        />
+        <MultiFixedAssetItemFooter
+          {...{ form, isBegBal, setIsBegBal, dataSource, ...props }}
+        />
       </MultiFixedAssetContext.Provider>
     </Modal>
   )

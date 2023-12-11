@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS fixed_asset.fixed_asset_items (
     item_id uuid,
     office_id uuid,
     company_id uuid,
+    reference VARCHAR,
 
     purchase_id uuid,
     purchase_no VARCHAR,

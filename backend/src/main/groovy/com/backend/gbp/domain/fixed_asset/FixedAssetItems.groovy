@@ -2,10 +2,13 @@ package com.backend.gbp.domain.fixed_asset
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.inventory.PurchaseOrder
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.domain.inventory.ReceivingReportItem
+import com.backend.gbp.domain.types.AutoIntegrateable
+import com.backend.gbp.domain.types.Subaccountable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
@@ -26,7 +29,7 @@ enum DepreciationMethod {
 
 @Entity
 @Table(schema = "fixed_asset", name = "fixed_asset_items")
-class FixedAssetItems extends AbstractAuditingEntity implements Serializable {
+class FixedAssetItems extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
 
     @GraphQLQuery
     @Id
@@ -46,7 +49,7 @@ class FixedAssetItems extends AbstractAuditingEntity implements Serializable {
 
     @GraphQLQuery
     @Column(name = "item_id", unique = true)
-    String itemId
+    UUID itemId
 
     @GraphQLQuery
     @Column(name = "item_name", unique = true)
@@ -101,17 +104,21 @@ class FixedAssetItems extends AbstractAuditingEntity implements Serializable {
     @Column(name = "book_value")
     BigDecimal bookValue
 
-    @GraphQLQuery
-    @Column(name = "delivery_receiving_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_receiving_id", referencedColumnName = "id")
     ReceivingReport deliveryReceiving
 
-    @GraphQLQuery
-    @Column(name = "delivery_receiving_item_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_receiving_item_id", referencedColumnName = "id")
     ReceivingReportItem deliveryReceivingItem
 
     @GraphQLQuery
     @Column(name = "delivery_receiving_date")
     Date deliveryReceivingDate
+
+    @GraphQLQuery
+    @Column(name = "reference")
+    String reference
 
     @GraphQLQuery
     @Column(name = "status")
@@ -120,4 +127,17 @@ class FixedAssetItems extends AbstractAuditingEntity implements Serializable {
     @GraphQLQuery
     @Column(name = "company_id")
     UUID companyId
+
+    @Override
+    String getDomain() {
+        return IntegrationDomainEnum.FIXED_ASSET_ITEM.name()
+    }
+
+    @Override
+    Map<String, String> getDetails() {
+        return [:]
+    }
+
+    @Transient
+    String flagValue
 }

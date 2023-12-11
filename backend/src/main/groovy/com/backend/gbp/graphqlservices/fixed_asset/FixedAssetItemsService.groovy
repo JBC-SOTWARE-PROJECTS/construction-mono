@@ -45,6 +45,25 @@ class FixedAssetItemsService extends AbstractDaoCompanyService<FixedAssetItems> 
         return  new GraphQLResVal<FixedAssetItems>(fixeAssetItem,true,'Successfully saved.')
     }
 
+    @Transactional
+    @GraphQLMutation(name='upsertMultiFixedAssetItems')
+    GraphQLResVal<Boolean> upsertMultiFixedAssetItems(
+            @GraphQLArgument(name='fields') List<Map<String,Object>> fields
+    ){
+        if(fields) {
+            fields.each {
+                field ->
+                upsertFromMap(null,field, { fa, isInsert ->
+                        fa.assetNo = generatorService.getNextValue(GeneratorType.FIXED_ASSET_ITEMS) {
+                            it -> return "FA-${StringUtils.leftPad(it.toString(), 6, "0")}"
+                        }
+                    }
+                )
+            }
+        }
+        return  new GraphQLResVal<FixedAssetItems>(true,true,'Successfully saved.')
+    }
+
 
     @GraphQLQuery(name='getFixedAssetPageable')
     Page<FixedAssetItems> getFixedAssetPageable(
@@ -58,8 +77,8 @@ class FixedAssetItemsService extends AbstractDaoCompanyService<FixedAssetItems> 
         params['filter'] = filter
 
         getPageable(
-                """ Select f from FixedAssetItems f where f.companyId = :companyId and (upper(f.assetNo) like upper(:filter)) order by f.assetNo desc""",
-                """ Select count(f) from FixedAssetItems f where f.companyId = :companyId and (upper(f.assetNo) like upper(:filter)) """,
+                """ Select f from FixedAssetItems f where f.companyId = :companyId and (upper(f.assetNo) like upper(concat('%',:filter,'%'))) order by f.assetNo desc""",
+                """ Select count(f) from FixedAssetItems f where f.companyId = :companyId and (upper(f.assetNo) like upper(concat('%',:filter,'%'))) """,
                 page,
                 size,
                 params

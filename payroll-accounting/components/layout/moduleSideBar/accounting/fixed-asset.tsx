@@ -12,6 +12,18 @@ const FixedAssetMenu = {
             path: '/accounting/fixed-asset/registered-assets',
             name: 'Registered Assets',
           },
+          {
+            path: '/accounting/fixed-asset/depreciation',
+            name: 'Depreciation',
+          },
+          {
+            path: '/accounting/fixed-asset/depreciation',
+            name: 'Maintenance',
+          },
+          {
+            path: '/accounting/fixed-asset/depreciation',
+            name: 'Disposal',
+          },
         ],
       },
     ],

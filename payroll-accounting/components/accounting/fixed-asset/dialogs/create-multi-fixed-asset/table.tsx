@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import type { InputRef } from 'antd'
-import { Button, Col, Form, Input, Popconfirm, Row, Table } from 'antd'
+import { Button, Col, Form, Input, Popconfirm, Row, Space, Table } from 'antd'
 import type { FormInstance } from 'antd/es/form'
 import numeral from 'numeral'
 import styled from 'styled-components'
@@ -8,7 +8,12 @@ import TableCell from './table-components'
 import dayjs from 'dayjs'
 import { DeleteOutlined } from '@ant-design/icons'
 import { FixedAssetItems, Office } from '@/graphql/gql/graphql'
-const EditableContext = React.createContext<FormInstance<any> | null>(null)
+import { DepreciationMethodsObj } from '@/constant/fixed-asset'
+import { v4 as uuidv4 } from 'uuid'
+
+export const FAEditableContext = React.createContext<FormInstance<any> | null>(
+  null
+)
 
 interface FormFields {
   itemName: { value: string; label: string } | null
@@ -26,9 +31,9 @@ const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
   const [form] = Form.useForm()
   return (
     <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
+      <FAEditableContext.Provider value={form}>
         <tr {...props} />
-      </EditableContext.Provider>
+      </FAEditableContext.Provider>
     </Form>
   )
 }
@@ -53,7 +58,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const [editing, setEditing] = useState(false)
   const inputRef = useRef<InputRef>(null)
-  const form: FormInstance<FormFields> = useContext(EditableContext)!
+  const form: FormInstance<FormFields> = useContext(FAEditableContext)!
 
   // useEffect(() => {
   //   if (editing) {
@@ -155,26 +160,21 @@ interface DataType {
 
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>
 
-export default function MultiFixedAssetItemTable() {
-  const [dataSource, setDataSource] = useState<DataType[]>([
-    {
-      key: '0',
-      name: 'Edward King 0',
-      age: '32',
-      address: 'London, Park Lane no. 0',
-    },
-    {
-      key: '1',
-      name: 'Edward King 1',
-      age: '32',
-      address: 'London, Park Lane no. 1',
-    },
-  ])
+interface MultiFixedAssetItemTableI {
+  isBegBal: boolean
+  dataSource: FixedAssetItems[]
+  setDataSource: React.Dispatch<React.SetStateAction<FixedAssetItems[]>>
+}
+
+export default function MultiFixedAssetItemTable(
+  props: MultiFixedAssetItemTableI
+) {
+  const { isBegBal, dataSource, setDataSource } = props
 
   const [count, setCount] = useState(2)
 
-  const handleDelete = (key: React.Key) => {
-    const newData = dataSource.filter((item) => item.key !== key)
+  const handleDelete = (id: string) => {
+    const newData = dataSource.filter((item) => item.id !== id)
     setDataSource(newData)
   }
 
@@ -201,7 +201,7 @@ export default function MultiFixedAssetItemTable() {
     {
       title: 'Asset Name',
       dataIndex: 'itemName',
-      width: 150,
+      width: 180,
       editable: true,
     },
     {
@@ -210,13 +210,6 @@ export default function MultiFixedAssetItemTable() {
       width: 150,
       editable: true,
       render: (text: Office) => text?.officeDescription ?? '',
-    },
-    {
-      title: 'Depreciation Start Date',
-      dataIndex: 'depreciationStartDate',
-      width: 120,
-      editable: true,
-      render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
     },
     {
       title: 'Purchase Date',
@@ -234,8 +227,37 @@ export default function MultiFixedAssetItemTable() {
       render: (text) => (text ? numeral(text).format('0,0.00') : ''),
     },
     {
+      title: 'Reference',
+      dataIndex: 'reference',
+      align: 'right',
+      width: 100,
+      editable: true,
+    },
+    {
+      title: 'Depreciation Method',
+      dataIndex: 'depreciationMethod',
+      width: 140,
+      editable: true,
+      render: (text: keyof typeof DepreciationMethodsObj) =>
+        text ? DepreciationMethodsObj[text] : '',
+    },
+    {
+      title: 'Depreciation Start Date',
+      dataIndex: 'depreciationStartDate',
+      width: 150,
+      editable: true,
+      render: (text) => (text ? dayjs(text).format('YYYY-MM-DD') : ''),
+    },
+    {
+      title: 'Accumulated Depreciation',
+      dataIndex: 'accumulatedDepreciation',
+      width: 150,
+      editable: true,
+      render: (text) => (text ? numeral(text).format('0,0.00') : ''),
+    },
+    {
       title: 'Salvage Value',
-      dataIndex: 'salvage_value',
+      dataIndex: 'salvageValue',
       align: 'right',
       width: 120,
       editable: true,
@@ -244,23 +266,23 @@ export default function MultiFixedAssetItemTable() {
 
     {
       title: 'Useful Life',
-      dataIndex: 'useful_life',
+      dataIndex: 'usefulLife',
       align: 'right',
       width: 120,
       editable: true,
-      render: (text) => (text ? numeral(text).format('0,0.00') : ''),
+      render: (text) => (text ? `${text} year(s)` : ''),
     },
     {
       title: '#',
-      dataIndex: 'operation',
+      dataIndex: 'id',
       align: 'center',
       fixed: 'right',
       width: 50,
-      render: (value: any, record: any, index: number) =>
+      render: (value: string) =>
         dataSource.length >= 1 ? (
           <Button
             type='link'
-            onClick={() => handleDelete(record.key)}
+            onClick={() => handleDelete(value)}
             icon={<DeleteOutlined />}
           />
         ) : null,
@@ -268,19 +290,20 @@ export default function MultiFixedAssetItemTable() {
   ]
 
   const handleAdd = () => {
-    const newData: DataType = {
-      key: count,
-      name: `Edward King ${count}`,
-      age: '32',
-      address: `London, Park Lane no. ${count}`,
+    const newData: FixedAssetItems = {
+      id: uuidv4(),
+      purchaseDate: dayjs(),
+      depreciationStartDate: dayjs(),
     }
     setDataSource([...dataSource, newData])
     setCount(count + 1)
   }
 
-  const handleSave = (row: DataType) => {
+  const handleAddFromReceiving = () => {}
+
+  const handleSave = (row: FixedAssetItems) => {
     const newData = [...dataSource]
-    const index = newData.findIndex((item) => row.key === item.key)
+    const index = newData.findIndex((item) => row.id === item.id)
     const item = newData[index]
     newData.splice(index, 1, {
       ...item,
@@ -318,9 +341,17 @@ export default function MultiFixedAssetItemTable() {
         <StyledWrapper>
           <Table
             title={() => (
-              <Button onClick={handleAdd} type='primary'>
-                Add a row
-              </Button>
+              <Space>
+                {isBegBal ? (
+                  <Button onClick={handleAdd} type='primary'>
+                    Add a row
+                  </Button>
+                ) : (
+                  <Button onClick={handleAddFromReceiving} type='primary'>
+                    Add a asset
+                  </Button>
+                )}
+              </Space>
             )}
             size='small'
             bordered
@@ -328,7 +359,7 @@ export default function MultiFixedAssetItemTable() {
             columns={columns as ColumnTypes}
             rowClassName={() => 'editable-row'}
             dataSource={dataSource}
-            scroll={{ x: 1600 }}
+            scroll={{ x: 2100 }}
           />
         </StyledWrapper>
       </Col>

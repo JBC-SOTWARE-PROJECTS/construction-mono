@@ -6,15 +6,25 @@ import {
   FormTextarea,
 } from '@/components/common/form-styled'
 import FormInput from '@/components/common/form-styled/form-input'
+import { DepreciationMethods } from '@/constant/fixed-asset'
+import { FixedAssetItems } from '@/graphql/gql/graphql'
+import { useGetFixedAssetItems } from '@/hooks/fixed-asset'
+import { useGetCompanyActiveOffices } from '@/hooks/public'
 import { Col, Divider, Form, Modal, Row } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
+import dayjs from 'dayjs'
 
 interface CreateFixedAssetI {
   hide: () => void
+  record: FixedAssetItems
 }
 
 export default function CreateFixedAsset(props: CreateFixedAssetI) {
+  const { record } = props
   const [form] = useForm()
+
+  const itemList = useGetFixedAssetItems()
+  const companyOffices = useGetCompanyActiveOffices()
 
   return (
     <Modal
@@ -23,7 +33,20 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
       onCancel={props.hide}
       okText='Save'
     >
-      <Form form={form} layout='vertical'>
+      <Form
+        form={form}
+        layout='vertical'
+        initialValues={{
+          ...record,
+          purchaseDate: record?.purchaseDate
+            ? dayjs(record?.purchaseDate)
+            : dayjs(),
+          depreciationStartDate: record?.depreciationStartDate
+            ? dayjs(record?.depreciationStartDate)
+            : dayjs(),
+          officeId: record?.office?.id ?? '',
+        }}
+      >
         <Divider dashed orientation='left' orientationMargin={0} plain>
           Details
         </Divider>
@@ -36,17 +59,34 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
           </Col>
           <Col flex='100%'>
             <FormSelect
-              name='serialNo'
+              name='itemId'
               label='Asset name'
               bold
-              propsselect={{}}
+              propsselect={{
+                options: itemList?.data?.map((item) => ({
+                  label: item?.descLong,
+                  value: item?.id,
+                  key: item?.id,
+                })),
+              }}
             />
           </Col>
           <Col flex='100%'>
             <FormTextarea name='description' label='Description' bold />
           </Col>
           <Col flex='100%'>
-            <FormSelect name='officeId' label='Office' bold propsselect={{}} />
+            <FormSelect
+              name='officeId'
+              label='Office'
+              bold
+              propsselect={{
+                options: companyOffices?.data?.map((item) => ({
+                  label: item?.officeDescription,
+                  value: item?.id,
+                  key: item?.id,
+                })),
+              }}
+            />
           </Col>
           <Col flex='50%'>
             <FormInputNumber name='purchasePrice' label='Purchase price' bold />
@@ -71,7 +111,7 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
               label='Depreciation Method'
               name='depreciationMethod'
               bold
-              propsselect={{}}
+              propsselect={{ options: DepreciationMethods }}
             />
           </Col>
           <Col flex='50%'>
