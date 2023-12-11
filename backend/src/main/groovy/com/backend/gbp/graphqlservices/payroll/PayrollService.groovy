@@ -293,9 +293,19 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             entries.push(itemsAccount)
         }
 
+        BigDecimal totalSSS = 0
+        BigDecimal totalHDMF = 0
+        BigDecimal totalPHIC = 0
+        BigDecimal totalContributions = 0
+        payroll.contribution.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = generateEntry(it)
+            totalContributions += it.amount
+            entries.push(itemsAccount)
+        }
+
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit - totalOtherDeduction - totalLoan
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit - totalOtherDeduction - totalLoan - totalContributions
             it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
         }
 

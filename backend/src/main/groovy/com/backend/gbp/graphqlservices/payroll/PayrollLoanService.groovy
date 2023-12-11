@@ -97,7 +97,7 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
                     SubAccountBreakdownDto breakdown = breakdownMap.get(subAccountCode)
                     if (!breakdown) breakdown = new SubAccountBreakdownDto()
 
-                    breakdown.amount = it.amount
+                    breakdown.amount += it.amount
                     breakdown.entryType = AccountingEntryType.CREDIT
                     breakdown.description = it.category
                     breakdown.subaccountCode = EmployeeLoanCategory.CASH_ADVANCE ? '111-01-0000' : '211-02-0000'

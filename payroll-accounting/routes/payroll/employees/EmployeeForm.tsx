@@ -719,13 +719,14 @@ const EmployeeForm = ({ account }: IPageProps) => {
                   />
                 </Col>
                 <Col {...col4}>
-                  <FormCheckBox
-                    name="isExcludedFromAttendance"
-                    valuePropName="checked"
-                    checkBoxLabel="Exclude from attendance"
-                    initialValue={_.get(data, "emp.isExcludedFromAttendance")}
-                    propscheckbox={{
-                      defaultChecked: true,
+                  <FormInput
+                    label={"Basic Salary (for contributions computation)"}
+                    initialValue={_.get(data, "emp.basicSalary") || 0}
+                    name="basicSalary"
+                    propsinput={{
+                      placeholder: "Basic Salary",
+                      type: "number",
+                      disabled: isFixedRate,
                     }}
                   />
                 </Col>
@@ -757,6 +758,17 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     initialValue={_.get(data, "emp.isActiveHDMF")}
                     valuePropName="checked"
                     checkBoxLabel="include in HDMF"
+                    propscheckbox={{
+                      defaultChecked: true,
+                    }}
+                  />
+                </Col>
+                <Col {...col4}>
+                  <FormCheckBox
+                    name="isExcludedFromAttendance"
+                    valuePropName="checked"
+                    checkBoxLabel="Exclude from attendance"
+                    initialValue={_.get(data, "emp.isExcludedFromAttendance")}
                     propscheckbox={{
                       defaultChecked: true,
                     }}

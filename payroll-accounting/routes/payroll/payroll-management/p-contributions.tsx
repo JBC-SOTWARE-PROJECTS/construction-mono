@@ -1,6 +1,6 @@
-import { ReloadOutlined } from "@ant-design/icons";
+import { CheckOutlined, EditOutlined, ReloadOutlined } from "@ant-design/icons";
 
-import { Switch, Tabs, Typography } from "antd";
+import { Switch, Tabs, Typography, message } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/router";
 // import { payrollHeaderBreadcrumbRenderer } from "./adjustments";
@@ -27,6 +27,9 @@ import { PageHeader } from "@ant-design/pro-components";
 import { ColumnsType } from "antd/es/table";
 import { ButtonProps } from "antd/lib/button";
 import { useState } from "react";
+import CustomButton from "@/components/common/CustomButton";
+import { statusMap } from "@/utility/constant";
+import useUpdatePayrollContributionStatus from "@/hooks/payroll/contributions/useUpdatePayrollContributionStatus";
 
 export const recalculateButton: ButtonProps = {
   icon: <ReloadOutlined />,
@@ -86,6 +89,12 @@ function PayrollContributionsPage() {
 
   const [updateContributionStatus, loadingContributionStatus] =
     useUpdateContributionTypeStatus(() => refetchContribution());
+
+  const [updateStatus, loadingUpdateStatus] =
+    useUpdatePayrollContributionStatus(() => {
+      refetch();
+      refetchContribution();
+    });
 
   function NumeralDisabledComponent({ active, text, type }: params) {
     if (!contribution) return;
@@ -293,6 +302,22 @@ function PayrollContributionsPage() {
     setActiveTab(key);
   };
 
+  const handleClickFinalize = () => {
+    let countDraft = 0;
+    data?.response?.content.forEach((item: any) => {
+      if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
+    });
+    if (countDraft > 0 && contribution?.status === "DRAFT") {
+      message.error(
+        "There are still some DRAFT employees. Please finalize all employees first"
+      );
+    } else {
+      updateStatus({
+        payrollId: router?.query?.id as string,
+        status: statusMap[contribution?.status as string],
+      });
+    }
+  };
   let tabContent = (
     <>
       <PageHeader title={headerMap[activeTab]} />
@@ -360,6 +385,20 @@ function PayrollContributionsPage() {
                 refetch={refetch}
                 // allowedPermissions={["recalculate_all_contributions_employees"]}
               />
+              <CustomButton
+                type="primary"
+                icon={
+                  contribution?.status === "FINALIZED" ? (
+                    <EditOutlined />
+                  ) : (
+                    <CheckOutlined />
+                  )
+                }
+                onClick={handleClickFinalize}
+                loading={loading || loadingUpdateStatus}
+              >
+                Set as {statusMap[contribution?.status as string]}
+              </CustomButton>
             </>
           )
         }

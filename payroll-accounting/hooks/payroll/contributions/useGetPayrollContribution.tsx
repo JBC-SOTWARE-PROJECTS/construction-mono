@@ -13,6 +13,7 @@ const PAYROLL_CONTRIBUTION = gql`
         isActivePHIC
         isActiveSSS
         isActiveHDMF
+        status
         payroll {
           id
           title

@@ -467,4 +467,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/50_alter_table_item_sub_account.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/55_michael_edit_contributions_view.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

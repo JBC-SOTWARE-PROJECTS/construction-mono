@@ -96,7 +96,7 @@ class PayrollOtherDeductionService implements IPayrollModuleBaseOperations<Payro
                     if (!deduction) deduction = new SubAccountBreakdownDto()
 
 
-                    deduction.amount = it.amount
+                    deduction.amount += it.amount
                     deduction.entryType = AccountingEntryType.CREDIT
                     deduction.subaccountCode = it.type.subaccountCode
 
