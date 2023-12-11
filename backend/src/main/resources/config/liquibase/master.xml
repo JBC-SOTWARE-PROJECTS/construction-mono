@@ -469,4 +469,16 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/55_michael_edit_contributions_view.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/56_wilson_project_updates.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/57_wilson_alter_project.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/58_wilson_alter_project_and_status.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/59_wilson_alter_project_status_color.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/60_wilson_alter_project_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/61_wilson_alter_supplier_item.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

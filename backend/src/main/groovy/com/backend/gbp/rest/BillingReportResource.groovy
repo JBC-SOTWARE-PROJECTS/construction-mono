@@ -142,7 +142,7 @@ class BillingReportResource {
 
 		parameters.put("trans_type", bill?.project ? "PROJECT" : "OTC" )
 		parameters.put("job_desc", bill?.project ? bill?.project?.description : "OTC Transaction" )
-		parameters.put("customer", bill?.customer?.fullName ?: bill.otcName)
+		parameters.put("customer", bill?.customer?.accountName ?: bill.otcName)
 		parameters.put("address", bill?.customer?.address ?: "")
 		parameters.put("prepared", employee.fullName ?: "")
 		parameters.put("totals", totals ?: 0.00)
@@ -586,7 +586,7 @@ class BillingReportResource {
 				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
 		def dto = new ReceiptDto(
 				date: dateFormat.format(payment.createdDate) ?: "",
-				customer: payment?.billing?.customer?.fullName ?: payment?.billing?.otcName,
+				customer: payment?.billing?.customer?.accountName ?: payment?.billing?.otcName,
 				tin: "",
 				address: payment?.billing?.customer?.address ?: "" ,
 				totalWords: "" ,
@@ -840,10 +840,10 @@ class BillingReportResource {
 		parameters.put("email", office.emailAdd ?: "N/A")
 
 
-		parameters.put("customer", job.customer?.fullName ?: "N/A")
+		parameters.put("customer", job.customer?.accountName ?: "N/A")
 		parameters.put("address", job.customer?.address ?: "N/A")
-		parameters.put("cust_email", job.customer?.emailAdd ?: "N/A")
-		parameters.put("cust_phone_no", job.customer?.telNo ? job.customer?.telNo : "N/A")
+		parameters.put("cust_email", job.customer?.contactEmail ?: "N/A")
+		parameters.put("cust_phone_no", job.customer?.contactNo ? job.customer?.contactNo : "N/A")
 		parameters.put("plate_no", job.plateNo ?: "N/A")
 		parameters.put("date_trans", dateFormat.format(job.dateTrans) ?: "")
 		parameters.put("repair_type", job.repair?.description ?: "")
@@ -1002,9 +1002,9 @@ class BillingReportResource {
 		parameters.put("email", office.emailAdd ?: "N/A")
 
 
-		parameters.put("customer", job.customer?.fullName ?: "N/A")
+		parameters.put("customer", job.customer?.accountName ?: "N/A")
 		parameters.put("address", job.customer?.address ?: "N/A")
-		parameters.put("cust_phone_no", job.customer?.telNo ? job.customer?.telNo : "N/A")
+		parameters.put("cust_phone_no", job.customer?.contactNo ? job.customer?.contactNo : "N/A")
 		parameters.put("make", job.make ?: "")
 		parameters.put("date_trans", dateFormat.format(job.dateTrans) ?: "")
 		parameters.put("trans_time", timeFormatter.format(job.dateTrans) ?: "")
