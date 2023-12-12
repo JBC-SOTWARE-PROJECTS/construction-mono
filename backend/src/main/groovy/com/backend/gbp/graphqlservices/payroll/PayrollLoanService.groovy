@@ -93,14 +93,14 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
             Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
             module.employees.each { employee ->
                 employee.loanItems.each {
-                    String subAccountCode = it.category == EmployeeLoanCategory.CASH_ADVANCE ? '111-01-0000' : '211-02-0000'
+                    String subAccountCode = it.category == EmployeeLoanCategory.CASH_ADVANCE ? '116-04-0000' : '211-02-0000'
                     SubAccountBreakdownDto breakdown = breakdownMap.get(subAccountCode)
                     if (!breakdown) breakdown = new SubAccountBreakdownDto()
 
                     breakdown.amount += it.amount
                     breakdown.entryType = AccountingEntryType.CREDIT
                     breakdown.description = it.category
-                    breakdown.subaccountCode = EmployeeLoanCategory.CASH_ADVANCE ? '111-01-0000' : '211-02-0000'
+                    breakdown.subaccountCode = EmployeeLoanCategory.CASH_ADVANCE ? '116-04-0000' : '211-02-0000'
 
                     breakdownMap.put(subAccountCode, breakdown)
                 }

@@ -89,11 +89,11 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
             Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
             payrollContribution.contributionEmployees.each {
                 generateBreakdown(it.sssEE + it.sssWispEE, 'SSS EE', '217-01-0000', breakdownMap)
-                generateBreakdown(it.sssER + it.sssWispER, 'SSS ER', '511-46-0000', breakdownMap)
+                generateBreakdown(it.sssER + it.sssWispER, 'SSS ER', '211-03-0000', breakdownMap)
                 generateBreakdown(it.phicEE, 'PHIC EE', '217-03-0000', breakdownMap)
-                generateBreakdown(it.phicER, 'PHIC ER', '511-48-0000', breakdownMap)
+                generateBreakdown(it.phicER, 'PHIC ER', '211-05-0000', breakdownMap)
                 generateBreakdown(it.hdmfEE, 'HDMF EE', '217-02-0000', breakdownMap)
-                generateBreakdown(it.hdmfER, 'HDMF ER', '511-47-0000', breakdownMap)
+                generateBreakdown(it.hdmfER, 'HDMF ER', '211-04-0000', breakdownMap)
             }
 
             payrollContribution.totalsBreakdown = []

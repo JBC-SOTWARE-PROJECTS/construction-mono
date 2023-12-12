@@ -251,7 +251,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     ) {
         Payroll payroll = payrollRepository.findById(id).get()
         postToLedgerAccounting(payroll)
-        return new GraphQLResVal<String>("OK", true, "Successfully deleted payroll")
+        return new GraphQLResVal<String>("OK", true, "Successfully posted payroll entries to accounting")
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -293,9 +293,6 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             entries.push(itemsAccount)
         }
 
-        BigDecimal totalSSS = 0
-        BigDecimal totalHDMF = 0
-        BigDecimal totalPHIC = 0
         BigDecimal totalContributions = 0
         payroll.contribution.totalsBreakdown.each {
             Map<String, Object> itemsAccount = generateEntry(it)
@@ -303,9 +300,20 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             entries.push(itemsAccount)
         }
 
+        BigDecimal totalSalary = 0
+        payroll.timekeeping.salaryBreakdown.each {
+            Map<String, Object> itemsAccount = [:]
+            itemsAccount['code'] = it.subAccountCode
+            itemsAccount['debit'] = it.total
+            itemsAccount['credit'] = 0.00
+            totalSalary += it.total
+
+            entries.push(itemsAccount)
+        }
+        totalSalary = totalSalary - totalOtherDeduction - totalLoan - totalContributions
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit - totalOtherDeduction - totalLoan - totalContributions
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary
             it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
         }
 
