@@ -279,41 +279,43 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 //        headerLedgerGroup.particulars = 'TEST PAYROLL'
 //        def newSave = headerGroupServices.save(headerLedgerGroup)
 
-
+        Map<String, Map<String, Object>> entryMap = new HashMap<>()
         List<Map<String, Object>> entries = []
         BigDecimal totalAllowance = 0
         payrollAllowanceRepository.joinFetchAllowanceItems(payroll.id)
 
         payroll.allowance.totalsBreakdown.each {
-            Map<String, Object> itemsAccount = generateEntry(it)
+            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
+
             totalAllowance += it.amount
-            entries.push(itemsAccount)
+//            entries.push(itemsAccount)
         }
 
         BigDecimal totalAdjustmentDebit = 0
         BigDecimal totalAdjustmentCredit = 0
         payroll.adjustment.totalsBreakdown.each {
-            Map<String, Object> itemsAccount = generateEntry(it)
+            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
             if (it.entryType == AccountingEntryType.DEBIT)
                 totalAdjustmentCredit += it.amount
             else if (it.entryType == AccountingEntryType.CREDIT)
                 totalAdjustmentDebit += it.amount
-            entries.push(itemsAccount)
+//            entries.push(itemsAccount)
         }
 
         BigDecimal totalOtherDeduction = 0
         payroll.otherDeduction.totalsBreakdown.each {
-            Map<String, Object> itemsAccount = generateEntry(it)
+            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
             totalOtherDeduction += it.amount
-            entries.push(itemsAccount)
+//            entries.push(itemsAccount)
         }
 
 //        BigDecimal totalLoan = 0
 //        payroll.loan.totalsBreakdown.each {
-//            Map<String, Object> itemsAccount = generateEntry(it)
+//            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
 //            totalLoan += it.amount
-//            entries.push(itemsAccount)
+////            entries.push(itemsAccount)
 //        }
+
 
         BigDecimal totalLoan = 0
         payroll.advancesToEmployees = 0
@@ -354,12 +356,24 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         totalSalary = totalSalary - totalOtherDeduction - totalLoan - totalContributions
 
 
-
-
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
             it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary
             it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
+        }
+
+        entryMap.keySet().each { key ->
+            Map<String, Object> item = entryMap.get(key.toString())
+            Boolean foundDuplicate = false
+            headerLedger.ledger.each {
+                if (it.journalAccount.code == key) {
+                    it.credit += item['credit'] as BigDecimal
+                    it.debit += item['debit'] as BigDecimal
+                    foundDuplicate = true
+                }
+            }
+            if (!foundDuplicate) entries.push(item)
+            foundDuplicate = false
         }
 //        headerLedger.headerLedgerGroup = newSave.id
 
@@ -397,19 +411,42 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
     }
 
-    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it) {
-        Map<String, Object> itemsAccount = [:]
+    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it, Map<String, Map<String, Object>> entryMap) {
+
+        Map<String, Object> itemsAccount = entryMap.get(it.subaccountCode)
+        if (!itemsAccount)
+            itemsAccount = new HashMap<>()
         itemsAccount['code'] = it.subaccountCode
 
         if (it.entryType == AccountingEntryType.DEBIT) {
-            itemsAccount['debit'] = it.amount
-            itemsAccount['credit'] = 0.00
+            itemsAccount['debit'] = (itemsAccount['debit'] ? (itemsAccount['debit'] as BigDecimal) : 0) + it.amount
         } else if (it.entryType == AccountingEntryType.CREDIT) {
-            itemsAccount['debit'] = 0.00
-            itemsAccount['credit'] = it.amount
+            itemsAccount['credit'] = (itemsAccount['credit'] ? (itemsAccount['credit'] as BigDecimal) : 0) + it.amount
         }
-        return itemsAccount
+
+        if (!itemsAccount['debit'])
+            itemsAccount['debit'] = 0
+
+        if (!itemsAccount['credit'])
+            itemsAccount['credit'] = 0
+        entryMap.put(it.subaccountCode, itemsAccount)
+//        return itemsAccount
     }
+
+
+//    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it) {
+//        Map<String, Object> itemsAccount = [:]
+//        itemsAccount['code'] = it.subaccountCode
+//
+//        if (it.entryType == AccountingEntryType.DEBIT) {
+//            itemsAccount['debit'] = it.amount
+//            itemsAccount['credit'] = 0.00
+//        } else if (it.entryType == AccountingEntryType.CREDIT) {
+//            itemsAccount['debit'] = 0.00
+//            itemsAccount['credit'] = it.amount
+//        }
+//        return itemsAccount
+//    }
 
 }
 
