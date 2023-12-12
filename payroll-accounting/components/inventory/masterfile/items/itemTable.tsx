@@ -97,7 +97,7 @@ export default function ItemTable({
           },
           {
             label: "Assign Supplier",
-            onClick: () => handleOpen(record),
+            onClick: () => handleSupplier(record),
             key: "2",
           },
         ];

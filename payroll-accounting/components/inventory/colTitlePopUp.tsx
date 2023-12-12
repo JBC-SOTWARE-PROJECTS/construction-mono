@@ -6,16 +6,22 @@ interface IProps {
   descripton: string;
   popup?: string;
   editable?: boolean;
+  popupColor?: string;
 }
 
-export default function ColTitlePopUp({ descripton, popup, editable }: IProps) {
+export default function ColTitlePopUp({
+  descripton,
+  popup,
+  editable,
+  popupColor = "#fff",
+}: IProps) {
   return (
     <span>
       {descripton}
       {popup && (
         <Tooltip title={popup} color="green" key={"popover"}>
           &nbsp;
-          <QuestionCircleFilled style={{ color: "#fff" }} />
+          <QuestionCircleFilled style={{ color: popupColor }} />
         </Tooltip>
       )}
       {editable && (
@@ -24,7 +30,7 @@ export default function ColTitlePopUp({ descripton, popup, editable }: IProps) {
           color="blue"
           key={"popoverEditable"}>
           &nbsp;
-          <EditFilled style={{ color: "#fff" }} />
+          <EditFilled style={{ color: popupColor }} />
         </Tooltip>
       )}
     </span>

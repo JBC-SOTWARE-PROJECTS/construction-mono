@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices
 
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -46,7 +47,7 @@ class CompanySettingsService extends AbstractDaoService<CompanySettings> {
 
     @GraphQLQuery(name = "comById")
     CompanySettings comById() {
-        def id = UUID.fromString("ee58932e-ab09-4cce-b46d-ef3477db84a6")
+        def id = SecurityUtils.currentCompanyId()
         if(id){
             findOne(id)
         }else{

@@ -56,4 +56,8 @@ class OfficeItem implements Serializable{
 	@GraphQLQuery
 	@Column(name = "is_assign")
 	Boolean is_assign
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 }

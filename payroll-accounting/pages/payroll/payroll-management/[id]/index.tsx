@@ -15,7 +15,11 @@ import {
   Tag,
   Typography,
 } from "antd";
-import { EditOutlined, FieldTimeOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  FieldTimeOutlined,
+  FileOutlined,
+} from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { PayrollFormUsage } from "@/components/payroll/PayrollForm";
@@ -79,6 +83,13 @@ const ViewPayroll = ({ account }: IPageProps) => {
       link: "/p-other-deductions",
       description:
         "Manages various deductions, such as healthcare premiums and union dues.",
+      show: true,
+    },
+    {
+      title: "Payroll Payslip",
+      icon: <FileOutlined />,
+      link: "/p-payslip",
+      description: "Manages employee salary and its payslip.",
       show: true,
     },
   ];

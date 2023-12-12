@@ -120,7 +120,7 @@ export const responsiveColumn2 = {
   sm: 24,
   md: 12,
   lg: 12,
-}
+};
 
 export const responsiveColumn18 = {
   xs: 24,
@@ -211,7 +211,7 @@ export const RPTOTALS = [
     debit: 0,
     credit: null,
   },
-]
+];
 
 export const PETTYTOTALS = [
   {
@@ -462,6 +462,85 @@ export const PC_CATEGORY = [
   },
 ];
 
+
+export const headerConstant = [
+  {
+    title: "No. of Hrs",
+  },
+  {
+    title: "Rate",
+  },
+  {
+    title: "Total",
+  },
+];
+
+export const grossName = [
+  {
+    title: "Regular",
+  },
+  {
+    title: "Late",
+  },
+  {
+    title: "Under Time",
+  },
+  {
+    title: "Over Time",
+  },
+  {
+    title: "Regular Holiday",
+  },
+  {
+    title: "Special Non-Working",
+  },
+  {
+    title: "Vication Leave",
+  },
+  {
+    title: "Sick Leave",
+  },
+  {
+    title: "Semi Monthly Allowance",
+  },
+  {
+    title: "Dialy Allowance",
+  },
+  {
+    title: "Load Allowance",
+  },
+  {
+    title: "Transportation Allowance",
+  },
+  {
+    title: "Food Allowance",
+  },
+];
+
+export const payrollDeduction = [
+  {
+    title: "Withholding Tax",
+  },
+  {
+    title: "SSS",
+  },
+  {
+    title: "HDMF",
+  },
+  {
+    title: "PHIC",
+  },
+  {
+    title: "HMO Insurance",
+  },
+  {
+    title: "Cash Advance",
+  },
+  {
+    title: "Item Credit",
+  },
+];
+
 export const SUP_EN_TYPE = [
   { label: "PERSONAL", value: "PERSONAL" },
   { label: "CORPORATE", value: "CORPORATE" },
@@ -487,3 +566,4 @@ export const AssetStatusColor = {
   UNDER_MAINTENANCE : 'red',
   NO_STATUS : 'gold'
 }
+
