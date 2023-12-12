@@ -77,7 +77,7 @@ class EmployeeLoan extends AbstractAuditingEntity implements Serializable, AutoI
 
     @Override
     String getDomain() {
-        return IntegrationDomainEnum.PAYROLL.name()
+        return IntegrationDomainEnum.EMPLOYEE_LOAN.name()
     }
 
     @Transient
@@ -89,12 +89,7 @@ class EmployeeLoan extends AbstractAuditingEntity implements Serializable, AutoI
     }
 
     @Transient
-    BigDecimal negativeAmount
-
-    @Transient
-    BigDecimal getNegativeAmount() {
-        return amount.negate()
-    }
+    BigDecimal cashOnHand
 
     @Transient
     BigDecimal apClearingAccount

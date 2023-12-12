@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.accounting.HeaderLedgerGroup
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.hrm.Employee
@@ -11,6 +12,7 @@ import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.accounting.ArInvoiceServices
+import com.backend.gbp.graphqlservices.accounting.HeaderGroupServices
 import com.backend.gbp.graphqlservices.accounting.IntegrationServices
 import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollStatusService
@@ -20,12 +22,15 @@ import com.backend.gbp.repository.payroll.PayrollAllowanceRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.backend.gbp.security.SecurityUtils
+import com.backend.gbp.services.GeneratorService
+import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -74,6 +79,13 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
     @Autowired
     LedgerServices ledgerServices
+
+    @Autowired
+    HeaderGroupServices headerGroupServices
+
+    @Autowired
+    GeneratorService generatorService
+
 
     @Autowired
     PayrollService(EmployeeRepository employeeRepository) {
@@ -258,6 +270,16 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     Payroll postToLedgerAccounting(Payroll payroll) {
         def yearFormat = DateTimeFormatter.ofPattern("yyyy")
         def actPay = super.save(payroll) as Payroll
+
+//        HeaderLedgerGroup headerLedgerGroup = new HeaderLedgerGroup()
+//        headerLedgerGroup.recordNo = generatorService.getNextValue(GeneratorType.HEADER_GROUP) {
+//            StringUtils.leftPad(it.toString(), 5, "0")
+//        }
+//        headerLedgerGroup.entity_name = 'MEGATAM PAYROLL'
+//        headerLedgerGroup.particulars = 'TEST PAYROLL'
+//        def newSave = headerGroupServices.save(headerLedgerGroup)
+
+
         List<Map<String, Object>> entries = []
         BigDecimal totalAllowance = 0
         payrollAllowanceRepository.joinFetchAllowanceItems(payroll.id)
@@ -286,18 +308,37 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             entries.push(itemsAccount)
         }
 
+//        BigDecimal totalLoan = 0
+//        payroll.loan.totalsBreakdown.each {
+//            Map<String, Object> itemsAccount = generateEntry(it)
+//            totalLoan += it.amount
+//            entries.push(itemsAccount)
+//        }
+
         BigDecimal totalLoan = 0
+        payroll.advancesToEmployees = 0
         payroll.loan.totalsBreakdown.each {
-            Map<String, Object> itemsAccount = generateEntry(it)
+            payroll.advancesToEmployees -= it.amount
             totalLoan += it.amount
-            entries.push(itemsAccount)
         }
 
         BigDecimal totalContributions = 0
         payroll.contribution.totalsBreakdown.each {
-            Map<String, Object> itemsAccount = generateEntry(it)
+            switch (it.description) {
+                case 'SSS EE':
+                    payroll.sssEe = it.amount; break;
+                case 'HDMF EE':
+                    payroll.hdmfEe = it.amount; break;
+                case 'PHIC EE':
+                    payroll.phicEe = it.amount; break;
+                case 'SSS ER':
+                    payroll.dueToSss = it.amount; break;
+                case 'HDMF ER':
+                    payroll.dueToHdmf = it.amount; break;
+                case 'PHIC ER':
+                    payroll.dueToPhic = it.amount; break;
+            }
             totalContributions += it.amount
-            entries.push(itemsAccount)
         }
 
         BigDecimal totalSalary = 0
@@ -311,11 +352,16 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             entries.push(itemsAccount)
         }
         totalSalary = totalSalary - totalOtherDeduction - totalLoan - totalContributions
+
+
+
+
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
             it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary
             it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
         }
+//        headerLedger.headerLedgerGroup = newSave.id
 
 
         headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger, entries)

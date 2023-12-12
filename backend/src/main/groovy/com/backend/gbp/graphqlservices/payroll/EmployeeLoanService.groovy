@@ -1,6 +1,5 @@
 package com.backend.gbp.graphqlservices.payroll
 
-import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.accounting.HeaderLedger
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LedgerDocType
@@ -8,20 +7,15 @@ import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.dto.EmployeeLoanConfig
 import com.backend.gbp.domain.payroll.EmployeeLoan
 import com.backend.gbp.domain.payroll.EmployeeLoanLedgerItem
-import com.backend.gbp.domain.payroll.PHICContribution
-import com.backend.gbp.domain.payroll.Payroll
-import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.EmployeeLoanCategory
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.accounting.ArInvoiceServices
 import com.backend.gbp.graphqlservices.accounting.IntegrationServices
 import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
-import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.EmployeeLoanLedgerItemRepository
 import com.backend.gbp.repository.payroll.EmployeeLoanRepository
-import com.backend.gbp.repository.payroll.PHICContributionRepository
 import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -220,35 +214,20 @@ limit ${size} offset ${size * page}
     @Transactional(rollbackFor = Exception.class)
     EmployeeLoan postToLedgerAccounting(EmployeeLoan employeeLoan) {
         def yearFormat = DateTimeFormatter.ofPattern("yyyy")
-//        def actPay = super.save(employeeLoan) as EmployeeLoan
         List<Map<String, Object>> entries = []
 
+        def headerLedger = integrationServices.generateAutoEntries(employeeLoan) { it, mul ->
+            it.flagValue = "EMPLOYEE_LOAN_SETUP"
+            it.advanceToEmployees = employeeLoan.amount
+            if (employeeLoan.category == EmployeeLoanCategory.EQUIPMENT_LOAN) {
+                it.cashOnHand = 0
+                it.apClearingAccount = employeeLoan.amount
+            } else if (employeeLoan.category == EmployeeLoanCategory.CASH_ADVANCE) {
+                it.cashOnHand = employeeLoan.amount.negate()
+                it.apClearingAccount = 0
+            }
 
-        Map<String, Object> debit = [:]
-        debit['code'] = '116-04-0000'
-        debit['debit'] = employeeLoan.amount
-        debit['credit'] = 0.00
-        entries.push(debit)
-
-        Map<String, Object> credit = [:]
-        credit['code'] = employeeLoan.category == EmployeeLoanCategory.CASH_ADVANCE ? '111-01-0000' : '211-02-0000'
-        credit['debit'] = 0.00
-        credit['credit'] = employeeLoan.amount
-        entries.push(credit)
-
-
-        HeaderLedger headerLedger = new HeaderLedger()
-        headerLedger.transactionDate = Instant.now()
-        headerLedger.transactionDateOnly = headerLedger.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
-        headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger, entries)
-
-//
-//        def headerLedger = integrationServices.generateAutoEntries(employeeLoan) { it, mul ->
-//            it.flagValue = "EMPLOYEE_LOAN_SETUP"
-//            it.apClearingAccount = 0 //initialize
-//            it.advanceToEmployees = 0 //initialize
-//        }
-
+        }
 
         Map<String, String> details = [:]
 
