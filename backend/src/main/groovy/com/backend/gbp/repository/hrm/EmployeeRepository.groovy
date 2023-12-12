@@ -30,6 +30,9 @@ interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     @Query(value = "Select e from Employee e where e.id in :id")
     List<Employee> getEmployees(@Param("id") List<UUID> id)
 
+    @Query(value = "Select e from Employee e where e.id in :id")
+    List<Employee> getAllEmployee(@Param("id") List<UUID> id)
+
     @Query(
             value = "Select e from Employee e where lower(e.fullName) like lower(concat('%',:filter,'%'))",
             countQuery = "Select count(e) from Employee e where lower(e.fullName) like lower(concat('%',:filter,'%'))"
