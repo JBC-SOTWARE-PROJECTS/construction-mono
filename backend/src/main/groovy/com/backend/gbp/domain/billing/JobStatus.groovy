@@ -41,4 +41,13 @@ class JobStatus extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "disabled_editing", columnDefinition = 'bool')
 	Boolean disabledEditing
 
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
+
+	@GraphQLQuery
+	@Column(name = "status_color", columnDefinition = 'varchar')
+	@UpperCase
+	String statusColor
+
 }

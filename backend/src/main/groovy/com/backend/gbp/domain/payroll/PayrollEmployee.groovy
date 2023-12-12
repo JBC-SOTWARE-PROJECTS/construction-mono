@@ -46,9 +46,9 @@ class PayrollEmployee extends AbstractAuditingEntity implements Serializable {
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
 
-//    @OneToOne(mappedBy = "payrollEmployee")
-//    OtherDeductionEmployee otherDeduction
-//
+    @OneToOne(mappedBy = "payrollEmployee")
+    PayrollEmployeeOtherDeduction employeeOtherDeduction
+
     @OneToOne(mappedBy = "payrollEmployee")
     TimekeepingEmployee timekeepingEmployee
 
@@ -60,8 +60,8 @@ class PayrollEmployee extends AbstractAuditingEntity implements Serializable {
     PayrollEmployeeAdjustment employeeAdjustment
 
 //
-//    @OneToOne(mappedBy = "payrollEmployee")
-//    PayrollEmployeeAllowance allowanceEmployee
+    @OneToOne(mappedBy = "payrollEmployee")
+    PayrollEmployeeAllowance allowanceEmployee
 //
     @OneToOne(mappedBy = "payrollEmployee")
     PayrollEmployeeContribution payrollEmployeeContribution

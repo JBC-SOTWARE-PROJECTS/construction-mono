@@ -1,21 +1,22 @@
-import FormSelect from '@/components/common/formSelect/formSelect'
-import { SubAccountSetup } from '@/graphql/gql/graphql'
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { Form, Modal } from 'antd'
-import _ from 'lodash'
-import React, { useEffect } from 'react'
+import FormSelect from "@/components/common/formSelect/formSelect";
+import { SubAccountSetup } from "@/graphql/gql/graphql";
+import { filterOption } from "@/utility/helper";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { Form, Modal } from "antd";
+import _ from "lodash";
+import React, { useEffect } from "react";
 
 export const ADD_SUBCCOUNT_RECORD = gql`
   mutation AddSubAccount($id: UUID, $accountId: UUID) {
     addSubAccountToIntegration(id: $id, accountId: $accountId)
   }
-`
+`;
 
 const ACCOUNTS_LEVEL_VALUES = gql`
   query ($domain: String, $target: String) {
     fields: getSpecificFieldsFromDomain(domain: $domain, target: $target)
   }
-`
+`;
 
 export const GET_COA_SUB = gql`
   query {
@@ -25,30 +26,30 @@ export const GET_COA_SUB = gql`
       key
     }
   }
-`
+`;
 
 interface AddAccountProps {
-  hide: (hideProps: any) => {}
-  values?: SubAccountSetup
-  itemid: string
+  hide: (hideProps: any) => {};
+  values?: SubAccountSetup;
+  itemid: string;
 }
 
 const AddAccount = (props: AddAccountProps) => {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm();
 
-  const { loading, error, data, fetchMore } = useQuery(GET_COA_SUB)
+  const { loading, error, data, fetchMore } = useQuery(GET_COA_SUB);
   const [onLoadAccountsLevel, { loading: levelLoading }] = useLazyQuery(
     ACCOUNTS_LEVEL_VALUES
-  )
+  );
   const [addSubAccountNow, { loading: resultLoadingAddSub }] = useMutation(
     ADD_SUBCCOUNT_RECORD,
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        props.hide(data)
+        props.hide(data);
       },
     }
-  )
+  );
 
   const handleSubmmit = (fields: SubAccountSetup) => {
     // console.log("payload for add", props.itemid, fields.id)
@@ -57,8 +58,8 @@ const AddAccount = (props: AddAccountProps) => {
         accountId: fields.id,
         id: props.itemid,
       },
-    })
-  }
+    });
+  };
 
   // useEffect(() => {
   //   onLoadAccountsLevel()
@@ -66,38 +67,37 @@ const AddAccount = (props: AddAccountProps) => {
   return (
     <>
       <Modal
-        title={'Add Account'}
+        title={"Add Account"}
         open={true}
-        okText={'Save'}
+        okText={"Save"}
         onOk={() => form.submit()}
         //okButtonProps={{ loading: upsertLoading }}
-        onCancel={() => props.hide(false)}
-      >
+        onCancel={() => props.hide(false)}>
         <Form
           form={form}
-          name='basic'
-          layout='vertical'
+          name="basic"
+          layout="vertical"
           initialValues={{ ...props.values }}
           onFinish={handleSubmmit}
-          autoComplete='off'
-        >
+          autoComplete="off">
           <FormSelect
-            label='Select Account'
-            name='id'
+            label="Select Account"
+            name="id"
             rules={[
               {
                 required: true,
-                message: 'Please input your Account!',
+                message: "Please input your Account!",
               },
             ]}
             propsselect={{
+              showSearch: true,
               options: data?.getAllCOAParent || [],
             }}
           />
         </Form>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default AddAccount
+export default AddAccount;

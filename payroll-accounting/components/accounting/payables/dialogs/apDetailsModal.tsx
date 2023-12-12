@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { InsertRowBelowOutlined, SaveOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Modal, Row, Space, Typography } from "antd";
 import _ from "lodash";
@@ -17,7 +17,11 @@ import {
   ExtendedAPTransactionDto,
   IFormAPTransactionDetails,
 } from "@/interface/payables/formInterfaces";
-import { useAPTransactionType, useOffices } from "@/hooks/payables";
+import {
+  useAPTransactionType,
+  useOffices,
+  useProjects,
+} from "@/hooks/payables";
 import { Supplier } from "@/graphql/gql/graphql";
 
 interface IProps {
@@ -31,13 +35,14 @@ export default function APDetailsModal(props: IProps) {
   const { hide, record, status, supplier } = props;
   const [form] = Form.useForm();
   const { setFieldValue } = form;
-
+  const [selectedOffice, setOffice] = useState("");
   // ===================== Queries ==============================
   const transactionList = useAPTransactionType({
     type: supplier?.supplierTypes?.id,
     category: "AP",
   });
-  const departments = useOffices();
+  const offices = useOffices();
+  const projects = useProjects({ office: selectedOffice });
   //================== functions ====================
 
   const onSubmit = (data: IFormAPTransactionDetails) => {
@@ -312,8 +317,12 @@ export default function APDetailsModal(props: IProps) {
               propsselect={{
                 showSearch: true,
                 labelInValue: true,
-                options: departments,
+                options: offices,
                 placeholder: "Select Office",
+                onChange: (e) => {
+                  setOffice(e?.value);
+                  setFieldValue("project", null);
+                },
               }}
             />
           </Col>
@@ -324,7 +333,7 @@ export default function APDetailsModal(props: IProps) {
               propsselect={{
                 showSearch: true,
                 labelInValue: true,
-                options: departments,
+                options: projects,
                 placeholder: "Select Project",
               }}
             />

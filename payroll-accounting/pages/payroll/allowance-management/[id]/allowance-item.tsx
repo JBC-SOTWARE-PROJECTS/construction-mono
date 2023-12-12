@@ -33,7 +33,7 @@ interface Item {
   key: string;
   id: string;
   name: string;
-  allowanceTypeName: string;
+  allowanceType: string;
   amount: number;
 }
 
@@ -126,7 +126,7 @@ function AllowanceItem() {
   const edit = (record: Partial<Item> & { key: React.Key }) => {
     form.setFieldsValue({
       name: "",
-      allowanceTypeName: "",
+      allowanceType: "",
       amount: 0,
       ...record,
     });
@@ -172,8 +172,10 @@ function AllowanceItem() {
     },
     {
       title: "Allowance Type",
-      dataIndex: "allowanceTypeName",
-      key: "allowanceTypeName",
+      dataIndex: "allowanceType",
+      render: (value: string) => {
+        return value.replace("_", " ");
+      },
     },
     {
       title: "Amount",

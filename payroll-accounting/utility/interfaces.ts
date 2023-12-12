@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { ReactNode } from "react";
 
 export interface ICredentials {
   username: string;
@@ -17,7 +18,7 @@ export interface IUserEmployee {
 }
 
 export interface OptionsValue {
-  label: string | null;
+  label: string | null | ReactNode;
   value: string | null;
 }
 

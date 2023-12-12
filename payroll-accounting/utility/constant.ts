@@ -462,6 +462,7 @@ export const PC_CATEGORY = [
   },
 ];
 
+
 export const headerConstant = [
   {
     title: "No. of Hrs",
@@ -539,3 +540,30 @@ export const payrollDeduction = [
     title: "Item Credit",
   },
 ];
+
+export const SUP_EN_TYPE = [
+  { label: "PERSONAL", value: "PERSONAL" },
+  { label: "CORPORATE", value: "CORPORATE" },
+];
+
+export const VAT_CON = [
+  { label: "VATABLE", value: "true" },
+  { label: "NON-VATABLE", value: "false" },
+];
+
+
+export const AssetStatusColor = {
+  ACTIVE : 'blue',
+  DISPOSED : 'grey',
+  IDLE : 'warning',
+  IN_REPAIR : 'red',
+  IN_SERVICE : 'green',
+  IN_TRANSIT : 'purple',
+  OUT_OF_SERVICE : 'yellow',
+  RESERVED : 'cyan',
+  RETIRED : 'volcano',
+  UNDER_INSPECTION : 'magenta',
+  UNDER_MAINTENANCE : 'red',
+  NO_STATUS : 'gold'
+}
+

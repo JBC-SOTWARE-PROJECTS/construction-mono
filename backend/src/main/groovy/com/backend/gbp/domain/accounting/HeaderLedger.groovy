@@ -180,6 +180,16 @@ class HeaderLedger extends AbstractAuditingEntity implements Serializable {
 	Instant approvedDatetime
 
 	@GraphQLQuery
+	@Column(name = "parent_ledger", columnDefinition = "uuid")
+	@UpperCase
+	UUID parentLedger
+
+	@GraphQLQuery
+	@Column(name = "invoice_soa_reference", columnDefinition = "varchar")
+	@UpperCase
+	String invoiceSoaReference
+
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company_id", referencedColumnName = "id")
 	CompanySettings company

@@ -20,6 +20,7 @@ import com.backend.gbp.repository.inventory.DocumentTypeRepository
 import com.backend.gbp.repository.inventory.QuantityAdjustmentRepository
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.ChargeItemsDto
+import com.backend.gbp.rest.dto.LedgerDto
 import com.backend.gbp.rest.dto.OnHandReport
 import com.backend.gbp.rest.dto.POMonitoringDto
 import com.backend.gbp.rest.dto.PostDto
@@ -570,6 +571,27 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 		def one = findOne(id)
 		delete(one)
 		return one
+	}
+
+	@Transactional
+	@GraphQLMutation(name = "postInventoryGlobal")
+	InventoryLedger postInventoryGlobal(
+			@GraphQLArgument(name = "items") LedgerDto it
+	) {
+		def upsert = new InventoryLedger()
+		upsert.sourceOffice = it.sourceOffice
+		upsert.destinationOffice = it.destinationOffice
+		upsert.documentTypes = documentTypeRepository.findById(it.documentTypes).get()
+		upsert.item = itemService.itemById(it.item)
+		upsert.referenceNo = it.referenceNo
+		upsert.ledgerDate = it.ledgerDate
+		upsert.ledgerQtyIn = it.ledgerQtyIn
+		upsert.ledgerQtyOut = it.ledgerQtyOut
+		upsert.ledgerPhysical = it.ledgerPhysical
+		upsert.ledgerUnitCost = it.ledgerUnitCost
+		upsert.isInclude = true
+		def afterSave = save(upsert)
+		return afterSave
 	}
 
 }

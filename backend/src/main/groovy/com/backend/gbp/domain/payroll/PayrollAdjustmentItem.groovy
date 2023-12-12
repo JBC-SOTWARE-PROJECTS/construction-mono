@@ -2,6 +2,7 @@ package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.payroll.enums.AdjustmentOperation
 import com.backend.gbp.domain.payroll.enums.EmployeeLoanCategory
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -12,7 +13,7 @@ import org.hibernate.annotations.Type
 import javax.persistence.*
 
 @Entity
-@Table(schema = "payroll", name = "payroll_loan_items")
+@Table(schema = "payroll", name = "payroll_adjustment_item")
 class PayrollAdjustmentItem extends AbstractAuditingEntity implements Serializable {
 
     @GraphQLQuery
@@ -44,4 +45,15 @@ class PayrollAdjustmentItem extends AbstractAuditingEntity implements Serializab
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
+
+    @GraphQLQuery
+    @Transient
+    String getName() {
+        return category.name
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "operation", columnDefinition = "varchar")
+    AdjustmentOperation operation
+
 }

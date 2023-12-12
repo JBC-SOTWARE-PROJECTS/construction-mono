@@ -144,12 +144,17 @@ function UpsertScheduleType(props: IProps) {
             <FormSelect
               name="project_id"
               label="Project"
-              rules={requiredField}
               propsselect={{
-                options: projects?.list?.map((item: any) => ({
-                  value: item.id,
-                  label: item.description,
-                })),
+                defaultValue: null,
+                options: [
+                  { value: null, label: "Office Based" },
+                  ...(projects
+                    ? projects?.list?.map((item: any) => ({
+                        value: item.id,
+                        label: item.description,
+                      }))
+                    : []),
+                ],
                 allowClear: true,
                 placeholder: "Select Project",
               }}

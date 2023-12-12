@@ -35,6 +35,8 @@ export const GET_DISBURSEMENT_RECORD = gql`
           id
           description
         }
+        referenceType
+        referenceNo
         payeeName
         disNo
         paymentCategory
@@ -260,6 +262,7 @@ export const GET_REAPPLICATION_RECORD = gql`
           voucherAmount
           appliedAmount
         }
+        referenceNo
         prevApplied
         discountAmount
         ewtAmount
@@ -397,7 +400,7 @@ export const POST_DISBURSEMENT_PAYABLE = gql`
 `;
 
 export const POST_ACCOUNT_DISBURSEMENT_MANUAL = gql`
-  mutation UpdateItem(
+  mutation (
     $id: UUID
     $header: Map_String_ObjectScalar
     $entries: [Map_String_ObjectScalar]
@@ -429,7 +432,7 @@ export const POST_REAPPLICATION_PAYABLE = gql`
 `;
 
 export const POST_ACCOUNT_REAPPLICATION_MANUAL = gql`
-  mutation UpdateItem(
+  mutation (
     $id: UUID
     $header: Map_String_ObjectScalar
     $entries: [Map_String_ObjectScalar]

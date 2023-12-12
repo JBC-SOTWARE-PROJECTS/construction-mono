@@ -48,7 +48,7 @@ export default function DisbursementWTXModal(props: IProps) {
       payload.id = randomId();
     }
     if (data?.ewtDesc) {
-      payload.ewtDesc = data.ewtDesc?.label;
+      payload.ewtDesc = _.toString(data.ewtDesc?.label);
     }
     payload.ewtAmount = decimalRound2(data?.ewtAmount);
     payload.isNew = true;

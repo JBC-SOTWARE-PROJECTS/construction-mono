@@ -3,7 +3,6 @@ import { useGetEmployeesByFilter } from "@/hooks/employee";
 import useGetOnePayroll from "@/hooks/payroll/useGetOnePayroll";
 import useGetPayrollEmployees from "@/hooks/payroll/useGetPayrollEmployees";
 import useUpsertPayroll from "@/hooks/payroll/useUpsertPayroll";
-import { IState } from "@/routes/administrative/Employees";
 import { requiredField } from "@/utility/helper";
 import {
   CheckCircleOutlined,
@@ -36,6 +35,7 @@ import EmployeeDrawer from "./EmployeeDrawer";
 import useUpdatePayrollStatus from "@/hooks/payroll/useUpdatePayrollStatus";
 import CustomButton from "../common/CustomButton";
 import AccessControl from "../accessControl/AccessControl";
+import { IState } from "@/routes/payroll/employees";
 const initialState: IState = {
   filter: "",
   status: true,

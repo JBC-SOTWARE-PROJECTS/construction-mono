@@ -1,0 +1,1 @@
+ALTER TABLE hrm.employees ADD COLUMN facial_data varchar default null;

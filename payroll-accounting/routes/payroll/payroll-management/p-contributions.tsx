@@ -4,33 +4,29 @@ import { Switch, Tabs, Typography } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/router";
 // import { payrollHeaderBreadcrumbRenderer } from "./adjustments";
-import { useState } from "react";
-import NumeralFormatter from "@/utility/numeral-formatter";
-import useGetPayrollContribution from "@/hooks/payroll/contributions/useGetPayrollContribution";
-import useGetContributionEmployees from "@/hooks/payroll/contributions/useGetContributionEmployees";
+import TablePaginated from "@/components/common/TablePaginated";
+import PayrollHeader from "@/components/payroll/PayrollHeader";
+import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/PayrollEmployeeFilter";
+import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 import PayrollEmployeeStatusTag from "@/components/payroll/payroll-management/PayrollEmployeeStatusTag";
+import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
+import ContributionStatusAction from "@/components/payroll/payroll-management/contributions/ContributionStatusAction";
 import {
-  PayrollContribution,
   PayrollEmployeeContributionDto,
   PayrollEmployeeStatus,
   PayrollModule,
 } from "@/graphql/gql/graphql";
-import { PageHeader } from "@ant-design/pro-components";
-import TablePaginated from "@/components/common/TablePaginated";
-import { ColumnsType } from "antd/es/table";
-import { ButtonProps } from "antd/lib/button";
-import { PayrollContributionFilter } from "@/components/payroll/payroll-management/contributions/PayrollContributionFilter";
-import usePaginationState from "@/hooks/usePaginationState";
+import useGetContributionEmployees from "@/hooks/payroll/contributions/useGetContributionEmployees";
+import useGetPayrollContribution from "@/hooks/payroll/contributions/useGetPayrollContribution";
 import useUpdateContributionTypeStatus from "@/hooks/payroll/contributions/useUpdateContributionTypeStatus";
 import useHasPermission from "@/hooks/useHasPermission";
-import ContributionStatusAction from "@/components/payroll/payroll-management/contributions/ContributionStatusAction";
-import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
-import useMemoizedPayrollHeaderBreadcrumb, {
-  payrollHeaderBreadcrumbRenderer,
-} from "@/hooks/payroll/useMemoizedPayrollHeadBreadcrumb";
-import PayrollHeader from "@/components/payroll/PayrollHeader";
-import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
+import usePaginationState from "@/hooks/usePaginationState";
+import NumeralFormatter from "@/utility/numeral-formatter";
+import { PageHeader } from "@ant-design/pro-components";
+import { ColumnsType } from "antd/es/table";
+import { ButtonProps } from "antd/lib/button";
+import { useState } from "react";
 
 export const recalculateButton: ButtonProps = {
   icon: <ReloadOutlined />,
@@ -92,6 +88,7 @@ function PayrollContributionsPage() {
     useUpdateContributionTypeStatus(() => refetchContribution());
 
   function NumeralDisabledComponent({ active, text, type }: params) {
+    if (!contribution) return;
     const key = `isActive${type}`;
     return active && contribution[key as keyof typeof contribution] ? (
       <NumeralFormatter value={text} format="0,0.00" />
@@ -368,7 +365,7 @@ function PayrollContributionsPage() {
         }
       />
 
-      <PayrollContributionFilter onQueryChange={onQueryChange} />
+      <PayrollEmployeeFilter onQueryChange={onQueryChange} />
 
       <Tabs
         defaultActiveKey="ALL"

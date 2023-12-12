@@ -32,6 +32,8 @@ const QUERY = gql`
       projectBreakdown {
         project
         projectName
+        company
+        companyName
         regular
         overtime
         regularHoliday

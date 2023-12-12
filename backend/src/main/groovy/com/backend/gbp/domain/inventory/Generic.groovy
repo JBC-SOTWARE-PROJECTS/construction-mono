@@ -37,4 +37,8 @@ class Generic extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "is_active")
 	Boolean isActive
 
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
+
 }

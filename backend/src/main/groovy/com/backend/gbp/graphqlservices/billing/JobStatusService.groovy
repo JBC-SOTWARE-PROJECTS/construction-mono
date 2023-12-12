@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.billing
 
 import com.backend.gbp.domain.billing.JobStatus
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -37,18 +38,28 @@ class JobStatusService extends AbstractDaoService<JobStatus> {
     List<JobStatus> jobStatusList(
             @GraphQLArgument(name = "filter") String filter
     ) {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select e from JobStatus e where 
                           lower(concat(e.code,e.description)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
         createQuery(query, params).resultList.sort {it.code }
     }
 
     @GraphQLQuery(name = "jobStatusActive")
     List<JobStatus> jobStatusActive() {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select e from JobStatus e where e.is_active = :status'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
         createQuery(query, params).resultList.sort {it.code }
     }
 
@@ -65,11 +76,13 @@ class JobStatusService extends AbstractDaoService<JobStatus> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         upsertFromMap(id, fields, { JobStatus entity, boolean forInsert ->
             if(forInsert){
                 entity.code = generatorService.getNextValue(GeneratorType.JOB_STATUS, {
                     return "JS-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
+                entity.company = company
             }
         })
     }

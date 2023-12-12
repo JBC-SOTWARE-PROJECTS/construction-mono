@@ -1,9 +1,23 @@
 package com.backend.gbp.graphqlservices.cashier
 
+import com.backend.gbp.domain.accounting.CustomerType
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.LedgerDocType
+import com.backend.gbp.domain.cashier.PaymentType
+import com.backend.gbp.domain.cashier.ReceiptType
+import com.backend.gbp.domain.types.AutoIntegrateable
+import com.backend.gbp.graphqlservices.accounting.ARPaymentPostingService
+import com.backend.gbp.graphqlservices.accounting.ArCustomerServices
+import com.backend.gbp.graphqlservices.accounting.Entry
+import com.backend.gbp.graphqlservices.accounting.IntegrationServices
+import com.backend.gbp.graphqlservices.accounting.LedgerServices
+import com.backend.gbp.graphqlservices.accounting.SubAccountSetupService
 import com.backend.gbp.graphqlservices.billing.BillingItemService
 import com.backend.gbp.graphqlservices.billing.BillingService
 import com.backend.gbp.graphqlservices.billing.JobService
+import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.billing.BillingRepository
+import com.backend.gbp.services.EntityObjectMapperService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.backend.gbp.domain.User
 import com.backend.gbp.domain.billing.Billing
@@ -22,6 +36,7 @@ import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
+import groovy.transform.Canonical
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -34,6 +49,13 @@ import org.springframework.stereotype.Component
 import javax.transaction.Transactional
 import java.time.Duration
 import java.time.Instant
+
+@Canonical
+class PaymentTarget {
+	String journalCode
+	BigDecimal amount
+}
+
 
 @Component
 @GraphQLApi
@@ -88,6 +110,24 @@ class PaymentService {
 	@Autowired
 	PaymentItemRepository paymentItemRepository
 
+	@Autowired
+	ArCustomerServices arCustomerServices
+
+	@Autowired
+	EntityObjectMapperService entityObjectMapperService
+
+	@Autowired
+	SubAccountSetupService subAccountSetupService
+
+	@Autowired
+	IntegrationServices integrationServices
+
+	@Autowired
+	LedgerServices ledgerServices
+
+	@Autowired
+	ARPaymentPostingService arPaymentPostingService
+
 	@GraphQLQuery(name = "paymentByBillingId", description = "List of Payments By Billing ID")
 	List<Payment> paymentByBillingId(@GraphQLArgument(name = "id") UUID id) {
 		return paymentRepository.getPaymentByBillingId(id).sort { it.createdDate }
@@ -130,7 +170,6 @@ class PaymentService {
 		def paymentVal = objectMapper.convertValue(payment, Payment)
 		def listPaymentDetials = payment_details as ArrayList<PaymentDetial>
 		def billObject = billingService.billingById(billing)
-
 		Payment pay = new Payment()
 		BillingItem item = new BillingItem()
 
@@ -158,7 +197,7 @@ class PaymentService {
 			pay.totalCash = paymentVal.totalCash
 			pay.totalCheck = paymentVal.totalCheck
 			pay.orNumber = paymentVal.orNumber
-			pay.description = paymentVal.receiptType+' #' + paymentVal.orNumber + ' - ' + (billObject.customer?.fullName ? billObject.customer?.fullName : billObject.otcName)
+			pay.description = paymentVal.receiptType+' #' + paymentVal.orNumber + ' - ' + (billObject.customer?.accountName ? billObject.customer?.accountName : billObject.otcName)
 			pay.remarks = paymentVal.remarks
 			pay.billing = billObject
 			pay.billingItem = bill_item
@@ -286,5 +325,209 @@ class PaymentService {
 		return voidPay
 	}
 
+	Payment postARPaymentsToAccounting(Payment paymentTracker, String clientType) {
 
+
+		def allCoa = subAccountSetupService.getAllChartOfAccountGenerate("", "", "", "", "", "")
+
+		def headerLedger = integrationServices.generateAutoEntriesEnhance(paymentTracker) { Payment ptracker, multipleData ->
+
+			ptracker.flagValue = "AR_CLIENTS_PAYMENT"
+			multipleData['amountForCreditCard'] = []
+			multipleData['amountForCashDeposit'] = []
+			//Check for Credit Card
+
+			ptracker.paymentDetails.findAll { it.type == PaymentType.CARD.name() }.each { pdt ->
+				multipleData['amountForCreditCard'] << new Payment().tap {
+					it.amountForCreditCard = pdt.amount
+					it.bankForCreditCard = pdt.bankEntity
+				}
+			}
+
+			ptracker.paymentDetails.findAll { it.type == PaymentType.EWALLET.name() }.each { pdt ->
+				multipleData['amountForCreditCard'] << new Payment().tap {
+					it.amountForCreditCard = pdt.amount
+					it.bankForCreditCard = pdt.bankEntity
+				}
+			}
+
+
+			ptracker.paymentDetails.findAll { it.type == PaymentType.BANKDEPOSIT.name() }.each { pdt ->
+				multipleData['amountForCashDeposit'] << new Payment().tap {
+					it.amountForCashDeposit = pdt.amount
+					it.bankForCashDeposit = pdt.bankEntity
+				}
+			}
+
+		}
+
+
+		List<Entry> entries = []
+
+
+		headerLedger.ledger.each {
+			it.journalAccount.fromGenerator = true
+			entries << new Entry(it.journalAccount, it.debit)
+		}
+
+		paymentTracker.paymentTargets.each { target ->
+
+			def match = allCoa.find { it.code == target.journalCode }
+			if (match) {
+				if(match.motherAccount.normalSide.equalsIgnoreCase('debit'))
+					entries << new Entry(match, target.amount.negate())
+				else
+					entries << new Entry(match, target.amount)
+			}
+		}
+
+		headerLedger = ledgerServices.createDraftHeaderLedger(entries,headerLedger.transactionDate)
+
+		headerLedger.transactionType =  "${paymentTracker.receiptType} NO"
+		headerLedger.transactionNo = paymentTracker.orNumber
+
+//		headerLedger.referenceType = paymentTracker.referenceType
+//		headerLedger.referenceNo = paymentTracker.reference
+
+		def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+				"${paymentTracker.receiptType}-${paymentTracker.orNumber}",
+				"${paymentTracker.payorName}",
+				"${clientType} PAYMENTS",
+				paymentTracker.receiptType == ReceiptType.AR.name() ? LedgerDocType.AR : LedgerDocType.OR,
+				JournalType.RECEIPTS,
+				paymentTracker.createdDate,
+				[:]
+		)
+		paymentTracker.postedLedgerId = pHeader.id
+		paymentRepository.save(paymentTracker)
+	}
+
+	@GraphQLMutation
+	@Transactional
+	GraphQLResVal<Payment> addReceivablePayment(
+			@GraphQLArgument(name = "customerId") UUID  customerId,
+			@GraphQLArgument(name = "tendered") List<Map<String, Object>> tendered,
+			@GraphQLArgument(name = "shiftId") UUID shiftId,
+			@GraphQLArgument(name = "orNumber") BigDecimal orNumber,
+			@GraphQLArgument(name = "transactionType") String transactionType,
+			@GraphQLArgument(name = "paymentMethod") String paymentMethod,
+			@GraphQLArgument(name = "transactions") List<Map<String, Object>> transactions
+	) {
+
+		def client = arCustomerServices.findOne(customerId)
+
+		String clientType = client.customerType
+		def totalpayments = 0.0,
+			totalCash = 0.0,
+			totalCheck = 0.0,
+			totalCard = 0.0,
+			totalDeposit = 0.0,
+			totalEWallet = 0.0,
+			pf = 0.0,
+			hosp = 0.0
+
+
+		def paymentTracker = new Payment()
+		paymentTracker.payorName = client.customerName
+		paymentTracker.arCustomerId = client.id
+
+		tendered.each {
+			map ->
+				def payTrackerDetail = new PaymentDetial()
+				payTrackerDetail.payment = paymentTracker
+				entityObjectMapperService.updateFromMap(payTrackerDetail, map)
+
+				if (payTrackerDetail.type == PaymentType.CASH.name())
+					totalCash += payTrackerDetail.amount
+
+				if (payTrackerDetail.type == PaymentType.CHECK.name())
+					totalCheck += payTrackerDetail.amount
+
+				if (payTrackerDetail.type == PaymentType.CARD.name())
+					totalCard += payTrackerDetail.amount
+
+				if (payTrackerDetail.type == PaymentType.BANKDEPOSIT.name())
+					totalDeposit += payTrackerDetail.amount
+
+				if (payTrackerDetail.type == PaymentType.EWALLET.name())
+					totalEWallet += payTrackerDetail.amount
+
+				paymentTracker.paymentDetails.add(payTrackerDetail)
+		}
+
+
+		paymentTracker.totalCash = totalCash
+		paymentTracker.totalCheck = totalCheck
+		paymentTracker.totalCard = totalCard
+		paymentTracker.totalDeposit = totalDeposit
+		paymentTracker.totalEWallet = totalEWallet
+
+		totalpayments = (totalCash + totalCheck + totalCard + totalDeposit + totalEWallet)
+
+		paymentTracker.totalPayments = totalpayments
+
+		transactions.each {
+			String itemType = it['itemType'] ?: '' as String
+			def payAmount = it['payment']
+			BigDecimal paymentApplied = (payAmount ? payAmount : 0.00) as BigDecimal
+			if(paymentApplied > 0) {
+				if (itemType.equalsIgnoreCase('PF'))
+					pf += paymentApplied
+				else
+					hosp += paymentApplied
+			}
+		}
+
+//		def receiptIssuance = receiptIssuanceService.findOne(batchReceiptId)
+		def shift = shiftRepository.findById(shiftId).get()
+
+//		if (type == "OR") {
+			paymentTracker.orNumber = orNumber
+			paymentTracker.receiptType = ReceiptType.OR
+			paymentTracker.shift = shift
+			paymentTracker.description = "OR [${paymentTracker.orNumber}] - AR CLIENT PAYMENT ${paymentTracker?.remarks ?: ''}"
+
+//			receiptIssuance.receiptCurrent++
+//
+//			if (receiptIssuance.receiptCurrent > receiptIssuance.receiptTo) {
+//				receiptIssuance.receiptCurrent = null
+//				receiptIssuance.activebatch = false
+//			}
+//			receiptIssuanceService.save(receiptIssuance)
+//		} else {
+//			paymentTracker.ornumber = receiptIssuance.arCurrent
+//			paymentTracker.receiptType = ReceiptType.AR
+//			paymentTracker.shift = shift
+//			paymentTracker.description = "OR [${paymentTracker.ornumber}] - AR CLIENT PAYMENT ${paymentTracker?.reference ?: ''}"
+//
+//			receiptIssuance.arCurrent++
+//
+//			if (receiptIssuance.arCurrent > receiptIssuance.arTo) {
+//				receiptIssuance.arCurrent = null
+//				receiptIssuance.aractive = false
+//			}
+//			receiptIssuanceService.save(receiptIssuance)
+//
+//		}
+
+//		paymentTracker.referenceType = referenceType
+//		paymentTracker.reference = referenceNo
+		paymentTracker = paymentRepository.save(paymentTracker)
+
+		// changed to new Coa
+		def pt = new PaymentTarget()
+		pt.amount = totalpayments
+
+		pt.journalCode = client?.discountAndPenalties?.salesAccountCode ?: ''
+
+		paymentTracker.paymentTargets << pt
+
+		postARPaymentsToAccounting(paymentTracker,clientType)
+
+		arPaymentPostingService.onProcessPaymentInvoice(paymentTracker,transactions,paymentMethod,transactionType)
+
+		paymentTracker
+
+		return new GraphQLResVal<Payment>(paymentTracker, true, 'Payment was successful. Your invoice now reflects the updated total amount due. ')
+	}
 }

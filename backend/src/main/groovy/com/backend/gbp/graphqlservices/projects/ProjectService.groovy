@@ -7,6 +7,7 @@ import com.backend.gbp.graphqlservices.billing.BillingService
 import com.backend.gbp.graphqlservices.cashier.PettyCashService
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.DashboardDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -85,30 +86,53 @@ class ProjectService extends AbstractDaoService<Projects> {
     List<Projects> projectList(
             @GraphQLArgument(name = "filter") String filter
     ) {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select e from Projects e where lower(concat(e.projectCode,e.description)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
         createQuery(query, params).resultList.sort { it.projectCode }
     }
 
     @GraphQLQuery(name = "projectLists")
     List<Projects> projectList() {
-        findAll()
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Projects e where e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put("company", company)
+        createQuery(query, params).resultList.sort { it.projectCode }
     }
 
     @GraphQLQuery(name = "getActiveProjects")
     List<Projects> getActiveProject() {
-        findAll()
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Projects e where e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put("company", company)
+        createQuery(query, params).resultList.sort { it.projectCode }
     }
 
     @GraphQLQuery(name = "projectByOffice")
     List<Projects> projectByOffice(
             @GraphQLArgument(name = "id") UUID id
     ) {
-        String query = '''Select e from Projects e where e.location.id = :id'''
-        Map<String, Object> params = new HashMap<>()
-        params.put('id', id)
-        createQuery(query, params).resultList.sort { it.projectCode }
+        if(id){
+            def company = SecurityUtils.currentCompanyId()
+            String query = '''Select e from Projects e where e.location.id = :id'''
+            Map<String, Object> params = new HashMap<>()
+            params.put('id', id)
+            if (company) {
+                query += ''' and (e.company = :company)'''
+                params.put("company", company)
+            }
+            createQuery(query, params).resultList.sort { it.projectCode }
+        }else{
+            return null
+        }
+
     }
 
     @GraphQLQuery(name = "projectListPageable")
@@ -120,7 +144,7 @@ class ProjectService extends AbstractDaoService<Projects> {
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
-
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select p from Projects p where
 						lower(concat(p.projectCode,p.description)) like lower(concat('%',:filter,'%'))'''
 
@@ -148,6 +172,12 @@ class ProjectService extends AbstractDaoService<Projects> {
             params.put("status", status)
         }
 
+        if (company) {
+            query += ''' and (p.company = :company)'''
+            countQuery += ''' and (p.company = :company)'''
+            params.put("company", company)
+        }
+
         query += ''' ORDER BY p.projectCode DESC'''
 
         Page<Projects> result = getPageable(query, countQuery, page, size, params)
@@ -166,15 +196,17 @@ class ProjectService extends AbstractDaoService<Projects> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         def project = upsertFromMap(id, fields, { Projects entity, boolean forInsert ->
             if (forInsert) {
                 entity.projectCode = generatorService.getNextValue(GeneratorType.PROJECT_CODE, {
-                    return "PROJ-" + StringUtils.leftPad(it.toString(), 6, "0")
+                    return "PRJ-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
+                entity.company = company
             }
         })
 
-        //create billing if id is misssing
+        //create billing if id is missing
         if (!id) {
             billingService.createBillingProject(project)
         }

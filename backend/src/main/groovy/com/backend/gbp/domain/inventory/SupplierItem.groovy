@@ -40,6 +40,14 @@ class SupplierItem extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "cost")
 	BigDecimal cost
+
+	@GraphQLQuery
+	@Column(name = "cost_unit_of_purchase")
+	BigDecimal costPurchase
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 	@Transient
 	String getDescLong() {

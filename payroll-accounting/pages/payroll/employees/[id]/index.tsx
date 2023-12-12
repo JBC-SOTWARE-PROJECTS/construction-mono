@@ -25,13 +25,13 @@ const menuItems = [
     description: "Records employee work hours for wage calculations.",
     show: true,
   },
-  // {
-  //   title: "Allowance",
-  //   icon: <FieldTimeOutlined />,
-  //   link: "/p-allowance",
-  //   description: "Manages extra payments like bonuses and commissions.",
-  //   show: true,
-  // },
+  {
+    title: "Allowance",
+    icon: <FieldTimeOutlined />,
+    link: "/allowance",
+    description: "Manages extra payments like bonuses and commissions.",
+    show: true,
+  },
   {
     title: "Loans",
     icon: <FieldTimeOutlined />,
