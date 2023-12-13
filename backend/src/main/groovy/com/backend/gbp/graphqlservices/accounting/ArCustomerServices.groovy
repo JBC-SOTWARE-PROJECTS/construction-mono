@@ -123,5 +123,22 @@ class ArCustomerServices extends  AbstractDaoCompanyService<ArCustomers> {
         )
     }
 
+    @GraphQLQuery(name="findAllCustomerList")
+    List<ArCustomers> findAllCustomerList(
+            @GraphQLArgument(name = "search") String search
+    ){
+        String queryStr = """ from ArCustomers c where 
+                    c.companyId = :companyId and
+                    (
+						lower(c.accountNo) like lower(concat('%',:search,'%')) or 
+						lower(c.customerName) like lower(concat('%',:search,'%'))
+              		) """
+        Map<String,Object> params = [:]
+        params['search'] = search
+        params['companyId'] = SecurityUtils.currentCompanyId()
+
+        createQuery(queryStr, params).resultList.sort { it.customerName }
+    }
+
 
 }

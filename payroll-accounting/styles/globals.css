@@ -102,7 +102,7 @@ a {
 
 .ant-segmented-item-selected {
   color: #fff !important;
-} 
+}
 
 /* .ant-btn-primary {
   background-color: #399b53 !important;
@@ -221,7 +221,7 @@ th.ant-table-cell {
 }
 
 .mt-6-5 {
-  margin-top: 1.60rem !important;
+  margin-top: 1.6rem !important;
 }
 
 .margin-0 {
@@ -461,4 +461,10 @@ th.ant-table-cell {
 
 .relative {
   position: relative !important;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
 }

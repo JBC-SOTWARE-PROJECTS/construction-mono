@@ -1,16 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   PageContainer,
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, Row, Col, Form } from "antd";
+import { Input, Button, Row, Col, Form, message } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { FormSelect } from "@/components/common";
+import ProjectList from "@/components/inventory/projects/projectItemList";
+import { useDialog } from "@/hooks";
+import UpsertProject from "@/components/inventory/projects/dialogs/upsertProject";
+import { useQuery } from "@apollo/client";
+import { Projects, Query } from "@/graphql/gql/graphql";
+import { GET_PROJECTS_RECORDS } from "@/graphql/inventory/project-queries";
+import { useOffices } from "@/hooks/payables";
+import { useClients, useProjectStatus } from "@/hooks/inventory";
 
 const { Search } = Input;
 
 export default function ProjectComponent() {
+  const modal = useDialog(UpsertProject);
+
+  const [customer, setCustomer] = useState(null);
+  const [location, setLocation] = useState(null);
+  const [state, setState] = useState({
+    filter: "",
+    status: null,
+    page: 0,
+    size: 10,
+  });
+  // ====================== queries =====================================
+  const offices = useOffices();
+  const clients = useClients();
+  const statusList = useProjectStatus();
+
+  const { data, loading, refetch } = useQuery<Query>(GET_PROJECTS_RECORDS, {
+    variables: {
+      filter: state.filter,
+      customer: customer,
+      location: location,
+      status: state.status,
+      page: state.page,
+      size: state.size,
+    },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const onUpsertRecord = (record?: Projects) => {
+    modal({ record: record }, (result: any) => {
+      if (result) {
+        if (record?.id) {
+          message.success("Project successfully updated");
+        } else {
+          message.success("Project successfully added");
+        }
+        refetch();
+      }
+    });
+  };
+
+  const onRefresh = () => {
+    refetch();
+  };
+
   return (
     <PageContainer
       title="Projects"
@@ -27,8 +79,8 @@ export default function ProjectComponent() {
             <Button
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={() => console.log()}>
-              Add Project
+              onClick={() => onUpsertRecord()}>
+              Create New Project
             </Button>
           </ProFormGroup>
         }>
@@ -48,13 +100,12 @@ export default function ProjectComponent() {
                   label="Filter By Client"
                   propsselect={{
                     showSearch: true,
-                    options: [],
+                    options: clients,
                     allowClear: true,
                     placeholder: "Filter By Client",
-                    // onChange: (newValue) => {
-                    //   setGroupId(newValue);
-                    //   setCategory([]);
-                    // },
+                    onChange: (newValue) => {
+                      setCustomer(newValue);
+                    },
                   }}
                 />
               </Col>
@@ -63,13 +114,15 @@ export default function ProjectComponent() {
                   label="Filter By Status"
                   propsselect={{
                     showSearch: true,
-                    mode: "multiple",
-                    options: [],
+                    options: statusList,
                     allowClear: true,
                     placeholder: "Filter By Status",
-                    // onChange: (newValue) => {
-                    //   setCategory(newValue);
-                    // },
+                    onChange: (newValue) => {
+                      setState((prev) => ({
+                        ...prev,
+                        status: newValue ?? null,
+                      }));
+                    },
                   }}
                 />
               </Col>
@@ -78,18 +131,26 @@ export default function ProjectComponent() {
                   label="Filter By Location"
                   propsselect={{
                     showSearch: true,
-                    options: [],
+                    options: offices,
                     allowClear: true,
                     placeholder: "Filter By Location",
-                    // onChange: (newValue) => {
-                    //   setState((prev) => ({ ...prev, brand: newValue }));
-                    // },
+                    onChange: (newValue) => {
+                      setLocation(newValue);
+                    },
                   }}
                 />
               </Col>
             </Row>
           </Form>
         </div>
+        <ProjectList
+          dataSource={data?.projectListPageable?.content as Projects[]}
+          loading={loading}
+          totalElements={data?.projectListPageable?.totalElements as number}
+          handleOpen={(record) => onUpsertRecord(record)}
+          changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
+          onRefresh={onRefresh}
+        />
       </ProCard>
     </PageContainer>
   );

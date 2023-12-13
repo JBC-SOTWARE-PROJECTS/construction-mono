@@ -1,24 +1,22 @@
 package com.backend.gbp.graphqlservices.inventory
 
-import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.inventory.OfficeItem
-import com.backend.gbp.domain.inventory.UnitMeasurement
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.repository.OfficeRepository
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
-import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
-import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 
 
 @Component
@@ -54,10 +52,17 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
             @GraphQLArgument(name = "itemId") UUID itemId,
             @GraphQLArgument(name = "depId") UUID depId
     ) {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select s from OfficeItem s where s.item.id=:itemId AND s.office.id=:depId'''
         Map<String, Object> params = new HashMap<>()
         params.put('itemId', itemId)
         params.put('depId', depId)
+
+        if (company) {
+            query += ''' and (s.company = :company)'''
+            params.put("company", company)
+        }
+
         createQuery(query, params).resultList.find()
     }
 
@@ -65,9 +70,16 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
     List<OfficeItem> officeListByItem(
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select s from OfficeItem s where s.item.id=:id'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
+
+        if (company) {
+            query += ''' and (s.company = :company)'''
+            params.put("company", company)
+        }
+
         createQuery(query, params).resultList.sort { it.office.officeDescription }
     }
 
@@ -85,6 +97,7 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
     ) {
         OfficeItem officeItem = new OfficeItem()
         OfficeItem depItemObj = this.findByItemOffice(itemId, depId)
+        def company = SecurityUtils.currentCompanyId()
 
         if(id){ //update
             officeItem = findOne(id)
@@ -101,6 +114,7 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
                 officeItem.sellingPrice = 0
                 officeItem.allow_trade = true
                 officeItem.is_assign = true
+                officeItem.company = company
                 save(officeItem)
             }
         }
@@ -128,13 +142,13 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
         list.each {
             upsert = findOne(it.id)
             if(it.actualCost == 0){
-                def lcost = it.lastUnitCost.round(2)
-                def markupPrice = lcost + (lcost * com.markup);
-                def outputTax =  it.vatable ? markupPrice * com.vatRate : 0.00;
-                def sellPrice = markupPrice + outputTax;
+                BigDecimal lcost = it.lastUnitCost.setScale(2, RoundingMode.HALF_EVEN)
+                BigDecimal markupPrice = lcost + (lcost * com.markup);
+                BigDecimal outputTax =  it.vatable ? markupPrice * com.vatRate : BigDecimal.ZERO;
+                BigDecimal sellPrice = markupPrice + outputTax;
                 upsert.actualCost = lcost
-                upsert.sellingPrice = sellPrice.round(2)
-                upsert.outputTax = outputTax.round(2)
+                upsert.sellingPrice = sellPrice.setScale(2, RoundingMode.HALF_EVEN)
+                upsert.outputTax = outputTax.setScale(2, RoundingMode.HALF_EVEN)
             }
             save(upsert)
         }
@@ -153,10 +167,10 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
         if(el.equalsIgnoreCase("actualCost")){
             officeItem.actualCost = value
         } else if(el.equalsIgnoreCase("sellingPrice")) {
-            def beforeVat = value / (com.vatRate + 1);
-            def outputTax =  officeItem.item.vatable ? beforeVat * com.vatRate : 0.00;
+            BigDecimal beforeVat = value / (com.vatRate + 1) as BigDecimal;
+            BigDecimal outputTax =  officeItem.item.vatable ? beforeVat * com.vatRate : BigDecimal.ZERO;
             officeItem.sellingPrice = value
-            officeItem.outputTax = outputTax.round(2)
+            officeItem.outputTax = outputTax.setScale(2, RoundingMode.HALF_EVEN)
         }
         save(officeItem)
     }
