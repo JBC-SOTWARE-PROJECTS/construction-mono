@@ -1,15 +1,16 @@
 import CreateFixedAsset from '@/components/accounting/fixed-asset/dialogs/create-fixed-asset'
 import CreateMultiFixedAsset from '@/components/accounting/fixed-asset/dialogs/create-multi-fixed-asset'
+import { UPSERT_FIXED_ASSET } from '@/components/accounting/fixed-asset/others/gql'
 import {
   CardLayout,
   CustomPageTitle,
 } from '@/components/common/custom-components'
 import { FixedAssetItems, Office } from '@/graphql/gql/graphql'
-import { useDialog } from '@/hooks'
+import { useConfirmationPasswordHook, useDialog } from '@/hooks'
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
-import { gql, useQuery } from '@apollo/client'
-import { Button, Dropdown, Space, Table } from 'antd'
+import { gql, useMutation, useQuery } from '@apollo/client'
+import { Button, Dropdown, Space, Table, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import numeral from 'numeral'
@@ -34,6 +35,7 @@ const REGISTERED_FIXED_ASSET_PAGEABLE = gql`
         purchaseDate
         usefulLife
         accumulatedDepreciation
+        isBeginningBalance
       }
     }
   }
@@ -42,10 +44,13 @@ const REGISTERED_FIXED_ASSET_PAGEABLE = gql`
 export default function RegisteredAssets() {
   const createDialog = useDialog(CreateFixedAsset)
   const createMultiDialog = useDialog(CreateMultiFixedAsset)
+  const [showPasswordConfirmation] = useConfirmationPasswordHook()
+
+  const [onUpdate, { loading }] = useMutation(UPSERT_FIXED_ASSET)
 
   const {
     data: registeredData,
-    loading: registeeredLoading,
+    loading: registeredLoading,
     refetch,
   } = useQuery(REGISTERED_FIXED_ASSET_PAGEABLE, {
     variables: {
@@ -55,9 +60,26 @@ export default function RegisteredAssets() {
     },
   })
 
-  const handleSearch = () => {}
-  const handleCreateClick = () => {
-    createDialog({}, () => {})
+  const handleSearch = (e: string) => {
+    refetch({ filter: e })
+  }
+  const handleVoid = (id: string) => {
+    showPasswordConfirmation(() => {
+      onUpdate({
+        variables: {
+          id,
+          fields: {
+            status: 'VOIDED',
+          },
+        },
+        onCompleted: (data) => {
+          data?.upsertFixedAssetItems?.success
+            ? message.success('Successfully voided.')
+            : message.error('Something went wrong.')
+          refetch()
+        },
+      })
+    })
   }
   const handleMultiCreateClick = () => {
     createMultiDialog({}, () => {
@@ -73,7 +95,13 @@ export default function RegisteredAssets() {
   ) => {
     switch (key) {
       case 'view':
-        createDialog({ record }, () => {})
+        createDialog({ record }, () => {
+          refetch()
+        })
+        break
+      case 'void':
+        handleVoid(record?.id)
+        break
       default:
         break
     }
@@ -83,12 +111,12 @@ export default function RegisteredAssets() {
     {
       title: 'Asset No.',
       dataIndex: 'assetNo',
-      width: 100,
+      width: 70,
     },
     {
       title: 'Serial No.',
       dataIndex: 'serialNo',
-      width: 100,
+      width: 70,
     },
     {
       title: 'Asset Name',
@@ -104,7 +132,7 @@ export default function RegisteredAssets() {
     {
       title: 'Purchase Date',
       dataIndex: 'purchaseDate',
-      width: 100,
+      width: 70,
       render: (text) => dayjs(text).format('YYYY-MM-DD'),
     },
     {
@@ -137,7 +165,8 @@ export default function RegisteredAssets() {
     {
       title: 'Useful Life',
       dataIndex: 'usefulLife',
-      width: 100,
+      width: 80,
+      render: (text) => (text ? `${text} year(s)` : ''),
     },
     {
       title: '#',

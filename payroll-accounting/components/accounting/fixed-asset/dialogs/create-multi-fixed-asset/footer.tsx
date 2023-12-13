@@ -32,6 +32,10 @@ export default function MultiFixedAssetItemFooter(
 
   const onHandleBegBalCheckbox = () => {
     setIsBegBal(!isBegBal)
+    dataSource.map((data) => ({
+      ...data,
+      isBeginningBalance: isBegBal,
+    }))
   }
 
   const onCreateFixedAsset = () => {
@@ -41,8 +45,10 @@ export default function MultiFixedAssetItemFooter(
       },
       onCompleted: (data) => {
         const fixedAssets = data?.fixedAssets
-        if (fixedAssets?.success) message.success('Successfully saved.')
-        hide()
+        if (fixedAssets?.success) {
+          message.success('Successfully saved.')
+          hide()
+        }
       },
     })
   }

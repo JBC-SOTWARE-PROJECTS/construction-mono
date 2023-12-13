@@ -130,7 +130,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
   if (editable) {
     childNode = editing ? (
-      <TableCell {...{ dataIndex, inputRef, save }} />
+      <TableCell {...{ dataIndex, inputRef, record, save }} />
     ) : (
       <div
         className='editable-cell-value-wrap'
@@ -294,6 +294,7 @@ export default function MultiFixedAssetItemTable(
       id: uuidv4(),
       purchaseDate: dayjs(),
       depreciationStartDate: dayjs(),
+      isBeginningBalance: isBegBal,
     }
     setDataSource([...dataSource, newData])
     setCount(count + 1)

@@ -17,11 +17,11 @@ const FixedAssetMenu = {
             name: 'Depreciation',
           },
           {
-            path: '/accounting/fixed-asset/depreciation',
+            path: '/accounting/fixed-asset/maintenance',
             name: 'Maintenance',
           },
           {
-            path: '/accounting/fixed-asset/depreciation',
+            path: '/accounting/fixed-asset/disposal',
             name: 'Disposal',
           },
         ],

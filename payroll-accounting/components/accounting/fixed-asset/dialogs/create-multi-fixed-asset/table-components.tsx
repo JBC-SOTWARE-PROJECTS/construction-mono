@@ -8,6 +8,7 @@ import {
   Input,
   InputNumber,
   Select,
+  message,
 } from 'antd'
 import React, { useContext } from 'react'
 import { MultiFixedAssetContext } from '.'
@@ -23,14 +24,16 @@ interface FormFields {
 interface TableCellI {
   dataIndex: keyof FixedAssetItems
   save: any
+  record: FixedAssetItems
 }
 
-interface SelectI {
+interface TableCellPropsI {
   save: (params: any) => void
   dataIndex: keyof FixedAssetItems
+  record: FixedAssetItems
 }
 
-const ItemSelect = React.memo((props: SelectI) => {
+const ItemSelect = React.memo((props: TableCellPropsI) => {
   const context = useContext(MultiFixedAssetContext)
   const itemList = context?.fixedAssetItemList
 
@@ -64,7 +67,7 @@ const ItemSelect = React.memo((props: SelectI) => {
 ItemSelect.displayName = 'ItemSelect'
 
 // eslint-disable-next-line react/display-name
-const OfficeSelect = React.memo((props: SelectI) => {
+const OfficeSelect = React.memo((props: TableCellPropsI) => {
   const context = useContext(MultiFixedAssetContext)
   const companyOffices = context?.companyOffices
 
@@ -97,7 +100,7 @@ const OfficeSelect = React.memo((props: SelectI) => {
 
 OfficeSelect.displayName = 'OfficeSelect'
 
-const DepreciationMethodSelect = React.memo((props: SelectI) => {
+const DepreciationMethodSelect = React.memo((props: TableCellPropsI) => {
   return (
     <Form.Item
       style={{ margin: 0 }}
@@ -122,7 +125,7 @@ const DepreciationMethodSelect = React.memo((props: SelectI) => {
 
 DepreciationMethodSelect.displayName = 'DepreciationMethodSelect'
 
-const UsefulLifeInput = React.memo((props: SelectI) => {
+const UsefulLifeInput = React.memo((props: TableCellPropsI) => {
   return (
     <Form.Item
       style={{ margin: 0 }}
@@ -147,12 +150,13 @@ const UsefulLifeInput = React.memo((props: SelectI) => {
 
 UsefulLifeInput.displayName = 'UsefulLifeInput'
 
-const DepreciationDatePicker = React.memo((props: SelectI) => {
+const DepreciationDatePicker = React.memo((props: TableCellPropsI) => {
   const form: FormInstance<FormFields> = useContext(FAEditableContext)!
 
   const validateDepreciationDate = (_: any, value: any) => {
-    const purchaseDate = form.getFieldValue('purchaseDate')
-    const depreciationMethod = form.getFieldValue('depreciationMethod')
+    const purchaseDate = props.record?.purchaseDate
+    const depreciationMethod = props.record?.depreciationMethod
+
     if (value && dayjs(value).isBefore(purchaseDate, 'day')) {
       return Promise.reject(
         new Error('Depreciation Date must not be earlier than Purchase Date')
@@ -188,12 +192,12 @@ const DepreciationDatePicker = React.memo((props: SelectI) => {
 
 DepreciationDatePicker.displayName = 'DepreciationDatePicker'
 
-const PruchaseDatePicker = React.memo((props: SelectI) => {
+const PurchaseDatePicker = React.memo((props: TableCellPropsI) => {
   const form: FormInstance<FormFields> = useContext(FAEditableContext)!
 
   const validateDepreciationDate = (_: any, value: any) => {
-    const depreciationStartDate = form.getFieldValue('depreciationStartDate')
-    const depreciationMethod = form.getFieldValue('depreciationMethod')
+    const depreciationStartDate = props.record?.depreciationStartDate
+    const depreciationMethod = props.record?.depreciationMethod
     if (value && dayjs(value).isAfter(depreciationStartDate, 'day')) {
       return Promise.reject(
         new Error('Depreciation Date must not be earlier than Purchase Date')
@@ -228,7 +232,7 @@ const PruchaseDatePicker = React.memo((props: SelectI) => {
   )
 })
 
-PruchaseDatePicker.displayName = 'PruchaseDatePicker'
+PurchaseDatePicker.displayName = 'PurchaseDatePicker'
 
 const InputNumberIndexes = ['salvage_value', 'purchasePrice', 'useful_life']
 
@@ -246,7 +250,7 @@ export default function TableCell(props: TableCellI) {
   if (dataIndex == 'usefulLife') return <UsefulLifeInput {...props} />
   if (dataIndex == 'depreciationMethod')
     return <DepreciationMethodSelect {...props} />
-  else if (dataIndex == 'purchaseDate') return <PruchaseDatePicker {...props} />
+  else if (dataIndex == 'purchaseDate') return <PurchaseDatePicker {...props} />
   else if (InputNumberIndexes.includes(dataIndex))
     children = (
       <InputNumber

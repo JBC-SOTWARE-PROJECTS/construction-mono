@@ -2116,6 +2116,7 @@ export type DocumentTypes = {
 
 export enum DomainEnum {
   Bank = 'BANK',
+  FixedAssetSubAccount = 'FIXED_ASSET_SUB_ACCOUNT',
   ItemCategory = 'ITEM_CATEGORY',
   NoDomain = 'NO_DOMAIN',
   Projects = 'PROJECTS',
@@ -2667,19 +2668,27 @@ export type FixedAssetItems = {
   depreciationMethod?: Maybe<DepreciationMethod>;
   depreciationStartDate?: Maybe<Scalars['Date']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
-  itemId?: Maybe<Scalars['String']['output']>;
+  isBeginningBalance?: Maybe<Scalars['Boolean']['output']>;
+  itemId?: Maybe<Scalars['UUID']['output']>;
   itemName?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  ledgerGroupId?: Maybe<Scalars['UUID']['output']>;
+  negativeAmount?: Maybe<Scalars['BigDecimal']['output']>;
   office?: Maybe<Office>;
   purchase?: Maybe<PurchaseOrder>;
   purchaseDate?: Maybe<Scalars['Date']['output']>;
   purchaseNo?: Maybe<Scalars['String']['output']>;
   purchasePrice?: Maybe<Scalars['BigDecimal']['output']>;
+  reference?: Maybe<Scalars['String']['output']>;
   salvageValue?: Maybe<Scalars['BigDecimal']['output']>;
   serialNo?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
+  subAccount?: Maybe<ItemSubAccount>;
   usefulLife?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
@@ -3273,6 +3282,7 @@ export enum IntegrationDomainEnum {
   CreditNote = 'CREDIT_NOTE',
   DebitMemo = 'DEBIT_MEMO',
   Disbursement = 'DISBURSEMENT',
+  FixedAssetItem = 'FIXED_ASSET_ITEM',
   Invoice = 'INVOICE',
   NoDomain = 'NO_DOMAIN',
   Payment = 'PAYMENT',
@@ -3486,10 +3496,13 @@ export type ItemJobsDto = {
 
 export type ItemSubAccount = {
   __typename?: 'ItemSubAccount';
+  accountName?: Maybe<Scalars['String']['output']>;
   accountType?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
   isFixedAsset?: Maybe<Scalars['Boolean']['output']>;
@@ -3762,6 +3775,7 @@ export enum LedgerDocType {
   Dm = 'DM',
   Ds = 'DS',
   Ei = 'EI',
+  Fa = 'FA',
   Inv = 'INV',
   Jv = 'JV',
   Or = 'OR',
@@ -4165,6 +4179,7 @@ export type Mutation = {
   upsertMPAssetRepairMaintenanceItem?: Maybe<AssetRepairMaintenanceItems>;
   upsertManyMaterials?: Maybe<GraphQlRetVal_Boolean>;
   upsertMpItem?: Maybe<MaterialProductionItem>;
+  upsertMultiFixedAssetItems?: Maybe<GraphQlResVal_Boolean>;
   upsertOffice?: Maybe<Office>;
   upsertOfficeItem?: Maybe<OfficeItem>;
   upsertOtherDeductionItem?: Maybe<GraphQlResVal_PayrollOtherDeductionItem>;
@@ -6080,6 +6095,12 @@ export type MutationUpsertMpItemArgs = {
   dto?: InputMaybe<PurchaseMpDtoInput>;
   item?: InputMaybe<ItemInput>;
   mp?: InputMaybe<MaterialProductionInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertMultiFixedAssetItemsArgs = {
+  fields?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
 };
 
 
@@ -9734,6 +9755,7 @@ export type Query = {
   itemListByOffice?: Maybe<Array<Maybe<Inventory>>>;
   itemSubAccountActive?: Maybe<Array<Maybe<ItemSubAccount>>>;
   itemSubAccountList?: Maybe<Array<Maybe<ItemSubAccount>>>;
+  itemsActivePage?: Maybe<Page_Item>;
   itemsByFilterOnly?: Maybe<Page_Item>;
   jobByFiltersPage?: Maybe<Page_Job>;
   jobById?: Maybe<Job>;
@@ -11828,6 +11850,14 @@ export type QueryItemSubAccountActiveArgs = {
 export type QueryItemSubAccountListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryItemsActivePageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 

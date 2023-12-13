@@ -10,9 +10,11 @@ import { DepreciationMethods } from '@/constant/fixed-asset'
 import { FixedAssetItems } from '@/graphql/gql/graphql'
 import { useGetFixedAssetItems } from '@/hooks/fixed-asset'
 import { useGetCompanyActiveOffices } from '@/hooks/public'
+import { useMutation } from '@apollo/client'
 import { Col, Divider, Form, Modal, Row } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
 import dayjs from 'dayjs'
+import { UPSERT_FIXED_ASSET } from '../others/gql'
 
 interface CreateFixedAssetI {
   hide: () => void
@@ -23,14 +25,31 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
   const { record } = props
   const [form] = useForm()
 
+  const [onUpdate, { loading }] = useMutation(UPSERT_FIXED_ASSET)
+
   const itemList = useGetFixedAssetItems()
   const companyOffices = useGetCompanyActiveOffices()
+
+  const onSave = (values: FixedAssetItems) => {
+    onUpdate({
+      variables: {
+        id: record?.id,
+        fields: {
+          ...values,
+        },
+      },
+      onCompleted: () => props.hide(),
+    })
+  }
 
   return (
     <Modal
       title={<Header $bold='bolder'>Fixed Asset Item</Header>}
       open
       onCancel={props.hide}
+      onOk={() => form.submit()}
+      okButtonProps={{ loading }}
+      cancelButtonProps={{ loading }}
       okText='Save'
     >
       <Form
@@ -46,6 +65,7 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
             : dayjs(),
           officeId: record?.office?.id ?? '',
         }}
+        onFinish={onSave}
       >
         <Divider dashed orientation='left' orientationMargin={0} plain>
           Details
@@ -125,15 +145,17 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
             />
           </Col>
         </Row>
-        <Row gutter={[8, 8]}>
-          <Col flex='100%'>
-            <FormInputNumber
-              name='accumulatedDepreciation'
-              label='Accumulated Depreciation as at 31 Dec 2022'
-              bold
-            />
-          </Col>
-        </Row>
+        {record?.isBeginningBalance && (
+          <Row gutter={[8, 8]}>
+            <Col flex='100%'>
+              <FormInputNumber
+                name='accumulatedDepreciation'
+                label='Accumulated Depreciation as at 31 Dec 2022'
+                bold
+              />
+            </Col>
+          </Row>
+        )}
       </Form>
     </Modal>
   )
