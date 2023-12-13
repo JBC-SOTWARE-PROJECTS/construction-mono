@@ -9660,6 +9660,7 @@ export type Query = {
   itemListByOffice?: Maybe<Array<Maybe<Inventory>>>;
   itemSubAccountActive?: Maybe<Array<Maybe<ItemSubAccount>>>;
   itemSubAccountList?: Maybe<Array<Maybe<ItemSubAccount>>>;
+  itemsActivePage?: Maybe<Page_Item>;
   itemsByFilterOnly?: Maybe<Page_Item>;
   jobByFiltersPage?: Maybe<Page_Job>;
   jobById?: Maybe<Job>;
@@ -11740,6 +11741,14 @@ export type QueryItemSubAccountActiveArgs = {
 export type QueryItemSubAccountListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryItemsActivePageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
