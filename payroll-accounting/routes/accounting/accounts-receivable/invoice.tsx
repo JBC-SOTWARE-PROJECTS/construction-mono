@@ -152,16 +152,24 @@ export default function Invoice() {
       width: 100,
       render: (text) => dayjs(text).format('YYYY/MM/DD'),
     },
-
+    {
+      title: 'NET AMOUNT',
+      dataIndex: 'totalAmountDue',
+      width: 120,
+      align: 'right',
+      render: (text) => numeral(text).format('0,0.00'),
+    },
     {
       title: 'BALANCE',
       dataIndex: 'netTotalAmount',
       align: 'right',
+      width: 120,
       render: (text) => numeral(text).format('0,0.00'),
     },
     {
       title: 'STATUS',
       dataIndex: 'status',
+      width: 150,
       render: (text) => (
         <Typography.Text
           style={{
@@ -225,29 +233,27 @@ export default function Invoice() {
         onSearch={onSearch}
         extra={<Button onClick={handleCreateInvoiceClick}>New Invoice</Button>}
       >
-        <CommonTableCSS>
-          <Table
-            rowKey='id'
-            columns={columns}
-            dataSource={data?.invoices?.content ?? []}
-            size='small'
-            loading={loading}
-            scroll={{ x: 1200 }}
-            pagination={false}
-            footer={() => (
-              <Pagination
-                current={data?.payments?.number + 1}
-                showSizeChanger={false}
-                pageSize={10}
-                responsive={true}
-                total={data?.payments?.totalElements}
-                onChange={(e) => {
-                  refetch({ page: e - 1 })
-                }}
-              />
-            )}
-          />
-        </CommonTableCSS>
+        <Table
+          rowKey='id'
+          columns={columns}
+          dataSource={data?.invoices?.content ?? []}
+          size='small'
+          loading={loading}
+          scroll={{ x: 1200 }}
+          pagination={false}
+          footer={() => (
+            <Pagination
+              current={data?.payments?.number + 1}
+              showSizeChanger={false}
+              pageSize={10}
+              responsive={true}
+              total={data?.payments?.totalElements}
+              onChange={(e) => {
+                refetch({ page: e - 1 })
+              }}
+            />
+          )}
+        />
       </CardLayout>
     </PageContainer>
   )
