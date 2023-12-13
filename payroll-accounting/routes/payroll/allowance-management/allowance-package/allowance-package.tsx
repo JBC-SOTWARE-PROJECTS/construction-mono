@@ -1,23 +1,37 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from 'react';
 
-import { CloseCircleOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusCircleOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   ProFormGroup,
-} from "@ant-design/pro-components";
-import { Button, Input, message, Popconfirm, Table, Typography } from "antd";
+} from '@ant-design/pro-components';
+import {
+  Button,
+  Input,
+  message,
+  Popconfirm,
+  Table,
+  Tooltip,
+  Typography,
+} from 'antd';
 
-import { useRouter } from "next/router";
-import UseDialog from "@/hooks/useDialog";
-import AllowancePackageModal from "./allowance-package-modal";
-import { useMutation, useQuery } from "@apollo/client";
+import { useRouter } from 'next/router';
+import UseDialog from '@/hooks/useDialog';
+import AllowancePackageModal from './allowance-package-modal';
+import { useMutation, useQuery } from '@apollo/client';
 import {
   DELETE_ALLOWANCE_PACKAGE,
   FETCH_ALLOWANCE_PACKAGE_PAGEABLE,
-} from "@/graphql/company/queries";
-import _ from "lodash";
-import type { ColumnsType } from "antd/es/table";
+} from '@/graphql/company/queries';
+import _ from 'lodash';
+import type { ColumnsType } from 'antd/es/table';
 
 const { Search } = Input;
 
@@ -36,7 +50,7 @@ function AllowancePackage() {
   const router = useRouter();
 
   const [state, setState] = useState({
-    filter: "",
+    filter: '',
     page: 0,
     pageSize: 50,
   });
@@ -56,10 +70,10 @@ function AllowancePackage() {
   const [deleteAllowancePackage] = useMutation(DELETE_ALLOWANCE_PACKAGE, {
     onCompleted: ({ data }) => {
       if (data?.success) {
-        message.success(data?.message || "Delete Successfully");
+        message.success(data?.message || 'Delete Successfully');
         refetch();
       } else {
-        message.error(data?.message || "Failed to Delete");
+        message.error(data?.message || 'Failed to Delete');
       }
     },
   });
@@ -91,70 +105,70 @@ function AllowancePackage() {
 
   const columns: ColumnsType<DataSourceProps> = [
     {
-      title: "Name",
-      key: "name",
-      width: "150px",
-      render: (_, record) => {
-        return (
-          <Text
-            onClick={() => handleClick(record?.id)}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            {record?.name}
-          </Text>
-        );
-      },
+      title: 'Name',
+      key: 'name',
+      dataIndex: 'name',
+      width: '150px',
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      width: "150px",
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: '150px',
       render: (_, record) => {
         let status;
         if (record?.status == true) {
-          status = "ACTIVE";
+          status = 'ACTIVE';
         } else {
-          status = "IN-ACTIVE";
+          status = 'IN-ACTIVE';
         }
         return status;
       },
     },
     {
-      title: "Action",
-      dataIndex: "action",
-      width: "50px",
+      title: 'Action',
+      dataIndex: 'action',
+      width: '50px',
       render: (_, record) => {
         return (
           <div
             style={{
-              width: "50px",
-              justifyContent: "flex-start",
-              display: "flex",
-              gap: "15px",
+              width: '50px',
+              justifyContent: 'flex-start',
+              display: 'flex',
+              gap: '15px',
             }}
           >
             <Button
               onClick={() => allowancePackageModal({ record }, closeCallBack)}
-              type="primary"
-              icon={<PlusCircleOutlined />}
-            >
-              Edit
-            </Button>
+              type='primary'
+              shape='circle'
+              icon={<EditOutlined />}
+            />
 
             <Popconfirm
-              title="Delete the task"
-              description="Are you sure to delete this task?"
+              title='Delete the task'
+              description='Are you sure to delete this task?'
               onConfirm={() => handleDelete(record?.id)}
               onCancel={onCancel}
-              okText="Yes"
-              cancelText="No"
+              okText='Yes'
+              cancelText='No'
             >
-              <Button danger type="primary" icon={<CloseCircleOutlined />}>
-                Delete
-              </Button>
+              <Button
+                danger
+                type='primary'
+                icon={<DeleteOutlined />}
+                shape='circle'
+              />
             </Popconfirm>
+            <Tooltip title='View Package'>
+              <Button
+                onClick={() => handleClick(record?.id)}
+                type='primary'
+                shape='circle'
+                icon={<EyeOutlined />}
+              />
+            </Tooltip>
           </div>
         );
       },
@@ -163,10 +177,10 @@ function AllowancePackage() {
 
   return (
     <div>
-      <PageContainer title="Allowance Package Management">
+      <PageContainer title='Allowance Package Management'>
         <ProCard
           headStyle={{
-            flexWrap: "wrap",
+            flexWrap: 'wrap',
           }}
           bordered
           headerBordered
@@ -174,14 +188,14 @@ function AllowancePackage() {
             <ProFormGroup>
               <Search
                 allowClear
-                size="middle"
-                placeholder="Search here.."
+                size='middle'
+                placeholder='Search here..'
                 onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-                className="select-header-list"
+                className='select-header-list'
               />
               <Button
-                form="upsertForm"
-                type="primary"
+                form='upsertForm'
+                type='primary'
                 onClick={() => {
                   allowancePackageModal({ selectedItem }, closeCallBack);
                 }}
@@ -196,20 +210,12 @@ function AllowancePackage() {
             loading={loading}
             dataSource={allowanceData}
             columns={columns}
-            size="small"
+            size='small'
           />
         </ProCard>
       </PageContainer>
     </div>
   );
 }
-
-const handleMouseEnter = () => {
-  document.body.style.cursor = "pointer";
-};
-
-const handleMouseLeave = () => {
-  document.body.style.cursor = "auto";
-};
 
 export default AllowancePackage;
