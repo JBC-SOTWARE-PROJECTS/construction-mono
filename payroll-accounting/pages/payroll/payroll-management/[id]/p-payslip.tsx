@@ -1,27 +1,23 @@
-import React from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import AccessManager from "@/components/accessControl/AccessManager";
-import CircularProgress from "@/components/circularProgress";
-import { IPageProps } from "@/utility/interfaces";
+import React from 'react';
+import Head from 'next/head';
+import dynamic from 'next/dynamic';
+import CircularProgress from '@/components/circularProgress';
 
 const Component = dynamic(
-  () => import("@/routes/payroll/payroll-management/p-payslip"),
+  () => import('@/routes/payroll/payroll-management/p-payslip'),
   {
     loading: () => <CircularProgress />,
   }
 );
 
-const PayrollPayslip = ({ account }: IPageProps) => (
+const PayrollPayslip = () => (
   <React.Fragment>
     <Head>
       <title>Payroll Management</title>
     </Head>
-    <AccessManager roles={["ROLE_ADMIN", "PAYROLL_MANAGER"]}>
-      <div className="gx-main-content-wrapper-full-width">
-        <Component account={account} />
-      </div>
-    </AccessManager>
+    <div className='gx-main-content-wrapper-full-width'>
+      <Component />
+    </div>
   </React.Fragment>
 );
 
