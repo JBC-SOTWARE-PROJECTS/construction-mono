@@ -29,6 +29,8 @@ const options = ["Edit", "Assign Item", "Assign Supplier"];
 //graphQL Queries
 const GET_RECORDS = gql`
   query (
+    $brand: String
+    $type: String
     $filter: String
     $groupId: UUID
     $category: [UUID]
@@ -36,6 +38,8 @@ const GET_RECORDS = gql`
     $size: Int
   ) {
     list: itemByFiltersPage(
+      brand: $brand
+      type: $type
       filter: $filter
       group: $groupId
       category: $category
@@ -114,6 +118,8 @@ const ItemContent = ({ account }) => {
       category: category,
       page: state.page,
       size: state.size,
+      type: "all",
+      brand: "",
     },
     fetchPolicy: "network-only",
   });

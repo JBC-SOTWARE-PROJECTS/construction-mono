@@ -471,4 +471,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/61_wilson_alter_supplier_item.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/55_donss_add_fixed_asset.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/62_donss_alter_ledger_group.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

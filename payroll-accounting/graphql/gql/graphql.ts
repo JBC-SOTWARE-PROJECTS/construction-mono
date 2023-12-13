@@ -1642,6 +1642,11 @@ export type DebitMemoInput = {
   value_100?: InputMaybe<Scalars['BigDecimal']['input']>;
 };
 
+export enum DepreciationMethod {
+  NoDepreciation = 'NO_DEPRECIATION',
+  StraightLine = 'STRAIGHT_LINE'
+}
+
 export enum Direction {
   Asc = 'ASC',
   Desc = 'DESC'
@@ -2111,6 +2116,7 @@ export type DocumentTypes = {
 
 export enum DomainEnum {
   Bank = 'BANK',
+  FixedAssetSubAccount = 'FIXED_ASSET_SUB_ACCOUNT',
   ItemCategory = 'ITEM_CATEGORY',
   NoDomain = 'NO_DOMAIN',
   Projects = 'PROJECTS',
@@ -2648,6 +2654,44 @@ export type Fiscal = {
   toDate?: Maybe<Scalars['LocalDate']['output']>;
 };
 
+export type FixedAssetItems = {
+  __typename?: 'FixedAssetItems';
+  accumulatedDepreciation?: Maybe<Scalars['BigDecimal']['output']>;
+  assetNo?: Maybe<Scalars['String']['output']>;
+  bookValue?: Maybe<Scalars['BigDecimal']['output']>;
+  companyId?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  deliveryReceiving?: Maybe<ReceivingReport>;
+  deliveryReceivingDate?: Maybe<Scalars['Date']['output']>;
+  deliveryReceivingItem?: Maybe<ReceivingReportItem>;
+  depreciationMethod?: Maybe<DepreciationMethod>;
+  depreciationStartDate?: Maybe<Scalars['Date']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  isBeginningBalance?: Maybe<Scalars['Boolean']['output']>;
+  itemId?: Maybe<Scalars['UUID']['output']>;
+  itemName?: Maybe<Scalars['String']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  ledgerGroupId?: Maybe<Scalars['UUID']['output']>;
+  negativeAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  office?: Maybe<Office>;
+  purchase?: Maybe<PurchaseOrder>;
+  purchaseDate?: Maybe<Scalars['Date']['output']>;
+  purchaseNo?: Maybe<Scalars['String']['output']>;
+  purchasePrice?: Maybe<Scalars['BigDecimal']['output']>;
+  reference?: Maybe<Scalars['String']['output']>;
+  salvageValue?: Maybe<Scalars['BigDecimal']['output']>;
+  serialNo?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  subAccount?: Maybe<ItemSubAccount>;
+  usefulLife?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
 export type GeneralLedgerDetailsListDto = {
   __typename?: 'GeneralLedgerDetailsListDto';
   account?: Maybe<Scalars['String']['output']>;
@@ -2821,6 +2865,14 @@ export type GraphQlResVal_EmployeeLoan = {
   __typename?: 'GraphQLResVal_EmployeeLoan';
   message?: Maybe<Scalars['String']['output']>;
   response?: Maybe<EmployeeLoan>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlResVal_FixedAssetItems = {
+  __typename?: 'GraphQLResVal_FixedAssetItems';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<FixedAssetItems>;
   returnId?: Maybe<Scalars['UUID']['output']>;
   success: Scalars['Boolean']['output'];
 };
@@ -3230,6 +3282,7 @@ export enum IntegrationDomainEnum {
   CreditNote = 'CREDIT_NOTE',
   DebitMemo = 'DEBIT_MEMO',
   Disbursement = 'DISBURSEMENT',
+  FixedAssetItem = 'FIXED_ASSET_ITEM',
   Invoice = 'INVOICE',
   NoDomain = 'NO_DOMAIN',
   Payment = 'PAYMENT',
@@ -3443,10 +3496,13 @@ export type ItemJobsDto = {
 
 export type ItemSubAccount = {
   __typename?: 'ItemSubAccount';
+  accountName?: Maybe<Scalars['String']['output']>;
   accountType?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
   isFixedAsset?: Maybe<Scalars['Boolean']['output']>;
@@ -3719,6 +3775,7 @@ export enum LedgerDocType {
   Dm = 'DM',
   Ds = 'DS',
   Ei = 'EI',
+  Fa = 'FA',
   Inv = 'INV',
   Jv = 'JV',
   Or = 'OR',
@@ -4099,6 +4156,7 @@ export type Mutation = {
   upsertExTransType?: Maybe<GraphQlRetVal_Boolean>;
   upsertExp?: Maybe<DisbursementExpense>;
   upsertFiscal?: Maybe<Fiscal>;
+  upsertFixedAssetItems?: Maybe<GraphQlResVal_FixedAssetItems>;
   upsertGenerics?: Maybe<Generic>;
   upsertGroupPolicy?: Maybe<GroupPolicy>;
   upsertHDMFContribution?: Maybe<GraphQlRetVal_HdmfContribution>;
@@ -4121,6 +4179,7 @@ export type Mutation = {
   upsertMPAssetRepairMaintenanceItem?: Maybe<AssetRepairMaintenanceItems>;
   upsertManyMaterials?: Maybe<GraphQlRetVal_Boolean>;
   upsertMpItem?: Maybe<MaterialProductionItem>;
+  upsertMultiFixedAssetItems?: Maybe<GraphQlResVal_Boolean>;
   upsertOffice?: Maybe<Office>;
   upsertOfficeItem?: Maybe<OfficeItem>;
   upsertOtherDeductionItem?: Maybe<GraphQlResVal_PayrollOtherDeductionItem>;
@@ -5873,6 +5932,13 @@ export type MutationUpsertFiscalArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertFixedAssetItemsArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertGenericsArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -6029,6 +6095,12 @@ export type MutationUpsertMpItemArgs = {
   dto?: InputMaybe<PurchaseMpDtoInput>;
   item?: InputMaybe<ItemInput>;
   mp?: InputMaybe<MaterialProductionInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertMultiFixedAssetItemsArgs = {
+  fields?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
 };
 
 
@@ -7244,6 +7316,25 @@ export type Page_EmployeeLoanLedgerDto = {
 export type Page_Fiscal = {
   __typename?: 'Page_Fiscal';
   content?: Maybe<Array<Maybe<Fiscal>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_FixedAssetItems = {
+  __typename?: 'Page_FixedAssetItems';
+  content?: Maybe<Array<Maybe<FixedAssetItems>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -9368,6 +9459,8 @@ export type Query = {
   cityByProvince?: Maybe<Array<Maybe<City>>>;
   cityFilter?: Maybe<Array<Maybe<City>>>;
   comById?: Maybe<CompanySettings>;
+  /** Get All Active Company Offices  */
+  companyActiveOffices?: Maybe<Array<Maybe<Office>>>;
   companyList?: Maybe<Array<Maybe<CompanySettings>>>;
   companyListSelection?: Maybe<Array<Maybe<CompanySettings>>>;
   companyPage?: Maybe<Page_CompanySettings>;
@@ -9490,6 +9583,7 @@ export type Query = {
   findPostedCNPerInvoice?: Maybe<Array<Maybe<ArCreditNote>>>;
   fiscalById?: Maybe<Fiscal>;
   fiscals?: Maybe<Page_Fiscal>;
+  fixedAssetItemList?: Maybe<Array<Maybe<Item>>>;
   generateGeneralLedgerDetailedSummary?: Maybe<Array<Maybe<GeneralLedgerListDto>>>;
   generateGeneralLedgerDetails?: Maybe<Array<Maybe<GeneralLedgerDetailsListDto>>>;
   generateGeneralLedgerSummary?: Maybe<Array<Maybe<GeneralLedgerListDto>>>;
@@ -9539,6 +9633,7 @@ export type Query = {
   getEmployeeScheduleDetails?: Maybe<EmployeeScheduleDetailsDto>;
   /** Filter Event Calendar between two dates. */
   getEventsBetweenTwoDates?: Maybe<Array<Maybe<EventCalendar>>>;
+  getFixedAssetPageable?: Maybe<Page_FixedAssetItems>;
   getGeneralLedger?: Maybe<GeneralLedgerDtoContainer>;
   /** Get Group Policy by name */
   getGroupPolicyById?: Maybe<GroupPolicy>;
@@ -10977,6 +11072,12 @@ export type QueryFiscalsArgs = {
 
 
 /** Query root */
+export type QueryFixedAssetItemListArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
 export type QueryGenerateGeneralLedgerDetailedSummaryArgs = {
   account?: InputMaybe<Scalars['String']['input']>;
   endDate?: InputMaybe<Scalars['String']['input']>;
@@ -11210,6 +11311,14 @@ export type QueryGetEmployeeScheduleDetailsArgs = {
 export type QueryGetEventsBetweenTwoDatesArgs = {
   endDate?: InputMaybe<Scalars['Instant']['input']>;
   startDate?: InputMaybe<Scalars['Instant']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetFixedAssetPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
