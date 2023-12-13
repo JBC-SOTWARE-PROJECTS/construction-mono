@@ -13,6 +13,7 @@ import com.backend.gbp.rest.dto.GrossDto
 import com.backend.gbp.rest.dto.HeaderDto
 import com.backend.gbp.rest.dto.HeadersDto
 import com.backend.gbp.rest.dto.PayslipPayrollDto
+import com.backend.gbp.rest.dto.SummaryDto
 import com.google.gson.Gson
 import groovy.transform.TypeChecked
 import net.sf.jasperreports.engine.JRException
@@ -89,38 +90,119 @@ class PayrollReportResource {
 
                     List<GrossDto> grossDtoList = [];
                     List<DeductionDto> deductionDtoList = []
-                    def headerDtoList = new HeaderDto([
-                           regular: "Regular",
-                           late:     "Late",
-                           underTime: "Under Time",
-                           overTime: "Over Time",
-                           regularHoliday: "Regular Holiday",
-                           specialNonWorking: "Special Non-Working",
-                           vacationLeave: "Vacation Leave",
-                           sickLeave: "Sick leave",
-                           semiMonthlyAllowance: "Semi Monthly Allowance",
-                           dailyAllowance: "Daily Allowance",
-                           loadAllowance: "Load Allowance",
-                           transportation: "Transportation Allowance",
-                           foodAllowance: "Food Allowance"
-                   ])
-
-                    def descriptionString = headerDtoList.properties.values().join(', ')
+                    List<SummaryDto> summaryDtoList = []
 
                     grossDtoList.push( new GrossDto(
                             description: "Regular",
-                            nohours: 0,
+                            nohours: 100,
                             rate: 100,
                             total: 200
                     ))
 
-//                    deductionDtoList.push( new DeductionDto(
-//                            deduction: "deduction",
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Late",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Under Time",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Over Time",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Regular Holiday",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Special Non-Working",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Vacation Leave",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Sick leave",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Semi Monthly Allowance",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Daily Allowance",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Load Allowance",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Transportation Allowance",
+//                            nohours: 0,
+//                            rate: 100,
+//                            total: 200
+//                    ))
+//
+//                    grossDtoList.push( new GrossDto(
+//                            description: "Food Allowance",
 //                            nohours: 0,
 //                            rate: 100,
 //                            total: 200
 //                    ))
 
+                    deductionDtoList.push( new DeductionDto(
+                            description: "Withholding Tax",
+                            nohours: 100,
+                            rate: 100,
+                            total: 200
+                    ))
+
+                    deductionDtoList.push( new DeductionDto(
+                            description: "SSS",
+                            nohours: 100,
+                            rate: 100,
+                            total: 200
+                    ))
+
+                    summaryDtoList.push(new SummaryDto(
+                            description: "Sample 1",
+                            nohours: 100,
+                            rate: 100,
+                            total: 200
+                    ))
 
 
                     def data = new PayslipPayrollDto(
@@ -131,10 +213,12 @@ class PayrollReportResource {
                             regularRate: 100.0,
                             regularTotal: 123.0,
                             descriptionField: new JRBeanCollectionDataSource(grossDtoList),
-//                            deductionField : new JRBeanCollectionDataSource(deductionDtoList),
+                            deductionField : new JRBeanCollectionDataSource(deductionDtoList),
+                            summaryField: new JRBeanCollectionDataSource(summaryDtoList),
                             payrollCode: "19993",
                             payPeriod: "1239848",
-                            paycheckdate: "19283"
+                            paycheckdate: "19283",
+                            totalGross: 1000
 
                     )
 

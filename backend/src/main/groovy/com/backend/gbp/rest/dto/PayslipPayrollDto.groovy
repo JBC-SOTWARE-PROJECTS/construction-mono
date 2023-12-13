@@ -16,6 +16,8 @@ class PayslipPayrollDto {
     BigDecimal regularTotal
     JRBeanCollectionDataSource descriptionField
     JRBeanCollectionDataSource deductionField
+    JRBeanCollectionDataSource summaryField
+    Double totalGross
 
 }
 
@@ -64,7 +66,15 @@ class GrossDto {
 
 @Canonical
 class DeductionDto {
-    String deduction
+    String description
+    Integer nohours
+    Integer rate
+    Integer total
+}
+
+@Canonical
+class  SummaryDto{
+    String description
     Integer nohours
     Integer rate
     Integer total
