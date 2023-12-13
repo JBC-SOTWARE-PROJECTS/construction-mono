@@ -23,7 +23,7 @@ enum IntegrationDomainEnum {
     REAPPLICATION("Disbursement Reapplication", "com.backend.gbp.domain.accounting.Reapplication"),
     DEBIT_MEMO("Debit Memo", "com.backend.gbp.domain.accounting.DebitMemo"),
     PETTY_CASH("Petty Cash", "com.backend.gbp.domain.accounting.PettyCashAccounting"),
-    FIXED_ASSET_ITEM("Fixed Asset Item", "com.backend.gbp.domain.accounting.FixedAssetItems")
+    FIXED_ASSET_ITEM("Fixed Asset Item", "com.backend.gbp.domain.fixed_asset.FixedAssetItems")
 
     String displayName
     String path

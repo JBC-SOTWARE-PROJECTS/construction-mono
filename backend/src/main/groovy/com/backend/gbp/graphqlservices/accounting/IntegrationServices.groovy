@@ -639,7 +639,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
         return IntegrationDomainEnum.values().findAll { it != IntegrationDomainEnum.NO_DOMAIN } .collect { [label: it.displayName, value: it.name()] as DomainOptionDto }
     }
 
-    def  <T extends AutoIntegrateable>  HeaderLedger generateAutoEntriesEnhance(T autoIntegrateable,AutoIntegrateAbleInitializerForMultiple<T> init){
+    def  <T extends AutoIntegrateable>  HeaderLedger generateAutoEntriesEnhanced(T autoIntegrateable,AutoIntegrateAbleInitializerForMultiple<T> init){
 
 
         Map<String,List<T>> multipleData = [:]

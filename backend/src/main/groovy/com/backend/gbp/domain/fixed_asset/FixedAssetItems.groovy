@@ -4,6 +4,7 @@ import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.IntegrationDomainEnum
 import com.backend.gbp.domain.inventory.Item
+import com.backend.gbp.domain.inventory.ItemSubAccount
 import com.backend.gbp.domain.inventory.PurchaseOrder
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.domain.inventory.ReceivingReportItem
@@ -128,6 +129,14 @@ class FixedAssetItems extends AbstractAuditingEntity implements Serializable, Au
     @Column(name = "company_id")
     UUID companyId
 
+    @GraphQLQuery
+    @Column(name = "ledger_group_id")
+    UUID ledgerGroupId
+
+    @GraphQLQuery
+    @Column(name = "is_beginning_balance")
+    Boolean isBeginningBalance
+
     @Override
     String getDomain() {
         return IntegrationDomainEnum.FIXED_ASSET_ITEM.name()
@@ -140,4 +149,11 @@ class FixedAssetItems extends AbstractAuditingEntity implements Serializable, Au
 
     @Transient
     String flagValue
+
+    @Transient
+    ItemSubAccount subAccount
+
+    @Transient
+    BigDecimal negativeAmount
+
 }

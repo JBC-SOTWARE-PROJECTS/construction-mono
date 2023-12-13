@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS fixed_asset.fixed_asset_items (
     delivery_receiving_id uuid,
     delivery_receiving_item_id uuid,
     delivery_receiving_date uuid,
+    ledger_group_id uuid,
 
     status VARCHAR,
 
@@ -39,3 +40,6 @@ CREATE TABLE IF NOT EXISTS fixed_asset.fixed_asset_items (
 );
 
 CREATE INDEX IF NOT EXISTS idx_fixed_asset_items_company_id ON accounting.ar_payment_posting (company_id);
+
+ALTER TABLE fixed_asset.fixed_asset_items
+ADD COLUMN IF NOT EXISTS is_beginning_balance bool;

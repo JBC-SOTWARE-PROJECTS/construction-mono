@@ -40,7 +40,8 @@ enum LedgerDocType { //transactype
 	CH, // Charges
 	CA, // Cash,
 	XX, // Generated From Generator - Error when pushed through
-	BB // Beginning Balance
+	BB, // Beginning Balance
+	FA
 }
 
 
