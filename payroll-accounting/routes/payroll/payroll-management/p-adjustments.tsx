@@ -74,6 +74,32 @@ function PayrollAdjustments({ account }: IPageProps) {
     }
   );
 
+  const actionColumns: ColumnsType<PayrollEmployeeAdjustmentDto> = [
+    {
+      title: "Action",
+      dataIndex: "id",
+      render: (value, { status }) => {
+        return (
+          <>
+            <PayrollModuleRecalculateEmployeeAction
+              id={value}
+              module={PayrollModule.Adjustment}
+              buttonProps={recalculateButton}
+              refetch={refetch}
+              // allowedPermissions={[]}
+            />
+            <PayrollEmployeeStatusAction
+              id={value}
+              module={PayrollModule.Adjustment}
+              value={status}
+              refetch={refetch}
+            />
+          </>
+        );
+      },
+    },
+  ];
+
   const columns: ColumnsType<PayrollEmployeeAdjustmentDto> = [
     { title: "Name", dataIndex: "employeeName" },
     {
@@ -97,24 +123,23 @@ function PayrollAdjustments({ account }: IPageProps) {
         return <NumeralFormatter value={total} />;
       },
     },
+    ...(adjustment?.status === PayrollStatus.Draft ? actionColumns : []),
+  ];
+
+  const expandedColumnsAction: ColumnsType<PayrollAdjustmentItem> = [
     {
       title: "Action",
       dataIndex: "id",
-      render: (value, { status }) => {
+      render: (value) => {
         return (
           <>
-            <PayrollModuleRecalculateEmployeeAction
+            <CustomButton
               id={value}
-              module={PayrollModule.Adjustment}
-              buttonProps={recalculateButton}
-              refetch={refetch}
-              // allowedPermissions={[]}
-            />
-            <PayrollEmployeeStatusAction
-              id={value}
-              module={PayrollModule.Adjustment}
-              value={status}
-              refetch={refetch}
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => {
+                confirmDelete(value);
+              }}
             />
           </>
         );
@@ -152,11 +177,14 @@ function PayrollAdjustments({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditing(record.id as string);
-              setEditingField("CATEGORY");
+              if (adjustment?.status === PayrollStatus.Draft) {
+                setEditing(record.id as string);
+                setEditingField("CATEGORY");
+              }
             }}
           >
-            {value} <EditOutlined />
+            {value}{" "}
+            {adjustment?.status === PayrollStatus.Draft && <EditOutlined />}
           </div>
         ),
     },
@@ -178,11 +206,14 @@ function PayrollAdjustments({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditing(record.id as string);
-              setEditingField("DESCRIPTION");
+              if (adjustment?.status === PayrollStatus.Draft) {
+                setEditing(record.id as string);
+                setEditingField("DESCRIPTION");
+              }
             }}
           >
-            {value} <EditOutlined />
+            {value}{" "}
+            {adjustment?.status === PayrollStatus.Draft && <EditOutlined />}
           </div>
         ),
     },
@@ -211,32 +242,20 @@ function PayrollAdjustments({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditing(record.id as string);
-              setEditingField("AMOUNT");
+              if (adjustment?.status === PayrollStatus.Draft) {
+                setEditing(record.id as string);
+                setEditingField("AMOUNT");
+              }
             }}
           >
-            <NumeralFormatter value={value} /> <EditOutlined />
+            <NumeralFormatter value={value} />{" "}
+            {adjustment?.status === PayrollStatus.Draft && <EditOutlined />}
           </div>
         ),
     },
-    {
-      title: "Action",
-      dataIndex: "id",
-      render: (value) => {
-        return (
-          <>
-            <CustomButton
-              id={value}
-              icon={<DeleteOutlined />}
-              danger
-              onClick={() => {
-                confirmDelete(value);
-              }}
-            />
-          </>
-        );
-      },
-    },
+    ...(adjustment?.status === PayrollStatus.Draft
+      ? expandedColumnsAction
+      : []),
   ];
 
   const editAmount = (record: PayrollAdjustmentItem) => {
@@ -314,6 +333,8 @@ function PayrollAdjustments({ account }: IPageProps) {
         module={PayrollModule.Adjustment}
         status={adjustment?.status}
         showTitle
+        handleClickFinalize={handleClickFinalize}
+        loading={loadingUpdateStatus}
         extra={
           <>
             {adjustment?.status === PayrollStatus.Draft && (
@@ -327,20 +348,6 @@ function PayrollAdjustments({ account }: IPageProps) {
                 Recalculate All Employee Adjustment
               </PayrollModuleRecalculateAllEmployeeAction>
             )}
-
-            <CustomButton
-              type="primary"
-              icon={
-                adjustment?.status === "FINALIZED" ? (
-                  <EditOutlined />
-                ) : (
-                  <CheckOutlined />
-                )
-              }
-              onClick={handleClickFinalize}
-            >
-              Set as {statusMap[adjustment?.status]}
-            </CustomButton>
           </>
         }
       />

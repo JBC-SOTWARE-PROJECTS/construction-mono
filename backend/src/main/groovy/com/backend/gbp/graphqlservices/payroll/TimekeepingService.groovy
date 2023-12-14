@@ -17,6 +17,7 @@ import com.backend.gbp.repository.TimekeepingRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.backend.gbp.security.SecurityUtils
+import com.backend.gbp.services.requestscope.ChartofAccountGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -54,6 +55,9 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
 
     @Autowired
     SalaryRateMultiplierService salaryRateMultiplierService
+
+    @Autowired
+    ChartofAccountGenerator chartofAccountGenerator
 
     @Autowired
     ObjectMapper objectMapper
@@ -187,11 +191,26 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         return new GraphQLResVal<String>(null, true, "Successfully updated Timekeeping status.")
     }
 
-    static consolidateSalaryBreakdown(Map<String, EmployeeSalaryDto> breakdownMap, EmployeeSalaryDto it) {
-        EmployeeSalaryDto breakdown= breakdownMap.get((it?.project ? it.project : it.company) as String)
-        if (!breakdown) breakdown = new EmployeeSalaryDto()
+    void consolidateSalaryBreakdown(Map<String, EmployeeSalaryDto> breakdownMap, EmployeeSalaryDto it) {
+
+
+        EmployeeSalaryDto breakdown = breakdownMap.get((it?.project ? it.project : it.company) as String)
+        if (!breakdown) {
+            breakdown = new EmployeeSalaryDto()
+            String subAccountCode = chartofAccountGenerator.getAllChartOfAccountGenerate(null,
+                    null,
+                    it?.project ? it.projectName : 'GENERAL AND ADMIN',
+                    null,
+                    null,
+                    null,
+                    true)[0].code
+            breakdown.subAccountCode = subAccountCode
+        }
+
+
         breakdown.project = it?.project
         breakdown.projectName = it?.projectName
+
 
         breakdown.company = it?.company
         breakdown.companyName = it?.companyName

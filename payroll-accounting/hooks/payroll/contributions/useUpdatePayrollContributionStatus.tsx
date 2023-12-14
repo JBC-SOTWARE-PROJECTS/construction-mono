@@ -1,34 +1,28 @@
+import { PayrollStatus } from "@/graphql/gql/graphql";
 import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
 
 const MUTATION = gql`
-  mutation (
-    $id: UUID
-    $name: String
-    $description: String
-    $status: Boolean
-    $subaccountCode: String
+  mutation updatePayrollContributionStatus(
+    $payrollId: UUID
+    $status: PayrollStatus
   ) {
-    data: upsertOtherDeductionType(
-      id: $id
-      name: $name
-      description: $description
+    data: updatePayrollContributionStatus(
+      payrollId: $payrollId
       status: $status
-      subaccountCode: $subaccountCode
     ) {
       success
       message
+      response
     }
   }
 `;
 
 interface params {
-  id: string | undefined;
-  name: string;
-  description: string;
-  status: boolean;
+  payrollId: string;
+  status: PayrollStatus;
 }
-function useUpsertOtherDeductionType(callBack?: (result: any) => void) {
+function useUpdatePayrollContributionStatus(callBack?: (result: any) => void) {
   const [mutationFn, { loading }] = useMutation(MUTATION, {
     onCompleted: (result: any) => {
       message[result?.data?.success ? "success" : "error"](
@@ -48,4 +42,4 @@ function useUpsertOtherDeductionType(callBack?: (result: any) => void) {
   return returnValue;
 }
 
-export default useUpsertOtherDeductionType;
+export default useUpdatePayrollContributionStatus;

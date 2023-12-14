@@ -5,6 +5,7 @@ import { SubAccountSetup } from "@/graphql/gql/graphql";
 import { BookOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { Form, Modal } from "antd";
+import _ from "lodash";
 import { useEffect, useState } from "react";
 interface AddAccountProps {
   hide: (hideProps: any) => {};
@@ -133,7 +134,8 @@ const EditAccount = (props: AddAccountProps) => {
         okText={"Update"}
         onOk={() => form.submit()}
         //okButtonProps={{ loading: upsertLoading }}
-        onCancel={() => props.hide(false)}>
+        onCancel={() => props.hide(false)}
+      >
         <Form
           form={form}
           name="basic"
@@ -145,7 +147,8 @@ const EditAccount = (props: AddAccountProps) => {
               props?.row?.journalAccount?.motherAccount?.accountName,
           }}
           onFinish={handleSubmmit}
-          autoComplete="off">
+          autoComplete="off"
+        >
           <FormInput
             label="Parent Account"
             name={"motherAccount"}
@@ -203,7 +206,7 @@ const EditAccount = (props: AddAccountProps) => {
               options: (sourceData?.sourceColumns ?? []).map(
                 (columns: string) => ({
                   value: columns,
-                  label: columns,
+                  label: _.upperCase(columns),
                 })
               ),
             }}

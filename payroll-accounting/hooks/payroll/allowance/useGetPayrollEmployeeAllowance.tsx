@@ -42,6 +42,7 @@ const useGetPayrollEmployeeAllowance = ({
             employeeName
             total
             position
+            status
             employee {
               id
               allowanceItems {

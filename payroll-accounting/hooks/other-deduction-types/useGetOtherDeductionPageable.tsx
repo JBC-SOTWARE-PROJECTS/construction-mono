@@ -25,6 +25,7 @@ const useGetOtherDeductionPageable = (
             id
             description
             status
+            subaccountCode
           }
           totalElements
         }

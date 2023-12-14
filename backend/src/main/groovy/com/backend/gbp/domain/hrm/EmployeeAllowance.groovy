@@ -43,8 +43,15 @@ class EmployeeAllowance extends AbstractAuditingEntity {
 	@JoinColumn(name = "company", referencedColumnName = "id")
 	CompanySettings company
 
-	@GraphQLQuery
-	@Column(name = "allowance", columnDefinition = "uuid")
-	UUID allowanceId
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "allowance", referencedColumnName = "id")
+	Allowance allowance
+
+	@java.beans.Transient
+	UUID getAllowanceId(){
+		return allowance.id
+	}
+
 
 }

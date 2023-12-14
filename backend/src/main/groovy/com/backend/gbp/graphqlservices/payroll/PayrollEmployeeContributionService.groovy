@@ -197,7 +197,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
     private void assignContributionAmounts(PayrollEmployeeContribution employee) {
         PayrollEmployeeContributionsView employeeView = payrollEmployeeContributionsViewRepository.findById(employee.payrollEmployee.employee.id).get()
         employee.sssEE = employeeView.sssEE ?: 0
-        employee.sssER = employeeView.sssER ?: 0
+        employee.sssER = employeeView.sssER + employeeView.sssER_EC?: 0
         employee.sssWispEE = employeeView.sssWispEE ?: 0
         employee.sssWispER = employeeView.sssWispER ?: 0
         employee.phicEE = employeeView.phicEE ?: 0

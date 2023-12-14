@@ -41,6 +41,8 @@ enum LedgerDocType { //transactype
 	CA, // Cash,
 	XX, // Generated From Generator - Error when pushed through
 	BB, // Beginning Balance
+	PRL, //Payroll
+	EL, //Employee Loan
 	FA
 }
 
