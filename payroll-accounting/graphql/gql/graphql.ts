@@ -648,6 +648,22 @@ export type ArCustomers = {
   otherDetails?: Maybe<CustomerOtherDetails>;
 };
 
+export type ArCustomersInput = {
+  accountNo?: InputMaybe<Scalars['String']['input']>;
+  accountPrefix?: InputMaybe<Scalars['String']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  companyId?: InputMaybe<Scalars['UUID']['input']>;
+  contactEmail?: InputMaybe<Scalars['String']['input']>;
+  contactNo?: InputMaybe<Scalars['String']['input']>;
+  contactPerson?: InputMaybe<Scalars['String']['input']>;
+  customerInfo?: InputMaybe<CustomerInfoInput>;
+  customerName?: InputMaybe<Scalars['String']['input']>;
+  customerType?: InputMaybe<CustomerType>;
+  discountAndPenalties?: InputMaybe<CompanyDiscountAndPenaltiesInput>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  otherDetails?: InputMaybe<CustomerOtherDetailsInput>;
+};
+
 export type ArInvoice = {
   __typename?: 'ArInvoice';
   approvedBy?: Maybe<Scalars['UUID']['output']>;
@@ -1018,7 +1034,7 @@ export type Billing = {
   companyId?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
-  customer?: Maybe<Customer>;
+  customer?: Maybe<ArCustomers>;
   dateTrans?: Maybe<Scalars['Instant']['output']>;
   /** deductions */
   deductions?: Maybe<Scalars['BigDecimal']['output']>;
@@ -1040,7 +1056,7 @@ export type Billing = {
 export type BillingInput = {
   billNo?: InputMaybe<Scalars['String']['input']>;
   companyId?: InputMaybe<Scalars['UUID']['input']>;
-  customer?: InputMaybe<CustomerInput>;
+  customer?: InputMaybe<ArCustomersInput>;
   dateTrans?: InputMaybe<Scalars['Instant']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   job?: InputMaybe<JobInput>;
@@ -1183,6 +1199,16 @@ export type CompanyDiscountAndPenalties = {
   salesAccountCode?: Maybe<Scalars['String']['output']>;
 };
 
+export type CompanyDiscountAndPenaltiesInput = {
+  autoDiscountInPayment?: InputMaybe<Scalars['Boolean']['input']>;
+  blockOnCreditLimit?: InputMaybe<Scalars['Boolean']['input']>;
+  creditLimit?: InputMaybe<Scalars['BigDecimal']['input']>;
+  creditPeriod?: InputMaybe<Scalars['Int']['input']>;
+  overduePenalties?: InputMaybe<Array<InputMaybe<PaymentPromptFieldInput>>>;
+  paymentDiscounts?: InputMaybe<Array<InputMaybe<PaymentPromptFieldInput>>>;
+  salesAccountCode?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CompanySettings = {
   __typename?: 'CompanySettings';
   companyCode?: Maybe<Scalars['String']['output']>;
@@ -1263,6 +1289,18 @@ export type CustomerContact = {
   zipcode?: Maybe<Scalars['Int']['output']>;
 };
 
+export type CustomerContactInput = {
+  barangay?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  phoneNo?: InputMaybe<Scalars['String']['input']>;
+  province?: InputMaybe<Scalars['String']['input']>;
+  street?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<ContactType>;
+  zipcode?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type CustomerInfo = {
   __typename?: 'CustomerInfo';
   birthday?: Maybe<Scalars['String']['output']>;
@@ -1274,16 +1312,14 @@ export type CustomerInfo = {
   middleName?: Maybe<Scalars['String']['output']>;
 };
 
-export type CustomerInput = {
-  address?: InputMaybe<Scalars['String']['input']>;
-  contactPerson?: InputMaybe<Scalars['String']['input']>;
-  contactPersonNum?: InputMaybe<Scalars['String']['input']>;
-  customerType?: InputMaybe<Scalars['String']['input']>;
-  emailAdd?: InputMaybe<Scalars['String']['input']>;
-  fullName?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['UUID']['input']>;
-  isAssetsCustomer?: InputMaybe<Scalars['Boolean']['input']>;
-  telNo?: InputMaybe<Scalars['String']['input']>;
+export type CustomerInfoInput = {
+  birthday?: InputMaybe<Scalars['String']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  gender?: InputMaybe<Scalars['String']['input']>;
+  govId?: InputMaybe<Scalars['String']['input']>;
+  govIdType?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  middleName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CustomerOtherDetails = {
@@ -1291,6 +1327,12 @@ export type CustomerOtherDetails = {
   billingContact?: Maybe<CustomerContact>;
   color?: Maybe<Scalars['String']['output']>;
   contacts?: Maybe<Array<Maybe<CustomerContact>>>;
+};
+
+export type CustomerOtherDetailsInput = {
+  billingContact?: InputMaybe<CustomerContactInput>;
+  color?: InputMaybe<Scalars['String']['input']>;
+  contacts?: InputMaybe<Array<InputMaybe<CustomerContactInput>>>;
 };
 
 export enum CustomerType {
@@ -2079,6 +2121,7 @@ export enum DomainEnum {
   Bank = 'BANK',
   ItemCategory = 'ITEM_CATEGORY',
   NoDomain = 'NO_DOMAIN',
+  Projects = 'PROJECTS',
   Supplier = 'SUPPLIER'
 }
 
@@ -2310,6 +2353,7 @@ export type EmployeeLoan = {
   advanceToEmployees?: Maybe<Scalars['BigDecimal']['output']>;
   amount?: Maybe<Scalars['BigDecimal']['output']>;
   apClearingAccount?: Maybe<Scalars['BigDecimal']['output']>;
+  cashOnHand?: Maybe<Scalars['BigDecimal']['output']>;
   category?: Maybe<EmployeeLoanCategory>;
   company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -2323,7 +2367,6 @@ export type EmployeeLoan = {
   isVoided?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  negativeAmount?: Maybe<Scalars['BigDecimal']['output']>;
   posted?: Maybe<Scalars['Boolean']['output']>;
   postedBy?: Maybe<Scalars['String']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
@@ -2377,6 +2420,7 @@ export type EmployeeSalaryDto = {
   regularDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
   regularHoliday?: Maybe<Scalars['BigDecimal']['output']>;
   regularSpecialHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  subAccountCode?: Maybe<Scalars['String']['output']>;
   total?: Maybe<Scalars['BigDecimal']['output']>;
   underTime?: Maybe<Scalars['BigDecimal']['output']>;
 };
@@ -3454,7 +3498,7 @@ export type Job = {
   completed?: Maybe<Scalars['Boolean']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
-  customer?: Maybe<Customer>;
+  customer?: Maybe<ArCustomers>;
   customerComplain?: Maybe<Scalars['String']['output']>;
   dateReleased?: Maybe<Scalars['Instant']['output']>;
   dateTrans?: Maybe<Scalars['Instant']['output']>;
@@ -3488,7 +3532,7 @@ export type JobInput = {
   bodyNo?: InputMaybe<Scalars['String']['input']>;
   chassisNo?: InputMaybe<Scalars['String']['input']>;
   completed?: InputMaybe<Scalars['Boolean']['input']>;
-  customer?: InputMaybe<CustomerInput>;
+  customer?: InputMaybe<ArCustomersInput>;
   customerComplain?: InputMaybe<Scalars['String']['input']>;
   dateReleased?: InputMaybe<Scalars['Instant']['input']>;
   dateTrans?: InputMaybe<Scalars['Instant']['input']>;
@@ -3630,6 +3674,7 @@ export type JobStatus = {
   is_active?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  statusColor?: Maybe<Scalars['String']['output']>;
 };
 
 export type JournalEntryViewDto = {
@@ -6552,6 +6597,7 @@ export type OfficeItem = {
   __typename?: 'OfficeItem';
   actualCost?: Maybe<Scalars['BigDecimal']['output']>;
   allow_trade?: Maybe<Scalars['Boolean']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   is_assign?: Maybe<Scalars['Boolean']['output']>;
   item?: Maybe<Item>;
@@ -8030,6 +8076,11 @@ export type PaymentPromptField = {
   rate?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
+export type PaymentPromptFieldInput = {
+  maximumDays?: InputMaybe<Scalars['Int']['input']>;
+  rate?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
 export type PaymentTarget = {
   __typename?: 'PaymentTarget';
   amount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -8062,6 +8113,7 @@ export type PaymentTermInput = {
 export type Payroll = {
   __typename?: 'Payroll';
   adjustment?: Maybe<PayrollAdjustment>;
+  advancesToEmployees?: Maybe<Scalars['BigDecimal']['output']>;
   allowance?: Maybe<PayrollAllowance>;
   company?: Maybe<CompanySettings>;
   contribution?: Maybe<PayrollContribution>;
@@ -8072,20 +8124,26 @@ export type Payroll = {
   description?: Maybe<Scalars['String']['output']>;
   details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
+  dueToHdmf?: Maybe<Scalars['BigDecimal']['output']>;
+  dueToPhic?: Maybe<Scalars['BigDecimal']['output']>;
+  dueToSss?: Maybe<Scalars['BigDecimal']['output']>;
   finalizedBy?: Maybe<Employee>;
   finalizedDate?: Maybe<Scalars['Instant']['output']>;
   flagValue?: Maybe<Scalars['String']['output']>;
+  hdmfEe?: Maybe<Scalars['BigDecimal']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   loan?: Maybe<PayrollLoan>;
   otherDeduction?: Maybe<PayrollOtherDeduction>;
   payrollEmployees?: Maybe<Array<Maybe<PayrollEmployee>>>;
+  phicEe?: Maybe<Scalars['BigDecimal']['output']>;
   posted?: Maybe<Scalars['Boolean']['output']>;
   postedBy?: Maybe<Scalars['String']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
   salariesPayableTotalCredit?: Maybe<Scalars['BigDecimal']['output']>;
   salariesPayableTotalDebit?: Maybe<Scalars['BigDecimal']['output']>;
+  sssEe?: Maybe<Scalars['BigDecimal']['output']>;
   status?: Maybe<PayrollStatus>;
   timekeeping?: Maybe<Timekeeping>;
   title?: Maybe<Scalars['String']['output']>;
@@ -8908,19 +8966,26 @@ export type ProjectUpdatesNotes = {
 
 export type Projects = {
   __typename?: 'Projects';
+  accountName?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
-  customer?: Maybe<Customer>;
+  customer?: Maybe<ArCustomers>;
   description?: Maybe<Scalars['String']['output']>;
   disabledEditing?: Maybe<Scalars['Boolean']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   image?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   location?: Maybe<Office>;
+  prefixShortName?: Maybe<Scalars['String']['output']>;
   projectCode?: Maybe<Scalars['String']['output']>;
+  projectColor?: Maybe<Scalars['String']['output']>;
   projectEnded?: Maybe<Scalars['Instant']['output']>;
   projectStarted?: Maybe<Scalars['Instant']['output']>;
+  projectStatusColor?: Maybe<Scalars['String']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
   /** totalExpenses */
@@ -8933,15 +8998,19 @@ export type Projects = {
 };
 
 export type ProjectsInput = {
-  customer?: InputMaybe<CustomerInput>;
+  company?: InputMaybe<Scalars['UUID']['input']>;
+  customer?: InputMaybe<ArCustomersInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   disabledEditing?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   image?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<OfficeInput>;
+  prefixShortName?: InputMaybe<Scalars['String']['input']>;
   projectCode?: InputMaybe<Scalars['String']['input']>;
+  projectColor?: InputMaybe<Scalars['String']['input']>;
   projectEnded?: InputMaybe<Scalars['Instant']['input']>;
   projectStarted?: InputMaybe<Scalars['Instant']['input']>;
+  projectStatusColor?: InputMaybe<Scalars['String']['input']>;
   remarks?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   total_cost?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -9445,6 +9514,7 @@ export type Query = {
   findAllAssetRepairMaintenanceItems?: Maybe<Array<Maybe<AssetRepairMaintenanceItems>>>;
   findAllAssets?: Maybe<Array<Maybe<Assets>>>;
   findAllCreditNote?: Maybe<Page_ArCreditNote>;
+  findAllCustomerList?: Maybe<Array<Maybe<ArCustomers>>>;
   findAllCustomers?: Maybe<Page_ArCustomers>;
   findAllInvoice?: Maybe<Page_ArInvoice>;
   findAllInvoiceItemUUIDById?: Maybe<Array<Maybe<Scalars['UUID']['output']>>>;
@@ -9659,6 +9729,7 @@ export type Query = {
   itemListByOffice?: Maybe<Array<Maybe<Inventory>>>;
   itemSubAccountActive?: Maybe<Array<Maybe<ItemSubAccount>>>;
   itemSubAccountList?: Maybe<Array<Maybe<ItemSubAccount>>>;
+  itemsActivePage?: Maybe<Page_Item>;
   itemsByFilterOnly?: Maybe<Page_Item>;
   jobByFiltersPage?: Maybe<Page_Job>;
   jobById?: Maybe<Job>;
@@ -10688,6 +10759,12 @@ export type QueryFindAllCreditNoteArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryFindAllCustomerListArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -11733,6 +11810,14 @@ export type QueryItemSubAccountActiveArgs = {
 export type QueryItemSubAccountListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryItemsActivePageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -13669,7 +13754,9 @@ export type SupplierInventory = {
 export type SupplierItem = {
   __typename?: 'SupplierItem';
   brand?: Maybe<Scalars['String']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
   cost?: Maybe<Scalars['BigDecimal']['output']>;
+  costPurchase?: Maybe<Scalars['BigDecimal']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   descLong?: Maybe<Scalars['String']['output']>;

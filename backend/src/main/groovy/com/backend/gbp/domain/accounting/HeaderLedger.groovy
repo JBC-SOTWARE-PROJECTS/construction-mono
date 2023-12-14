@@ -43,6 +43,7 @@ enum LedgerDocType { //transactype
 	BB, // Beginning Balance
 	PRL, //Payroll
 	EL, //Employee Loan
+	FA
 }
 
 

@@ -32,11 +32,11 @@ enum AccountCategory {
 enum AccountType {
 	// Assets (Normal side: Debit)
 	CURRENT_ASSETS("Current Assets", AccountCategory.ASSET, NormalSide.DEBIT),
-	LONG_TERM_ASSETS("Long-Term Assets", AccountCategory.ASSET, NormalSide.DEBIT),
+	LONG_TERM_ASSETS("Non-Current Assets", AccountCategory.ASSET, NormalSide.DEBIT),
 
 	// Liabilities (Normal side: Credit)
 	CURRENT_LIABILITIES("Current Liabilities", AccountCategory.LIABILITY, NormalSide.CREDIT),
-	LONG_TERM_LIABILITIES("Long-Term Liabilities", AccountCategory.LIABILITY, NormalSide.CREDIT),
+	LONG_TERM_LIABILITIES("Non-Current Liabilities", AccountCategory.LIABILITY, NormalSide.CREDIT),
 
 	// Equity (Normal side: Credit)
 	EQUITY("Equity", AccountCategory.EQUITY, NormalSide.CREDIT),

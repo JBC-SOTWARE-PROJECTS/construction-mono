@@ -330,7 +330,7 @@ class PaymentService {
 
 		def allCoa = subAccountSetupService.getAllChartOfAccountGenerate("", "", "", "", "", "")
 
-		def headerLedger = integrationServices.generateAutoEntriesEnhance(paymentTracker) { Payment ptracker, multipleData ->
+		def headerLedger = integrationServices.generateAutoEntriesEnhanced(paymentTracker) { Payment ptracker, multipleData ->
 
 			ptracker.flagValue = "AR_CLIENTS_PAYMENT"
 			multipleData['amountForCreditCard'] = []

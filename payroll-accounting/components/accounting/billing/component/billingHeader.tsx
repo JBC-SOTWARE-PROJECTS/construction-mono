@@ -99,7 +99,7 @@ export default function BillingHeader(props: Iprops) {
               <p>Customer Name</p>
             </div>
             <div className="billing-info-value">
-              {otc ? record?.otcName : record?.customer?.fullName}
+              {otc ? record?.otcName : record?.customer?.accountName}
             </div>
           </div>
           <div className="w-full flex-div">
@@ -123,7 +123,7 @@ export default function BillingHeader(props: Iprops) {
               <p>Contact Number</p>
             </div>
             <div className="billing-info-value">
-              {record?.customer?.contactPersonNum ?? "--"}
+              {record?.customer?.contactNo ?? "--"}
             </div>
           </div>
           <div className="w-full flex-div">
@@ -131,7 +131,7 @@ export default function BillingHeader(props: Iprops) {
               <p>Email Address</p>
             </div>
             <div className="billing-info-value">
-              {record?.customer?.emailAdd ?? "--"}
+              {record?.customer?.contactEmail ?? "--"}
             </div>
           </div>
         </div>

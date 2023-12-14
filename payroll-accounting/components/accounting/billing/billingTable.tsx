@@ -53,7 +53,7 @@ export default function BillingTable({
       title: "Customer",
       dataIndex: "customer.fullName",
       key: "customer.fullName",
-      render: (_, record) => <span>{record.customer?.fullName}</span>,
+      render: (_, record) => <span>{record.customer?.accountName}</span>,
     },
     {
       title: "Description",
