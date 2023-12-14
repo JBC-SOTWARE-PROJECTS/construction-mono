@@ -61,6 +61,9 @@ export default function AssetTable({
       dataIndex: "brand",
       key: "brand",
       width: 100,
+      render: (_, record) => {
+        return <Tag color="blue">{record?.item?.brand}</Tag>;
+      },
     },
     {
       title: "Status",

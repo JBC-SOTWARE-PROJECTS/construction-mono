@@ -24,6 +24,7 @@ const GET_RECORDS = gql`
         brand
         model
         plateNo
+        serialNo
         image
         status
         type

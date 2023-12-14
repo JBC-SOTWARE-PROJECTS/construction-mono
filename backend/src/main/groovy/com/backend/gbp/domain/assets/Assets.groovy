@@ -55,6 +55,10 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	String plateNo
 
 	@GraphQLQuery
+	@Column(name = "serial_no")
+	String serialNo
+
+	@GraphQLQuery
 	@Column(name = "prefix")
 	String prefix
 

@@ -202,7 +202,7 @@ export default function UpsertAssetModal(props: IProps) {
               propsinput={{
                 placeholder: selectedItem?.brand ?? "No item selected",
                 disabled: true,
-                value : selectedItem?.brand ?? ""
+                value: selectedItem?.brand ?? "",
               }}
             />
           </Col>
@@ -227,6 +227,25 @@ export default function UpsertAssetModal(props: IProps) {
               label="Description"
               propsinput={{
                 placeholder: "Description",
+              }}
+            />
+          </Col>
+
+          <Col span={12}>
+            <FormInput
+              name="serialNo"
+              label="Serial No."
+              propsinput={{
+                placeholder: "Add serial number"
+              }}
+            />
+          </Col>
+          <Col span={12}>
+          <FormInput
+              name="plateNo"
+              label="Plate No."
+              propsinput={{
+                placeholder: "Add plate number",
               }}
             />
           </Col>

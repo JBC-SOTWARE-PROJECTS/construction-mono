@@ -921,6 +921,7 @@ export type Assets = {
   model?: Maybe<Scalars['String']['output']>;
   plateNo?: Maybe<Scalars['String']['output']>;
   prefix?: Maybe<Scalars['String']['output']>;
+  serialNo?: Maybe<Scalars['String']['output']>;
   status?: Maybe<AssetStatus>;
   type?: Maybe<AssetType>;
 };
