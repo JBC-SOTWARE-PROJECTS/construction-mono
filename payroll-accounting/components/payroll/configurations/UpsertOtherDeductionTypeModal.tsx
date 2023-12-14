@@ -1,8 +1,10 @@
 import CustomButton from "@/components/common/CustomButton";
 import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
 import FormInput from "@/components/common/formInput/formInput";
+import FormSelect from "@/components/common/formSelect/formSelect";
 import { AdjustmentCategory, OtherDeductionTypes } from "@/graphql/gql/graphql";
 import useUpsertOtherDeductionType from "@/hooks/other-deduction-types/useUpsertOtherDeductionType";
+import { requiredField } from "@/utility/helper";
 import { EditOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { Button, Form, Modal, Space, Spin } from "antd";
 import { useState } from "react";
@@ -10,9 +12,10 @@ import { useState } from "react";
 interface IProps {
   record?: AdjustmentCategory;
   refetch: () => void;
+  expenses: any[];
 }
 
-function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
+function UpsertOtherDeductionTypeModal({ refetch, record, expenses }: IProps) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState<boolean>(false);
   const [upsert, loadingUpsert] = useUpsertOtherDeductionType(() => {
@@ -90,6 +93,20 @@ function UpsertOtherDeductionTypeModal({ refetch, record }: IProps) {
               }}
             />
 
+            <FormSelect
+              label="Sub Account"
+              name="subaccountCode"
+              rules={requiredField}
+              propsselect={{
+                options: expenses?.map((item: any) => ({
+                  value: item.code,
+                  label: item.accountName.replace("_", " "),
+                })),
+                allowClear: true,
+                showSearch: true,
+                placeholder: "Sub Account",
+              }}
+            />
             <FormCheckBox
               name="status"
               valuePropName="checked"

@@ -2,12 +2,19 @@ import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
 
 const MUTATION = gql`
-  mutation ($id: UUID, $name: String, $description: String, $status: Boolean) {
+  mutation (
+    $id: UUID
+    $name: String
+    $description: String
+    $status: Boolean
+    $subaccountCode: String
+  ) {
     data: upsertOtherDeductionType(
       id: $id
       name: $name
       description: $description
       status: $status
+      subaccountCode: $subaccountCode
     ) {
       success
       message

@@ -152,6 +152,11 @@ export type AccountTypeDto = {
   options?: Maybe<Array<Maybe<OptionDto>>>;
 };
 
+export enum AccountingEntryType {
+  Credit = 'CREDIT',
+  Debit = 'DEBIT'
+}
+
 export type AccountsPayable = {
   __typename?: 'AccountsPayable';
   apCategory?: Maybe<Scalars['String']['output']>;
@@ -326,6 +331,7 @@ export type AdjustmentCategory = {
   name?: Maybe<Scalars['String']['output']>;
   operation?: Maybe<AdjustmentOperation>;
   status?: Maybe<Scalars['Boolean']['output']>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
 };
 
 export enum AdjustmentOperation {
@@ -344,6 +350,7 @@ export type Allowance = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
 };
 
 export type AllowanceInput = {
@@ -353,6 +360,7 @@ export type AllowanceInput = {
   createdDate?: InputMaybe<Scalars['Instant']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subaccountCode?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AllowanceItem = {
@@ -2188,6 +2196,7 @@ export type Employee = {
 
 export type EmployeeAllowance = {
   __typename?: 'EmployeeAllowance';
+  allowance?: Maybe<Allowance>;
   allowanceId?: Maybe<Scalars['UUID']['output']>;
   allowanceType?: Maybe<AllowanceType>;
   amount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -2202,7 +2211,7 @@ export type EmployeeAllowance = {
 };
 
 export type EmployeeAllowanceInput = {
-  allowanceId?: InputMaybe<Scalars['UUID']['input']>;
+  allowance?: InputMaybe<AllowanceInput>;
   allowanceType?: InputMaybe<AllowanceType>;
   amount?: InputMaybe<Scalars['BigDecimal']['input']>;
   company?: InputMaybe<CompanySettingsInput>;
@@ -2341,17 +2350,26 @@ export type EmployeeLeaveDto = {
 
 export type EmployeeLoan = {
   __typename?: 'EmployeeLoan';
+  advanceToEmployees?: Maybe<Scalars['BigDecimal']['output']>;
   amount?: Maybe<Scalars['BigDecimal']['output']>;
+  apClearingAccount?: Maybe<Scalars['BigDecimal']['output']>;
+  cashOnHand?: Maybe<Scalars['BigDecimal']['output']>;
   category?: Maybe<EmployeeLoanCategory>;
   company?: Maybe<CompanySettings>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
   employee?: Maybe<Employee>;
+  flagValue?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isVoided?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  posted?: Maybe<Scalars['Boolean']['output']>;
+  postedBy?: Maybe<Scalars['String']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -2402,6 +2420,7 @@ export type EmployeeSalaryDto = {
   regularDoubleHoliday?: Maybe<Scalars['BigDecimal']['output']>;
   regularHoliday?: Maybe<Scalars['BigDecimal']['output']>;
   regularSpecialHoliday?: Maybe<Scalars['BigDecimal']['output']>;
+  subAccountCode?: Maybe<Scalars['String']['output']>;
   total?: Maybe<Scalars['BigDecimal']['output']>;
   underTime?: Maybe<Scalars['BigDecimal']['output']>;
 };
@@ -3230,9 +3249,11 @@ export enum IntegrationDomainEnum {
   CreditNote = 'CREDIT_NOTE',
   DebitMemo = 'DEBIT_MEMO',
   Disbursement = 'DISBURSEMENT',
+  EmployeeLoan = 'EMPLOYEE_LOAN',
   Invoice = 'INVOICE',
   NoDomain = 'NO_DOMAIN',
   Payment = 'PAYMENT',
+  Payroll = 'PAYROLL',
   PettyCash = 'PETTY_CASH',
   Reapplication = 'REAPPLICATION'
 }
@@ -3719,11 +3740,13 @@ export enum LedgerDocType {
   Dm = 'DM',
   Ds = 'DS',
   Ei = 'EI',
+  El = 'EL',
   Inv = 'INV',
   Jv = 'JV',
   Or = 'OR',
   Pa = 'PA',
   Pc = 'PC',
+  Prl = 'PRL',
   Qa = 'QA',
   Rm = 'RM',
   Rr = 'RR',
@@ -3990,6 +4013,7 @@ export type Mutation = {
   setCounter?: Maybe<Counter>;
   setToCompleted?: Maybe<PurchaseOrder>;
   syncAttendance?: Maybe<Array<Maybe<EmployeeAttendance>>>;
+  testPayrollAccounting?: Maybe<GraphQlResVal_String>;
   transferIntegration?: Maybe<Scalars['Boolean']['output']>;
   update2307?: Maybe<Wtx2307>;
   updateAPStatus?: Maybe<AccountsPayable>;
@@ -4018,6 +4042,8 @@ export type Mutation = {
   updatePRStatus?: Maybe<PurchaseRequest>;
   updatePayableForRemove?: Maybe<AccountsPayable>;
   updatePayrollAdjustmentStatus?: Maybe<GraphQlResVal_String>;
+  updatePayrollAllowanceStatus?: Maybe<GraphQlResVal_String>;
+  updatePayrollContributionStatus?: Maybe<GraphQlResVal_String>;
   updatePayrollDetails?: Maybe<GraphQlResVal_String>;
   updatePayrollEmployeeAdjustmentStatus?: Maybe<GraphQlResVal_PayrollEmployeeAdjustment>;
   updatePayrollEmployeeAllowanceStatus?: Maybe<GraphQlResVal_PayrollEmployeeAllowance>;
@@ -5145,6 +5171,12 @@ export type MutationSyncAttendanceArgs = {
 
 
 /** Mutation root */
+export type MutationTestPayrollAccountingArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationTransferIntegrationArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -5325,6 +5357,20 @@ export type MutationUpdatePayableForRemoveArgs = {
 
 /** Mutation root */
 export type MutationUpdatePayrollAdjustmentStatusArgs = {
+  payrollId?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollStatus>;
+};
+
+
+/** Mutation root */
+export type MutationUpdatePayrollAllowanceStatusArgs = {
+  payrollId?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollStatus>;
+};
+
+
+/** Mutation root */
+export type MutationUpdatePayrollContributionStatusArgs = {
   payrollId?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<PayrollStatus>;
 };
@@ -6065,6 +6111,7 @@ export type MutationUpsertOtherDeductionTypeArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
+  subaccountCode?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -6602,6 +6649,7 @@ export type OtherDeductionTypes = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
 };
 
 export type PcvItemsDtoInput = {
@@ -8065,6 +8113,7 @@ export type PaymentTermInput = {
 export type Payroll = {
   __typename?: 'Payroll';
   adjustment?: Maybe<PayrollAdjustment>;
+  advancesToEmployees?: Maybe<Scalars['BigDecimal']['output']>;
   allowance?: Maybe<PayrollAllowance>;
   company?: Maybe<CompanySettings>;
   contribution?: Maybe<PayrollContribution>;
@@ -8073,14 +8122,28 @@ export type Payroll = {
   dateEnd?: Maybe<Scalars['Instant']['output']>;
   dateStart?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  dueToHdmf?: Maybe<Scalars['BigDecimal']['output']>;
+  dueToPhic?: Maybe<Scalars['BigDecimal']['output']>;
+  dueToSss?: Maybe<Scalars['BigDecimal']['output']>;
   finalizedBy?: Maybe<Employee>;
   finalizedDate?: Maybe<Scalars['Instant']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  hdmfEe?: Maybe<Scalars['BigDecimal']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   loan?: Maybe<PayrollLoan>;
   otherDeduction?: Maybe<PayrollOtherDeduction>;
   payrollEmployees?: Maybe<Array<Maybe<PayrollEmployee>>>;
+  phicEe?: Maybe<Scalars['BigDecimal']['output']>;
+  posted?: Maybe<Scalars['Boolean']['output']>;
+  postedBy?: Maybe<Scalars['String']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
+  salariesPayableTotalCredit?: Maybe<Scalars['BigDecimal']['output']>;
+  salariesPayableTotalDebit?: Maybe<Scalars['BigDecimal']['output']>;
+  sssEe?: Maybe<Scalars['BigDecimal']['output']>;
   status?: Maybe<PayrollStatus>;
   timekeeping?: Maybe<Timekeeping>;
   title?: Maybe<Scalars['String']['output']>;
@@ -8101,6 +8164,7 @@ export type PayrollAdjustment = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
   status?: Maybe<PayrollStatus>;
+  totalsBreakdown?: Maybe<Array<Maybe<SubAccountBreakdownDto>>>;
 };
 
 export type PayrollAdjustmentItem = {
@@ -8131,11 +8195,13 @@ export type PayrollAllowance = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
   status?: Maybe<PayrollStatus>;
+  total?: Maybe<Scalars['BigDecimal']['output']>;
+  totalsBreakdown?: Maybe<Array<Maybe<SubAccountBreakdownDto>>>;
 };
 
 export type PayrollAllowanceItem = {
   __typename?: 'PayrollAllowanceItem';
-  allowance?: Maybe<Scalars['UUID']['output']>;
+  allowance?: Maybe<Allowance>;
   amount?: Maybe<Scalars['BigDecimal']['output']>;
   deleted?: Maybe<Scalars['Boolean']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
@@ -8160,6 +8226,7 @@ export type PayrollContribution = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
   status?: Maybe<PayrollStatus>;
+  totalsBreakdown?: Maybe<Array<Maybe<SubAccountBreakdownDto>>>;
 };
 
 export type PayrollEmployee = {
@@ -8358,6 +8425,7 @@ export type PayrollLoan = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
   status?: Maybe<PayrollStatus>;
+  totalsBreakdown?: Maybe<Array<Maybe<SubAccountBreakdownDto>>>;
 };
 
 export type PayrollLoanItem = {
@@ -8399,6 +8467,7 @@ export type PayrollOtherDeduction = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   payroll?: Maybe<Payroll>;
   status?: Maybe<PayrollStatus>;
+  totalsBreakdown?: Maybe<Array<Maybe<SubAccountBreakdownDto>>>;
 };
 
 export type PayrollOtherDeductionItem = {
@@ -8413,7 +8482,7 @@ export type PayrollOtherDeductionItem = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  type?: Maybe<Scalars['UUID']['output']>;
+  type?: Maybe<OtherDeductionTypes>;
 };
 
 export enum PayrollStatus {
@@ -13574,6 +13643,14 @@ export type StockIssueItems = {
   uou?: Maybe<Scalars['String']['output']>;
 };
 
+export type SubAccountBreakdownDto = {
+  __typename?: 'SubAccountBreakdownDto';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  entryType?: Maybe<AccountingEntryType>;
+  subaccountCode?: Maybe<Scalars['String']['output']>;
+};
+
 export type SubAccountSetup = {
   __typename?: 'SubAccountSetup';
   accountCategory?: Maybe<AccountCategory>;
@@ -13955,6 +14032,22 @@ export type TransferIntegrationMutationVariables = Exact<{
 
 export type TransferIntegrationMutation = { __typename?: 'Mutation', transferIntegration?: boolean | null };
 
+export type UpdatePayrollAllowanceStatusMutationVariables = Exact<{
+  payrollId?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollStatus>;
+}>;
+
+
+export type UpdatePayrollAllowanceStatusMutation = { __typename?: 'Mutation', data?: { __typename?: 'GraphQLResVal_String', success: boolean, message?: string | null, response?: string | null } | null };
+
+export type UpdatePayrollContributionStatusMutationVariables = Exact<{
+  payrollId?: InputMaybe<Scalars['UUID']['input']>;
+  status?: InputMaybe<PayrollStatus>;
+}>;
+
+
+export type UpdatePayrollContributionStatusMutation = { __typename?: 'Mutation', data?: { __typename?: 'GraphQLResVal_String', success: boolean, message?: string | null, response?: string | null } | null };
+
 export type ChangePasswordMutationVariables = Exact<{
   username?: InputMaybe<Scalars['String']['input']>;
 }>;
@@ -13968,4 +14061,6 @@ export const DeleteIntegrationItemDocument = {"kind":"Document","definitions":[{
 export const AddSubAccountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddSubAccount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"accountId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addSubAccountToIntegration"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"accountId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"accountId"}}}]}]}}]} as unknown as DocumentNode<AddSubAccountMutation, AddSubAccountMutationVariables>;
 export const UpdateIntegrationItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateIntegrationItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fields"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Map_String_ObjectScalar"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"integrationId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"integrationItemId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateIntegrationItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"fields"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fields"}}},{"kind":"Argument","name":{"kind":"Name","value":"integrationId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"integrationId"}}},{"kind":"Argument","name":{"kind":"Name","value":"integrationItemId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"integrationItemId"}}}]}]}}]} as unknown as DocumentNode<UpdateIntegrationItemMutation, UpdateIntegrationItemMutationVariables>;
 export const TransferIntegrationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TransferIntegration"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fields"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Map_String_ObjectScalar"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"transferIntegration"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"fields"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fields"}}}]}]}}]} as unknown as DocumentNode<TransferIntegrationMutation, TransferIntegrationMutationVariables>;
+export const UpdatePayrollAllowanceStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updatePayrollAllowanceStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"payrollId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PayrollStatus"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"data"},"name":{"kind":"Name","value":"updatePayrollAllowanceStatus"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"payrollId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"payrollId"}}},{"kind":"Argument","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"response"}}]}}]}}]} as unknown as DocumentNode<UpdatePayrollAllowanceStatusMutation, UpdatePayrollAllowanceStatusMutationVariables>;
+export const UpdatePayrollContributionStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updatePayrollContributionStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"payrollId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PayrollStatus"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"data"},"name":{"kind":"Name","value":"updatePayrollContributionStatus"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"payrollId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"payrollId"}}},{"kind":"Argument","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"response"}}]}}]}}]} as unknown as DocumentNode<UpdatePayrollContributionStatusMutation, UpdatePayrollContributionStatusMutationVariables>;
 export const ChangePasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"newPassword"},"name":{"kind":"Name","value":"changePassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}]}]}}]} as unknown as DocumentNode<ChangePasswordMutation, ChangePasswordMutationVariables>;

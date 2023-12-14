@@ -9,6 +9,7 @@ const QUERY = gql`
       operation
       status
       isDefault
+      subaccountCode
     }
   }
 `;

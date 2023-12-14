@@ -12,7 +12,7 @@ export enum AccountCategory {
 export const AccountType = {
   CURRENT_ASSETS: { label: 'Current Assets', category: AccountCategory.ASSET },
   LONG_TERM_ASSETS: {
-    label: 'Long-Term Assets',
+    label: 'Non-Current Assets',
     category: AccountCategory.ASSET,
   },
   CURRENT_LIABILITIES: {
@@ -20,7 +20,7 @@ export const AccountType = {
     category: AccountCategory.LIABILITY,
   },
   LONG_TERM_LIABILITIES: {
-    label: 'Long-Term Liabilities',
+    label: 'Non-Current Liabilities',
     category: AccountCategory.LIABILITY,
   },
   EQUITY: { label: 'Equity', category: AccountCategory.EQUITY },

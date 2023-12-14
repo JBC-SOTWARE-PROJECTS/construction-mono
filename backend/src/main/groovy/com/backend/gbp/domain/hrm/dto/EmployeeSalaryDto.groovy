@@ -6,6 +6,8 @@ import java.time.Instant
 
 class EmployeeSalaryDto {
 
+    String subAccountCode
+
     UUID project
     String projectName
 

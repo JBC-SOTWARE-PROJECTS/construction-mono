@@ -20,14 +20,17 @@ enum DomainEnum {
     ITEM_CATEGORY("Item Category", "com.backend.gbp.domain.inventory.ItemCategory"),
     SUPPLIER("Supplier", "com.backend.gbp.domain.inventory.Supplier"),
     BANK("Bank", "com.backend.gbp.domain.accounting.Bank"),
-    PROJECTS("Projects", "com.backend.gbp.domain.projects.Projects")
+    PROJECTS("Projects", "com.backend.gbp.domain.projects.Projects"),
+    FIXED_ASSET_SUB_ACCOUNT("Fixed Asset Sub-account", "com.backend.gbp.domain.inventory.ItemSubAccount",'isFixedAsset')
 
     String displayName
     String path
+    String flagColumn
 
-    DomainEnum(String displayName, String path) {
+    DomainEnum(String displayName, String path, String flagColumn = '') {
         this.displayName = displayName
         this.path = path
+        this.flagColumn = flagColumn
     }
 
     String toString() {
@@ -36,6 +39,10 @@ enum DomainEnum {
 
     String getPath() {
         return path
+    }
+
+    String getFlagColumn() {
+        return flagColumn
     }
 }
 

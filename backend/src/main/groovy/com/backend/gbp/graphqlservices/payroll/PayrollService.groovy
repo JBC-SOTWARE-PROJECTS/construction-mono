@@ -1,30 +1,47 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.accounting.HeaderLedgerGroup
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.Timekeeping
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.graphqlservices.accounting.ArInvoiceServices
+import com.backend.gbp.graphqlservices.accounting.HeaderGroupServices
+import com.backend.gbp.graphqlservices.accounting.IntegrationServices
+import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollStatusService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.payroll.PayrollAllowanceRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.backend.gbp.security.SecurityUtils
+import com.backend.gbp.services.GeneratorService
+import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+
+import java.math.RoundingMode
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @TypeChecked
 @Component
@@ -49,10 +66,26 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     PayrollLoanService payrollLoanService
 
     @Autowired
-    PayrollEmployeeContributionService payrollEmployeeContributionService
+    PayrollAllowanceRepository payrollAllowanceRepository
 
     @Autowired
     ObjectMapper objectMapper
+
+    @Autowired
+    IntegrationServices integrationServices
+
+    @Autowired
+    ArInvoiceServices arInvoiceServices
+
+    @Autowired
+    LedgerServices ledgerServices
+
+    @Autowired
+    HeaderGroupServices headerGroupServices
+
+    @Autowired
+    GeneratorService generatorService
+
 
     @Autowired
     PayrollService(EmployeeRepository employeeRepository) {
@@ -179,28 +212,19 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         Payroll payroll = updateStatus(id, PayrollStatus.valueOf(status))
 
         if (status == 'ACTIVE') {
-            //TODO: actions for creating timekeeping, timekeeping employee, accumulated logs summary and accumulated logs.
-
-
-            //TODO: actions for creating allowance, payroll employee allowance, payroll employee allowance item.
-            //TODO: actions for creating contributions and payroll employee contributions
-
-//            timekeepingService.startPayroll(payroll) //TODO: Temporary only, use the code below in the future
-//            payrollLoanService.startPayroll(payroll)
             payrollOperations.each {
                 it.startPayroll(payroll)
             }
 
         }
-//        else if (status == 'CANCELLED')
-//            payroll.status = PayrollApprovalStatus.CANCELLED
-//        else if (status == 'FINALIZED') {
-//            payroll.status = PayrollApprovalStatus.FINALIZED
-//        }
-//
+
+        else if (status == 'FINALIZED') {
+            payroll.status = PayrollStatus.FINALIZED
+            postToLedgerAccounting(payroll)
+        }
         payrollRepository.save(payroll)
 
-        return new GraphQLResVal<Payroll>(payroll, true, "Successfully updated payroll")
+        return new GraphQLResVal<Payroll>(payroll, true, status == 'FINALIZED' ? "Successfully finalized payroll" : "Successfully updated payroll")
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -231,6 +255,197 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         return new GraphQLResVal<String>("OK", true, "Successfully deleted payroll")
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @GraphQLMutation
+    GraphQLResVal<String> testPayrollAccounting(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        Payroll payroll = payrollRepository.findById(id).get()
+        postToLedgerAccounting(payroll)
+        return new GraphQLResVal<String>("OK", true, "Successfully posted payroll entries to accounting")
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    Payroll postToLedgerAccounting(Payroll payroll) {
+        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
+        def actPay = super.save(payroll) as Payroll
+
+//        HeaderLedgerGroup headerLedgerGroup = new HeaderLedgerGroup()
+//        headerLedgerGroup.recordNo = generatorService.getNextValue(GeneratorType.HEADER_GROUP) {
+//            StringUtils.leftPad(it.toString(), 5, "0")
+//        }
+//        headerLedgerGroup.entity_name = 'MEGATAM PAYROLL'
+//        headerLedgerGroup.particulars = 'TEST PAYROLL'
+//        def newSave = headerGroupServices.save(headerLedgerGroup)
+
+        Map<String, Map<String, Object>> entryMap = new HashMap<>()
+        List<Map<String, Object>> entries = []
+        BigDecimal totalAllowance = 0
+        payrollAllowanceRepository.joinFetchAllowanceItems(payroll.id)
+
+        payroll.allowance.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
+
+            totalAllowance += it.amount
+//            entries.push(itemsAccount)
+        }
+
+        BigDecimal totalAdjustmentDebit = 0
+        BigDecimal totalAdjustmentCredit = 0
+        payroll.adjustment.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
+            if (it.entryType == AccountingEntryType.DEBIT)
+                totalAdjustmentCredit += it.amount
+            else if (it.entryType == AccountingEntryType.CREDIT)
+                totalAdjustmentDebit += it.amount
+//            entries.push(itemsAccount)
+        }
+
+        BigDecimal totalOtherDeduction = 0
+        payroll.otherDeduction.totalsBreakdown.each {
+            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
+            totalOtherDeduction += it.amount
+//            entries.push(itemsAccount)
+        }
+
+//        BigDecimal totalLoan = 0
+//        payroll.loan.totalsBreakdown.each {
+//            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
+//            totalLoan += it.amount
+////            entries.push(itemsAccount)
+//        }
+
+
+        BigDecimal totalLoan = 0
+        payroll.advancesToEmployees = 0
+        payroll.loan.totalsBreakdown.each {
+            payroll.advancesToEmployees -= it.amount
+            totalLoan += it.amount
+        }
+
+        BigDecimal totalContributions = 0
+        payroll.contribution.totalsBreakdown.each {
+            switch (it.description) {
+                case 'SSS EE':
+                    payroll.sssEe = it.amount; break;
+                case 'HDMF EE':
+                    payroll.hdmfEe = it.amount; break;
+                case 'PHIC EE':
+                    payroll.phicEe = it.amount; break;
+                case 'SSS ER':
+                    payroll.dueToSss = it.amount; break;
+                case 'HDMF ER':
+                    payroll.dueToHdmf = it.amount; break;
+                case 'PHIC ER':
+                    payroll.dueToPhic = it.amount; break;
+            }
+            totalContributions += it.amount
+        }
+
+        BigDecimal totalSalary = 0
+        payroll.timekeeping.salaryBreakdown.each {
+            Map<String, Object> itemsAccount = [:]
+            itemsAccount['code'] = it.subAccountCode
+            itemsAccount['debit'] = it.total
+            itemsAccount['credit'] = 0.00
+            totalSalary += it.total
+
+            entries.push(itemsAccount)
+        }
+        totalSalary = totalSalary - totalOtherDeduction - totalLoan - totalContributions
+        Instant now = Instant.now()
+
+        def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
+            it.flagValue = "PAYROLL_PROCESSING"
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary
+            it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
+        }
+
+        entryMap.keySet().each { key ->
+            Map<String, Object> item = entryMap.get(key.toString())
+            Boolean foundDuplicate = false
+            headerLedger.ledger.each {
+                if (it.journalAccount.code == key) {
+                    it.credit += item['credit'] as BigDecimal
+                    it.debit += item['debit'] as BigDecimal
+                    foundDuplicate = true
+                }
+            }
+            if (!foundDuplicate) entries.push(item)
+            foundDuplicate = false
+        }
+//        headerLedger.headerLedgerGroup = newSave.id
+
+
+        headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger, entries)
+        Map<String, String> details = [:]
+
+        actPay.details.each { k, v ->
+            details[k] = v
+        }
+
+        details["PAYROLL_ID"] = actPay.id.toString()
+        details["PAYROLL_CODE"] = ''
+
+        headerLedger.transactionNo = ''
+        headerLedger.transactionType = ''
+        headerLedger.referenceType = ''
+        headerLedger.referenceNo = ''
+
+        def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+                "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
+                payroll.description,
+                "${payroll.description ?: ""}",
+                LedgerDocType.PRL,
+                JournalType.GENERAL,
+                now,
+                details)
+
+        actPay.postedLedger = pHeader.id
+        actPay.status = PayrollStatus.FINALIZED
+        actPay.posted = true
+        actPay.postedBy = SecurityUtils.currentLogin()
+
+        save(actPay)
+
+    }
+
+    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it, Map<String, Map<String, Object>> entryMap) {
+
+        Map<String, Object> itemsAccount = entryMap.get(it.subaccountCode)
+        if (!itemsAccount)
+            itemsAccount = new HashMap<>()
+        itemsAccount['code'] = it.subaccountCode
+
+        if (it.entryType == AccountingEntryType.DEBIT) {
+            itemsAccount['debit'] = (itemsAccount['debit'] ? (itemsAccount['debit'] as BigDecimal) : 0) + it.amount
+        } else if (it.entryType == AccountingEntryType.CREDIT) {
+            itemsAccount['credit'] = (itemsAccount['credit'] ? (itemsAccount['credit'] as BigDecimal) : 0) + it.amount
+        }
+
+        if (!itemsAccount['debit'])
+            itemsAccount['debit'] = 0
+
+        if (!itemsAccount['credit'])
+            itemsAccount['credit'] = 0
+        entryMap.put(it.subaccountCode, itemsAccount)
+//        return itemsAccount
+    }
+
+
+//    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it) {
+//        Map<String, Object> itemsAccount = [:]
+//        itemsAccount['code'] = it.subaccountCode
+//
+//        if (it.entryType == AccountingEntryType.DEBIT) {
+//            itemsAccount['debit'] = it.amount
+//            itemsAccount['credit'] = 0.00
+//        } else if (it.entryType == AccountingEntryType.CREDIT) {
+//            itemsAccount['debit'] = 0.00
+//            itemsAccount['credit'] = it.amount
+//        }
+//        return itemsAccount
+//    }
 
 }
 

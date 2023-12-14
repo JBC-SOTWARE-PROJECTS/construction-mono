@@ -1,9 +1,11 @@
 package com.backend.gbp.graphqlservices.payroll
 
+
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollAllowance
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.PayrollEmployeeAllowance
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.payroll.PayrollAllowanceRepository
@@ -23,6 +25,14 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 
+
+class SubAccountBreakdownDto {
+    String subaccountCode
+    String description
+    BigDecimal amount = 0
+    AccountingEntryType entryType
+}
+
 @TypeChecked
 @Component
 @GraphQLApi
@@ -41,8 +51,6 @@ class PayrollAllowanceService implements IPayrollModuleBaseOperations<PayrollAll
 
     @Autowired
     PayrollEmployeeAllowanceService payrollEmployeeAllowanceService
-
-
 
 
     @Autowired
@@ -65,7 +73,6 @@ class PayrollAllowanceService implements IPayrollModuleBaseOperations<PayrollAll
         }
 
     }
-
 
 
     //=================================QUERY=================================\\
@@ -98,6 +105,48 @@ class PayrollAllowanceService implements IPayrollModuleBaseOperations<PayrollAll
         return new GraphQLResVal<String>(null, true, "Successfully recalculated allowance employee.")
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @GraphQLMutation(name = 'updatePayrollAllowanceStatus')
+    GraphQLResVal<String> updatePayrollAllowanceStatus(
+            @GraphQLArgument(name = "payrollId") UUID payrollId,
+            @GraphQLArgument(name = "status") PayrollStatus status
+
+    ) {
+
+        PayrollAllowance payrollAllowance = payrollAllowanceRepository.findByPayrollId(payrollId).get()
+
+        if (status == PayrollStatus.FINALIZED) {
+            payrollAllowance.total = 0
+
+            payrollAllowanceRepository.joinFetchAllowanceItems(payrollAllowance.id)
+            Map<String, SubAccountBreakdownDto> allowanceMap = new HashMap<>()
+
+            payrollAllowance.allowanceEmployees.each { employee ->
+                employee.allowanceItems.each {
+                    SubAccountBreakdownDto allowance = allowanceMap.get(it.allowance.subaccountCode)
+                    if (!allowance) allowance = new SubAccountBreakdownDto()
+                    allowance.subaccountCode = it.allowance.subaccountCode
+                    allowance.description = it.name
+                    allowance.amount += it.amount
+                    allowance.entryType = AccountingEntryType.DEBIT
+                    payrollAllowance.total += it.amount
+                    allowanceMap.put(allowance.subaccountCode, allowance)
+                }
+            }
+            payrollAllowance.totalsBreakdown = []
+            allowanceMap.keySet().each {
+                SubAccountBreakdownDto allowance = allowanceMap.get(it.toString())
+                payrollAllowance.totalsBreakdown.push(allowance)
+            }
+
+        }
+
+        payrollAllowance.status = status
+        payrollAllowanceRepository.save(payrollAllowance)
+
+        return new GraphQLResVal<String>(null, true, "Successfully updated Payroll Allowance status.")
+    }
+
 
 //===================================================== INTERFACE METHODS ==============================================
 
@@ -117,8 +166,6 @@ class PayrollAllowanceService implements IPayrollModuleBaseOperations<PayrollAll
     void finalizePayroll(Payroll payroll) {
 
     }
-
-
 
 
 }
