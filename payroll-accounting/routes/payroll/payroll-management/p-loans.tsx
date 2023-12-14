@@ -115,10 +115,11 @@ function PayrollLoans({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditing(id);
+              if (loan?.status === PayrollStatus.Draft) setEditing(id);
             }}
           >
-            <NumeralFormatter value={value} /> <EditOutlined />
+            <NumeralFormatter value={value} />{" "}
+            {loan?.status === PayrollStatus.Draft && <EditOutlined />}
           </div>
         ),
     },
@@ -152,6 +153,8 @@ function PayrollLoans({ account }: IPageProps) {
         module={PayrollModule.Loans}
         status={loan?.status}
         showTitle
+        handleClickFinalize={handleClickFinalize}
+        loading={loadingUpdateStatus}
         extra={
           <>
             {loan?.status === PayrollStatus.Draft && (
@@ -165,20 +168,6 @@ function PayrollLoans({ account }: IPageProps) {
                 Recalculate All Employee Loan
               </PayrollModuleRecalculateAllEmployeeAction>
             )}
-
-            <CustomButton
-              type="primary"
-              icon={
-                loan?.status === "FINALIZED" ? (
-                  <EditOutlined />
-                ) : (
-                  <CheckOutlined />
-                )
-              }
-              onClick={handleClickFinalize}
-            >
-              Set as {statusMap[loan?.status]}
-            </CustomButton>
           </>
         }
       />

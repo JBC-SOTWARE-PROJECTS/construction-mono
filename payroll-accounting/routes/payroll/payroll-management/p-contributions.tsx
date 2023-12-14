@@ -16,6 +16,7 @@ import {
   PayrollEmployeeContributionDto,
   PayrollEmployeeStatus,
   PayrollModule,
+  PayrollStatus,
 } from "@/graphql/gql/graphql";
 import useGetContributionEmployees from "@/hooks/payroll/contributions/useGetContributionEmployees";
 import useGetPayrollContribution from "@/hooks/payroll/contributions/useGetPayrollContribution";
@@ -264,7 +265,10 @@ function PayrollContributionsPage() {
       key: "status",
       render: (text: string) => <PayrollEmployeeStatusTag status={text} />,
     },
-    ...(contributionStatusActionsPermissions ? actionsColumn : []),
+    ...(contributionStatusActionsPermissions &&
+    contribution?.status === PayrollStatus.Draft
+      ? actionsColumn
+      : []),
   ];
 
   let finalColumns: ColumnsType<PayrollEmployeeContributionDto> = [];
@@ -343,62 +347,56 @@ function PayrollContributionsPage() {
 
       <PayrollHeader
         module={PayrollModule.Contribution}
+        status={contribution?.status as any}
+        handleClickFinalize={handleClickFinalize}
+        showTitle
+        loading={loadingUpdateStatus}
         extra={
           useHasPermission([
             "enable_or_disable_payroll_contribution_types",
           ]) && (
             <>
-              <Switch
-                checkedChildren="SSS Enabled"
-                unCheckedChildren="SSS Disabled"
-                checked={contribution?.isActiveSSS ? true : false}
-                onChange={() => {
-                  updateContributionStatus("SSS");
-                }}
-                loading={loadingContributionStatus}
-              />
-              <Switch
-                checkedChildren="PHIC Enabled"
-                unCheckedChildren="PHIC Disabled"
-                checked={contribution?.isActivePHIC ? true : false}
-                onChange={() => {
-                  updateContributionStatus("PHIC");
-                }}
-                loading={loadingContributionStatus}
-              />
+              {contribution?.status === PayrollStatus.Draft && (
+                <>
+                  <Switch
+                    checkedChildren="SSS Enabled"
+                    unCheckedChildren="SSS Disabled"
+                    checked={contribution?.isActiveSSS ? true : false}
+                    onChange={() => {
+                      updateContributionStatus("SSS");
+                    }}
+                    loading={loadingContributionStatus}
+                  />
+                  <Switch
+                    checkedChildren="PHIC Enabled"
+                    unCheckedChildren="PHIC Disabled"
+                    checked={contribution?.isActivePHIC ? true : false}
+                    onChange={() => {
+                      updateContributionStatus("PHIC");
+                    }}
+                    loading={loadingContributionStatus}
+                  />
 
-              <Switch
-                checkedChildren="HDMF Enabled"
-                unCheckedChildren="HDMF Disabled"
-                checked={contribution?.isActiveHDMF ? true : false}
-                onChange={() => {
-                  updateContributionStatus("HDMF");
-                }}
-                loading={loadingContributionStatus}
-              />
+                  <Switch
+                    checkedChildren="HDMF Enabled"
+                    unCheckedChildren="HDMF Disabled"
+                    checked={contribution?.isActiveHDMF ? true : false}
+                    onChange={() => {
+                      updateContributionStatus("HDMF");
+                    }}
+                    loading={loadingContributionStatus}
+                  />
 
-              <PayrollModuleRecalculateAllEmployeeAction
-                id={router?.query?.id as string}
-                module={PayrollModule.Contribution}
-                buttonProps={recalculateButton}
-                tooltipProps={{ placement: "topRight" }}
-                refetch={refetch}
-                // allowedPermissions={["recalculate_all_contributions_employees"]}
-              />
-              <CustomButton
-                type="primary"
-                icon={
-                  contribution?.status === "FINALIZED" ? (
-                    <EditOutlined />
-                  ) : (
-                    <CheckOutlined />
-                  )
-                }
-                onClick={handleClickFinalize}
-                loading={loading || loadingUpdateStatus}
-              >
-                Set as {statusMap[contribution?.status as string]}
-              </CustomButton>
+                  <PayrollModuleRecalculateAllEmployeeAction
+                    id={router?.query?.id as string}
+                    module={PayrollModule.Contribution}
+                    buttonProps={recalculateButton}
+                    tooltipProps={{ placement: "topRight" }}
+                    refetch={refetch}
+                    // allowedPermissions={["recalculate_all_contributions_employees"]}
+                  />
+                </>
+              )}
             </>
           )
         }

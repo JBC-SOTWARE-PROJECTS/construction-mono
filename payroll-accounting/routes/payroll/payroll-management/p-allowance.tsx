@@ -155,7 +155,28 @@ function PayrollAllowance({ account }: IPageProps) {
     },
     ...(allowance?.status === PayrollStatus.DRAFT ? action : []),
   ];
-
+  const expandedRowAction: ColumnsType<PayrollAllowanceItem> = [
+    {
+      title: "Action",
+      dataIndex: "id",
+      render: (value) => {
+        return (
+          <>
+            <CustomButton
+              id={value}
+              icon={<DeleteOutlined />}
+              danger
+              type="primary"
+              shape="circle"
+              onClick={() => {
+                confirmDelete(value);
+              }}
+            />
+          </>
+        );
+      },
+    },
+  ];
   let expandedRowColumns: ColumnsType<PayrollAllowanceItem> = [
     {
       title: "Name",
@@ -181,33 +202,15 @@ function PayrollAllowance({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditingKey(id);
+              if (allowance?.status === PayrollStatus.DRAFT) setEditingKey(id);
             }}
           >
-            <NumeralFormatter value={value} /> <EditOutlined />
+            <NumeralFormatter value={value} />{" "}
+            {allowance?.status === PayrollStatus.DRAFT && <EditOutlined />}
           </div>
         ),
     },
-    {
-      title: "Action",
-      dataIndex: "id",
-      render: (value) => {
-        return (
-          <>
-            <CustomButton
-              id={value}
-              icon={<DeleteOutlined />}
-              danger
-              type="primary"
-              shape="circle"
-              onClick={() => {
-                confirmDelete(value);
-              }}
-            />
-          </>
-        );
-      },
-    },
+    ...(allowance?.status === PayrollStatus.DRAFT ? expandedRowAction : []),
   ];
 
   const loading = useLoadingState(
@@ -220,6 +223,10 @@ function PayrollAllowance({ account }: IPageProps) {
     <>
       <PayrollHeader
         module={PayrollModule.Allowance}
+        showTitle
+        status={allowance?.status}
+        handleClickFinalize={handleClickFinalize}
+        loading={loadingUpdateStatus}
         extra={
           <>
             {allowance?.status === PayrollStatus.DRAFT && (
@@ -233,21 +240,6 @@ function PayrollAllowance({ account }: IPageProps) {
                 Recalculate All Employee Allowance
               </PayrollModuleRecalculateAllEmployeeAction>
             )}
-
-            <CustomButton
-              type="primary"
-              icon={
-                allowance?.status === "FINALIZED" ? (
-                  <EditOutlined />
-                ) : (
-                  <CheckOutlined />
-                )
-              }
-              onClick={handleClickFinalize}
-              loading={loading}
-            >
-              Set as {statusMap[allowance?.status]}
-            </CustomButton>
           </>
         }
       />

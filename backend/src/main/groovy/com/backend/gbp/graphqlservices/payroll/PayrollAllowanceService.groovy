@@ -126,6 +126,7 @@ class PayrollAllowanceService implements IPayrollModuleBaseOperations<PayrollAll
                     SubAccountBreakdownDto allowance = allowanceMap.get(it.allowance.subaccountCode)
                     if (!allowance) allowance = new SubAccountBreakdownDto()
                     allowance.subaccountCode = it.allowance.subaccountCode
+                    allowance.description = it.name
                     allowance.amount += it.amount
                     allowance.entryType = AccountingEntryType.DEBIT
                     payrollAllowance.total += it.amount

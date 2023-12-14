@@ -97,9 +97,10 @@ class ePayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollA
                     if (!adjustment) adjustment = new SubAccountBreakdownDto()
 
                     adjustment.subaccountCode = it.category.subaccountCode
-
+                    adjustment.description = it.name
                     if (it.operation == AdjustmentOperation.ADDITION) {
                         adjustment.amount += it.amount
+
                         adjustment.entryType = AccountingEntryType.DEBIT
 //                        payrollAdjustment.total += it.amount
 

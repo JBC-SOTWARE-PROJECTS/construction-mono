@@ -217,15 +217,14 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             }
 
         }
-//        else if (status == 'CANCELLED')
-//            payroll.status = PayrollApprovalStatus.CANCELLED
-//        else if (status == 'FINALIZED') {
-//            payroll.status = PayrollApprovalStatus.FINALIZED
-//        }
-//
+
+        else if (status == 'FINALIZED') {
+            payroll.status = PayrollStatus.FINALIZED
+            postToLedgerAccounting(payroll)
+        }
         payrollRepository.save(payroll)
 
-        return new GraphQLResVal<Payroll>(payroll, true, "Successfully updated payroll")
+        return new GraphQLResVal<Payroll>(payroll, true, status == 'FINALIZED' ? "Successfully finalized payroll" : "Successfully updated payroll")
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -354,7 +353,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             entries.push(itemsAccount)
         }
         totalSalary = totalSalary - totalOtherDeduction - totalLoan - totalContributions
-
+        Instant now = Instant.now()
 
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
@@ -394,12 +393,12 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         headerLedger.referenceNo = ''
 
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
-                "${Instant.now().atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
+                "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
                 payroll.description,
                 "${payroll.description ?: ""}",
                 LedgerDocType.PRL,
                 JournalType.GENERAL,
-                Instant.now(),
+                now,
                 details)
 
         actPay.postedLedger = pHeader.id

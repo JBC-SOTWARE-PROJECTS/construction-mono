@@ -29,6 +29,8 @@ import CustomButton from "@/components/common/CustomButton";
 import { payrollStatusColorGenerator } from "@/utility/constant-formatters";
 import AccessControl from "@/components/accessControl/AccessControl";
 import useHasRole from "@/hooks/useHasRole";
+import PayrollBreakdownModal from "@/components/payroll/PayrollBreakdownModal";
+import { PayrollStatus } from "@/graphql/gql/graphql";
 
 const gridStyle: React.CSSProperties = {
   width: "33%",
@@ -126,18 +128,21 @@ const ViewPayroll = ({ account }: IPageProps) => {
                 onBack={() => router.back()}
                 extra={
                   <Space>
-                    <CustomButton
-                      type="primary"
-                      onClick={() =>
-                        router?.push(
-                          `/payroll/payroll-management/${router?.query?.id}/edit`
-                        )
-                      }
-                      icon={<EditOutlined />}
-                      allowedPermissions={["edit_payroll"]}
-                    >
-                      Edit Payroll
-                    </CustomButton>
+                    <PayrollBreakdownModal />
+                    {payroll?.status === PayrollStatus.Active && (
+                      <CustomButton
+                        type="primary"
+                        onClick={() =>
+                          router?.push(
+                            `/payroll/payroll-management/${router?.query?.id}/edit`
+                          )
+                        }
+                        icon={<EditOutlined />}
+                        allowedPermissions={["edit_payroll"]}
+                      >
+                        Edit Payroll
+                      </CustomButton>
+                    )}
                   </Space>
                 }
               />
