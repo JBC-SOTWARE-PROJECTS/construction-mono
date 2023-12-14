@@ -3,18 +3,12 @@ package com.backend.gbp.graphqlservices.fixed_asset
 import com.backend.gbp.domain.accounting.HeaderLedgerGroup
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LedgerDocType
-import com.backend.gbp.domain.cashier.Payment
-import com.backend.gbp.domain.cashier.PaymentType
-import com.backend.gbp.domain.cashier.ReceiptType
 import com.backend.gbp.domain.fixed_asset.FixedAssetItems
-import com.backend.gbp.domain.inventory.ItemSubAccount
-import com.backend.gbp.graphqlservices.accounting.Entry
 import com.backend.gbp.graphqlservices.accounting.HeaderGroupServices
 import com.backend.gbp.graphqlservices.accounting.IntegrationServices
 import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.inventory.ItemService
-import com.backend.gbp.graphqlservices.inventory.ItemSubAccountService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
@@ -23,9 +17,7 @@ import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
-import javafx.scene.Group
 import org.apache.commons.lang3.StringUtils
-import org.apache.http.message.HeaderGroup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
@@ -136,7 +128,7 @@ class FixedAssetItemsService extends AbstractDaoCompanyService<FixedAssetItems> 
             }
 
         }
-        return  new GraphQLResVal<FixedAssetItems>(true,true,'Successfully saved.')
+        return  new GraphQLResVal<Boolean>(true,true,'Successfully saved.')
     }
 
 
