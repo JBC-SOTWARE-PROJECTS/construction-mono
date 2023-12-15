@@ -1,6 +1,7 @@
 import { FormInput, FormSelect } from "@/components/common";
 import FormButton from "@/components/common/formButton/formButton";
 import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
+import FormDatePicker from "@/components/common/formDatePicker/formDatePicker";
 import FormRadioButton from "@/components/common/formRadioButton";
 import { UseCompanySelection } from "@/hooks/companySelection";
 import { CIVIL, EMPSTATUS, GENDER, col2, col3, col4 } from "@/utility/constant";
@@ -24,6 +25,7 @@ import {
   Skeleton,
   message,
 } from "antd";
+import dayjs from "dayjs";
 import _ from "lodash";
 import moment from "moment";
 import { useRouter } from "next/router";
@@ -210,7 +212,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
             message.success("Employee Information Updated");
             refetch();
           } else {
-            window.location.href = `/administrative/employees`;
+            window.location.href = `/payroll/employees`;
           }
         }
       },
@@ -380,17 +382,14 @@ const EmployeeForm = ({ account }: IPageProps) => {
                 </Col>
                 {/* 2nd row */}
                 <Col {...col4}>
-                  <FormInput
+                  <FormDatePicker
                     label={"Date of Birth"}
                     rules={[
                       { required: true, message: "This Field is required" },
                     ]}
-                    initialValue={moment(_.get(data, "emp.dob"))}
+                    initialValue={dayjs(_?.get(data, "emp.dob"))}
                     name="dob"
-                    propsinput={{
-                      placeholder: "Date of Birth",
-                      type: "datepicker",
-                    }}
+                    propsdatepicker={{}}
                   />
                 </Col>
                 <Col {...col4}>
