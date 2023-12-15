@@ -3,6 +3,7 @@ import CustomPageTitle from '@/components/accountReceivables/common/customPageTi
 import { CommonTableCSS } from '@/components/accountReceivables/common/styles'
 import CnAllocateCredit from '@/components/accountReceivables/credit-note/dialog/apply-credit'
 import CreditNCreateDialog from '@/components/accountReceivables/credit-note/dialog/create'
+import CreditNoteViewing from '@/components/accountReceivables/credit-note/dialog/view'
 import {
   CreditNoteStatusColorEnum,
   CreditNoteStatusLabelEnum,
@@ -70,6 +71,7 @@ export default function CreditNote() {
 
   const creditNoteDialog = useDialog(CreditNCreateDialog)
   const allocateCreditDialog = useDialog(CnAllocateCredit)
+  const creditNoteViewDialog = useDialog(CreditNoteViewing)
 
   const onNewCreditNote = () => {
     creditNoteDialog({}, () => refetch())
@@ -133,11 +135,13 @@ export default function CreditNote() {
       title: 'AMOUNT',
       dataIndex: 'totalAmountDue',
       align: 'right',
+      width: 120,
       render: (text) => numeral(text).format('0,0.00'),
     },
     {
       title: 'STATUS',
       dataIndex: 'status',
+      width: 140,
       render: (text) => (
         <Typography.Text
           style={{
@@ -163,7 +167,7 @@ export default function CreditNote() {
       dataIndex: 'id',
       align: 'right',
       fixed: 'right',
-      width: 180,
+      width: 140,
       render: (text, record) => {
         return (
           <Button type='link' onClick={() => handleOpen(record)}>
@@ -197,29 +201,27 @@ export default function CreditNote() {
         onSearch={onSearch}
         extra={<Button onClick={onNewCreditNote}>New Credit Note</Button>}
       >
-        <CommonTableCSS>
-          <Table
-            rowKey='id'
-            columns={columns}
-            dataSource={data?.creditNote?.content ?? []}
-            size='small'
-            loading={false}
-            scroll={{ x: 1200 }}
-            pagination={false}
-            footer={() => (
-              <Pagination
-                current={data?.creditNote?.number + 1}
-                showSizeChanger={false}
-                pageSize={10}
-                responsive={true}
-                total={data?.creditNote?.totalElements}
-                onChange={(e) => {
-                  // refetch({ page: e - 1 })
-                }}
-              />
-            )}
-          />
-        </CommonTableCSS>
+        <Table
+          rowKey='id'
+          columns={columns}
+          dataSource={data?.creditNote?.content ?? []}
+          size='small'
+          loading={false}
+          scroll={{ x: 1200 }}
+          pagination={false}
+          footer={() => (
+            <Pagination
+              current={data?.creditNote?.number + 1}
+              showSizeChanger={false}
+              pageSize={10}
+              responsive={true}
+              total={data?.creditNote?.totalElements}
+              onChange={(e) => {
+                // refetch({ page: e - 1 })
+              }}
+            />
+          )}
+        />
       </CardLayout>
     </PageContainer>
   )
