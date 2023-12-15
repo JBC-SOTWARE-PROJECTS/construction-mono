@@ -51,7 +51,6 @@ class ePayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollA
 
     private PayrollAdjustment adjustment;
 
-
     //=================================QUERY=================================\\
 
     @GraphQLQuery(name = "getPayrollAdjustmentById")
@@ -101,12 +100,12 @@ class ePayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollA
                     if (it.operation == AdjustmentOperation.ADDITION) {
                         adjustment.amount += it.amount
 
-                        adjustment.entryType = AccountingEntryType.DEBIT
+                        adjustment.entryType = AccountingEntryType.CREDIT
 //                        payrollAdjustment.total += it.amount
 
                     } else if (it.operation == AdjustmentOperation.SUBTRACTION) {
                         adjustment.amount += it.amount
-                        adjustment.entryType = AccountingEntryType.CREDIT
+                        adjustment.entryType = AccountingEntryType.DEBIT
 //                        payrollAdjustment.total -= it.amount
                     }
 

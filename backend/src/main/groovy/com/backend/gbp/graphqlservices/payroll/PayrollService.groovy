@@ -216,9 +216,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
                 it.startPayroll(payroll)
             }
 
-        }
-
-        else if (status == 'FINALIZED') {
+        } else if (status == 'FINALIZED') {
             payroll.status = PayrollStatus.FINALIZED
             postToLedgerAccounting(payroll)
         }
@@ -270,18 +268,18 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         def yearFormat = DateTimeFormatter.ofPattern("yyyy")
         def actPay = super.save(payroll) as Payroll
 
-//        HeaderLedgerGroup headerLedgerGroup = new HeaderLedgerGroup()
-//        headerLedgerGroup.recordNo = generatorService.getNextValue(GeneratorType.HEADER_GROUP) {
-//            StringUtils.leftPad(it.toString(), 5, "0")
-//        }
-//        headerLedgerGroup.entity_name = 'MEGATAM PAYROLL'
-//        headerLedgerGroup.particulars = 'TEST PAYROLL'
-//        def newSave = headerGroupServices.save(headerLedgerGroup)
+        HeaderLedgerGroup headerLedgerGroup = new HeaderLedgerGroup()
+        headerLedgerGroup.recordNo = generatorService.getNextValue(GeneratorType.HEADER_GROUP) {
+            StringUtils.leftPad(it.toString(), 5, "0")
+        }
+        headerLedgerGroup.entity_name = 'MEGATAM PAYROLL'
+        headerLedgerGroup.particulars = 'TEST PAYROLL'
+        def newSave = headerGroupServices.save(headerLedgerGroup)
 
         Map<String, Map<String, Object>> entryMap = new HashMap<>()
         List<Map<String, Object>> entries = []
         BigDecimal totalAllowance = 0
-        payrollAllowanceRepository.joinFetchAllowanceItems(payroll.id)
+
 
         payroll.allowance.totalsBreakdown.each {
             Map<String, Object> itemsAccount = generateEntry(it, entryMap)
@@ -312,7 +310,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 //        payroll.loan.totalsBreakdown.each {
 //            Map<String, Object> itemsAccount = generateEntry(it, entryMap)
 //            totalLoan += it.amount
-////            entries.push(itemsAccount)
+//            entries.push(itemsAccount)
 //        }
 
 
@@ -324,22 +322,27 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         }
 
         BigDecimal totalContributions = 0
+        BigDecimal dueToSss = 0
+        BigDecimal dueToHdmf = 0
+        BigDecimal dueToPhic = 0
         payroll.contribution.totalsBreakdown.each {
             switch (it.description) {
-                case 'SSS EE':
+                case 'SSS EE': ''
+                    totalContributions += it.amount;
                     payroll.sssEe = it.amount; break;
                 case 'HDMF EE':
+                    totalContributions += it.amount;
                     payroll.hdmfEe = it.amount; break;
                 case 'PHIC EE':
+                    totalContributions += it.amount;
                     payroll.phicEe = it.amount; break;
                 case 'SSS ER':
-                    payroll.dueToSss = it.amount; break;
+                    dueToSss = it.amount; break;
                 case 'HDMF ER':
-                    payroll.dueToHdmf = it.amount; break;
+                    dueToHdmf = it.amount; break;
                 case 'PHIC ER':
-                    payroll.dueToPhic = it.amount; break;
+                    dueToPhic = it.amount; break;
             }
-            totalContributions += it.amount
         }
 
         BigDecimal totalSalary = 0
@@ -357,8 +360,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary
-            it.salariesPayableTotalDebit = 0 - totalAdjustmentDebit
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary - totalAdjustmentDebit
+            it.salariesPayableTotalDebit = 0
         }
 
         entryMap.keySet().each { key ->
@@ -374,7 +377,11 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             if (!foundDuplicate) entries.push(item)
             foundDuplicate = false
         }
-//        headerLedger.headerLedgerGroup = newSave.id
+
+//        entryMap.keySet().each { key ->
+//            Map<String, Object> item = entryMap.get(key.toString())
+//            entries.push(item)
+//        }
 
 
         headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger, entries)
@@ -391,7 +398,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         headerLedger.transactionType = ''
         headerLedger.referenceType = ''
         headerLedger.referenceNo = ''
-
+        headerLedger.headerLedgerGroup = newSave.id
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
                 payroll.description,
@@ -401,7 +408,39 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
                 now,
                 details)
 
-        actPay.postedLedger = pHeader.id
+
+        def headerLedgerContribution = integrationServices.generateAutoEntries(payroll) { it, mul ->
+            it.flagValue = "ER_CONTRIBUTIONS_PROCESSING"
+            it.salariesPayableTotalCredit = 0
+            it.salariesPayableTotalDebit = 0
+            it.sssEe = 0
+            it.hdmfEe = 0
+            it.phicEe = 0
+            it.advancesToEmployees = 0
+            it.sssEr = dueToSss
+            it.hdmfEr = dueToHdmf
+            it.phicEr = dueToPhic
+            it.sssPremium = dueToSss
+            it.hdmfPremium = dueToHdmf
+            it.phicPrmemium = dueToPhic
+        }
+        headerLedgerContribution.transactionNo = ''
+        headerLedgerContribution.transactionType = ''
+        headerLedgerContribution.referenceType = ''
+        headerLedgerContribution.referenceNo = ''
+        headerLedgerContribution.headerLedgerGroup = newSave.id
+
+        def pHeaderContribution = ledgerServices.persistHeaderLedger(headerLedgerContribution,
+                "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
+                payroll.description,
+                "${payroll.description ?: ""}",
+                LedgerDocType.PRL,
+                JournalType.GENERAL,
+                now,
+                details)
+
+
+        actPay.postedLedger = newSave.id
         actPay.status = PayrollStatus.FINALIZED
         actPay.posted = true
         actPay.postedBy = SecurityUtils.currentLogin()
@@ -429,11 +468,11 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         if (!itemsAccount['credit'])
             itemsAccount['credit'] = 0
         entryMap.put(it.subaccountCode, itemsAccount)
-//        return itemsAccount
+        return itemsAccount
     }
 
 
-//    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it) {
+//    private static Map<String, Object> generateEntry(SubAccountBreakdownDto it, Map<String, Map<String, Object>> entryMap) {
 //        Map<String, Object> itemsAccount = [:]
 //        itemsAccount['code'] = it.subaccountCode
 //

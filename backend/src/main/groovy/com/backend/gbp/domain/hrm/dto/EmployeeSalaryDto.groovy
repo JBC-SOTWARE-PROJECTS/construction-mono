@@ -32,10 +32,7 @@ class EmployeeSalaryDto {
 
     @Transient
     BigDecimal getTotal() {
-        regular +
-                regularHoliday +
-                regularDoubleHoliday +
-                regularSpecialHoliday
+        regular + overtime
     }
 
 }
