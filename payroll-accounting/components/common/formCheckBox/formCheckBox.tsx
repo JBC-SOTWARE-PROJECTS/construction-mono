@@ -1,23 +1,23 @@
-import { Form, FormItemProps, CheckboxProps, Checkbox } from "antd";
-import React, { forwardRef } from "react";
-import _ from "lodash";
+import { Form, FormItemProps, CheckboxProps, Checkbox } from 'antd'
+import React, { forwardRef } from 'react'
+import _ from 'lodash'
 
 interface ExtendedCheckBoxProps extends FormItemProps {
-  propscheckbox: CheckboxProps;
-  checkBoxLabel?: string;
+  propscheckbox: CheckboxProps
+  checkBoxLabel?: string
 }
 
-const FormSelect = (
+const FormCheckbox = (
   { checkBoxLabel, propscheckbox, ...props }: ExtendedCheckBoxProps,
   ref: any
 ) => {
   return (
-    <Form.Item {...props} style={{ marginBottom: "1px" }}>
+    <Form.Item {...props} style={{ marginBottom: '1px' }}>
       <Checkbox {...propscheckbox} ref={ref}>
         {checkBoxLabel}
       </Checkbox>
     </Form.Item>
-  );
-};
+  )
+}
 
-export default forwardRef(FormSelect);
+export default forwardRef(FormCheckbox)
