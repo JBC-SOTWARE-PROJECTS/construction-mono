@@ -41,7 +41,7 @@ export default function AssetUpcomingPreventiveMaintenanceTable({
       dataIndex: "asset.item.descLong",
       key: "asset.item.descLong",
       width: 100,
-      render: (_, record) => <span>{record?.asset?.item?.descLong}</span>,
+      render: (_, record) => <span>{record?.asset?.item?.descLong +"-"+ record?.asset?.model}</span>,
     },
     {
       title: "Maintenance Type",
