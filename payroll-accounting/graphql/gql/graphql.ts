@@ -937,6 +937,7 @@ export type Assets = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  fixedAssetItem?: Maybe<FixedAssetItems>;
   id?: Maybe<Scalars['UUID']['output']>;
   image?: Maybe<Scalars['String']['output']>;
   item?: Maybe<Item>;
@@ -964,7 +965,7 @@ export type Bank = {
   bankname?: Maybe<Scalars['String']['output']>;
   branch?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
-  company?: Maybe<Scalars['UUID']['output']>;
+  companyId?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   domain?: Maybe<Scalars['String']['output']>;
@@ -981,7 +982,7 @@ export type BankInput = {
   bankaccountId?: InputMaybe<Scalars['String']['input']>;
   bankname?: InputMaybe<Scalars['String']['input']>;
   branch?: InputMaybe<Scalars['String']['input']>;
-  company?: InputMaybe<Scalars['UUID']['input']>;
+  companyId?: InputMaybe<Scalars['UUID']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
