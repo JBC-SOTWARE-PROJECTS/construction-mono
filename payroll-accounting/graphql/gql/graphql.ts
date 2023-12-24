@@ -4264,6 +4264,7 @@ export type Mutation = {
   /** insert TransType */
   upsertTransType?: Maybe<TransactionType>;
   upsertUnitMeasurement?: Maybe<UnitMeasurement>;
+  upsertVehicleUsageMonitoringe?: Maybe<VehicleUsageMonitoring>;
   upsertWtx?: Maybe<DisbursementWtx>;
   voidLedgerById?: Maybe<InventoryLedger>;
   voidLedgerByRef?: Maybe<InventoryLedger>;
@@ -6559,6 +6560,13 @@ export type MutationUpsertUnitMeasurementArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertVehicleUsageMonitoringeArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertWtxArgs = {
   it?: InputMaybe<DisbursementWtxDtoInput>;
   parent?: InputMaybe<DisbursementInput>;
@@ -7991,6 +7999,25 @@ export type Page_SupplierInventory = {
 export type Page_TransactionJournalDto = {
   __typename?: 'Page_TransactionJournalDto';
   content?: Maybe<Array<Maybe<TransactionJournalDto>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_VehicleUsageMonitoring = {
+  __typename?: 'Page_VehicleUsageMonitoring';
+  content?: Maybe<Array<Maybe<VehicleUsageMonitoring>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -10093,6 +10120,7 @@ export type Query = {
   useGetLoanBalance?: Maybe<Scalars['BigDecimal']['output']>;
   /** List of Payments By shift ID */
   vatable_non?: Maybe<Scalars['BigDecimal']['output']>;
+  vehicleUsageMonitoringPageable?: Maybe<Page_VehicleUsageMonitoring>;
   version?: Maybe<Scalars['String']['output']>;
   wtxById?: Maybe<Wtx2307>;
   wtxConById?: Maybe<Wtx2307Consolidated>;
@@ -13094,6 +13122,14 @@ export type QueryVatable_NonArgs = {
 
 
 /** Query root */
+export type QueryVehicleUsageMonitoringPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryWtxByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -14061,6 +14097,27 @@ export type UserInput = {
   login: Scalars['String']['input'];
   resetDate?: InputMaybe<Scalars['LocalDateTime']['input']>;
   resetKey?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type VehicleUsageMonitoring = {
+  __typename?: 'VehicleUsageMonitoring';
+  asset?: Maybe<Assets>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  endDatetime?: Maybe<Scalars['Instant']['output']>;
+  endFuelReading?: Maybe<Scalars['String']['output']>;
+  endOdometerReading?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  item?: Maybe<Item>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  project?: Maybe<Projects>;
+  route?: Maybe<Scalars['String']['output']>;
+  startDatetime?: Maybe<Scalars['Instant']['output']>;
+  startFuelReading?: Maybe<Scalars['String']['output']>;
+  startOdometerReading?: Maybe<Scalars['String']['output']>;
+  usagePurpose?: Maybe<Scalars['String']['output']>;
 };
 
 export type Wtx2307 = {
