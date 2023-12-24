@@ -54,7 +54,7 @@ export default function VehicleUsageMonitoringTable({
       title: "Date",
       dataIndex: "date",
       key: "date",
-        render: (_, record) => <span>{moment(record?.startDatetime).format("ll")}</span>,
+        render: (_, record) => <span>{moment(record?.startDatetime).format("ll") +" "+moment(record?.startDatetime).format('HH:mm:ss') }</span>,
     },
     {
       title: "Usage Purpose",

@@ -56,7 +56,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
      
       initRec.startDatetime = dayjs(initRec.startDatetime ?? new Date()) ;
       initRec.endDatetime = dayjs(initRec.endDatetime ?? new Date());
-      initRec.projectId = record?.project?.id;
+      initRec.projectId = record?.project? record?.project?.id : null;
 
       setinitRecord(initRec);
     }else{

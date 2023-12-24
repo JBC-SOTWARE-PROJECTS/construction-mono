@@ -42,7 +42,7 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
   const [data, loading, refetch] = useGetVehicleUsageMonitoring({
     variables: {
       ...state,
-      // id: router?.query?.id,
+       asset: router?.query?.id,
     },
     fetchPolicy: "network-only",
   });

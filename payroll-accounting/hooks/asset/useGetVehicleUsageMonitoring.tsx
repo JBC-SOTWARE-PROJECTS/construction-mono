@@ -1,11 +1,12 @@
 import { QueryHookOptions, gql, useQuery } from "@apollo/client";
 
 const GET_RECORDS = gql`
-  query ($filter: String,  $page: Int, $size: Int) {
+  query ($filter: String,  $page: Int, $size: Int, $asset: UUID) {
     list: vehicleUsageMonitoringPageable(
         filter: $filter,
         page: $page,
-        size: $size
+        size: $size,
+        asset: $asset
       ) {
         content {
           id

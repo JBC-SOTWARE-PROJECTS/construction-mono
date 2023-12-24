@@ -40,17 +40,19 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
     Page<VehicleUsageMonitoring> vehicleUsageMonitoringListPageable(
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "page") Integer page,
-            @GraphQLArgument(name = "size") Integer size
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "asset") UUID asset
     ) {
 
-        String query = '''Select p from VehicleUsageMonitoring p where
+        String query = '''Select p from VehicleUsageMonitoring p where p.asset.id = :asset AND
 						lower(concat(p.usagePurpose,p.route)) like lower(concat('%',:filter,'%'))'''
 
-        String countQuery = '''Select count(p) from VehicleUsageMonitoring p where
+        String countQuery = '''Select count(p) from VehicleUsageMonitoring p where p.asset.id = :asset AND
 							lower(concat(p.usagePurpose,p.route)) like lower(concat('%',:filter,'%'))'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        params.put('asset', asset)
 
         query += ''' ORDER BY p.startDatetime DESC'''
 
