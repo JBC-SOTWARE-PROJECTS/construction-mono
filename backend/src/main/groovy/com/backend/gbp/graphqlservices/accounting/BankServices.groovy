@@ -1,6 +1,8 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.ARPaymentPostingItems
 import com.backend.gbp.domain.accounting.Bank
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.repository.accounting.BankRepository
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
@@ -18,8 +20,11 @@ import org.springframework.stereotype.Service
 
 @Service
 @GraphQLApi
-class BankServices {
+class BankServices extends AbstractDaoCompanyService<Bank> {
 
+	BankServices(){
+		super(Bank.class)
+	}
 	
 	@Autowired
 	BankRepository bankRepository
@@ -56,23 +61,14 @@ class BankServices {
 			@GraphQLArgument(name = "id") UUID id,
 			@GraphQLArgument(name = "fields") Map<String, Object> fields
 	) {
-		def company = SecurityUtils.currentCompanyId()
-
-		if (id) {
-			def item = bankRepository.findById(id).get()
-			entityObjectMapperService.updateFromMap(item, fields)
-			
-			bankRepository.save(item)
-			
-		} else {
-			def item = new Bank()
-			item.company = company
-			item.bankaccountId = generatorService.getNextValue(GeneratorType.BANKID, {
-				return "BNK-" + StringUtils.leftPad(it.toString(), 6, "0")
-			})
-			entityObjectMapperService.updateFromMap(item, fields)
-			bankRepository.save(item)
-		}
+		upsertFromMap(id,fields,{
+			it, isInsert ->
+			if(isInsert){
+				it.bankaccountId = generatorService.getNextValue(GeneratorType.BANKID, {
+					return "BNK-" + StringUtils.leftPad(it.toString(), 6, "0")
+				})
+			}
+		})
 	}
 	
 }

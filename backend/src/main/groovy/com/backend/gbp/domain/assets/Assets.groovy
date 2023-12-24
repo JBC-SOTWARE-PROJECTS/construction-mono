@@ -4,6 +4,7 @@ import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.assets.enums.AssetStatus
 import com.backend.gbp.domain.assets.enums.AssetType
+import com.backend.gbp.domain.fixed_asset.FixedAssetItems
 import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -75,6 +76,12 @@ class Assets extends AbstractAuditingEntity implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fixed_asset_item", referencedColumnName = "id")
+	FixedAssetItems fixedAssetItem
 
 	@GraphQLQuery
 	@Column(name = "company")
