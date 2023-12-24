@@ -47,7 +47,15 @@ export default function AssetTable({
       dataIndex: "model",
       key: "model",
       width: 50,
-    },{
+    },
+    {
+      title: "Serial No",
+      dataIndex: "model",
+      key: "model",
+      width: 50,
+      render: (_, record) => <span>{record?.fixedAssetItem?.serialNo}</span>,
+    },
+    {
       title: "Type",
       dataIndex: "type",
       key: "type",
@@ -55,12 +63,6 @@ export default function AssetTable({
       render: (_, record) => {
         return <Tag color="blue">{record?.type?.replace(/_/g, " ")}</Tag>;
       },
-    },
-    {
-      title: "Brand",
-      dataIndex: "brand",
-      key: "brand",
-      width: 100,
     },
     {
       title: "Status",

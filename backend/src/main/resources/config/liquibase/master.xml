@@ -487,4 +487,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/49_jacky_asset_vehicle_usage_monitoring.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_with_fixed_asset_item.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

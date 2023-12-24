@@ -67,6 +67,10 @@ export default function CnAllocateCredit(props: CnAllocateCreditI) {
     }
 
   const handleAdd = () => {
+    if (totalSummary.amountToCredit !== totalAmountDue)
+      return message.error(
+        'Total allocate amount does not match total credit note amount.'
+      )
     pendingInvoicesDialog(
       {
         selected: dataSource.map((item) => item.id),

@@ -65,4 +65,30 @@ export const DELETE_REPAIR_MAINTENANCE_ITEM_RECORD = gql`
   }
 `;
 
+export const REGISTERED_FIXED_ASSET_PAGEABLE = gql`
+  query ($filter: String, $page: Int, $size: Int) {
+    page: getFixedAssetPageable(filter: $filter, page: $page, size: $size) {
+      content {
+        id
+        assetNo
+        serialNo
+        itemId
+        itemName
+        depreciationMethod
+        depreciationStartDate
+        office {
+          id
+          officeDescription
+        }
+        salvageValue
+        purchasePrice
+        purchaseDate
+        usefulLife
+        accumulatedDepreciation
+        isBeginningBalance
+      }
+    }
+  }
+`
+
 
