@@ -16,6 +16,14 @@ export const UPSERT_MAINTENANCE_TYPE_RECORD = gql`
   }
 `;
 
+export const UPSERT_VEHICLE_USAGE_RECORD = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertVehicleUsageMonitoring(id: $id, fields: $fields) {
+      id
+    }
+  }
+`;
+
 
 export const UPSERT_PREVENTIVE_MAINTENANCE_RECORD = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
@@ -56,5 +64,31 @@ export const DELETE_REPAIR_MAINTENANCE_ITEM_RECORD = gql`
     }
   }
 `;
+
+export const REGISTERED_FIXED_ASSET_PAGEABLE = gql`
+  query ($filter: String, $page: Int, $size: Int) {
+    page: getFixedAssetPageable(filter: $filter, page: $page, size: $size) {
+      content {
+        id
+        assetNo
+        serialNo
+        itemId
+        itemName
+        depreciationMethod
+        depreciationStartDate
+        office {
+          id
+          officeDescription
+        }
+        salvageValue
+        purchasePrice
+        purchaseDate
+        usefulLife
+        accumulatedDepreciation
+        isBeginningBalance
+      }
+    }
+  }
+`
 
 

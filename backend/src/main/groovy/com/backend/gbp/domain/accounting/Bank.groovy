@@ -11,7 +11,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "bankaccounts", schema = "accounting")
-class Bank extends AbstractAuditingEntity implements Subaccountable {
+class Bank extends AbstractAuditingEntity implements Serializable, Subaccountable {
 	
 	@GraphQLQuery
 	@Id
@@ -56,7 +56,7 @@ class Bank extends AbstractAuditingEntity implements Subaccountable {
 
 	@GraphQLQuery
 	@Column(name = "company", columnDefinition = "uuid")
-	UUID company
+	UUID companyId
 
 	@Override
 	String getCode() {
