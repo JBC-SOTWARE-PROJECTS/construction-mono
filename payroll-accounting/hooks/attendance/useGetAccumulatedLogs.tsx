@@ -49,6 +49,9 @@ const QUERY = gql`
         overtimeDoubleHoliday
         regularSpecialHoliday
         overtimeSpecialHoliday
+        late
+        absent
+        underTime
       }
     }
   }

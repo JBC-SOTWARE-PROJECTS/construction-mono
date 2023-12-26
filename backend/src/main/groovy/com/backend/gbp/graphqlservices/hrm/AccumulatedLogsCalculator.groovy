@@ -137,6 +137,8 @@ class AccumulatedLogsCalculator {
                 if (generateBreakdown) {
                     accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList, holidays, employee.currentCompany)
                     accumulatedLogs.projectBreakdown.each {
+                        hoursLog.late += it.late
+
                         hoursLog.regular += it.regular
                         hoursLog.overtime += it.overtime
 
@@ -234,6 +236,7 @@ class AccumulatedLogsCalculator {
             Instant timeOut = attendanceList[i].attendance_time
             BigDecimal overtimeHours = 0
             BigDecimal regularHours = computeHours(regularSchedule, timeIn, timeOut)
+            hoursLog.late = getLateHours(regularSchedule.dateTimeStart, timeIn)
             if (overtimeSchedule && !timeOut.isBefore(overtimeSchedule.dateTimeStart)) {
                 overtimeHours = computeHours(overtimeSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time)
             }

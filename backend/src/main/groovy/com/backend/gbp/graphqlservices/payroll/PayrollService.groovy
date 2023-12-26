@@ -346,11 +346,13 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         }
 
         BigDecimal totalSalary = 0
+        BigDecimal totalLateAmount = 0
         payroll.timekeeping.salaryBreakdown.each {
             Map<String, Object> itemsAccount = [:]
             itemsAccount['code'] = it.subAccountCode
             itemsAccount['debit'] = it.total
-            itemsAccount['credit'] = 0.00
+            itemsAccount['credit'] = it.late
+            totalLateAmount += it.late
             totalSalary += it.total
 
             entries.push(itemsAccount)
@@ -360,7 +362,7 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary - totalAdjustmentDebit
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary - totalAdjustmentDebit - totalLateAmount
             it.salariesPayableTotalDebit = 0
         }
 

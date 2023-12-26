@@ -120,7 +120,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
                     </Tag>
                   </>
                 }
-                onBack={() => router.back()}
+                onBack={() => router.push("/payroll/payroll-management")}
                 extra={
                   <Space>
                     <PayrollBreakdownModal />
@@ -147,7 +147,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
               </Typography.Title>
               {payroll?.description}
               <Divider />
-              <Card bodyStyle={{ padding: 0 }}>
+              <Card bodyStyle={{ padding: 0 }} loading={loadingPayroll}>
                 {menuItems.map(
                   (item, index) =>
                     item.show === true && (

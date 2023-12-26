@@ -215,6 +215,7 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         breakdown.company = it?.company
         breakdown.companyName = it?.companyName
 
+        breakdown.late += it.late
         breakdown.regular += it.regular
         breakdown.overtime += it.overtime
         breakdown.regularHoliday += it.regularHoliday
