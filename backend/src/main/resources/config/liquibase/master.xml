@@ -491,4 +491,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_with_fixed_asset_item.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/64_michael_alter_adjustment_other_deduction.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
