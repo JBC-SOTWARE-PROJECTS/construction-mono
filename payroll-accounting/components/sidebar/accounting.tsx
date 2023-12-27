@@ -48,7 +48,7 @@ const accountingMenu: TDiverseTradeMenu[] = [
     title: 'Loan Management',
     subtitle: 'Effortlessly manage and maintain your list of employees.',
     icon: <FormOutlined className='diverse-trade-icon' />,
-    path: '/accounting/employees',
+    path: '/accounting/loan-management/loans',
   },
   {
     title: 'Fixed Asset',
