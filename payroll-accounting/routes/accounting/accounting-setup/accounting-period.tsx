@@ -1,5 +1,4 @@
 import CreateAccountingPeriod from '@/components/accounting/accounting-setup/createAccountingPeriod'
-import AccountingSetupSideBar from '@/components/accounting/commons/sidebar'
 import { Fiscal } from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
 import { PageContainer } from '@ant-design/pro-components'
