@@ -75,7 +75,7 @@ class LoanAmortization extends  AbstractAuditingEntity implements Serializable, 
 
     @Override
     String getDomain() {
-        return LoanAmortization.class.name
+        return IntegrationDomainEnum.LOAN_AMORTIZATION.name()
     }
 
     @Override

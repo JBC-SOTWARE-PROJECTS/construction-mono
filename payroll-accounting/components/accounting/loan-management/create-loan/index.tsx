@@ -1,5 +1,15 @@
 import { CustomModalPageHeader } from '@/components/accountReceivables/common'
 import {
+  FormDatePicker,
+  FormInput,
+  FormInputNumber,
+  FormSelect,
+} from '@/components/common'
+import { Bank } from '@/graphql/gql/graphql'
+import { useDialog } from '@/hooks'
+import { randomId } from '@/utility/helper'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import {
   Button,
   Col,
   Divider,
@@ -10,19 +20,11 @@ import {
   Space,
   message,
 } from 'antd'
-import { ModalStyles } from '../../commons/style-props'
-import {
-  FormDatePicker,
-  FormInput,
-  FormInputNumber,
-  FormSelect,
-} from '@/components/common'
 import { useForm } from 'antd/lib/form/Form'
-import LoanAmortization from './loan-amortization'
-import { useState } from 'react'
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { Bank } from '@/graphql/gql/graphql'
 import dayjs from 'dayjs'
+import CommonJournalEntry from '../../commons/dialog/journal-entry'
+import { ModalStyles } from '../../commons/style-props'
+import LoanAmortization from './loan-amortization'
 
 const LOAN_CALCULATOR = gql`
   query (
@@ -71,6 +73,26 @@ const BANK_PAGE = gql`
   }
 `
 
+const JOURNAL_ENTRY = gql`
+  query ($id: UUID) {
+    result: loanMViewPostingEntry(id: $id) {
+      payload
+      success
+      message
+    }
+  }
+`
+
+const JOURNAL_POSTING = gql`
+  mutation ($id: UUID, $entries: [Map_String_ObjectScalar]) {
+    results: loanMPostEntry(id: $id, entries: $entries) {
+      payload
+      success
+      message
+    }
+  }
+`
+
 interface CreateLoanI {
   hide: () => void
 }
@@ -103,6 +125,7 @@ function LoanFormDetails(props: LoanFormDetails) {
           <FormInputNumber
             label='Loan Amount'
             name='principalAmount'
+            rules={[{ required: true }]}
             propsinputnumber={{}}
           />
         </Col>
@@ -112,6 +135,7 @@ function LoanFormDetails(props: LoanFormDetails) {
           <FormSelect
             label='Bank Account'
             name='bankAccount'
+            rules={[{ required: true }]}
             propsselect={{
               options:
                 data?.banks?.content.map((account: Bank) => ({
@@ -125,6 +149,7 @@ function LoanFormDetails(props: LoanFormDetails) {
           <FormInputNumber
             label='Annual Interest Rate'
             name='annualInterest'
+            rules={[{ required: true }]}
             propsinputnumber={{}}
           />
         </Col>
@@ -134,6 +159,7 @@ function LoanFormDetails(props: LoanFormDetails) {
           <FormSelect
             label='Compound'
             name='compoundType'
+            rules={[{ required: true }]}
             propsselect={{ options: compoundType }}
           />
         </Col>
@@ -141,6 +167,7 @@ function LoanFormDetails(props: LoanFormDetails) {
           <FormInputNumber
             label='Loan period in years'
             name='numberOfPeriod'
+            rules={[{ required: true }]}
             propsinputnumber={{}}
           />
         </Col>
@@ -150,6 +177,7 @@ function LoanFormDetails(props: LoanFormDetails) {
           <FormDatePicker
             label='Start date of Loan'
             name='startDate'
+            rules={[{ required: true }]}
             propsdatepicker={{}}
           />
         </Col>
@@ -213,6 +241,8 @@ export interface CreateLoanDataType {
 export default function CreateLoan(props: CreateLoanI) {
   const [form] = useForm()
 
+  const journalEntryDialog = useDialog(CommonJournalEntry)
+
   const [onLoadLoanAmortization, { data, loading }] =
     useLazyQuery(LOAN_CALCULATOR)
 
@@ -220,6 +250,9 @@ export default function CreateLoan(props: CreateLoanI) {
     LOAN_MUTATION,
     {}
   )
+
+  const [onLoadJournalEntry] = useLazyQuery(JOURNAL_ENTRY)
+  const [postPayment, { loading: postLoading }] = useMutation(JOURNAL_POSTING)
 
   const onCalculateLoan = () => {
     const {
@@ -258,29 +291,61 @@ export default function CreateLoan(props: CreateLoanI) {
   }
 
   const onHandleCreate = () => {
-    const {
-      startDate,
-      principalAmount: loanAmount,
-      annualInterest: interestRate,
-      numberOfPeriod: loanPeriod,
-      ...values
-    } = form.getFieldsValue()
+    form
+      .validateFields()
+      .then((fieldsValues) => {
+        const {
+          startDate,
+          principalAmount: loanAmount,
+          annualInterest: interestRate,
+          numberOfPeriod: loanPeriod,
+          ...values
+        } = fieldsValues
 
-    onCreateLoan({
-      variables: {
-        fields: {
-          ...values,
-          loanAmount,
-          interestRate,
-          loanPeriod,
-          startDate: dayjs(startDate).format('YYYY/MM/DD'),
-        },
-      },
-      onCompleted: () => {
-        message.success('Successfully created.')
-        // props.hide()
-      },
-    })
+        onCreateLoan({
+          variables: {
+            fields: {
+              ...values,
+              loanAmount,
+              interestRate,
+              loanPeriod,
+              startDate: dayjs(startDate).format('YYYY/MM/DD'),
+            },
+          },
+          onCompleted: ({ results }) => {
+            if (results?.payload?.id)
+              onLoadJournalEntry({
+                variables: {
+                  id: results?.payload?.id,
+                },
+                onCompleted: ({ result }) => {
+                  const defaultAccounts = (result?.payload ?? []).map(
+                    (account: any) => ({
+                      ...account,
+                      id: randomId(),
+                    })
+                  )
+                  journalEntryDialog({ defaultAccounts }, (entries: any[]) => {
+                    console.log(entries, 'entries')
+                    if (entries.length > 0) {
+                      postPayment({
+                        variables: {
+                          id: results?.payload?.id,
+                          entries,
+                        },
+                        onCompleted: () => {
+                          message.success('Successfully created.')
+                          props.hide()
+                        },
+                      })
+                    }
+                  })
+                },
+              })
+          },
+        })
+      })
+      .catch((errorInfo) => {})
   }
 
   return (
@@ -319,10 +384,14 @@ export default function CreateLoan(props: CreateLoanI) {
         </Col>
       </Row>
 
-      <Divider dashed orientation='left' orientationMargin={0}>
-        Loan Amortization
-      </Divider>
-      <LoanAmortization {...{ data, loading }} />
+      {data?.loanMLoanPayments?.amortize && (
+        <>
+          <Divider dashed orientation='left' orientationMargin={0}>
+            Loan Amortization
+          </Divider>
+          <LoanAmortization {...{ data, loading }} />
+        </>
+      )}
     </Modal>
   )
 }

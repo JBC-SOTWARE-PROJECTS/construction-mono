@@ -100,7 +100,7 @@ class Loan extends  AbstractAuditingEntity implements Serializable, AutoIntegrat
 
     @Override
     String getDomain() {
-        return Loan.class.name
+        return IntegrationDomainEnum.LOAN.name()
     }
 
     @Override

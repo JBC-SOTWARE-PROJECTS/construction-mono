@@ -18,11 +18,11 @@ import {
   FormSelect,
 } from '@/components/common'
 import { useForm } from 'antd/lib/form/Form'
-import LoanAmortization from './loan-amortization'
 import { useState } from 'react'
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { Bank } from '@/graphql/gql/graphql'
+import { Bank, Loan } from '@/graphql/gql/graphql'
 import dayjs from 'dayjs'
+import LoanAmortization from './loan-amortization'
 
 const LOAN_QUERY = gql`
   query ($id: UUID) {
@@ -33,12 +33,9 @@ const LOAN_QUERY = gql`
         referenceNo
         bankAccount {
           id
-          accountNo
+          accountNumber
           accountName
-          bank {
-            id
-            bankname
-          }
+          bankname
         }
         numberOfPayments
         interestRate
@@ -101,8 +98,9 @@ const BANK_PAGE = gql`
   }
 `
 
-interface CreateLoanI {
+interface ViewLoanDetailsI {
   hide: () => void
+  id: string
 }
 
 interface LoanFormDetails {
@@ -133,54 +131,48 @@ function LoanFormDetails(props: LoanFormDetails) {
           <FormInputNumber
             label='Loan Amount'
             name='principalAmount'
-            propsinputnumber={{}}
+            propsinputnumber={{
+              readOnly: true,
+            }}
           />
         </Col>
       </Row>
       <Row gutter={[8, 8]}>
         <Col flex={'1 0'}>
-          <FormSelect
-            label='Bank Account'
-            name='bankAccount'
-            propsselect={{
-              options:
-                data?.banks?.content.map((account: Bank) => ({
-                  label: `${account.bankname} - ${account.accountNumber}`,
-                  value: account.id,
-                })) ?? [],
-            }}
-          />
+          <FormInput label='Bank Account' name='bankAccount' />
         </Col>
         <Col flex={'1 0'}>
           <FormInputNumber
             label='Annual Interest Rate'
             name='annualInterest'
-            propsinputnumber={{}}
+            propsinputnumber={{ readOnly: true }}
           />
         </Col>
       </Row>
       <Row gutter={[8, 8]}>
         <Col flex={'1 0'}>
-          <FormSelect
+          <FormInput
             label='Compound'
             name='compoundType'
-            propsselect={{ options: compoundType }}
+            propsinput={{ readOnly: true }}
           />
         </Col>
         <Col flex={'1 0'}>
           <FormInputNumber
             label='Loan period in years'
             name='numberOfPeriod'
-            propsinputnumber={{}}
+            propsinputnumber={{ readOnly: true }}
           />
         </Col>
       </Row>
       <Row gutter={[8, 8]}>
         <Col flex={'1 0'}>
-          <FormDatePicker
+          <FormInput
             label='Start date of Loan'
             name='startDate'
-            propsdatepicker={{}}
+            propsinput={{
+              readOnly: true,
+            }}
           />
         </Col>
         <Col flex={'1 0'} />
@@ -236,85 +228,43 @@ function LoanPaymentDetails(props: LoanFormDetails) {
   )
 }
 
-export interface CreateLoanDataType {
+export interface ViewLoanDetailsDataType {
   paymentDate: string
 }
 
-export default function CreateLoan(props: CreateLoanI) {
+export default function ViewLoanDetails(props: ViewLoanDetailsI) {
   const [form] = useForm()
 
   const { data, loading } = useQuery(LOAN_QUERY, {
     variables: {
-      id,
+      id: props.id,
+    },
+    onCompleted: ({ result }) => {
+      const loan: Loan = result?.payload
+      form.setFieldsValue({
+        referenceNo: loan?.referenceNo ?? '',
+        principalAmount: loan?.loanAmount ?? '',
+        bankAccount: loan?.bankAccount
+          ? `${loan?.bankAccount?.bankname} ${loan?.bankAccount?.accountNumber}`
+          : '',
+        annualInterest: loan?.interestRate ?? '',
+        compoundType: loan?.compoundType ?? '',
+        numberOfPeriod: loan?.loanPeriod ?? '',
+        startDate:
+          dayjs(loan?.startDate).format('YYYY-MM-DD') ??
+          dayjs().format('YYYY-MM-DD'),
+        monthlyPayment: loan?.loanPayment ?? '',
+        totalInterest: loan?.totalInterest ?? '',
+        numberOfPayments: loan?.numberOfPayments ?? '',
+        costOfLoan: loan?.totalCostOfLoan ?? '',
+      })
     },
   })
 
-  const { payload: records } = data?.result || {
-    payload: {
-      id: '',
-      loanNo: '',
-      referenceNo: '',
-      bankAccount: {
-        accountNo: '',
-        accountName: '',
-        bank: { bankname: '' },
-      },
-      loanAmount: '',
-      numberOfPayments: '',
-      loanPeriod: '',
-      loanPayment: '',
-      totalInterest: '',
-      totalCostOfLoan: '',
-      startDate: '',
-      compoundType: '',
-    },
-  }
-
-  const { loanNo } = records
-
-  const [onLoadLoanAmortization, { data, loading }] =
-    useLazyQuery(LOAN_CALCULATOR)
-
-  const [onCreateLoan, { loading: mutationLoad }] = useMutation(
+  const [onViewLoanDetails, { loading: mutationLoad }] = useMutation(
     LOAN_MUTATION,
     {}
   )
-
-  const onCalculateLoan = () => {
-    const {
-      principalAmount,
-      annualInterest,
-      compoundType,
-      numberOfPeriod,
-      startDate,
-    } = form.getFieldsValue()
-
-    onLoadLoanAmortization({
-      variables: {
-        principalAmount,
-        annualInterest,
-        compoundType,
-        numberOfPeriod,
-        startDate: dayjs(startDate).format('YYYY/MM/DD'),
-      },
-      onCompleted: ({ loanMLoanPayments }) => {
-        const { monthlyPayment, numberOfPayments, costOfLoan, totalInterest } =
-          loanMLoanPayments ?? {
-            monthlyPayment: 0.0,
-            numberOfPayments: 0.0,
-            costOfLoan: 0.0,
-            totalInterest: 0.0,
-          }
-
-        form.setFieldsValue({
-          monthlyPayment,
-          numberOfPayments,
-          costOfLoan,
-          totalInterest,
-        })
-      },
-    })
-  }
 
   const onHandleCreate = () => {
     const {
@@ -325,7 +275,7 @@ export default function CreateLoan(props: CreateLoanI) {
       ...values
     } = form.getFieldsValue()
 
-    onCreateLoan({
+    onViewLoanDetails({
       variables: {
         fields: {
           ...values,
@@ -346,15 +296,15 @@ export default function CreateLoan(props: CreateLoanI) {
     <Modal
       open
       closable={false}
-      onCancel={props.hide}
       title={<CustomModalPageHeader label={'New Record'} />}
       width='100%'
       style={ModalStyles.style}
       maskStyle={ModalStyles.maskStyle}
-      okText='Create'
-      onOk={onHandleCreate}
-      okButtonProps={{ loading: mutationLoad }}
-      cancelButtonProps={{ loading: mutationLoad }}
+      footer={
+        <Button type='primary' danger onClick={props.hide}>
+          Close
+        </Button>
+      }
     >
       <Row gutter={[8, 8]}>
         <Col flex='1'>
@@ -363,9 +313,6 @@ export default function CreateLoan(props: CreateLoanI) {
               Loan Form Details
             </Divider>
             <LoanFormDetails {...{ form }} />
-            <Button type='primary' onClick={onCalculateLoan}>
-              Calculate Loan
-            </Button>
           </Space>
         </Col>
         <Col flex='1'>
@@ -381,7 +328,7 @@ export default function CreateLoan(props: CreateLoanI) {
       <Divider dashed orientation='left' orientationMargin={0}>
         Loan Amortization
       </Divider>
-      <LoanAmortization {...{ data, loading }} />
+      <LoanAmortization {...{ id: props?.id }} />
     </Modal>
   )
 }

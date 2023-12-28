@@ -1,12 +1,17 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.LOAN_AMORTIZATION_INTEGRATION
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.accounting.Loan
 import com.backend.gbp.domain.accounting.LoanAmortization
+import com.backend.gbp.domain.types.AutoIntegrateable
 import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.services.EntityObjectMapperService
 import com.backend.gbp.services.GeneratorService
+import com.backend.gbp.services.GeneratorType
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @GraphQLApi
@@ -42,6 +48,9 @@ class LoanAmortizationServices extends AbstractDaoCompanyService<LoanAmortizatio
     @Autowired
     LedgerServices ledgerServices
 
+    @Autowired
+    ArInvoiceServices arInvoiceServices
+
     @Transactional(rollbackFor = Exception.class)
     @Async
     GraphQLRetVal<Boolean> addLoanAmortization(Loan loan, List<Map<String,Object>> loanSchedule){
@@ -51,8 +60,7 @@ class LoanAmortizationServices extends AbstractDaoCompanyService<LoanAmortizatio
                 Integer count = 1
                 loanSchedule.each {
                     it->
-                        LoanAmortization details = new LoanAmortization()
-                        entityObjectMapperService.updateFromMap(details,it)
+                        LoanAmortization details = upsertFromMap(null,it)
                         details.recordNo = generatorService.getNextValue(GeneratorType.LOAN_RECORD, {
                             return StringUtils.leftPad(it.toString(), 6, "0")
                         })
@@ -111,14 +119,14 @@ class LoanAmortizationServices extends AbstractDaoCompanyService<LoanAmortizatio
 
                     def headerLedger =	integrationServices.generateAutoEntries(loanAmortization){it, nul ->
                         it.flagValue = LOAN_AMORTIZATION_INTEGRATION.LOANM_PAYMENT.name()
-                        it.bank = it.loan.bankAccount.bank
                     }
 
                     if(headerLedger) {
                         headerLedger.ledger.each {
                             it ->
                                 Map<String, Object> rows = [:]
-                                rows["description"] = it['journalAccount']["description"]
+                                rows["code"] = it['journalAccount']["code"]
+                                rows["accountName"] = it['journalAccount']["accountName"]
                                 rows["debit"] = it['debit']
                                 rows["credit"] = it['credit']
                                 entry.push(rows)
@@ -137,16 +145,17 @@ class LoanAmortizationServices extends AbstractDaoCompanyService<LoanAmortizatio
     }
 
     @GraphQLMutation(name="loanMPaidLoan")
-    GraphQLRetVal<Boolean> loanMPaidLoan(@GraphQLArgument(name="id") UUID id){
+    GraphQLRetVal<Boolean> loanMPaidLoan(
+            @GraphQLArgument(name="id") UUID id,
+            @GraphQLArgument(name="entries") List<Map<String,Object>> entries
+    ){
         try {
 
             def loanAmortization = findOne(id)
             if (loanAmortization) {
-                def yearFormat = DateTimeFormatter.ofPattern("yyyy")
 
                 def headerLedger =	integrationServices.generateAutoEntries(loanAmortization){it, nul ->
                     it.flagValue = LOAN_AMORTIZATION_INTEGRATION.LOANM_PAYMENT.name()
-                    it.bank = it.loan.bankAccount.bank
                 }
 
                 Map<String,String> details = [:]
@@ -154,17 +163,30 @@ class LoanAmortizationServices extends AbstractDaoCompanyService<LoanAmortizatio
                     details[k] = v
                 }
 
-                def convertedStartDate = dateToInstantConverter(loanAmortization.loan.startDate)
-                def convertedPaymentDate = dateToInstantConverter(loanAmortization.loan.startDate)
+                if(entries.size() > 0) {
+                    headerLedger.ledger = []
+                    headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger, entries)
+                }
+
+                headerLedger.transactionNo = loanAmortization.recordNo
+                headerLedger.transactionType = 'LOAN AMORTIZATION'
+
+                headerLedger.referenceNo = loanAmortization.loan.loanNo
+                headerLedger.referenceType = 'LOAN'
+
+                def groupHeader = ledgerServices.findOne(loanAmortization.loan.postedLedger)
+                if(groupHeader.headerLedgerGroup){
+                    headerLedger.headerLedgerGroup = groupHeader.headerLedgerGroup
+                }
 
                 details["LOAN_AMORTIZATION_ID"] = loanAmortization.id.toString()
                 def pHeader =	ledgerServices.persistHeaderLedger(headerLedger,
-                        "LOAN ${convertedStartDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${loanAmortization.loan.loanNo}",
-                        "LOAN ${loanAmortization.loan.loanNo} - ${loanAmortization.loan.bankAccount.accountNo}",
-                        "PAID ${loanAmortization.payment} FOR PAYMENT NO: ${loanAmortization.orderNo}",
+                        "LOAN ${loanAmortization.loan.loanNo}".toString(),
+                        "LOAN ${loanAmortization.loan.loanNo} - ${loanAmortization.loan.bankAccount.accountNumber}".toString(),
+                        "PAID ${loanAmortization.payment} FOR PAYMENT NO: ${loanAmortization.orderNo}".toString(),
                         LedgerDocType.JV,
                         JournalType.GENERAL,
-                        convertedPaymentDate,
+                        loanAmortization.createdDate,
                         details)
 
                 loanAmortization.postedLedger = pHeader.id

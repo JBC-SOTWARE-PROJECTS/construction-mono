@@ -1,14 +1,25 @@
 import { CardLayout } from '@/components/accountReceivables/common'
 import CreateLoan from '@/components/accounting/loan-management/create-loan'
+import ViewLoanDetails from '@/components/accounting/loan-management/view-loan'
 import { CustomPageTitle } from '@/components/common/custom-components'
+import { Loan } from '@/graphql/gql/graphql'
 import { useDialog } from '@/hooks'
-import { PlusCircleFilled } from '@ant-design/icons'
+import {
+  CheckCircleOutlined,
+  DeleteOutlined,
+  FolderOpenOutlined,
+  MoreOutlined,
+  PlusCircleFilled,
+  QuestionCircleOutlined,
+} from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
-import { gql, useQuery } from '@apollo/client'
-import { Button, Pagination, Space, Table } from 'antd'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { Button, Dropdown, Pagination, Space, Table, message } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import numeral from 'numeral'
+import { randomId } from '@/utility/helper'
+import CommonJournalEntry from '@/components/accounting/commons/dialog/journal-entry'
 
 const LOAN_QUERY = gql`
   query ($filter: String, $page: Int, $size: Int) {
@@ -40,8 +51,30 @@ const LOAN_QUERY = gql`
   }
 `
 
+const JOURNAL_ENTRY = gql`
+  query ($id: UUID) {
+    result: loanMViewPostingEntry(id: $id) {
+      payload
+      success
+      message
+    }
+  }
+`
+
+const JOURNAL_POSTING = gql`
+  mutation ($id: UUID, $entries: [Map_String_ObjectScalar]) {
+    results: loanMPostEntry(id: $id, entries: $entries) {
+      payload
+      success
+      message
+    }
+  }
+`
+
 export default function Loans() {
   const createLoanDialog = useDialog(CreateLoan)
+  const showLoanDetails = useDialog(ViewLoanDetails)
+  const journalEntryDialog = useDialog(CommonJournalEntry)
 
   const { data, loading, refetch, fetchMore } = useQuery(LOAN_QUERY, {
     variables: {
@@ -57,12 +90,55 @@ export default function Loans() {
     totalPages: 10,
   }
 
+  const [onLoadJournalEntry] = useLazyQuery(JOURNAL_ENTRY)
+  const [postPayment, { loading: postLoading }] = useMutation(JOURNAL_POSTING)
+
   const handleSearch = (filter: string) => {
     refetch({ filter, page: 0 })
   }
 
   const handleNewRecord = () => {
-    createLoanDialog({}, () => {})
+    createLoanDialog({}, () => {
+      refetch({ page: 0 })
+    })
+  }
+
+  const handleActionButton = (key: string, id: string) => {
+    switch (key) {
+      case 'post':
+        onLoadJournalEntry({
+          variables: {
+            id: id,
+          },
+          onCompleted: ({ result }) => {
+            const defaultAccounts = (result?.payload ?? []).map(
+              (account: any) => ({
+                ...account,
+                id: randomId(),
+              })
+            )
+            journalEntryDialog({ defaultAccounts }, (entries: any[]) => {
+              console.log(entries, 'entries')
+              if (entries.length > 0) {
+                postPayment({
+                  variables: {
+                    id: id,
+                    entries,
+                  },
+                  onCompleted: () => {
+                    message.success('Successfully created.')
+                    refetch()
+                  },
+                })
+              }
+            })
+          },
+        })
+        break
+      default:
+        showLoanDetails({ id }, () => {})
+        break
+    }
   }
 
   const columns: ColumnsType<any> = [
@@ -144,12 +220,66 @@ export default function Loans() {
       render: (text) => numeral(text).format('0,0.00'),
     },
     {
-      title: 'Action',
-      dataIndex: 'itemName',
-      width: 100,
+      title: 'Posted',
+      dataIndex: 'postedLedger',
+      width: 50,
       align: 'center',
       fixed: 'right',
-      render: (text) => <Button type='primary'>Open</Button>,
+      render: (text) =>
+        text ? (
+          <Button
+            type='text'
+            style={{ color: 'green' }}
+            icon={<CheckCircleOutlined />}
+          />
+        ) : (
+          <Button
+            type='text'
+            style={{ color: 'blue' }}
+            icon={<QuestionCircleOutlined />}
+          />
+        ),
+    },
+    {
+      title: '#',
+      dataIndex: 'id',
+      width: 50,
+      align: 'center',
+      fixed: 'right',
+      render: (text, record: Loan) => {
+        const items = [
+          {
+            icon: <FolderOpenOutlined />,
+            label: 'View',
+            key: 'view',
+          },
+        ]
+
+        if (!record?.postedLedger)
+          items.push({
+            icon: <CheckCircleOutlined />,
+            label: 'Post',
+            key: 'post',
+          })
+
+        return (
+          <Dropdown
+            key={'button-carret'}
+            menu={{
+              items,
+              onClick: ({ key }) => handleActionButton(key, text),
+            }}
+            trigger={['click']}
+          >
+            <Button
+              type='link'
+              icon={<MoreOutlined />}
+              size='large'
+              onClick={(e) => e.preventDefault()}
+            />
+          </Dropdown>
+        )
+      },
     },
   ]
   return (

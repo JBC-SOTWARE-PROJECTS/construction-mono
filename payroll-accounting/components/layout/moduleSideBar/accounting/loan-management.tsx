@@ -12,10 +12,6 @@ const LoanManagementMenu = {
             path: '/accounting/loan-management/loans',
             name: 'Loans',
           },
-          {
-            path: '/accounting/loan-management/bank-accounts',
-            name: 'Bank Accounts',
-          },
         ],
       },
     ],

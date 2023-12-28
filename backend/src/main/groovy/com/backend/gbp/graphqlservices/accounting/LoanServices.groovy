@@ -1,7 +1,9 @@
 package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.CompoundType
+import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LOAN_INTEGRATION
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.accounting.Loan
 import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
@@ -46,6 +48,9 @@ class LoanServices extends AbstractDaoCompanyService<Loan> {
 
     @Autowired
     LedgerServices ledgerServices
+
+    @Autowired
+    ArInvoiceServices arInvoiceServices
 
     @GraphQLQuery(name="loanMPMT" , description = "One of the financial functions, calculates the payment for a loan based on constant payments and a constant interest rate.")
      Map<String,BigDecimal> loanMPMT(
@@ -203,8 +208,6 @@ class LoanServices extends AbstractDaoCompanyService<Loan> {
             fields["startDate"] = localDate
             Loan loanManagement = upsertFromMap(null,fields)
 
-
-
             def loanCalculation = loanMLoanPayments(localDate.format(formatter),loanManagement.interestRate,loanManagement.compoundType,loanManagement.loanAmount,loanManagement.loanPeriod)
 
             loanManagement.loanPayment = loanCalculation['monthlyPayment'] as BigDecimal
@@ -285,8 +288,8 @@ class LoanServices extends AbstractDaoCompanyService<Loan> {
             return  new GraphQLRetVal<Loan>(new Loan(),false,'No parameter found.')
     }
 
-    @GraphQLQuery(name="loanMViewStartingEntry")
-    GraphQLRetVal<List<Map<String,Object>>> loanMViewStartingEntry(@GraphQLArgument(name="id") UUID id){
+    @GraphQLQuery(name="loanMViewPostingEntry")
+    GraphQLRetVal<List<Map<String,Object>>> loanMViewPostingEntry(@GraphQLArgument(name="id") UUID id){
         try{
             if(id) {
                 def loan = findOne(id)
@@ -301,7 +304,8 @@ class LoanServices extends AbstractDaoCompanyService<Loan> {
                         headerLedger.ledger.each {
                             it ->
                                 Map<String, Object> rows = [:]
-                                rows["description"] = it['journalAccount']["description"]
+                                rows["code"] = it['journalAccount']["code"]
+                                rows["accountName"] = it['journalAccount']["accountName"]
                                 rows["debit"] = it['debit']
                                 rows["credit"] = it['credit']
                                 entry.push(rows)
@@ -319,13 +323,15 @@ class LoanServices extends AbstractDaoCompanyService<Loan> {
         }
     }
 
-    @GraphQLMutation(name="loanMStartingEntry")
-    GraphQLRetVal<Boolean> loanMStartingEntry(@GraphQLArgument(name="id") UUID id){
+    @GraphQLMutation(name="loanMPostEntry")
+    GraphQLRetVal<Boolean> loanMPostEntry(
+        @GraphQLArgument(name="id") UUID id,
+        @GraphQLArgument(name="entries") List<Map<String,Object>> entries
+    ){
         try {
 
             def loan = findOne(id)
             if (loan) {
-                def yearFormat = DateTimeFormatter.ofPattern("yyyy")
 
                 def headerLedger = integrationServices.generateAutoEntries(loan) { it, nul ->
                     it.flagValue = LOAN_INTEGRATION.LOAN_ENTRY.name()
@@ -336,16 +342,19 @@ class LoanServices extends AbstractDaoCompanyService<Loan> {
                     details[k] = v
                 }
 
-                def convertedDate = dateToInstantConverter(loan.startDate)
+                if(entries.size() > 0) {
+                    headerLedger.ledger = []
+                    headerLedger = arInvoiceServices.addHeaderManualEntries(headerLedger, entries)
+                }
 
                 details["LOAN_ID"] = loan.id.toString()
                 def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
-                        "LOAN ${convertedDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${loan.loanNo}",
+                        "LOAN-${loan.loanNo}",
                         "LOAN ${loan.loanNo} - ${loan.bankAccount.accountNumber}",
                         "NEW LOAN ACQUIRED FROM ${loan.bankAccount.bankname}",
                         LedgerDocType.JV,
                         JournalType.GENERAL,
-                        convertedDate,
+                        loan.createdDate,
                         details)
 
                 loan.postedLedger = pHeader.id

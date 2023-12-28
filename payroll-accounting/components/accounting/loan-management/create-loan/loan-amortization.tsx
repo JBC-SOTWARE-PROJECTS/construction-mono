@@ -3,6 +3,7 @@ import { SetStateType } from '../../commons/interface'
 import { CreateLoanDataType } from '.'
 import type { ColumnsType } from 'antd/es/table'
 import numeral from 'numeral'
+import dayjs from 'dayjs'
 
 interface LoanAmortizationI {
   data: any
@@ -21,6 +22,7 @@ export default function LoanAmortization(props: LoanAmortizationI) {
       title: 'Payment Date',
       dataIndex: 'paymentDate',
       width: '125px',
+      render: (text) => dayjs(text).format('YYYY-MM-DD'),
     },
     {
       title: 'Beginning Balance',

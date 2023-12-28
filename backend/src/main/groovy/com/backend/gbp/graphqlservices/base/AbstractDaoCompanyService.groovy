@@ -8,6 +8,9 @@ import org.springframework.data.domain.Page
 
 import javax.persistence.Query
 import javax.persistence.TypedQuery
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneOffset
 
 
 abstract class AbstractDaoCompanyService<T extends Serializable> implements IGenericDao<T> {
@@ -146,5 +149,20 @@ abstract class AbstractDaoCompanyService<T extends Serializable> implements IGen
 			save(entity)
 			
 		}
+	}
+
+	static Instant dateToInstantConverter(Date dateTime){
+		SimpleDateFormat yr = new SimpleDateFormat("yyyy")
+		SimpleDateFormat mth = new SimpleDateFormat("MM")
+		SimpleDateFormat dy = new SimpleDateFormat("dd")
+
+		int year = Integer.parseInt(yr.format(dateTime).toString())
+		int month = Integer.parseInt(mth.format(dateTime).toString())
+		int date = Integer.parseInt(dy.format(dateTime).toString())
+		Calendar cl = Calendar.getInstance()
+		cl.set(year,month-1,date)
+		TimeZone philZone = TimeZone.getTimeZone('UTC')
+		cl.setTimeZone(philZone)
+		return cl.getTime().toInstant()
 	}
 }
