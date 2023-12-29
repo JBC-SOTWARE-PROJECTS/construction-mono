@@ -16,6 +16,7 @@ import com.backend.gbp.rest.dto.EmployeeAttendanceDto
 import com.backend.gbp.rest.dto.EmployeeDto
 import com.backend.gbp.rest.dto.mobile.EmployeeDetailsDto
 import com.backend.gbp.rest.dto.mobile.MobileInitializerDto
+import com.backend.gbp.services.DigitalOceanSpaceService
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -27,9 +28,17 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.xmlsoap.schemas.soap.encoding.Array
+//import com.digitalocean.spaces.SpacesClient
+//import com.digitalocean.spaces.model.ObjectWriteResponse
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -58,6 +67,10 @@ class EmployeeResource {
 
     @Autowired
     CompanySettingsService companySettingsService
+
+    @Autowired
+    DigitalOceanSpaceService spaceService;
+
 
 
     @RequestMapping(method = RequestMethod.POST,value = ['/filter'])
@@ -109,6 +122,7 @@ class EmployeeResource {
             @RequestParam(name = "fields") String fields
     ){
 
+
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> fieldMap = objectMapper.readValue(fields, Map.class);
 
@@ -119,6 +133,24 @@ class EmployeeResource {
 
         return empAttendance.returnId;
 
+    }
+
+    @RequestMapping(method = RequestMethod.POST,value = ['/attendance/capture'])
+    String uploadCaptureAttendance (
+            @RequestPart("file") MultipartFile capture
+    ){
+
+        File file = convertMultipartFileToFile(capture);
+        //  MultipartFile file = request.getFile("image");
+        spaceService.uploadFileToSpace(file);
+        return "File uploaded successfully!";
+
+    }
+
+    private File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
+        File file = new File(System.getProperty("java.io.tmpdir") + File.separator + multipartFile.getOriginalFilename());
+        multipartFile.transferTo(file);
+        return file;
     }
 
     @RequestMapping(method = RequestMethod.POST,value = ['/attendance/sync'])
