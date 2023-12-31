@@ -4,6 +4,8 @@ import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollContribution
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.PayrollEmployeeContribution
+import com.backend.gbp.domain.payroll.PayrollContribution
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.payroll.enums.ContributionTypes
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
@@ -73,6 +75,52 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
 
     //================================MUTATION================================\\
 
+
+    @Transactional(rollbackFor = Exception.class)
+    @GraphQLMutation
+    GraphQLResVal<String> updatePayrollContributionStatus(
+            @GraphQLArgument(name = "payrollId") UUID payrollId,
+            @GraphQLArgument(name = "status") PayrollStatus status
+
+    ) {
+        PayrollContribution payrollContribution = payrollContributionRepository.findByPayrollId(payrollId).get()
+
+        if (status == PayrollStatus.FINALIZED) {
+            Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
+            payrollContribution.contributionEmployees.each {
+                generateBreakdown(it.sssEE + it.sssWispEE, 'SSS EE', '217-01-0000', breakdownMap)
+                generateBreakdown(it.sssER + it.sssWispER, 'SSS ER', '211-03-0000', breakdownMap)
+                generateBreakdown(it.phicEE, 'PHIC EE', '217-03-0000', breakdownMap)
+                generateBreakdown(it.phicER, 'PHIC ER', '211-05-0000', breakdownMap)
+                generateBreakdown(it.hdmfEE, 'HDMF EE', '217-02-0000', breakdownMap)
+                generateBreakdown(it.hdmfER, 'HDMF ER', '211-04-0000', breakdownMap)
+            }
+
+            payrollContribution.totalsBreakdown = []
+            breakdownMap.keySet().each {
+                SubAccountBreakdownDto deduction = breakdownMap.get(it.toString())
+                payrollContribution.totalsBreakdown.push(deduction)
+            }
+
+        }
+
+        payrollContribution.status = status
+        payrollContributionRepository.save(payrollContribution)
+        return new GraphQLResVal<String>(null, true, "Successfully updated Payroll Contribution status.")
+    }
+
+    private static void generateBreakdown(BigDecimal amount,
+                                          String description, String subAccountCode,
+                                          HashMap<String, SubAccountBreakdownDto> breakdownMap) {
+        SubAccountBreakdownDto breakdown = breakdownMap.get(subAccountCode)
+        if (!breakdown) breakdown = new SubAccountBreakdownDto()
+        breakdown.description = description
+        breakdown.entryType = AccountingEntryType.CREDIT
+        breakdown.amount += amount
+        breakdown.subaccountCode = subAccountCode
+        breakdownMap.put(subAccountCode, breakdown)
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @GraphQLMutation
     GraphQLResVal<PayrollContribution> updateContributionTypeStatus(
@@ -129,7 +177,7 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
     PayrollContribution startPayroll(Payroll payroll) {
         PayrollContribution contribution = new PayrollContribution();
         contribution.payroll = payroll
-        contribution.status = PayrollStatus.ACTIVE
+        contribution.status = PayrollStatus.DRAFT
         contribution.company = SecurityUtils.currentCompany()
         contribution = payrollContributionRepository.save(contribution)
 

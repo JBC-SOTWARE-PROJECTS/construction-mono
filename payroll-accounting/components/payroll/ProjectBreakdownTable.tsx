@@ -5,7 +5,7 @@ import { Table } from "antd";
 import { round } from "lodash";
 import React from "react";
 
-function ProjectBreakdownTable({ dataSource, toggleValue }: any) {
+function ProjectBreakdownTable({ dataSource, toggleValue, size }: any) {
   const render = (value: any) => {
     if (toggleValue == "hours") return value && round(value, 4);
     else if (toggleValue == "salary") return <NumeralFormatter value={value} />;
@@ -128,6 +128,7 @@ function ProjectBreakdownTable({ dataSource, toggleValue }: any) {
     <Table
       onHeaderRow={() => ({ style: { textAlignLast: "center" } })}
       columns={columns as any}
+      size={size}
       dataSource={dataSource as HoursLog[]}
     />
   );

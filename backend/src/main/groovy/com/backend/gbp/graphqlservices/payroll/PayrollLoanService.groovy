@@ -2,6 +2,8 @@ package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.*
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
+import com.backend.gbp.domain.payroll.enums.EmployeeLoanCategory
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
@@ -86,10 +88,30 @@ class PayrollLoanService implements IPayrollModuleBaseOperations<PayrollLoan> {
             @GraphQLArgument(name = "status") PayrollStatus status
 
     ) {
-        PayrollLoan payrollLoan = payrollLoanRepository.findByPayrollId(payrollId).get()
-        payrollLoan.status = status
-        payrollLoanRepository.save(payrollLoan)
-//        TODO: Additional operations when finalizing loan module
+        PayrollLoan module = payrollLoanRepository.findByPayrollId(payrollId).get()
+        if (status == PayrollStatus.FINALIZED) {
+            Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
+            module.employees.each { employee ->
+                employee.loanItems.each {
+                    SubAccountBreakdownDto breakdown = breakdownMap.get(it.category.toString())
+                    if (!breakdown) breakdown = new SubAccountBreakdownDto()
+
+                    breakdown.amount += it.amount
+                    breakdown.entryType = AccountingEntryType.CREDIT
+                    breakdown.description = it.category
+
+                    breakdownMap.put(it.category.toString(), breakdown)
+                }
+            }
+            module.totalsBreakdown = []
+            breakdownMap.keySet().each {
+                SubAccountBreakdownDto deduction = breakdownMap.get(it.toString())
+                module.totalsBreakdown.push(deduction)
+            }
+        }
+        module.status = status
+        payrollLoanRepository.save(module)
+
         return new GraphQLResVal<String>(null, true, "Successfully updated Payroll Loan status.")
     }
 

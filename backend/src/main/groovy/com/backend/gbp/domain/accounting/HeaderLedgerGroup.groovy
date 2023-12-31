@@ -34,6 +34,10 @@ class HeaderLedgerGroup extends AbstractAuditingEntity implements Serializable {
 	String recordNo
 
 	@GraphQLQuery
+	@Column(name = "doc_no", columnDefinition = "date")
+	String docNo
+
+	@GraphQLQuery
 	@Column(name = "entity_name", columnDefinition = "date")
 	@UpperCase
 	String entity_name

@@ -1,27 +1,24 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  PlusCircleOutlined,
-  CloseCircleOutlined,
-  EditOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import {
   PageContainer,
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Button, Table, Input, message, Popconfirm } from "antd";
+import { Button, Input, Table, message } from "antd";
 
-import AllowanceTypeModal from "./allowance-type-modal";
 import {
-  FETCH_ALLOWANCE_PAGEABLE,
   DELETE_ALLOWANCE,
+  FETCH_ALLOWANCE_PAGEABLE,
 } from "@/graphql/company/queries";
 import { useMutation, useQuery } from "@apollo/client";
-import _ from "lodash";
 import type { ColumnsType } from "antd/es/table";
+import _ from "lodash";
+import AllowanceTypeModal from "./allowance-type-modal";
 
 import UseDialog from "@/hooks/useDialog";
+import useGetChartOfAccounts from "@/hooks/useGetChartOfAccounts";
 
 const { Search } = Input;
 
@@ -34,6 +31,7 @@ interface DataSourceProps {
 
 function AllowanceType() {
   const [, setIsModalOpen] = useState(false);
+  const [expenses, loadingExpenses] = useGetChartOfAccounts("EXPENSE");
   const [selectedItem] = useState<DataSourceProps | null | string>();
   const [state, setState] = useState({
     filter: "",
@@ -89,9 +87,18 @@ function AllowanceType() {
     {
       title: "Allowance Type",
       dataIndex: "allowanceType",
-      width: "150px",
       render: (value: string) => {
         return value.replace("_", " ");
+      },
+    },
+    {
+      title: "Sub-account",
+      dataIndex: "subaccountCode",
+      render: (code) => {
+        return (
+          expenses?.filter((item: any) => item.code === code)[0]?.accountName ||
+          ""
+        );
       },
     },
     {
@@ -114,7 +121,9 @@ function AllowanceType() {
             }}
           >
             <Button
-              onClick={() => allownceTypeModal({ record }, closeCallBack)}
+              onClick={() =>
+                allownceTypeModal({ record, expenses }, closeCallBack)
+              }
               type="primary"
               icon={<EditOutlined />}
               shape="circle"
@@ -147,7 +156,7 @@ function AllowanceType() {
                 form="upsertForm"
                 type="primary"
                 onClick={() => {
-                  allownceTypeModal({ selectedItem }, closeCallBack);
+                  allownceTypeModal({ selectedItem, expenses }, closeCallBack);
                 }}
                 icon={<PlusCircleOutlined />}
               >

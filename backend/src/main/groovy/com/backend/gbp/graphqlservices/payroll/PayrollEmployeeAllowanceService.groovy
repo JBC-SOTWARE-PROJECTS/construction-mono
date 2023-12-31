@@ -144,7 +144,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
         PayrollEmployeeAllowance employee = payrollEmployeeAllowanceRepository.findById(employeeId).get()
 
         PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
-        allowanceItem.allowance = allowance.id as UUID
+        allowanceItem.allowance = allowance
         allowanceItem.name = allowance.name
         allowanceItem.amount = amount
         allowanceItem.originalAmount = allowance.amount
@@ -226,7 +226,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
         allowanceEmployees.each { PayrollEmployeeAllowance employeeAllowance ->
             employeeAllowance.payrollEmployee.employee.allowanceItems.each {
                 PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
-                allowanceItem.allowance = it.allowanceId
+                allowanceItem.allowance = it.allowance
                 allowanceItem.name = it.name
                 allowanceItem.amount = it.amount
                 allowanceItem.originalAmount = it.amount

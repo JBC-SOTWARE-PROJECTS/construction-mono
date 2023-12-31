@@ -99,7 +99,7 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
 
         if (deductionType) {
             OtherDeductionTypes type = otherDeductionTypesRepository.findById(deductionType).get()
-            item.type = deductionType
+            item.type = type
             item.name = type.name
         }
 

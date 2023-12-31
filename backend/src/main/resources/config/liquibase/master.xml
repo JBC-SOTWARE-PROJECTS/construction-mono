@@ -423,6 +423,12 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_prefix.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/49_michael_add_subaccount_code_to_tables.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/50_michael_edit_adjustment_category_default_val.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/51_michael_alter_payroll_add_accounting_columns.sql"
+             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/49_jacky_asset_repair_maintenance.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/49_jacky_asset_repair_maintenance_items.sql"
@@ -438,6 +444,8 @@
     <include file="classpath:config/liquibase/changelog4/51_donss_add_ar_credit_note_table.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/52_donss_add_ar_transaction_ledger_table.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/53_michael_add_total_to_payroll_submodules.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/53_donss_insert_integration_table.sql"
              relativeToChangelogFile="false"/>
@@ -459,6 +467,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/50_alter_table_item_sub_account.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/55_michael_edit_contributions_view.sql"
+             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/56_wilson_project_updates.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/57_wilson_alter_project.sql"
@@ -470,5 +480,15 @@
     <include file="classpath:config/liquibase/changelog4/60_wilson_alter_project_company.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/61_wilson_alter_supplier_item.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/55_donss_add_fixed_asset.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/62_donss_alter_ledger_group.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/49_jacky_asset_vehicle_usage_monitoring.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_with_fixed_asset_item.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/63_donss_add_loan_table.sql"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>

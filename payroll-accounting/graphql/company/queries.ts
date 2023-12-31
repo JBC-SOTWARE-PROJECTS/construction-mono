@@ -235,6 +235,7 @@ export const FETCH_ALLOWANCE_PAGEABLE = gql`
         name
         allowanceType
         amount
+        subaccountCode
       }
       totalElements
       totalPages

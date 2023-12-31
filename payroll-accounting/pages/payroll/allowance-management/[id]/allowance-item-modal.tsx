@@ -1,4 +1,4 @@
-import React, { use, useEffect, useMemo, useState } from "react";
+import React, { use, useEffect, useMemo, useState } from 'react';
 
 import {
   Button,
@@ -10,14 +10,14 @@ import {
   Row,
   Space,
   Table,
-} from "antd";
-import { CloseCircleOutlined, SaveOutlined } from "@ant-design/icons";
+} from 'antd';
+import { CloseCircleOutlined, SaveOutlined } from '@ant-design/icons';
 import {
   UPSERT_ALLOWANCE_ITEM,
   FETCH_ALLOWANCE_PAGEABLE,
-} from "@/graphql/company/queries";
-import { useMutation, useQuery } from "@apollo/client";
-import _ from "lodash";
+} from '@/graphql/company/queries';
+import { useMutation, useQuery } from '@apollo/client';
+import _ from 'lodash';
 
 const { Search } = Input;
 
@@ -41,7 +41,7 @@ function AllowanceItemModal(props: propsTypes) {
   const { hide, idx, refetch, data: allowanceData } = props;
 
   const [state, setState] = useState({
-    filter: "",
+    filter: '',
     page: 0,
     pageSize: 10,
   });
@@ -62,19 +62,20 @@ function AllowanceItemModal(props: propsTypes) {
     {
       onCompleted: ({ data }) => {
         if (data?.success) {
-          message.success(data?.success && "Successfully Saved");
+          message.success(data?.success && 'Successfully Saved');
           hide(false);
           refetch();
         } else {
-          message.error("Faild to Saved!");
+          message.error('Faild to Saved!');
         }
       },
     }
   );
 
   const externalItems = (allowanceData?.data?.content || []).map(
-    (item: any) => item?.allowanceType?.id
+    (item: any) => item?.allowance?.id
   );
+
   const [data, setData] = useState<DataType[] | any>([]);
   const [selectedRows, setSelectedRows] = useState<DataType | any>([]);
 
@@ -147,19 +148,19 @@ function AllowanceItemModal(props: propsTypes) {
 
   const columns = [
     {
-      title: "name",
-      dataIndex: "name",
+      title: 'name',
+      dataIndex: 'name',
     },
     {
-      title: "Allowance Type",
-      dataIndex: "allowanceType",
+      title: 'Allowance Type',
+      dataIndex: 'allowanceType',
       render: (value: string) => {
-        return value.replace("_", " ");
+        return value.replace('_', ' ');
       },
     },
     {
-      title: "Amount",
-      dataIndex: "amount",
+      title: 'Amount',
+      dataIndex: 'amount',
     },
   ];
 
@@ -168,15 +169,15 @@ function AllowanceItemModal(props: propsTypes) {
       <Modal
         title={
           <Row gutter={4}>
-            <Col md={8}> Add Allowance Item</Col>
+            <Col md={8}> Add Allowance Itemsfdgsfgs</Col>
             <Col md={16}>
               <Search
                 allowClear
-                size="middle"
-                placeholder="Search here.."
+                size='middle'
+                placeholder='Search here..'
                 onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-                className="select-header-list"
-                style={{ float: "right", marginRight: 30 }}
+                className='select-header-list'
+                style={{ float: 'right', marginRight: 30 }}
               />
             </Col>
           </Row>
@@ -185,13 +186,13 @@ function AllowanceItemModal(props: propsTypes) {
         destroyOnClose={true}
         maskClosable={false}
         onCancel={() => hide(false)}
-        width={"100%"}
-        style={{ maxWidth: "1000px" }}
+        width={'100%'}
+        style={{ maxWidth: '1000px' }}
         footer={
           <Space>
             <Button
-              type="primary"
-              size="large"
+              type='primary'
+              size='large'
               danger
               onClick={() => hide(false)}
               icon={<CloseCircleOutlined />}
@@ -199,10 +200,10 @@ function AllowanceItemModal(props: propsTypes) {
               Cancel
             </Button>
             <Button
-              type="primary"
-              size="large"
-              htmlType="submit"
-              form="upsertForm"
+              type='primary'
+              size='large'
+              htmlType='submit'
+              form='upsertForm'
               onClick={onSubmit}
               icon={<SaveOutlined />}
             >
@@ -219,7 +220,7 @@ function AllowanceItemModal(props: propsTypes) {
               columns={columns}
               loading={allowanceLoading}
               rowSelection={{
-                type: "checkbox",
+                type: 'checkbox',
                 ...rowSelection,
               }}
             />

@@ -54,6 +54,7 @@ class OtherDeductionTypesService {
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name ="name") String name,
             @GraphQLArgument(name ="description") String description,
+            @GraphQLArgument(name ="subaccountCode") String subaccountCode,
             @GraphQLArgument(name ="status") Boolean status
 
     ){
@@ -66,6 +67,7 @@ class OtherDeductionTypesService {
         type.description = description
         type.status = status
         type.company = companySettings
+        type.subaccountCode = subaccountCode
         type = otherDeductionTypesRepository.save(type)
         return  new GraphQLRetVal<OtherDeductionTypes>(type, true, 'Successfully Saved')
     }

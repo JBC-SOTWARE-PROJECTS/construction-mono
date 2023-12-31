@@ -67,7 +67,7 @@ class ChartofAccountGenerator {
                 subAccountsWithSubAccount << it.subaccountParent.id
         }
 
-        Map<DomainEnum,List<Subaccountable>> entityListMap = [:]
+        Map<String,List<Subaccountable>> entityListMap = [:]
 
         coaList.each {coa->
             ChartOfAccountGenerate coaNew
@@ -99,7 +99,7 @@ class ChartofAccountGenerator {
                         }
 
                         // Prevent duplicate loading [USING DOMAIN]
-                        if(!entityListMap.containsKey(subAccount.sourceDomain)){
+                        if(!entityListMap.containsKey(subAccount.sourceDomain.name())){
                             List<Subaccountable> entities=  entityManager.createQuery("from ${subAccount.sourceDomain.path}",
                                     Class.forName(subAccount.sourceDomain.path as String)).resultList
                                     .findAll {
@@ -111,7 +111,14 @@ class ChartofAccountGenerator {
                                             return true
                                         }
                                     } as List<Subaccountable>
-                            entityListMap.put(subAccount.sourceDomain.name(),entities.toSorted { a,b ->
+                            def filtered = entities.findAll {
+                                if(subAccount.sourceDomain.flagColumn)
+                                    it[subAccount.sourceDomain.flagColumn] != false
+                                else
+                                    true
+                            }
+
+                            entityListMap.put(subAccount.sourceDomain.name(),filtered.toSorted { a,b ->
                                 a.code <=> b.code
                             })
                         }
@@ -128,7 +135,7 @@ class ChartofAccountGenerator {
                                     }
                                 }
 
-                                if(!entityListMap.containsKey(subAccount.subaccountParent.sourceDomain)){
+                                if(!entityListMap.containsKey(subAccount.subaccountParent.sourceDomain.name())){
                                     List<Subaccountable> entities=  entityManager.createQuery("from ${subAccount.subaccountParent.sourceDomain.path}",
                                             Class.forName(subAccount.subaccountParent.sourceDomain.path as String)).resultList
                                             .findAll {
@@ -146,6 +153,7 @@ class ChartofAccountGenerator {
                                 }
 
                                 entityListMap.get(subAccount.subaccountParent.sourceDomain.name()).each {
+
                                     if(!subDomainExcludes[it.id]) {
                                         if(entityListMap.get(subAccount.sourceDomain.name())) subAccountsWithSubAccount << it.id
 
@@ -211,7 +219,8 @@ class ChartofAccountGenerator {
                         }
                         else {
                             entityListMap.get(subAccount.sourceDomain.name()).each {
-                                if(!domainExcludes[it.id]) {
+                                def isShow = it[subAccount.sourceDomain.flagColumn]
+                                if(!domainExcludes[it.id] && isShow) {
                                     coaNew = new ChartOfAccountGenerate(motherAccount: new CoaComponentContainer(coa.accountCode, coa.id, coa.accountName,
                                             coa.class.name, coa.normalSide.name()), accountType: coa.accountType.name(),accountCategory:coa.accountCategory.name(),  fromGenerator: true)
 

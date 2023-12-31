@@ -12,16 +12,16 @@ interface BankRepository extends JpaRepository<Bank, UUID> {
 	@Query(value = """
     Select c from Bank c  where (lower(c.bankname) like lower(concat('%',:filter,'%'))
     or
-    lower(c.accountNumber) like lower(concat('%',:filter,'%'))) and c.company = :company
+    lower(c.accountNumber) like lower(concat('%',:filter,'%'))) and c.companyId = :company
 """,
 			countQuery = """
      Select count(c) from Bank c  where (lower(c.bankname) like lower(concat('%',:filter,'%'))
      or
-    lower(c.accountNumber) like lower(concat('%',:filter,'%'))) and c.company = :company
+    lower(c.accountNumber) like lower(concat('%',:filter,'%'))) and c.companyId = :company
 """)
 	Page<Bank> getBanks(@Param("filter") String filter, @Param("company") UUID company,
                         Pageable page)
 
-	@Query(value = """Select c from Bank c  where c.company = :company""")
+	@Query(value = """Select c from Bank c  where c.companyId = :company""")
 	List<Bank> getBankList(@Param("company") UUID company)
 }
