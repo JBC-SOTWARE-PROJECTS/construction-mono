@@ -12,6 +12,7 @@ interface IProps {
   handleOpen: (record: Projects) => void;
   changePage: (page: number) => void;
   onRefresh: () => void;
+  handleOpenDetails: (record: Projects) => void;
 }
 
 export default function ProjectList({
@@ -21,6 +22,7 @@ export default function ProjectList({
   handleOpen,
   changePage,
   onRefresh,
+  handleOpenDetails
 }: IProps) {
   return (
     <>
@@ -113,7 +115,10 @@ export default function ProjectList({
                     onClick={() => handleOpen(record)}>
                     Project Information
                   </Button>
-                  <Button size="small" type="dashed">
+                  <Button
+                    size="small"
+                    type="dashed"
+                    onClick={() => handleOpenDetails(record)}>
                     View Project Details
                   </Button>
                 </div>

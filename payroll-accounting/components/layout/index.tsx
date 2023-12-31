@@ -208,7 +208,7 @@ const DiverseTradeLayout = (props: IProps) => {
                     type="link"
                     onClick={showDrawer}
                     className="notification-badge">
-                    <Badge size="small" count={12}>
+                    <Badge size="small" count={0}>
                       <AlertOutlined key="AlertOutlined" />
                     </Badge>
                   </Button>,
