@@ -164,8 +164,10 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
         List<PayrollAllowanceItem> allowanceItemList = []
 
         if (payrollId) {
-            Payroll payroll = payrollRepository.findById(payrollId).get()
+            Payroll payroll = payrollRepository.findByIdJoinFetchPayrollEmployees(payrollId).get()
             payrollAllowanceItemRepository.deleteAll(payrollAllowanceItemRepository.findAttendanceBasedByAllowanceId(payroll.allowance.id))
+            payrollAllowanceItemRepository.joinFetchTimekeepingEmployees(payrollId)
+            payrollAllowanceItemRepository.joinFetchAllowanceItems(payrollId)
             payroll.payrollEmployees.each { payrollEmployee ->
                 generateDailyAllowance(payrollEmployee, allowanceItemList)
             }
