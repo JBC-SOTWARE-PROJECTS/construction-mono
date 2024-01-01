@@ -46,7 +46,7 @@ class AllowanceService  {
             @GraphQLArgument(name = 'page') Integer page,
             @GraphQLArgument(name = 'pageSize') Integer pageSize
     ){
-        allowanceRepository.getAllowancePageable(filter, PageRequest.of(page, pageSize, Sort.Direction.ASC, 'createdDate'))
+        allowanceRepository.getAllowancePageable(filter, PageRequest.of(page, pageSize, Sort.Direction.ASC, 'name'))
     }
 
 

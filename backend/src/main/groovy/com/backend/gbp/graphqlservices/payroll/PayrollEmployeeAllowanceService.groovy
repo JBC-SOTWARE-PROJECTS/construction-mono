@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.hrm.Allowance
+import com.backend.gbp.domain.hrm.EmployeeAllowance
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollAllowance
 import com.backend.gbp.domain.payroll.PayrollAllowanceItem
@@ -17,6 +18,7 @@ import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollAllowanceItemRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeAllowanceDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeAllowanceRepository
+import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -56,7 +58,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
     AllowanceRepository allowanceRepository
 
     @Autowired
-    AllowanceService allowanceService
+    PayrollEmployeeRepository payrollEmployeeRepository
 
     @Autowired
     EmployeeAllowanceRepository employeeAllowanceRepository
@@ -154,6 +156,56 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
 
     }
 
+    @GraphQLMutation(name = "generateDailyAllowances")
+    GraphQLResVal<Boolean> generateDailyAllowances(
+            @GraphQLArgument(name = "payrollId") UUID payrollId,
+            @GraphQLArgument(name = "payrollEmployeeId") UUID payrollEmployeeId
+    ) {
+        List<PayrollAllowanceItem> allowanceItemList = []
+
+        if (payrollId) {
+            Payroll payroll = payrollRepository.findById(payrollId).get()
+            payrollAllowanceItemRepository.deleteAll(payrollAllowanceItemRepository.findAttendanceBasedByAllowanceId(payroll.allowance.id))
+            payroll.payrollEmployees.each { payrollEmployee ->
+                generateDailyAllowance(payrollEmployee, allowanceItemList)
+            }
+        }
+        if (payrollEmployeeId) {
+            payrollAllowanceItemRepository.deleteAll(payrollAllowanceItemRepository.findAttendanceBasedByPayrollEmployeeId(payrollEmployeeId))
+            PayrollEmployee payrollEmployee = payrollEmployeeRepository.findById(payrollEmployeeId).get()
+            generateDailyAllowance(payrollEmployee, allowanceItemList)
+        }
+        payrollAllowanceItemRepository.saveAll(allowanceItemList)
+        return new GraphQLResVal<Boolean>(true, true, "Successfully regenerated daily allowance")
+
+    }
+
+    private static generateDailyAllowance(PayrollEmployee payrollEmployee, allowanceItemList) {
+        List<EmployeeAllowance> allowanceItems = []
+        payrollEmployee.employee.allowanceItems.each {
+            if (it.allowance.isAttendanceBased) allowanceItems.push(it)
+        }
+        allowanceItems.each {
+            PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
+            allowanceItem.allowance = it.allowance
+            allowanceItem.amount = 0
+            allowanceItem.originalAmount = 0
+            allowanceItem.payrollEmployeeAllowance = payrollEmployee.allowanceEmployee
+            Integer count = 0
+            payrollEmployee.timekeepingEmployee.accumulatedLogs.each { accumulatedLogs ->
+                if (accumulatedLogs.inTime && accumulatedLogs.outTime) {
+                    allowanceItem.amount += it.amount
+                    allowanceItem.originalAmount += it.amount
+                    count++
+                }
+            }
+            allowanceItem.name = """${it.name} (${count} day(s) x PHP ${it.amount})"""
+            allowanceItemList.push(allowanceItem)
+
+
+        }
+    }
+
 
     @Override
     List<PayrollEmployeeAllowance> addEmployees(List<PayrollEmployee> payrollEmployees, Payroll payroll) {
@@ -226,13 +278,15 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
         allowanceEmployees.each { PayrollEmployeeAllowance employeeAllowance ->
             employeeAllowance.payrollEmployee.employee.allowanceItems.each {
                 PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
-                allowanceItem.allowance = it.allowance
-                allowanceItem.name = it.name
-                allowanceItem.amount = it.amount
-                allowanceItem.originalAmount = it.amount
+                if (!it.allowance.isAttendanceBased) {
+                    allowanceItem.allowance = it.allowance
+                    allowanceItem.name = it.name
+                    allowanceItem.amount = it.amount
+                    allowanceItem.originalAmount = it.amount
 //                allowanceItem.taxable = null
-                allowanceItem.payrollEmployeeAllowance = employeeAllowance
-                allowanceItemList.push(allowanceItem)
+                    allowanceItem.payrollEmployeeAllowance = employeeAllowance
+                    allowanceItemList.push(allowanceItem)
+                }
             }
         }
         allowanceItemList

@@ -493,6 +493,4 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/64_michael_alter_adjustment_other_deduction.sql"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/63_donss_add_loan_table.sql"
-             relativeToChangelogFile="false"/>
 </databaseChangeLog>
