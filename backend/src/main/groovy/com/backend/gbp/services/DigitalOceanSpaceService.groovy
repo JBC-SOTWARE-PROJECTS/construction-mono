@@ -1,5 +1,6 @@
 package com.backend.gbp.services
 
+import com.amazonaws.AmazonClientException
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.client.builder.AwsClientBuilder
@@ -7,6 +8,9 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.PutObjectRequest
+import com.amazonaws.services.s3.transfer.TransferManager
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder
+import com.amazonaws.services.s3.transfer.Upload
 import org.apache.poi.hpsf.ClassID
 import org.apache.poi.sl.usermodel.ObjectMetaData
 import org.springframework.beans.factory.annotation.Value;
@@ -24,17 +28,9 @@ public class DigitalOceanSpaceService {
      // Replace with your DigitalOcean Space bucket name
 
     public void uploadFileToSpace(File fileToUpload) {
-//        AwsBasicCredentials awsCreds = AwsBasicCredentials.create("DO0047JFAG3CLJZRYDW6", "ElKj6QSbeYsbMgMi2BVafKxj9JpirQ6wfGdcd0yJtow");
-
-//        S3Client s3Client = S3Client.builder()
-//                .region(Region.of("us-east-1"))
-//                .credentialsProvider({ -> awsCreds })
-//                .endpointOverride("https://megatam.sgp1.digitaloceanspaces.com")
-//                .build();
 
         String accessKey = "DO0047JFAG3CLJZRYDW6";
         String secretKey = "ElKj6QSbeYsbMgMi2BVafKxj9JpirQ6wfGdcd0yJtow";
-        String stringObjKeyName = "fileup"
 
         BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
 
@@ -57,6 +53,49 @@ public class DigitalOceanSpaceService {
 
         // Upload file to S3
         s3Client.putObject(request);
+
+    }
+
+    public void uploadMultiFileToSpace(List<File> filesToUpload) {
+
+        String accessKey = "DO0047JFAG3CLJZRYDW6";
+        String secretKey = "ElKj6QSbeYsbMgMi2BVafKxj9JpirQ6wfGdcd0yJtow";
+
+        BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
+
+        AmazonS3 s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("https://megatam.sgp1.digitaloceanspaces.com", "ap-southeast-1"))
+                .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
+
+        String bucketName = "megatam-development";
+
+        TransferManager transferManager = TransferManagerBuilder.standard()
+                .withS3Client(s3Client)
+                .build();
+
+        List<Upload> uploadList = new ArrayList<>();
+        for (File ftp : filesToUpload) {
+
+            try {
+                Upload upload = transferManager.upload(bucketName, ftp.getName(), ftp);
+                uploadList.add(upload);
+            } catch (AmazonClientException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Wait for all uploads to complete
+        for (Upload upload : uploadList) {
+            try {
+                upload.waitForCompletion();
+                System.out.println("Upload completed");
+            } catch (AmazonClientException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Shutdown TransferManager when done
+        transferManager.shutdownNow();
 
     }
 }

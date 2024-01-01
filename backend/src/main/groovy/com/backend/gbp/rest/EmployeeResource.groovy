@@ -1,5 +1,6 @@
 package com.backend.gbp.rest
 
+import com.amazonaws.AmazonClientException
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
@@ -144,6 +145,29 @@ class EmployeeResource {
         //  MultipartFile file = request.getFile("image");
         spaceService.uploadFileToSpace(file);
         return "File uploaded successfully!";
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST,value = ['/attendance/sync/capture'])
+    String uploadSyncCaptureAttendance (
+            @RequestParam("files") MultipartFile[] capture
+    ){
+        //return "true";
+        try {
+            ArrayList<File> files = new ArrayList<>();
+            for (MultipartFile capt: capture){
+                File file = convertMultipartFileToFile(capt);
+                files.add(file);
+            }
+
+            //  MultipartFile file = request.getFile("image");
+            spaceService.uploadMultiFileToSpace(files);
+            return "true";
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return "false";
+        }
+
 
     }
 
