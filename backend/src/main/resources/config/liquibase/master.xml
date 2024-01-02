@@ -489,6 +489,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_alter_asset_with_fixed_asset_item.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/63_jacky_alter_emp_attendance_camera_capture.sql"
+             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/63_donss_add_loan_table.sql"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>
