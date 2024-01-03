@@ -56,14 +56,14 @@ function AdjustmentCategory() {
     {
       title: "Actions",
       dataIndex: "id",
-      render: (value, { isDefault, ...record }) =>
-        !isDefault && (
-          <UpsertAdjustmentCategoryModal
-            coa={coa}
-            refetch={refetch}
-            record={record}
-          />
-        ),
+      render: (value, { isDefault, ...record }) => (
+        <UpsertAdjustmentCategoryModal
+          isDefault={isDefault}
+          coa={coa}
+          refetch={refetch}
+          record={record}
+        />
+      ),
     },
   ];
 

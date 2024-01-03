@@ -19,7 +19,7 @@ const GET_PAYROLL = gql`
           projectName
           company
           companyName
-
+          late
           regular
           overtime
           regularHoliday

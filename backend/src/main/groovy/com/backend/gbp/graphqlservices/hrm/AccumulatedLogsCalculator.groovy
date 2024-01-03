@@ -123,10 +123,21 @@ class AccumulatedLogsCalculator {
 
                 HoursLog hoursLog = new HoursLog()
                 if (!firstIn && !out) {
-                    hoursLog.absent = regularSchedule.scheduleDuration
-                    accumulatedLogs.isError = true
+                    if (holidays?.size() > 0 && !employee.isExcludedFromAttendance) {
+                        HoursLog temp = new HoursLog()
+                        calculateHolidayHours(holidays, 0 as BigDecimal, hoursLog, 0 as BigDecimal)
+                        temp.regular = 8
+                        temp.company = employee.currentCompany.id
+                        temp.companyName = employee.currentCompany.companyName
+                        accumulatedLogs.projectBreakdown = [temp]
+                        accumulatedLogs.message = 'Holiday'
+                    } else {
+                        hoursLog.absent = regularSchedule.scheduleDuration
+                        accumulatedLogs.isError = true
+                        accumulatedLogs.message = "Absent"
+
+                    }
                     accumulatedLogs.hours = hoursLog
-                    accumulatedLogs.message = "Absent"
                     accumulatedLogs.employeeId = id
                     accumulatedLogsList.push(accumulatedLogs)
                     date = date.plus(1, ChronoUnit.DAYS)
@@ -135,8 +146,10 @@ class AccumulatedLogsCalculator {
                 accumulatedLogs.inTime = firstIn
                 accumulatedLogs.outTime = out
                 if (generateBreakdown) {
-                    accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList, holidays, employee.currentCompany)
+                    accumulatedLogs.projectBreakdown = computeProjectBreakdown(regularSchedule, overtimeSchedule, attendanceList, holidays, employee.currentCompany, accumulatedLogs)
                     accumulatedLogs.projectBreakdown.each {
+                        hoursLog.late += it.late
+
                         hoursLog.regular += it.regular
                         hoursLog.overtime += it.overtime
 
@@ -154,6 +167,7 @@ class AccumulatedLogsCalculator {
                     BigDecimal regularHours = computeHours(regularSchedule, firstIn, out)
                     BigDecimal overtimeHours = overtimeSchedule ? computeHours(overtimeSchedule, firstIn, out) : 0
                     if (holidays?.size() > 0) {
+                        accumulatedLogs.message = 'Holiday'
                         calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
                     } else {
                         hoursLog.regular = regularHours
@@ -189,29 +203,35 @@ class AccumulatedLogsCalculator {
         Integer nonHolidayCount = 0
         Integer specialNonWorkingCount = 0
 
-        holidays.each {
-            if (it.holidayType == 'REGULAR') regularCount++
-            if (it.holidayType == 'SPECIAL_NON_WORKING') specialNonWorkingCount++
-            if (it.holidayType == 'NON_HOLIDAY') nonHolidayCount++
+        if (regularHours > 0) {
+            holidays.each {
+                if (it.holidayType == 'REGULAR') regularCount++
+                if (it.holidayType == 'SPECIAL_NON_WORKING') specialNonWorkingCount++
+                if (it.holidayType == 'NON_HOLIDAY') nonHolidayCount++
+            }
+            Integer totalHolidayCount = regularCount + specialNonWorkingCount
+            switch (totalHolidayCount) {
+                case 1:
+                    if (regularCount == 1) {
+                        hoursLog.regularHoliday = regularHours
+                        hoursLog.overtimeHoliday = overtimeHours
+                    } else if (specialNonWorkingCount == 1) {
+                        hoursLog.regularSpecialHoliday = regularHours
+                        hoursLog.overtimeSpecialHoliday = overtimeHours
+                    }
+                    break;
+                default:
+                    if (totalHolidayCount >= 2) {
+                        hoursLog.regularDoubleHoliday = regularHours
+                        hoursLog.overtimeDoubleHoliday = overtimeHours
+                    }
+                    break;
+            }
+        } else {
+            hoursLog.regular = 8
         }
-        Integer totalHolidayCount = regularCount + specialNonWorkingCount
-        switch (totalHolidayCount) {
-            case 1:
-                if (regularCount == 1) {
-                    hoursLog.regularHoliday = regularHours
-                    hoursLog.overtimeHoliday = overtimeHours
-                } else if (specialNonWorkingCount == 1) {
-                    hoursLog.regularSpecialHoliday = regularHours
-                    hoursLog.overtimeSpecialHoliday = overtimeHours
-                }
-                break;
-            default:
-                if (totalHolidayCount >= 2) {
-                    hoursLog.regularDoubleHoliday = regularHours
-                    hoursLog.overtimeDoubleHoliday = overtimeHours
-                }
-                break;
-        }
+
+
     }
 
     static List<HoursLog> computeProjectBreakdown(
@@ -219,7 +239,8 @@ class AccumulatedLogsCalculator {
             EmployeeSchedule overtimeSchedule,
             List<EmployeeAttendance> attendanceList,
             List<EventCalendar> holidays,
-            CompanySettings company) {
+            CompanySettings company,
+            AccumulatedLogs accumulatedLogs) {
         List<HoursLog> hoursLogList = []
         for (int i = 1; i < attendanceList.size(); i++) {
             HoursLog hoursLog = new HoursLog()
@@ -234,11 +255,13 @@ class AccumulatedLogsCalculator {
             Instant timeOut = attendanceList[i].attendance_time
             BigDecimal overtimeHours = 0
             BigDecimal regularHours = computeHours(regularSchedule, timeIn, timeOut)
+            hoursLog.late = getLateHours(regularSchedule.dateTimeStart, timeIn)
             if (overtimeSchedule && !timeOut.isBefore(overtimeSchedule.dateTimeStart)) {
                 overtimeHours = computeHours(overtimeSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time)
             }
 
             if (holidays?.size() > 0) {
+                accumulatedLogs.message = 'Holiday'
                 calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
             } else {
                 hoursLog.regular = regularHours

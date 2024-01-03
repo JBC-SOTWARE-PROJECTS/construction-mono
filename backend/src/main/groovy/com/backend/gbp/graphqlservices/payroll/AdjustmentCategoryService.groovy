@@ -29,6 +29,12 @@ class AdjustmentCategoryService {
     @Autowired
     AdjustmentCategoryRepository adjustmentCategoryRepository
 
+    List<UUID> defaults = [
+            UUID.fromString("84da0ca7-0376-426d-92d9-7ad11659edd1"),
+            UUID.fromString("19e7669b-6b19-4d32-9e75-e425fe75ccd7"),
+            UUID.fromString("e3e5123b-c096-4587-88ef-05664342b37a"),
+            UUID.fromString("f6dfa272-292b-4fdd-b423-60df576935bf")
+    ]
 
     @GraphQLQuery(name = "getAdjustmentCategories")
     List<AdjustmentCategory> getAdjustmentCategories(
@@ -56,7 +62,8 @@ class AdjustmentCategoryService {
         } else {
             category = objectMapper.convertValue(fields, AdjustmentCategory)
         }
-        category.isDefault = false
+        if (!defaults.contains(category.id))
+            category.isDefault = false
         category.company = SecurityUtils.currentCompany()
         adjustmentCategoryRepository.save(category)
 

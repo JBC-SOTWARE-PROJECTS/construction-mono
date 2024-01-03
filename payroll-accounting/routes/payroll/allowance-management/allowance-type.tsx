@@ -6,7 +6,7 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Button, Input, Table, message } from "antd";
+import { Button, Input, Table, Tag, message } from "antd";
 
 import {
   DELETE_ALLOWANCE,
@@ -105,6 +105,16 @@ function AllowanceType() {
       title: "Amount",
       dataIndex: "amount",
       width: "150px",
+    },
+    {
+      title: "Attendance Based",
+      dataIndex: "isAttendanceBased",
+      render: (value, record) =>
+        record?.allowanceType === "DAILY" ? (
+          <Tag color={value ? "green" : "orange"}>{value ? "Yes" : "No"}</Tag>
+        ) : (
+          "N/A"
+        ),
     },
     {
       title: "Action",
