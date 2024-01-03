@@ -50,4 +50,9 @@ class Allowance extends AbstractAuditingEntity {
 	@GraphQLQuery
 	@Column(name = "subaccount_code", columnDefinition = "varchar")
 	String subaccountCode
+
+	@GraphQLQuery
+	@Column(name = "is_attendance_based", columnDefinition = "bool")
+	Boolean isAttendanceBased
+
 }

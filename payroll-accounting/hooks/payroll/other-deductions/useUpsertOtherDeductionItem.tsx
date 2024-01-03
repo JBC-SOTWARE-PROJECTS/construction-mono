@@ -8,6 +8,7 @@ const MUTATION = gql`
     $amount: BigDecimal
     $description: String
     $deductionType: UUID
+    $subaccountCode: String
   ) {
     data: upsertOtherDeductionItem(
       id: $id
@@ -15,6 +16,7 @@ const MUTATION = gql`
       amount: $amount
       description: $description
       deductionType: $deductionType
+      subaccountCode: $subaccountCode
     ) {
       success
       message
@@ -29,6 +31,7 @@ interface IParams {
   name: string;
   description: string;
   deductionType: string;
+  subaccountCode: string;
 }
 
 function useUpsertOtherDeductionItem(callBack: () => void) {

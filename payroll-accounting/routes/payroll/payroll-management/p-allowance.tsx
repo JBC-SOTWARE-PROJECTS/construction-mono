@@ -26,10 +26,10 @@ import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
 import {
-  CheckOutlined,
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
+  TransactionOutlined,
 } from "@ant-design/icons";
 import { InputNumber, Modal, Table, Tag, message } from "antd";
 import { ColumnsType } from "antd/lib/table";
@@ -37,6 +37,7 @@ import { capitalize } from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { recalculateButton } from "./p-contributions";
+import useGenerateDailyAllowances from "@/hooks/payroll/allowance/useGenerateDailyAllowances";
 
 const initialState: variables = {
   filter: "",
@@ -70,6 +71,11 @@ function PayrollAllowance({ account }: IPageProps) {
   const [deleteItem, loadingDeletItem] = useDeletePayrollAllowanceItem(() => {
     refetchEmployees();
   });
+
+  const [generateDailyAllowance, loadingGenerateAllowance] =
+    useGenerateDailyAllowances(() => {
+      refetchEmployees();
+    });
   const [allowance, loadingAllowance, refetchAllowance] =
     useGetPayrollAllowance();
 
@@ -110,6 +116,21 @@ function PayrollAllowance({ account }: IPageProps) {
     }
   };
 
+  const confirmGenerateDailyAllowance = (id?: any) => {
+    Modal.confirm({
+      title: "Confirm?",
+      content: `Are you sure you want to generate ${
+        id ? "this employee's" : "all"
+      } daily allowances?`,
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        generateDailyAllowance(id);
+      },
+      okText: "Yes",
+      cancelText: "No",
+    });
+  };
+
   const action: ColumnsType<PayrollEmployeeAllowanceDto> = [
     {
       title: "Action",
@@ -123,6 +144,17 @@ function PayrollAllowance({ account }: IPageProps) {
               buttonProps={recalculateButton}
               refetch={refetchEmployees}
             />
+            <CustomButton
+              icon={<TransactionOutlined />}
+              ghost
+              style={{ marginLeft: 5 }}
+              type="primary"
+              shape="circle"
+              onClick={() => {
+                confirmGenerateDailyAllowance(value);
+              }}
+            />
+
             <PayrollEmployeeStatusAction
               id={value}
               module={PayrollModule.Allowance}
@@ -259,6 +291,18 @@ function PayrollAllowance({ account }: IPageProps) {
             refetch={refetchEmployees}
             employees={employees as PayrollEmployeeAllowanceDto[]}
           />
+        )}
+
+        {allowance?.status === PayrollStatus.DRAFT && (
+          <CustomButton
+            type="primary"
+            ghost
+            onClick={() => confirmGenerateDailyAllowance()}
+            style={{ marginLeft: 5 }}
+            icon={<TransactionOutlined />}
+          >
+            Generate Daily Allowances
+          </CustomButton>
         )}
       </div>
       <TablePaginated

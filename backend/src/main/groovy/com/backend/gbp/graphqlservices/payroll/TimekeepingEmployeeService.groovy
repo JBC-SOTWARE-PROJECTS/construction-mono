@@ -225,24 +225,63 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
             hourlyRate = employee.hourlyRate
         }
 
-        if(hoursLog.project) {
+        if (hoursLog.project) {
             salaryBreakDown.project = hoursLog.project
             salaryBreakDown.projectName = hoursLog.projectName
-        }else{
+        } else {
             salaryBreakDown.company = hoursLog.company
             salaryBreakDown.companyName = hoursLog.companyName
         }
 
-        salaryBreakDown.regular = ((hourlyRate * hoursLog.regular * multiplier.regular) as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
-        salaryBreakDown.overtime = ((hourlyRate * hoursLog.overtime) * multiplier.regularOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
-        salaryBreakDown.regularHoliday = ((hourlyRate * hoursLog.regularHoliday) * multiplier.regularHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
-        salaryBreakDown.overtimeHoliday = ((hourlyRate * hoursLog.overtimeHoliday) * multiplier.regularHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
-        salaryBreakDown.regularDoubleHoliday = ((hourlyRate * hoursLog.regularDoubleHoliday) * multiplier.doubleHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
-        salaryBreakDown.overtimeDoubleHoliday = ((hourlyRate * hoursLog.overtimeDoubleHoliday) * multiplier.doubleHolidayOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
-        salaryBreakDown.regularSpecialHoliday = ((hourlyRate * hoursLog.regularSpecialHoliday) * multiplier.specialHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
-        salaryBreakDown.overtimeSpecialHoliday = ((hourlyRate * hoursLog.overtimeSpecialHoliday) * multiplier.specialHolidayOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        BigDecimal additionalRegular = 0
+        BigDecimal additionalOvertime = 0
+        BigDecimal totalOvertimeHours = hoursLog.overtimeHoliday +
+                hoursLog.overtimeSpecialHoliday +
+                hoursLog.overtimeDoubleHoliday +
+                hoursLog.overtime
+
+        BigDecimal lateUnderTime = hoursLog.late + hoursLog.underTime
+
+        if (hoursLog.regularHoliday > 0) {
+            salaryBreakDown.regularHoliday = calculateHoliday(hourlyRate, hoursLog.regularHoliday, lateUnderTime, multiplier.regularHoliday, multiplier.regular).setScale(2, RoundingMode.HALF_EVEN)
+            additionalRegular += (hourlyRate * hoursLog.regularHoliday) * multiplier.regular as BigDecimal
+        }
+
+
+//        salaryBreakDown.overtimeHoliday = calculateHoliday(hourlyRate, hoursLog.overtimeHoliday, 0.00, multiplier.regularHoliday, multiplier.regular).setScale(2, RoundingMode.HALF_EVEN)
+//        additionalOvertime += (hourlyRate * hoursLog.overtimeHoliday) * multiplier.regularOvertime as BigDecimal
+//
+//        salaryBreakDown.regularSpecialHoliday = calculateHoliday(hourlyRate, hoursLog.regularSpecialHoliday, lateUnderTime, multiplier.specialHoliday, multiplier.regular).setScale(2, RoundingMode.HALF_EVEN)
+//        additionalRegular += (hourlyRate * hoursLog.regularSpecialHoliday) * multiplier.regular as BigDecimal
+//
+//        salaryBreakDown.overtimeSpecialHoliday = calculateHoliday(hourlyRate, hoursLog.overtimeSpecialHoliday, 0.00, multiplier.specialHolidayOvertime, multiplier.regular).setScale(2, RoundingMode.HALF_EVEN)
+//        additionalOvertime += (hourlyRate * hoursLog.overtimeSpecialHoliday) * multiplier.regularOvertime as BigDecimal
+//
+//        salaryBreakDown.regularDoubleHoliday = calculateHoliday(hourlyRate, hoursLog.regularDoubleHoliday, lateUnderTime, multiplier.doubleHoliday, multiplier.regular).setScale(2, RoundingMode.HALF_EVEN)
+//        additionalRegular += (hourlyRate * hoursLog.regularDoubleHoliday) * multiplier.regular as BigDecimal
+//
+//        salaryBreakDown.overtimeDoubleHoliday = calculateHoliday(hourlyRate, hoursLog.overtimeDoubleHoliday, 0.00, multiplier.doubleHolidayOvertime, multiplier.regular).setScale(2, RoundingMode.HALF_EVEN)
+//        additionalOvertime += (hourlyRate * hoursLog.overtimeDoubleHoliday) * multiplier.regularOvertime as BigDecimal
+
+        salaryBreakDown.late = ((hourlyRate * hoursLog.late * multiplier.regular) as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.regular = (((hourlyRate * hoursLog.regular * multiplier.regular) as BigDecimal) + additionalRegular).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.overtime = ((hourlyRate * totalOvertimeHours) * multiplier.regularOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
 
         return salaryBreakDown
+
+    }
+
+    static BigDecimal calculateHoliday(
+            BigDecimal hourlyRate,
+            BigDecimal noOfHours,
+            BigDecimal lateUnderTime,
+            Float multiplier,
+            Float regularMultiplier
+    ) {
+        if (noOfHours > 0) {
+            BigDecimal regularSalary = (hourlyRate * (noOfHours + lateUnderTime)) * regularMultiplier as BigDecimal
+            return ((hourlyRate * (noOfHours + lateUnderTime)) * multiplier as BigDecimal).setScale(2, RoundingMode.HALF_EVEN) - regularSalary
+        } else return 0
 
     }
 
@@ -256,6 +295,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
                 accumulatedLogs.timekeepingEmployee.payrollEmployee.employee)
         list[0].timekeepingEmployee = accumulatedLogs.timekeepingEmployee
         accumulatedLogRepository.delete(accumulatedLogs)
+        list[0].company = SecurityUtils.currentCompany()
         accumulatedLogRepository.save(list[0])
         return new GraphQLResVal<String>('Success', true, "Successfully recalculated selected date!")
 

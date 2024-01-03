@@ -18,8 +18,8 @@ interface PayrollRepository extends JpaRepository<Payroll, UUID> {
 //            countQuery = "select count(p) from Payroll p where (lower(p.title) like lower(concat('%',:filter,'%')))")
 //    Page<Payroll> getPayroll(@Param("filter") String filter, Pageable pageable)
 //
-//    @Query(value = "select p from Payroll p left join fetch p.otherDeduction where p.id = :id")
-//    Optional<Payroll> getPayrollWithOtherDeduction(@Param("id")UUID id)
+    @Query(value = "select p from Payroll p left join fetch p.payrollEmployees pe where p.id = :id")
+    Optional<Payroll> findByIdJoinFetchPayrollEmployees(@Param("id")UUID id)
 //
 //    @Query(value = "select p from Payroll p left join fetch p.adjustment where p.id = :id")
 //    Optional<Payroll> getPayrollWithAdjustment(@Param("id")UUID id)

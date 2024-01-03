@@ -13,6 +13,7 @@ const useGetOtherDeduction = (
           name
           id
           description
+          subaccountCode
         }
       }
     `,

@@ -28,9 +28,17 @@ function ProjectBreakdownTable({ dataSource, toggleValue, size }: any) {
     },
     {
       title: "Regular",
-      dataIndex: "regular",
       key: "regular",
       children: [
+        {
+          title: "Late",
+          dataIndex: "late",
+          key: "late",
+
+          onCell: (record: any) => onCellProps(record, "late"),
+          render: render,
+        },
+
         {
           title: "Regular",
           dataIndex: "regular",

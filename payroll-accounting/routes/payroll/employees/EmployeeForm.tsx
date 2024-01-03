@@ -167,8 +167,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
   const router = useRouter();
   const companyList = UseCompanySelection();
   const id = router?.query?.id;
-  const [formError, setFormError] = useState({});
-  const [isFixedRate, setIsFixedRate] = useState<boolean | undefined>();
   const [state, setState] = useState({
     province: null,
     city: null,
@@ -183,7 +181,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
     },
     fetchPolicy: "network-only",
     onCompleted: (res) => {
-      setIsFixedRate(res.data.isFixedRate);
+      console.log(res.data.isFixedRate);
       setState({
         ...state,
         city: res.data.cityMunicipality,
@@ -312,7 +310,8 @@ const EmployeeForm = ({ account }: IPageProps) => {
     let obj = _.find(_.get(addressData, address), ["value", value]);
     if (obj) setState({ ...state, [address]: obj.id });
   };
-
+  const [form] = Form.useForm();
+  const fixedRate = Form.useWatch("isFixedRate", form);
   return (
     <Row gutter={16}>
       <Col span={24}>
@@ -338,6 +337,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
               //   error={formError}
               onFinish={onSubmitEmployee}
               className="form-card"
+              form={form}
             >
               <Row gutter={16}>
                 <Col {...col4}>
@@ -686,9 +686,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                       ],
                       optionType: "button",
                       buttonStyle: "solid",
-                      onChange: (e) => {
-                        setIsFixedRate(e.target.value);
-                      },
                     }}
                   />
                 </Col>
@@ -701,7 +698,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                       placeholder: "Monthly Rate",
                       type: "number",
 
-                      disabled: !isFixedRate,
+                      disabled: !fixedRate,
                     }}
                   />
                 </Col>
@@ -713,7 +710,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{
                       placeholder: "Houry Rate",
                       type: "number",
-                      disabled: isFixedRate,
+                      disabled: fixedRate,
                     }}
                   />
                 </Col>
@@ -725,7 +722,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{
                       placeholder: "Basic Salary",
                       type: "number",
-                      disabled: isFixedRate,
                     }}
                   />
                 </Col>
