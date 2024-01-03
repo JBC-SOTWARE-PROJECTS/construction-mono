@@ -1,23 +1,25 @@
 package com.backend.gbp.domain.projects
 
 import com.backend.gbp.domain.AbstractAuditingEntity
-import com.sun.org.apache.xpath.internal.operations.Bool
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
-import org.hibernate.annotations.NotFound
-import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
 
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
+import javax.persistence.Table
+import javax.persistence.Transient
 import java.time.Instant
 
 @Entity
-@Table(schema = "projects", name = "project_costs")
-@SQLDelete(sql = "UPDATE projects.project_costs SET deleted = true WHERE id = ?")
+@Table(schema = "projects", name = "project_costs_revisions")
+@SQLDelete(sql = "UPDATE projects.project_costs_revisions SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class ProjectCost extends AbstractAuditingEntity implements Serializable {
+class ProjectCostRevisions extends AbstractAuditingEntity implements Serializable {
 	
 	@GraphQLQuery
 	@Id
@@ -28,26 +30,16 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	UUID id
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "project", referencedColumnName = "id")
-	Projects project
+	@Column(name = "prev_date")
+	Instant prevDate
 
 	@GraphQLQuery
-	@Column(name = "date_transact")
-	Instant dateTransact
+	@Column(name = "project")
+	UUID project
 
 	@GraphQLQuery
-	@Column(name = "ref_no")
-	String refNo
-
-	@GraphQLQuery
-	@Column(name = "description")
-	String description
-
-	@GraphQLQuery
-	@Column(name = "category")
-	String category
+	@Column(name = "project_cost_id")
+	UUID projectCostId
 
 	@GraphQLQuery
 	@Column(name = "qty")
@@ -60,10 +52,6 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "cost")
 	BigDecimal cost
-
-	@GraphQLQuery
-	@Column(name = "status")
-	Boolean status
 
 	@GraphQLQuery
 	@Column(name = "tag_no")

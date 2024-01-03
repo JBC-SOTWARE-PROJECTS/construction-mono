@@ -22,7 +22,7 @@ interface Iprops {
   onRefetchBillingInfo: () => void;
 }
 
-const formatter = (value: number, color?: string) => (
+export const formatter = (value: number, color?: string) => (
   <p className={color}>
     {currency + " "}
     {NumberFormater(value)}
@@ -46,7 +46,7 @@ export default function BillingHeader(props: Iprops) {
       {
         key: "dateTrans",
         label: "Transaction Date",
-        children: dayjs(record?.dateTrans).format("MM/DD/YYYY HH:mm:ss A"),
+        children: dayjs(record?.dateTrans).format("MM/DD/YYYY hh:mm:ss A"),
       },
       {
         key: "billNo",
@@ -99,7 +99,7 @@ export default function BillingHeader(props: Iprops) {
               <p>Customer Name</p>
             </div>
             <div className="billing-info-value">
-              {otc ? record?.otcName : record?.customer?.accountName}
+              {otc ? record?.otcName : record?.customer?.customerName}
             </div>
           </div>
           <div className="w-full flex-div">

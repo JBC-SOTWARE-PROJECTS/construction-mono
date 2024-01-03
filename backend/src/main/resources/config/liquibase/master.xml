@@ -497,4 +497,10 @@
              relativeToChangelogFile="false"/>
     <!-- <include file="classpath:config/liquibase/changelog4/63_donss_add_loan_table.sql"
              relativeToChangelogFile="false"/> -->
+    <include file="classpath:config/liquibase/changelog4/63_wilson_add_index_project_cost.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/64_wilson_project_cost_revision.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/65_wilson_project_cost_alter.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
