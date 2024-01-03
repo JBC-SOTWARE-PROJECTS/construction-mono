@@ -8,6 +8,8 @@ const QUERY = gql`
       projectBreakdown {
         project
         projectName
+        company
+        companyName
         late
         regular
         overtime
