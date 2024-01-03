@@ -1,5 +1,6 @@
 package com.backend.gbp.rest
 
+import com.amazonaws.AmazonClientException
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
@@ -16,6 +17,7 @@ import com.backend.gbp.rest.dto.EmployeeAttendanceDto
 import com.backend.gbp.rest.dto.EmployeeDto
 import com.backend.gbp.rest.dto.mobile.EmployeeDetailsDto
 import com.backend.gbp.rest.dto.mobile.MobileInitializerDto
+import com.backend.gbp.services.DigitalOceanSpaceService
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -27,9 +29,17 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.xmlsoap.schemas.soap.encoding.Array
+//import com.digitalocean.spaces.SpacesClient
+//import com.digitalocean.spaces.model.ObjectWriteResponse
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -58,6 +68,10 @@ class EmployeeResource {
 
     @Autowired
     CompanySettingsService companySettingsService
+
+    @Autowired
+    DigitalOceanSpaceService spaceService;
+
 
 
     @RequestMapping(method = RequestMethod.POST,value = ['/filter'])
@@ -109,6 +123,7 @@ class EmployeeResource {
             @RequestParam(name = "fields") String fields
     ){
 
+
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> fieldMap = objectMapper.readValue(fields, Map.class);
 
@@ -119,6 +134,47 @@ class EmployeeResource {
 
         return empAttendance.returnId;
 
+    }
+
+    @RequestMapping(method = RequestMethod.POST,value = ['/attendance/capture'])
+    String uploadCaptureAttendance (
+            @RequestPart("file") MultipartFile capture
+    ){
+
+        File file = convertMultipartFileToFile(capture);
+        //  MultipartFile file = request.getFile("image");
+        spaceService.uploadFileToSpace(file);
+        return "File uploaded successfully!";
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST,value = ['/attendance/sync/capture'])
+    String uploadSyncCaptureAttendance (
+            @RequestParam("files") MultipartFile[] capture
+    ){
+        //return "true";
+        try {
+            ArrayList<File> files = new ArrayList<>();
+            for (MultipartFile capt: capture){
+                File file = convertMultipartFileToFile(capt);
+                files.add(file);
+            }
+
+            //  MultipartFile file = request.getFile("image");
+            spaceService.uploadMultiFileToSpace(files);
+            return "true";
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return "false";
+        }
+
+
+    }
+
+    private File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
+        File file = new File(System.getProperty("java.io.tmpdir") + File.separator + multipartFile.getOriginalFilename());
+        multipartFile.transferTo(file);
+        return file;
     }
 
     @RequestMapping(method = RequestMethod.POST,value = ['/attendance/sync'])
@@ -146,6 +202,7 @@ class EmployeeResource {
            // attendance.project = projectService.findOne(reAtt.project);
             attendance.additionalNote = reAtt.additionalNote;
             attendance.referenceId = reAtt.referenceId;
+            attendance.cameraCapture = reAtt.cameraCapture;
 
             if(reAtt.project.equals("")){
                 attendance.project = projectService.findOne(reAtt.project);
