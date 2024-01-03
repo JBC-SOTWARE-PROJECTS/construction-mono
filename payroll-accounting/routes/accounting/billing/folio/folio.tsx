@@ -10,10 +10,11 @@ import _ from "lodash";
 
 interface Iprops {
   id?: string;
+  type?: string;
 }
 
 export default function BillingFolioComponent(props: Iprops) {
-  const { id } = props;
+  const { id, type } = props;
   const [billingInfo, setBillingInfo] = useState<Billing>({});
 
   const { refetch } = useQuery<Query>(GET_BILLING_INFO_BY_ID, {
@@ -55,6 +56,7 @@ export default function BillingFolioComponent(props: Iprops) {
         record={billingInfo}
         billingId={id}
         onRefetchBillingInfo={onRefetchBillingInfo}
+        type={type}
       />
     </>
   );

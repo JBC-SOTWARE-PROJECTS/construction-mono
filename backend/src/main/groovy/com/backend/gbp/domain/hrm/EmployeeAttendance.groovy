@@ -63,6 +63,10 @@ class EmployeeAttendance extends AbstractAuditingEntity {
     String referenceId
 
     @GraphQLQuery
+    @Column(name = "camera_capture", columnDefinition = "varchar")
+    String cameraCapture
+
+    @GraphQLQuery
     @Column(name = "is_manual", columnDefinition = "bool")
     Boolean isManual
 

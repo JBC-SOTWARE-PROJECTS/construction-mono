@@ -147,7 +147,7 @@ function PayrollBreakdownModal() {
                   <h4>
                     {label}{" "}
                     <Tag color={getStatusColor(status as string)}>
-                      {payroll?.timekeeping?.status as string}
+                      {status as string}
                     </Tag>
                     {payroll?.status === PayrollStatus.Finalized && (
                       <Tag color="green">POSTED</Tag>

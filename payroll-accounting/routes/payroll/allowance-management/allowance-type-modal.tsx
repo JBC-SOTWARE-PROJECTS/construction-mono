@@ -10,6 +10,7 @@ import { UPSERT_ALLOWANCE_TYPE } from "@/graphql/company/queries";
 import { AllowanceType } from "@/graphql/gql/graphql";
 import { GET_COA_GEN_RECORDS } from "@/graphql/coa/queries";
 import useGetChartOfAccounts from "@/hooks/useGetChartOfAccounts";
+import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
 
 interface typeProps {
   hide: (hideProps: any) => void;
@@ -30,7 +31,7 @@ interface allowanceTypeProps {
 function AllowanceTypeModal(props: typeProps) {
   const { hide, record, expenses } = props;
   const [form] = Form.useForm();
-
+  const allowanceType = Form.useWatch("allowanceType", form);
   const [upsertAllowance, { loading }] = useMutation(UPSERT_ALLOWANCE_TYPE, {
     onCompleted: ({ data }) => {
       if (data?.success) {
@@ -99,6 +100,7 @@ function AllowanceTypeModal(props: typeProps) {
             allowanceType: record?.allowanceType || "",
             amount: record?.amount || null,
             subaccountCode: record?.subaccountCode,
+            isAttendanceBased: record?.isAttendanceBased,
           }}
         >
           <Row>
@@ -153,6 +155,14 @@ function AllowanceTypeModal(props: typeProps) {
                 }}
               />
             </Col>
+            {allowanceType === "DAILY" && (
+              <FormCheckBox
+                name="isAttendanceBased"
+                label="Attendance Based"
+                valuePropName="checked"
+                propscheckbox={{}}
+              />
+            )}
           </Row>
         </Form>
       </Modal>

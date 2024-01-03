@@ -11,6 +11,7 @@ class EmployeeAttendanceDto implements Serializable{
     public String type
     public String additionalNote
     public String referenceId
+    public String cameraCapture
 
     public EmployeeAttendanceDto(){
 
@@ -22,7 +23,8 @@ class EmployeeAttendanceDto implements Serializable{
             UUID project,
             String attendance_time,
             String type,
-            String referenceId
+            String referenceId,
+            String cameraCapture
     ){
         this.id = id;
         this.employee = employee;
@@ -30,5 +32,6 @@ class EmployeeAttendanceDto implements Serializable{
         this.attendance_time = attendance_time;
         this.type = type;
         this.referenceId = referenceId;
+        this.cameraCapture = cameraCapture;
     }
 }

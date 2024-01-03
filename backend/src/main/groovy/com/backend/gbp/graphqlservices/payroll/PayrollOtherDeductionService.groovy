@@ -92,15 +92,14 @@ class PayrollOtherDeductionService implements IPayrollModuleBaseOperations<Payro
             Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
             payrollOtherDeduction.employees.each { employee ->
                 employee.deductionItems.each {
-                    SubAccountBreakdownDto deduction = breakdownMap.get(it.type.subaccountCode)
+                    SubAccountBreakdownDto deduction = breakdownMap.get(it.subaccountCode)
                     if (!deduction) deduction = new SubAccountBreakdownDto()
 
                     deduction.description = it.name
                     deduction.amount += it.amount
                     deduction.entryType = AccountingEntryType.CREDIT
-                    deduction.subaccountCode = it.type.subaccountCode
-
-                    breakdownMap.put(it.type.subaccountCode, deduction)
+                    deduction.subaccountCode = it.subaccountCode
+                    breakdownMap.put(it.subaccountCode, deduction)
                 }
             }
             payrollOtherDeduction.totalsBreakdown = []
