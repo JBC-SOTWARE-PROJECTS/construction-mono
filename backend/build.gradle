@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'idea'
 group = 'com.backend'
-version = '1.0.12'
+version = '1.0.15'
 sourceCompatibility = '1.8'
 repositories {
 
@@ -134,6 +134,11 @@ dependencies {
     implementation "org.apache.commons:commons-csv:1.5"
     // https://mvnrepository.com/artifact/com.intuit.fuzzymatcher/fuzzy-matcher
     implementation group: 'com.intuit.fuzzymatcher', name: 'fuzzy-matcher', version: '1.0.3'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web' // Add other Spring Boot dependencies as needed
+    implementation 'software.amazon.awssdk:s3:2.17.98' // AWS SDK for Java S3
+    implementation 'com.amazonaws:aws-java-sdk:1.11.163'
+
 }
 sourceSets {
     main.groovy.srcDirs = ['src/main/groovy']
