@@ -4068,6 +4068,7 @@ export type Mutation = {
   removedMaterialDirectExpense?: Maybe<ProjectUpdatesMaterials>;
   resetPassword?: Maybe<User>;
   reverseHeader?: Maybe<GraphQlRetVal_Boolean>;
+  reviseProjectCost?: Maybe<ProjectCost>;
   setCounter?: Maybe<Counter>;
   setToCompleted?: Maybe<PurchaseOrder>;
   syncAttendance?: Maybe<Array<Maybe<EmployeeAttendance>>>;
@@ -4233,6 +4234,7 @@ export type Mutation = {
   upsertProjectCost?: Maybe<GraphQlRetVal_Boolean>;
   upsertProjectMaterials?: Maybe<ProjectUpdatesMaterials>;
   upsertProjectNotes?: Maybe<ProjectUpdatesNotes>;
+  upsertProjectRevCost?: Maybe<ProjectCostRevisions>;
   upsertProjectUpdates?: Maybe<ProjectUpdates>;
   upsertPurchaseItems?: Maybe<PettyCashItem>;
   upsertQty?: Maybe<QuantityAdjustment>;
@@ -4265,7 +4267,7 @@ export type Mutation = {
   /** insert TransType */
   upsertTransType?: Maybe<TransactionType>;
   upsertUnitMeasurement?: Maybe<UnitMeasurement>;
-  upsertVehicleUsageMonitoringe?: Maybe<VehicleUsageMonitoring>;
+  upsertVehicleUsageMonitoring?: Maybe<VehicleUsageMonitoring>;
   upsertWtx?: Maybe<DisbursementWtx>;
   voidLedgerById?: Maybe<InventoryLedger>;
   voidLedgerByRef?: Maybe<InventoryLedger>;
@@ -5209,6 +5211,14 @@ export type MutationResetPasswordArgs = {
 /** Mutation root */
 export type MutationReverseHeaderArgs = {
   headerId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationReviseProjectCostArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  tag?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -6356,6 +6366,14 @@ export type MutationUpsertProjectNotesArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertProjectRevCostArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  projectCost?: InputMaybe<ProjectCostInput>;
+  tag?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertProjectUpdatesArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -6561,7 +6579,7 @@ export type MutationUpsertUnitMeasurementArgs = {
 
 
 /** Mutation root */
-export type MutationUpsertVehicleUsageMonitoringeArgs = {
+export type MutationUpsertVehicleUsageMonitoringArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -9033,6 +9051,23 @@ export type ProjectCostInput = {
   unit?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ProjectCostRevisions = {
+  __typename?: 'ProjectCostRevisions';
+  cost?: Maybe<Scalars['BigDecimal']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  prevDate?: Maybe<Scalars['Instant']['output']>;
+  project?: Maybe<Scalars['UUID']['output']>;
+  projectCostId?: Maybe<Scalars['UUID']['output']>;
+  qty?: Maybe<Scalars['BigDecimal']['output']>;
+  tagNo?: Maybe<Scalars['String']['output']>;
+  totalCost?: Maybe<Scalars['BigDecimal']['output']>;
+  unit?: Maybe<Scalars['String']['output']>;
+};
+
 export type ProjectUpdates = {
   __typename?: 'ProjectUpdates';
   completedDate?: Maybe<Scalars['Instant']['output']>;
@@ -9909,6 +9944,8 @@ export type Query = {
   outputTax?: Maybe<Scalars['BigDecimal']['output']>;
   pCostById?: Maybe<ProjectCost>;
   pCostByList?: Maybe<Array<Maybe<ProjectCost>>>;
+  pCostRevById?: Maybe<ProjectCostRevisions>;
+  pCostRevByList?: Maybe<Array<Maybe<ProjectCostRevisions>>>;
   pMaterialById?: Maybe<ProjectUpdatesMaterials>;
   pMaterialByList?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
   pUpdatesById?: Maybe<ProjectUpdates>;
@@ -12245,6 +12282,18 @@ export type QueryPCostByListArgs = {
 
 
 /** Query root */
+export type QueryPCostRevByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPCostRevByListArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryPMaterialByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -13124,6 +13173,7 @@ export type QueryVatable_NonArgs = {
 
 /** Query root */
 export type QueryVehicleUsageMonitoringPageableArgs = {
+  asset?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;

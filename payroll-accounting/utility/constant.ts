@@ -462,7 +462,6 @@ export const PC_CATEGORY = [
   },
 ];
 
-
 export const headerConstant = [
   {
     title: "No. of Hrs",
@@ -551,19 +550,30 @@ export const VAT_CON = [
   { label: "NON-VATABLE", value: "false" },
 ];
 
+export const REVISIONS_COST = [
+  { label: "Revision 1", value: "rev_1" },
+  { label: "Revision 2", value: "rev_2" },
+  { label: "Revision 3", value: "rev_3" },
+  { label: "Revision 4", value: "rev_4" },
+  { label: "Revision 5", value: "rev_5" },
+  { label: "Revision 6", value: "rev_6" },
+  { label: "Revision 7", value: "rev_7" },
+  { label: "Revision 8", value: "rev_8" },
+  { label: "Revision 9", value: "rev_9" },
+  { label: "Revision 10", value: "rev_10" },
+];
 
 export const AssetStatusColor = {
-  ACTIVE : 'blue',
-  DISPOSED : 'grey',
-  IDLE : 'warning',
-  IN_REPAIR : 'red',
-  IN_SERVICE : 'green',
-  IN_TRANSIT : 'purple',
-  OUT_OF_SERVICE : 'yellow',
-  RESERVED : 'cyan',
-  RETIRED : 'volcano',
-  UNDER_INSPECTION : 'magenta',
-  UNDER_MAINTENANCE : 'red',
-  NO_STATUS : 'gold'
-}
-
+  ACTIVE: "blue",
+  DISPOSED: "grey",
+  IDLE: "warning",
+  IN_REPAIR: "red",
+  IN_SERVICE: "green",
+  IN_TRANSIT: "purple",
+  OUT_OF_SERVICE: "yellow",
+  RESERVED: "cyan",
+  RETIRED: "volcano",
+  UNDER_INSPECTION: "magenta",
+  UNDER_MAINTENANCE: "red",
+  NO_STATUS: "gold",
+};

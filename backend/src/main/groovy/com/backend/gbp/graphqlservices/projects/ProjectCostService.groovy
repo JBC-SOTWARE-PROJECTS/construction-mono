@@ -47,6 +47,9 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     @Autowired
     ProjectService projectService
 
+    @Autowired
+    ProjectCostRevisionService projectCostRevisionService
+
 
     @GraphQLQuery(name = "pCostById")
     ProjectCost pCostById(
@@ -119,13 +122,10 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
                 }
 
             }
-            return new GraphQLRetVal<Boolean>(true, true, "Project Cost added successfully")
+            return new GraphQLRetVal<Boolean>(true, true, "Bill of Quantities added successfully")
         }else{
             return new GraphQLRetVal<Boolean>(false, false, "Project ID is missing")
         }
-
-
-
     }
 
     @GraphQLMutation(name = "updateStatusCost")
@@ -141,6 +141,31 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
         }
 
         return  proj
+    }
+
+    @GraphQLMutation(name = "reviseProjectCost")
+    @Transactional
+    ProjectCost reviseProjectCost(
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "tag") String tag
+    ) {
+        if(id) {
+            def proj = findOne(id)
+            def rev = projectCostRevisionService.upsertProjectRevCost(proj, tag, null)
+            if(rev?.id){
+                def costing = upsertFromMap(id, fields, { ProjectCost entity, boolean forInsert ->
+                    if(forInsert){
+                        //conditions here before save
+                    }
+                })
+                return  costing
+            }
+            return  proj
+        }
+
+        return null
+
     }
 
 }

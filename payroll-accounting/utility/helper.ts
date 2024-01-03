@@ -67,6 +67,10 @@ export const DateFormatterWithTime = (value: string) => {
   return dayjs(value).format("YYYY-MM-DD hh:mm:ss A");
 };
 
+export const DateFormatterText = (value: string) => {
+  return dayjs(value).format("MMMM DD, YYYY");
+};
+
 export const randomId = () => {
   return uuidv4();
 };

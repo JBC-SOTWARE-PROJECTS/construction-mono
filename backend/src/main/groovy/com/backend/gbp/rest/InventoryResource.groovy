@@ -106,14 +106,14 @@ class InventoryResource {
 
 	List<CategoryDto> getCategoryProjects() {
 
-		String sql = "select distinct(i.category) from projects.project_costs i;"
+		String sql = "select distinct(i.category) from projects.project_costs i where i.category is not null;"
 		List<CategoryDto> category = jdbcTemplate.query(sql, new BeanPropertyRowMapper(CategoryDto.class))
 		return category
 	}
 
 	List<UnitDto> getUnitProjects() {
 
-		String sql = "select distinct(i.unit) from projects.project_costs i;"
+		String sql = "select distinct(i.unit) from projects.project_costs i where i.unit is not null;"
 		List<UnitDto> units = jdbcTemplate.query(sql, new BeanPropertyRowMapper(UnitDto.class))
 		return units
 	}

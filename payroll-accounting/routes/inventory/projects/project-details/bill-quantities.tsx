@@ -4,69 +4,126 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, Row, Col, Form, message } from "antd";
+import { Input, Button, Row, Col, Form, App } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
-import { FormSelect } from "@/components/common";
-import ProjectList from "@/components/inventory/projects/projectItemList";
-import { useDialog } from "@/hooks";
-import UpsertProject from "@/components/inventory/projects/dialogs/upsertProject";
-import { useQuery } from "@apollo/client";
-import { Projects, Query } from "@/graphql/gql/graphql";
-import { GET_PROJECTS_RECORDS } from "@/graphql/inventory/project-queries";
-import { useOffices } from "@/hooks/payables";
-import { useClients, useProjectStatus } from "@/hooks/inventory";
+import { confirmDelete, useDialog } from "@/hooks";
+import UpsertProjectCost from "@/components/inventory/projects/dialogs/upsertProjectCost";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import {
+  ProjectCost,
+  ProjectCostRevisions,
+  Projects,
+  Query,
+} from "@/graphql/gql/graphql";
+import {
+  DELETE_PROJECT_COST_ITEM,
+  GET_PROJECT_BY_ID,
+  GET_PROJECT_COST,
+  GET_PROJECT_COST_REV,
+} from "@/graphql/inventory/project-queries";
+import BillQuantitesTable from "@/components/inventory/project-details/billQuantitiesTable";
+import ProjectHeader from "@/components/inventory/project-details/common/projectHeader";
+import { useRouter } from "next/router";
+import _ from "lodash";
+import { ExtendedProjectCostRevisions } from "@/interface/projects";
+import ReviseProjectCost from "@/components/inventory/projects/dialogs/reviseProjectCost";
 
 const { Search } = Input;
 
-export default function ProjectComponent() {
-  const modal = useDialog(UpsertProject);
+export default function BillQuantitesContent() {
+  const { message } = App.useApp();
+  const modal = useDialog(UpsertProjectCost);
+  const reviseModal = useDialog(ReviseProjectCost);
+  const router = useRouter();
+  const { query } = router;
 
-  const [customer, setCustomer] = useState(null);
-  const [location, setLocation] = useState(null);
   const [state, setState] = useState({
     filter: "",
-    status: null,
-    page: 0,
-    size: 10,
+    revesions: {} as any,
   });
   // ====================== queries =====================================
-  const offices = useOffices();
-  const clients = useClients();
-  const statusList = useProjectStatus();
-
-  const { data, loading, refetch } = useQuery<Query>(GET_PROJECTS_RECORDS, {
+  const { data, loading, refetch } = useQuery<Query>(GET_PROJECT_COST, {
     variables: {
       filter: state.filter,
-      customer: customer,
-      location: location,
-      status: state.status,
-      page: state.page,
-      size: state.size,
+      id: query?.id ?? null,
     },
     fetchPolicy: "cache-and-network",
   });
 
-  const onUpsertRecord = (record?: Projects) => {
-    modal({ record: record }, (result: any) => {
-      if (result) {
-        if (record?.id) {
-          message.success("Project successfully updated");
+  const [getRevisions, { loading: revisionLoading }] =
+    useLazyQuery<Query>(GET_PROJECT_COST_REV);
+
+  const [deleletRecord, { loading: upsertLoading }] = useMutation(
+    DELETE_PROJECT_COST_ITEM,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (data?.updateStatusCost?.id) {
+          message.success("Bill of Quanities successfully removed");
+          refetch();
         } else {
-          message.success("Project successfully added");
+          message.error("Something went wrong. Please contact administrator");
         }
-        refetch();
-      }
+      },
+      refetchQueries: [GET_PROJECT_BY_ID],
+    }
+  );
+
+  const onDelete = (record: ProjectCost) => {
+    confirmDelete("Click Yes if you want to proceed", () => {
+      deleletRecord({
+        variables: {
+          id: record?.id,
+        },
+      });
     });
   };
 
-  const onRefresh = () => {
-    refetch();
+  const onUpsertRecord = (record?: ProjectCost) => {
+    if (record) {
+      reviseModal({ record: record }, (result: any) => {
+        if (result) {
+          message.success(result);
+          refetch();
+        }
+      });
+    } else {
+      modal({ record: record, projectId: query?.id ?? null }, (result: any) => {
+        if (result) {
+          message.success(result);
+          refetch();
+        }
+      });
+    }
+  };
+
+  const openRevisions = (id: string, desc: string) => {
+    if (_.isEmpty(state?.revesions[id])) {
+      getRevisions({
+        variables: {
+          id: id,
+        },
+        onCompleted: (data) => {
+          let result = data?.pCostRevByList as ProjectCostRevisions[];
+          let finalResult: ExtendedProjectCostRevisions[] = (result || []).map(
+            (obj: ProjectCostRevisions) => ({ ...obj, description: desc })
+          );
+          if (!_.isEmpty(result)) {
+            setState((prev) => ({
+              ...prev,
+              revesions: { ...prev.revesions, [id]: finalResult },
+            }));
+          }
+        },
+      });
+    }
   };
 
   return (
-    <PageContainer title="Bill of Quantities">
+    <PageContainer
+      pageHeaderRender={(e) => <ProjectHeader id={query?.id as string} />}>
       <ProCard
-        title="Project List"
+        title="Project Bill of Quantities List"
         headStyle={{
           flexWrap: "wrap",
         }}
@@ -78,7 +135,7 @@ export default function ProjectComponent() {
               type="primary"
               icon={<PlusCircleOutlined />}
               onClick={() => onUpsertRecord()}>
-              Create New Project
+              Add Bill of Quantities
             </Button>
           </ProFormGroup>
         }>
@@ -89,65 +146,20 @@ export default function ProjectComponent() {
                 <Search
                   size="middle"
                   placeholder="Search here.."
-                  onSearch={(e) => console.log()}
+                  onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
                   className="w-full"
-                />
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <FormSelect
-                  label="Filter By Client"
-                  propsselect={{
-                    showSearch: true,
-                    options: clients,
-                    allowClear: true,
-                    placeholder: "Filter By Client",
-                    onChange: (newValue) => {
-                      setCustomer(newValue);
-                    },
-                  }}
-                />
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <FormSelect
-                  label="Filter By Status"
-                  propsselect={{
-                    showSearch: true,
-                    options: statusList,
-                    allowClear: true,
-                    placeholder: "Filter By Status",
-                    onChange: (newValue) => {
-                      setState((prev) => ({
-                        ...prev,
-                        status: newValue ?? null,
-                      }));
-                    },
-                  }}
-                />
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <FormSelect
-                  label="Filter By Location"
-                  propsselect={{
-                    showSearch: true,
-                    options: offices,
-                    allowClear: true,
-                    placeholder: "Filter By Location",
-                    onChange: (newValue) => {
-                      setLocation(newValue);
-                    },
-                  }}
                 />
               </Col>
             </Row>
           </Form>
         </div>
-        <ProjectList
-          dataSource={data?.projectListPageable?.content as Projects[]}
-          loading={loading}
-          totalElements={data?.projectListPageable?.totalElements as number}
-          handleOpen={(record) => onUpsertRecord(record)}
-          changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
-          onRefresh={onRefresh}
+        <BillQuantitesTable
+          dataSource={data?.pCostByList as ProjectCost[]}
+          loading={loading || upsertLoading || revisionLoading}
+          handleOpen={(e) => onUpsertRecord(e)}
+          handleRemove={(e) => onDelete(e)}
+          openRevisions={(e, d) => openRevisions(e, d)}
+          revesions={state.revesions}
         />
       </ProCard>
     </PageContainer>
