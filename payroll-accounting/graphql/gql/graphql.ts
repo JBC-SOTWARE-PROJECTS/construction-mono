@@ -2231,6 +2231,7 @@ export type EmployeeAttendance = {
   __typename?: 'EmployeeAttendance';
   additionalNote?: Maybe<Scalars['String']['output']>;
   attendance_time?: Maybe<Scalars['Instant']['output']>;
+  cameraCapture?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   dateString?: Maybe<Scalars['String']['output']>;
@@ -2251,6 +2252,7 @@ export type EmployeeAttendance = {
 export type EmployeeAttendanceInput = {
   additionalNote?: InputMaybe<Scalars['String']['input']>;
   attendance_time?: InputMaybe<Scalars['Instant']['input']>;
+  cameraCapture?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   isIgnored?: InputMaybe<Scalars['Boolean']['input']>;
   isManual?: InputMaybe<Scalars['Boolean']['input']>;
@@ -4265,7 +4267,7 @@ export type Mutation = {
   /** insert TransType */
   upsertTransType?: Maybe<TransactionType>;
   upsertUnitMeasurement?: Maybe<UnitMeasurement>;
-  upsertVehicleUsageMonitoringe?: Maybe<VehicleUsageMonitoring>;
+  upsertVehicleUsageMonitoring?: Maybe<VehicleUsageMonitoring>;
   upsertWtx?: Maybe<DisbursementWtx>;
   voidLedgerById?: Maybe<InventoryLedger>;
   voidLedgerByRef?: Maybe<InventoryLedger>;
@@ -6561,7 +6563,7 @@ export type MutationUpsertUnitMeasurementArgs = {
 
 
 /** Mutation root */
-export type MutationUpsertVehicleUsageMonitoringeArgs = {
+export type MutationUpsertVehicleUsageMonitoringArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -13124,6 +13126,7 @@ export type QueryVatable_NonArgs = {
 
 /** Query root */
 export type QueryVehicleUsageMonitoringPageableArgs = {
+  asset?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;

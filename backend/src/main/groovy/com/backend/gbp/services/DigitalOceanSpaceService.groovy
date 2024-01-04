@@ -31,15 +31,15 @@ public class DigitalOceanSpaceService {
     private Environment env;
 
 
-    public void uploadFileToSpace(File fileToUpload) {
+    public void uploadFileToSpace(File fileToUpload, String folderPath) {
 
-        String accessKey = "DO0047JFAG3CLJZRYDW6";
-        String secretKey = "ElKj6QSbeYsbMgMi2BVafKxj9JpirQ6wfGdcd0yJtow";
+        String accessKey = env.getProperty("do.accessKey");
+        String secretKey = env.getProperty("do.secretKey");
 
         BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
 
         AmazonS3 s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("https://megatam.sgp1.digitaloceanspaces.com", "ap-southeast-1"))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(env.getProperty("do.endpoint")+folderPath, env.getProperty("do.region")))
                 .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
 
         String bucketName = env.getProperty("do.bucketname");
@@ -60,15 +60,15 @@ public class DigitalOceanSpaceService {
 
     }
 
-    public void uploadMultiFileToSpace(List<File> filesToUpload) {
+    public void uploadMultiFileToSpace(List<File> filesToUpload, String folderPath) {
 
-        String accessKey = "DO0047JFAG3CLJZRYDW6";
-        String secretKey = "ElKj6QSbeYsbMgMi2BVafKxj9JpirQ6wfGdcd0yJtow";
+        String accessKey = env.getProperty("do.accessKey");
+        String secretKey = env.getProperty("do.secretKey");
 
         BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
 
         AmazonS3 s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("https://megatam.sgp1.digitaloceanspaces.com", "ap-southeast-1"))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(env.getProperty("do.endpoint")+folderPath, env.getProperty("do.region")))
                 .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
 
         String bucketName = env.getProperty("do.bucketname");

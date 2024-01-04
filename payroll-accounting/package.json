@@ -20,6 +20,7 @@
     "amcharts3": "^3.21.15",
     "antd": "^5.8.6",
     "apollo-link-error": "^1.1.13",
+    "aws-sdk": "^2.1528.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.9",
