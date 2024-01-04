@@ -503,4 +503,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/65_wilson_project_cost_alter.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/sample_data/1_5_2024_public_user_authorities.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
