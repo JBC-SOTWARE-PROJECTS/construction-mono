@@ -15,12 +15,13 @@ import { Projects, Query } from "@/graphql/gql/graphql";
 import { GET_PROJECTS_RECORDS } from "@/graphql/inventory/project-queries";
 import { useOffices } from "@/hooks/payables";
 import { useClients, useProjectStatus } from "@/hooks/inventory";
+import { useRouter } from "next/router";
 
 const { Search } = Input;
 
 export default function ProjectComponent() {
   const modal = useDialog(UpsertProject);
-
+  const router = useRouter();
   const [customer, setCustomer] = useState(null);
   const [location, setLocation] = useState(null);
   const [state, setState] = useState({
@@ -150,6 +151,11 @@ export default function ProjectComponent() {
           handleOpen={(record) => onUpsertRecord(record)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
           onRefresh={onRefresh}
+          handleOpenDetails={(record) =>
+            router.push(
+              `/inventory/project-details/${record.id}/bill-quantities`
+            )
+          }
         />
       </ProCard>
     </PageContainer>

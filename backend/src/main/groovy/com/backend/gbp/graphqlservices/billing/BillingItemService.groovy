@@ -547,6 +547,13 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         return item
     }
 
+    //override save for accounting entries
+    @Override
+    BillingItem save(BillingItem billingItem) {
+        Boolean newEntity = billingItem.id == null
+        def bItem = super.save(billingItem) as BillingItem
+        return bItem
+    }
 
 
 }

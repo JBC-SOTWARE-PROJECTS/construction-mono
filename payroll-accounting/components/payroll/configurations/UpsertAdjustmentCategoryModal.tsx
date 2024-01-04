@@ -17,9 +17,15 @@ interface IProps {
   record?: AdjustmentCategory;
   refetch: () => void;
   coa: ChartOfAccountGenerate[];
+  isDefault?: any;
 }
 
-function UpsertAdjustmentCategoryModal({ refetch, record, coa }: IProps) {
+function UpsertAdjustmentCategoryModal({
+  refetch,
+  record,
+  coa,
+  isDefault,
+}: IProps) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState<boolean>(false);
   const [upsert, loadingUpsert] = useUpsertAdjustmentCategory(() => {
@@ -88,6 +94,7 @@ function UpsertAdjustmentCategoryModal({ refetch, record, coa }: IProps) {
               label="Name"
               propsinput={{
                 placeholder: "Name",
+                disabled: isDefault,
               }}
             />
 
@@ -96,6 +103,7 @@ function UpsertAdjustmentCategoryModal({ refetch, record, coa }: IProps) {
               label="Description"
               propsinput={{
                 placeholder: "Description",
+                disabled: isDefault,
               }}
             />
             <FormSelect
@@ -118,6 +126,7 @@ function UpsertAdjustmentCategoryModal({ refetch, record, coa }: IProps) {
               checkBoxLabel="Status"
               propscheckbox={{
                 defaultChecked: true,
+                disabled: isDefault,
               }}
             />
             <FormSelect
@@ -128,6 +137,7 @@ function UpsertAdjustmentCategoryModal({ refetch, record, coa }: IProps) {
                   value: item,
                   label: item.replace("_", " "),
                 })),
+                disabled: isDefault,
               }}
               rules={[{ required: true }]}
             />

@@ -47,6 +47,10 @@ class PayrollOtherDeductionItem extends AbstractAuditingEntity implements Serial
     @Column(name = "amount", columnDefinition = "numeric")
     BigDecimal amount
 
+    @GraphQLQuery
+    @Column(name = "subaccount_code", columnDefinition = "varchar")
+    String subaccountCode
+
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")
