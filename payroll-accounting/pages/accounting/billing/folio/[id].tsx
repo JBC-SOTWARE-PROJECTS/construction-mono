@@ -10,7 +10,7 @@ const BillingFolio = () => {
   const router = useRouter();
   const { id }: { id?: string } = router.query;
 
-  return <BillingFolioComponent id={id} />;
+  return <BillingFolioComponent id={id} type="billing" />;
 };
 
 export default BillingFolio;

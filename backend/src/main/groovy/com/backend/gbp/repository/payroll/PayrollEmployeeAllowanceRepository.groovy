@@ -13,6 +13,8 @@ import java.time.Instant
 interface PayrollEmployeeAllowanceDto {
     String getId()
 
+    String getPayrollEmployeeId()
+
     String getEmployeeName()
 
     String getDepartment()
@@ -31,6 +33,7 @@ interface PayrollEmployeeAllowanceRepository extends JpaRepository<PayrollEmploy
 
     @Query(value = """
 SELECT ae.id as id,
+pe.id as payrollEmployeeId,
 e.fullName as employeeName,
 ae as employee,
 e.firstName,
@@ -51,7 +54,7 @@ WHERE
 p.id = :payroll
 and upper(e.fullName) like upper(concat('%',:filter,'%'))
 and ae.status in :status
-GROUP BY ae.id, e.fullName, e.firstName, e.lastName, e.middleName, e.nameSuffix, pos.description ,ae.status 
+GROUP BY ae.id, pe.id, e.fullName, e.firstName, e.lastName, e.middleName, e.nameSuffix, pos.description ,ae.status 
 HAVING (:withItems = false OR COALESCE(sum(ai.amount), 0) != 0)
 """,
             countQuery = """

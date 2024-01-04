@@ -51,7 +51,6 @@ class ePayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollA
 
     private PayrollAdjustment adjustment;
 
-
     //=================================QUERY=================================\\
 
     @GraphQLQuery(name = "getPayrollAdjustmentById")
@@ -61,16 +60,6 @@ class ePayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollA
         } else {
             return null
         }
-
-    }
-
-    @GraphQLQuery(name = "getPayrollAdjustmentByPayrollId", description = "Get adjustment by ID")
-    PayrollAdjustment getPayrollAdjustmentByPayrollId(@GraphQLArgument(name = "id") UUID id) {
-//        if (id) {
-//            return payrollAdjustmentRepository.findByPayrollId(id).get()
-//        } else {
-//            return null
-//        }
 
     }
 
@@ -93,24 +82,19 @@ class ePayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollA
             Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
             payrollAdjustment.employees.each { employee ->
                 employee.adjustmentItems.each {
-                    SubAccountBreakdownDto adjustment = breakdownMap.get(it.category.subaccountCode + "_" + it.operation)
+                    SubAccountBreakdownDto adjustment = breakdownMap.get(it.subaccountCode + "_" + it.operation)
                     if (!adjustment) adjustment = new SubAccountBreakdownDto()
 
-                    adjustment.subaccountCode = it.category.subaccountCode
+                    adjustment.subaccountCode = it.subaccountCode
                     adjustment.description = it.name
                     if (it.operation == AdjustmentOperation.ADDITION) {
                         adjustment.amount += it.amount
-
-                        adjustment.entryType = AccountingEntryType.DEBIT
-//                        payrollAdjustment.total += it.amount
-
+                        adjustment.entryType = AccountingEntryType.CREDIT
                     } else if (it.operation == AdjustmentOperation.SUBTRACTION) {
                         adjustment.amount += it.amount
-                        adjustment.entryType = AccountingEntryType.CREDIT
-//                        payrollAdjustment.total -= it.amount
+                        adjustment.entryType = AccountingEntryType.DEBIT
                     }
-
-                    breakdownMap.put(it.category.subaccountCode + "_" + it.operation, adjustment)
+                    breakdownMap.put(it.subaccountCode + "_" + it.operation, adjustment)
                 }
             }
             payrollAdjustment.totalsBreakdown = []

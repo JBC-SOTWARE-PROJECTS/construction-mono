@@ -18,6 +18,7 @@ import dayjs from "dayjs";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import UpsertAttendanceModal from "./UpsertAttendanceModal";
+import DOImageViewer from "@/components/thirdParty/doImageViewer";
 interface IProps {
   employeeId?: string;
   useStaticData?: boolean;
@@ -51,8 +52,17 @@ function RawLogs({
     setRecord(record);
     setOpen(true);
   };
+  console.log("dat", data)
 
   const columns: ColumnsType<EmployeeAttendance> = [
+    {
+      title: "Captured",
+      dataIndex: "cameraCapture",
+      key: "cameraCapture",
+      render: (value) => {
+        return <DOImageViewer filename={value} folder="ATTENDANCE_CAPTURE" width={50} height={50}/>;
+      }
+    },
     {
       title: "Date Time",
       dataIndex: "attendance_time",

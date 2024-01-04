@@ -141,7 +141,7 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
             @GraphQLArgument(name = "status") PayrollStatus status
 
     ) {
-        Timekeeping timekeeping = timekeepingRepository.findByPayrollId(payrollId).get()
+        Timekeeping timekeeping = timekeepingRepository.findByIdJoinFetchTimekeepingEmployees(payrollId)
         timekeeping.status = status
         timekeeping.salaryBreakdown = []
         SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
@@ -150,27 +150,27 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
             Map<String, HoursLog> timekeepingHoursBreakdownMap = new HashMap<>()
             Map<String, EmployeeSalaryDto> timekeepingSalaryBreakdownMap = new HashMap<>()
 
+//            timekeeping.timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
+//                timekeepingEmployee.status = PayrollEmployeeStatus.FINALIZED
+//                timekeepingEmployee.accumulatedLogs.each {
+//                    AccumulatedLogs accumulatedLogs ->
+//                        accumulatedLogs.projectBreakdown.each {
+//                            consolidateProjectBreakdown(timekeepingHoursBreakdownMap, it)
+//                        }
+//                }
+//                timekeepingEmployee.salaryBreakdown.each {
+//                    consolidateSalaryBreakdown(timekeepingSalaryBreakdownMap, it)
+//                }
+//            }
+
             timekeeping.timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
                 timekeepingEmployee.status = PayrollEmployeeStatus.FINALIZED
-//                Map<String, HoursLog> employeeHoursBreakdownMap = new HashMap<>()
-                timekeepingEmployee.accumulatedLogs.each {
-                    AccumulatedLogs accumulatedLogs ->
-                        accumulatedLogs.projectBreakdown.each {
-                            consolidateProjectBreakdown(timekeepingHoursBreakdownMap, it)
-//                            consolidateProjectBreakdown(employeeHoursBreakdownMap, it)
-                        }
+                timekeepingEmployee.projectBreakdown.each {
+                    consolidateProjectBreakdown(timekeepingHoursBreakdownMap, it)
                 }
-//                timekeepingEmployee.projectBreakdown = []
-//                employeeHoursBreakdownMap.keySet().each {
-//                    HoursLog hoursLog = employeeHoursBreakdownMap.get(it.toString())
-//                    timekeepingEmployee.projectBreakdown.push(hoursLog)
-
                 timekeepingEmployee.salaryBreakdown.each {
                     consolidateSalaryBreakdown(timekeepingSalaryBreakdownMap, it)
                 }
-
-//                    timekeepingEmployee.salaryBreakdown.push(TimekeepingEmployeeService.calculateSalaryBreakdown(multiplier, hoursLog, timekeepingEmployee.payrollEmployee.employee))
-//                }
             }
             timekeeping.projectBreakdown = []
             timekeepingHoursBreakdownMap.keySet().each {
@@ -215,6 +215,7 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         breakdown.company = it?.company
         breakdown.companyName = it?.companyName
 
+        breakdown.late += it.late
         breakdown.regular += it.regular
         breakdown.overtime += it.overtime
         breakdown.regularHoliday += it.regularHoliday
