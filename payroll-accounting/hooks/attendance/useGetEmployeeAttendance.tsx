@@ -29,6 +29,7 @@ const GET_SAVED_EMPLOYEE_ATTENDANCE = gql`
         original_attendance_time
         type
         originalType
+        cameraCapture
         employee {
           id
         }

@@ -24,6 +24,7 @@ import groovy.transform.TypeChecked
 import org.springframework.beans.BeanUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
+import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
@@ -71,6 +72,9 @@ class EmployeeResource {
 
     @Autowired
     DigitalOceanSpaceService spaceService;
+
+    @Autowired
+    private Environment env;
 
 
 
@@ -143,7 +147,7 @@ class EmployeeResource {
 
         File file = convertMultipartFileToFile(capture);
         //  MultipartFile file = request.getFile("image");
-        spaceService.uploadFileToSpace(file);
+        spaceService.uploadFileToSpace(file, "/"+env.getProperty("do.event.type")+"/ATTENDANCE_CAPTURE");
         return "File uploaded successfully!";
 
     }
@@ -161,7 +165,7 @@ class EmployeeResource {
             }
 
             //  MultipartFile file = request.getFile("image");
-            spaceService.uploadMultiFileToSpace(files);
+            spaceService.uploadMultiFileToSpace(files, "/"+env.getProperty("do.event.type")+"/ATTENDANCE_CAPTURE");
             return "true";
         } catch (InterruptedException e) {
             e.printStackTrace();
