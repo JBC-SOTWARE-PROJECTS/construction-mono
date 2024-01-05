@@ -1,6 +1,6 @@
 
 
-CREATE TABLE accounting.loans (
+CREATE TABLE IF NOT EXISTS accounting.loans (
         id uuid NOT NULL,
         loan_no varchar(50) NULL,
         reference_no varchar(50) NULL,
@@ -25,7 +25,7 @@ CREATE TABLE accounting.loans (
         CONSTRAINT loans_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE accounting.loan_amortization (
+CREATE TABLE IF NOT EXISTS accounting.loan_amortization (
         id uuid NOT NULL,
                 loan uuid NULL,
                 order_no int4 NULL,
