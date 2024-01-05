@@ -29,6 +29,7 @@ import javax.persistence.NoResultException
 import javax.transaction.Transactional
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @Canonical
@@ -424,7 +425,6 @@ class ArInvoiceServices extends ArAbstractFormulaHelper<ArInvoice> {
             BigDecimal credit =  new BigDecimal(entry.get("credit") as String)
             def match =  coa.find {
                 String codex = it.motherAccount.code+"-${it?.subAccount?.code ?: '0000'}-${it?.subSubAccount?.code ?: '0000'}"
-                String codes = it.code
                 codex == code
             }
             if(!match){
