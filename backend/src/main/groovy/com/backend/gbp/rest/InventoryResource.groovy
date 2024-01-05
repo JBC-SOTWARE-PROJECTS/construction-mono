@@ -118,6 +118,13 @@ class InventoryResource {
 		return units
 	}
 
+	List<Weather> getWeatherList() {
+
+		String sql = "select distinct(i.weather) from projects.project_updates i where i.weather is not null;"
+		List<Weather> weathers = jdbcTemplate.query(sql, new BeanPropertyRowMapper(Weather.class))
+		return weathers
+	}
+
 	ItemJobsDto getJobOrderDistinct() {
 		String typeSql = '''select distinct(upper(joi."type")) as j_type  from asset.job_order_items joi;'''
 		String unitSql = '''select distinct(upper(joi.unit)) as j_type  from asset.job_order_items joi;'''

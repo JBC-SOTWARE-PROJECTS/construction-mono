@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ProjectCost } from "@/graphql/gql/graphql";
 import { SaveOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
@@ -18,6 +18,7 @@ import {
 } from "@/graphql/inventory/project-queries";
 import FormSelect from "@/components/common/formSelect/formSelect";
 import { REVISIONS_COST } from "@/utility/constant";
+import ConfirmationPasswordHook from "@/hooks/promptPassword";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -28,7 +29,7 @@ export default function ReviseProjectCost(props: IProps) {
   const { message } = App.useApp();
   const { hide, record } = props;
   const [form] = Form.useForm();
-
+  const [showPasswordConfirmation] = ConfirmationPasswordHook();
   // ===================== Queries ==============================
   const units = useProjectCostUnits();
 
@@ -55,17 +56,17 @@ export default function ReviseProjectCost(props: IProps) {
 
   const onSubmit = (data: any) => {
     let payload = _.clone(data);
-    payload.dateTransact = dayjs();
-    console.log("record?.id", record?.id);
     if (Number(data?.cost) <= 0) {
       message.error("Invalid Cost! Cost must not be less than zero or zero");
     } else {
-      upsertRecord({
-        variables: {
-          id: record?.id,
-          tag: payload.tagNo,
-          fields: payload,
-        },
+      showPasswordConfirmation(() => {
+        upsertRecord({
+          variables: {
+            id: record?.id,
+            tag: payload.tagNo,
+            fields: payload,
+          },
+        });
       });
     }
   };
@@ -86,6 +87,11 @@ export default function ReviseProjectCost(props: IProps) {
       }
     }
   };
+
+  const index = useMemo(() => {
+    let count = _.findIndex(REVISIONS_COST, ["value", record?.tagNo]);
+    return count + 1;
+  }, [record]);
 
   return (
     <Modal
@@ -121,6 +127,7 @@ export default function ReviseProjectCost(props: IProps) {
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
+          tagNo: REVISIONS_COST[index].value,
         }}>
         <Row gutter={[8, 0]}>
           <Col span={24}>
@@ -196,6 +203,7 @@ export default function ReviseProjectCost(props: IProps) {
               propsselect={{
                 options: REVISIONS_COST,
                 placeholder: "Revision Tag",
+                disabled: true,
               }}
             />
           </Col>

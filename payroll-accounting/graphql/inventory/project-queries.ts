@@ -148,3 +148,28 @@ export const REVISE_RECORD_PROJECT_COST = gql`
     }
   }
 `;
+
+export const GET_RECORDS_PROJECT_ACCOMPLISHMENTS = gql`
+  query ($filter: String, $id: UUID) {
+    pUpdatesByList(filter: $filter, id: $id) {
+      id
+      transNo
+      dateTransact
+      description
+      accomplishment
+      weather
+      status
+      createdBy
+    }
+  }
+`;
+
+export const UPSERT_RECORD_PROJECT_ACCOMPLISHMENT = gql`
+  mutation ($fields: Map_String_ObjectScalar, $date: String, $id: UUID) {
+    upsertProjectUpdates(fields: $fields, date: $date, id: $id) {
+      payload
+      success
+      message
+    }
+  }
+`;

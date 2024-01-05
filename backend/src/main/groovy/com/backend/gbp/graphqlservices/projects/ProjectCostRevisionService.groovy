@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
+import java.time.Instant
 
 @Component
 @GraphQLApi
@@ -66,12 +68,12 @@ class ProjectCostRevisionService extends AbstractDaoService<ProjectCostRevisions
         if(id){
             upsert = findOne(id)
         }
-        upsert.prevDate = projectCost.dateTransact
+        upsert.prevDate = Instant.now()
         upsert.project = projectCost.project.id
         upsert.projectCostId = projectCost.id
         upsert.qty = projectCost.qty
         upsert.unit = projectCost.unit
-        upsert.cost = projectCost.cost
+        upsert.cost = projectCost.cost.setScale(2, RoundingMode.HALF_EVEN)
         upsert.tagNo = tag
         save(upsert)
     }

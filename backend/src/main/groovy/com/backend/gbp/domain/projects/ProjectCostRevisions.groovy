@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.Table
 import javax.persistence.Transient
+import java.math.RoundingMode
 import java.time.Instant
 
 @Entity
@@ -59,7 +60,8 @@ class ProjectCostRevisions extends AbstractAuditingEntity implements Serializabl
 
 	@Transient
 	BigDecimal getTotalCost() {
-		return qty * cost
+		def e =  qty * cost
+		return e.setScale(2, RoundingMode.HALF_EVEN)
 	}
 
 }

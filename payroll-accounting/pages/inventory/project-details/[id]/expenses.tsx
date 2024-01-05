@@ -11,7 +11,7 @@ const ProjectsDetailsPage = () => {
   return (
     <React.Fragment>
       <Head>
-        <title>Project Bill of Quantities</title>
+        <title>Project Management</title>
       </Head>
       <AccessManager roles={["ROLE_ADMIN", "ROLE_PROJECT_BILL_QUANTITIES"]}>
         <div className="w-full">
