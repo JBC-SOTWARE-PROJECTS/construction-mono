@@ -27,6 +27,8 @@ export type Scalars = {
   /** Long type */
   Long: { input: any; output: any; }
   /** Built-in scalar for map-like structures */
+  Map_String_BigDecimalScalar: { input: any; output: any; }
+  /** Built-in scalar for map-like structures */
   Map_String_List_EventCalendarScalar: { input: any; output: any; }
   /** Built-in scalar for map-like structures */
   Map_String_List_ScheduleDtoScalar: { input: any; output: any; }
@@ -3093,6 +3095,22 @@ export type GraphQlRetVal_HdmfContribution = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlRetVal_List_Map_String_Object = {
+  __typename?: 'GraphQLRetVal_List_Map_String_Object';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<Array<Maybe<Scalars['Map_String_ObjectScalar']['output']>>>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlRetVal_Loan = {
+  __typename?: 'GraphQLRetVal_Loan';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<Loan>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlRetVal_OtherDeductionTypes = {
   __typename?: 'GraphQLRetVal_OtherDeductionTypes';
   message?: Maybe<Scalars['String']['output']>;
@@ -3861,6 +3879,65 @@ export type LedgerViewContainer = {
   totalDebit?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
+export type Loan = {
+  __typename?: 'Loan';
+  bankAccount?: Maybe<Bank>;
+  companyId?: Maybe<Scalars['UUID']['output']>;
+  compoundType?: Maybe<Scalars['String']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  interestRate?: Maybe<Scalars['BigDecimal']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  loanAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  loanNo?: Maybe<Scalars['String']['output']>;
+  loanPayment?: Maybe<Scalars['BigDecimal']['output']>;
+  loanPeriod?: Maybe<Scalars['Int']['output']>;
+  negativeInterestRate?: Maybe<Scalars['BigDecimal']['output']>;
+  negativeLoanAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  negativeLoanPayment?: Maybe<Scalars['BigDecimal']['output']>;
+  numberOfPayments?: Maybe<Scalars['Int']['output']>;
+  paidPayments?: Maybe<Scalars['BigDecimal']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
+  referenceNo?: Maybe<Scalars['String']['output']>;
+  remainingBalance?: Maybe<Scalars['BigDecimal']['output']>;
+  startDate?: Maybe<Scalars['Date']['output']>;
+  totalCostOfLoan?: Maybe<Scalars['BigDecimal']['output']>;
+  totalInterest?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type LoanAmortization = {
+  __typename?: 'LoanAmortization';
+  bank?: Maybe<Bank>;
+  beginningBalance?: Maybe<Scalars['BigDecimal']['output']>;
+  companyId?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  endingBalance?: Maybe<Scalars['BigDecimal']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  interest?: Maybe<Scalars['BigDecimal']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  loan?: Maybe<Loan>;
+  negativeInterest?: Maybe<Scalars['BigDecimal']['output']>;
+  negativePayment?: Maybe<Scalars['BigDecimal']['output']>;
+  negativePrincipal?: Maybe<Scalars['BigDecimal']['output']>;
+  orderNo?: Maybe<Scalars['Int']['output']>;
+  payment?: Maybe<Scalars['BigDecimal']['output']>;
+  paymentDate?: Maybe<Scalars['Date']['output']>;
+  postedLedger?: Maybe<Scalars['UUID']['output']>;
+  principal?: Maybe<Scalars['BigDecimal']['output']>;
+  recordNo?: Maybe<Scalars['String']['output']>;
+  referenceNo?: Maybe<Scalars['String']['output']>;
+};
+
 export enum LoanPaymentTerm {
   Monthly = 'MONTHLY',
   SemiMonthly = 'SEMI_MONTHLY'
@@ -4004,6 +4081,10 @@ export type Mutation = {
   invoicePosting?: Maybe<GraphQlResVal_ArInvoice>;
   invoiceVoidPosting?: Maybe<GraphQlResVal_ArInvoice>;
   linkPOItemRec?: Maybe<PurchaseOrderItems>;
+  loanMAddLoan?: Maybe<GraphQlRetVal_Loan>;
+  loanMPaidLoan?: Maybe<GraphQlRetVal_Boolean>;
+  loanMStartingEntry?: Maybe<GraphQlRetVal_Boolean>;
+  loanMVoidPaidLoan?: Maybe<GraphQlRetVal_Boolean>;
   lockBilling?: Maybe<Billing>;
   onDeleteIntegrationGroup?: Maybe<Scalars['Boolean']['output']>;
   overrideRecItems?: Maybe<ReceivingReport>;
@@ -4796,6 +4877,30 @@ export type MutationInvoiceVoidPostingArgs = {
 export type MutationLinkPoItemRecArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   rec?: InputMaybe<ReceivingReportInput>;
+};
+
+
+/** Mutation root */
+export type MutationLoanMAddLoanArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationLoanMPaidLoanArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationLoanMStartingEntryArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationLoanMVoidPaidLoanArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -7592,6 +7697,44 @@ export type Page_Ledger = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_Loan = {
+  __typename?: 'Page_Loan';
+  content?: Maybe<Array<Maybe<Loan>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_LoanAmortization = {
+  __typename?: 'Page_LoanAmortization';
+  content?: Maybe<Array<Maybe<LoanAmortization>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_MaterialProduction = {
   __typename?: 'Page_MaterialProduction';
   content?: Maybe<Array<Maybe<MaterialProduction>>>;
@@ -9797,6 +9940,7 @@ export type Query = {
   getLedgerByHeaderId?: Maybe<Array<Maybe<Ledger>>>;
   getLedgerByRef?: Maybe<Array<Maybe<InventoryLedger>>>;
   getLegerByDoc?: Maybe<Array<Maybe<InventoryLedger>>>;
+  getLoanScheduleById?: Maybe<Page_LoanAmortization>;
   getMaterialByRefStockCard?: Maybe<ProjectUpdatesMaterials>;
   getOnHandByItem?: Maybe<Inventory>;
   getOneRawLog?: Maybe<EmployeeAttendance>;
@@ -9931,6 +10075,19 @@ export type Query = {
   ledgerViewList?: Maybe<LedgerViewContainer>;
   /** Ledger View Listing */
   ledgerViewListV2?: Maybe<LedgerView>;
+  loanMCostOFLoan?: Maybe<Scalars['BigDecimal']['output']>;
+  loanMFV?: Maybe<Scalars['BigDecimal']['output']>;
+  loanMIPMT?: Maybe<Scalars['BigDecimal']['output']>;
+  loanMInterestRate?: Maybe<Scalars['BigDecimal']['output']>;
+  loanMLoanAmortization?: Maybe<Array<Maybe<Scalars['Map_String_ObjectScalar']['output']>>>;
+  loanMLoanPayments?: Maybe<Scalars['Map_String_ObjectScalar']['output']>;
+  loanMNumberOfPayments?: Maybe<Scalars['Int']['output']>;
+  /** One of the financial functions, calculates the payment for a loan based on constant payments and a constant interest rate. */
+  loanMPMT?: Maybe<Scalars['Map_String_BigDecimalScalar']['output']>;
+  loanMViewPaidLoan?: Maybe<GraphQlRetVal_List_Map_String_Object>;
+  loanMViewStartingEntry?: Maybe<GraphQlRetVal_List_Map_String_Object>;
+  loanManagementById?: Maybe<GraphQlRetVal_Loan>;
+  loanManagements?: Maybe<Page_Loan>;
   /** Filter Event Calendar between two dates. */
   mapEventsToDates?: Maybe<Scalars['Map_String_List_EventCalendarScalar']['output']>;
   monById?: Maybe<PurchaseOrderItemsMonitoring>;
@@ -11541,6 +11698,15 @@ export type QueryGetLegerByDocArgs = {
 
 
 /** Query root */
+export type QueryGetLoanScheduleByIdArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetMaterialByRefStockCardArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -12160,6 +12326,101 @@ export type QueryLedgerViewListV2Args = {
   fiscalId?: InputMaybe<Scalars['UUID']['input']>;
   monthNo?: InputMaybe<Scalars['Int']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMCostOfLoanArgs = {
+  numOfPayments?: InputMaybe<Scalars['BigDecimal']['input']>;
+  payment?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMfvArgs = {
+  nPer?: InputMaybe<Scalars['Int']['input']>;
+  pmt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  pv?: InputMaybe<Scalars['BigDecimal']['input']>;
+  rate?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMipmtArgs = {
+  nPer?: InputMaybe<Scalars['Int']['input']>;
+  per?: InputMaybe<Scalars['Int']['input']>;
+  pv?: InputMaybe<Scalars['BigDecimal']['input']>;
+  rate?: InputMaybe<Scalars['BigDecimal']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMInterestRateArgs = {
+  annualInterest?: InputMaybe<Scalars['BigDecimal']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMLoanAmortizationArgs = {
+  annualInterest?: InputMaybe<Scalars['BigDecimal']['input']>;
+  compoundType?: InputMaybe<Scalars['String']['input']>;
+  numOfPayments?: InputMaybe<Scalars['Int']['input']>;
+  principalAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  startDate?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMLoanPaymentsArgs = {
+  annualInterest?: InputMaybe<Scalars['BigDecimal']['input']>;
+  compoundType?: InputMaybe<Scalars['String']['input']>;
+  numberOfPeriod?: InputMaybe<Scalars['Int']['input']>;
+  principalAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  startDate?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMNumberOfPaymentsArgs = {
+  numOFYears?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMpmtArgs = {
+  nPer?: InputMaybe<Scalars['Int']['input']>;
+  pv?: InputMaybe<Scalars['BigDecimal']['input']>;
+  rate?: InputMaybe<Scalars['BigDecimal']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMViewPaidLoanArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanMViewStartingEntryArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanManagementByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryLoanManagementsArgs = {
+  accountNo?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
