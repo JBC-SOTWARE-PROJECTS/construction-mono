@@ -46,7 +46,7 @@ class FiscalServices extends AbstractDaoService<Fiscal> {
 
 		// @Adonis @Wilson  - you will encounter an error if no Fiscal Record matched your transaction Date
 		LocalDate localDateOfTransaction = transactionDate.atZone(ZoneId.systemDefault()).toLocalDate()
-		createQuery("Select f from Fiscal f where   :localDate >= f.fromDate   and :localDate <= f.toDate ",[
+		createQuery("Select f from Fiscal f where   :localDate >= f.fromDate   and :localDate <= f.toDate and f.active is true ",[
 				localDate:localDateOfTransaction]).resultList.find()
 	}
 
