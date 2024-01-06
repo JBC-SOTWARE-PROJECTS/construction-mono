@@ -3157,6 +3157,14 @@ export type GraphQlRetVal_SubAccountSetup = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlRetVal_WithholdingTaxMatrix = {
+  __typename?: 'GraphQLRetVal_WithholdingTaxMatrix';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<WithholdingTaxMatrix>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GroupPolicy = {
   __typename?: 'GroupPolicy';
   description?: Maybe<Scalars['String']['output']>;
@@ -4271,6 +4279,7 @@ export type Mutation = {
   upsertTransType?: Maybe<TransactionType>;
   upsertUnitMeasurement?: Maybe<UnitMeasurement>;
   upsertVehicleUsageMonitoring?: Maybe<VehicleUsageMonitoring>;
+  upsertWithholdingTaxMatrix?: Maybe<GraphQlRetVal_WithholdingTaxMatrix>;
   upsertWtx?: Maybe<DisbursementWtx>;
   voidLedgerById?: Maybe<InventoryLedger>;
   voidLedgerByRef?: Maybe<InventoryLedger>;
@@ -6582,6 +6591,13 @@ export type MutationUpsertVehicleUsageMonitoringArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertWithholdingTaxMatrixArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertWtxArgs = {
   it?: InputMaybe<DisbursementWtxDtoInput>;
   parent?: InputMaybe<DisbursementInput>;
@@ -8631,6 +8647,11 @@ export enum PayrollStatus {
   Finalized = 'FINALIZED'
 }
 
+export enum PayrollType {
+  SemiMonthly = 'SEMI_MONTHLY',
+  Weekly = 'WEEKLY'
+}
+
 export type Permission = {
   __typename?: 'Permission';
   description?: Maybe<Scalars['String']['output']>;
@@ -9831,6 +9852,7 @@ export type Query = {
   getTotalMaterials?: Maybe<Scalars['BigDecimal']['output']>;
   getTotals?: Maybe<Scalars['BigDecimal']['output']>;
   getUnitProjects?: Maybe<Array<Maybe<UnitDto>>>;
+  getWithholdingTaxMatrix?: Maybe<Array<Maybe<WithholdingTaxMatrix>>>;
   /** Get all Group Policies */
   groupPolicies?: Maybe<Array<Maybe<GroupPolicy>>>;
   /** List of  grouped account types */
@@ -11784,6 +11806,12 @@ export type QueryGetTotalMaterialsArgs = {
 /** Query root */
 export type QueryGetTotalsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetWithholdingTaxMatrixArgs = {
+  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -14132,6 +14160,22 @@ export type VehicleUsageMonitoring = {
   startFuelReading?: Maybe<Scalars['String']['output']>;
   startOdometerReading?: Maybe<Scalars['String']['output']>;
   usagePurpose?: Maybe<Scalars['String']['output']>;
+};
+
+export type WithholdingTaxMatrix = {
+  __typename?: 'WithholdingTaxMatrix';
+  baseAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<CompanySettings>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  maxAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  minAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  percentage?: Maybe<Scalars['BigDecimal']['output']>;
+  thresholdAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  type?: Maybe<PayrollType>;
 };
 
 export type Wtx2307 = {
