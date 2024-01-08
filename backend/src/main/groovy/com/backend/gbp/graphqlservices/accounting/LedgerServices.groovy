@@ -996,9 +996,9 @@ from HeaderLedger hl where
 
         if(!showAll)
             queryString += """  HAVING COUNT(CASE WHEN (hl.approved_by IS NULL OR hl.approved_by = '') THEN 1 ELSE NULL END) > 0
-                                ORDER BY min(hl.transaction_date) DESC
+                                ORDER by hlg.record_no desc,min(hl.transaction_date) desc 
                                 LIMIT :size OFFSET :offset """
-        else queryString += """ ORDER BY min(hl.transaction_date) DESC
+        else queryString += """ ORDER by hlg.record_no desc,min(hl.transaction_date) desc 
                                 LIMIT :size OFFSET :offset """
 
         def headerLedgerList = entityManager.createNativeQuery(queryString)
@@ -1538,7 +1538,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         headerLedger.docType = ledgerDocType
         headerLedger.journalType = journalType
         headerLedger.transactionDate = transactionDatetime
-        headerLedger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).toLocalDate()
+        headerLedger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
         headerLedger.beginningBalance = begBalance
         headerLedger.custom = custom
         headerLedger.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1562,6 +1562,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
             headerLedgerGroup.entity_name = headerLedger.entityName
             headerLedgerGroup.particulars = headerLedger.particulars
+            headerLedgerGroup.company = SecurityUtils.currentCompany()
             def newSave = headerGroupServices.save(headerLedgerGroup)
             headerLedger.headerLedgerGroup = newSave.id
         }

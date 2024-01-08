@@ -4,7 +4,7 @@ import { SaveOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
 import { Button, Col, Form, Modal, Row, Space, Typography, App } from "antd";
 import _ from "lodash";
-import { requiredField } from "@/utility/helper";
+import { decimalRound2, requiredField } from "@/utility/helper";
 import {
   FormInput,
   FormTextArea,
@@ -13,7 +13,10 @@ import {
 } from "@/components/common";
 import { useProjectCostCategory, useProjectCostUnits } from "@/hooks/inventory";
 import dayjs from "dayjs";
-import { GET_PROJECT_BY_ID, UPSERT_RECORD_PROJECT_COST } from "@/graphql/inventory/project-queries";
+import {
+  GET_PROJECT_BY_ID,
+  UPSERT_RECORD_PROJECT_COST,
+} from "@/graphql/inventory/project-queries";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -82,7 +85,7 @@ export default function UpsertProjectCost(props: IProps) {
       let qty = getFieldValue("qty");
       if (qty) {
         let total = qty * value;
-        setFieldValue("totalCost", total);
+        setFieldValue("totalCost", decimalRound2(total));
       }
     }
   };

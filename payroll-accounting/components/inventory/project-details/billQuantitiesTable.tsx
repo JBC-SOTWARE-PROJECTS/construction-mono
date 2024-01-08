@@ -1,11 +1,17 @@
+import { AccountContext } from "@/components/accessControl/AccountContext";
 import { ProjectCost } from "@/graphql/gql/graphql";
 import { ExtendedProjectCostRevisions } from "@/interface/projects";
 import { REVISIONS_COST } from "@/utility/constant";
-import { DateFormatterWithTime, NumberFormater } from "@/utility/helper";
+import {
+  DateFormatterWithTime,
+  NumberFormater,
+  accessControl,
+} from "@/utility/helper";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Row, Col, Table, Tag, Button, Typography, Space } from "antd";
 import { ColumnsType } from "antd/es/table";
 import _ from "lodash";
+import { useContext } from "react";
 
 interface IProps {
   dataSource: ProjectCost[];
@@ -27,6 +33,8 @@ export default function BillQuantitesTable({
   revesions,
 }: IProps) {
   // ===================== menus ========================
+  const account = useContext(AccountContext);
+  console.log("account", account);
   const subColmns: ColumnsType<ExtendedProjectCostRevisions> = [
     {
       title: "Date of Prev. Transaction",
@@ -193,16 +201,28 @@ export default function BillQuantitesTable({
       dataIndex: "action",
       key: "action",
       width: 90,
-      render: (text, record) => (
+      align: "center",
+      render: (_, record) => (
         <Space>
-          <Button size="small" type="dashed" onClick={() => handleOpen(record)}>
+          <Button
+            size="small"
+            type="dashed"
+            onClick={() => handleOpen(record)}
+            disabled={accessControl(
+              account.user?.access || [],
+              "bill_of_quantities_revision"
+            )}>
             <EditOutlined />
           </Button>
           <Button
             size="small"
             danger
             type="dashed"
-            onClick={() => handleRemove(record)}>
+            onClick={() => handleRemove(record)}
+            disabled={accessControl(
+              account.user?.access || [],
+              "add_bill_of_quantities"
+            )}>
             <DeleteOutlined />
           </Button>
         </Space>
@@ -229,7 +249,7 @@ export default function BillQuantitesTable({
               }
             },
             expandedRowRender: (record) => (
-              <div className="w-full">
+              <div className="w-full px-5">
                 <p style={{ margin: 0, fontWeight: "bold" }}>Revision Logs</p>
                 <Table
                   rowKey="id"

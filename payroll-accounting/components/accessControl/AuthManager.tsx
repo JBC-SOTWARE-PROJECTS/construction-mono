@@ -12,6 +12,7 @@ import CircularProgress from "../circularProgress";
 import dynamic from "next/dynamic";
 import Custom403 from "@/pages/403";
 import { ModalProvider } from "react-modal-hook";
+import { AppContextProvider } from "./AppContext";
 
 const DiverseTradeLayout = dynamic(() => import("../layout"), {
   ssr: false,
@@ -50,9 +51,11 @@ const AuthManager = (props: any) => {
               React.cloneElement(child, { account: value || NULLACCOUNT })
           );
           return (
-            <DiverseTradeLayout account={value}>
-              <ModalProvider>{childrenWithProps}</ModalProvider>
-            </DiverseTradeLayout>
+            <AppContextProvider>
+              <DiverseTradeLayout account={value}>
+                <ModalProvider>{childrenWithProps}</ModalProvider>
+              </DiverseTradeLayout>
+            </AppContextProvider>
           );
         }}
       </AccountConsumer>

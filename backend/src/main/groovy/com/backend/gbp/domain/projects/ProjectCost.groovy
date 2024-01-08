@@ -11,6 +11,7 @@ import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
 
 import javax.persistence.*
+import java.math.RoundingMode
 import java.time.Instant
 
 @Entity
@@ -71,7 +72,8 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 
 	@Transient
 	BigDecimal getTotalCost() {
-		return qty * cost
+		def e =  qty * cost
+		return e.setScale(2, RoundingMode.HALF_EVEN)
 	}
 
 }

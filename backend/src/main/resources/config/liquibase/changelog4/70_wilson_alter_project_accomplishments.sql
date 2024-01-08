@@ -1,0 +1,1 @@
+ALTER TABLE projects.project_updates ADD COLUMN IF NOT EXISTS transaction_no varchar default null;

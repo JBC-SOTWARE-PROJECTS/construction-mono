@@ -17,5 +17,9 @@ class UnitDto {
     String unit
 }
 
+@TupleConstructor
+class Weather {
+    String weather
+}
 
 

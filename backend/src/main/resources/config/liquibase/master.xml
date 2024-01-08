@@ -495,8 +495,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/63_jacky_alter_emp_attendance_camera_capture.sql"
              relativeToChangelogFile="false"/>
-    <!-- <include file="classpath:config/liquibase/changelog4/63_donss_add_loan_table.sql"
-             relativeToChangelogFile="false"/> -->
+    <include file="classpath:config/liquibase/changelog4/63_donss_add_loan_table.sql"
+             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/63_wilson_add_index_project_cost.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/64_wilson_project_cost_revision.sql"
@@ -504,5 +504,21 @@
     <include file="classpath:config/liquibase/changelog4/65_wilson_project_cost_alter.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/66_jacky_vehicle_usage_docs.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/65_wilson_project_cost_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/66_wilson_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/67_billing_item_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/68_wilson_project_accomplishments.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/69_wilson_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/70_wilson_alter_project_accomplishments.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/71_wilson_project_accomplishments_workers.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/72_wilson_project_progress.sql"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>

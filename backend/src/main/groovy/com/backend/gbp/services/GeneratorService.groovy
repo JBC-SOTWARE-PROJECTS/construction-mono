@@ -111,7 +111,10 @@ enum GeneratorType {
 	AR_CREDIT_NOTE_ITEMS,
 
 	FIXED_ASSET_ITEMS,
-	LOAN_NO
+	LOAN_NO,
+	LOAN_RECORD,
+	DAR_NO,
+	PRS_NO
 }
 
 @Service

@@ -4,7 +4,7 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, Row, Col, Form, App } from "antd";
+import { Input, Button, Row, Col, Form, App, Tag } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { confirmDelete, useDialog } from "@/hooks";
 import UpsertProjectCost from "@/components/inventory/projects/dialogs/upsertProjectCost";
@@ -27,6 +27,7 @@ import { useRouter } from "next/router";
 import _ from "lodash";
 import { ExtendedProjectCostRevisions } from "@/interface/projects";
 import ReviseProjectCost from "@/components/inventory/projects/dialogs/reviseProjectCost";
+import AccessControl from "@/components/accessControl/AccessControl";
 
 const { Search } = Input;
 
@@ -85,6 +86,7 @@ export default function BillQuantitesContent() {
         if (result) {
           message.success(result);
           refetch();
+          openRevisions(record?.id, record?.description ?? "");
         }
       });
     } else {
@@ -98,25 +100,23 @@ export default function BillQuantitesContent() {
   };
 
   const openRevisions = (id: string, desc: string) => {
-    if (_.isEmpty(state?.revesions[id])) {
-      getRevisions({
-        variables: {
-          id: id,
-        },
-        onCompleted: (data) => {
-          let result = data?.pCostRevByList as ProjectCostRevisions[];
-          let finalResult: ExtendedProjectCostRevisions[] = (result || []).map(
-            (obj: ProjectCostRevisions) => ({ ...obj, description: desc })
-          );
-          if (!_.isEmpty(result)) {
-            setState((prev) => ({
-              ...prev,
-              revesions: { ...prev.revesions, [id]: finalResult },
-            }));
-          }
-        },
-      });
-    }
+    getRevisions({
+      variables: {
+        id: id,
+      },
+      onCompleted: (data) => {
+        let result = data?.pCostRevByList as ProjectCostRevisions[];
+        let finalResult: ExtendedProjectCostRevisions[] = (result || []).map(
+          (obj: ProjectCostRevisions) => ({ ...obj, description: desc })
+        );
+        if (!_.isEmpty(result)) {
+          setState((prev) => ({
+            ...prev,
+            revesions: { ...prev.revesions, [id]: finalResult },
+          }));
+        }
+      },
+    });
   };
 
   return (
@@ -128,16 +128,20 @@ export default function BillQuantitesContent() {
           flexWrap: "wrap",
         }}
         bordered
+        size="small"
         headerBordered
         extra={
-          <ProFormGroup>
-            <Button
-              type="primary"
-              icon={<PlusCircleOutlined />}
-              onClick={() => onUpsertRecord()}>
-              Add Bill of Quantities
-            </Button>
-          </ProFormGroup>
+          <AccessControl allowedPermissions={["add_bill_of_quantities"]}>
+            <ProFormGroup size="small">
+              <Button
+                size="small"
+                type="primary"
+                icon={<PlusCircleOutlined />}
+                onClick={() => onUpsertRecord()}>
+                Add Bill of Quantities
+              </Button>
+            </ProFormGroup>
+          </AccessControl>
         }>
         <div className="w-full mb-5">
           <Form layout="vertical" className="filter-form">
