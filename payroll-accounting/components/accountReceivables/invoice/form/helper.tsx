@@ -40,6 +40,6 @@ export const textStatus = (value: {
 }
 
 export const invoiceTypeDetails = {
-  CLAIMS: { icon: <SolutionOutlined />, label: 'Claims', color: 'purple' },
+  PROJECT: { icon: <SolutionOutlined />, label: 'Project', color: 'purple' },
   REGULAR: { icon: <TagsOutlined />, label: 'Regular', color: 'magenta' },
 }

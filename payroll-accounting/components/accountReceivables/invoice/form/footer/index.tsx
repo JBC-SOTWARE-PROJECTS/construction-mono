@@ -42,7 +42,7 @@ export default function FormFooter(props: FormFooterI) {
           />
         )}
 
-        {invoiceType == 'CLAIMS' && (
+        {invoiceType == 'PROJECT' && (
           <SubSummary
             {...{
               label: 'Subtotal HCI',
@@ -51,7 +51,7 @@ export default function FormFooter(props: FormFooterI) {
           />
         )}
 
-        {invoiceType == 'CLAIMS' && (
+        {invoiceType == 'PROJECT' && (
           <SubSummary
             {...{
               label: 'Subtotal PF',

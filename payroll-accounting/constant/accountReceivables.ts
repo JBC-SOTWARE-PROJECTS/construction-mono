@@ -35,7 +35,7 @@ export const CustomerTypeOptionsFilter = [
 
 export const InvoiceTransactionModeOptions = [
   { value: 'property_rent_and_energy', label: 'Property Rent and Energy' },
-  { value: 'claims', label: 'Claims' },
+  { value: 'claims', label: 'Project' },
 ]
 
 export const InvoiceItemsTypeOptions = [
@@ -153,7 +153,7 @@ export const GuarantorBillingItemSearchFilter = [
   },
   {
     value: 'APPROVAL_CODE',
-    label: 'Claims Reference',
+    label: 'Project Reference',
   },
 ]
 
@@ -198,7 +198,7 @@ export enum CustomerTypeDomainEnum {
 
 export const InvoiceTypeOptEnum = {
   regular: { value: 'regular', label: 'Regular Invoice' },
-  claims: { value: 'claims', label: 'Claims Invoice' },
+  claims: { value: 'claims', label: 'Project Invoice' },
 }
 
 export enum InvoiceItemsTypeEnum {
@@ -415,7 +415,7 @@ export const MiscEWalletType = [
 ]
 
 export const InvoiceTypeOption = [
-  { label: 'Claims Invoice', value: 'CLAIMS' },
+  { label: 'Project Invoice', value: 'PROJECT' },
   { label: 'Regular Invoice', value: 'REGULAR' },
 ]
 

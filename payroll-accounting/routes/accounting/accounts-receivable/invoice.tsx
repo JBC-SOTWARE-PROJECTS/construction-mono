@@ -19,7 +19,7 @@ import {
 import { useDialog } from '@/hooks'
 import ConfirmationPasswordHook from '@/hooks/promptPassword'
 import { apiUrlPrefix } from '@/shared/settings'
-import { InfoCircleOutlined } from '@ant-design/icons'
+import { InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery } from '@apollo/client'
 import type { MenuProps } from 'antd'
@@ -231,7 +231,14 @@ export default function Invoice() {
     >
       <CardLayout
         onSearch={onSearch}
-        extra={<Button onClick={handleCreateInvoiceClick}>New Invoice</Button>}
+        extra={
+          <Dropdown menu={createMenuProps} placement='bottomRight'>
+            <Button type='primary' icon={<PlusCircleOutlined />}>
+              New Invoice
+            </Button>
+          </Dropdown>
+          // <Button onClick={handleCreateInvoiceClick}>New Invoice</Button>
+        }
       >
         <Table
           rowKey='id'

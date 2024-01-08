@@ -261,7 +261,7 @@ export const assignCnFormValues = (
   dispatch({ type: 'customer-id', payload: values?.arCustomer?.id ?? '' })
   dispatch({
     type: 'set-invoiceType',
-    payload: (values?.invoiceType ?? 'CLAIMS') as InvoiceTypeT,
+    payload: (values?.invoiceType ?? 'PROJECT') as InvoiceTypeT,
   })
   dispatch({ type: 'creditNote-id', payload: id })
   dispatch({ type: 'status', payload: status ?? '' })

@@ -40,7 +40,7 @@ interface CreditNCreateProps {
   creditNoteType: CreditNoteTypeT
 }
 
-export type InvoiceTypeT = 'CLAIMS' | 'REGULAR'
+export type InvoiceTypeT = 'PROJECT' | 'REGULAR'
 export interface StateI {
   id?: string
   status?: string

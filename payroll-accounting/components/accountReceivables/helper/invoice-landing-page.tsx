@@ -10,8 +10,8 @@ import type { MenuProps } from 'antd'
 
 export const CreateInvoiceMenu: MenuProps['items'] = [
   {
-    label: 'Claims Invoice',
-    key: 'CLAIMS',
+    label: 'Project Invoice',
+    key: 'PROJECT',
     icon: <SolutionOutlined />,
   },
   {

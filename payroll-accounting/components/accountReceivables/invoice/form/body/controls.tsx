@@ -50,7 +50,7 @@ export default function BodyControls(props: BodyControlsI) {
 
   return (
     <Space size='middle'>
-      {invoiceType == 'CLAIMS' && editable && (
+      {invoiceType == 'PROJECT' && editable && (
         <Button
           size='middle'
           icon={<PlusCircleOutlined />}
@@ -58,10 +58,10 @@ export default function BodyControls(props: BodyControlsI) {
           // style={{ color: '#0078c8', fontWeight: 'bold' }}
           type='primary'
         >
-          Add Claims
+          Add Project
         </Button>
       )}
-      {/* {invoiceType == 'CLAIMS' && editable && (
+      {/* {invoiceType == 'PROJECT' && editable && (
         <Button
           size='middle'
           icon={<PlusCircleOutlined />}
@@ -69,7 +69,7 @@ export default function BodyControls(props: BodyControlsI) {
           // style={{ color: '#0078c8', fontWeight: 'bold' }}
           type='primary'
         >
-          Add Manual Claims
+          Add Manual Project
         </Button>
       )} */}
 

@@ -261,7 +261,7 @@ export default function FormBody(props: FormBodyI) {
       className: 'NUMBER',
       width: 180,
       editable:
-        invoiceType == 'CLAIMS' || state.isCWT || state.isVatable
+        invoiceType == 'PROJECT' || state.isCWT || state.isVatable
           ? false
           : true,
       sorter: (a: any, b: any) => a.totalAmountDue - b.totalAmountDue,

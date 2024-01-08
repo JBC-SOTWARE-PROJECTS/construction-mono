@@ -122,7 +122,7 @@ export default function InvoiceViewing(props: InvoiceViewingI) {
       render: (text) => (text ? dayjs(text).format(' MM/DD/YYYY') : null),
     },
     {
-      title: invoiceType == 'CLAIMS' ? 'Particular' : 'Product/Services',
+      title: invoiceType == 'PROJECT' ? 'Particular' : 'Product/Services',
       dataIndex: ['invoiceParticulars', 'itemName'],
       className: 'SEARCH',
       width: 300,

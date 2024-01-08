@@ -100,7 +100,7 @@ export default function CreateManualClaims(props: CreateManualClaimsI) {
 
   return (
     <Modal
-      title='Manually Add Claims'
+      title='Manually Add Project'
       wrapClassName='ar-modal'
       open={true}
       okText='Create'

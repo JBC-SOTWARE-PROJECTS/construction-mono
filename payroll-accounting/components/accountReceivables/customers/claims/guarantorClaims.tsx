@@ -165,7 +165,7 @@ const GuarantorClaims = (props: {
       width: 150,
     },
     {
-      title: 'Claims Reference',
+      title: 'Project Reference',
       dataIndex: 'approvalCode',
       width: 55,
     },

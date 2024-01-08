@@ -23,12 +23,12 @@ export default function CustomerClaims(props: {
   const items: TabsProps['items'] = [
     {
       key: '1',
-      label: `Guarantor Claims`,
+      label: `Guarantor Project`,
       children: <GuarantorClaims {...{ id, customerRefId, hide }} />,
     },
     // {
     //   key: '2',
-    //   label: `Transferred Claims`,
+    //   label: `Transferred Project`,
     //   children: (
     //     <TransferredClaims
     //       {...{ invoiceId, customerId, invoiceReturn, setInvoiceReturn }}
@@ -42,7 +42,7 @@ export default function CustomerClaims(props: {
       title={
         <CustomModalPageHeader
           {...{
-            label: 'Patient Claims',
+            label: 'Patient Project',
           }}
         />
       }

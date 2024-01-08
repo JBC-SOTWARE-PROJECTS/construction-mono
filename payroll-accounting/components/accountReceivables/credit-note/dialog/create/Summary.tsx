@@ -34,14 +34,14 @@ export default function CNSummary(props: CreditNCreateContextProps) {
           />
         )}
 
-        {state.invoiceType == 'CLAIMS' && (
+        {state.invoiceType == 'PROJECT' && (
           <SubSummary
             label='Subtotal HCI'
             value={numeral(totalSummary.subTotalHCI).format('0,0.00')}
           />
         )}
 
-        {state.invoiceType == 'CLAIMS' && (
+        {state.invoiceType == 'PROJECT' && (
           <SubSummary
             label='Subtotal PF'
             value={numeral(totalSummary.subTotalPF).format('0,0.00')}

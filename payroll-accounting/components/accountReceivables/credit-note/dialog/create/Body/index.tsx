@@ -77,12 +77,12 @@ export default function CNBodyContainer(props: CreditNCreateContextProps) {
       dataIndex: ['invoiceParticulars', 'itemName'],
       className: 'SEARCH',
       width: 300,
-      editable: state?.invoiceType == 'CLAIMS' ? false : true,
+      editable: state?.invoiceType == 'PROJECT' ? false : true,
       sorter: (a: any, b: any) =>
         sortArrayText(a.itemName as string, b.itemName as string),
       defaultSortOrder: ['ascend'],
       ...getColumnSearchProps(
-        state?.invoiceType == 'CLAIMS'
+        state?.invoiceType == 'PROJECT'
           ? (['itemName'] as any)
           : (['invoiceParticulars', 'itemName'] as any)
       ),
@@ -127,7 +127,7 @@ export default function CNBodyContainer(props: CreditNCreateContextProps) {
       className: 'NUMBER',
       width: 180,
       editable:
-        state?.invoiceType == 'CLAIMS' || state.isCWT || state.isVatable
+        state?.invoiceType == 'PROJECT' || state.isCWT || state.isVatable
           ? false
           : true,
       sorter: (a: any, b: any) => a.totalAmountDue - b.totalAmountDue,
