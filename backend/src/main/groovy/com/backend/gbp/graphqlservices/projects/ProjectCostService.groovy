@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 
 @Component
 @GraphQLApi
@@ -151,17 +152,22 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
             @GraphQLArgument(name = "tag") String tag
     ) {
         if(id) {
-            def proj = findOne(id)
-            def rev = projectCostRevisionService.upsertProjectRevCost(proj, tag, null)
+            def projCost = findOne(id)
+            def project = projCost.project
+
+            def rev = projectCostRevisionService.upsertProjectRevCost(projCost, tag, null)
             if(rev?.id){
                 def costing = upsertFromMap(id, fields, { ProjectCost entity, boolean forInsert ->
                     if(forInsert){
                         //conditions here before save
+                        entity.cost = entity.cost.setScale(2, RoundingMode.HALF_EVEN)
                     }
                 })
+                //update billing
+                billingItemService.updateBillingItemForRevisions(costing.id, costing)
                 return  costing
             }
-            return  proj
+            return  projCost
         }
 
         return null

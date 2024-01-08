@@ -27,8 +27,17 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 import java.time.Duration
 import java.time.Instant
+
+
+enum SALES_INTEGRATION {
+    PROJECT_BILL_QUANTITIES,
+    OTC_ITEM,
+    OTC_SERVICE,
+}
+
 
 @Component
 @GraphQLApi
@@ -263,12 +272,13 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         item.recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
             StringUtils.leftPad(no.toString(), 6, "0")
         }
-
+        BigDecimal cost = it.cost.setScale(2, RoundingMode.HALF_EVEN)
+        BigDecimal sub = it.qty * cost
         item.description = it.description
         item.qty = it.qty
-        item.debit = it.cost
+        item.debit = cost
         item.credit = BigDecimal.ZERO
-        item.subTotal = it.qty * it.cost
+        item.subTotal = sub.setScale(2, RoundingMode.HALF_EVEN)
         item.itemType = "SERVICE"
         item.outputTax = BigDecimal.ZERO
         item.wcost = BigDecimal.ZERO
@@ -547,12 +557,44 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         return item
     }
 
+    @Transactional
+    @GraphQLMutation(name = "updateBillingItemForRevisions")
+    BillingItem updateBillingItemForRevisions(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "it") ProjectCost it
+    ) {
+        def item = this.billingByRef(id)
+        BigDecimal cost = it.cost.setScale(2, RoundingMode.HALF_EVEN)
+        BigDecimal sub = it.qty * cost
+        item.qty = it.qty
+        item.debit = cost
+        item.credit = BigDecimal.ZERO
+        item.subTotal = sub.setScale(2, RoundingMode.HALF_EVEN)
+        item.recalculationDate = Instant.now()
+        item.tagNo = it.tagNo
+        save(item)
+        return item
+    }
+
     //override save for accounting entries
     @Override
     BillingItem save(BillingItem billingItem) {
         Boolean newEntity = billingItem.id == null
         def bItem = super.save(billingItem) as BillingItem
+        Boolean isRevise = bItem.tagNo != null
+        if(isRevise){
+            println("For Revisions")
+        }else{
+            println("First Time Save")
+        }
         return bItem
+    }
+
+    @Override
+    void delete(BillingItem billingItem) {
+        Boolean newEntity = billingItem.id == null
+        def bItem = super.delete(billingItem) as BillingItem
+
     }
 
 
