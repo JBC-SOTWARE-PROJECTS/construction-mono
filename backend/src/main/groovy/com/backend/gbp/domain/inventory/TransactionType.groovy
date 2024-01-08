@@ -41,5 +41,17 @@ class TransactionType extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "tag", columnDefinition = "varchar")
 	@UpperCase
 	String tag
+
+	@GraphQLQuery
+	@Column(name = "fix_asset", columnDefinition = "bool")
+	Boolean fixAsset
+
+	@GraphQLQuery
+	@Column(name = "consignment", columnDefinition = "bool")
+	Boolean consignment
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 }
 

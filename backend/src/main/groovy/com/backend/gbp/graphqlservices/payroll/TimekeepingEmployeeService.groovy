@@ -2,6 +2,8 @@ package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.hrm.SalaryRateMultiplier
+import com.backend.gbp.domain.hrm.dto.EmployeeSalaryDto
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.AccumulatedLogs
 import com.backend.gbp.domain.payroll.Payroll
@@ -10,6 +12,7 @@ import com.backend.gbp.domain.payroll.Timekeeping
 import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.graphqlservices.hrm.AccumulatedLogsCalculator
+import com.backend.gbp.graphqlservices.hrm.SalaryRateMultiplierService
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollEmployeeStatusService
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Component
 
 import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
+import java.math.RoundingMode
 import java.time.Instant
 
 @TypeChecked
@@ -50,6 +54,9 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     @Autowired
     AccumulatedLogRepository accumulatedLogRepository
+
+    @Autowired
+    SalaryRateMultiplierService salaryRateMultiplierService
 
     @PersistenceContext
     EntityManager entityManager
@@ -123,11 +130,11 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
         timekeepingEmployees.each { TimekeepingEmployee timekeepingEmployee ->
             timekeepingEmployee.status = PayrollEmployeeStatus.DRAFT
             timekeepingEmployee.accumulatedLogs.clear()
-            List<AccumulatedLogs> accumulatedLogs = accumulatedLogsCalculator.getAccumulatedLogs(
-                    payroll.dateStart,
+            List<AccumulatedLogs> accumulatedLogs = accumulatedLogsCalculator.getAccumulatedLogs(payroll.dateStart,
                     payroll.dateEnd,
                     timekeepingEmployee.payrollEmployee.employee.id,
-                    true)
+                    true,
+                    timekeepingEmployee.payrollEmployee.employee)
             accumulatedLogs.each {
                 it.company = company
                 it.timekeepingEmployee = timekeepingEmployee
@@ -162,43 +169,91 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
     //=================================MUTATIONS=================================\\
     @Override
     @GraphQLMutation(name = "updateTimekeepingEmployeeStatus")
-    GraphQLResVal<TimekeepingEmployee> updateEmployeeStatus(
-            @GraphQLArgument(name = "id", description = "ID of the module employee.") UUID id,
-            @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status
-    ) {
-        TimekeepingEmployee employee = null
-        timekeepingEmployeeRepository.findById(id).ifPresent { employee = it }
-        if (!employee) return new GraphQLResVal<TimekeepingEmployee>(null, false, "Failed to update employee timekeeping status. Please try again later!")
-        else {
+    GraphQLResVal<TimekeepingEmployee> updateEmployeeStatus(@GraphQLArgument(name = "id", description = "ID of the module employee.") UUID id,
+                                                            @GraphQLArgument(name = "status", description = "Status of the module employee you want to set.") PayrollEmployeeStatus status) {
+        TimekeepingEmployee timekeepingEmployee = null
+        timekeepingEmployeeRepository.findById(id).ifPresent { timekeepingEmployee = it }
+        if (!timekeepingEmployee) return new GraphQLResVal<TimekeepingEmployee>(null, false, "Failed to update employee timekeeping status. Please try again later!") else {
 
-            employee = this.updateStatus(id, status)
+            timekeepingEmployee = this.updateStatus(id, status)
+            timekeepingEmployee.payrollEmployee.employee
             Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
+            SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
 
             if (status == PayrollEmployeeStatus.FINALIZED) {
-                employee.accumulatedLogs.each {
-                    AccumulatedLogs accumulatedLogs ->
+                timekeepingEmployee.projectBreakdown = []
+                timekeepingEmployee.salaryBreakdown = []
+                if (timekeepingEmployee.payrollEmployee.employee.isExcludedFromAttendance) {
+                    timekeepingEmployee.salaryBreakdown.push(calculateSalaryBreakdown(multiplier, null, timekeepingEmployee.payrollEmployee.employee))
+                } else {
+                    timekeepingEmployee.accumulatedLogs.each { AccumulatedLogs accumulatedLogs ->
                         accumulatedLogs.projectBreakdown.each {
                             TimekeepingService.consolidateProjectBreakdown(employeeBreakdownMap, it)
                         }
+                    }
+
+                    employeeBreakdownMap.keySet().each {
+                        HoursLog hoursLog = employeeBreakdownMap.get(it.toString())
+                        timekeepingEmployee.projectBreakdown.push(hoursLog)
+                        timekeepingEmployee.salaryBreakdown.push(calculateSalaryBreakdown(multiplier, hoursLog, timekeepingEmployee.payrollEmployee.employee))
+                    }
                 }
-                employee.projectBreakdown = []
-                employeeBreakdownMap.keySet().each {
-                    employee.projectBreakdown.push(employeeBreakdownMap.get(it.toString()))
-                }
+
+
             }
-            return new GraphQLResVal<TimekeepingEmployee>(employee, true, "Successfully updated employee timekeeping status!")
+            timekeepingEmployeeRepository.save(timekeepingEmployee)
+            return new GraphQLResVal<TimekeepingEmployee>(timekeepingEmployee, true, "Successfully updated employee timekeeping status!")
         }
     }
 
+
+    static EmployeeSalaryDto calculateSalaryBreakdown(SalaryRateMultiplier multiplier, HoursLog hoursLog, Employee employee) {
+        EmployeeSalaryDto salaryBreakDown = new EmployeeSalaryDto()
+        Integer daysInCutoff = 12
+
+        BigDecimal hourlyRate
+        if (employee?.isExcludedFromAttendance) {
+            salaryBreakDown.company = employee.currentCompany.id
+            salaryBreakDown.companyName = employee.currentCompany.companyName
+            salaryBreakDown.regular = employee.monthlyRate
+            return salaryBreakDown
+        }
+        if (employee?.isFixedRate) {
+            BigDecimal dailyRate = (employee.monthlyRate / 2) / daysInCutoff
+            hourlyRate = dailyRate / 8
+        } else {
+            hourlyRate = employee.hourlyRate
+        }
+
+        if(hoursLog.project) {
+            salaryBreakDown.project = hoursLog.project
+            salaryBreakDown.projectName = hoursLog.projectName
+        }else{
+            salaryBreakDown.company = hoursLog.company
+            salaryBreakDown.companyName = hoursLog.companyName
+        }
+
+        salaryBreakDown.regular = ((hourlyRate * hoursLog.regular * multiplier.regular) as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.overtime = ((hourlyRate * hoursLog.overtime) * multiplier.regularOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.regularHoliday = ((hourlyRate * hoursLog.regularHoliday) * multiplier.regularHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.overtimeHoliday = ((hourlyRate * hoursLog.overtimeHoliday) * multiplier.regularHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.regularDoubleHoliday = ((hourlyRate * hoursLog.regularDoubleHoliday) * multiplier.doubleHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.overtimeDoubleHoliday = ((hourlyRate * hoursLog.overtimeDoubleHoliday) * multiplier.doubleHolidayOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.regularSpecialHoliday = ((hourlyRate * hoursLog.regularSpecialHoliday) * multiplier.specialHoliday as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+        salaryBreakDown.overtimeSpecialHoliday = ((hourlyRate * hoursLog.overtimeSpecialHoliday) * multiplier.specialHolidayOvertime as BigDecimal).setScale(2, RoundingMode.HALF_EVEN)
+
+        return salaryBreakDown
+
+    }
+
     @GraphQLMutation(name = "recalculateOneDay")
-    GraphQLResVal<String> recalculateOneDay(
-            @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "startDate") Instant startDate,
-            @GraphQLArgument(name = "endDate") Instant endDate,
-            @GraphQLArgument(name = "employeeId") UUID employeeId
-    ) {
+    GraphQLResVal<String> recalculateOneDay(@GraphQLArgument(name = "id") UUID id,
+                                            @GraphQLArgument(name = "startDate") Instant startDate,
+                                            @GraphQLArgument(name = "endDate") Instant endDate,
+                                            @GraphQLArgument(name = "employeeId") UUID employeeId) {
         AccumulatedLogs accumulatedLogs = accumulatedLogRepository.findById(id).get()
-        List<AccumulatedLogs> list = accumulatedLogsCalculator.getAccumulatedLogs(startDate, endDate, employeeId, true)
+        List<AccumulatedLogs> list = accumulatedLogsCalculator.getAccumulatedLogs(startDate, endDate, employeeId, true,
+                accumulatedLogs.timekeepingEmployee.payrollEmployee.employee)
         list[0].timekeepingEmployee = accumulatedLogs.timekeepingEmployee
         accumulatedLogRepository.delete(accumulatedLogs)
         accumulatedLogRepository.save(list[0])

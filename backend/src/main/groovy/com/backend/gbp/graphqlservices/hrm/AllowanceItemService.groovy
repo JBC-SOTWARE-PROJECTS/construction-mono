@@ -84,10 +84,10 @@ class AllowanceItemService extends AbstractDaoService<AllowanceItem> {
 
         allowanceItemList.each {
 
-            if(toDelete.contains(it.allowanceType.id)){
+            if(toDelete.contains(it.allowance.id)){
                 deleteItems.push(it)
             }
-            existAllowanceItemTypes.push(it.allowanceType.id)
+            existAllowanceItemTypes.push(it.allowance.id)
         }
          allowanceItemRepository.deleteAll(deleteItems)
 
@@ -95,10 +95,10 @@ class AllowanceItemService extends AbstractDaoService<AllowanceItem> {
                 if(!existAllowanceItemTypes.contains(it.id)) {
                     AllowanceItem allowanceItem = new AllowanceItem()
 
-                    allowanceItem.allowanceType = allowanceRepository.findById(it.id).get()
+                    allowanceItem.allowance = allowanceRepository.findById(it.id).get()
                     allowanceItem.amount = it.amount
                     allowanceItem.name = it.name
-                    allowanceItem.allowanceTypeName = it.allowanceType
+                    allowanceItem.allowanceType = it.allowanceType
                     allowanceItem.allowancePackage = allPackage
                     allowanceItem.company = companySettings
                     allowances.add(allowanceItem)

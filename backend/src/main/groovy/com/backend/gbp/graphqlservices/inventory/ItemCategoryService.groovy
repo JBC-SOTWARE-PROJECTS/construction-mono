@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.inventory
 import com.backend.gbp.domain.inventory.ItemCategory
 import com.backend.gbp.domain.inventory.ItemGroup
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -38,9 +39,17 @@ class ItemCategoryService extends AbstractDaoService<ItemCategory> {
     List<ItemCategory> itemCategoryList(
             @GraphQLArgument(name = "filter") String filter
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         String query = '''Select e from ItemCategory e where lower(concat(e.categoryDescription,e.categoryCode)) like lower(concat('%',:filter,'%'))'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
+
         createQuery(query, params).resultList.sort{it.categoryCode}
     }
 
@@ -48,10 +57,18 @@ class ItemCategoryService extends AbstractDaoService<ItemCategory> {
     List<ItemCategory> itemCategoryActive(
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         String query = '''Select e from ItemCategory e where e.itemGroup.id = :id and e.isActive = :status'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
         params.put('status', true)
+
+        if (company) {
+            query += ''' and (e.company = :company)'''
+            params.put("company", company)
+        }
+
         createQuery(query, params).resultList.sort { it.categoryCode }
     }
 
@@ -62,11 +79,14 @@ class ItemCategoryService extends AbstractDaoService<ItemCategory> {
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         upsertFromMap(id, fields, { ItemCategory entity, boolean forInsert ->
             if(forInsert){
                 entity.categoryCode = generatorService.getNextValue(GeneratorType.CATCODE, {
                     return "CAT-" + StringUtils.leftPad(it.toString(), 6, "0")
                 })
+                entity.company = company
             }
         })
     }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { SaveOutlined, TransactionOutlined } from "@ant-design/icons";
 import { Button, Col, Form, Modal, Row, Space, Typography } from "antd";
 import FormSelect from "@/components/common/formSelect/formSelect";
@@ -7,11 +7,16 @@ import {
   PettyCashOthersDto,
   IFormPettyCashOthers,
 } from "@/interface/payables/formInterfaces";
-import { useOffices, useExpenseTransaction } from "@/hooks/payables";
+import {
+  useOffices,
+  useExpenseTransaction,
+  useProjects,
+} from "@/hooks/payables";
 import { FormTextArea } from "@/components/common";
 import _ from "lodash";
 import { randomId, requiredField, shapeOptionValue } from "@/utility/helper";
 import { decimalRound2 } from "@/utility/helper";
+import { ExpenseTransaction, Office, Projects } from "@/graphql/gql/graphql";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -20,9 +25,13 @@ interface IProps {
 
 export default function PettyCashOtherModal(props: IProps) {
   const { hide, record } = props;
+  const [selectedOffice, setOffice] = useState("");
+  const [form] = Form.useForm();
+  const { setFieldValue } = form;
   // ================== Queries =====================
   const types = useExpenseTransaction({ type: "PETTYCASH" });
   const offices = useOffices();
+  const projects = useProjects({ office: selectedOffice });
   //================== functions ====================
   const onSubmit = (data: IFormPettyCashOthers) => {
     const payload = {
@@ -39,19 +48,19 @@ export default function PettyCashOtherModal(props: IProps) {
       payload.office = {
         id: data?.office?.value,
         officeDescription: data?.office?.label,
-      };
+      } as Office;
     }
     payload.project = null;
     if (data.project) {
       payload.project = {
         id: data?.project?.value,
         description: data?.project?.label,
-      };
+      } as Projects;
     }
     payload.transType = {
       id: data?.transType?.value,
       description: data?.transType?.label,
-    };
+    } as ExpenseTransaction;
     payload.amount = decimalRound2(data?.amount);
     payload.isNew = true;
     hide(payload);
@@ -108,6 +117,7 @@ export default function PettyCashOtherModal(props: IProps) {
         </Space>
       }>
       <Form
+        form={form}
         name="expenseForm"
         layout="vertical"
         onFinish={onSubmit}
@@ -141,6 +151,10 @@ export default function PettyCashOtherModal(props: IProps) {
                 labelInValue: true,
                 options: offices,
                 placeholder: "Select Offices",
+                onChange: (e) => {
+                  setOffice(e?.value);
+                  setFieldValue("project", null);
+                },
               }}
             />
           </Col>
@@ -151,7 +165,7 @@ export default function PettyCashOtherModal(props: IProps) {
               propsselect={{
                 showSearch: true,
                 labelInValue: true,
-                options: offices,
+                options: projects,
                 placeholder: "Select Project",
               }}
             />

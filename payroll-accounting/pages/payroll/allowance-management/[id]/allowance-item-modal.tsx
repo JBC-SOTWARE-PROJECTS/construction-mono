@@ -153,6 +153,9 @@ function AllowanceItemModal(props: propsTypes) {
     {
       title: "Allowance Type",
       dataIndex: "allowanceType",
+      render: (value: string) => {
+        return value.replace("_", " ");
+      },
     },
     {
       title: "Amount",

@@ -3,9 +3,8 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.PettyCashAccounting
 import com.backend.gbp.domain.accounting.PettyCashOther
-import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
-import com.backend.gbp.repository.OfficeRepository
+import com.backend.gbp.domain.accounting.ExpenseTransaction
 import com.backend.gbp.rest.dto.payables.PCVOthersDto
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper

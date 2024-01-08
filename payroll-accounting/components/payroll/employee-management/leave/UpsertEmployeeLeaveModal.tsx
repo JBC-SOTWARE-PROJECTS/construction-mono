@@ -161,7 +161,6 @@ function UpsertEmployeeLeaveModal({ record, refetch }: IParams) {
             ref={reasonRef}
             id="reasonInput"
             onChange={(e) => {
-              debugger;
               setWithPay(e.target.checked);
             }}
             defaultChecked={record?.withPay as boolean}

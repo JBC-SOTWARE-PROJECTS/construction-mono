@@ -1,21 +1,30 @@
-import { AccumulatedLogs, HoursLog } from "@/graphql/gql/graphql";
+import {
+  AccumulatedLogs,
+  EmployeeSalaryDto,
+  HoursLog,
+} from "@/graphql/gql/graphql";
 import { UnorderedListOutlined } from "@ant-design/icons";
-import { Descriptions, Modal, Table, Typography } from "antd";
+import { Descriptions, Modal, Radio, Typography } from "antd";
 import dayjs from "dayjs";
-import CustomButton from "../common/CustomButton";
 import { useState } from "react";
-import { CSSProperties } from "@ant-design/cssinjs/lib/hooks/useStyleRegister";
-import { DateFormatterWithTime } from "@/utility/helper";
+import CustomButton from "../common/CustomButton";
 import ProjectBreakdownTable from "./ProjectBreakdownTable";
 
 interface IProps {
   record: AccumulatedLogs;
+  salaryBreakdown?: EmployeeSalaryDto[];
   disabled: boolean;
   children?: any;
 }
 const { Text, Title } = Typography;
-function LogsProjectBreakdownModal({ record, disabled, ...props }: IProps) {
+function LogsProjectBreakdownModal({
+  record,
+  disabled,
+  salaryBreakdown,
+  ...props
+}: IProps) {
   const [visible, setVisible] = useState(false);
+  const [toggleValue, setToggleValue] = useState<string>("hours");
 
   return (
     <>
@@ -61,8 +70,31 @@ function LogsProjectBreakdownModal({ record, disabled, ...props }: IProps) {
           </Descriptions>
         )}
 
+        {salaryBreakdown && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: 10,
+            }}
+          >
+            <Radio.Group
+              buttonStyle="solid"
+              onChange={(e) => setToggleValue(e.target.value)}
+              value={toggleValue}
+            >
+              <Radio.Button value={"hours"}>Hours Breakdown</Radio.Button>
+              <Radio.Button value={"salary"}>Salary Breakdown</Radio.Button>
+            </Radio.Group>
+          </div>
+        )}
         <ProjectBreakdownTable
-          dataSource={record?.projectBreakdown as HoursLog[]}
+          dataSource={
+            toggleValue == "hours"
+              ? (record?.projectBreakdown as HoursLog[])
+              : salaryBreakdown
+          }
+          toggleValue={toggleValue}
         />
       </Modal>
     </>

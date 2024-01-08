@@ -75,7 +75,7 @@ export default function CashierTable({
       dataIndex: "customer.fullName",
       key: "customer.fullName",
       render: (_, record) => (
-        <span>{record.customer?.fullName ?? record?.otcName}</span>
+        <span>{record.customer?.accountName ?? record?.otcName}</span>
       ),
     },
     {

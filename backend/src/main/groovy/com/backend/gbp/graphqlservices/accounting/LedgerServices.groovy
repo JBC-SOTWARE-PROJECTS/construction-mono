@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.accounting
 
 import com.backend.gbp.domain.accounting.Fiscal
 import com.backend.gbp.domain.accounting.HeaderLedger
+import com.backend.gbp.domain.accounting.HeaderLedgerGroup
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.domain.accounting.LedgerDocType
@@ -91,6 +92,7 @@ class TransactionJournalDto{
 
 @Canonical
 class HeaderLedgerGroupDto{
+    String id
     String referenceNo
     String entityName
     String journalType
@@ -158,6 +160,8 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
     @Autowired
     EntityManager entityManager
 
+    @Autowired
+    HeaderGroupServices headerGroupServices
 
 
     LedgerServices() {
@@ -177,7 +181,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         entityManager.createNativeQuery(""" select 
             cast(l.id as varchar) as "id",
             l.journal_account ->> 'code' as "code",
-            l.journal_account ->> 'description' as "description",
+            l.journal_account ->> 'accountName' as "description",
             l.debit,
             l.credit
             from accounting.ledger l 
@@ -239,6 +243,8 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
                 .executeUpdate();
     }
 
+
+
     void updateLedgerApproval(UUID headerId, String transactionDate, String login){
         entityManager.createNativeQuery("""
             update accounting.ledger  
@@ -297,7 +303,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         def header = findOne(headerId)
 
 
-        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+        def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","")
         List<EntryFull> entriesTarget = []
 
         for (Map<String,Object> entry in entries ){
@@ -332,7 +338,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
            return new GraphQLRetVal<Boolean>(false,false,"Entries not Balanced. Debit [${totalDebit.toPlainString()}] Credit [${totalCredit.toPlainString()}]")
         }
 
-        def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget)
+        def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget, header.transactionDate)
 
 
         headerLedger.ledger.each {
@@ -351,7 +357,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
                                        @GraphQLArgument(name = "transactionDate")  Instant transactionDate) {
 
 
-       def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","")
+       def coa =  subAccountSetupService.getAllChartOfAccountGenerate("","","","","","")
 
         // validate if code is on cOa
 
@@ -384,7 +390,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
 
         try {
 
-            def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget)
+            def headerLedger  =   createDraftHeaderLedgerFull(entriesTarget, transactionDate?:Instant.now())
 
             headerLedger.entityName = entityName
             validateEntries(headerLedger)
@@ -442,7 +448,6 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
             entriesTarget << new EntryFull(match,debit,credit)
         }
 
-
         String invoiceSoaReference = header.get("invoiceSoaReference")
         String entityName = header.get("entityName")
         String particulars = header.get("particulars")
@@ -455,7 +460,7 @@ class LedgerServices extends AbstractDaoService<HeaderLedger> {
         def id = null
         try {
 
-            def headerLedger  =  createDraftHeaderLedgerFull(entriesTarget)
+            def headerLedger  =  createDraftHeaderLedgerFull(entriesTarget, ledgerDate)
 
             headerLedger.entityName = entityName
             headerLedger.transactionNo = transactionNo
@@ -972,21 +977,21 @@ from HeaderLedger hl where
 
         String queryString = """ 
                 select 
-                hl.invoice_soa_reference as "referenceNo",
-                upper(hl.entity_name) as "entityName",
+                cast(hlg.id as text) as "id",
+                hlg.record_no as "referenceNo",
+                hlg.entity_name as "entityName",
                 hl.journal_type as "journalType",
-                'none' as "otherDetail",
                 cast(COUNT(CASE WHEN (hl.approved_by is null or hl.approved_by = '') THEN 1 ELSE NULL END) as varchar) AS "notApproved",
                 cast(COUNT(CASE WHEN (hl.approved_by is not null or hl.approved_by != '') THEN 1 ELSE NULL END) as varchar) AS "approved"
                 from accounting.header_ledger hl 
+                left join accounting.header_ledger_group hlg on hlg.id = hl.header_ledger_group_id
                 where 
                 hl.transaction_date_only >= :startDate
                 and
                 hl.transaction_date_only <= :endDate
                 and (case when :journalType = 'ALL' then true else hl.journal_type  = :journalType end)
-                and (hl.reversal is null or hl.reversal = false)
-                and (hl.entity_name like concat('%',:filter,'%') or hl.invoice_soa_reference like concat('%',:filter,'%'))
-                GROUP BY hl.invoice_soa_reference ,upper(hl.entity_name), journal_type
+                and (hlg.entity_name like concat('%',:filter,'%') or hlg.record_no like concat('%',:filter,'%'))
+                GROUP by hlg.record_no, hlg.entity_name, journal_type,hlg.id
         """
 
         if(!showAll)
@@ -1037,21 +1042,20 @@ from HeaderLedger hl where
                 coalesce(count(*),0)
                 from (
                 select 
-                    hl.invoice_soa_reference as "referenceNo",
-                    upper(hl.entity_name) as "entityName",
+                    hlg.record_no as "referenceNo",
+                    hlg.entity_name as "entityName",
                     hl.journal_type as "journalType",
-                    'none' as "otherDetail",
                     cast(COUNT(CASE WHEN (hl.approved_by is null or hl.approved_by = '') THEN 1 ELSE NULL END) as varchar) AS "notApproved",
                     cast(COUNT(CASE WHEN (hl.approved_by is not null or hl.approved_by != '') THEN 1 ELSE NULL END) as varchar) AS "approved"
                     from accounting.header_ledger hl 
+                    left join accounting.header_ledger_group hlg on hlg.id = hl.header_ledger_group_id
                     where 
                     hl.transaction_date_only >= :startDate
                     and
                     hl.transaction_date_only <= :endDate
                     and (case when :journalType = 'ALL' then true else hl.journal_type  = :journalType end)
-                    and (hl.reversal is null or hl.reversal = false)
-                    and (hl.entity_name like concat('%',:filter,'%') or hl.invoice_soa_reference like concat('%',:filter,'%'))
-                    group by hl.invoice_soa_reference ,upper(hl.entity_name), journal_type
+                    and (hlg.entity_name like concat('%',:filter,'%') or hlg.record_no like concat('%',:filter,'%'))
+                    GROUP by hlg.record_no, hlg.entity_name, journal_type
         """
 
         if(!showAll)
@@ -1073,8 +1077,7 @@ from HeaderLedger hl where
     @GraphQLQuery(name = "transactionJournalGroupItemQuery", description = "Transaction Journals")
     List<HeaderLedgerGroupItemsDto> transactionJournalGroupItemQuery(
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "reference") String reference,
-            @GraphQLArgument(name = "entityName") String entityName,
+            @GraphQLArgument(name = "groupId") UUID groupId,
             @GraphQLArgument(name = "journalType") String journalType,
             @GraphQLArgument(name = "startDate") Instant startDateTime,
             @GraphQLArgument(name = "endDate") Instant endDateTime,
@@ -1102,9 +1105,9 @@ from HeaderLedger hl where
                 hl.journal_type as "journalType",
                 to_char(hl.transaction_date_only,'YYYY-MM-DD')  as "transactionDateOnly",
                 hl.transaction_type  as "docType",
-                hl.transaction_no  as "docNo",
+                hl.transaction_num  as "docNo",
                 hl.reference_type  as "refType",
-                hl.reference_no  as "refNo",
+                hl.reference_num  as "refNo",
                 hl.particulars,
                 hl.created_by as "createdBy",
                 coalesce(hl.approved_by,'') as "approvedBy",
@@ -1113,25 +1116,22 @@ from HeaderLedger hl where
                 from accounting.header_ledger hl 
                 left join accounting.ledger l on l."header" = hl.id 
                 where 
-                hl.invoice_soa_reference = :reference
-                and hl.entity_name = :entityName
+                hl.header_ledger_group_id = :groupId
                 and hl.transaction_date_only >= :startDate
                 and hl.transaction_date_only <= :endDate
                 and l.transaction_date_only >= :startDate
                 and l.transaction_date_only <= :endDate
                 and (case when :journalType = 'ALL' then true else hl.journal_type  = :journalType end)
-                and (hl.reversal is null or hl.reversal = false)
                 and (hl.particulars like concat('%',:filter,'%'))
                 group by hl.id,hl.journal_type,to_char(hl.transaction_date_only,'YYYY-MM-DD'),hl.doctype,
-                hl.docnum,hl.particulars,hl.created_by,coalesce(hl.approved_by,''),hl.reference_type,hl.reference_no,
-                hl.transaction_type,hl.transaction_no
+                hl.docnum,hl.particulars,hl.created_by,coalesce(hl.approved_by,''),hl.reference_type,hl.reference_num,
+                hl.transaction_type,hl.transaction_num
                 order by hl.docnum desc;
         """)
                 .setParameter('journalType',journalType)
                 .setParameter('startDate',startDateLocal)
                 .setParameter('endDate',endDateLocal)
-                .setParameter('entityName',entityName)
-                .setParameter('reference',reference)
+                .setParameter('groupId',groupId)
                 .setParameter('filter',filter)
 
         return  headerLedgerList.unwrap(NativeQuery.class).setResultTransformer(Transformers.aliasToBean(HeaderLedgerGroupItemsDto.class)).getResultList()
@@ -1251,8 +1251,6 @@ from HeaderLedger hl where
             @GraphQLArgument(name = "beginningBalance")  Boolean  beginningBalance
             ){
 
-
-
         if(beginningBalance){
 
             getPageable("""from HeaderLedger hl where hl.transactionDate >= :startDateTime and hl.transactionDate <= :endDateTime 
@@ -1326,7 +1324,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
     }*/
 
 
-    HeaderLedger createDraftHeaderLedger(List<Entry> entries){
+    HeaderLedger createDraftHeaderLedger(List<Entry> entries, Instant transactionDatetime = Instant.now()){
         HeaderLedger header = new HeaderLedger()
         entries.each { entry->
 
@@ -1337,6 +1335,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
 
             Ledger ledger = new Ledger()
+            ledger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
             ledger.journalAccount = entry.journal
             ledger.debit = 0.0
             ledger.credit = 0.0
@@ -1360,7 +1359,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
     }
 
 
-    HeaderLedger createDraftHeaderLedgerFull(List<EntryFull> entries){
+    HeaderLedger createDraftHeaderLedgerFull(List<EntryFull> entries, Instant transactionDatetime){
         HeaderLedger header = new HeaderLedger()
         entries.each { entry->
 
@@ -1370,6 +1369,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
                 throw  new Exception("Method: createDraftHeaderLedger will only accept journal record from getAllChartOfAccountGenerate")
             Ledger ledger = new Ledger()
             ledger.journalAccount = entry.journal
+            ledger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
             ledger.debit = entry.debit
             ledger.credit = entry.credit
             ledger.header = header
@@ -1530,13 +1530,15 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
 
         headerLedger.entityName = entity
-        headerLedger.referenceType = refType?:''
-        headerLedger.referenceNo = refNo
+        if(StringUtils.isNotBlank(refType) ){
+            headerLedger.referenceType = refType?:''
+        }
+        headerLedger.invoiceSoaReference = refNo
         headerLedger.particulars = particulars
         headerLedger.docType = ledgerDocType
         headerLedger.journalType = journalType
         headerLedger.transactionDate = transactionDatetime
-        headerLedger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+        headerLedger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).toLocalDate()
         headerLedger.beginningBalance = begBalance
         headerLedger.custom = custom
         headerLedger.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1551,6 +1553,18 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
         validateEntries(headerLedger)
         headerLedger.company = SecurityUtils.currentCompany()
+
+        if(!headerLedger.headerLedgerGroup){
+            HeaderLedgerGroup headerLedgerGroup = new HeaderLedgerGroup()
+            headerLedgerGroup.recordNo = generatorService.getNextValue( GeneratorType.HEADER_GROUP){
+                StringUtils.leftPad(it.toString(),5,"0")
+            }
+
+            headerLedgerGroup.entity_name = headerLedger.entityName
+            headerLedgerGroup.particulars = headerLedger.particulars
+            def newSave = headerGroupServices.save(headerLedgerGroup)
+            headerLedger.headerLedgerGroup = newSave.id
+        }
         save(headerLedger)
     }
 
@@ -1565,6 +1579,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         HeaderLedger reversal = new HeaderLedger()
         reversal.reversal = true
         reversal.fiscal = source.fiscal
+        reversal.invoiceSoaReference = source.invoiceSoaReference
         reversal.particulars = source.particulars
         reversal.transactionDate = Instant.now()
         reversal.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
@@ -1573,8 +1588,15 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         reversal.docType = source.docType
         reversal.journalType = source.journalType
         reversal.custom = source.custom
-        reversal.parentLedger = source.parentLedger
+        reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
+        // ========== added by wilson ==============
+        reversal.company = source.company
+        reversal.referenceNo = source.referenceNo
+        reversal.referenceType = source.referenceType
+        reversal.transactionNo = source.transactionNo
+        reversal.transactionType = source.transactionType
+        reversal.headerLedgerGroup = source.headerLedgerGroup
 
 
         reversal.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1592,10 +1614,13 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
             Ledger l = new Ledger()
             l.header = reversal
 
+            l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+            l.company = source.company
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit
             l.credit = it.debit
+
 
             reversal.ledger << l
         }
@@ -1618,8 +1643,15 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         reversal.docType = source.docType
         reversal.journalType = source.journalType
         reversal.custom = source.custom
-        reversal.parentLedger = source.parentLedger
+        reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
+        // ========== added by wilson ==============
+        reversal.company = source.company
+        reversal.referenceNo = source.referenceNo
+        reversal.referenceType = source.referenceType
+        reversal.transactionNo = source.transactionNo
+        reversal.transactionType = source.transactionType
+        reversal.headerLedgerGroup = source.headerLedgerGroup
 
 
         reversal.docnum = generatorService.getNextValue( GeneratorType.JOURNAL_VOUCHER){
@@ -1637,6 +1669,8 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
             Ledger l = new Ledger()
             l.header = reversal
 
+            l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+            l.company = source.company
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit
@@ -1692,7 +1726,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         coaList.each {coa ->
             results << new GeneralLedgerDto().tap {
                 it.code = coa.code
-                it.description = coa.description
+                it.description = coa.accountName
                 it.accountType = coa.accountType
                 it.normalSide = coa.motherAccount.normalSide
             }

@@ -70,6 +70,14 @@ const ViewPayroll = ({ account }: IPageProps) => {
       show: true,
     },
     {
+      title: "Adjustments",
+      icon: <FieldTimeOutlined />,
+      link: "/p-adjustments",
+      description:
+        "Manages various deductions, such as healthcare premiums and union dues.",
+      show: true,
+    },
+    {
       title: "Other Deduction",
       icon: <FieldTimeOutlined />,
       link: "/p-other-deductions",

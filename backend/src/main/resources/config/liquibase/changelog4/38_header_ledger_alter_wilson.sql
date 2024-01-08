@@ -1,0 +1,1 @@
+ALTER TABLE accounting.header_ledger add column if not exists invoice_soa_reference varchar default null, add column if not exists parent_ledger uuid default null;

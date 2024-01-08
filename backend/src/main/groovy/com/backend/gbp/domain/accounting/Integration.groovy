@@ -14,11 +14,15 @@ import javax.persistence.*
 
 enum IntegrationDomainEnum {
     NO_DOMAIN("NO DOMAIN", ""),
+    INVOICE("Invoice", "com.backend.gbp.domain.accounting.ArInvoice"),
+    CREDIT_NOTE("Credit Note", "com.backend.gbp.domain.accounting.ArCreditNote"),
+    PAYMENT("Payment", "com.backend.gbp.domain.cashier.Payment"),
     BILLING_ITEM("Billing Item", "com.backend.gbp.domain.billing.BillingItem"),
     ACCOUNTS_PAYABLE("Accounts Payable", "com.backend.gbp.domain.accounting.AccountsPayable"),
     DISBURSEMENT("Disbursement", "com.backend.gbp.domain.accounting.Disbursement"),
     REAPPLICATION("Disbursement Reapplication", "com.backend.gbp.domain.accounting.Reapplication"),
-    DEBIT_MEMO("Debit Memo", "com.backend.gbp.domain.accounting.DebitMemo")
+    DEBIT_MEMO("Debit Memo", "com.backend.gbp.domain.accounting.DebitMemo"),
+    PETTY_CASH("Petty Cash", "com.backend.gbp.domain.accounting.PettyCashAccounting")
 
     String displayName
     String path

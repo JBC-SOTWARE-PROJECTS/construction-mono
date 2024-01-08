@@ -221,9 +221,9 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	@Transient
 	BigDecimal clearingAmount = BigDecimal.ZERO
 	@Transient
-	BigDecimal supplierAmount = BigDecimal.ZERO
-	@Transient
 	BigDecimal discAmount = BigDecimal.ZERO
+	@Transient
+	BigDecimal supplierAmount = BigDecimal.ZERO
 
 
 	@Transient
@@ -248,6 +248,6 @@ class AccountsPayable extends AbstractAuditingEntity implements Serializable, Au
 	BigDecimal ewt30Percent = BigDecimal.ZERO
 
 	@Transient
-	ItemCategory itemCategory
+	BigDecimal cwt = BigDecimal.ZERO
 }
 

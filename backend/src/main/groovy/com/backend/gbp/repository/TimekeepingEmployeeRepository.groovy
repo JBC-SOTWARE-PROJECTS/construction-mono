@@ -2,6 +2,7 @@ package com.backend.gbp.repository
 
 import com.backend.gbp.domain.Position
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.hrm.dto.EmployeeSalaryDto
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.TimekeepingEmployee
@@ -16,6 +17,8 @@ interface TimekeepingEmployeeDto{
     String getGender()
     String getStatus()
     List<HoursLog> getProjectBreakdown()
+    List<EmployeeSalaryDto> getSalaryBreakdown()
+    Boolean getIsExcludedFromAttendance()
     Position getPosition()
 }
 
@@ -35,9 +38,11 @@ te.id as id,
 te.status as status,
 e.id as employeeId,
 e.fullName as fullName, 
+e.isExcludedFromAttendance as isExcludedFromAttendance,
 e.position as position,
 e.gender as gender,
 te.projectBreakdown as projectBreakdown,
+te.salaryBreakdown as salaryBreakdown,
 pe,
 te
 from TimekeepingEmployee te 

@@ -171,7 +171,7 @@ export default function DisbrusementExepnseTable(props: IProps) {
       title: "Transaction Type",
       dataIndex: "transType.description",
       key: "transType.description",
-      width: 150,
+      width: 300,
       render: (_, record) => <span>{record?.transType?.description}</span>,
     },
     {

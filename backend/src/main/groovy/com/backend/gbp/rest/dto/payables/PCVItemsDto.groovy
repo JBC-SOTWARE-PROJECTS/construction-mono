@@ -11,14 +11,19 @@ class PCVItemsDto {
 	String id
 	Item item
 	Office office
-	Projects project
 	Integer qty
 	BigDecimal unitCost
+	BigDecimal inventoryCost
+	BigDecimal grossAmount
 	BigDecimal discRate
 	BigDecimal discAmount
-	BigDecimal netAmount
+	BigDecimal netDiscount
+	String expirationDate
+	String lotNo
 	Boolean isVat
 	BigDecimal vatAmount
+	BigDecimal netAmount
+	Boolean	isPosted
 	Boolean	isNew
 }
 

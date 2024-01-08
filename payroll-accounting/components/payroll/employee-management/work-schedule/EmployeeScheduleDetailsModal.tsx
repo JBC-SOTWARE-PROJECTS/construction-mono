@@ -1,6 +1,6 @@
 import { EmployeeSchedule, Schedule } from "@/graphql/gql/graphql";
 import useGetEmployeeScheduleDetails from "@/hooks/employee-schedule/useGetEmployeeScheduleDetails";
-import { IState } from "@/routes/administrative/Employees";
+import { IState } from "@/routes/payroll/employees";
 import {
   Card,
   Divider,

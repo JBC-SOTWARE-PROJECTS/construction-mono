@@ -231,7 +231,7 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
                             date: it.transDate,
                             refNo: it.recordNo,
                             type: "CASH IN",
-                            description: "[Bill #: ${it.billing.billNo}] ${it.billing.otcName ? it.billing.otcName: it.billing.customer.fullName} - ${it.description}",
+                            description: "[Bill #: ${it.billing.billNo}] ${it.billing.otcName ? it.billing.otcName: it.billing.customer.accountName} - ${it.description}",
                             amount: it.subTotal.negate(),
                             remarks: ""
                     )

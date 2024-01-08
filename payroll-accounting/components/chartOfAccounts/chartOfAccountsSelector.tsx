@@ -151,7 +151,6 @@ export default function ChartOfAccountsComponentSelector(props: IProps) {
                 <AutoSizer>
                   {({ height, width }) => (
                     <VirtualTable
-                      ref="Table"
                       width={width}
                       height={height}
                       headerHeight={20}

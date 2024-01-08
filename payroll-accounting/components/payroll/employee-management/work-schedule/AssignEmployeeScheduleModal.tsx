@@ -1,7 +1,7 @@
 import { Employee, Schedule } from "@/graphql/gql/graphql";
 import { useGetEmployeesByFilter } from "@/hooks/employee";
 import useUpsertEmployeeSchedule from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
-import { IState } from "@/routes/administrative/Employees";
+import { IState } from "@/routes/payroll/employees";
 import { transformDate } from "@/utility/helper";
 import {
   ExclamationCircleOutlined,

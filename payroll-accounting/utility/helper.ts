@@ -123,6 +123,11 @@ export const stringEndDate = (date: Dayjs) => {
   return endOfDay.format(dateFormat);
 };
 
+export const stringDateFull = (date: Dayjs) => {
+  const endOfDay = dayjs(date).endOf("day");
+  return endOfDay.format("MMMM DD, YYYY");
+};
+
 export const shapeOptionValue = (
   label?: ReactNode,
   value?: string | number
@@ -153,24 +158,29 @@ export const validateDisbursement = (
   application: any[],
   expense: any[]
 ): string => {
-  if (payload.paymentCategory === 'PAYABLE') {
+  if (payload.paymentCategory === "PAYABLE") {
     if (_.isEmpty(checks) && _.isEmpty(application)) {
-      return 'Please supply check details or Accounts payable application to proceed'
+      return "Please supply check details or Accounts payable application to proceed";
     }
     if (!payload.isAdvance) {
       if (Number(balance) !== 0) {
-        return 'Disbursement amount and Applied amount are not equals'
+        return "Disbursement amount and Applied amount are not equals";
       }
     }
-  } else if (payload.paymentCategory === 'EXPENSE') {
+  } else if (payload.paymentCategory === "EXPENSE") {
     if (_.isEmpty(checks) && _.isEmpty(expense)) {
-      return 'Please supply check details or expense transaction to proceed'
+      return "Please supply check details or expense transaction to proceed";
     }
     if (!payload.isAdvance) {
       if (Number(balance) !== 0) {
-        return 'Disbursement amount and Applied amount are not equals'
+        return "Disbursement amount and Applied amount are not equals";
       }
     }
   }
-  return ''
-}
+  return "";
+};
+
+export const filterOption = (
+  input: string,
+  option?: { label: string; value: string }
+) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
