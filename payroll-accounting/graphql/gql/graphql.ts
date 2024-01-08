@@ -3330,6 +3330,8 @@ export enum IntegrationDomainEnum {
   EmployeeLoan = 'EMPLOYEE_LOAN',
   FixedAssetItem = 'FIXED_ASSET_ITEM',
   Invoice = 'INVOICE',
+  Loan = 'LOAN',
+  LoanAmortization = 'LOAN_AMORTIZATION',
   NoDomain = 'NO_DOMAIN',
   Payment = 'PAYMENT',
   Payroll = 'PAYROLL',
@@ -4092,7 +4094,7 @@ export type Mutation = {
   linkPOItemRec?: Maybe<PurchaseOrderItems>;
   loanMAddLoan?: Maybe<GraphQlRetVal_Loan>;
   loanMPaidLoan?: Maybe<GraphQlRetVal_Boolean>;
-  loanMStartingEntry?: Maybe<GraphQlRetVal_Boolean>;
+  loanMPostEntry?: Maybe<GraphQlRetVal_Boolean>;
   loanMVoidPaidLoan?: Maybe<GraphQlRetVal_Boolean>;
   lockBilling?: Maybe<Billing>;
   onDeleteIntegrationGroup?: Maybe<Scalars['Boolean']['output']>;
@@ -4901,12 +4903,14 @@ export type MutationLoanMAddLoanArgs = {
 
 /** Mutation root */
 export type MutationLoanMPaidLoanArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
 /** Mutation root */
-export type MutationLoanMStartingEntryArgs = {
+export type MutationLoanMPostEntryArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -10207,7 +10211,7 @@ export type Query = {
   /** One of the financial functions, calculates the payment for a loan based on constant payments and a constant interest rate. */
   loanMPMT?: Maybe<Scalars['Map_String_BigDecimalScalar']['output']>;
   loanMViewPaidLoan?: Maybe<GraphQlRetVal_List_Map_String_Object>;
-  loanMViewStartingEntry?: Maybe<GraphQlRetVal_List_Map_String_Object>;
+  loanMViewPostingEntry?: Maybe<GraphQlRetVal_List_Map_String_Object>;
   loanManagementById?: Maybe<GraphQlRetVal_Loan>;
   loanManagements?: Maybe<Page_Loan>;
   /** Filter Event Calendar between two dates. */
@@ -12539,7 +12543,7 @@ export type QueryLoanMViewPaidLoanArgs = {
 
 
 /** Query root */
-export type QueryLoanMViewStartingEntryArgs = {
+export type QueryLoanMViewPostingEntryArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 

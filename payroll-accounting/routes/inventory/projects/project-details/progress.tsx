@@ -8,7 +8,7 @@ import { Input, Button, Row, Col, Form, App } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
-import { ProjectProgress, Query } from "@/graphql/gql/graphql";
+import { ProjectProgress, ProjectUpdates, Query } from "@/graphql/gql/graphql";
 import { GET_RECORDS_PROJECT_PROGRESS } from "@/graphql/inventory/project-queries";
 import ProjectHeader from "@/components/inventory/project-details/common/projectHeader";
 import { useRouter } from "next/router";
@@ -43,7 +43,7 @@ export default function AccomplishmentsContent() {
     }
   );
 
-  const onUpsertRecord = (record?: ProjectProgress) => {
+  const onUpsertRecord = (record?: ProjectUpdates) => {
     modal({ record: record, projectId: query?.id ?? null }, (result: any) => {
       if (result) {
         message.success(result);
@@ -91,7 +91,7 @@ export default function AccomplishmentsContent() {
           </Form>
         </div>
         <AccomplishmentLists
-          dataSource={data?.pUpdatesByPage?.content as ProjectProgress[]}
+          dataSource={data?.pUpdatesByPage?.content as ProjectUpdates[]}
           loading={loading}
           totalElements={data?.pUpdatesByPage?.totalElements as number}
           handleOpen={(e) => onUpsertRecord(e)}
