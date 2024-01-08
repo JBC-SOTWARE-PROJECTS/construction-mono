@@ -4365,6 +4365,7 @@ export type Mutation = {
   /** insert TransType */
   upsertTransType?: Maybe<TransactionType>;
   upsertUnitMeasurement?: Maybe<UnitMeasurement>;
+  upsertVehicleUsageDocs?: Maybe<VehicleUsageDocs>;
   upsertVehicleUsageMonitoring?: Maybe<VehicleUsageMonitoring>;
   upsertWtx?: Maybe<DisbursementWtx>;
   voidLedgerById?: Maybe<InventoryLedger>;
@@ -6733,6 +6734,13 @@ export type MutationUpsertUnitMeasurementArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertVehicleUsageDocsArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertVehicleUsageMonitoringArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -8248,6 +8256,25 @@ export type Page_SupplierInventory = {
 export type Page_TransactionJournalDto = {
   __typename?: 'Page_TransactionJournalDto';
   content?: Maybe<Array<Maybe<TransactionJournalDto>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_VehicleUsageDocs = {
+  __typename?: 'Page_VehicleUsageDocs';
+  content?: Maybe<Array<Maybe<VehicleUsageDocs>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -10432,6 +10459,7 @@ export type Query = {
   useGetLoanBalance?: Maybe<Scalars['BigDecimal']['output']>;
   /** List of Payments By shift ID */
   vatable_non?: Maybe<Scalars['BigDecimal']['output']>;
+  vehicleUsageDocsListPageable?: Maybe<Page_VehicleUsageDocs>;
   vehicleUsageMonitoringPageable?: Maybe<Page_VehicleUsageMonitoring>;
   version?: Maybe<Scalars['String']['output']>;
   weatherList?: Maybe<Array<Maybe<Weather>>>;
@@ -13583,6 +13611,15 @@ export type QueryVatable_NonArgs = {
 
 
 /** Query root */
+export type QueryVehicleUsageDocsListPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  vehicleUsageId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryVehicleUsageMonitoringPageableArgs = {
   asset?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
@@ -14559,6 +14596,21 @@ export type UserInput = {
   login: Scalars['String']['input'];
   resetDate?: InputMaybe<Scalars['LocalDateTime']['input']>;
   resetKey?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type VehicleUsageDocs = {
+  __typename?: 'VehicleUsageDocs';
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  docType?: Maybe<Scalars['String']['output']>;
+  file?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  item?: Maybe<Item>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  vehicleUsage?: Maybe<VehicleUsageMonitoring>;
 };
 
 export type VehicleUsageMonitoring = {

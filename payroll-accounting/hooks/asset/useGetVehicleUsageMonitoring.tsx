@@ -22,6 +22,9 @@ const GET_RECORDS = gql`
             id
             description
           }
+          item {
+            id
+          }
         }
         size
         totalElements

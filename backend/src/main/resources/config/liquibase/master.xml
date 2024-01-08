@@ -503,6 +503,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/65_wilson_project_cost_alter.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/66_jacky_vehicle_usage_docs.sql"
+             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/65_wilson_project_cost_alter.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/66_wilson_roles_and_permissions.sql"
