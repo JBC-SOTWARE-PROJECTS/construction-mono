@@ -112,7 +112,8 @@ enum GeneratorType {
 
 	FIXED_ASSET_ITEMS,
 	LOAN_NO,
-	DAR_NO
+	DAR_NO,
+	PRS_NO
 }
 
 @Service

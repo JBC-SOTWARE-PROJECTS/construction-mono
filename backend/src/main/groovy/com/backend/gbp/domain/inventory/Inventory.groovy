@@ -156,22 +156,4 @@ class Inventory implements Serializable {
 		}
 		rate
 	}
-
-	@GraphQLQuery(name = "govOutputTax")
-	@Transient
-	BigDecimal govOutputTax
-	BigDecimal getOutputTax() {
-		def markup = sellingPrice + (sellingPrice * govMarkup);
-		def outputTax =  vatable ? markup * vatRate : 0.00;
-		outputTax
-	}
-
-	@GraphQLQuery(name = "govPrice")
-	@Transient
-	BigDecimal govPrice
-	BigDecimal getGovPrice() {
-		def markup = sellingPrice + (sellingPrice * govMarkup);
-		def sellPrice = markup;
-		sellPrice
-	}
 }

@@ -8,8 +8,8 @@ import { Input, Button, Row, Col, Form, App } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
-import { ProjectUpdates, Query } from "@/graphql/gql/graphql";
-import { GET_RECORDS_PROJECT_ACCOMPLISHMENTS } from "@/graphql/inventory/project-queries";
+import { ProjectProgress, Query } from "@/graphql/gql/graphql";
+import { GET_RECORDS_PROJECT_PROGRESS } from "@/graphql/inventory/project-queries";
 import ProjectHeader from "@/components/inventory/project-details/common/projectHeader";
 import { useRouter } from "next/router";
 import _ from "lodash";
@@ -31,7 +31,7 @@ export default function AccomplishmentsContent() {
   });
   // ====================== queries =====================================
   const { data, loading, refetch } = useQuery<Query>(
-    GET_RECORDS_PROJECT_ACCOMPLISHMENTS,
+    GET_RECORDS_PROJECT_PROGRESS,
     {
       variables: {
         filter: state.filter,
@@ -43,7 +43,7 @@ export default function AccomplishmentsContent() {
     }
   );
 
-  const onUpsertRecord = (record?: ProjectUpdates) => {
+  const onUpsertRecord = (record?: ProjectProgress) => {
     modal({ record: record, projectId: query?.id ?? null }, (result: any) => {
       if (result) {
         message.success(result);
@@ -56,7 +56,7 @@ export default function AccomplishmentsContent() {
     <PageContainer
       pageHeaderRender={(e) => <ProjectHeader id={query?.id as string} />}>
       <ProCard
-        title="Accomplishment Reports"
+        title="Progress Reports"
         headStyle={{
           flexWrap: "wrap",
         }}
@@ -71,7 +71,7 @@ export default function AccomplishmentsContent() {
                 type="primary"
                 icon={<PlusCircleOutlined />}
                 onClick={() => onUpsertRecord()}>
-                Add Accomplishment Report
+                Add Progress Report
               </Button>
             </ProFormGroup>
           </AccessControl>
@@ -91,7 +91,7 @@ export default function AccomplishmentsContent() {
           </Form>
         </div>
         <AccomplishmentLists
-          dataSource={data?.pUpdatesByPage?.content as ProjectUpdates[]}
+          dataSource={data?.pUpdatesByPage?.content as ProjectProgress[]}
           loading={loading}
           totalElements={data?.pUpdatesByPage?.totalElements as number}
           handleOpen={(e) => onUpsertRecord(e)}

@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from "react";
 import { ProjectUpdates } from "@/graphql/gql/graphql";
-import { Row, Col, Collapse, Tag, Button, Empty, Spin } from "antd";
+import { Row, Col, Collapse, Tag, Button, Empty, Spin, Pagination } from "antd";
 import type { CollapseProps } from "antd";
 import _ from "lodash";
 import { EditOutlined } from "@ant-design/icons";
@@ -11,13 +11,17 @@ import { accessControl } from "@/utility/helper";
 interface IProps {
   dataSource: ProjectUpdates[];
   loading: boolean;
+  totalElements: number;
   handleOpen: (record: ProjectUpdates) => void;
+  handleChangePage: (page: number) => void;
 }
 
 export default function AccomplishmentLists({
   dataSource,
   loading,
+  totalElements,
   handleOpen,
+  handleChangePage,
 }: IProps) {
   // ===================== menus ========================
   const account = useContext(AccountContext);
@@ -53,7 +57,7 @@ export default function AccomplishmentLists({
       (obj: ProjectUpdates) => {
         return {
           key: obj.id,
-          label: `[${obj.transNo}]${obj.description}`,
+          label: `[${obj.transNo}] ${obj.description}`,
           children: <AccomplishmentDetails record={obj} />,
           extra: genExtra(obj),
         };
@@ -73,8 +77,18 @@ export default function AccomplishmentLists({
               <Collapse
                 defaultActiveKey={[`${itemLists[0]?.key}`]}
                 size="small"
+                destroyInactivePanel={true}
                 items={itemLists}
               />
+            )}
+            {totalElements && (
+              <div className="w-full project-accomplishments-pagination">
+                <Pagination
+                  defaultCurrent={1}
+                  total={totalElements}
+                  onChange={(e) => handleChangePage(e - 1)}
+                />
+              </div>
             )}
           </div>
         </Spin>

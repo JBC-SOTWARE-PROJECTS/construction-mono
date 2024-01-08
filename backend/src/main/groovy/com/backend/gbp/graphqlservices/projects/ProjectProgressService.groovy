@@ -1,20 +1,14 @@
 package com.backend.gbp.graphqlservices.projects
 
-
-import com.backend.gbp.domain.projects.ProjectUpdates
-import com.backend.gbp.domain.projects.ProjectUpdatesMaterials
-
+import com.backend.gbp.domain.projects.ProjectProgress
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.rest.InventoryResource
-import com.backend.gbp.rest.dto.Weather
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.sun.org.apache.xpath.internal.operations.Bool
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
-import io.leangen.graphql.annotations.GraphQLContext
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
@@ -24,15 +18,14 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
-import java.time.Instant
 
 @Component
 @GraphQLApi
 @TypeChecked
-class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
+class ProjectProgressService extends AbstractDaoService<ProjectProgress> {
 
-    ProjectUpdatesService() {
-        super(ProjectUpdates.class)
+    ProjectProgressService() {
+        super(ProjectProgress.class)
     }
 
     @Autowired
@@ -48,8 +41,8 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
     InventoryResource inventoryResource
 
 
-    @GraphQLQuery(name = "pUpdatesById")
-    ProjectUpdates pUpdatesById(
+    @GraphQLQuery(name = "pProgressById")
+    ProjectProgress pProgressById(
             @GraphQLArgument(name = "id") UUID id
     ) {
         if(id){
@@ -59,20 +52,15 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
         }
     }
 
-    @GraphQLQuery(name = "weatherList")
-    List<Weather> weatherList() {
-        return inventoryResource.getWeatherList()
-    }
-
     Boolean checkpointGetProjectByDate(
             @GraphQLArgument(name = "date") String date,
             @GraphQLArgument(name = "id") UUID id
     ) {
-        String query = '''Select e from ProjectUpdates e where e.project.id = :id and to_date(to_char(e.dateTransact, 'YYYY-MM-DD'),'YYYY-MM-DD') = to_date(:date,'YYYY-MM-DD')'''
+        String query = '''Select e from ProjectProgress e where e.project.id = :id and to_date(to_char(e.dateTransact, 'YYYY-MM-DD'),'YYYY-MM-DD') = to_date(:date,'YYYY-MM-DD')'''
         Map<String, Object> params = new HashMap<>()
         params.put('date', date)
         params.put('id', id)
-        def list = createQuery(query, params).resultList.sort { it.dateTransact }
+        def list = createQuery(query, params).resultList.sort { it.transNo }
         if(list.size()){
             return true
         }else{
@@ -80,8 +68,8 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
         }
     }
 
-    @GraphQLQuery(name = "pUpdatesByList")
-    List<ProjectUpdates> pUpdatesByList(
+    @GraphQLQuery(name = "pProgressByList")
+    List<ProjectProgress> pProgressByList(
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "id") UUID id
     ) {
@@ -92,16 +80,16 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
         createQuery(query, params).resultList.sort { it.dateTransact }
     }
 
-    @GraphQLQuery(name = "pUpdatesByPage")
-    Page<ProjectUpdates> pUpdatesByPage(
+    @GraphQLQuery(name = "pProgressByPage")
+    Page<ProjectProgress> pProgressByPage(
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size
     ) {
-        String query = '''Select e from ProjectUpdates e where lower(e.description) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
+        String query = '''Select e from ProjectProgress e where lower(e.description) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
 
-        String countQuery = '''Select count(e) from ProjectUpdates e where lower(e.description) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
+        String countQuery = '''Select count(e) from ProjectProgress e where lower(e.description) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
 
         Map<String, Object> params = new HashMap<>()
 
@@ -115,9 +103,9 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
 
 
     // ============== Mutation =======================//
-    @GraphQLMutation(name = "upsertProjectUpdates")
+    @GraphQLMutation(name = "upsertProjectProgress")
     @Transactional
-    GraphQLRetVal<Boolean> upsertProjectUpdates(
+    GraphQLRetVal<Boolean> upsertProjectProgress(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "date") String date,
             @GraphQLArgument(name = "id") UUID id
@@ -128,20 +116,20 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
             checkpoint = this.checkpointGetProjectByDate(date, projectId)
         }
         if(!checkpoint) {
-            upsertFromMap(id, fields, { ProjectUpdates entity, boolean forInsert ->
+            upsertFromMap(id, fields, { ProjectProgress entity, boolean forInsert ->
                 if(forInsert){
-                    entity.transNo = generatorService.getNextValue(GeneratorType.DAR_NO, {
-                        return "DAR" + StringUtils.leftPad(it.toString(), 6, "0")
+                    entity.transNo = generatorService.getNextValue(GeneratorType.PRS_NO, {
+                        return "PRS" + StringUtils.leftPad(it.toString(), 6, "0")
                     })
                 }
             })
             if(id) {
-                return new GraphQLRetVal<Boolean>(true, true, "Accomplishment Report Updated.")
+                return new GraphQLRetVal<Boolean>(true, true, "Progress Report Updated.")
             }else{
-                return new GraphQLRetVal<Boolean>(true, true, "Accomplishment Report Added.")
+                return new GraphQLRetVal<Boolean>(true, true, "Progress Report Added.")
             }
         }else{
-            return new GraphQLRetVal<Boolean>(false, false, "Accomplishment Report already added with the same date.")
+            return new GraphQLRetVal<Boolean>(false, false, "Progress Report already added with the same date.")
         }
     }
 

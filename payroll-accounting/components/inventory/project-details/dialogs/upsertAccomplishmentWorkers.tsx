@@ -1,50 +1,42 @@
-import React, { useContext } from "react";
-import { ProjectCost } from "@/graphql/gql/graphql";
+import React from "react";
+import { ProjectUpdatesWorkers } from "@/graphql/gql/graphql";
 import { SaveOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
 import { Button, Col, Form, Modal, Row, Space, Typography, App } from "antd";
 import _ from "lodash";
-import { accessControl, requiredField } from "@/utility/helper";
-import {
-  FormInput,
-  FormTextArea,
-  FormAutoComplete,
-  FormDatePicker,
-} from "@/components/common";
+import { requiredField } from "@/utility/helper";
+import { FormSelect, FormTextArea } from "@/components/common";
 import dayjs from "dayjs";
-import { UPSERT_RECORD_PROJECT_ACCOMPLISHMENT } from "@/graphql/inventory/project-queries";
-import { AccountContext } from "@/components/accessControl/AccountContext";
-import { useWeathers } from "@/hooks/projects";
+import { UPSERT_RECORD_PROJECT_WORKERS } from "@/graphql/inventory/project-queries";
+import FormInputNumber from "@/components/common/formInputNumber/formInputNumber";
+import { useEmployeePositions } from "@/hooks/projects";
 
 interface IProps {
   hide: (hideProps: any) => void;
-  record?: ProjectCost | null | undefined;
+  record?: ProjectUpdatesWorkers | null | undefined;
   projectId?: string;
+  projectUpdateId?: string;
 }
 
-export default function UpsertAccomplishmentReport(props: IProps) {
+export default function UpsertAccomplishmentWorkers(props: IProps) {
   const { message } = App.useApp();
-  const { hide, record, projectId } = props;
-  const account = useContext(AccountContext);
+  const { hide, record, projectId, projectUpdateId } = props;
   const [form] = Form.useForm();
-
   // ===================== Queries ==============================
-  const weatherList = useWeathers();
-
+  const positions = useEmployeePositions();
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
-    UPSERT_RECORD_PROJECT_ACCOMPLISHMENT,
+    UPSERT_RECORD_PROJECT_WORKERS,
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        if (data?.upsertProjectUpdates?.success) {
-          hide(data?.upsertProjectUpdates?.message);
+        if (data?.upsertProjectUpdatesWorkers?.success) {
+          hide(data?.upsertProjectUpdatesWorkers?.message);
         } else {
-          message.error(data?.upsertProjectUpdates?.message);
+          message.error(data?.upsertProjectUpdatesWorkers?.message);
         }
       },
     }
   );
-
   //================== functions ====================
   const onFinishFailed = () => {
     message.error("Something went wrong. Please contact administrator.");
@@ -53,11 +45,12 @@ export default function UpsertAccomplishmentReport(props: IProps) {
   const onSubmit = (data: any) => {
     let payload = _.clone(data);
     payload.project = projectId;
-    payload.status = "ACTIVE";
+    payload.projectUpdates = projectUpdateId;
+    payload.dateTransact = dayjs();
     upsertRecord({
       variables: {
         id: record?.id,
-        date: dayjs(data?.dateTransact).format("YYYY-MM-DD"),
+        position: data?.position,
         fields: payload,
       },
     });
@@ -69,14 +62,14 @@ export default function UpsertAccomplishmentReport(props: IProps) {
         <Typography.Title level={4}>
           <Space align="center">{`${
             record?.id ? "Edit" : "Add"
-          } Accomplishment Report`}</Space>
+          } Number of Worker`}</Space>
         </Typography.Title>
       }
       destroyOnClose={true}
       maskClosable={false}
       open={true}
       width={"100%"}
-      style={{ maxWidth: "600px" }}
+      style={{ maxWidth: "500px" }}
       onCancel={() => hide(false)}
       footer={
         <Space>
@@ -99,56 +92,47 @@ export default function UpsertAccomplishmentReport(props: IProps) {
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
-          dateTransact: dayjs(),
-          description: `DAILY ACCOMPLISHMENT REPORT ${dayjs().format(
-            "MM/DD/YYYY"
-          )}`,
         }}>
         <Row gutter={[8, 0]}>
           <Col span={24}>
-            <FormDatePicker
-              label="Accomplishment Date"
-              name="dateTransact"
+            <FormSelect
+              name="position"
+              label="Position"
               rules={requiredField}
-              propsdatepicker={{
-                allowClear: false,
-                disabled: accessControl(
-                  account.user?.access || [],
-                  "edit_accomplishment_date"
-                ),
+              propsselect={{
+                options: positions,
+                placeholder: "Select Position",
+                disabled: !_.isEmpty(record?.id),
               }}
             />
           </Col>
           <Col span={24}>
-            <FormInput
-              name="description"
+            <FormInputNumber
+              name="amShift"
               rules={requiredField}
-              label="Description"
-              propsinput={{
-                placeholder: "Description",
-                disabled: true,
+              label="Total Workers in AM Shift"
+              propsinputnumber={{
+                placeholder: "Total Workers in AM Shift",
               }}
             />
           </Col>
           <Col span={24}>
-            <FormAutoComplete
-              label="Weather"
-              name="weather"
+            <FormInputNumber
+              name="pmShift"
               rules={requiredField}
-              propsinput={{
-                options: weatherList,
-                placeholder: "Weather",
+              label="Total Workers in PM Shift"
+              propsinputnumber={{
+                placeholder: "Total Workers in PM Shift",
               }}
             />
           </Col>
           <Col span={24}>
             <FormTextArea
-              label="Accomplishment"
-              rules={requiredField}
-              name="accomplishment"
+              label="Remarks"
+              name="remarks"
               propstextarea={{
                 rows: 4,
-                placeholder: "Accomplishment",
+                placeholder: "Remarks",
               }}
             />
           </Col>

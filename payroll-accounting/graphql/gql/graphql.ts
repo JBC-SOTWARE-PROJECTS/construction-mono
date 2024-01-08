@@ -3357,8 +3357,6 @@ export type Inventory = {
   descLong?: Maybe<Scalars['String']['output']>;
   expiration_date?: Maybe<Scalars['LocalDateTime']['output']>;
   govMarkup?: Maybe<Scalars['BigDecimal']['output']>;
-  govOutputTax?: Maybe<Scalars['BigDecimal']['output']>;
-  govPrice?: Maybe<Scalars['BigDecimal']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isMedicine?: Maybe<Scalars['Boolean']['output']>;
   item?: Maybe<Item>;
@@ -3381,6 +3379,14 @@ export type Inventory = {
   unitMeasurement?: Maybe<Scalars['String']['output']>;
   vatRate?: Maybe<Scalars['BigDecimal']['output']>;
   vatable?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type InventoryInfoDto = {
+  __typename?: 'InventoryInfoDto';
+  cost?: Maybe<Scalars['BigDecimal']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  item?: Maybe<Item>;
+  onHand?: Maybe<Scalars['Int']['output']>;
 };
 
 export type InventoryLedger = {
@@ -4064,6 +4070,7 @@ export type Mutation = {
   removePettyCashItemById?: Maybe<PettyCashItem>;
   removePoItem?: Maybe<PurchaseOrderItems>;
   removePrItem?: Maybe<PurchaseRequestItem>;
+  removeProjectUpdateWorkers?: Maybe<GraphQlRetVal_Boolean>;
   removePurchaseItemsByParent?: Maybe<PettyCashItem>;
   removeRecItem?: Maybe<ReceivingReportItem>;
   removeRecItemNoQuery?: Maybe<ReceivingReportItem>;
@@ -4242,8 +4249,10 @@ export type Mutation = {
   upsertProject?: Maybe<Projects>;
   upsertProjectCost?: Maybe<GraphQlRetVal_Boolean>;
   upsertProjectMaterials?: Maybe<ProjectUpdatesMaterials>;
+  upsertProjectProgress?: Maybe<GraphQlRetVal_Boolean>;
   upsertProjectRevCost?: Maybe<ProjectCostRevisions>;
   upsertProjectUpdates?: Maybe<GraphQlRetVal_Boolean>;
+  upsertProjectUpdatesWorkers?: Maybe<GraphQlRetVal_Boolean>;
   upsertPurchaseItems?: Maybe<PettyCashItem>;
   upsertQty?: Maybe<QuantityAdjustment>;
   /** Insert/Update QuantityAdjustmentType */
@@ -5152,6 +5161,12 @@ export type MutationRemovePoItemArgs = {
 
 /** Mutation root */
 export type MutationRemovePrItemArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveProjectUpdateWorkersArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -6383,6 +6398,14 @@ export type MutationUpsertProjectMaterialsArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertProjectProgressArgs = {
+  date?: InputMaybe<Scalars['String']['input']>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertProjectRevCostArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   projectCost?: InputMaybe<ProjectCostInput>;
@@ -6395,6 +6418,14 @@ export type MutationUpsertProjectUpdatesArgs = {
   date?: InputMaybe<Scalars['String']['input']>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertProjectUpdatesWorkersArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  position?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -7824,6 +7855,44 @@ export type Page_Position = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_ProjectProgress = {
+  __typename?: 'Page_ProjectProgress';
+  content?: Maybe<Array<Maybe<ProjectProgress>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_ProjectUpdates = {
+  __typename?: 'Page_ProjectUpdates';
+  content?: Maybe<Array<Maybe<ProjectUpdates>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_Projects = {
   __typename?: 'Page_Projects';
   content?: Maybe<Array<Maybe<Projects>>>;
@@ -9094,6 +9163,21 @@ export type ProjectCostRevisions = {
   unit?: Maybe<Scalars['String']['output']>;
 };
 
+export type ProjectProgress = {
+  __typename?: 'ProjectProgress';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dateTransact?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  progress?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<Projects>;
+  status?: Maybe<Scalars['String']['output']>;
+  transNo?: Maybe<Scalars['String']['output']>;
+};
+
 export type ProjectUpdates = {
   __typename?: 'ProjectUpdates';
   accomplishment?: Maybe<Scalars['String']['output']>;
@@ -9130,6 +9214,22 @@ export type ProjectUpdatesMaterials = {
   stockCardRefId?: Maybe<Scalars['UUID']['output']>;
   subTotal?: Maybe<Scalars['BigDecimal']['output']>;
   uou?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProjectUpdatesWorkers = {
+  __typename?: 'ProjectUpdatesWorkers';
+  amShift?: Maybe<Scalars['Int']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dateTransact?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  pmShift?: Maybe<Scalars['Int']['output']>;
+  position?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<Projects>;
+  projectUpdates?: Maybe<ProjectUpdates>;
+  remarks?: Maybe<Scalars['String']['output']>;
 };
 
 export type Projects = {
@@ -9785,6 +9885,7 @@ export type Query = {
   getGroupPolicyById?: Maybe<GroupPolicy>;
   /** Get allowance by ID */
   getHDMFContributions?: Maybe<Array<Maybe<HdmfContribution>>>;
+  getInventoryInfo?: Maybe<InventoryInfoDto>;
   getItemByName?: Maybe<Array<Maybe<Item>>>;
   getItemDiscountable?: Maybe<Array<Maybe<BillingItem>>>;
   getJobByPlateNo?: Maybe<Job>;
@@ -9960,8 +10061,14 @@ export type Query = {
   pCostRevByList?: Maybe<Array<Maybe<ProjectCostRevisions>>>;
   pMaterialById?: Maybe<ProjectUpdatesMaterials>;
   pMaterialByList?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
+  pProgressById?: Maybe<ProjectProgress>;
+  pProgressByList?: Maybe<Array<Maybe<ProjectProgress>>>;
+  pProgressByPage?: Maybe<Page_ProjectProgress>;
   pUpdatesById?: Maybe<ProjectUpdates>;
   pUpdatesByList?: Maybe<Array<Maybe<ProjectUpdates>>>;
+  pUpdatesByPage?: Maybe<Page_ProjectUpdates>;
+  pUpdatesWorkerById?: Maybe<ProjectUpdatesWorkers>;
+  pUpdatesWorkersByList?: Maybe<Array<Maybe<ProjectUpdatesWorkers>>>;
   /** List of Mother Accounts */
   parentAccountPageable?: Maybe<Page_ParentAccount>;
   /** List of parents account */
@@ -11493,6 +11600,13 @@ export type QueryGetHdmfContributionsArgs = {
 
 
 /** Query root */
+export type QueryGetInventoryInfoArgs = {
+  itemId?: InputMaybe<Scalars['UUID']['input']>;
+  office?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetItemByNameArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -12312,6 +12426,28 @@ export type QueryPMaterialByListArgs = {
 
 
 /** Query root */
+export type QueryPProgressByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPProgressByListArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPProgressByPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryPUpdatesByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -12320,6 +12456,27 @@ export type QueryPUpdatesByIdArgs = {
 /** Query root */
 export type QueryPUpdatesByListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPUpdatesByPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryPUpdatesWorkerByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPUpdatesWorkersByListArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 

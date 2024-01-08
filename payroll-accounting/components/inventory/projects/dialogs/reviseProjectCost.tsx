@@ -19,6 +19,7 @@ import {
 import FormSelect from "@/components/common/formSelect/formSelect";
 import { REVISIONS_COST } from "@/utility/constant";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
+import { decimalRound2 } from "../../../../utility/helper";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -83,7 +84,7 @@ export default function ReviseProjectCost(props: IProps) {
       let qty = getFieldValue("qty");
       if (qty) {
         let total = qty * value;
-        setFieldValue("totalCost", total);
+        setFieldValue("totalCost", decimalRound2(total));
       }
     }
   };

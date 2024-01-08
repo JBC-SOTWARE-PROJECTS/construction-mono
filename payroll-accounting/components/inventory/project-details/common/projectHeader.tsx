@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { Button, Card, Descriptions, Tag } from "antd";
 import { Projects, Query } from "@/graphql/gql/graphql";
 import type { DescriptionsProps } from "antd";
@@ -12,13 +12,14 @@ import { useQuery } from "@apollo/client";
 import { currency } from "@/utility/constant";
 import AccessControl from "@/components/accessControl/AccessControl";
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import { AppContext } from "@/components/accessControl/AppContext";
 
 interface Iprops {
   id: string;
 }
 
 export default function ProjectHeader(props: Iprops) {
-  const [info, setInfo] = useState<Projects>({});
+  const { projectInfo: info, setProjectInfo } = useContext(AppContext);
   const [hide, setHide] = useLocalStorage("project_details", true);
   const { loading } = useQuery<Query>(GET_PROJECT_BY_ID, {
     variables: {
@@ -27,7 +28,7 @@ export default function ProjectHeader(props: Iprops) {
     onCompleted: (data) => {
       let result = data?.projectById as Projects;
       if (result.id) {
-        setInfo(result);
+        setProjectInfo(result);
       }
     },
     fetchPolicy: "cache-and-network",
