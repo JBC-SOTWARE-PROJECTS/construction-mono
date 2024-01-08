@@ -7,6 +7,7 @@ import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
+import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
@@ -31,16 +32,16 @@ public class DigitalOceanSpaceService {
     private Environment env;
 
 
-    public void uploadFileToSpace(File fileToUpload) {
+    public void uploadFileToSpace(File fileToUpload, String folderPath) {
 
-        String accessKey = "DO0047JFAG3CLJZRYDW6";
-        String secretKey = "ElKj6QSbeYsbMgMi2BVafKxj9JpirQ6wfGdcd0yJtow";
+        String accessKey = env.getProperty("do.accessKey");
+        String secretKey = env.getProperty("do.secretKey");
 
         BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
 
         AmazonS3 s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("https://megatam.sgp1.digitaloceanspaces.com", "ap-southeast-1"))
-                .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
+                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(env.getProperty("do.endpoint"), env.getProperty("do.region")))
+                 .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
 
         String bucketName = env.getProperty("do.bucketname");
 
@@ -53,22 +54,23 @@ public class DigitalOceanSpaceService {
             System.out.println("Bucket already exists.");
         }
 
-        PutObjectRequest request = new PutObjectRequest(bucketName, fileToUpload.getName(), fileToUpload);
+        PutObjectRequest request = new PutObjectRequest(bucketName, folderPath + fileToUpload.getName(), fileToUpload);
+        request.setCannedAcl(CannedAccessControlList.PublicRead);
 
         // Upload file to S3
         s3Client.putObject(request);
 
     }
 
-    public void uploadMultiFileToSpace(List<File> filesToUpload) {
+    public void uploadMultiFileToSpace(List<File> filesToUpload, String folderPath) {
 
-        String accessKey = "DO0047JFAG3CLJZRYDW6";
-        String secretKey = "ElKj6QSbeYsbMgMi2BVafKxj9JpirQ6wfGdcd0yJtow";
+        String accessKey = env.getProperty("do.accessKey");
+        String secretKey = env.getProperty("do.secretKey");
 
         BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
 
         AmazonS3 s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("https://megatam.sgp1.digitaloceanspaces.com", "ap-southeast-1"))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(env.getProperty("do.endpoint"), env.getProperty("do.region")))
                 .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
 
         String bucketName = env.getProperty("do.bucketname");
@@ -81,7 +83,11 @@ public class DigitalOceanSpaceService {
         for (File ftp : filesToUpload) {
 
             try {
-                Upload upload = transferManager.upload(bucketName, ftp.getName(), ftp);
+                String key =folderPath + ftp.getName();
+                //String key = folderPath + ftp.getName();
+                Upload upload = transferManager.upload(bucketName, key, ftp);
+                s3Client.setObjectAcl(bucketName, key, CannedAccessControlList.PublicRead); // Set object ACL to public-read
+
                 uploadList.add(upload);
             } catch (AmazonClientException e) {
                 e.printStackTrace();

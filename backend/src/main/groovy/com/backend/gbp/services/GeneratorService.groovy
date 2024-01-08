@@ -112,6 +112,7 @@ enum GeneratorType {
 
 	FIXED_ASSET_ITEMS,
 	LOAN_NO,
+	LOAN_RECORD,
 	DAR_NO,
 	PRS_NO
 }
