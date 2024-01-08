@@ -129,15 +129,18 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
             toBeInsert.each {
                 def item = objectMapper.convertValue(it.item, Item.class)
                 //minus inventory
-                def inv = inventoryLedgerService.expenseItemFromProjects(proj, item, it.qty, it.cost)
+                def inv = inventoryLedgerService.expenseItemFromProjects(proj, item, it.qty, it.wCost)
                 //insert materials
                 ProjectUpdatesMaterials n = new ProjectUpdatesMaterials()
                 n.project = proj
                 n.projectUpdates = pUpdates
                 n.dateTransact = Instant.now()
                 n.item = item
+                n.onHand = it.onHand
                 n.qty = it.qty
-                n.cost = it.cost
+                n.balance = it.balance
+                n.wCost = it.wCost
+                n.remarks = it.remarks
                 n.stockCardRefId = inv.id
                 save(n)
             }
@@ -176,7 +179,7 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         n.dateTransact = Instant.now()
         n.item = item
         n.qty = qty
-        n.cost = cost
+        n.wCost = cost
         n.stockCardRefId = refId
         save(n)
 

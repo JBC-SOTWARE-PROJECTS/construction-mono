@@ -188,3 +188,14 @@ export const filterOption = (
   input: string,
   option?: { label: string; value: string }
 ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
+export function accessControl(permissions: string[], access: string) {
+  let result = _.findIndex(permissions, function (value) {
+    return value == access;
+  });
+  if (result < 0) {
+    return true;
+  } else {
+    return false;
+  }
+}

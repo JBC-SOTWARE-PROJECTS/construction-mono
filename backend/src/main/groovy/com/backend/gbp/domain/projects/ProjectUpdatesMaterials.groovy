@@ -11,6 +11,7 @@ import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
 
 import javax.persistence.*
+import java.math.RoundingMode
 import java.time.Instant
 
 @Entity
@@ -50,20 +51,34 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 	Item item
 
 	@GraphQLQuery
+	@Column(name = "on_hand")
+	Integer onHand
+
+	@GraphQLQuery
 	@Column(name = "qty")
 	Integer qty
 
 	@GraphQLQuery
-	@Column(name = "cost")
-	BigDecimal cost
+	@Column(name = "balance")
+	Integer balance
+
+	@GraphQLQuery
+	@Column(name = "w_cost")
+	BigDecimal wCost
+
+	@GraphQLQuery
+	@Column(name = "remarks")
+	String remarks
 
 	@GraphQLQuery
 	@Column(name = "ref_id")
 	UUID stockCardRefId
 
+
 	@Transient
 	BigDecimal getSubTotal() {
-		return cost * qty
+		BigDecimal total = wCost * qty
+		return total.setScale(2, RoundingMode.HALF_EVEN)
 	}
 
 	@Transient

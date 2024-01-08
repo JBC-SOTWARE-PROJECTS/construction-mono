@@ -7,8 +7,11 @@ import groovy.transform.TupleConstructor
 class MaterialsDto {
     String id
     Item item
+    Integer onHand
     Integer qty
-    BigDecimal cost
+    Integer balance
+    BigDecimal wCost
+    String remarks
 }
 
 

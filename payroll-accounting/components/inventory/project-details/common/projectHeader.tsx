@@ -1,18 +1,26 @@
-import React, { useMemo, useState } from "react";
-import { Card, Descriptions, Tag } from "antd";
+import React, { useContext, useMemo, useState } from "react";
+import { Button, Card, Descriptions, Tag } from "antd";
 import { Projects, Query } from "@/graphql/gql/graphql";
 import type { DescriptionsProps } from "antd";
-import { DateFormatterText, NumberFormater } from "@/utility/helper";
+import {
+  DateFormatterText,
+  NumberFormater,
+  useLocalStorage,
+} from "@/utility/helper";
 import { GET_PROJECT_BY_ID } from "@/graphql/inventory/project-queries";
 import { useQuery } from "@apollo/client";
 import { currency } from "@/utility/constant";
+import AccessControl from "@/components/accessControl/AccessControl";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+import { AppContext } from "@/components/accessControl/AppContext";
 
 interface Iprops {
   id: string;
 }
 
 export default function ProjectHeader(props: Iprops) {
-  const [info, setInfo] = useState<Projects>({});
+  const { projectInfo: info, setProjectInfo } = useContext(AppContext);
+  const [hide, setHide] = useLocalStorage("project_details", true);
   const { loading } = useQuery<Query>(GET_PROJECT_BY_ID, {
     variables: {
       id: props.id,
@@ -20,7 +28,7 @@ export default function ProjectHeader(props: Iprops) {
     onCompleted: (data) => {
       let result = data?.projectById as Projects;
       if (result.id) {
-        setInfo(result);
+        setProjectInfo(result);
       }
     },
     fetchPolicy: "cache-and-network",
@@ -50,7 +58,15 @@ export default function ProjectHeader(props: Iprops) {
       {
         key: "cost",
         label: "Total Project Cost",
-        children: <span className="font-bold currency-green">{`${currency} ${NumberFormater(info.totals)}`}</span>,
+        children: (
+          <AccessControl
+            allowedPermissions={["show_project_cost"]}
+            renderNoAccess={<Tag color="red">No Permission to View</Tag>}>
+            <span className="font-bold currency-green">{`${currency} ${NumberFormater(
+              info.totals
+            )}`}</span>
+          </AccessControl>
+        ),
       },
     ];
 
@@ -144,14 +160,29 @@ export default function ProjectHeader(props: Iprops) {
 
   return (
     <div className="w-full project-page-header">
-      <Card className="no-spacing-card" loading={loading}>
-        <Descriptions
-          bordered
-          size="small"
-          items={borderedItems}
-          column={{ xs: 1, sm: 1, md: 2, lg: 4 }}
-          layout="vertical"
-        />
+      <Card
+        className="no-spacing-card"
+        loading={loading}
+        size="small"
+        title="Project Information"
+        extra={
+          <Button
+            size="small"
+            type="dashed"
+            icon={hide ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+            onClick={() => setHide(!hide)}>
+            {hide ? "Show Details" : "Hide Details"}
+          </Button>
+        }>
+        {!hide && (
+          <Descriptions
+            bordered
+            size="small"
+            items={borderedItems}
+            column={{ xs: 1, sm: 1, md: 2, lg: 4 }}
+            layout="vertical"
+          />
+        )}
       </Card>
     </div>
   );
