@@ -1,7 +1,10 @@
 package com.backend.gbp.rest
 
+import com.backend.gbp.domain.projects.ProjectProgressImages
 import com.backend.gbp.graphqlservices.address.AddressServices
-import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.graphqlservices.projects.ProjectProgressService
+import com.backend.gbp.repository.projects.ProjectsProgressImagesRepository
+import com.backend.gbp.services.DigitalOceanSpaceService
 import com.backend.gbp.services.NotificationService
 import com.backend.gbp.socket.SocketService
 import com.backend.gbp.utils.SOAPConnector
@@ -10,24 +13,27 @@ import com.sun.xml.messaging.saaj.SOAPExceptionImpl
 import groovy.transform.Canonical
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.event.EventListener
+import org.springframework.core.env.Environment
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.messaging.simp.SimpMessagingTemplate
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 import org.springframework.web.context.support.RequestHandledEvent
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartRequest
 import ph.gov.doh.uhmistrn.ahsr.webservice.index.GetDataTable
 import ph.gov.doh.uhmistrn.ahsr.webservice.index.GetDataTableResponse
 
-import javax.persistence.EntityManager
-import javax.persistence.NoResultException
 import javax.servlet.http.HttpSession
+import java.time.Instant
 
 @Canonical
 class CitySelect{
@@ -48,22 +54,25 @@ class CommonResource {
     SOAPConnector soapConnector
 
     @Autowired
-    EmployeeRepository employeeRepository
-
-    @Autowired
-    UserResource userResource
-
-    @Autowired
-    EntityManager entityManager
-
-    @Autowired
     ObjectMapper objectMapper
 
     @Autowired
     AddressServices addressServices
 
     @Autowired
+    DigitalOceanSpaceService spaceService;
+
+    @Autowired
+    ProjectProgressService projectProgressService;
+
+    @Autowired
     SimpMessagingTemplate simpMessagingTemplate
+
+    @Autowired
+    ProjectsProgressImagesRepository progressImagesRepository
+
+    @Autowired
+    private Environment env;
     /*
     ANNOTATION_PAYMENTS_GROUPS
     ANNOTATION_NOTIFICATION_GROUPS
@@ -99,12 +108,13 @@ class CommonResource {
     String test() {
 
         SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
+        //Authentication authentication = context.getAuthentication();
         ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpSession session = attr.getRequest().getSession(false)
-        println "Last Accessed "+ session.getLastAccessedTime()
-        println "Current Time "+ System.currentTimeMillis();
-        session.getLastAccessedTime()
+        println "session "+ session.getId()
+        //println "Last Accessed "+ session.getLastAccessedTime()
+        //println "Current Time "+ System.currentTimeMillis();
+        //session.getLastAccessedTime()
     }
 
     @RequestMapping("/")
@@ -112,7 +122,6 @@ class CommonResource {
         "WELCOME TO Backend DiverseTrade GraphQL Server."
     }
 
-    @RequestMapping("/serverTime")
     String serverTime() {
         System.currentTimeMillis()
     }
@@ -162,6 +171,49 @@ class CommonResource {
             ))
         }
         return result
+    }
+
+    @Transactional
+    @RequestMapping(method = RequestMethod.POST, value = "/project/upload")
+    ResponseEntity<String> uploadProjectImages(@RequestParam String id, MultipartRequest request) {
+        UUID progressId = UUID.fromString(id)
+        def parent = projectProgressService.findOne(progressId)
+        def attachments = request.getFiles("file")
+
+        try {
+            attachments.forEach { file ->
+                MultipartFile f = file
+                //convert here
+                File convFile = spaceService.convertToFile(f)
+                //end convert here
+                String saveType = env.getProperty("do.env.type");
+
+                ProjectProgressImages uploadedResult = new ProjectProgressImages()
+                uploadedResult.folderName = "${saveType}/PROJECT_IMAGES/${parent.project.id}/"
+                uploadedResult.dateTransact = Instant.now()
+                uploadedResult.fileName = f.originalFilename
+                uploadedResult.mimetype = f.contentType
+                uploadedResult.project = parent.project
+                uploadedResult.projectProgress = parent
+                try {
+                    /*** ready for DO S3***/
+                    spaceService.uploadFileToSpace(convFile, "PROJECT_IMAGES/${parent.project.id}")
+                    progressImagesRepository.save(uploadedResult)
+                    spaceService.deleteToFile(convFile)
+                } catch (Exception e) {
+                    e.printStackTrace()
+                    throw e
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace()
+            throw e
+        }
+
+        return new ResponseEntity<>(
+                "Success Uploading Files",
+                HttpStatus.OK)
     }
 
 

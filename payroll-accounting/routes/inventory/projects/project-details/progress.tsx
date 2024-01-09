@@ -13,15 +13,14 @@ import { GET_RECORDS_PROJECT_PROGRESS } from "@/graphql/inventory/project-querie
 import ProjectHeader from "@/components/inventory/project-details/common/projectHeader";
 import { useRouter } from "next/router";
 import _ from "lodash";
-import UpsertAccomplishmentReport from "@/components/inventory/project-details/dialogs/upsertAccomplishments";
-import AccessControl from "@/components/accessControl/AccessControl";
-import AccomplishmentLists from "@/components/inventory/project-details/accomplishmentLists";
+import UpsertProgressReport from "@/components/inventory/project-details/dialogs/upsertProgress";
+import ProgressLists from "@/components/inventory/project-details/progressLists";
 
 const { Search } = Input;
 
 export default function AccomplishmentsContent() {
   const { message } = App.useApp();
-  const modal = useDialog(UpsertAccomplishmentReport);
+  const modal = useDialog(UpsertProgressReport);
   const router = useRouter();
   const { query } = router;
 
@@ -64,17 +63,15 @@ export default function AccomplishmentsContent() {
         headerBordered
         size="small"
         extra={
-          <AccessControl allowedPermissions={["add_bill_of_quantities"]}>
-            <ProFormGroup size="small">
-              <Button
-                size="small"
-                type="primary"
-                icon={<PlusCircleOutlined />}
-                onClick={() => onUpsertRecord()}>
-                Add Progress Report
-              </Button>
-            </ProFormGroup>
-          </AccessControl>
+          <ProFormGroup size="small">
+            <Button
+              size="small"
+              type="primary"
+              icon={<PlusCircleOutlined />}
+              onClick={() => onUpsertRecord()}>
+              Add Progress Report
+            </Button>
+          </ProFormGroup>
         }>
         <div className="w-full mb-5">
           <Form layout="vertical" className="filter-form">
@@ -90,10 +87,10 @@ export default function AccomplishmentsContent() {
             </Row>
           </Form>
         </div>
-        <AccomplishmentLists
-          dataSource={data?.pUpdatesByPage?.content as ProjectProgress[]}
+        <ProgressLists
+          dataSource={data?.pProgressByPage?.content as ProjectProgress[]}
           loading={loading}
-          totalElements={data?.pUpdatesByPage?.totalElements as number}
+          totalElements={data?.pProgressByPage?.totalElements as number}
           handleOpen={(e) => onUpsertRecord(e)}
           handleChangePage={(e: number) =>
             setState((prev) => ({ ...prev, page: e }))

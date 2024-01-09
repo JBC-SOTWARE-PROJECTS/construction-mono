@@ -288,3 +288,26 @@ export const UPSERT_RECORD_PROJECT_PROGRESS = gql`
     }
   }
 `;
+
+export const GET_PROGRESS_IMAGES = gql`
+  query ($id: UUID) {
+    pProgressImagesByList(id: $id) {
+      id
+      dateTransact
+      folderName
+      fileName
+      mimetype
+      imageUrl
+    }
+  }
+`;
+
+export const REMOVE_PROGRESS_IMAGE = gql`
+  mutation ($id: UUID) {
+    removeProjectProgressImage(id: $id) {
+      payload
+      success
+      message
+    }
+  }
+`;

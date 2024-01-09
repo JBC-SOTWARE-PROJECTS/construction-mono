@@ -12,10 +12,10 @@ import javax.persistence.*
 import java.time.Instant
 
 @Entity
-@Table(schema = "projects", name = "project_progress")
-@SQLDelete(sql = "UPDATE projects.project_progress SET deleted = true WHERE id = ?")
+@Table(schema = "projects", name = "project_progress_images")
+@SQLDelete(sql = "UPDATE projects.project_progress_images SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class ProjectProgress extends AbstractAuditingEntity implements Serializable {
+class ProjectProgressImages extends AbstractAuditingEntity implements Serializable {
 	
 	@GraphQLQuery
 	@Id
@@ -25,10 +25,10 @@ class ProjectProgress extends AbstractAuditingEntity implements Serializable {
 	@Type(type = "pg-uuid")
 	UUID id
 
-    @GraphQLQuery
-    @Column(name = "trans_no")
-    @UpperCase
-    String transNo
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project_progress", referencedColumnName = "id")
+	ProjectProgress projectProgress
 
 	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -40,17 +40,21 @@ class ProjectProgress extends AbstractAuditingEntity implements Serializable {
 	Instant dateTransact
 
 	@GraphQLQuery
-	@Column(name = "description")
+	@Column(name = "folder_name")
 	@UpperCase
-	String description
+	String folderName
 
 	@GraphQLQuery
-	@Column(name = "progress")
+	@Column(name = "file_name")
 	@UpperCase
-	String progress
+	String fileName
 
 	@GraphQLQuery
-	@Column(name = "status")
-	String status
+	@Column(name = "mimetype")
+	String mimetype
 
+	@Transient
+	String getImageUrl() {
+		return "${folderName}${fileName}";
+	}
 }

@@ -3330,6 +3330,8 @@ export enum IntegrationDomainEnum {
   EmployeeLoan = 'EMPLOYEE_LOAN',
   FixedAssetItem = 'FIXED_ASSET_ITEM',
   Invoice = 'INVOICE',
+  Loan = 'LOAN',
+  LoanAmortization = 'LOAN_AMORTIZATION',
   NoDomain = 'NO_DOMAIN',
   Payment = 'PAYMENT',
   Payroll = 'PAYROLL',
@@ -4092,7 +4094,7 @@ export type Mutation = {
   linkPOItemRec?: Maybe<PurchaseOrderItems>;
   loanMAddLoan?: Maybe<GraphQlRetVal_Loan>;
   loanMPaidLoan?: Maybe<GraphQlRetVal_Boolean>;
-  loanMStartingEntry?: Maybe<GraphQlRetVal_Boolean>;
+  loanMPostEntry?: Maybe<GraphQlRetVal_Boolean>;
   loanMVoidPaidLoan?: Maybe<GraphQlRetVal_Boolean>;
   lockBilling?: Maybe<Billing>;
   onDeleteIntegrationGroup?: Maybe<Scalars['Boolean']['output']>;
@@ -4151,6 +4153,7 @@ export type Mutation = {
   removePettyCashItemById?: Maybe<PettyCashItem>;
   removePoItem?: Maybe<PurchaseOrderItems>;
   removePrItem?: Maybe<PurchaseRequestItem>;
+  removeProjectProgressImage?: Maybe<GraphQlRetVal_Boolean>;
   removeProjectUpdateWorkers?: Maybe<GraphQlRetVal_Boolean>;
   removePurchaseItemsByParent?: Maybe<PettyCashItem>;
   removeRecItem?: Maybe<ReceivingReportItem>;
@@ -4900,12 +4903,14 @@ export type MutationLoanMAddLoanArgs = {
 
 /** Mutation root */
 export type MutationLoanMPaidLoanArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
 /** Mutation root */
-export type MutationLoanMStartingEntryArgs = {
+export type MutationLoanMPostEntryArgs = {
+  entries?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -5266,6 +5271,12 @@ export type MutationRemovePoItemArgs = {
 
 /** Mutation root */
 export type MutationRemovePrItemArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveProjectProgressImageArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -9321,6 +9332,22 @@ export type ProjectProgress = {
   transNo?: Maybe<Scalars['String']['output']>;
 };
 
+export type ProjectProgressImages = {
+  __typename?: 'ProjectProgressImages';
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  dateTransact?: Maybe<Scalars['Instant']['output']>;
+  fileName?: Maybe<Scalars['String']['output']>;
+  folderName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  mimetype?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<Projects>;
+  projectProgress?: Maybe<ProjectProgress>;
+};
+
 export type ProjectUpdates = {
   __typename?: 'ProjectUpdates';
   accomplishment?: Maybe<Scalars['String']['output']>;
@@ -10180,7 +10207,7 @@ export type Query = {
   /** One of the financial functions, calculates the payment for a loan based on constant payments and a constant interest rate. */
   loanMPMT?: Maybe<Scalars['Map_String_BigDecimalScalar']['output']>;
   loanMViewPaidLoan?: Maybe<GraphQlRetVal_List_Map_String_Object>;
-  loanMViewStartingEntry?: Maybe<GraphQlRetVal_List_Map_String_Object>;
+  loanMViewPostingEntry?: Maybe<GraphQlRetVal_List_Map_String_Object>;
   loanManagementById?: Maybe<GraphQlRetVal_Loan>;
   loanManagements?: Maybe<Page_Loan>;
   /** Filter Event Calendar between two dates. */
@@ -10221,6 +10248,8 @@ export type Query = {
   pProgressById?: Maybe<ProjectProgress>;
   pProgressByList?: Maybe<Array<Maybe<ProjectProgress>>>;
   pProgressByPage?: Maybe<Page_ProjectProgress>;
+  pProgressImageById?: Maybe<ProjectProgressImages>;
+  pProgressImagesByList?: Maybe<Array<Maybe<ProjectProgressImages>>>;
   pUpdatesById?: Maybe<ProjectUpdates>;
   pUpdatesByList?: Maybe<Array<Maybe<ProjectUpdates>>>;
   pUpdatesByPage?: Maybe<Page_ProjectUpdates>;
@@ -12511,7 +12540,7 @@ export type QueryLoanMViewPaidLoanArgs = {
 
 
 /** Query root */
-export type QueryLoanMViewStartingEntryArgs = {
+export type QueryLoanMViewPostingEntryArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -12705,6 +12734,18 @@ export type QueryPProgressByPageArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryPProgressImageByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPProgressImagesByListArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 

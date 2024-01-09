@@ -17,10 +17,12 @@ import { AppContext } from "@/components/accessControl/AppContext";
 
 interface IProps {
   projectUpdateId: string;
+  isLocked?: boolean;
 }
 
 export default function ProjectAccomplishmentMaterialsTable({
   projectUpdateId,
+  isLocked,
 }: IProps) {
   const { message } = App.useApp();
   const account = useContext(AccountContext);
@@ -117,10 +119,14 @@ export default function ProjectAccomplishmentMaterialsTable({
             size="small"
             type="dashed"
             onClick={() => console.log(record)}
-            disabled={accessControl(
-              account.user?.access || [],
-              "bill_of_quantities_revision"
-            )}>
+            disabled={
+              isLocked
+                ? accessControl(
+                    account?.user?.access,
+                    "overwrite_lock_accomplishment"
+                  )
+                : false
+            }>
             <EditOutlined />
           </Button>
           <Button
@@ -128,10 +134,14 @@ export default function ProjectAccomplishmentMaterialsTable({
             danger
             type="dashed"
             onClick={() => console.log(record)}
-            disabled={accessControl(
-              account.user?.access || [],
-              "add_bill_of_quantities"
-            )}>
+            disabled={
+              isLocked
+                ? accessControl(
+                    account?.user?.access,
+                    "overwrite_lock_accomplishment"
+                  )
+                : false
+            }>
             <DeleteOutlined />
           </Button>
         </Space>
@@ -143,7 +153,17 @@ export default function ProjectAccomplishmentMaterialsTable({
     <Row gutter={[0, 8]}>
       <Col span={24}>
         <div className="w-full dev-right">
-          <Button type="primary" onClick={() => onUpsertRecord()}>
+          <Button
+            type="primary"
+            disabled={
+              isLocked
+                ? accessControl(
+                    account?.user?.access,
+                    "overwrite_lock_accomplishment"
+                  )
+                : false
+            }
+            onClick={() => onUpsertRecord()}>
             Record Used Materials
           </Button>
         </div>

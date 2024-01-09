@@ -69,12 +69,14 @@ export default function UpsertAccomplishmentMaterials(props: IProps) {
             setInfo({
               type: "info",
               message: "",
+              submitDisabled: false,
             });
           } else {
             setInfo({
               type: "error",
               message:
                 "Ensure that both the on-hand quantity and unit cost are not zero for the respective item.",
+              submitDisabled: true,
             });
           }
           let balance = info.onHand ? info.onHand - 1 : 0;
