@@ -115,6 +115,58 @@ class ArInvoiceItems extends AbstractAuditingEntity implements Serializable {
     @Column(name = "reference_transfer_id")
     UUID reference_transfer_id
 
+    @GraphQLQuery
+    @Column(name = "uom")
+    String unitOfMeasure
+
+    @GraphQLQuery
+    @Column(name = "relative_weight")
+    BigDecimal relativeWeight
+
+    @GraphQLQuery
+    @Column(name = "percentage")
+    BigDecimal percentage
+
+    @GraphQLQuery
+    @Column(name = "qty_prev")
+    Integer qtyPrev
+
+    @GraphQLQuery
+    @Column(name = "qty_this_period")
+    Integer qtyThisPeriod
+
+    @GraphQLQuery
+    @Column(name = "qty_to_date")
+    Integer qtyToDate
+
+    @GraphQLQuery
+    @Column(name = "qty_balance")
+    Integer qtyBalance
+
+    @GraphQLQuery
+    @Column(name = "amount_prev")
+    BigDecimal amountPrev
+
+    @GraphQLQuery
+    @Column(name = "amount_this_period")
+    BigDecimal amountThisPeriod
+
+    @GraphQLQuery
+    @Column(name = "amount_to_date")
+    BigDecimal amountToDate
+
+    @GraphQLQuery
+    @Column(name = "amount_balance")
+    BigDecimal amountBalance
+
+    @GraphQLQuery
+    @Column(name = "project_id")
+    UUID projectId
+
+    @GraphQLQuery
+    @Column(name = "project_costs_id")
+    UUID projectCostsId
+
     @Transient
     BigDecimal netTotalAmount
     BigDecimal getNetTotalAmount() {

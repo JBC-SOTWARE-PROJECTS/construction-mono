@@ -25,8 +25,10 @@ export const assignFormValues = (
 
   if (isCWT) dispatch({ type: 'set-CWT', payload: isCWT })
   if (isVatable) dispatch({ type: 'set-Vat', payload: isVatable })
+
   dispatch({ type: 'invoice-id', payload: id })
   dispatch({ type: 'status', payload: status })
+  dispatch({ type: 'customer-id', payload: arCustomer?.id })
 }
 
 export const textStatus = (value: {

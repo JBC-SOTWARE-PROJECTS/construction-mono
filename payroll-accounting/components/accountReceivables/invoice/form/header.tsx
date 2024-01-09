@@ -1,4 +1,18 @@
 import {
+  FormDatePicker,
+  FormInput,
+  FormInputNumber,
+  FormSelect,
+  FormTextArea,
+} from '@/components/common'
+import { CWTRates, InvoiceStatusEnum } from '@/constant/accountReceivables'
+import {
+  GENERATE_INVOICE_TAX,
+  GENERATE_INVOICE_VAT,
+} from '@/graphql/accountReceivables/invoices'
+import { BookOutlined, CaretDownOutlined } from '@ant-design/icons'
+import { ApolloQueryResult, gql, useMutation, useQuery } from '@apollo/client'
+import {
   Button,
   Checkbox,
   Divider,
@@ -7,40 +21,14 @@ import {
   Space,
   message,
 } from 'antd'
-import CustomerSelector from '../../common/customerSelector'
-import {
-  FormDatePicker,
-  FormInput,
-  FormInputNumber,
-  FormSelect,
-  FormSwitch,
-  FormTextArea,
-} from '@/components/common'
-import {
-  BookOutlined,
-  CaretDownOutlined,
-  PercentageOutlined,
-} from '@ant-design/icons'
-import { CWTRates, InvoiceStatusEnum } from '@/constant/accountReceivables'
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-import { StateI } from '.'
-import { INVOICE_TYPE_CUSTOMER } from './enum'
 import dayjs from 'dayjs'
-import { ApolloQueryResult, FetchResult, useMutation } from '@apollo/client'
-import {
-  GENERATE_INVOICE_TAX,
-  GENERATE_INVOICE_VAT,
-} from '@/graphql/accountReceivables/invoices'
-import CustomFieldLabel from '../../common/customFieldLabel'
-import { assignFormValues } from './helper'
 import styled from 'styled-components'
+import { StateI } from '.'
+import CustomFieldLabel from '../../common/customFieldLabel'
+import CustomerSelector from '../../common/customerSelector'
+import { INVOICE_TYPE_CUSTOMER } from './enum'
+import { assignFormValues } from './helper'
 
 const dateFormat = 'DD MMM YYYY'
 
@@ -58,6 +46,31 @@ interface FormHeaderI {
     onCompleted?: (value: any) => void
   }) => void
 }
+
+const CUSTOMER_PROJECT = gql`
+  query (
+    $filter: String
+    $customer: UUID
+    $location: UUID
+    $status: String
+    $page: Int
+    $size: Int
+  ) {
+    projects: projectListPageable(
+      filter: $filter
+      customer: $customer
+      location: $location
+      status: $status
+      page: $page
+      size: $size
+    ) {
+      content {
+        value: id
+        label: description
+      }
+    }
+  }
+`
 
 export default function FormHeader(props: FormHeaderI) {
   const {
@@ -87,6 +100,20 @@ export default function FormHeader(props: FormHeaderI) {
     GENERATE_INVOICE_VAT,
     {
       onCompleted: () => {},
+    }
+  )
+
+  const { data: projectsData, loading: projectsLoading } = useQuery(
+    CUSTOMER_PROJECT,
+    {
+      variables: {
+        filter: '',
+        customer: state?.customerId,
+        location: null,
+        status: '',
+        page: 0,
+        size: 100,
+      },
     }
   )
 
@@ -217,6 +244,15 @@ export default function FormHeader(props: FormHeaderI) {
             }
             onSelect={(e) => onSelectCustomer(e)}
           />
+          <FormSelect
+            name='project'
+            label='Project'
+            propsselect={{
+              style: { width: 300 },
+              size: 'large',
+              options: projectsData?.projects?.content ?? [],
+            }}
+          />
           <FormDatePicker
             label='Invoice Date'
             name='invoiceDate'
@@ -252,7 +288,7 @@ export default function FormHeader(props: FormHeaderI) {
             propsinput={{
               size: 'large',
               prefix: true ? <BookOutlined /> : <span />,
-              style: { minWidth: 300 },
+              style: { width: 300 },
             }}
           />
 

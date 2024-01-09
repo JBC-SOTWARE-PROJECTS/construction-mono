@@ -9,6 +9,6 @@ export const TABLE_FIELD_TYPE = {
 }
 
 export const INVOICE_TYPE_CUSTOMER = {
-  PROJECT: ['HMO', 'CORPORATE'],
+  PROJECT: [],
   REGULAR: [],
 }

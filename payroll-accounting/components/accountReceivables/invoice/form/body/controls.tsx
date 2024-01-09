@@ -22,8 +22,8 @@ export default function BodyControls(props: BodyControlsI) {
   const claimsDialog = useDialog(CustomerClaims)
 
   const onHandleAddClaimsItems = () => {
-    const { id, customerRefId } = state
-    claimsDialog({ id, customerRefId }, (newItems: ArInvoiceItems[]) => {
+    const { id, customerId } = state
+    claimsDialog({ id, customerId }, (newItems: ArInvoiceItems[]) => {
       if (newItems) dispatch({ type: 'add-items', payload: newItems })
     })
   }
@@ -58,7 +58,7 @@ export default function BodyControls(props: BodyControlsI) {
           // style={{ color: '#0078c8', fontWeight: 'bold' }}
           type='primary'
         >
-          Add Project
+          Add Bill of Quantities
         </Button>
       )}
       {/* {invoiceType == 'PROJECT' && editable && (

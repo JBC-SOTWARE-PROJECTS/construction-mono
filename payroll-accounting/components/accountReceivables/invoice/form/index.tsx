@@ -36,7 +36,7 @@ export interface StateI {
   status?: string
   isCWT?: boolean
   isVatable?: boolean
-  customerRefId?: string
+  customerId?: string
   dataSource: ArInvoiceItems[]
 }
 
@@ -45,11 +45,11 @@ export type Action =
   | { type: 'toggleVat' }
   | { type: 'invoice-id'; payload: string }
   | { type: 'status'; payload: string }
-  | { type: 'customer-reference-id'; payload: string }
+  | { type: 'customer-id'; payload: string }
   | { type: 'add-item'; payload: ArInvoiceItems }
   | { type: 'add-items'; payload: ArInvoiceItems[] }
   | { type: 'new-set-item'; payload: ArInvoiceItems[] }
-  | { type: 'customer-reference-id'; payload: string }
+  | { type: 'customer-id'; payload: string }
   | { type: 'set-CWT'; payload: boolean }
   | { type: 'set-Vat'; payload: boolean }
 
@@ -73,8 +73,8 @@ const reducer: Reducer = (state, action) => {
       return { ...state, id: action.payload }
     case 'status':
       return { ...state, status: action.payload }
-    case 'customer-reference-id':
-      return { ...state, customerRefId: action.payload }
+    case 'customer-id':
+      return { ...state, customerId: action.payload }
     case 'add-item':
       return { ...state, dataSource: [...state.dataSource, action.payload] }
     case 'add-items':
