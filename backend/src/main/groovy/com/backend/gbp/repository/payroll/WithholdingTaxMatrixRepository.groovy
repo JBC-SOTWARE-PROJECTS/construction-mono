@@ -14,5 +14,14 @@ interface WithholdingTaxMatrixRepository extends JpaRepository<WithholdingTaxMat
     List<WithholdingTaxMatrix> findByType(
             @Param("company") UUID company
     )
-
+    @Query(value = '''SELECT a FROM WithholdingTaxMatrix a where
+(((:amount >= a.minAmount) AND ((:amount <= a.maxAmount) OR (a.maxAmount IS NULL)) AND ((a.maxAmount IS NULL) OR (:amount <= a.maxAmount))))
+and a.company.id = :company 
+and a.type = :type
+           ''')
+    List<WithholdingTaxMatrix> findByAmountRangeAndType(
+            @Param("amount") BigDecimal amount,
+            @Param("type") PayrollType type,
+            @Param("company") UUID company
+    )
 }

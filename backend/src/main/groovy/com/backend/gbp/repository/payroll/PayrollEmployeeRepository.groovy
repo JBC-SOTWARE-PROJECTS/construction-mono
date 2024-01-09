@@ -2,16 +2,23 @@ package com.backend.gbp.repository.payroll
 
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.PayrollEmployee
+import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+interface PayrollEmployeeListDto {
+    UUID getId()
+    String getFullName()
+    String getPosition()
+    BigDecimal getWithholdingTax()
+    PayrollEmployeeStatus getStatus()
+    PayrollEmployeeStatus getTimekeepingStatus()
+    PayrollEmployeeStatus getContributionStatus()
 
+}
 interface PayrollEmployeeRepository extends JpaRepository<PayrollEmployee, UUID> {
 
-    interface PayrollEmployeeListDto {
-        UUID getId()
-        String getFullName()
-    }
+
 
     @Query(
             value = """Select te.employee from PayrollEmployee te where te.payroll.id = :id order by te.employee.fullName asc"""
@@ -19,14 +26,27 @@ interface PayrollEmployeeRepository extends JpaRepository<PayrollEmployee, UUID>
     List<Employee> findEmployeeByPayrollId(@Param("id") UUID id)
 
     @Query(
-            value = """Select te.employee.fullName as fullName, te.id as id from PayrollEmployee te where te.payroll.id = :id order by te.employee.fullName asc"""
+            value = """Select 
+e.fullName as fullName, 
+e.position.description as position,
+pe.withholdingTax as withholdingTax,
+pe.status as status,
+te.status as timekeepingStatus,
+ce.status as contributionStatus,
+pe.id as id from 
+PayrollEmployee pe 
+left join pe.timekeepingEmployee te
+left join pe.payrollEmployeeContribution ce
+left join pe.employee e
+where pe.payroll.id = :id 
+order by pe.employee.fullName asc"""
     )
     List<PayrollEmployeeListDto> findPayrollEmployee(@Param("id") UUID id)
 
     @Query(
             value = """Select te from PayrollEmployee te where te.employee.id = :id and te.payroll.id = :payrollId"""
     )
-    Optional<PayrollEmployee> findByPayroll(@Param("id") UUID id, @Param("payrollId") UUID payrollId)
+    List<PayrollEmployee> findByPayroll(@Param("id") UUID id, @Param("payrollId") UUID payrollId)
 
     @Query(
             value = """Select te from PayrollEmployee te left join fetch te.employee where te.payroll.id = :id"""

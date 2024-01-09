@@ -4,6 +4,7 @@ import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.accounting.IntegrationDomainEnum
 import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
+import com.backend.gbp.domain.payroll.enums.PayrollType
 import com.backend.gbp.domain.types.AutoIntegrateable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -78,6 +79,11 @@ class Payroll extends PayrollAuditingEntity implements Serializable, AutoIntegra
     PayrollAllowance allowance
 
     @GraphQLQuery
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", columnDefinition = "varchar")
+    PayrollType type
+
+    @GraphQLQuery
     @Column(name = "posted_ledger", columnDefinition = "uuid")
     UUID postedLedger
 
@@ -122,6 +128,9 @@ class Payroll extends PayrollAuditingEntity implements Serializable, AutoIntegra
 
     @Transient
     BigDecimal advancesToEmployees = 0
+
+    @Transient
+    BigDecimal withholdingTax = 0
 
 
    //Contributions

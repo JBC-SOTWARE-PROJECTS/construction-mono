@@ -497,6 +497,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/65_michael_withholding_tax_matrix.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/66_michael_payroll_withholding_tax.sql"
+             relativeToChangelogFile="false"/>
     <!-- <include file="classpath:config/liquibase/changelog4/63_donss_add_loan_table.sql"
              relativeToChangelogFile="false"/> -->
 </databaseChangeLog>

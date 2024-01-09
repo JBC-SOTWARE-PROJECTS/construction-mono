@@ -21,6 +21,7 @@ import com.backend.gbp.repository.TimekeepingEmployeeDto
 import com.backend.gbp.repository.TimekeepingEmployeeRepository
 import com.backend.gbp.repository.TimekeepingRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
@@ -57,6 +58,9 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     @Autowired
     SalaryRateMultiplierService salaryRateMultiplierService
+
+    @Autowired
+    PayrollEmployeeRepository payrollEmployeeRepository
 
     @PersistenceContext
     EntityManager entityManager
@@ -95,7 +99,11 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
     @Override
     void recalculateAllEmployee(Payroll payroll) {
-        payroll.timekeeping.timekeepingEmployees
+        List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.findByPayrollId(payroll.id)
+        payrollEmployees.each {
+            it.status = PayrollEmployeeStatus.DRAFT
+        }
+        payrollEmployeeRepository.saveAll(payrollEmployees)
         generateAccumulatedLogs(payroll.timekeeping.timekeepingEmployees, payroll)
     }
 
@@ -118,6 +126,8 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
     @Override
     TimekeepingEmployee recalculateEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
         TimekeepingEmployee timekeepingEmployee = payrollEmployee.timekeepingEmployee
+        payrollEmployee.status = PayrollEmployeeStatus.DRAFT
+        payrollEmployeeRepository.save(payrollEmployee)
         generateAccumulatedLogs([timekeepingEmployee], payroll)
         return null
     }
@@ -176,7 +186,6 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
         if (!timekeepingEmployee) return new GraphQLResVal<TimekeepingEmployee>(null, false, "Failed to update employee timekeeping status. Please try again later!") else {
 
             timekeepingEmployee = this.updateStatus(id, status)
-            timekeepingEmployee.payrollEmployee.employee
             Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
             SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
 
@@ -198,6 +207,10 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
                         timekeepingEmployee.salaryBreakdown.push(calculateSalaryBreakdown(multiplier, hoursLog, timekeepingEmployee.payrollEmployee.employee))
                     }
                 }
+            } else {
+                PayrollEmployee payrollEmployee = payrollEmployeeRepository.findById(timekeepingEmployee.payrollEmployee.id).get()
+                payrollEmployee.status = PayrollEmployeeStatus.DRAFT
+                payrollEmployeeRepository.save(payrollEmployee)
 
 
             }

@@ -67,6 +67,13 @@ const useMemoizedPayrollHeaderBreadcrumb = (
         disabled: pathname === `${basePathName}/p-other-deductions`,
         hasRole: hasOtherDeductionRole,
       },
+      {
+        key: `${basePath}/p-withholding-tax`,
+        title: "Withholding Tax",
+        path: `${basePath}/p-withholding-tax`,
+        disabled: pathname === `${basePathName}/p-withholding-tax`,
+        hasRole: hasOtherDeductionRole,
+      },
     ];
 
     const items = menus

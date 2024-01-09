@@ -4039,9 +4039,10 @@ export type Mutation = {
   /** insert adj */
   quantityAdjustmentInsert?: Maybe<QuantityAdjustment>;
   reapplicationUpsert?: Maybe<GraphQlRetVal_Boolean>;
-  /** A mutation to recalculate all payroll module employee . */
   recalculateAllPayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
+  recalculateAllWithholdingTax?: Maybe<GraphQlResVal_String>;
   recalculateOneDay?: Maybe<GraphQlResVal_String>;
+  recalculateOneWithholdingTax?: Maybe<GraphQlResVal_String>;
   /** A mutation to recalculate payroll module employee . */
   recalculatePayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
   remove2307?: Maybe<Wtx2307>;
@@ -4997,11 +4998,23 @@ export type MutationRecalculateAllPayrollModuleEmployeeArgs = {
 
 
 /** Mutation root */
+export type MutationRecalculateAllWithholdingTaxArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationRecalculateOneDayArgs = {
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
   endDate?: InputMaybe<Scalars['Instant']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   startDate?: InputMaybe<Scalars['Instant']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRecalculateOneWithholdingTaxArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -8299,6 +8312,7 @@ export type Payroll = {
   status?: Maybe<PayrollStatus>;
   timekeeping?: Maybe<Timekeeping>;
   title?: Maybe<Scalars['String']['output']>;
+  type?: Maybe<PayrollType>;
 };
 
 export type PayrollAdjustment = {
@@ -8400,6 +8414,7 @@ export type PayrollEmployee = {
   payrollEmployeeLoan?: Maybe<PayrollEmployeeLoan>;
   status?: Maybe<PayrollEmployeeStatus>;
   timekeepingEmployee?: Maybe<TimekeepingEmployee>;
+  withholdingTax?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type PayrollEmployeeAdjustment = {
@@ -8507,6 +8522,17 @@ export type PayrollEmployeeContributionDto = {
   total?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
+export type PayrollEmployeeListDto = {
+  __typename?: 'PayrollEmployeeListDto';
+  contributionStatus?: Maybe<PayrollEmployeeStatus>;
+  fullName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  position?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<PayrollEmployeeStatus>;
+  timekeepingStatus?: Maybe<PayrollEmployeeStatus>;
+  withholdingTax?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
 export type PayrollEmployeeLoan = {
   __typename?: 'PayrollEmployeeLoan';
   company?: Maybe<CompanySettings>;
@@ -8603,7 +8629,8 @@ export enum PayrollModule {
   Contribution = 'CONTRIBUTION',
   Loans = 'LOANS',
   OtherDeduction = 'OTHER_DEDUCTION',
-  Timekeeping = 'TIMEKEEPING'
+  Timekeeping = 'TIMEKEEPING',
+  WithholdingTax = 'WITHHOLDING_TAX'
 }
 
 export type PayrollOtherDeduction = {
@@ -9807,7 +9834,9 @@ export type Query = {
   /** Gets the loan employees by payroll id */
   getPayrollEmployeeLoan?: Maybe<Page_PayrollEmployeeLoanDto>;
   /** Gets all the employees by payroll id */
-  getPayrollEmployees?: Maybe<Array<Maybe<Employee>>>;
+  getPayrollEmployees?: Maybe<Array<Maybe<PayrollEmployeeListDto>>>;
+  /** Gets all the employees by payroll id */
+  getPayrollHRMEmployees?: Maybe<Array<Maybe<Employee>>>;
   /** Get loan by ID */
   getPayrollLoanById?: Maybe<PayrollLoan>;
   /** Get loan by ID */
@@ -11647,6 +11676,12 @@ export type QueryGetPayrollEmployeesArgs = {
 
 
 /** Query root */
+export type QueryGetPayrollHrmEmployeesArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetPayrollLoanByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -11806,12 +11841,6 @@ export type QueryGetTotalMaterialsArgs = {
 /** Query root */
 export type QueryGetTotalsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Query root */
-export type QueryGetWithholdingTaxMatrixArgs = {
-  type?: InputMaybe<Scalars['String']['input']>;
 };
 
 
