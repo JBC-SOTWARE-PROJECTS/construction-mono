@@ -83,6 +83,15 @@ const ViewPayroll = ({ account }: IPageProps) => {
       status: payroll?.otherDeduction?.status,
     },
     {
+      title: "Withholding Tax",
+      icon: <FieldTimeOutlined />,
+      link: "/p-withholding-tax",
+      description:
+        "Manages various deductions, such as healthcare premiums and union dues.",
+      show: true,
+      status: "FINALIZED",
+    },
+    {
       title: "Payroll Payslip",
       icon: <FileOutlined />,
       link: "/p-payslip",

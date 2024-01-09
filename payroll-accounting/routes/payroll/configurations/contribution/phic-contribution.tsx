@@ -13,7 +13,7 @@ import {
   GET_PHIC_CONTRIBUTIONS,
   UPSERT_PHIC_CONTRIBUTION,
 } from "@/graphql/company/queries";
-import useManageContributions from "@/hooks/configurations/useManageContribution";
+import useManageTableMatrix from "@/hooks/configurations/useManageTableMatrix";
 import NumeralFormatter from "@/utility/numeral-formatter";
 
 interface DataType {
@@ -49,7 +49,7 @@ function PhicContribution() {
       handleCancelEdit,
       renderInput,
     },
-  ] = useManageContributions({
+  ] = useManageTableMatrix({
     initialValues,
     upsertGQL: UPSERT_PHIC_CONTRIBUTION,
     queryGQL: GET_PHIC_CONTRIBUTIONS,

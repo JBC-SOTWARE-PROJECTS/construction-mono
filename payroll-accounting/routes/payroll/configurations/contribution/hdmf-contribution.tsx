@@ -8,7 +8,7 @@ import {
   SaveOutlined,
 } from "@ant-design/icons";
 import { ProCard, ProFormGroup } from "@ant-design/pro-components";
-import useGetScheduleTypes from "@/hooks/configurations/useManageContribution";
+import useGetScheduleTypes from "@/hooks/configurations/useManageTableMatrix";
 
 import {
   UPSERT_HDMF_CONTRIBUTION,

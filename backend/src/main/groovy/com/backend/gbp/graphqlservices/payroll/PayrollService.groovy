@@ -360,10 +360,16 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         totalSalary = totalSalary - totalOtherDeduction - totalLoan - totalContributions
         Instant now = Instant.now()
 
+        BigDecimal totalWithholdingTax = 0
+        payroll.payrollEmployees.each {
+            totalWithholdingTax += it.withholdingTax
+        }
+
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary - totalAdjustmentDebit - totalLateAmount
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary - totalAdjustmentDebit - totalLateAmount - totalWithholdingTax
             it.salariesPayableTotalDebit = 0
+            it.withholdingTax = totalWithholdingTax
         }
 
         entryMap.keySet().each { key ->
@@ -403,8 +409,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         headerLedger.headerLedgerGroup = newSave.id
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
-                payroll.description,
-                "${payroll.description ?: ""}",
+                payroll.title,
+                "${payroll.title ?: ""}",
                 LedgerDocType.PRL,
                 JournalType.GENERAL,
                 now,
@@ -434,8 +440,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
         def pHeaderContribution = ledgerServices.persistHeaderLedger(headerLedgerContribution,
                 "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
-                payroll.description,
-                "${payroll.description ?: ""}",
+                payroll.title + 'Contributions',
+                "${payroll.title + ' Contributions' ?: ""}",
                 LedgerDocType.PRL,
                 JournalType.GENERAL,
                 now,

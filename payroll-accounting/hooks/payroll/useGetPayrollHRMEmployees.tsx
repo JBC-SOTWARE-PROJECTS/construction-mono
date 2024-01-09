@@ -4,21 +4,25 @@ import { useRouter } from "next/router";
 
 const GET_EMPLOYEES = gql`
   query ($id: UUID) {
-    employees: getPayrollEmployees(id: $id) {
+    employees: getPayrollHRMEmployees(id: $id) {
       id
       fullName
-      position
-      withholdingTax
+      gender
       status
-      timekeepingStatus
-      contributionStatus
+      position {
+        description
+      }
     }
   }
 `;
 
-function useGetPayrollEmployees(callBack?: (result: any) => void) {
+function useGetPayrollHRMEmployees(
+  usage?: string,
+  callBack?: (result: any) => void
+) {
   const router = useRouter();
-  const { data, loading, refetch } = useQuery(GET_EMPLOYEES, {
+  const { data, loading } = useQuery(GET_EMPLOYEES, {
+    skip: usage === PayrollFormUsage.CREATE && true,
     variables: {
       id: router?.query.id,
     },
@@ -26,7 +30,7 @@ function useGetPayrollEmployees(callBack?: (result: any) => void) {
       if (callBack) callBack(result?.employees);
     },
   });
-  return [data?.employees, loading, refetch];
+  return [data?.employees, loading];
 }
 
-export default useGetPayrollEmployees;
+export default useGetPayrollHRMEmployees;
