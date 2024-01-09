@@ -47,5 +47,12 @@ class Allowance extends AbstractAuditingEntity {
 	@Column(name = "created_date", columnDefinition = "timestamp")
 	Instant createdDate
 
+	@GraphQLQuery
+	@Column(name = "subaccount_code", columnDefinition = "varchar")
+	String subaccountCode
+
+	@GraphQLQuery
+	@Column(name = "is_attendance_based", columnDefinition = "bool")
+	Boolean isAttendanceBased
 
 }

@@ -18,11 +18,15 @@ import {
   useItemGroups,
   useItemBrands,
 } from "@/hooks/inventory";
+import UpsertAssignItemLocationModal from "@/components/inventory/masterfile/other-configurations/dialogs/upsertAssignItem";
+import UpsertAssignSupplierItemModal from "@/components/inventory/masterfile/other-configurations/dialogs/upsertSupplierItem";
 
 const { Search } = Input;
 
 export default function ItemComponent({ type }: { type: string }) {
   const modal = useDialog(UpsertItemModal);
+  const assignItemModal = useDialog(UpsertAssignItemLocationModal);
+  const assignSupplierItemModal = useDialog(UpsertAssignSupplierItemModal);
   const [category, setCategory] = useState<string[]>([]);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [state, setState] = useState({
@@ -56,6 +60,14 @@ export default function ItemComponent({ type }: { type: string }) {
         refetch();
       }
     });
+  };
+
+  const onAssignRecord = (record?: Item) => {
+    assignItemModal({ record: record });
+  };
+
+  const onAssignSupplierRecord = (record?: Item) => {
+    assignSupplierItemModal({ record: record });
   };
 
   const title = useMemo(() => {
@@ -165,8 +177,8 @@ export default function ItemComponent({ type }: { type: string }) {
           loading={loading}
           totalElements={data?.itemByFiltersPage?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
-          handleAssign={(record) => onUpsertRecord(record)}
-          handleSupplier={(record) => onUpsertRecord(record)}
+          handleAssign={(record) => onAssignRecord(record)}
+          handleSupplier={(record) => onAssignSupplierRecord(record)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
         />
       </ProCard>

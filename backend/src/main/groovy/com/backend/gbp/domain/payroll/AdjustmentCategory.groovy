@@ -49,4 +49,7 @@ class AdjustmentCategory extends AbstractAuditingEntity implements Serializable 
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
 
+    @GraphQLQuery
+    @Column(name = "subaccount_code", columnDefinition = "varchar")
+    String subaccountCode
 }

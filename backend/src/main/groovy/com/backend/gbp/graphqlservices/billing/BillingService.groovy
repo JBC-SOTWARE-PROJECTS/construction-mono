@@ -158,14 +158,14 @@ class BillingService extends AbstractDaoService<Billing> {
 
 		String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
-           lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
+           lower(q.customer.customerName) like lower(concat('%',:filter,'%')) OR
            lower(q.job.jobNo) like lower(concat('%',:filter,'%')) OR
            lower(q.job.description) like lower(concat('%',:filter,'%'))) 
            AND q.otcName is null AND q.companyId = :company'''
 
 		String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
-           lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
+           lower(q.customer.customerName) like lower(concat('%',:filter,'%')) OR
            lower(q.job.jobNo) like lower(concat('%',:filter,'%')) OR
            lower(q.job.description) like lower(concat('%',:filter,'%')))
            AND q.otcName is null AND q.companyId = :company'''
@@ -198,14 +198,14 @@ class BillingService extends AbstractDaoService<Billing> {
 
         String query = '''select q from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
-           lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
+           lower(q.customer.customerName) like lower(concat('%',:filter,'%')) OR
            lower(q.project.projectCode) like lower(concat('%',:filter,'%')) OR
            lower(q.project.description) like lower(concat('%',:filter,'%'))) 
            AND q.otcName is null AND q.companyId = :company'''
 
         String countQuery = '''Select count(q) from Billing q where  
            (lower(q.billNo) like lower(concat('%',:filter,'%')) OR 
-           lower(q.customer.fullName) like lower(concat('%',:filter,'%')) OR
+           lower(q.customer.customerName) like lower(concat('%',:filter,'%')) OR
            lower(q.project.projectCode) like lower(concat('%',:filter,'%')) OR
            lower(q.project.description) like lower(concat('%',:filter,'%')))
            AND q.otcName is null AND q.companyId = :company'''
@@ -305,6 +305,7 @@ class BillingService extends AbstractDaoService<Billing> {
     Billing pushToBill(
             @GraphQLArgument(name = "jobId") UUID jobId
     ) {
+        def company = SecurityUtils.currentCompanyId()
         Job job = jobService.jobById(jobId)
         List<JobItems> jobItems = jobItemService.jobItemByParent(jobId).sort { it.descriptions }
         Billing bill = new Billing()
@@ -318,6 +319,7 @@ class BillingService extends AbstractDaoService<Billing> {
             bill.customer = job.customer
             bill.locked = false
             bill.status = true
+            bill.companyId = company
             def billing = save(bill)
 
             //add billing items after save billing
@@ -359,6 +361,7 @@ class BillingService extends AbstractDaoService<Billing> {
     Billing pushToBillProject(
             @GraphQLArgument(name = "projectId") UUID projectId
     ) {
+        def company = SecurityUtils.currentCompanyId()
         def project = projectService.projectById(projectId)
         def costItems = projectCostService.pCostByList("", projectId).sort { it.description }
         Billing bill = new Billing()
@@ -372,6 +375,7 @@ class BillingService extends AbstractDaoService<Billing> {
             bill.customer = project.customer
             bill.locked = false
             bill.status = true
+            bill.companyId = company
             def billing = save(bill)
 
             //add billing items after save billing
@@ -433,7 +437,7 @@ class BillingService extends AbstractDaoService<Billing> {
     Billing createBillingProject(
             @GraphQLArgument(name = "project") Projects project
     ) {
-
+        def company = SecurityUtils.currentCompanyId()
         Billing bill = new Billing()
         try {
             //add billing first
@@ -445,6 +449,7 @@ class BillingService extends AbstractDaoService<Billing> {
             bill.customer = project.customer
             bill.locked = false
             bill.status = true
+            bill.companyId = company
             save(bill)
 
         } catch (Exception e) {
@@ -461,6 +466,7 @@ class BillingService extends AbstractDaoService<Billing> {
             @GraphQLArgument(name = "dateTrans") Instant dateTrans
     ) {
         Billing bill = new Billing()
+        def company = SecurityUtils.currentCompanyId()
         try {
             //add billing first
             bill.dateTrans = dateTrans
@@ -470,6 +476,7 @@ class BillingService extends AbstractDaoService<Billing> {
             bill.otcName = customer
             bill.locked = false
             bill.status = true
+            bill.companyId = company
             save(bill)
 
         } catch (Exception e) {

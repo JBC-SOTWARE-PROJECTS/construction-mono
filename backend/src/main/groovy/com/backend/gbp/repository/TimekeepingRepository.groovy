@@ -9,4 +9,9 @@ interface TimekeepingRepository extends JpaRepository<Timekeeping, UUID> {
     @Query(value = "select t from Timekeeping t where t.payroll.id = :payrollId")
    Optional <Timekeeping> findByPayrollId(@Param("payrollId") UUID payrollId)
 
+    @Query(value = """select t from Timekeeping t 
+join fetch t.timekeepingEmployees te
+where t.payroll.id = :payrollId""")
+    Timekeeping findByIdJoinFetchTimekeepingEmployees(@Param("payrollId") UUID payrollId)
+
 }

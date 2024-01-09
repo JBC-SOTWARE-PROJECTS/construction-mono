@@ -2,8 +2,13 @@ import CustomButton from "@/components/common/CustomButton";
 import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
 import FormInput from "@/components/common/formInput/formInput";
 import FormSelect from "@/components/common/formSelect/formSelect";
-import { AdjustmentCategory, AdjustmentOperation } from "@/graphql/gql/graphql";
+import {
+  AdjustmentCategory,
+  AdjustmentOperation,
+  ChartOfAccountGenerate,
+} from "@/graphql/gql/graphql";
 import useUpsertAdjustmentCategory from "@/hooks/adjustment-category/useUpsertAdjustmentCategory";
+import { requiredField } from "@/utility/helper";
 import { EditOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { Button, Form, Modal, Space, Spin } from "antd";
 import { useState } from "react";
@@ -11,9 +16,16 @@ import { useState } from "react";
 interface IProps {
   record?: AdjustmentCategory;
   refetch: () => void;
+  coa: ChartOfAccountGenerate[];
+  isDefault?: any;
 }
 
-function UpsertAdjustmentCategoryModal({ refetch, record }: IProps) {
+function UpsertAdjustmentCategoryModal({
+  refetch,
+  record,
+  coa,
+  isDefault,
+}: IProps) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState<boolean>(false);
   const [upsert, loadingUpsert] = useUpsertAdjustmentCategory(() => {
@@ -73,6 +85,7 @@ function UpsertAdjustmentCategoryModal({ refetch, record }: IProps) {
               name: record?.name,
               status: record?.status || true,
               operation: record?.operation,
+              subaccountCode: record?.subaccountCode,
             }}
           >
             <FormInput
@@ -81,6 +94,7 @@ function UpsertAdjustmentCategoryModal({ refetch, record }: IProps) {
               label="Name"
               propsinput={{
                 placeholder: "Name",
+                disabled: isDefault,
               }}
             />
 
@@ -89,15 +103,30 @@ function UpsertAdjustmentCategoryModal({ refetch, record }: IProps) {
               label="Description"
               propsinput={{
                 placeholder: "Description",
+                disabled: isDefault,
               }}
             />
-
+            <FormSelect
+              label="Sub Account"
+              name="subaccountCode"
+              rules={requiredField}
+              propsselect={{
+                options: coa?.map((item: any) => ({
+                  value: item.code,
+                  label: item.accountName.replace("_", " "),
+                })),
+                allowClear: true,
+                showSearch: true,
+                placeholder: "Sub Account",
+              }}
+            />
             <FormCheckBox
               name="status"
               valuePropName="checked"
               checkBoxLabel="Status"
               propscheckbox={{
                 defaultChecked: true,
+                disabled: isDefault,
               }}
             />
             <FormSelect
@@ -108,6 +137,7 @@ function UpsertAdjustmentCategoryModal({ refetch, record }: IProps) {
                   value: item,
                   label: item.replace("_", " "),
                 })),
+                disabled: isDefault,
               }}
               rules={[{ required: true }]}
             />

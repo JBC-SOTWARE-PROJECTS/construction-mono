@@ -14,7 +14,7 @@ import usePaginationState from "@/hooks/usePaginationState";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { InputNumber, Modal, Select, Tag } from "antd";
+import { InputNumber, Modal, Select, Tag, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { recalculateButton } from "./p-contributions";
 import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
@@ -112,17 +112,10 @@ function OtherDeductions({ account }: IPageProps) {
         if (item.status === PayrollEmployeeStatus.Draft) countDraft++;
       });
     }
-    if (countDraft > 0) {
-      Modal.confirm({
-        title: "There still some DRAFT employees. Proceed?",
-        icon: <ExclamationCircleOutlined />,
-        onOk() {
-          updateStatus({
-            payrollId: router?.query?.id as string,
-            status: "FINALIZED",
-          });
-        },
-      });
+    if (countDraft > 0 && otherDeduction.status === "DRAFT") {
+      message.error(
+        "There are still some DRAFT employees. Please finalize all employees first"
+      );
     } else {
       updateStatus({
         payrollId: router?.query?.id as string,
@@ -131,25 +124,7 @@ function OtherDeductions({ account }: IPageProps) {
     }
   };
 
-  const columns: ColumnsType<PayrollEmployeeOtherDeductionDto> = [
-    { title: "Name", dataIndex: "employeeName" },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (value) => <Tag color={getStatusColor(value)}>{value}</Tag>,
-    },
-    {
-      title: "Total",
-      dataIndex: "total",
-      render: (value, record) => {
-        let total = 0;
-        console.log(record.employee?.deductionItems);
-        record.employee?.deductionItems?.forEach((item) => {
-          total = total + item?.amount;
-        });
-        return <NumeralFormatter value={total} />;
-      },
-    },
+  const actionColumn: ColumnsType<PayrollEmployeeOtherDeductionDto> = [
     {
       title: "Action",
       dataIndex: "id",
@@ -174,6 +149,49 @@ function OtherDeductions({ account }: IPageProps) {
       },
     },
   ];
+
+  const columns: ColumnsType<PayrollEmployeeOtherDeductionDto> = [
+    { title: "Name", dataIndex: "employeeName" },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (value) => <Tag color={getStatusColor(value)}>{value}</Tag>,
+    },
+    {
+      title: "Total",
+      dataIndex: "total",
+      render: (value, record) => {
+        let total = 0;
+        console.log(record.employee?.deductionItems);
+        record.employee?.deductionItems?.forEach((item) => {
+          total = total + item?.amount;
+        });
+        return <NumeralFormatter value={total} />;
+      },
+    },
+    ...(otherDeduction?.status === PayrollStatus.DRAFT ? actionColumn : []),
+  ];
+  const expandedColumnsAction: ColumnsType<PayrollOtherDeductionItem> = [
+    {
+      title: "Action",
+      dataIndex: "id",
+      render: (value) => {
+        return (
+          <>
+            <CustomButton
+              id={value}
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => {
+                confirmDelete(value);
+              }}
+            />
+          </>
+        );
+      },
+    },
+  ];
+
   let expandedRowColumns: ColumnsType<PayrollOtherDeductionItem> = [
     { title: "Name", dataIndex: "name" },
     {
@@ -194,11 +212,14 @@ function OtherDeductions({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditing(record.id as string);
-              setEditingField("DESCRIPTION");
+              if (otherDeduction?.status === PayrollStatus.DRAFT) {
+                setEditing(record.id as string);
+                setEditingField("DESCRIPTION");
+              }
             }}
           >
-            {value} <EditOutlined />
+            {value}{" "}
+            {otherDeduction?.status === PayrollStatus.DRAFT && <EditOutlined />}
           </div>
         ),
     },
@@ -220,32 +241,20 @@ function OtherDeductions({ account }: IPageProps) {
         ) : (
           <div
             onClick={() => {
-              setEditing(record.id as string);
-              setEditingField("AMOUNT");
+              if (otherDeduction?.status === PayrollStatus.DRAFT) {
+                setEditing(record.id as string);
+                setEditingField("AMOUNT");
+              }
             }}
           >
-            <NumeralFormatter value={value} /> <EditOutlined />
+            <NumeralFormatter value={value} />{" "}
+            {otherDeduction?.status === PayrollStatus.DRAFT && <EditOutlined />}
           </div>
         ),
     },
-    {
-      title: "Action",
-      dataIndex: "id",
-      render: (value) => {
-        return (
-          <>
-            <CustomButton
-              id={value}
-              icon={<DeleteOutlined />}
-              danger
-              onClick={() => {
-                confirmDelete(value);
-              }}
-            />
-          </>
-        );
-      },
-    },
+    ...(otherDeduction?.status === PayrollStatus.DRAFT
+      ? expandedColumnsAction
+      : []),
   ];
   return (
     <>
@@ -253,6 +262,8 @@ function OtherDeductions({ account }: IPageProps) {
         module={PayrollModule.OtherDeduction}
         status={otherDeduction?.status}
         showTitle
+        handleClickFinalize={handleClickFinalize}
+        loading={loadingUpdateStatus}
         extra={
           <>
             {otherDeduction?.status === PayrollStatus.DRAFT && (
@@ -266,20 +277,6 @@ function OtherDeductions({ account }: IPageProps) {
                 Recalculate All Employee Other Deduction
               </PayrollModuleRecalculateAllEmployeeAction>
             )}
-
-            <CustomButton
-              type="primary"
-              icon={
-                otherDeduction?.status === "FINALIZED" ? (
-                  <EditOutlined />
-                ) : (
-                  <CheckOutlined />
-                )
-              }
-              onClick={handleClickFinalize}
-            >
-              Set as {statusMap[otherDeduction?.status]}
-            </CustomButton>
           </>
         }
       />

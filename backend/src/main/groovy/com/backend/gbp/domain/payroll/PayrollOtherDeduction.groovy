@@ -2,6 +2,8 @@ package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
+import com.backend.gbp.graphqlservices.payroll.SubAccountBreakdownDto
+import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.NotFound
 import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
@@ -40,4 +42,8 @@ class PayrollOtherDeduction extends PayrollAuditingEntity implements Serializabl
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
 
+    @Type(type = "jsonb")
+    @GraphQLQuery
+    @Column(name="totals_breakdown",columnDefinition = "jsonb")
+    List<SubAccountBreakdownDto> totalsBreakdown
 }

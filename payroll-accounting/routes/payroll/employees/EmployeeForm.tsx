@@ -1,6 +1,7 @@
 import { FormInput, FormSelect } from "@/components/common";
 import FormButton from "@/components/common/formButton/formButton";
 import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
+import FormDatePicker from "@/components/common/formDatePicker/formDatePicker";
 import FormRadioButton from "@/components/common/formRadioButton";
 import { UseCompanySelection } from "@/hooks/companySelection";
 import { CIVIL, EMPSTATUS, GENDER, col2, col3, col4 } from "@/utility/constant";
@@ -24,6 +25,7 @@ import {
   Skeleton,
   message,
 } from "antd";
+import dayjs from "dayjs";
 import _ from "lodash";
 import moment from "moment";
 import { useRouter } from "next/router";
@@ -165,8 +167,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
   const router = useRouter();
   const companyList = UseCompanySelection();
   const id = router?.query?.id;
-  const [formError, setFormError] = useState({});
-  const [isFixedRate, setIsFixedRate] = useState<boolean | undefined>();
   const [state, setState] = useState({
     province: null,
     city: null,
@@ -181,7 +181,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
     },
     fetchPolicy: "network-only",
     onCompleted: (res) => {
-      setIsFixedRate(res.data.isFixedRate);
+      console.log(res.data.isFixedRate);
       setState({
         ...state,
         city: res.data.cityMunicipality,
@@ -210,7 +210,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
             message.success("Employee Information Updated");
             refetch();
           } else {
-            window.location.href = `/administrative/employees`;
+            window.location.href = `/payroll/employees`;
           }
         }
       },
@@ -310,7 +310,8 @@ const EmployeeForm = ({ account }: IPageProps) => {
     let obj = _.find(_.get(addressData, address), ["value", value]);
     if (obj) setState({ ...state, [address]: obj.id });
   };
-
+  const [form] = Form.useForm();
+  const fixedRate = Form.useWatch("isFixedRate", form);
   return (
     <Row gutter={16}>
       <Col span={24}>
@@ -336,6 +337,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
               //   error={formError}
               onFinish={onSubmitEmployee}
               className="form-card"
+              form={form}
             >
               <Row gutter={16}>
                 <Col {...col4}>
@@ -380,17 +382,14 @@ const EmployeeForm = ({ account }: IPageProps) => {
                 </Col>
                 {/* 2nd row */}
                 <Col {...col4}>
-                  <FormInput
+                  <FormDatePicker
                     label={"Date of Birth"}
                     rules={[
                       { required: true, message: "This Field is required" },
                     ]}
-                    initialValue={moment(_.get(data, "emp.dob"))}
+                    initialValue={dayjs(_?.get(data, "emp.dob"))}
                     name="dob"
-                    propsinput={{
-                      placeholder: "Date of Birth",
-                      type: "datepicker",
-                    }}
+                    propsdatepicker={{}}
                   />
                 </Col>
                 <Col {...col4}>
@@ -687,9 +686,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                       ],
                       optionType: "button",
                       buttonStyle: "solid",
-                      onChange: (e) => {
-                        setIsFixedRate(e.target.value);
-                      },
                     }}
                   />
                 </Col>
@@ -702,7 +698,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                       placeholder: "Monthly Rate",
                       type: "number",
 
-                      disabled: !isFixedRate,
+                      disabled: !fixedRate,
                     }}
                   />
                 </Col>
@@ -714,18 +710,18 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propsinput={{
                       placeholder: "Houry Rate",
                       type: "number",
-                      disabled: isFixedRate,
+                      disabled: fixedRate,
                     }}
                   />
                 </Col>
                 <Col {...col4}>
-                  <FormCheckBox
-                    name="isExcludedFromAttendance"
-                    valuePropName="checked"
-                    checkBoxLabel="Exclude from attendance"
-                    initialValue={_.get(data, "emp.isExcludedFromAttendance")}
-                    propscheckbox={{
-                      defaultChecked: true,
+                  <FormInput
+                    label={"Basic Salary (for contributions computation)"}
+                    initialValue={_.get(data, "emp.basicSalary") || 0}
+                    name="basicSalary"
+                    propsinput={{
+                      placeholder: "Basic Salary",
+                      type: "number",
                     }}
                   />
                 </Col>
@@ -757,6 +753,17 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     initialValue={_.get(data, "emp.isActiveHDMF")}
                     valuePropName="checked"
                     checkBoxLabel="include in HDMF"
+                    propscheckbox={{
+                      defaultChecked: true,
+                    }}
+                  />
+                </Col>
+                <Col {...col4}>
+                  <FormCheckBox
+                    name="isExcludedFromAttendance"
+                    valuePropName="checked"
+                    checkBoxLabel="Exclude from attendance"
+                    initialValue={_.get(data, "emp.isExcludedFromAttendance")}
                     propscheckbox={{
                       defaultChecked: true,
                     }}

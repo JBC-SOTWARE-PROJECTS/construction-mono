@@ -19,6 +19,7 @@ const GET_RECORDS = gql`
               id
               descLong
             }
+            model
           }
           assetMaintenanceType{
             id

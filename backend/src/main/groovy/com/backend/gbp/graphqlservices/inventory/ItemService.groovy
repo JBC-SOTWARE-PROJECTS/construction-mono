@@ -63,6 +63,23 @@ class ItemService extends AbstractDaoService<Item> {
         createQuery(query, params).resultList.sort { it.descLong }
     }
 
+    @GraphQLQuery(name = "fixedAssetItemList")
+    List<Item> fixedAssetItemList(
+            @GraphQLArgument(name = "filter") String filter
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''
+        Select e from Item e 
+        where 
+        lower(concat(e.sku,e.itemCode,e.descLong)) like lower(concat('%',:filter,'%')) 
+        and e.fixAsset is true
+        and e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        params.put('company', company)
+        createQuery(query, params).resultList.sort { it.descLong }
+    }
+
     @GraphQLQuery(name = "getItemByName")
     List<Item> getItemByName(
             @GraphQLArgument(name = "name") String name,
@@ -191,10 +208,34 @@ class ItemService extends AbstractDaoService<Item> {
         return result
     }
 
+    @GraphQLQuery(name = "itemsActivePage")
+    Page<Item> itemsActivePage(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Item e where (lower(e.descLong) like lower(concat('%',:filter,'%')) or
+						lower(e.sku) like lower(concat('%',:filter,'%'))) and e.active = :status and e.company = :company'''
+
+        String countQuery = '''Select count(e) from Item e where (lower(e.descLong) like lower(concat('%',:filter,'%')) or
+						lower(e.sku) like lower(concat('%',:filter,'%'))) and e.active = :status and e.company = :company'''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        params.put('status', true)
+        params.put('company', company)
+
+        query += ''' ORDER BY e.descLong ASC'''
+
+        Page<Item> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
     @GraphQLQuery(name = "itemActive")
     List<Item> itemActive() {
         def company = SecurityUtils.currentCompanyId()
-        String query = '''Select e from Item e where e.isActive = :status and e.company = :company'''
+        String query = '''Select e from Item e where e.active = :status and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
         params.put('company', company)

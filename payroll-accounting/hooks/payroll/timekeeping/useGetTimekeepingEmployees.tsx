@@ -11,6 +11,7 @@ const GET_EMPLOYEES = gql`
       status
       isExcludedFromAttendance
       projectBreakdown {
+        late
         project
         projectName
         company
@@ -30,6 +31,7 @@ const GET_EMPLOYEES = gql`
         projectName
         company
         companyName
+        late
         regular
         overtime
         regularHoliday

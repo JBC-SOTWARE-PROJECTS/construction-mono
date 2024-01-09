@@ -6,8 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
 
 enum GeneratorType {
-	HEADER_GROUP_NO,
-
 	EMPLOYEE_NO,
 	PATIENT_NO,
 	CASE_NO,
@@ -110,7 +108,13 @@ enum GeneratorType {
 	AR_INVOICE_ITEMS,
 	AR_PAYMENT_POSTING_ITEMS,
 	AR_TRANS_LEDGER,
-	AR_CREDIT_NOTE_ITEMS
+	AR_CREDIT_NOTE_ITEMS,
+
+	FIXED_ASSET_ITEMS,
+	LOAN_NO,
+	LOAN_RECORD,
+	DAR_NO,
+	PRS_NO
 }
 
 @Service

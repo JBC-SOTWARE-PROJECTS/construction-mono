@@ -19,7 +19,7 @@ export const GET_BILLING_RECORDS = gql`
         }
         customer {
           id
-          fullName
+          customerName
         }
         otcName
         locked
@@ -52,11 +52,11 @@ export const GET_BILLING_INFO_BY_ID = gql`
       }
       customer {
         id
-        fullName
+        customerName
         customerType
         address
-        telNo
-        emailAdd
+        contactNo
+        contactEmail
       }
       otcName
       locked

@@ -87,7 +87,9 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
             @GraphQLArgument(name = "employee") UUID employee,
             @GraphQLArgument(name = "category") UUID category,
             @GraphQLArgument(name = "amount") BigDecimal amount,
-            @GraphQLArgument(name = "description") String description
+            @GraphQLArgument(name = "description") String description,
+            @GraphQLArgument(name = "subaccountCode") String subaccountCode
+
     ) {
         PayrollAdjustmentItem item = new PayrollAdjustmentItem()
         if (id) {
@@ -103,6 +105,9 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
 
         if (amount)
             item.amount = amount
+
+        if (subaccountCode)
+            item.subaccountCode = subaccountCode
 
         item.description = description ? description : item.category.description
         item.company = SecurityUtils.currentCompany()

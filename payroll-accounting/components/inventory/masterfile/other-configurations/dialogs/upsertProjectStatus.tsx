@@ -15,7 +15,8 @@ import {
 import _ from "lodash";
 import { UPSERT_RECORD_PROJECT_STATUS } from "@/graphql/inventory/masterfile-queries";
 import { requiredField } from "@/utility/helper";
-import { FormCheckBox, FormInput } from "@/components/common";
+import { FormCheckBox, FormColorPicker, FormInput } from "@/components/common";
+import { getRandomColor } from "@/hooks/accountReceivables/commons";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -24,6 +25,7 @@ interface IProps {
 
 export default function UpsertProjectStatusModal(props: IProps) {
   const { hide, record } = props;
+  const [form] = Form.useForm();
   // ===================== Queries ==============================
   const [upsert, { loading: upsertLoading }] = useMutation(
     UPSERT_RECORD_PROJECT_STATUS,
@@ -43,6 +45,8 @@ export default function UpsertProjectStatusModal(props: IProps) {
   };
 
   const onSubmit = (values: any) => {
+    console.log("values", values);
+    
     upsert({
       variables: {
         fields: values,
@@ -80,12 +84,14 @@ export default function UpsertProjectStatusModal(props: IProps) {
         </Space>
       }>
       <Form
+        form={form}
         name="upsertForm"
         layout="vertical"
         onFinish={onSubmit}
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
+          statusColor: record?.statusColor ?? getRandomColor(),
           is_active: record?.is_active ?? false,
         }}>
         <Row gutter={[8, 0]}>
@@ -106,6 +112,18 @@ export default function UpsertProjectStatusModal(props: IProps) {
               label="Project Status Description"
               propsinput={{
                 placeholder: "Project Status Description",
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormColorPicker
+              label="Color"
+              name="statusColor"
+              propscolorpicker={{
+                format: "hex",
+                onChange: (_, hex: string) => {
+                  form.setFieldValue("statusColor", hex);
+                },
               }}
             />
           </Col>

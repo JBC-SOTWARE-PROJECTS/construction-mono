@@ -276,6 +276,7 @@ export const GET_RECORDS_PROJECT_STATUS = gql`
       code
       description
       disabledEditing
+      statusColor
       is_active
     }
   }
@@ -372,6 +373,144 @@ export const UPSERT_RECORD_ITEM_SUB_ACCOUNT = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     upsertItemSubAccount(id: $id, fields: $fields) {
       id
+    }
+  }
+`;
+
+export const GET_RECORDS_LOCATION_ITEM = gql`
+  query ($id: UUID) {
+    officeListByItem(id: $id) {
+      id
+      office {
+        id
+        officeDescription
+      }
+      allow_trade
+      is_assign
+    }
+  }
+`;
+
+export const UPSERT_RECORD_LOCATION_ITEM = gql`
+  mutation (
+    $depId: UUID
+    $itemId: UUID
+    $trade: Boolean
+    $assign: Boolean
+    $id: UUID
+  ) {
+    upsertOfficeItem(
+      depId: $depId
+      itemId: $itemId
+      trade: $trade
+      assign: $assign
+      id: $id
+    ) {
+      id
+    }
+  }
+`;
+
+export const GET_RECORDS_SUPPLIER_BY_ITEM = gql`
+  query ($id: UUID) {
+    allSupplierByItem(id: $id) {
+      id
+      supplier {
+        id
+        supplierFullname
+      }
+      cost
+      costPurchase
+    }
+  }
+`;
+
+export const UPSERT_RECORD_SUPPLIER_BY_ITEM = gql`
+  mutation (
+    $fields: Map_String_ObjectScalar
+    $itemId: UUID
+    $supId: UUID
+    $id: UUID
+  ) {
+    upsertSupplierItem(
+      fields: $fields
+      itemId: $itemId
+      supId: $supId
+      id: $id
+    ) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_SUPPLIER_BY_ITEM = gql`
+  mutation ($id: UUID) {
+    removeItemSupplier(id: $id) {
+      id
+    }
+  }
+`;
+
+export const GET_RECORD_ITEM_BY_SUPPLIER = gql`
+  query ($id: UUID, $filter: String) {
+    allItemBySupplier(id: $id, filter: $filter) {
+      id
+      itemId
+      item {
+        id
+        unit_of_usage {
+          id
+          unitDescription
+        }
+        unit_of_purchase {
+          id
+          unitDescription
+        }
+      }
+      cost
+      costPurchase
+      descLong
+      brand
+      unitMeasurement
+      genericName
+    }
+  }
+`;
+
+export const UPSERT_RECORD_ITEM_BY_SUPPLIER = gql`
+  mutation (
+    $fields: Map_String_ObjectScalar
+    $itemId: UUID
+    $supId: UUID
+    $id: UUID
+  ) {
+    upsertSupplierItem(
+      fields: $fields
+      itemId: $itemId
+      supId: $supId
+      id: $id
+    ) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_ITEM_BY_SUPPLIER = gql`
+  mutation ($id: UUID) {
+    removeItemSupplier(id: $id) {
+      id
+    }
+  }
+`;
+
+export const GET_ACTIVE_ITEM = gql`
+  query ($filter: String!, $size: Int, $page: Int) {
+    list: itemsActivePage(filter: $filter, size: $size, page: $page) {
+      content {
+        value: id
+        label: descLong
+      }
+      totalElements
     }
   }
 `;

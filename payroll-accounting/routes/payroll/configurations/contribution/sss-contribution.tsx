@@ -185,15 +185,23 @@ function SSSContribution() {
               key: "totalEr",
               render: (
                 _,
-                { isEditable, erContribution, er_ec_Contribution }
+                {
+                  isEditable,
+                  erContribution,
+                  er_ec_Contribution,
+                  wispErContribution,
+                }
               ) => {
                 if (isEditable)
                   return (
                     parseInt(editableRow.erContribution || 0) +
-                    parseInt(editableRow.er_ec_Contribution || 0)
+                    parseInt(editableRow.er_ec_Contribution || 0) +
+                    parseInt(editableRow.wispErContribution || 0)
                   );
                 else {
-                  return erContribution + er_ec_Contribution;
+                  return (
+                    erContribution + er_ec_Contribution + wispErContribution
+                  );
                 }
               },
             },
@@ -201,9 +209,15 @@ function SSSContribution() {
               title: "EE",
               dataIndex: "ee",
               key: "ee",
-              render: (_, { isEditable, eeContribution }) => {
-                if (isEditable) return editableRow.eeContribution;
-                else return eeContribution;
+              render: (
+                _,
+                { isEditable, eeContribution, wispEeContribution }
+              ) => {
+                if (isEditable)
+                  return (
+                    editableRow.eeContribution + editableRow.wispEeContribution
+                  );
+                else return eeContribution + wispEeContribution;
               },
             },
             {
@@ -217,16 +231,26 @@ function SSSContribution() {
                   erContribution,
                   eeContribution,
                   er_ec_Contribution,
+                  wispEeContribution,
+                  wispErContribution,
                 }
               ) => {
                 if (isEditable)
                   return (
                     parseInt(editableRow.erContribution || 0) +
                     parseInt(editableRow.eeContribution || 0) +
-                    parseInt(editableRow.er_ec_Contribution || 0)
+                    parseInt(editableRow.er_ec_Contribution || 0) +
+                    parseInt(editableRow.wispEeContribution || 0) +
+                    parseInt(editableRow.wispErContribution || 0)
                   );
                 else
-                  return erContribution + eeContribution + er_ec_Contribution;
+                  return (
+                    erContribution +
+                    eeContribution +
+                    er_ec_Contribution +
+                    wispEeContribution +
+                    wispErContribution
+                  );
               },
             },
           ],

@@ -2,8 +2,11 @@ package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
+import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.enums.EmployeeLoanCategory
+import com.backend.gbp.domain.types.AutoIntegrateable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -15,7 +18,7 @@ import javax.persistence.*
 
 @Entity
 @Table(schema = "payroll", name = "employee_loan")
-class EmployeeLoan extends AbstractAuditingEntity implements Serializable {
+class EmployeeLoan extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
 
     @GraphQLQuery
     @Id
@@ -55,5 +58,43 @@ class EmployeeLoan extends AbstractAuditingEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")
     CompanySettings company
+
+
+    @GraphQLQuery
+    @Column(name = "posted_ledger", columnDefinition = "uuid")
+    UUID postedLedger
+
+    @GraphQLQuery
+    @Column(name = "posted", columnDefinition = "bool")
+    @UpperCase
+    Boolean posted
+
+    @GraphQLQuery
+    @Column(name = "posted_by", columnDefinition = "varchar")
+    @UpperCase
+    String postedBy
+
+
+    @Override
+    String getDomain() {
+        return IntegrationDomainEnum.EMPLOYEE_LOAN.name()
+    }
+
+    @Transient
+    String flagValue
+
+    @Override
+    Map<String, String> getDetails() {
+        return [:]
+    }
+
+    @Transient
+    BigDecimal cashOnHand
+
+    @Transient
+    BigDecimal apClearingAccount
+
+    @Transient
+    BigDecimal advanceToEmployees
 
 }

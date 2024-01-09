@@ -102,7 +102,7 @@ a {
 
 .ant-segmented-item-selected {
   color: #fff !important;
-} 
+}
 
 /* .ant-btn-primary {
   background-color: #399b53 !important;
@@ -221,7 +221,7 @@ th.ant-table-cell {
 }
 
 .mt-6-5 {
-  margin-top: 1.60rem !important;
+  margin-top: 1.6rem !important;
 }
 
 .margin-0 {
@@ -384,11 +384,18 @@ th.ant-table-cell {
   font-weight: 700;
   width: 300px;
 }
+
 .billing-info-value {
   width: calc(100% - 300px);
 }
 
 .flex-div {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.billing-flex-div {
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -461,4 +468,49 @@ th.ant-table-cell {
 
 .relative {
   position: relative !important;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+}
+
+.project-page-header {
+  padding-block-start: 8px;
+  padding-block-end: 12px;
+  padding-inline-start: 40px;
+  padding-inline-end: 40px;
+}
+
+.no-spacing-card > .ant-card-body {
+  padding: 0 !important;
+}
+
+/* responsive */
+@media screen and (max-width: 756px) {
+  .billing-info-width {
+    font-weight: 700;
+    width: 100%;
+  }
+
+  .billing-flex-div {
+    display: block;
+  }
+
+  .billing-info-value {
+    width: 100%;
+  }
+}
+
+.px-5 {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.project-accomplishments-pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

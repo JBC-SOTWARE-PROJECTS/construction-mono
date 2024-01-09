@@ -122,29 +122,27 @@ export default function ReceivedPayments() {
         onSearch={onSearch}
         extra={<Button onClick={onNewPayment}>New Payment</Button>}
       >
-        <CommonTableCSS>
-          <Table
-            rowKey='id'
-            columns={columns}
-            dataSource={data?.payments?.content ?? []}
-            size='small'
-            loading={false}
-            scroll={{ x: 1200 }}
-            pagination={false}
-            footer={() => (
-              <Pagination
-                current={data?.payments?.number + 1}
-                showSizeChanger={false}
-                pageSize={10}
-                responsive={true}
-                total={data?.payments?.totalElements}
-                onChange={(e) => {
-                  refetch({ page: e - 1 })
-                }}
-              />
-            )}
-          />
-        </CommonTableCSS>
+        <Table
+          rowKey='id'
+          columns={columns}
+          dataSource={data?.payments?.content ?? []}
+          size='small'
+          loading={false}
+          scroll={{ x: 1200 }}
+          pagination={false}
+          footer={() => (
+            <Pagination
+              current={data?.payments?.number + 1}
+              showSizeChanger={false}
+              pageSize={10}
+              responsive={true}
+              total={data?.payments?.totalElements}
+              onChange={(e) => {
+                refetch({ page: e - 1 })
+              }}
+            />
+          )}
+        />
       </CardLayout>
     </PageContainer>
   )

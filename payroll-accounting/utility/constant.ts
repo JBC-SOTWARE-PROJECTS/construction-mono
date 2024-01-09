@@ -120,7 +120,7 @@ export const responsiveColumn2 = {
   sm: 24,
   md: 12,
   lg: 12,
-}
+};
 
 export const responsiveColumn18 = {
   xs: 24,
@@ -211,7 +211,7 @@ export const RPTOTALS = [
     debit: 0,
     credit: null,
   },
-]
+];
 
 export const PETTYTOTALS = [
   {
@@ -462,6 +462,84 @@ export const PC_CATEGORY = [
   },
 ];
 
+export const headerConstant = [
+  {
+    title: "No. of Hrs",
+  },
+  {
+    title: "Rate",
+  },
+  {
+    title: "Total",
+  },
+];
+
+export const grossName = [
+  {
+    title: "Regular",
+  },
+  {
+    title: "Late",
+  },
+  {
+    title: "Under Time",
+  },
+  {
+    title: "Over Time",
+  },
+  {
+    title: "Regular Holiday",
+  },
+  {
+    title: "Special Non-Working",
+  },
+  {
+    title: "Vication Leave",
+  },
+  {
+    title: "Sick Leave",
+  },
+  {
+    title: "Semi Monthly Allowance",
+  },
+  {
+    title: "Dialy Allowance",
+  },
+  {
+    title: "Load Allowance",
+  },
+  {
+    title: "Transportation Allowance",
+  },
+  {
+    title: "Food Allowance",
+  },
+];
+
+export const payrollDeduction = [
+  {
+    title: "Withholding Tax",
+  },
+  {
+    title: "SSS",
+  },
+  {
+    title: "HDMF",
+  },
+  {
+    title: "PHIC",
+  },
+  {
+    title: "HMO Insurance",
+  },
+  {
+    title: "Cash Advance",
+  },
+  {
+    title: "Item Credit",
+  },
+];
+
 export const SUP_EN_TYPE = [
   { label: "PERSONAL", value: "PERSONAL" },
   { label: "CORPORATE", value: "CORPORATE" },
@@ -472,18 +550,30 @@ export const VAT_CON = [
   { label: "NON-VATABLE", value: "false" },
 ];
 
+export const REVISIONS_COST = [
+  { label: "Revision 1", value: "rev_1" },
+  { label: "Revision 2", value: "rev_2" },
+  { label: "Revision 3", value: "rev_3" },
+  { label: "Revision 4", value: "rev_4" },
+  { label: "Revision 5", value: "rev_5" },
+  { label: "Revision 6", value: "rev_6" },
+  { label: "Revision 7", value: "rev_7" },
+  { label: "Revision 8", value: "rev_8" },
+  { label: "Revision 9", value: "rev_9" },
+  { label: "Revision 10", value: "rev_10" },
+];
 
 export const AssetStatusColor = {
-  ACTIVE : 'blue',
-  DISPOSED : 'grey',
-  IDLE : 'warning',
-  IN_REPAIR : 'red',
-  IN_SERVICE : 'green',
-  IN_TRANSIT : 'purple',
-  OUT_OF_SERVICE : 'yellow',
-  RESERVED : 'cyan',
-  RETIRED : 'volcano',
-  UNDER_INSPECTION : 'magenta',
-  UNDER_MAINTENANCE : 'red',
-  NO_STATUS : 'gold'
-}
+  ACTIVE: "blue",
+  DISPOSED: "grey",
+  IDLE: "warning",
+  IN_REPAIR: "red",
+  IN_SERVICE: "green",
+  IN_TRANSIT: "purple",
+  OUT_OF_SERVICE: "yellow",
+  RESERVED: "cyan",
+  RETIRED: "volcano",
+  UNDER_INSPECTION: "magenta",
+  UNDER_MAINTENANCE: "red",
+  NO_STATUS: "gold",
+};
