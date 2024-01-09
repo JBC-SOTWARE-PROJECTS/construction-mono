@@ -67,6 +67,10 @@ export const DateFormatterWithTime = (value: string) => {
   return dayjs(value).format("YYYY-MM-DD hh:mm:ss A");
 };
 
+export const DateFormatterText = (value: string) => {
+  return dayjs(value).format("MMMM DD, YYYY");
+};
+
 export const randomId = () => {
   return uuidv4();
 };
@@ -184,3 +188,14 @@ export const filterOption = (
   input: string,
   option?: { label: string; value: string }
 ) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
+export function accessControl(permissions: string[], access: string) {
+  let result = _.findIndex(permissions, function (value) {
+    return value == access;
+  });
+  if (result < 0) {
+    return true;
+  } else {
+    return false;
+  }
+}

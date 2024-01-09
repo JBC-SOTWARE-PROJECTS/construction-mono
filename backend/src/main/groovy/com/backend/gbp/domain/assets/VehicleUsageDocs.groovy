@@ -1,8 +1,9 @@
-package com.backend.gbp.domain.projects
+package com.backend.gbp.domain.assets
 
 import com.backend.gbp.domain.AbstractAuditingEntity
-import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.inventory.Item
+import com.backend.gbp.domain.projects.Projects
+import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -15,10 +16,10 @@ import javax.persistence.*
 import java.time.Instant
 
 @Entity
-@Table(schema = "projects", name = "projects_updates_notes")
-@SQLDelete(sql = "UPDATE projects.projects_updates_materials SET deleted = true WHERE id = ?")
+@Table(schema = "asset", name = "vehicle_usage_docs")
+@SQLDelete(sql = "UPDATE asset.vehicle_usage_docs SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class ProjectUpdatesNotes extends AbstractAuditingEntity implements Serializable {
+class VehicleUsageDocs extends AbstractAuditingEntity implements Serializable {
 	
 	@GraphQLQuery
 	@Id
@@ -29,23 +30,31 @@ class ProjectUpdatesNotes extends AbstractAuditingEntity implements Serializable
 	UUID id
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "project_updates", referencedColumnName = "id")
-	ProjectUpdates projectUpdates
+	@Column(name = "doc_type")
+	String docType
+
+	@GraphQLQuery
+	@Column(name = "description")
+	String description
+
+	@GraphQLQuery
+	@Column(name = "file")
+	String file
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_id", referencedColumnName = "id")
-	Employee user
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "item", referencedColumnName = "id")
+	Item item
 
 	@GraphQLQuery
-	@Column(name = "date_transact")
-	Instant dateTransact
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "vehicle_usage", referencedColumnName = "id")
+	VehicleUsageMonitoring vehicleUsage
 
 	@GraphQLQuery
-	@Column(name = "remarks")
-	String remarks
+	@Column(name = "company")
+	UUID company
 
 }

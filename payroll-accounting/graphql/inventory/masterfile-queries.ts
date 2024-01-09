@@ -503,7 +503,7 @@ export const DELETE_RECORD_ITEM_BY_SUPPLIER = gql`
   }
 `;
 
-export const GET_AVTIVE_ITEM = gql`
+export const GET_ACTIVE_ITEM = gql`
   query ($filter: String!, $size: Int, $page: Int) {
     list: itemsActivePage(filter: $filter, size: $size, page: $page) {
       content {

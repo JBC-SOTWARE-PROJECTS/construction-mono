@@ -17,6 +17,7 @@ import useGetVehicleUsageMonitoring from "@/hooks/asset/useGetVehicleUsageMonito
 import UpsertVehicleUsageModal from "@/components/inventory/assets/dialogs/upsertVehicleUsage";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_ACTIVE_PROJECTS } from "@/components/payroll/configurations/UpsertScheduleType";
+import VehicleUsageAttachemntModal from "@/components/inventory/assets/dialogs/vehicleUsageAttachment";
 
 type Props = {};
 const { Search } = Input;
@@ -35,6 +36,7 @@ const initialState: IPMState = {
 
 export default function VehicleUsageMonitoringComponent({}: Props) {
   const modalUpsert = useDialog(UpsertVehicleUsageModal);
+  const modalAttachment = useDialog(VehicleUsageAttachemntModal);
   //const modalViewRM = useDialog(ViewRepairMaintenance);
   const router = useRouter();
   const [state, setState] = useState(initialState);
@@ -77,6 +79,12 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
     });
   };
 
+  const onVehicleUsageAttach = (record?: any) => {
+    modalAttachment({ record: record }, (result: any) => {
+       
+     });
+   };
+
   // const viewRepairMaintenance = (record?: any) => {
   //   modalViewRM({ record: record });
   // };
@@ -115,6 +123,7 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
           handleOpen={(record) => onUpsertRecord(record)}
           handleView={(record) => {}}
           handleSupplier={(record) => {}}
+          handleAttachment={(record) => onVehicleUsageAttach(record)}
           changePage={(page) => {
             setState((prev) => ({ ...prev, page: page }));
           }}

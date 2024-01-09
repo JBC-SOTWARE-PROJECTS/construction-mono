@@ -49,9 +49,7 @@ const GET_RECORDS = gql`
         projectEnded
         customer {
           id
-          customerType
-          address
-          fullName
+          accountName
         }
         location {
           id

@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.projects
 
 import com.backend.gbp.domain.AbstractAuditingEntity
+import com.backend.gbp.domain.annotations.UpperCase
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -26,9 +27,13 @@ class ProjectUpdates extends AbstractAuditingEntity implements Serializable {
 	@Type(type = "pg-uuid")
 	UUID id
 
+    @GraphQLQuery
+    @Column(name = "transaction_no")
+    @UpperCase
+    String transNo
+
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
 
@@ -37,20 +42,19 @@ class ProjectUpdates extends AbstractAuditingEntity implements Serializable {
 	Instant dateTransact
 
 	@GraphQLQuery
-	@Column(name = "start_date")
-	Instant startDate
-
-	@GraphQLQuery
-	@Column(name = "estimate_end_date")
-	Instant estimateEndDate
-
-	@GraphQLQuery
-	@Column(name = "completed_date")
-	Instant completedDate
-
-	@GraphQLQuery
 	@Column(name = "description")
+	@UpperCase
 	String description
+
+	@GraphQLQuery
+	@Column(name = "accomplishment")
+	@UpperCase
+	String accomplishment
+
+	@GraphQLQuery
+	@Column(name = "weather")
+	@UpperCase
+	String weather
 
 	@GraphQLQuery
 	@Column(name = "status")

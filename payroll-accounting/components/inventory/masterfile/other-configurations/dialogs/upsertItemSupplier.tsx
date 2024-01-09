@@ -13,7 +13,7 @@ import {
 } from "antd";
 import _ from "lodash";
 import {
-  GET_AVTIVE_ITEM,
+  GET_ACTIVE_ITEM,
   UPSERT_RECORD_ITEM_BY_SUPPLIER,
 } from "@/graphql/inventory/masterfile-queries";
 import { requiredField } from "@/utility/helper";
@@ -103,7 +103,7 @@ export default function UpsertItemSupplierModal(props: IProps) {
               propsselect={{
                 allowClear: true,
                 placeholder: "Select Item",
-                fetchOptions: GET_AVTIVE_ITEM,
+                fetchOptions: GET_ACTIVE_ITEM,
                 onChange: (newValue) => {
                   form.setFieldValue("item", newValue?.value);
                 },

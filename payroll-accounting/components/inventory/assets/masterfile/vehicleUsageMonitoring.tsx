@@ -1,5 +1,5 @@
 import React from "react";
-import { EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { EyeOutlined, EditOutlined, PaperClipOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
@@ -21,6 +21,7 @@ type IProps = {
   handleOpen: (record: VehicleUsageMonitoring) => void;
   handleView: (record: VehicleUsageMonitoring) => void;
   handleSupplier: (record: VehicleUsageMonitoring) => void;
+  handleAttachment: (record: VehicleUsageMonitoring) => void;
   changePage: (page: number) => void;
 };
 
@@ -31,6 +32,7 @@ export default function VehicleUsageMonitoringTable({
   handleOpen,
   handleView,
   handleSupplier,
+  handleAttachment,
   changePage,
 }: IProps) {
   const router = useRouter();
@@ -114,6 +116,15 @@ export default function VehicleUsageMonitoringTable({
                 type="primary"
                 onClick={() => {
                   handleOpen(record);
+                }}
+              />
+            </Col>
+            <Col>
+              <Button
+                icon={<PaperClipOutlined />}
+                type="primary"
+                onClick={() => {
+                  handleAttachment(record);
                 }}
               />
             </Col>
