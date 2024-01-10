@@ -187,10 +187,12 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
                 payrollLoanItem.category = it.category
                 switch (it.category) {
                     case EmployeeLoanCategory.CASH_ADVANCE:
-                        payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.cashAdvanceAmount
+                        if(!payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount) return
+                        payrollLoanItem.amount = payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount ?: 0
                         break;
                     case EmployeeLoanCategory.EQUIPMENT_LOAN:
-                        payrollLoanItem.amount = payrollEmployee.employee.employeeLoanConfig.equipmentLoanAmount
+                        if(!payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount) return
+                        payrollLoanItem.amount = payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount ?: 0
                         break;
                 }
 

@@ -8,9 +8,8 @@ import { useRouter } from "next/router";
 interface IProps {
   dataSource: Employee[];
   loading?: boolean;
-  totalElements: number;
   handleOpen?: (record: CompanySettings) => void;
-  changePage?: (page: number) => void;
+  changePage?: any;
   rowSelection?: TableRowSelection<Employee>;
   hideExtraColumns?: boolean;
   additionalColumns?: ColumnsType<Employee>;
@@ -19,7 +18,6 @@ interface IProps {
 export default function EmployeeTable({
   dataSource,
   loading,
-  totalElements = 1,
   handleOpen,
   changePage,
   rowSelection,
@@ -100,20 +98,21 @@ export default function EmployeeTable({
           size="small"
           columns={columns}
           dataSource={dataSource}
-          pagination={false}
+          // pagination={false}
+          onChange={changePage}
           loading={loading}
           rowSelection={rowSelection}
-          footer={() => (
-            <Pagination
-              showSizeChanger={false}
-              pageSize={10}
-              responsive={true}
-              total={totalElements}
-              onChange={(e) => {
-                if (changePage) changePage(e - 1);
-              }}
-            />
-          )}
+          // footer={() => (
+          //   <Pagination
+          //     showSizeChanger={false}
+          //     pageSize={10}
+          //     responsive={true}
+          //     total={totalElements}
+          //     onChange={(e) => {
+          //       if (changePage) changePage(e - 1);
+          //     }}
+          //   />
+          // )}
           scroll={{ x: 1600 }}
         />
       </Col>

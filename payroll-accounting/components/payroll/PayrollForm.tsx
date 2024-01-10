@@ -36,6 +36,7 @@ import useUpdatePayrollStatus from "@/hooks/payroll/useUpdatePayrollStatus";
 import CustomButton from "../common/CustomButton";
 import AccessControl from "../accessControl/AccessControl";
 import { IState } from "@/routes/payroll/employees";
+import usePaginationState from "@/hooks/usePaginationState";
 const initialState: IState = {
   filter: "",
   status: true,
@@ -58,8 +59,8 @@ function PayrollForm({ usage }: IProps) {
   const [form] = useForm();
   const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>([]);
   const router = useRouter();
-  const [state, setState] = useState(initialState);
   const [selectedIds, setSelectedIds] = useState<Key[]>([]);
+  const [state, { onNextPage }] = usePaginationState(initialState, 0, 25);
 
   const [_, loadingPayrollEmployees] = useGetPayrollHRMEmployees(
     usage,
@@ -219,11 +220,7 @@ function PayrollForm({ usage }: IProps) {
               <EmployeeTable
                 dataSource={employees as Employee[]}
                 loading={loadingEmployees}
-                totalElements={1 as number}
-                handleOpen={(record) => console.log("record => ", record)}
-                changePage={(page) =>
-                  setState((prev: any) => ({ ...prev, page: page }))
-                }
+                changePage={onNextPage}
                 hideExtraColumns
                 rowSelection={rowSelection}
               />
