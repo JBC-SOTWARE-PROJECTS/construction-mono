@@ -1,25 +1,10 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import FormInputNumber from "@/components/common/formInputNumber/formInputNumber";
 import { InputNumber, message } from "antd";
 import { useState } from "react";
 
-/*
-
-Description: For fetching departments whose ids falls within an array of UUIDs
-Parameters: same with the parameters of useMutation hook except the query
-
-NOTE: The variables object must have the following properties:
-    ids ([UUID])        - array of the employee ids to be fetched
-
-*/
-
 const inputStyle = { margin: 0, padding: 0, width: "100%" };
 
-const useManageContributions = ({
-  upsertGQL,
-  queryGQL,
-  initialValues,
-}: any) => {
+const useManageTableMatrix = ({ upsertGQL, queryGQL, initialValues }: any) => {
   const [dataSource, setDataSource] = useState<any>([]);
   const [isEditing, setIsEditing] = useState<Boolean>(false);
   const [editableRow, setEditableRow] = useState<any | [] | {}>(initialValues);
@@ -63,14 +48,14 @@ const useManageContributions = ({
     }
   );
 
-  const handleClickAdd = () => {
+  const handleClickAdd = (type: string) => {
     setIsEditing(true);
-    setDataSource([
-      {
-        isEditable: true,
-      },
-      ...dataSource,
-    ]);
+    const row = {
+      isEditable: true,
+      ...(type ? { type } : {}),
+    };
+    setEditableRow(row);
+    setDataSource([row, ...dataSource]);
   };
 
   const handleEdit = (record: any) => {
@@ -120,7 +105,7 @@ const useManageContributions = ({
     setEditableRow({ ...editableRow, [property]: value });
   };
 
-  const renderInput = (property: any) => {
+  const renderInput = (property: any, suffix: string) => {
     return (
       <InputNumber
         min={0}
@@ -131,6 +116,7 @@ const useManageContributions = ({
         onChange={(value: any) => {
           handleChangeInput(value, property);
         }}
+        suffix={suffix}
       ></InputNumber>
     );
   };
@@ -150,4 +136,4 @@ const useManageContributions = ({
   ];
 };
 
-export default useManageContributions;
+export default useManageTableMatrix;

@@ -25,11 +25,15 @@ class PayrollEmployeeContributionsView {
     BigDecimal basicSalary
 
     @GraphQLQuery
+    @Column(name = "ss_er_ec_amount", columnDefinition = "numeric")
+    BigDecimal sssER_EC
+
+    @GraphQLQuery
     @Column(name = "ss_ee_amount", columnDefinition = "numeric")
     BigDecimal sssEE
 
     @GraphQLQuery
-    @Column(name = "ss_er_total", columnDefinition = "numeric")
+    @Column(name = "ss_er_amount", columnDefinition = "numeric")
     BigDecimal sssER
 
     @GraphQLQuery

@@ -8,6 +8,7 @@ const MUTATION = gql`
     $category: UUID
     $amount: BigDecimal
     $description: String
+    $subaccountCode: String
   ) {
     data: upsertAdjustmentItem(
       id: $id
@@ -15,6 +16,7 @@ const MUTATION = gql`
       category: $category
       amount: $amount
       description: $description
+      subaccountCode: $subaccountCode
     ) {
       success
       message
@@ -28,6 +30,7 @@ interface IParams {
   amount: number;
   category: string;
   description: string;
+  subaccountCode: string;
 }
 
 function useUpsertAdjustmentItem(callBack: () => void) {

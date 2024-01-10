@@ -15,6 +15,7 @@ import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeContributionDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeContributionRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeContributionsViewRepository
+import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.security.SecurityUtils
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -43,6 +44,8 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
     @Autowired
     PayrollEmployeeContributionsViewRepository payrollEmployeeContributionsViewRepository
 
+    @Autowired
+    PayrollEmployeeRepository payrollEmployeeRepository
 
     //=========================== QUERIES ============================
 
@@ -83,6 +86,11 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
     ) {
         PayrollEmployeeContribution employee = null
         employee = this.updateStatus(id, status)
+        if (status == PayrollEmployeeStatus.DRAFT) {
+            PayrollEmployee payrollEmployee = payrollEmployeeRepository.findById(employee.payrollEmployee.id).get()
+            payrollEmployee.status = PayrollEmployeeStatus.DRAFT
+            payrollEmployeeRepository.save(payrollEmployee)
+        }
 
         if (!employee) return new GraphQLResVal<PayrollEmployeeContribution>(null, false, "Failed to update employee contribution status. Please try again later!")
         return new GraphQLResVal<PayrollEmployeeContribution>(employee, true, "Successfully updated employee contribution status!")
@@ -165,7 +173,10 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
     @Override
     PayrollEmployeeContribution recalculateEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
         PayrollEmployeeContribution employee = payrollEmployee.payrollEmployeeContribution
+        employee.status = PayrollEmployeeStatus.DRAFT
         resetEmployeeContribution(employee)
+        payrollEmployee.status = PayrollEmployeeStatus.DRAFT
+        payrollEmployeeRepository.save(payrollEmployee)
         payrollEmployeeContributionRepository.save(employee)
         return null
     }
@@ -175,9 +186,15 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
         List<PayrollEmployeeContribution> employeeList = []
         payroll.contribution.contributionEmployees.each {
             PayrollEmployeeContribution employee = it
+            employee.status = PayrollEmployeeStatus.DRAFT
             resetEmployeeContribution(employee)
             employeeList.push(employee)
         }
+        List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.findByPayrollId(payroll.id)
+        payrollEmployees.each {
+            it.status = PayrollEmployeeStatus.DRAFT
+        }
+        payrollEmployeeRepository.saveAll(payrollEmployees)
         employeeList = payrollEmployeeContributionRepository.saveAll(employeeList)
         payroll.contribution.contributionEmployees = employeeList
     }
@@ -197,7 +214,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
     private void assignContributionAmounts(PayrollEmployeeContribution employee) {
         PayrollEmployeeContributionsView employeeView = payrollEmployeeContributionsViewRepository.findById(employee.payrollEmployee.employee.id).get()
         employee.sssEE = employeeView.sssEE ?: 0
-        employee.sssER = employeeView.sssER ?: 0
+        employee.sssER = employeeView.sssER + employeeView.sssER_EC ?: 0
         employee.sssWispEE = employeeView.sssWispEE ?: 0
         employee.sssWispER = employeeView.sssWispER ?: 0
         employee.phicEE = employeeView.phicEE ?: 0

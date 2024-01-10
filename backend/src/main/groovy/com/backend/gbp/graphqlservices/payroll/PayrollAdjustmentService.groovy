@@ -3,7 +3,8 @@ package com.backend.gbp.graphqlservices.payroll
 
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollAdjustment
-import com.backend.gbp.domain.payroll.PayrollAdjustment
+import com.backend.gbp.domain.payroll.enums.AccountingEntryType
+import com.backend.gbp.domain.payroll.enums.AdjustmentOperation
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.payroll.PayrollEmployeeAdjustmentRepository
@@ -27,7 +28,7 @@ import javax.persistence.PersistenceContext
 @Component
 @GraphQLApi
 @Transactional(rollbackFor = Exception.class)
-class PayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAdjustment> {
+class ePayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAdjustment> {
 
     @Autowired
     PayrollAdjustmentRepository payrollAdjustmentRepository
@@ -50,7 +51,6 @@ class PayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAd
 
     private PayrollAdjustment adjustment;
 
-
     //=================================QUERY=================================\\
 
     @GraphQLQuery(name = "getPayrollAdjustmentById")
@@ -60,16 +60,6 @@ class PayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAd
         } else {
             return null
         }
-
-    }
-
-    @GraphQLQuery(name = "getPayrollAdjustmentByPayrollId", description = "Get adjustment by ID")
-    PayrollAdjustment getPayrollAdjustmentByPayrollId(@GraphQLArgument(name = "id") UUID id) {
-//        if (id) {
-//            return payrollAdjustmentRepository.findByPayrollId(id).get()
-//        } else {
-//            return null
-//        }
 
     }
 
@@ -87,9 +77,37 @@ class PayrollAdjustmentService implements IPayrollModuleBaseOperations<PayrollAd
 
     ) {
         PayrollAdjustment payrollAdjustment = payrollAdjustmentRepository.findByPayrollId(payrollId).get()
+
+        if (status == PayrollStatus.FINALIZED) {
+            Map<String, SubAccountBreakdownDto> breakdownMap = new HashMap<>()
+            payrollAdjustment.employees.each { employee ->
+                employee.adjustmentItems.each {
+                    SubAccountBreakdownDto adjustment = breakdownMap.get(it.subaccountCode + "_" + it.operation)
+                    if (!adjustment) adjustment = new SubAccountBreakdownDto()
+
+                    adjustment.subaccountCode = it.subaccountCode
+                    adjustment.description = it.name
+                    if (it.operation == AdjustmentOperation.ADDITION) {
+                        adjustment.amount += it.amount
+                        adjustment.entryType = AccountingEntryType.CREDIT
+                    } else if (it.operation == AdjustmentOperation.SUBTRACTION) {
+                        adjustment.amount += it.amount
+                        adjustment.entryType = AccountingEntryType.DEBIT
+                    }
+                    breakdownMap.put(it.subaccountCode + "_" + it.operation, adjustment)
+                }
+            }
+            payrollAdjustment.totalsBreakdown = []
+            breakdownMap.keySet().each {
+                SubAccountBreakdownDto adjustment = breakdownMap.get(it.toString())
+                payrollAdjustment.totalsBreakdown.push(adjustment)
+            }
+
+        }
+
+
         payrollAdjustment.status = status
         payrollAdjustmentRepository.save(payrollAdjustment)
-////        TODO: Additional operations when finalizing adjustment module
         return new GraphQLResVal<String>(null, true, "Successfully updated Payroll Adjustment status.")
     }
 

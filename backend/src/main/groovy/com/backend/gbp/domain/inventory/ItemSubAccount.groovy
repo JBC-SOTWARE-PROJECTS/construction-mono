@@ -2,6 +2,7 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.types.Subaccountable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.SQLDelete
@@ -14,7 +15,7 @@ import javax.persistence.*
 @Table(schema = "inventory", name = "item_sub_account")
 @SQLDelete(sql = "UPDATE inventory.item_sub_account SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class ItemSubAccount extends AbstractAuditingEntity implements Serializable {
+class ItemSubAccount extends AbstractAuditingEntity implements Serializable, Subaccountable{
 	
 	@GraphQLQuery
 	@Id
@@ -53,5 +54,19 @@ class ItemSubAccount extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "company")
 	UUID company
-	
+
+	@Override
+	String getCode() {
+		return subAccountCode
+	}
+
+	@Override
+	String getAccountName() {
+		return subAccountDescription
+	}
+
+	@Override
+	String getDomain() {
+		return ItemSubAccount.class.name
+	}
 }

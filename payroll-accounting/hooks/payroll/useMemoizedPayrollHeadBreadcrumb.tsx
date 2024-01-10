@@ -40,13 +40,6 @@ const useMemoizedPayrollHeaderBreadcrumb = (
         hasRole: hasallowanceRole,
       },
       {
-        key: `${basePath}/p-other-deductions`,
-        title: "Other Deduction",
-        path: `${basePath}/p-other-deduction`,
-        disabled: pathname === `${basePathName}/p-other-deduction`,
-        hasRole: hasOtherDeductionRole,
-      },
-      {
         key: `${basePath}/p-adjustments`,
         title: "Adjustments",
         path: `${basePath}/p-adjustments`,
@@ -72,6 +65,13 @@ const useMemoizedPayrollHeaderBreadcrumb = (
         title: "Other Deductions",
         path: `${basePath}/p-other-deductions`,
         disabled: pathname === `${basePathName}/p-other-deductions`,
+        hasRole: hasOtherDeductionRole,
+      },
+      {
+        key: `${basePath}/p-withholding-tax`,
+        title: "Withholding Tax",
+        path: `${basePath}/p-withholding-tax`,
+        disabled: pathname === `${basePathName}/p-withholding-tax`,
         hasRole: hasOtherDeductionRole,
       },
     ];

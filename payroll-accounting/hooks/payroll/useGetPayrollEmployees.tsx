@@ -7,21 +7,18 @@ const GET_EMPLOYEES = gql`
     employees: getPayrollEmployees(id: $id) {
       id
       fullName
-      gender
-      position {
-        description
-      }
+      position
+      withholdingTax
+      status
+      timekeepingStatus
+      contributionStatus
     }
   }
 `;
 
-function useGetPayrollEmployees(
-  usage: string,
-  callBack: (result: any) => void
-) {
+function useGetPayrollEmployees(callBack?: (result: any) => void) {
   const router = useRouter();
-  const { data, loading } = useQuery(GET_EMPLOYEES, {
-    skip: usage === PayrollFormUsage.CREATE && true,
+  const { data, loading, refetch } = useQuery(GET_EMPLOYEES, {
     variables: {
       id: router?.query.id,
     },
@@ -29,7 +26,7 @@ function useGetPayrollEmployees(
       if (callBack) callBack(result?.employees);
     },
   });
-  return [data?.employees, loading];
+  return [data?.employees, loading, refetch];
 }
 
 export default useGetPayrollEmployees;

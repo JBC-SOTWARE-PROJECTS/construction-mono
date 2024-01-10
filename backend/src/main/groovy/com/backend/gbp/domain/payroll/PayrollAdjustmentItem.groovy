@@ -56,4 +56,7 @@ class PayrollAdjustmentItem extends AbstractAuditingEntity implements Serializab
     @Column(name = "operation", columnDefinition = "varchar")
     AdjustmentOperation operation
 
+    @GraphQLQuery
+    @Column(name = "subaccount_code", columnDefinition = "varchar")
+    String subaccountCode
 }

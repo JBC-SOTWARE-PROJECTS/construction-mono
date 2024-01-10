@@ -113,5 +113,17 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 	@OneToMany(mappedBy = "billingItem")
 	List<DiscountDetails> discountDetails
 
+	@GraphQLQuery
+	@Column(name = "recalculation_date")
+	Instant recalculationDate
+
+	@GraphQLQuery
+	@Column(name = "tag_no")
+	String tagNo
+
+	@GraphQLQuery
+	@Column(name = "posted_ledger")
+	UUID postedLedger
+
 
 }

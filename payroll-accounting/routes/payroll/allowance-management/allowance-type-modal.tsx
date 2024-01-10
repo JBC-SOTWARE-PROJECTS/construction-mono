@@ -5,9 +5,12 @@ import { FormInput, FormInputNumber, FormSelect } from "@/components/common";
 import { Button, Col, Form, message, Modal, Row, Space } from "antd";
 import _ from "lodash";
 import { SaveOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { UPSERT_ALLOWANCE_TYPE } from "@/graphql/company/queries";
 import { AllowanceType } from "@/graphql/gql/graphql";
+import { GET_COA_GEN_RECORDS } from "@/graphql/coa/queries";
+import useGetChartOfAccounts from "@/hooks/useGetChartOfAccounts";
+import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
 
 interface typeProps {
   hide: (hideProps: any) => void;
@@ -15,6 +18,7 @@ interface typeProps {
   onCancel: any;
   record: any;
   refetch: any;
+  expenses: any[];
 }
 
 interface allowanceTypeProps {
@@ -25,9 +29,9 @@ interface allowanceTypeProps {
 }
 
 function AllowanceTypeModal(props: typeProps) {
-  const { hide, record } = props;
+  const { hide, record, expenses } = props;
   const [form] = Form.useForm();
-
+  const allowanceType = Form.useWatch("allowanceType", form);
   const [upsertAllowance, { loading }] = useMutation(UPSERT_ALLOWANCE_TYPE, {
     onCompleted: ({ data }) => {
       if (data?.success) {
@@ -95,6 +99,8 @@ function AllowanceTypeModal(props: typeProps) {
             name: record?.name || "",
             allowanceType: record?.allowanceType || "",
             amount: record?.amount || null,
+            subaccountCode: record?.subaccountCode,
+            isAttendanceBased: record?.isAttendanceBased,
           }}
         >
           <Row>
@@ -124,6 +130,22 @@ function AllowanceTypeModal(props: typeProps) {
               />
             </Col>
             <Col span={24}>
+              <FormSelect
+                label="Sub Account"
+                name="subaccountCode"
+                rules={requiredField}
+                propsselect={{
+                  options: expenses?.map((item: any) => ({
+                    value: item.code,
+                    label: item.accountName.replace("_", " "),
+                  })),
+                  allowClear: true,
+                  showSearch: true,
+                  placeholder: "Sub Account",
+                }}
+              />
+            </Col>
+            <Col span={24}>
               <FormInputNumber
                 label="Amount"
                 name="amount"
@@ -133,6 +155,14 @@ function AllowanceTypeModal(props: typeProps) {
                 }}
               />
             </Col>
+            {allowanceType === "DAILY" && (
+              <FormCheckBox
+                name="isAttendanceBased"
+                label="Attendance Based"
+                valuePropName="checked"
+                propscheckbox={{}}
+              />
+            )}
           </Row>
         </Form>
       </Modal>

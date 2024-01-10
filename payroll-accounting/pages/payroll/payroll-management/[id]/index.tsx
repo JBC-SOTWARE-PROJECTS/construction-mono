@@ -1,34 +1,24 @@
-import React from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
+import AccessControl from "@/components/accessControl/AccessControl";
 import AccessManager from "@/components/accessControl/AccessManager";
-import CircularProgress from "@/components/circularProgress";
+import CustomButton from "@/components/common/CustomButton";
+import PayrollBreakdownModal from "@/components/payroll/PayrollBreakdownModal";
+import { PayrollStatus } from "@/graphql/gql/graphql";
+import useGetPayrollTotals from "@/hooks/payroll/useGetPayrollTotals";
+import useHasRole from "@/hooks/useHasRole";
+import { payrollStatusColorGenerator } from "@/utility/constant-formatters";
 import { IPageProps } from "@/utility/interfaces";
-import { PageHeader, ProCard } from "@ant-design/pro-components";
-import {
-  Avatar,
-  Card,
-  Divider,
-  List,
-  Result,
-  Space,
-  Tag,
-  Typography,
-} from "antd";
 import {
   EditOutlined,
   FieldTimeOutlined,
   FileOutlined,
 } from "@ant-design/icons";
+import { PageHeader, ProCard } from "@ant-design/pro-components";
+import { Card, Divider, Result, Space, Tag, Typography } from "antd";
+import dayjs from "dayjs";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { PayrollFormUsage } from "@/components/payroll/PayrollForm";
-import useGetOnePayroll from "@/hooks/payroll/useGetOnePayroll";
-import dayjs from "dayjs";
-import CustomButton from "@/components/common/CustomButton";
-import { payrollStatusColorGenerator } from "@/utility/constant-formatters";
-import AccessControl from "@/components/accessControl/AccessControl";
-import useHasRole from "@/hooks/useHasRole";
+import React from "react";
 
 const gridStyle: React.CSSProperties = {
   width: "33%",
@@ -38,6 +28,7 @@ const gridStyle: React.CSSProperties = {
 };
 const ViewPayroll = ({ account }: IPageProps) => {
   const router = useRouter();
+  const [payroll, loadingPayroll] = useGetPayrollTotals();
 
   const menuItems = [
     {
@@ -46,6 +37,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
       link: "/p-timekeeping",
       description: "Records employee work hours for wage calculations.",
       show: true,
+      status: payroll?.timekeeping?.status,
     },
     {
       title: "Allowance",
@@ -53,6 +45,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
       link: "/p-allowance",
       description: "Manages extra payments like bonuses and commissions.",
       show: true,
+      status: payroll?.allowance?.status,
     },
     {
       title: "Contributions",
@@ -61,6 +54,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
       description:
         "Handles mandatory deductions mandated by the government (SSS, HDMF, PHIC).",
       show: useHasRole(["PAYROLL_CONTRIBUTIONS_USER"]),
+      status: payroll?.contribution?.status,
     },
     {
       title: "Loans",
@@ -68,6 +62,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
       link: "/p-loans",
       description: "Tracks employee loans and repayment deductions.",
       show: true,
+      status: payroll?.loan?.status,
     },
     {
       title: "Adjustments",
@@ -76,6 +71,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
       description:
         "Manages various deductions, such as healthcare premiums and union dues.",
       show: true,
+      status: payroll?.adjustment?.status,
     },
     {
       title: "Other Deduction",
@@ -84,6 +80,16 @@ const ViewPayroll = ({ account }: IPageProps) => {
       description:
         "Manages various deductions, such as healthcare premiums and union dues.",
       show: true,
+      status: payroll?.otherDeduction?.status,
+    },
+    {
+      title: "Withholding Tax",
+      icon: <FieldTimeOutlined />,
+      link: "/p-withholding-tax",
+      description:
+        "Manages various deductions, such as healthcare premiums and union dues.",
+      show: true,
+      status: "FINALIZED",
     },
     {
       title: "Payroll Payslip",
@@ -91,10 +97,10 @@ const ViewPayroll = ({ account }: IPageProps) => {
       link: "/p-payslip",
       description: "Manages employee salary and its payslip.",
       show: true,
+      status: "FINALIZED",
     },
   ];
 
-  const [payroll, loadingPayroll] = useGetOnePayroll();
   return (
     <>
       <Head>
@@ -123,21 +129,24 @@ const ViewPayroll = ({ account }: IPageProps) => {
                     </Tag>
                   </>
                 }
-                onBack={() => router.back()}
+                onBack={() => router.push("/payroll/payroll-management")}
                 extra={
                   <Space>
-                    <CustomButton
-                      type="primary"
-                      onClick={() =>
-                        router?.push(
-                          `/payroll/payroll-management/${router?.query?.id}/edit`
-                        )
-                      }
-                      icon={<EditOutlined />}
-                      allowedPermissions={["edit_payroll"]}
-                    >
-                      Edit Payroll
-                    </CustomButton>
+                    <PayrollBreakdownModal />
+                    {payroll?.status === PayrollStatus.Active && (
+                      <CustomButton
+                        type="primary"
+                        onClick={() =>
+                          router?.push(
+                            `/payroll/payroll-management/${router?.query?.id}/edit`
+                          )
+                        }
+                        icon={<EditOutlined />}
+                        allowedPermissions={["edit_payroll"]}
+                      >
+                        Edit Payroll
+                      </CustomButton>
+                    )}
                   </Space>
                 }
               />
@@ -147,7 +156,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
               </Typography.Title>
               {payroll?.description}
               <Divider />
-              <Card bodyStyle={{ padding: 0 }}>
+              <Card bodyStyle={{ padding: 0 }} loading={loadingPayroll}>
                 {menuItems.map(
                   (item, index) =>
                     item.show === true && (
@@ -160,7 +169,13 @@ const ViewPayroll = ({ account }: IPageProps) => {
                       >
                         <a style={{ textDecoration: "none" }}>
                           <Card.Grid
-                            style={gridStyle}
+                            style={{
+                              ...gridStyle,
+                              background:
+                                item?.status === PayrollStatus.Finalized
+                                  ? "#e1f8e0"
+                                  : "#faeece",
+                            }}
                             key={index}
                             onClick={() => {}}
                           >

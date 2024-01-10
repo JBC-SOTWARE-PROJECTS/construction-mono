@@ -1,7 +1,7 @@
 import { Employee, PayrollStatus } from "@/graphql/gql/graphql";
 import { useGetEmployeesByFilter } from "@/hooks/employee";
 import useGetOnePayroll from "@/hooks/payroll/useGetOnePayroll";
-import useGetPayrollEmployees from "@/hooks/payroll/useGetPayrollEmployees";
+import useGetPayrollHRMEmployees from "@/hooks/payroll/useGetPayrollHRMEmployees";
 import useUpsertPayroll from "@/hooks/payroll/useUpsertPayroll";
 import { requiredField } from "@/utility/helper";
 import {
@@ -61,7 +61,7 @@ function PayrollForm({ usage }: IProps) {
   const [state, setState] = useState(initialState);
   const [selectedIds, setSelectedIds] = useState<Key[]>([]);
 
-  const [_, loadingPayrollEmployees] = useGetPayrollEmployees(
+  const [_, loadingPayrollEmployees] = useGetPayrollHRMEmployees(
     usage,
     (result) => {
       let ids: Key[] = [];

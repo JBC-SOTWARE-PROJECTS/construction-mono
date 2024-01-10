@@ -1,5 +1,10 @@
 import React, { useMemo } from "react";
-import { IssuesCloseOutlined, LockOutlined } from "@ant-design/icons";
+import {
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  IssuesCloseOutlined,
+  LockOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 import {
   Button,
@@ -14,7 +19,7 @@ import {
 import { Billing } from "@/graphql/gql/graphql";
 import type { DescriptionsProps } from "antd";
 import { col4, currency } from "@/utility/constant";
-import { NumberFormater } from "@/utility/helper";
+import { NumberFormater, useLocalStorage } from "@/utility/helper";
 
 interface Iprops {
   record?: Billing;
@@ -22,7 +27,7 @@ interface Iprops {
   onRefetchBillingInfo: () => void;
 }
 
-const formatter = (value: number, color?: string) => (
+export const formatter = (value: number, color?: string) => (
   <p className={color}>
     {currency + " "}
     {NumberFormater(value)}
@@ -31,6 +36,7 @@ const formatter = (value: number, color?: string) => (
 
 export default function BillingHeader(props: Iprops) {
   const { record, otc, onRefetchBillingInfo } = props;
+  const [hide, setHide] = useLocalStorage("folio_details", true);
 
   const borderedItems: DescriptionsProps["items"] = useMemo(() => {
     let status = { color: "red", text: "INACTIVE" };
@@ -46,7 +52,7 @@ export default function BillingHeader(props: Iprops) {
       {
         key: "dateTrans",
         label: "Transaction Date",
-        children: dayjs(record?.dateTrans).format("MM/DD/YYYY HH:mm:ss A"),
+        children: dayjs(record?.dateTrans).format("MM/DD/YYYY hh:mm:ss A"),
       },
       {
         key: "billNo",
@@ -83,6 +89,13 @@ export default function BillingHeader(props: Iprops) {
               size="small">
               Close Biling Folio
             </Button>
+            <Button
+              type="dashed"
+              icon={hide ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+              size="small"
+              onClick={() => setHide(!hide)}>
+              {hide ? "Show Folio Details" : "Hide Folio Details"}
+            </Button>
           </Space>
         ),
       },
@@ -99,7 +112,7 @@ export default function BillingHeader(props: Iprops) {
               <p>Customer Name</p>
             </div>
             <div className="billing-info-value">
-              {otc ? record?.otcName : record?.customer?.accountName}
+              {otc ? record?.otcName : record?.customer?.customerName}
             </div>
           </div>
           <div className="w-full flex-div">
@@ -183,12 +196,14 @@ export default function BillingHeader(props: Iprops) {
     if (otc) {
       items.push(customer);
     } else {
-      items.push(project);
-      items.push(customer);
+      if (!hide) {
+        items.push(project);
+        items.push(customer);
+      }
     }
 
     return items;
-  }, [record, otc]);
+  }, [record, otc, hide]);
 
   return (
     <div className="w-full">

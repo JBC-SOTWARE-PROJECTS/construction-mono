@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   CloseOutlined,
   EditOutlined,
@@ -8,13 +6,13 @@ import {
 } from "@ant-design/icons";
 import { Button, Space, Table } from "antd";
 
-import { ProCard, ProFormGroup } from "@ant-design/pro-components";
-import type { ColumnsType } from "antd/es/table";
-import useGetScheduleTypes from "@/hooks/configurations/useManageContribution";
 import {
   GET_SSS_CONTRIBUTIONS,
   UPSERT_SSS_CONTRIBUTION,
 } from "@/graphql/company/queries";
+import useManageTableMatrix from "@/hooks/configurations/useManageTableMatrix";
+import { ProCard, ProFormGroup } from "@ant-design/pro-components";
+import type { ColumnsType } from "antd/es/table";
 
 interface DataType {
   isEditable: boolean;
@@ -53,7 +51,7 @@ function SSSContribution() {
       handleCancelEdit,
       renderInput,
     },
-  ] = useGetScheduleTypes({
+  ] = useManageTableMatrix({
     initialValues,
     upsertGQL: UPSERT_SSS_CONTRIBUTION,
     queryGQL: GET_SSS_CONTRIBUTIONS,
@@ -185,15 +183,23 @@ function SSSContribution() {
               key: "totalEr",
               render: (
                 _,
-                { isEditable, erContribution, er_ec_Contribution }
+                {
+                  isEditable,
+                  erContribution,
+                  er_ec_Contribution,
+                  wispErContribution,
+                }
               ) => {
                 if (isEditable)
                   return (
                     parseInt(editableRow.erContribution || 0) +
-                    parseInt(editableRow.er_ec_Contribution || 0)
+                    parseInt(editableRow.er_ec_Contribution || 0) +
+                    parseInt(editableRow.wispErContribution || 0)
                   );
                 else {
-                  return erContribution + er_ec_Contribution;
+                  return (
+                    erContribution + er_ec_Contribution + wispErContribution
+                  );
                 }
               },
             },
@@ -201,9 +207,15 @@ function SSSContribution() {
               title: "EE",
               dataIndex: "ee",
               key: "ee",
-              render: (_, { isEditable, eeContribution }) => {
-                if (isEditable) return editableRow.eeContribution;
-                else return eeContribution;
+              render: (
+                _,
+                { isEditable, eeContribution, wispEeContribution }
+              ) => {
+                if (isEditable)
+                  return (
+                    editableRow.eeContribution + editableRow.wispEeContribution
+                  );
+                else return eeContribution + wispEeContribution;
               },
             },
             {
@@ -217,16 +229,26 @@ function SSSContribution() {
                   erContribution,
                   eeContribution,
                   er_ec_Contribution,
+                  wispEeContribution,
+                  wispErContribution,
                 }
               ) => {
                 if (isEditable)
                   return (
                     parseInt(editableRow.erContribution || 0) +
                     parseInt(editableRow.eeContribution || 0) +
-                    parseInt(editableRow.er_ec_Contribution || 0)
+                    parseInt(editableRow.er_ec_Contribution || 0) +
+                    parseInt(editableRow.wispEeContribution || 0) +
+                    parseInt(editableRow.wispErContribution || 0)
                   );
                 else
-                  return erContribution + eeContribution + er_ec_Contribution;
+                  return (
+                    erContribution +
+                    eeContribution +
+                    er_ec_Contribution +
+                    wispEeContribution +
+                    wispErContribution
+                  );
               },
             },
           ],

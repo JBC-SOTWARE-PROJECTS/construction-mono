@@ -32,6 +32,7 @@ class OtherDeductionTypes extends AbstractAuditingEntity {
 	@Column(name = "description", columnDefinition = "varchar")
 	String description
 
+
 	@GraphQLQuery
 	@Column(name = "code", columnDefinition = "varchar")
 	String code
@@ -45,4 +46,8 @@ class OtherDeductionTypes extends AbstractAuditingEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "company", referencedColumnName = "id")
 	CompanySettings company
+
+	@GraphQLQuery
+	@Column(name = "subaccount_code", columnDefinition = "varchar")
+	String subaccountCode
 }

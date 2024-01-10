@@ -9,8 +9,11 @@ import {
 } from "@/graphql/gql/graphql";
 import useGetAdjustmentCategories from "@/hooks/adjustment-category/useGetAdjustmentCategories";
 import useUpsertAdjustmentItem from "@/hooks/payroll/adjustments/useUpsertAdjustmentItem";
+import useGetChartOfAccounts from "@/hooks/useGetChartOfAccounts";
+import { requiredField } from "@/utility/helper";
 import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { Button, Form, Modal, Space, Tag } from "antd";
+import { DefaultOptionType } from "antd/es/select";
 import React, { useState } from "react";
 
 interface IParams {
@@ -22,7 +25,7 @@ function AddAdjustmentItemsModal({ refetch, employeeList }: IParams) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState<boolean>(false);
   const [categories, loading] = useGetAdjustmentCategories("");
-
+  const [coa, loadingCoa] = useGetChartOfAccounts();
   const [upsert, loadingUpsert] = useUpsertAdjustmentItem(() => {
     setOpen(false);
     refetch();
@@ -34,6 +37,7 @@ function AddAdjustmentItemsModal({ refetch, employeeList }: IParams) {
       category: values.category,
       description: values.description,
       employee: values.employee,
+      subaccountCode: values.subaccountCode,
     });
   };
   return (
@@ -90,6 +94,7 @@ function AddAdjustmentItemsModal({ refetch, employeeList }: IParams) {
             label="Adjustment Category"
             propsselect={{
               options: categories?.map((item: AdjustmentCategory) => ({
+                code: item.subaccountCode,
                 value: item.id,
                 label: (
                   <>
@@ -102,10 +107,27 @@ function AddAdjustmentItemsModal({ refetch, employeeList }: IParams) {
                   </>
                 ),
               })),
+              onChange: (_, record) => {
+                const code = (record as DefaultOptionType).code;
+                form.setFieldValue("subaccountCode", code as any);
+              },
             }}
             rules={[{ required: true }]}
           />
-
+          <FormSelect
+            label="Sub Account"
+            name="subaccountCode"
+            rules={requiredField}
+            propsselect={{
+              options: coa?.map((item: any) => ({
+                value: item.code,
+                label: item.accountName.replace("_", " "),
+              })),
+              allowClear: true,
+              showSearch: true,
+              placeholder: "Sub Account",
+            }}
+          />
           <FormInputNumber
             name="amount"
             rules={[{ required: true }]}

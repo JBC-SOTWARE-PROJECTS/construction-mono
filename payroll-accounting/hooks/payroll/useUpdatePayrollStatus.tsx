@@ -19,10 +19,13 @@ const UPDATE_PAYROLL_STATUS = gql`
   }
 `;
 
-function useUpdatePayrollStatus() {
+function useUpdatePayrollStatus(callBack?: () => void) {
   const router = useRouter();
   const [update, { loading }] = useMutation(UPDATE_PAYROLL_STATUS, {
     onCompleted: (data) => {
+      if (callBack) {
+        callBack();
+      }
       router.push(
         `/payroll/payroll-management/${data?.updatePayrollStatus?.response?.id}`
       );

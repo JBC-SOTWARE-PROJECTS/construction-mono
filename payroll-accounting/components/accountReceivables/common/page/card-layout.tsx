@@ -28,7 +28,7 @@ export default function CardLayout(props: CardLayoutI) {
         state == 'SEARCH' ? (
           <Input.Search
             autoFocus
-            placeholder='Search invoice #'
+            placeholder='Search here...'
             allowClear
             onSearch={onSearch}
             onBlur={onHideSearch}

@@ -85,7 +85,7 @@ class EmployeeAllowanceService {
             allowance.allowanceType = it.allowanceType
             allowance.amount = it.amount
             allowance.company = company
-            allowance.allowanceId = it.allowance.id
+            allowance.allowance = allowanceRepository.findById(it.allowance.id).get()
             employeeAllowanceList.push(allowance)
         }
         List<EmployeeAllowance> toDelete = getEmployeeAllowance(employeeId, "")

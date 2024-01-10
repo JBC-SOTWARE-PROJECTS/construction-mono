@@ -49,6 +49,14 @@ class OfficeService {
         officeRepository.activeOffices().sort { it.officeCode }
     }
 
+    @GraphQLQuery(name = "companyActiveOffices", description = "Get All Active Company Offices ")
+    List<Office> companyActiveOffices() {
+        def company = SecurityUtils.currentCompanyId()
+        officeRepository.companyActiveOffices(company).sort { it.officeCode }
+    }
+
+
+
     @GraphQLQuery(name = "officeListByFilter", description = "Search Offices")
     List<Office> officeListByFilter(
             @GraphQLArgument(name = "filter") String filter,

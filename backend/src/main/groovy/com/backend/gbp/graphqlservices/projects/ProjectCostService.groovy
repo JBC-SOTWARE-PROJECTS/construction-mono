@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 
 @Component
 @GraphQLApi
@@ -46,6 +47,9 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
 
     @Autowired
     ProjectService projectService
+
+    @Autowired
+    ProjectCostRevisionService projectCostRevisionService
 
 
     @GraphQLQuery(name = "pCostById")
@@ -119,13 +123,10 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
                 }
 
             }
-            return new GraphQLRetVal<Boolean>(true, true, "Project Cost added successfully")
+            return new GraphQLRetVal<Boolean>(true, true, "Bill of Quantities added successfully")
         }else{
             return new GraphQLRetVal<Boolean>(false, false, "Project ID is missing")
         }
-
-
-
     }
 
     @GraphQLMutation(name = "updateStatusCost")
@@ -141,6 +142,36 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
         }
 
         return  proj
+    }
+
+    @GraphQLMutation(name = "reviseProjectCost")
+    @Transactional
+    ProjectCost reviseProjectCost(
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "tag") String tag
+    ) {
+        if(id) {
+            def projCost = findOne(id)
+            def project = projCost.project
+
+            def rev = projectCostRevisionService.upsertProjectRevCost(projCost, tag, null)
+            if(rev?.id){
+                def costing = upsertFromMap(id, fields, { ProjectCost entity, boolean forInsert ->
+                    if(forInsert){
+                        //conditions here before save
+                        entity.cost = entity.cost.setScale(2, RoundingMode.HALF_EVEN)
+                    }
+                })
+                //update billing
+                billingItemService.updateBillingItemForRevisions(costing.id, costing)
+                return  costing
+            }
+            return  projCost
+        }
+
+        return null
+
     }
 
 }

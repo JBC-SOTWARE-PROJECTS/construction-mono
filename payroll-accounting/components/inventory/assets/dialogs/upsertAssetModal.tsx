@@ -1,4 +1,4 @@
-import { AssetStatus, AssetType, Assets, Item } from "@/graphql/gql/graphql";
+import { AssetStatus, AssetType, Assets, FixedAssetItems, Item } from "@/graphql/gql/graphql";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -18,6 +18,7 @@ import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { UPSERT_ASSET_RECORD } from "@/graphql/assets/queries";
 
 import ItemSelector from "@/components/inventory/itemSelector";
+import FixedAssetSelector from "@/components/inventory/fixedAssetSelector";
 import { useMutation, useQuery } from "@apollo/client";
 import { useDialog } from "@/hooks";
 import _ from "lodash";
@@ -30,12 +31,12 @@ interface IProps {
 export default function UpsertAssetModal(props: IProps) {
   const { hide, record } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
-  const showItems = useDialog(ItemSelector);
-  const [selectedItem, setSelectedItem] = useState<Item>();
+  const showItems = useDialog(FixedAssetSelector);
+  const [selectedItem, setSelectedItem] = useState<FixedAssetItems>();
 
   useEffect(() => {
     if (record) {
-      setSelectedItem(record?.item as Item);
+      setSelectedItem(record?.item as FixedAssetItems);
     }
   }, [record]);
 
@@ -54,8 +55,9 @@ export default function UpsertAssetModal(props: IProps) {
   const onOpenItemSelector = (record?: Assets) => {
     showItems(
       { defaultSelected: [], defaultKey: [], isSingleSelection: true },
-      (newItem: Item) => {
+      (newItem: FixedAssetItems) => {
         if (!_.isEmpty(newItem)) {
+          console.log("newItem", newItem)
           setSelectedItem(newItem);
         }
       }
@@ -66,7 +68,8 @@ export default function UpsertAssetModal(props: IProps) {
     let payload = {
       ...values,
     };
-    payload.item = selectedItem?.id;
+    payload.item = selectedItem?.itemId;
+    payload.fixedAssetItem = selectedItem?.id;
     payload.type = values.type as AssetType;
     payload.status = values.status as AssetStatus;
 
@@ -137,7 +140,7 @@ export default function UpsertAssetModal(props: IProps) {
             <FormInput
               label="Item"
               propsinput={{
-                placeholder: selectedItem?.descLong ?? "No item selected",
+                placeholder: selectedItem?.itemName ?? "No item selected",
                 disabled: true,
               }}
             />
@@ -152,7 +155,17 @@ export default function UpsertAssetModal(props: IProps) {
               Select Item
             </Button>
           </Col>
-          <Col span={12}>
+          <Col span={24}>
+            <FormInput
+              name="sn-code"
+              label="Fixed Asset Code / Serial No."
+              propsinput={{
+                placeholder: selectedItem ? selectedItem?.assetNo + " / "+ selectedItem?.serialNo  : "No item selected",
+                disabled: true,
+              }}
+            />
+          </Col>
+          {/* <Col span={12}>
             <FormInput
               name="assetCode"
               label="Asset Code"
@@ -161,7 +174,7 @@ export default function UpsertAssetModal(props: IProps) {
                 disabled: true,
               }}
             />
-          </Col>
+          </Col> */}
 
           <Col span={12}>
             <FormInput
@@ -195,7 +208,7 @@ export default function UpsertAssetModal(props: IProps) {
               }}
             />
           </Col>
-          <Col span={12}>
+          {/* <Col span={12}>
             <FormInput
               name="brand"
               label="Brand"
@@ -205,7 +218,7 @@ export default function UpsertAssetModal(props: IProps) {
                 value : selectedItem?.brand ?? ""
               }}
             />
-          </Col>
+          </Col> */}
 
           <Col span={12}>
             <FormSelect
@@ -223,7 +236,6 @@ export default function UpsertAssetModal(props: IProps) {
           <Col span={24}>
             <FormInput
               name="description"
-              rules={requiredField}
               label="Description"
               propsinput={{
                 placeholder: "Description",

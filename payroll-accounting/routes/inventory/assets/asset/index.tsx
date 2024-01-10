@@ -12,6 +12,7 @@ import { TabsProps } from "antd/lib";
 import PreventiveMaintenance from "./preventiveMaintenance";
 import AssetRepairMaintenance from "./repairMaintenance";
 import AssetRepairMaintenanceComponent from "./repairMaintenance";
+import VehicleUsageMonitoringComponent from "./vehicleUsageMonitoring";
 
 type Props = {};
 const items: TabsProps["items"] = [
@@ -27,8 +28,8 @@ const items: TabsProps["items"] = [
   },
   {
     key: "3",
-    label: "Fuel Monitoring",
-    children: <></>,
+    label: "Vehicle Usage Monitoring",
+    children: <VehicleUsageMonitoringComponent/>,
   },
 ];
 

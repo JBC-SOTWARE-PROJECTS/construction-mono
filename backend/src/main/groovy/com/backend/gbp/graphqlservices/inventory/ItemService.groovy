@@ -63,6 +63,23 @@ class ItemService extends AbstractDaoService<Item> {
         createQuery(query, params).resultList.sort { it.descLong }
     }
 
+    @GraphQLQuery(name = "fixedAssetItemList")
+    List<Item> fixedAssetItemList(
+            @GraphQLArgument(name = "filter") String filter
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''
+        Select e from Item e 
+        where 
+        lower(concat(e.sku,e.itemCode,e.descLong)) like lower(concat('%',:filter,'%')) 
+        and e.fixAsset is true
+        and e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        params.put('company', company)
+        createQuery(query, params).resultList.sort { it.descLong }
+    }
+
     @GraphQLQuery(name = "getItemByName")
     List<Item> getItemByName(
             @GraphQLArgument(name = "name") String name,

@@ -12,6 +12,7 @@ import {
   EmployeeSalaryDto,
   PayrollEmployeeStatus,
   PayrollModule,
+  PayrollStatus,
   TimekeepingEmployeeDto,
 } from "@/graphql/gql/graphql";
 import useGetTimekeeping from "@/hooks/payroll/timekeeping/useGetTimekeeping";
@@ -82,6 +83,8 @@ function Timekeeping({ account }: IPageProps) {
         showTitle
         status={timekeeping?.status}
         module={PayrollModule.Timekeeping}
+        handleClickFinalize={handleClickFinalize}
+        loading={loadingUpdateStatus}
         extra={
           <Space>
             {timekeeping?.status === "DRAFT" && (
@@ -101,19 +104,6 @@ function Timekeeping({ account }: IPageProps) {
                 }}
               />
             )}
-            <CustomButton
-              type="primary"
-              icon={
-                timekeeping?.status === "FINALIZED" ? (
-                  <EditOutlined />
-                ) : (
-                  <CheckOutlined />
-                )
-              }
-              onClick={handleClickFinalize}
-            >
-              Set as {statusMap[timekeeping?.status]}
-            </CustomButton>
 
             {timekeeping?.status === "FINALIZED" && (
               <LogsProjectBreakdownModal

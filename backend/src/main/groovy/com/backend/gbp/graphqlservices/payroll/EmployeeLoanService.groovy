@@ -1,18 +1,21 @@
 package com.backend.gbp.graphqlservices.payroll
 
-import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.accounting.HeaderLedger
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.dto.EmployeeLoanConfig
 import com.backend.gbp.domain.payroll.EmployeeLoan
 import com.backend.gbp.domain.payroll.EmployeeLoanLedgerItem
-import com.backend.gbp.domain.payroll.PHICContribution
 import com.backend.gbp.domain.payroll.enums.EmployeeLoanCategory
+import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.graphqlservices.accounting.ArInvoiceServices
+import com.backend.gbp.graphqlservices.accounting.IntegrationServices
+import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
-import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.payroll.EmployeeLoanLedgerItemRepository
 import com.backend.gbp.repository.payroll.EmployeeLoanRepository
-import com.backend.gbp.repository.payroll.PHICContributionRepository
 import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -31,6 +34,9 @@ import org.springframework.data.domain.Page
 
 import java.sql.Timestamp
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class EmployeeLoanLedgerDto {
     UUID id
@@ -64,6 +70,15 @@ class EmployeeLoanService {
 
     @Autowired
     EmployeeRepository employeeRepository
+
+    @Autowired
+    IntegrationServices integrationServices
+
+    @Autowired
+    LedgerServices ledgerServices
+
+    @Autowired
+    ArInvoiceServices arInvoiceServices
 
 
     // -------------------------------- Query --------------------------------
@@ -178,6 +193,8 @@ limit ${size} offset ${size * page}
         ledgerItem.description = description
         ledgerItem.status = true
         employeeLoanLedgerItemRepository.save(ledgerItem)
+
+        postToLedgerAccounting(employeeLoan)
         return new GraphQLResVal<EmployeeLoan>(employeeLoan, true, "Successfully created employee loan.")
     }
 
@@ -191,6 +208,55 @@ limit ${size} offset ${size * page}
         employee.employeeLoanConfig = config
         employeeRepository.save(employee)
         return new GraphQLResVal<String>('success', true, "Successfully updated employee loan configuration.")
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    EmployeeLoan postToLedgerAccounting(EmployeeLoan employeeLoan) {
+        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
+        List<Map<String, Object>> entries = []
+
+        def headerLedger = integrationServices.generateAutoEntries(employeeLoan) { it, mul ->
+            it.flagValue = "EMPLOYEE_LOAN_SETUP"
+            it.advanceToEmployees = employeeLoan.amount
+            if (employeeLoan.category == EmployeeLoanCategory.EQUIPMENT_LOAN) {
+                it.cashOnHand = 0
+                it.apClearingAccount = employeeLoan.amount
+            } else if (employeeLoan.category == EmployeeLoanCategory.CASH_ADVANCE) {
+                it.cashOnHand = employeeLoan.amount.negate()
+                it.apClearingAccount = 0
+            }
+
+        }
+
+        Map<String, String> details = [:]
+
+        employeeLoan.details.each { k, v ->
+            details[k] = v
+        }
+
+        details["LOAN_ID"] = employeeLoan.id.toString()
+
+        headerLedger.transactionNo = ''
+        headerLedger.transactionType = ''
+        headerLedger.referenceType = ''
+        headerLedger.referenceNo = ''
+
+        def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+                "${Instant.now().atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
+                employeeLoan.description,
+                "${employeeLoan.description ?: ""}",
+                LedgerDocType.EL,
+                JournalType.GENERAL,
+                Instant.now(),
+                details)
+
+        employeeLoan.postedLedger = pHeader.id
+        employeeLoan.status = PayrollStatus.FINALIZED
+        employeeLoan.posted = true
+        employeeLoan.postedBy = SecurityUtils.currentLogin()
+
+        employeeLoanRepository.save(employeeLoan)
 
     }
 }

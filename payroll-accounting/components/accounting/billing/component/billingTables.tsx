@@ -32,6 +32,7 @@ import { AccountContext } from "@/components/accessControl/AccountContext";
 interface Iprops {
   record?: Billing;
   billingId?: string;
+  type?: string;
   onRefetchBillingInfo: () => void;
 }
 
@@ -39,9 +40,10 @@ const { Search } = Input;
 const { Text } = Typography;
 
 export default function BillingTables(props: Iprops) {
-  const { record, billingId, onRefetchBillingInfo } = props;
-  const account = useContext(AccountContext);
-  const [activeTab, setActiveTab] = useState<string | number>("ITEM");
+  const { record, billingId, onRefetchBillingInfo, type } = props;
+  const [activeTab, setActiveTab] = useState<string | number>(
+    type === "otc" ? "ITEM" : "SERVICE"
+  );
   const [items, setItems] = useState<BillingItem[]>([]);
   const [filter, setFilter] = useState("");
   // ========================= Queries ===================================
@@ -276,28 +278,48 @@ export default function BillingTables(props: Iprops) {
               size="large"
               value={activeTab}
               onChange={setActiveTab}
-              options={[
-                {
-                  value: "ITEM",
-                  label: "Inventory Items",
-                  icon: <BarcodeOutlined />,
-                },
-                {
-                  value: "SERVICE",
-                  label: "Services",
-                  icon: <TagsOutlined />,
-                },
-                {
-                  label: "Deduction/Discount",
-                  value: "DEDUCTIONS",
-                  icon: <PercentageOutlined />,
-                },
-                {
-                  label: "Payment History",
-                  value: "PAYMENTS",
-                  icon: <PayCircleOutlined />,
-                },
-              ]}
+              options={
+                type === "otc"
+                  ? [
+                      {
+                        value: "ITEM",
+                        label: "Inventory Items",
+                        icon: <BarcodeOutlined />,
+                      },
+                      {
+                        value: "SERVICE",
+                        label: "Services",
+                        icon: <TagsOutlined />,
+                      },
+                      {
+                        label: "Deduction/Discount",
+                        value: "DEDUCTIONS",
+                        icon: <PercentageOutlined />,
+                      },
+                      {
+                        label: "Payment History",
+                        value: "PAYMENTS",
+                        icon: <PayCircleOutlined />,
+                      },
+                    ]
+                  : [
+                      {
+                        value: "SERVICE",
+                        label: "Bill of Quantities",
+                        icon: <TagsOutlined />,
+                      },
+                      {
+                        label: "Deduction/Discount",
+                        value: "DEDUCTIONS",
+                        icon: <PercentageOutlined />,
+                      },
+                      {
+                        label: "Payment History",
+                        value: "PAYMENTS",
+                        icon: <PayCircleOutlined />,
+                      },
+                    ]
+              }
             />
           </Col>
           <Col span={24}>

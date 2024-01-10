@@ -32,6 +32,11 @@ const GET_RECORDS = gql`
           id
           descLong
         }
+        fixedAssetItem{
+          id
+          serialNo
+          assetNo
+        }
       }
       size
       totalElements

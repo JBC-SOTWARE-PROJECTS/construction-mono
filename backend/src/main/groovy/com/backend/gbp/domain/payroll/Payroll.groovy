@@ -1,7 +1,11 @@
 package com.backend.gbp.domain.payroll
 
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
+import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.payroll.common.PayrollAuditingEntity
+import com.backend.gbp.domain.payroll.enums.PayrollType
+import com.backend.gbp.domain.types.AutoIntegrateable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -15,7 +19,7 @@ import java.time.Instant
 @Table(schema = "payroll", name = "payrolls")
 //@SQLDelete(sql = "UPDATE payroll.timekeepings SET deleted = true WHERE id = ?")
 //@Where(clause = "deleted <> true or deleted is  null ")
-class Payroll extends PayrollAuditingEntity implements Serializable {
+class Payroll extends PayrollAuditingEntity implements Serializable, AutoIntegrateable {
 
 
     @GraphQLQuery
@@ -73,4 +77,79 @@ class Payroll extends PayrollAuditingEntity implements Serializable {
 
     @OneToOne(mappedBy = "payroll")
     PayrollAllowance allowance
+
+    @GraphQLQuery
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", columnDefinition = "varchar")
+    PayrollType type
+
+    @GraphQLQuery
+    @Column(name = "posted_ledger", columnDefinition = "uuid")
+    UUID postedLedger
+
+    @GraphQLQuery
+    @Column(name = "posted", columnDefinition = "bool")
+    @UpperCase
+    Boolean posted
+
+    @GraphQLQuery
+    @Column(name = "posted_by", columnDefinition = "varchar")
+    @UpperCase
+    String postedBy
+
+
+    @Override
+    String getDomain() {
+        return IntegrationDomainEnum.PAYROLL.name()
+    }
+
+    @Transient
+    String flagValue
+
+    @Override
+    Map<String, String> getDetails() {
+        return [:]
+    }
+
+    @Transient
+    BigDecimal salariesPayableTotalCredit = 0
+
+    @Transient
+    BigDecimal salariesPayableTotalDebit = 0
+
+    @Transient
+    BigDecimal sssEe = 0
+
+    @Transient
+    BigDecimal hdmfEe = 0
+
+    @Transient
+    BigDecimal phicEe = 0
+
+    @Transient
+    BigDecimal advancesToEmployees = 0
+
+    @Transient
+    BigDecimal withholdingTax = 0
+
+
+   //Contributions
+    @Transient
+    BigDecimal sssEr = 0
+
+    @Transient
+    BigDecimal hdmfEr = 0
+
+    @Transient
+    BigDecimal phicEr = 0
+
+    @Transient
+    BigDecimal sssPremium = 0
+
+    @Transient
+    BigDecimal hdmfPremium = 0
+
+    @Transient
+    BigDecimal phicPrmemium = 0
+
 }
