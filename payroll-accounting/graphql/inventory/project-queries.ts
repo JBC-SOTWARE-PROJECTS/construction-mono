@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client'
 
 export const GET_PROJECTS_RECORDS = gql`
   query (
@@ -46,7 +46,7 @@ export const GET_PROJECTS_RECORDS = gql`
       number
     }
   }
-`;
+`
 
 export const UPSERT_RECORD_PROJECT = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
@@ -54,7 +54,7 @@ export const UPSERT_RECORD_PROJECT = gql`
       id
     }
   }
-`;
+`
 
 export const GET_PROJECT_BY_ID = gql`
   query ($id: UUID) {
@@ -87,16 +87,18 @@ export const GET_PROJECT_BY_ID = gql`
       status
     }
   }
-`;
+`
 
 export const GET_PROJECT_COST = gql`
   query ($filter: String, $id: UUID) {
     pCostByList(filter: $filter, id: $id) {
       id
+      itemNo
       dateTransact
       description
       refNo
       unit
+      relativeWeight
       totalCost
       category
       cost
@@ -106,7 +108,7 @@ export const GET_PROJECT_COST = gql`
       lastModifiedBy
     }
   }
-`;
+`
 
 export const GET_PROJECT_COST_REV = gql`
   query ($id: UUID) {
@@ -121,7 +123,7 @@ export const GET_PROJECT_COST_REV = gql`
       createdBy
     }
   }
-`;
+`
 
 export const UPSERT_RECORD_PROJECT_COST = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
@@ -131,7 +133,7 @@ export const UPSERT_RECORD_PROJECT_COST = gql`
       message
     }
   }
-`;
+`
 
 export const DELETE_PROJECT_COST_ITEM = gql`
   mutation ($id: UUID) {
@@ -139,7 +141,7 @@ export const DELETE_PROJECT_COST_ITEM = gql`
       id
     }
   }
-`;
+`
 
 export const REVISE_RECORD_PROJECT_COST = gql`
   mutation ($fields: Map_String_ObjectScalar, $id: UUID, $tag: String) {
@@ -147,7 +149,7 @@ export const REVISE_RECORD_PROJECT_COST = gql`
       id
     }
   }
-`;
+`
 
 export const GET_RECORDS_PROJECT_ACCOMPLISHMENTS = gql`
   query ($filter: String, $id: UUID, $page: Int, $size: Int) {
@@ -173,7 +175,7 @@ export const GET_RECORDS_PROJECT_ACCOMPLISHMENTS = gql`
       number
     }
   }
-`;
+`
 
 export const UPSERT_RECORD_PROJECT_ACCOMPLISHMENT = gql`
   mutation ($fields: Map_String_ObjectScalar, $date: String, $id: UUID) {
@@ -183,7 +185,7 @@ export const UPSERT_RECORD_PROJECT_ACCOMPLISHMENT = gql`
       message
     }
   }
-`;
+`
 
 export const GET_RECORD_PROJECT_UPDATES_MATERIALS = gql`
   query ($id: UUID) {
@@ -200,7 +202,7 @@ export const GET_RECORD_PROJECT_UPDATES_MATERIALS = gql`
       remarks
     }
   }
-`;
+`
 
 export const GET_INVENTORY_INFO = gql`
   query ($office: UUID, $itemId: UUID) {
@@ -216,7 +218,7 @@ export const GET_INVENTORY_INFO = gql`
       cost
     }
   }
-`;
+`
 
 export const GET_RECORD_PROJECT_UPDATES_WORKERS = gql`
   query ($id: UUID) {
@@ -232,7 +234,7 @@ export const GET_RECORD_PROJECT_UPDATES_WORKERS = gql`
       lastModifiedDate
     }
   }
-`;
+`
 
 export const UPSERT_RECORD_PROJECT_WORKERS = gql`
   mutation ($fields: Map_String_ObjectScalar, $position: String, $id: UUID) {
@@ -242,7 +244,7 @@ export const UPSERT_RECORD_PROJECT_WORKERS = gql`
       message
     }
   }
-`;
+`
 
 export const REMOVE_RECORD_PROJECT_WORKERS = gql`
   mutation ($id: UUID) {
@@ -252,7 +254,7 @@ export const REMOVE_RECORD_PROJECT_WORKERS = gql`
       message
     }
   }
-`;
+`
 
 export const GET_RECORDS_PROJECT_PROGRESS = gql`
   query ($filter: String, $id: UUID, $page: Int, $size: Int) {
@@ -277,7 +279,7 @@ export const GET_RECORDS_PROJECT_PROGRESS = gql`
       number
     }
   }
-`;
+`
 
 export const UPSERT_RECORD_PROJECT_PROGRESS = gql`
   mutation ($fields: Map_String_ObjectScalar, $date: String, $id: UUID) {
@@ -287,4 +289,4 @@ export const UPSERT_RECORD_PROJECT_PROGRESS = gql`
       message
     }
   }
-`;
+`

@@ -3344,6 +3344,7 @@ export enum IntegrationDomainEnum {
   Payment = 'PAYMENT',
   Payroll = 'PAYROLL',
   PettyCash = 'PETTY_CASH',
+  ProjectWorkAccomplish = 'PROJECT_WORK_ACCOMPLISH',
   Reapplication = 'REAPPLICATION'
 }
 
@@ -4176,6 +4177,7 @@ export type Mutation = {
   resetPassword?: Maybe<User>;
   reverseHeader?: Maybe<GraphQlRetVal_Boolean>;
   reviseProjectCost?: Maybe<ProjectCost>;
+  saveProjectWorkAccomplish?: Maybe<ProjectWorkAccomplish>;
   setCounter?: Maybe<Counter>;
   setToCompleted?: Maybe<PurchaseOrder>;
   syncAttendance?: Maybe<Array<Maybe<EmployeeAttendance>>>;
@@ -5382,6 +5384,14 @@ export type MutationReviseProjectCostArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   tag?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationSaveProjectWorkAccomplishArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  itemFields?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
 };
 
 
@@ -9352,11 +9362,13 @@ export type ProjectCost = {
   dateTransact?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
+  itemNo?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   project?: Maybe<Projects>;
   qty?: Maybe<Scalars['BigDecimal']['output']>;
   refNo?: Maybe<Scalars['String']['output']>;
+  relativeWeight?: Maybe<Scalars['BigDecimal']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
   tagNo?: Maybe<Scalars['String']['output']>;
   totalCost?: Maybe<Scalars['BigDecimal']['output']>;
@@ -9369,9 +9381,11 @@ export type ProjectCostInput = {
   dateTransact?: InputMaybe<Scalars['Instant']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+  itemNo?: InputMaybe<Scalars['String']['input']>;
   project?: InputMaybe<ProjectsInput>;
   qty?: InputMaybe<Scalars['BigDecimal']['input']>;
   refNo?: InputMaybe<Scalars['String']['input']>;
+  relativeWeight?: InputMaybe<Scalars['BigDecimal']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
   tagNo?: InputMaybe<Scalars['String']['input']>;
   unit?: InputMaybe<Scalars['String']['input']>;
@@ -9461,6 +9475,68 @@ export type ProjectUpdatesWorkers = {
   project?: Maybe<Projects>;
   projectUpdates?: Maybe<ProjectUpdates>;
   remarks?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProjectWorkAccomplish = {
+  __typename?: 'ProjectWorkAccomplish';
+  approvedForApproval?: Maybe<Scalars['String']['output']>;
+  checkedBy?: Maybe<Scalars['String']['output']>;
+  companyId?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  details?: Maybe<Scalars['Map_String_StringScalar']['output']>;
+  domain?: Maybe<Scalars['String']['output']>;
+  flagValue?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  periodEnd?: Maybe<Scalars['String']['output']>;
+  periodStart?: Maybe<Scalars['String']['output']>;
+  preparedBy?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<Scalars['UUID']['output']>;
+  recommendingApproval?: Maybe<Scalars['String']['output']>;
+  recordNo?: Maybe<Scalars['String']['output']>;
+  relativeWeight?: Maybe<Scalars['BigDecimal']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  totalAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  totalBalanceAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  totalPercentage?: Maybe<Scalars['BigDecimal']['output']>;
+  totalPeriodAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  totalPrevAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  totalToDateAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  verifiedBy?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProjectWorkAccomplishItems = {
+  __typename?: 'ProjectWorkAccomplishItems';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  balanceAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  balanceQty?: Maybe<Scalars['Int']['output']>;
+  companyId?: Maybe<Scalars['UUID']['output']>;
+  cost?: Maybe<Scalars['BigDecimal']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  itemNo?: Maybe<Scalars['String']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  percentage?: Maybe<Scalars['BigDecimal']['output']>;
+  periodEnd?: Maybe<Scalars['String']['output']>;
+  periodStart?: Maybe<Scalars['String']['output']>;
+  prevAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  prevQty?: Maybe<Scalars['BigDecimal']['output']>;
+  project?: Maybe<Scalars['UUID']['output']>;
+  projectCost?: Maybe<Scalars['UUID']['output']>;
+  projectWorkAccomplishId?: Maybe<Scalars['UUID']['output']>;
+  qty?: Maybe<Scalars['Int']['output']>;
+  relativeWeight?: Maybe<Scalars['BigDecimal']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  thisPeriodAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  thisPeriodQty?: Maybe<Scalars['Int']['output']>;
+  toDateAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  toDateQty?: Maybe<Scalars['Int']['output']>;
+  unit?: Maybe<Scalars['String']['output']>;
 };
 
 export type Projects = {
@@ -10162,6 +10238,7 @@ export type Query = {
   getPrItemByPoId?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getPrItemInPO?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getProjectMaterialsByMilestone?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
+  getProjectWorkAccomplishItemsByGroupId?: Maybe<Array<Maybe<ProjectWorkAccomplishItems>>>;
   /** Find Ap posted */
   getReapplicationStatus?: Maybe<Array<Maybe<Reapplication>>>;
   /** get sss contributions */
@@ -12078,6 +12155,12 @@ export type QueryGetPrItemInPoArgs = {
 
 /** Query root */
 export type QueryGetProjectMaterialsByMilestoneArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetProjectWorkAccomplishItemsByGroupIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
