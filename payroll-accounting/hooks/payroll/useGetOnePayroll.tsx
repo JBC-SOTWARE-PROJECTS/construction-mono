@@ -12,6 +12,8 @@ const GET_PAYROLL = gql`
       dateEnd
       description
       status
+      type
+      cycle
     }
   }
 `;

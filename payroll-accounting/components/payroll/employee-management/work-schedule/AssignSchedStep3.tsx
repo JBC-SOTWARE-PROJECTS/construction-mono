@@ -59,8 +59,6 @@ function AssignSchedStep3({
             >
               <EmployeeTable
                 dataSource={selectedEmployees as Employee[]}
-                totalElements={1 as number}
-                handleOpen={(record) => console.log("record => ", record)}
                 hideExtraColumns
               />
             </Card>

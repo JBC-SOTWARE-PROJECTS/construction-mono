@@ -84,6 +84,15 @@ class Payroll extends PayrollAuditingEntity implements Serializable, AutoIntegra
     PayrollType type
 
     @GraphQLQuery
+    @Column(name = "code", columnDefinition = "varchar")
+    String code
+
+    @GraphQLQuery
+    @Column(name = "cycle", columnDefinition = "numeric")
+    Integer cycle
+
+
+    @GraphQLQuery
     @Column(name = "posted_ledger", columnDefinition = "uuid")
     UUID postedLedger
 
