@@ -527,4 +527,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/72_wilson_project_progress.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/73_michael_payroll_code.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

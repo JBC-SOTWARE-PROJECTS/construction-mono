@@ -37,6 +37,8 @@ import CustomButton from "../common/CustomButton";
 import AccessControl from "../accessControl/AccessControl";
 import { IState } from "@/routes/payroll/employees";
 import usePaginationState from "@/hooks/usePaginationState";
+import FormSelect from "../common/formSelect/formSelect";
+import FormInputNumber from "../common/formInputNumber/formInputNumber";
 const initialState: IState = {
   filter: "",
   status: true,
@@ -95,6 +97,8 @@ function PayrollForm({ usage }: IProps) {
       employeeList: selectedIds,
       fields: {
         title: values.title,
+        cycle: values.cycle,
+        type: values?.type,
         description: values.description,
         dateStart: dayjs(values?.dateRange[0]).startOf("day"),
         dateEnd: dayjs(values?.dateRange[1]).endOf("day"),
@@ -179,7 +183,7 @@ function PayrollForm({ usage }: IProps) {
               form={form}
             >
               <Row gutter={[8, 0]}>
-                <Col span={12}>
+                <Col span={8}>
                   <FormInput
                     name="title"
                     rules={requiredField}
@@ -190,7 +194,7 @@ function PayrollForm({ usage }: IProps) {
                     initialValue={get(payroll, "title")}
                   />
                 </Col>
-                <Col span={12}>
+                <Col span={10}>
                   <FormDateRange
                     name="dateRange"
                     label="Date Range"
@@ -200,10 +204,48 @@ function PayrollForm({ usage }: IProps) {
                     }}
                   />
                 </Col>
+                {!loadingPayroll && (
+                  <>
+                    <Col span={3}>
+                      <FormSelect
+                        name="type"
+                        label="Payroll Type"
+                        initialValue={get(payroll, "type")}
+                        propsselect={{
+                          showSearch: true,
+                          options: [
+                            {
+                              value: "WEEKLY",
+                              label: "Weekly",
+                            },
+                            {
+                              value: "SEMI_MONTHLY",
+                              label: "Semi-monthly",
+                            },
+                          ],
+                          optionFilterProp: "label",
+                        }}
+                        rules={[{ required: true }]}
+                      />
+                    </Col>
+
+                    <Col span={3}>
+                      <FormInputNumber
+                        label="Payroll Cycle Number"
+                        name="cycle"
+                        initialValue={get(payroll, "cycle")}
+                        propsinputnumber={{ min: 1, max: 5 }}
+                        rules={[{ required: true }]}
+                      />
+                    </Col>
+                  </>
+                )}
+
                 <Col span={24}>
                   <FormTextArea
                     name="description"
                     label="Description"
+                    initialValue={get(payroll, "description")}
                     propstextarea={{ rows: 1 }}
                   />
                 </Col>
