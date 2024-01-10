@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 interface IProps {
   dataSource: Employee[];
   loading?: boolean;
+  totalElements?: number;
   handleOpen?: (record: CompanySettings) => void;
   changePage?: any;
   rowSelection?: TableRowSelection<Employee>;
