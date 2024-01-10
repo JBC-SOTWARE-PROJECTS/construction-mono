@@ -1,5 +1,5 @@
 import CustomButton from "@/components/common/CustomButton";
-import { PayrollStatus } from "@/graphql/gql/graphql";
+import { PayrollEmployeeStatus, PayrollStatus } from "@/graphql/gql/graphql";
 import useGetPayrollTotals from "@/hooks/payroll/useGetPayrollTotals";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { getStatusColor } from "@/utility/helper";
@@ -8,11 +8,12 @@ import {
   ExclamationCircleOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import { Collapse, Empty, Modal, Spin, Tag } from "antd";
+import { Collapse, Empty, Modal, Spin, Table, Tag } from "antd";
 import { useState } from "react";
 import PayrollSubmoduleTotalsTable from "./PayrollSubmoduleTotalsTable";
 import ProjectBreakdownTable from "./ProjectBreakdownTable";
 import useUpdatePayrollStatus from "@/hooks/payroll/useUpdatePayrollStatus";
+import NumeralFormatter from "@/utility/numeral-formatter";
 
 function PayrollBreakdownModal() {
   const [open, setOpen] = useState(false);
@@ -20,6 +21,14 @@ function PayrollBreakdownModal() {
   const [updateStatus, loadingUpdateStatus] = useUpdatePayrollStatus(() => {
     refetch();
   });
+
+  const withholdingTaxStatus =
+    payroll?.payrollEmployees &&
+    payroll?.payrollEmployees.filter(
+      (item: any) => (item.status as string) === "DRAFT"
+    ).length > 0
+      ? "DRAFT"
+      : "FINALIZED";
   const items: any = [
     {
       label: "Timekeeping",
@@ -61,7 +70,39 @@ function PayrollBreakdownModal() {
       dataSource: payroll?.otherDeduction?.totalsBreakdown,
       status: payroll?.allowance?.status,
     },
+    {
+      label: "Withholding Tax",
+      dataSource: payroll?.otherDeduction?.totalsBreakdown,
+      status: withholdingTaxStatus,
+      children:
+        withholdingTaxStatus === "DRAFT" ? (
+          <Empty description="Finalized all employee withholding tax first." />
+        ) : (
+          <Table
+            columns={[
+              {
+                title: "Description",
+                dataIndex: "description",
+                width: 800,
+              },
+              {
+                title: "Amount",
+                render: () => {
+                  let total = 0;
+                  payroll?.payrollEmployees?.map((item) => {
+                    total += item?.withholdingTax;
+                  });
+
+                  return <NumeralFormatter value={total} />;
+                },
+              },
+            ]}
+            dataSource={[{ description: "Total Withholding Tax" }]}
+          />
+        ),
+    },
   ];
+
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const confirmFinalize = () => {
     Modal.confirm({
@@ -95,6 +136,7 @@ function PayrollBreakdownModal() {
     payroll?.loan?.status,
     payroll?.adjustment?.status,
     payroll?.allowance?.status,
+    withholdingTaxStatus,
   ];
   return (
     <>
@@ -107,7 +149,7 @@ function PayrollBreakdownModal() {
       </CustomButton>
       <Spin spinning={loadingPayroll || loadingUpdateStatus}>
         <Modal
-          title={`Payroll - ${payroll?.description}`}
+          title={`Payroll - ${payroll?.title}`}
           onCancel={() => setOpen(false)}
           open={open}
           footer={null}

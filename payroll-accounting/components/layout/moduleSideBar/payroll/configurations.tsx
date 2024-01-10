@@ -19,6 +19,10 @@ const payrollConfigurationsMenu = {
             name: "Contribtion Management",
           },
           {
+            path: "/payroll/configurations/witholding-tax-table",
+            name: "Withholding Tax Table Management",
+          },
+          {
             path: "/payroll/configurations/events-holiday",
             name: "Holiday & Events",
           },

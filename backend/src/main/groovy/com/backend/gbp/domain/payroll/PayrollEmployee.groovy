@@ -5,6 +5,7 @@ import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.fasterxml.jackson.annotation.JsonIgnore
+import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
 import org.hibernate.annotations.NotFoundAction
@@ -65,6 +66,10 @@ class PayrollEmployee extends AbstractAuditingEntity implements Serializable {
 //
     @OneToOne(mappedBy = "payrollEmployee")
     PayrollEmployeeContribution payrollEmployeeContribution
+
+    @GraphQLQuery
+    @Column(name = "withholding_tax", columnDefinition = "numeric")
+    BigDecimal withholdingTax
 
     @Transient
     Boolean isOld
