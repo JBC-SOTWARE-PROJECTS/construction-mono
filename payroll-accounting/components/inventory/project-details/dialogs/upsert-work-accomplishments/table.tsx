@@ -8,11 +8,17 @@ import {
   InputRef,
   Table,
   Typography,
+  message,
 } from 'antd'
 import Decimal from 'decimal.js'
 import numeral from 'numeral'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import {
+  calculateAmountAccomplish,
+  calculateBalance,
+  calculatePercentage,
+} from '../../common/work-accomplishments-helpers'
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null)
 
@@ -42,10 +48,10 @@ interface EditableCellProps {
   title: React.ReactNode
   editable: boolean
   children: React.ReactNode
-  dataIndex: keyof Item
+  dataIndex: keyof ProjectWorkAccomplishItems
   required: boolean
-  record: Item
-  handleSave: (record: Item) => void
+  record: ProjectWorkAccomplishItems
+  handleSave: (record: ProjectWorkAccomplishItems) => void
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
@@ -77,6 +83,21 @@ const EditableCell: React.FC<EditableCellProps> = ({
     }
   }
 
+  const validator = (_: any, value: any) => {
+    const qty = new Decimal(record?.qty ?? 0)
+    const prev = new Decimal(record?.prevQty ?? 0)
+    const totalQty = new Decimal(value ?? 0).plus(prev)
+    const balance = qty.minus(totalQty)
+    const balanceStatus = balance.greaterThanOrEqualTo(0)
+
+    if (dataIndex == 'thisPeriodQty' && !balanceStatus) {
+      message.error('Invalid amount')
+      return Promise.reject(new Error('Invalid amount'))
+    }
+
+    return Promise.resolve()
+  }
+
   let childNode = children
 
   if (editable) {
@@ -88,6 +109,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
           {
             required: !!required,
             message: '',
+            validator,
           },
         ]}
       >
@@ -123,6 +145,7 @@ const TableSummaryCell = ({ text, index, align }: TableSummaryCellI) => {
 interface UpsertWorkAccomplishmentsTable {
   dataSource: ProjectWorkAccomplishItems[]
   setDataSource: SetStateType<ProjectWorkAccomplishItems[]>
+  tableLoadingIndicator: boolean
 }
 
 export default function UpsertWorkAccomplishmentsTable(
@@ -202,7 +225,7 @@ export default function UpsertWorkAccomplishmentsTable(
           align: 'right',
           width: 50,
           editable: true,
-          render: (text: string) => text ?? '-',
+          render: (text: number) => (text > 0 ? text : '-') ?? '-',
         },
         {
           title: 'This Period',
@@ -210,7 +233,7 @@ export default function UpsertWorkAccomplishmentsTable(
           align: 'right',
           width: 50,
           editable: true,
-          render: (text: string) => text ?? '-',
+          render: (text: number) => (text > 0 ? text : '-') ?? '-',
         },
         {
           title: 'To Date',
@@ -218,14 +241,14 @@ export default function UpsertWorkAccomplishmentsTable(
           align: 'right',
           width: 50,
           editable: true,
-          render: (text: string) => text ?? '-',
+          render: (text: number) => (text > 0 ? text : '-') ?? '-',
         },
         {
           title: 'Balance',
           dataIndex: 'balanceQty',
           align: 'right',
           width: 50,
-          render: (text: string) => text ?? '-',
+          render: (text: number) => (text > 0 ? text : '-') ?? '-',
         },
       ],
     },
@@ -275,52 +298,6 @@ export default function UpsertWorkAccomplishmentsTable(
         text ? `${numeral(text).format('0.00')}%` : '-',
     },
   ]
-
-  const calculateBalance = (row: ProjectWorkAccomplishItems) => {
-    const prev = new Decimal(row?.qty ?? 0).minus(
-      new Decimal(row?.prevQty ?? 0)
-    )
-
-    const balance = prev.minus(row?.thisPeriodQty ?? 0).toString()
-
-    row.balanceQty = parseInt(balance)
-    return row
-  }
-
-  const calculatePercentage = (row: ProjectWorkAccomplishItems) => {
-    const totalAmount = new Decimal(row?.qty ?? 0).times(
-      new Decimal(row?.cost ?? 0)
-    )
-
-    const prevPlusThisPeriod = new Decimal(row?.prevAmount).plus(
-      new Decimal(row?.thisPeriodAmount ?? 0)
-    )
-    const amountDividedByTotalAmount = prevPlusThisPeriod.dividedBy(totalAmount)
-
-    const percentage = amountDividedByTotalAmount
-      .times(new Decimal(row.relativeWeight ?? 0))
-      .toString()
-
-    row.percentage = parseFloat(percentage)
-    return row
-  }
-
-  const calculateAmountAccomplish = (row: ProjectWorkAccomplishItems) => {
-    const cost = new Decimal(row?.cost ?? 0)
-
-    const prev = cost.times(new Decimal(row.prevQty ?? 0)).toString()
-    const thisPeriod = cost
-      .times(new Decimal(row.thisPeriodQty ?? 0))
-      .toString()
-    const toDate = cost.times(new Decimal(row.toDateQty ?? 0)).toString()
-    const balance = cost.times(new Decimal(row.balanceQty ?? 0)).toString()
-
-    row.prevAmount = parseFloat(prev)
-    row.thisPeriodAmount = parseFloat(thisPeriod)
-    row.toDateAmount = parseFloat(toDate)
-    row.balanceAmount = parseFloat(balance)
-    return row
-  }
 
   const handleSave = (row: ProjectWorkAccomplishItems) => {
     const newData = [...dataSource]
@@ -385,6 +362,7 @@ export default function UpsertWorkAccomplishmentsTable(
   return (
     <TableCSV>
       <Table
+        loading={props?.tableLoadingIndicator}
         components={components}
         columns={columns}
         rowClassName={() => 'editable-row'}

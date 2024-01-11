@@ -19,6 +19,7 @@ export const GET_PROJECTS_RECORDS = gql`
     ) {
       content {
         id
+        contractId
         projectCode
         description
         projectStarted
@@ -60,6 +61,7 @@ export const GET_PROJECT_BY_ID = gql`
   query ($id: UUID) {
     projectById(id: $id) {
       id
+      contractId
       projectCode
       description
       projectStarted
@@ -100,6 +102,7 @@ export const GET_PROJECT_COST = gql`
       unit
       relativeWeight
       totalCost
+      billedQty
       category
       cost
       qty

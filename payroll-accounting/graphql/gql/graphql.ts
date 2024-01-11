@@ -9355,6 +9355,7 @@ export enum PreventiveScheduleType {
 
 export type ProjectCost = {
   __typename?: 'ProjectCost';
+  billedQty?: Maybe<Scalars['Int']['output']>;
   category?: Maybe<Scalars['String']['output']>;
   cost?: Maybe<Scalars['BigDecimal']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -9376,6 +9377,7 @@ export type ProjectCost = {
 };
 
 export type ProjectCostInput = {
+  billedQty?: InputMaybe<Scalars['Int']['input']>;
   category?: InputMaybe<Scalars['String']['input']>;
   cost?: InputMaybe<Scalars['BigDecimal']['input']>;
   dateTransact?: InputMaybe<Scalars['Instant']['input']>;
@@ -9544,6 +9546,7 @@ export type Projects = {
   accountName?: Maybe<Scalars['String']['output']>;
   code?: Maybe<Scalars['String']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
+  contractId?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   customer?: Maybe<ArCustomers>;
@@ -9574,6 +9577,7 @@ export type Projects = {
 
 export type ProjectsInput = {
   company?: InputMaybe<Scalars['UUID']['input']>;
+  contractId?: InputMaybe<Scalars['String']['input']>;
   customer?: InputMaybe<ArCustomersInput>;
   description?: InputMaybe<Scalars['String']['input']>;
   disabledEditing?: InputMaybe<Scalars['Boolean']['input']>;

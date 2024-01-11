@@ -2,6 +2,7 @@ package com.backend.gbp.domain.projects
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.accounting.IntegrationDomainEnum
+import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.types.AutoIntegrateable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -38,12 +39,12 @@ class ProjectWorkAccomplish extends AbstractAuditingEntity implements Serializab
 	String periodEnd
 
 	@GraphQLQuery
-	@Column(name = "relative_weight")
-	BigDecimal relativeWeight
-
-	@GraphQLQuery
 	@Column(name = "total_amount")
 	BigDecimal totalAmount
+
+	@GraphQLQuery
+	@Column(name = "total_payments")
+	BigDecimal totalPayments
 
 	@GraphQLQuery
 	@Column(name = "total_prev_amount")
@@ -67,23 +68,28 @@ class ProjectWorkAccomplish extends AbstractAuditingEntity implements Serializab
 
 	@GraphQLQuery
 	@Column(name = "prepared_by")
+	@UpperCase
 	String preparedBy
 
 	@GraphQLQuery
 	@Column(name = "verified_by")
+	@UpperCase
 	String verifiedBy
 
 	@GraphQLQuery
 	@Column(name = "checked_by")
+	@UpperCase
 	String checkedBy
 
 	@GraphQLQuery
 	@Column(name = "recommending_approval")
+	@UpperCase
 	String recommendingApproval
 
 	@GraphQLQuery
 	@Column(name = "approved_for_approval")
-	String approvedForApproval
+	@UpperCase
+	String approvedForPayment
 
 	@GraphQLQuery
 	String status

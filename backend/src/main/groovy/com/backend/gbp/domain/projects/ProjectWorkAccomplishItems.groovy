@@ -55,15 +55,15 @@ class ProjectWorkAccomplishItems extends AbstractAuditingEntity implements Seria
 
 	@GraphQLQuery
 	@Column(name = "qty")
-	Integer qty
+	BigDecimal qty
 
 	@GraphQLQuery
 	@Column(name = "cost")
 	BigDecimal cost
 
 	@GraphQLQuery
-	@Column(name = "amount")
-	BigDecimal amount
+	@Column(name = "payments")
+	BigDecimal payments
 
 	@GraphQLQuery
 	@Column(name = "relative_weight")
@@ -75,15 +75,15 @@ class ProjectWorkAccomplishItems extends AbstractAuditingEntity implements Seria
 
 	@GraphQLQuery
 	@Column(name = "this_period_qty")
-	Integer thisPeriodQty
+	BigDecimal thisPeriodQty
 
 	@GraphQLQuery
 	@Column(name = "to_date_qty")
-	Integer toDateQty
+	BigDecimal toDateQty
 
 	@GraphQLQuery
 	@Column(name = "balance_qty")
-	Integer balanceQty
+	BigDecimal balanceQty
 
 	@GraphQLQuery
 	@Column(name = "prev_amount")
@@ -110,5 +110,12 @@ class ProjectWorkAccomplishItems extends AbstractAuditingEntity implements Seria
 	@GraphQLQuery
 	@Column(name = "company_id")
 	UUID companyId
+
+	@Transient
+	BigDecimal amount
+	BigDecimal getAmount() {
+		BigDecimal calculated =  (cost?:0.00) * (qty?:0)
+		return  calculated
+	}
 
 }

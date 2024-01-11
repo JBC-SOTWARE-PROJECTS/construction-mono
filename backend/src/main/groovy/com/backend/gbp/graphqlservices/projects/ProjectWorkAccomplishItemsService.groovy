@@ -34,4 +34,16 @@ class ProjectWorkAccomplishItemsService extends AbstractDaoCompanyService<Projec
             .setParameter('id',id)
             .getResultList()
     }
+
+    @GraphQLQuery(name='findOneProjectWorkAccomplishItems')
+    ProjectWorkAccomplishItems findOneProjectWorkAccomplishItems(
+            @GraphQLArgument(name='id') UUID id
+    ){
+        createQuery("""
+            Select p from ProjectWorkAccomplishItems p
+            where p.id = :id
+        """)
+                .setParameter('id',id)
+                .singleResult
+    }
 }

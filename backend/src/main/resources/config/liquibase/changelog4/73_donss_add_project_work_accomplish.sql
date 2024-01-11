@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS projects.project_work_accomplish
     period_end          varchar,
 
     total_amount            numeric,
+    total_payments          numeric,
     total_prev_amount       numeric,
     total_period_amount     numeric,
     total_to_date_amount    numeric,
@@ -34,24 +35,25 @@ CREATE TABLE IF NOT EXISTS projects.project_work_accomplish
 CREATE TABLE IF NOT EXISTS projects.project_work_accomplish_items
 (
     id                  uuid NOT NULL PRIMARY KEY,
+    project_work_accomplish_id uuid NULL,
     project             uuid NULL,
     project_cost        uuid NULL,
     period_start        varchar,
     period_end          varchar,
 
-    item_no             varchar,
+    item_no            varchar,
     description        varchar,
     unit               varchar,
-    qty                int,
+    qty                numeric,
     cost               numeric,
-    amount             numeric,
+    payments           numeric,
     relative_weight    numeric,
     prev_qty           numeric,
-    this_period_qty    int,
-    to_date_qty        int,
-    balance_qty        int,
+    this_period_qty    numeric,
+    to_date_qty        numeric,
+    balance_qty        numeric,
     prev_amount        numeric,
-    this_period_amount  numeric,
+    this_period_amount numeric,
     to_date_amount     numeric,
     balance_amount     numeric,
     percentage         numeric,
@@ -68,5 +70,9 @@ CREATE TABLE IF NOT EXISTS projects.project_work_accomplish_items
 
 
 ALTER TABLE projects.project_costs
+ADD COLUMN IF  NOT EXISTS billed_qty numeric,
 ADD COLUMN IF  NOT EXISTS relative_weight numeric,
 ADD COLUMN IF  NOT EXISTS item_no varchar;
+
+ALTER TABLE projects.projects
+ADD COLUMN IF  NOT EXISTS contract_id varchar;
