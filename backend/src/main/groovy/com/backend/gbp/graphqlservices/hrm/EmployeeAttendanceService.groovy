@@ -1,7 +1,10 @@
 package com.backend.gbp.graphqlservices.hrm
 
+import com.backend.gbp.domain.assets.VehicleUsageDocs
+import com.backend.gbp.domain.billing.Job
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
+import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.projects.ProjectService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
@@ -27,6 +30,7 @@ import java.time.Instant
 @Component
 @GraphQLApi
 class EmployeeAttendanceService {
+
 
     @Autowired
     EmployeeAttendanceRepository employeeAttendanceRepository
@@ -74,6 +78,26 @@ class EmployeeAttendanceService {
     ) {
         EmployeeAttendance employeeAttendance = employeeAttendanceRepository.findById(id).get()
         return employeeAttendance
+    }
+
+    @GraphQLQuery(name = "getAttTypeByDate")
+    List<EmployeeAttendance> getAttTypeByDate(
+            @GraphQLArgument(name = "employee") UUID employee,
+            @GraphQLArgument(name = "specificDate") Instant specificDate,
+            @GraphQLArgument(name = "type") String type
+    ) {
+        Instant providedDate = Instant.parse("2024-01-09T16:00:00Z");
+
+// Extract the date part
+//        Instant startOfDay = providedDate.atOffset(ZoneOffset.UTC)
+//                .toLocalDate()
+//                .atStartOfDay(ZoneOffset.UTC)
+//                .toInstant();
+//
+//        Instant endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
+
+        List<EmployeeAttendance>   employeeAttendance = employeeAttendanceRepository.getEmployeeAttListByDateType(employee, specificDate, type )
+        return  employeeAttendance;
     }
 
     //=============================QUERY=============================\\
