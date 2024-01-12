@@ -9,6 +9,7 @@ enum AssetStatus {
     IN_TRANSIT,
     DISPOSED,
     RESERVED,
+    NO_SERVICE,
     UNDER_INSPECTION,
     IDLE,
     ACTIVE,
