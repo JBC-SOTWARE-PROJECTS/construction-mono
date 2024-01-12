@@ -53,12 +53,12 @@ class Projects extends AbstractAuditingEntity implements Serializable, Subaccoun
 	Instant projectEnded
 
 	@GraphQLQuery
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "customer", referencedColumnName = "id")
 	ArCustomers customer
 
 	@GraphQLQuery
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "location", referencedColumnName = "id")
 	Office location
 
