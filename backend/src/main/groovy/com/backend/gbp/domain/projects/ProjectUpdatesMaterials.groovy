@@ -29,14 +29,12 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 	UUID id
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project_updates", referencedColumnName = "id")
 	ProjectUpdates projectUpdates
 
@@ -45,8 +43,7 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 	Instant dateTransact
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
 
@@ -64,7 +61,7 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 
 	@GraphQLQuery
 	@Column(name = "w_cost")
-	BigDecimal wCost
+	BigDecimal cost
 
 	@GraphQLQuery
 	@Column(name = "remarks")
@@ -77,7 +74,7 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 
 	@Transient
 	BigDecimal getSubTotal() {
-		BigDecimal total = wCost * qty
+		BigDecimal total = cost * qty
 		return total.setScale(2, RoundingMode.HALF_EVEN)
 	}
 

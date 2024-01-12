@@ -564,6 +564,21 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 	}
 
 	@Transactional
+	@GraphQLMutation(name = "editExpenseItemFromProjects")
+	InventoryLedger editExpenseItemFromProjects(
+			@GraphQLArgument(name = "id") UUID id,
+			@GraphQLArgument(name = "qty") Integer qty
+	) {
+		if(id){
+			def upsert = findOne(id)
+			upsert.ledgerQtyOut = qty
+			def afterSave = save(upsert)
+			return afterSave
+		}
+		return null
+	}
+
+	@Transactional
 	@GraphQLMutation(name = "voidLedgerById")
 	InventoryLedger voidLedgerById(
 			@GraphQLArgument(name = "id") UUID id

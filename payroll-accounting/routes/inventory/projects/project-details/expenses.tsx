@@ -4,7 +4,7 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, Row, Col, Form, App } from "antd";
+import { Input, Button, Row, Col, Form, App, Statistic } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
@@ -15,10 +15,12 @@ import { useRouter } from "next/router";
 import _ from "lodash";
 import UpsertProgressReport from "@/components/inventory/project-details/dialogs/upsertProgress";
 import ProgressLists from "@/components/inventory/project-details/progressLists";
+import { formatter } from "@/components/accounting/billing/component/billingHeader";
+import MaterialsUsedTable from "@/components/inventory/project-details/materialsUsedTable";
 
 const { Search } = Input;
 
-export default function AccomplishmentsContent() {
+export default function MaterialsUsedContent() {
   const { message } = App.useApp();
   const modal = useDialog(UpsertProgressReport);
   const router = useRouter();
@@ -56,47 +58,43 @@ export default function AccomplishmentsContent() {
       className="project-details"
       pageHeaderRender={(e) => <ProjectHeader id={query?.id as string} />}>
       <ProCard
-        title="Progress Reports"
+        title="Project Expenses"
         headStyle={{
           flexWrap: "wrap",
         }}
         bordered
         headerBordered
-        size="small"
-        extra={
-          <ProFormGroup size="small">
-            <Button
-              size="small"
-              type="primary"
-              icon={<PlusCircleOutlined />}
-              onClick={() => onUpsertRecord()}>
-              Add Progress Report
-            </Button>
-          </ProFormGroup>
-        }>
-        <div className="w-full mb-5">
-          <Form layout="vertical" className="filter-form">
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <Search
-                  size="middle"
-                  placeholder="Search here.."
-                  onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-                  className="w-full"
-                />
-              </Col>
-            </Row>
-          </Form>
-        </div>
-        <ProgressLists
-          dataSource={data?.pProgressByPage?.content as ProjectProgress[]}
-          loading={loading}
-          totalElements={data?.pProgressByPage?.totalElements as number}
-          handleOpen={(e) => onUpsertRecord(e)}
-          handleChangePage={(e: number) =>
-            setState((prev) => ({ ...prev, page: e }))
-          }
-        />
+        size="small">
+        <Row gutter={[0, 8]}>
+          <Col span={24}>
+            <Search
+              size="middle"
+              placeholder="Search here.."
+              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+              className="w-full"
+            />
+          </Col>
+          <Col span={24}>
+            <div className="w-full dev-right">
+              <Statistic
+                title="Total Materials Expenses"
+                value={1}
+                formatter={(e) => {
+                  let value = Number(e);
+                  return formatter(value, "currency-red");
+                }}
+              />
+            </div>
+            <MaterialsUsedTable
+              dataSource={[]}
+              loading={loading}
+              totalElements={0}
+              handleChangePage={(e: number) =>
+                setState((prev) => ({ ...prev, page: e }))
+              }
+            />
+          </Col>
+        </Row>
       </ProCard>
     </PageContainer>
   );

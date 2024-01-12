@@ -1,11 +1,17 @@
 import React, { useContext, useState } from "react";
+import { ProjectProgressImages, Query } from "@/graphql/gql/graphql";
+import { DeleteFilled, UploadOutlined } from "@ant-design/icons";
 import {
-  ProjectProgressImages,
-  ProjectUpdatesWorkers,
-  Query,
-} from "@/graphql/gql/graphql";
-import { UploadOutlined } from "@ant-design/icons";
-import { Row, Col, Button, App, Upload, Image, Spin, Empty } from "antd";
+  Row,
+  Col,
+  Button,
+  App,
+  Upload,
+  Image,
+  Spin,
+  Empty,
+  Switch,
+} from "antd";
 import _ from "lodash";
 import { confirmDelete } from "@/hooks";
 import { useMutation, useQuery } from "@apollo/client";
@@ -17,6 +23,7 @@ import type { UploadProps } from "antd";
 import { apiUrlPrefix } from "@/shared/settings";
 import { accessControl } from "@/utility/helper";
 import { AccountContext } from "@/components/accessControl/AccountContext";
+import index from "../../../../pages/index";
 
 interface IProps {
   projectProgressId: string;
@@ -31,6 +38,7 @@ export default function ProjectProgressImagesLists({
   const { message } = App.useApp();
   const [uploading, setUploading] = useState<boolean>(false);
   const account = useContext(AccountContext);
+  const [showDelete, setShowDelete] = useState<boolean>(false);
   // ===================== queries ========================
   const { data, loading, refetch } = useQuery<Query>(GET_PROGRESS_IMAGES, {
     variables: {
@@ -53,14 +61,18 @@ export default function ProjectProgressImagesLists({
     }
   );
 
-  const onConfirmRemove = (record: ProjectUpdatesWorkers) => {
-    confirmDelete("Click Yes if you want to proceed", () => {
-      removeRecord({
-        variables: {
-          id: record?.id,
-        },
-      });
-    });
+  const onConfirmRemove = (record: ProjectProgressImages) => {
+    confirmDelete(
+      "Click Yes if you want to proceed",
+      () => {
+        removeRecord({
+          variables: {
+            id: record?.id,
+          },
+        });
+      },
+      "Do you want to delete this image?"
+    );
   };
 
   const uploadProps: UploadProps = {
@@ -90,9 +102,18 @@ export default function ProjectProgressImagesLists({
   };
 
   return (
-    <Row gutter={[0, 8]}>
+    <Row gutter={[0, 16]}>
       <Col span={24}>
-        <div className="w-full dev-right">
+        <div className="w-full dev-between">
+          <div>
+            Delete Images:{" "}
+            <Switch
+              checked={showDelete}
+              onChange={(e) => setShowDelete(e)}
+              checkedChildren="Yes"
+              unCheckedChildren="No"
+            />
+          </div>
           <Upload {...uploadProps}>
             <Button
               type="primary"
@@ -121,16 +142,40 @@ export default function ProjectProgressImagesLists({
                 onChange: (current, prev) =>
                   console.log(`current index: ${current}, prev index: ${prev}`),
               }}>
-              {(data?.pProgressImagesByList as ProjectProgressImages[]).map(
-                (image: ProjectProgressImages) => (
-                  <Image
-                    key={image?.id}
-                    width={200}
-                    height={200}
-                    src={`https://megatam.sgp1.cdn.digitaloceanspaces.com/${image?.imageUrl}`}
-                  />
-                )
-              )}
+              <div className="project-images">
+                {(data?.pProgressImagesByList as ProjectProgressImages[]).map(
+                  (image: ProjectProgressImages) => (
+                    <div
+                      style={{ height: 200, width: 200, position: "relative" }}>
+                      {showDelete && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 2,
+                            right: 2,
+                            zIndex: 999,
+                          }}>
+                          <Button
+                            type="primary"
+                            danger
+                            size="small"
+                            disabled={removeLoading}
+                            onClick={() => onConfirmRemove(image)}
+                            icon={<DeleteFilled />}
+                          />
+                        </div>
+                      )}
+                      <Image
+                        key={image?.id}
+                        style={{ objectPosition: "center", objectFit: "cover" }}
+                        width={200}
+                        height={200}
+                        src={`https://megatam.sgp1.cdn.digitaloceanspaces.com/${image?.imageUrl}`}
+                      />
+                    </div>
+                  )
+                )}
+              </div>
             </Image.PreviewGroup>
           )}
         </Spin>

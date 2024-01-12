@@ -53,4 +53,8 @@ class ProjectProgress extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "status")
 	String status
 
+	@GraphQLQuery
+	@Column(name = "progress_percent")
+	BigDecimal progressPercent
+
 }

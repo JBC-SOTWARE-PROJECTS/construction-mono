@@ -523,4 +523,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/74_wilson_roles_and_permissions.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/75_wilson_project_percent.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/76_wilson_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/77_wilson_update_inventory_views.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

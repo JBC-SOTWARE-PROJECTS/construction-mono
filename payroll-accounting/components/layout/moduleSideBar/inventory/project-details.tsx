@@ -27,11 +27,11 @@ const InventoryProjectMenu = (query: string) => {
               path: `/inventory/project-details/${query}/materials`,
               name: "Project Materials Used",
             },
-            {
-              key: "expenses",
-              path: `/inventory/project-details/${query}/expenses`,
-              name: "Project Expenses",
-            },
+            // {
+            //   key: "expenses",
+            //   path: `/inventory/project-details/${query}/expenses`,
+            //   name: "Project Expenses",
+            // },
             {
               key: "inventory",
               path: `/inventory/project-details/${query}/inventory`,

@@ -1,19 +1,23 @@
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import { ProjectUpdatesMaterials, Query } from "@/graphql/gql/graphql";
-import { accessControl } from "@/utility/helper";
+import { DateFormatterWithTime, accessControl } from "@/utility/helper";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Row, Col, Table, App, Button, Space } from "antd";
+import { Row, Col, Table, App, Button, Space, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import _ from "lodash";
 import { useContext } from "react";
 import ColTitlePopUp from "../../colTitlePopUp";
 import { NumberFormaterNoDecimal } from "@/utility/helper";
-import { useDialog } from "@/hooks";
-import { GET_RECORD_PROJECT_UPDATES_MATERIALS } from "@/graphql/inventory/project-queries";
-import { useQuery } from "@apollo/client";
+import { confirmDelete, useDialog } from "@/hooks";
+import {
+  GET_RECORD_PROJECT_UPDATES_MATERIALS,
+  REMOVE_MATERIAL,
+} from "@/graphql/inventory/project-queries";
+import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import UpsertAccomplishmentMaterials from "../dialogs/upsertAccomplishmentMaterials";
 import { AppContext } from "@/components/accessControl/AppContext";
+import AccessControl from "@/components/accessControl/AccessControl";
 
 interface IProps {
   projectUpdateId: string;
@@ -40,6 +44,31 @@ export default function ProjectAccomplishmentMaterialsTable({
       fetchPolicy: "cache-and-network",
     }
   );
+
+  const [removeRecord, { loading: removeLoading }] = useMutation(
+    REMOVE_MATERIAL,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (data?.removedMaterial?.id) {
+          message.success("Material successfully deleted");
+          refetch();
+        } else {
+          message.error("Something went wrong. Please contact administrator");
+        }
+      },
+    }
+  );
+
+  const onConfirmRemove = (record: ProjectUpdatesMaterials) => {
+    confirmDelete("Click Yes if you want to proceed", () => {
+      removeRecord({
+        variables: {
+          id: record?.id,
+        },
+      });
+    });
+  };
 
   const onUpsertRecord = (record?: ProjectUpdatesMaterials) => {
     modal(
@@ -106,6 +135,9 @@ export default function ProjectAccomplishmentMaterialsTable({
       dataIndex: "remarks",
       key: "remarks",
       width: 200,
+      render: (remarks) => {
+        return <span>{remarks ?? "--"}</span>;
+      },
     },
     {
       title: "#",
@@ -115,33 +147,21 @@ export default function ProjectAccomplishmentMaterialsTable({
       align: "center",
       render: (_, record) => (
         <Space>
-          <Button
-            size="small"
-            type="dashed"
-            onClick={() => console.log(record)}
-            disabled={
-              isLocked
-                ? accessControl(
-                    account?.user?.access,
-                    "overwrite_lock_accomplishment"
-                  )
-                : false
-            }>
-            <EditOutlined />
-          </Button>
+          <AccessControl allowedPermissions={["overwrite_lock_accomplishment"]}>
+            <Button
+              size="small"
+              type="dashed"
+              disabled={isLocked}
+              onClick={() => onUpsertRecord(record)}>
+              <EditOutlined />
+            </Button>
+          </AccessControl>
           <Button
             size="small"
             danger
             type="dashed"
-            onClick={() => console.log(record)}
-            disabled={
-              isLocked
-                ? accessControl(
-                    account?.user?.access,
-                    "overwrite_lock_accomplishment"
-                  )
-                : false
-            }>
+            onClick={() => onConfirmRemove(record)}
+            disabled={isLocked}>
             <DeleteOutlined />
           </Button>
         </Space>
@@ -155,14 +175,7 @@ export default function ProjectAccomplishmentMaterialsTable({
         <div className="w-full dev-right">
           <Button
             type="primary"
-            disabled={
-              isLocked
-                ? accessControl(
-                    account?.user?.access,
-                    "overwrite_lock_accomplishment"
-                  )
-                : false
-            }
+            disabled={isLocked}
             onClick={() => onUpsertRecord()}>
             Record Used Materials
           </Button>
@@ -181,11 +194,32 @@ export default function ProjectAccomplishmentMaterialsTable({
             showSizeChanger: false,
           }}
           expandable={{
-            expandedRowRender: (record: ProjectUpdatesMaterials) => (
-              <div className="w-full px-5"></div>
+            expandedRowRender: (record) => (
+              <div className="w-full px-5">
+                <p style={{ padding: 0 }}>
+                  <span className="font-bold">Date Added:&nbsp;</span>
+                  <span>{DateFormatterWithTime(record?.dateTransact)}</span>
+                </p>
+                <p style={{ padding: 0 }}>
+                  <span className="font-bold">Created By:&nbsp;</span>
+                  <span>
+                    <Tag color="green">{record?.createdBy}</Tag>
+                  </span>
+                </p>
+                <p style={{ padding: 0 }}>
+                  <span className="font-bold">Last Modified By:&nbsp;</span>
+                  <span>
+                    <Tag color="orange">{record?.lastModifiedBy}</Tag>
+                  </span>
+                </p>
+                <p style={{ padding: 0 }}>
+                  <span className="font-bold">Last Modified Date:&nbsp;</span>
+                  <span>{DateFormatterWithTime(record?.lastModifiedDate)}</span>
+                </p>
+              </div>
             ),
           }}
-          loading={loading}
+          loading={loading || removeLoading}
           scroll={{ x: 1400 }}
         />
       </Col>

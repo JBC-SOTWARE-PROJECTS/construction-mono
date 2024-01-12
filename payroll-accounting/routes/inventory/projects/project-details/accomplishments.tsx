@@ -53,6 +53,7 @@ export default function AccomplishmentsContent() {
 
   return (
     <PageContainer
+      className="project-details"
       pageHeaderRender={(e) => <ProjectHeader id={query?.id as string} />}>
       <ProCard
         title="Accomplishment Reports"

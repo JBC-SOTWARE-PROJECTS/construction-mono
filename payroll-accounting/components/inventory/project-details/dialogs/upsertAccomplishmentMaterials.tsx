@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   InventoryInfoDto,
   Item,
@@ -25,7 +25,7 @@ import { FormTextArea } from "@/components/common";
 import dayjs from "dayjs";
 import {
   GET_INVENTORY_INFO,
-  UPSERT_RECORD_PROJECT_ACCOMPLISHMENT,
+  UPSERT_RECORD_PROJECT_ACCOMPLISHMENT_MATERIALS,
 } from "@/graphql/inventory/project-queries";
 import FormDebounceSelect from "@/components/common/formDebounceSelect/formDebounceSelect";
 import { GET_ACTIVE_ITEM } from "@/graphql/inventory/masterfile-queries";
@@ -47,7 +47,7 @@ interface IProps {
 
 export default function UpsertAccomplishmentMaterials(props: IProps) {
   const { message } = App.useApp();
-  const { hide, record, projectId, officeId } = props;
+  const { hide, record, projectId, officeId, projectUpdateId } = props;
   const [item, setItem] = useState<Item>({} as Item);
   const [info, setInfo] = useState<InfoInterface>({
     type: "error",
@@ -79,25 +79,28 @@ export default function UpsertAccomplishmentMaterials(props: IProps) {
               submitDisabled: true,
             });
           }
-          let balance = info.onHand ? info.onHand - 1 : 0;
-          form.setFieldValue("onHand", info.onHand);
-          form.setFieldValue("wCost", info.cost);
-          form.setFieldValue("qty", balance ? 1 : 0);
-          form.setFieldValue("balance", balance);
+
+          if (!record?.id) {
+            let balance = info.onHand ? info.onHand - 1 : 0;
+            form.setFieldValue("onHand", info.onHand);
+            form.setFieldValue("cost", info.cost);
+            form.setFieldValue("qty", balance ? 1 : 0);
+            form.setFieldValue("balance", balance);
+          }
         }
       },
     }
   );
 
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
-    UPSERT_RECORD_PROJECT_ACCOMPLISHMENT,
+    UPSERT_RECORD_PROJECT_ACCOMPLISHMENT_MATERIALS,
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        if (data?.upsertProjectUpdates?.success) {
-          hide(data?.upsertProjectUpdates?.message);
+        if (data?.upsertProjectMaterials?.success) {
+          hide(data?.upsertProjectMaterials?.message);
         } else {
-          message.error(data?.upsertProjectUpdates?.message);
+          message.error(data?.upsertProjectMaterials?.message);
         }
       },
     }
@@ -111,11 +114,13 @@ export default function UpsertAccomplishmentMaterials(props: IProps) {
   const onSubmit = (data: any) => {
     let payload = _.clone(data);
     payload.project = projectId;
-    payload.status = "ACTIVE";
+    payload.projectUpdates = projectUpdateId;
+    if (record?.id) {
+      payload.item = record?.item?.id;
+    }
     upsertRecord({
       variables: {
         id: record?.id,
-        date: dayjs(data?.dateTransact).format("YYYY-MM-DD"),
         fields: payload,
       },
     });
@@ -134,6 +139,17 @@ export default function UpsertAccomplishmentMaterials(props: IProps) {
       setFieldValue("qty", 1);
     }
   };
+
+  useEffect(() => {
+    if (record?.id) {
+      getInventoryInfo({
+        variables: {
+          office: officeId,
+          itemId: record?.item?.id,
+        },
+      });
+    }
+  }, []);
 
   return (
     <Modal
@@ -172,30 +188,34 @@ export default function UpsertAccomplishmentMaterials(props: IProps) {
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
+          item: record?.item,
         }}>
         <Spin spinning={inventoryLoading}>
           <Row gutter={[8, 0]}>
-            <Col span={24}>
-              <FormDebounceSelect
-                label="Select Item"
-                name="item"
-                rules={requiredField}
-                propsselect={{
-                  allowClear: true,
-                  placeholder: "Select Item",
-                  fetchOptions: GET_ACTIVE_ITEM,
-                  onChange: (newValue) => {
-                    form.setFieldValue("item", newValue?.value);
-                    getInventoryInfo({
-                      variables: {
-                        office: officeId,
-                        itemId: newValue?.value,
-                      },
-                    });
-                  },
-                }}
-              />
-            </Col>
+            {!record?.id && (
+              <Col span={24}>
+                <FormDebounceSelect
+                  label="Select Item"
+                  name="item"
+                  rules={requiredField}
+                  propsselect={{
+                    allowClear: true,
+                    placeholder: "Select Item",
+                    fetchOptions: GET_ACTIVE_ITEM,
+                    disabled: !_.isEmpty(record?.id),
+                    onChange: (newValue) => {
+                      form.setFieldValue("item", newValue?.value);
+                      getInventoryInfo({
+                        variables: {
+                          office: officeId,
+                          itemId: newValue?.value,
+                        },
+                      });
+                    },
+                  }}
+                />
+              </Col>
+            )}
             {item?.id && (
               <Col span={24}>
                 <Alert
@@ -240,7 +260,7 @@ export default function UpsertAccomplishmentMaterials(props: IProps) {
             </Col>
             <Col span={24}>
               <FormInputNumber
-                name="wCost"
+                name="cost"
                 rules={requiredField}
                 label="Unit Cost (UoU)"
                 propsinputnumber={{

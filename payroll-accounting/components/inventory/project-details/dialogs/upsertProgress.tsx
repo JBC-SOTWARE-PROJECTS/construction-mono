@@ -1,18 +1,23 @@
 import React, { useContext } from "react";
-import { ProjectCost } from "@/graphql/gql/graphql";
+import { ProjectProgress } from "@/graphql/gql/graphql";
 import { SaveOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
 import { Button, Col, Form, Modal, Row, Space, Typography, App } from "antd";
 import _ from "lodash";
 import { accessControl, requiredField } from "@/utility/helper";
-import { FormInput, FormTextArea, FormDatePicker } from "@/components/common";
+import {
+  FormInput,
+  FormTextArea,
+  FormDatePicker,
+  FormInputNumber,
+} from "@/components/common";
 import dayjs from "dayjs";
 import { UPSERT_RECORD_PROJECT_PROGRESS } from "@/graphql/inventory/project-queries";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 
 interface IProps {
   hide: (hideProps: any) => void;
-  record?: ProjectCost | null | undefined;
+  record?: ProjectProgress | null | undefined;
   projectId?: string;
 }
 
@@ -45,7 +50,6 @@ export default function UpsertProgressReport(props: IProps) {
   const onSubmit = (data: any) => {
     let payload = _.clone(data);
     payload.project = projectId;
-    payload.status = "ACTIVE";
     upsertRecord({
       variables: {
         id: record?.id,
@@ -91,8 +95,12 @@ export default function UpsertProgressReport(props: IProps) {
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
-          dateTransact: dayjs(),
-          description: `PROGRESS REPORT ${dayjs().format("MM/DD/YYYY")}`,
+          dateTransact: record?.id ? dayjs(record?.dateTransact) : dayjs(),
+          description: `PROGRESS REPORT ${
+            record?.id
+              ? dayjs(record?.dateTransact).format("MM/DD/YYYY")
+              : dayjs().format("MM/DD/YYYY")
+          }`,
         }}>
         <Row gutter={[8, 0]}>
           <Col span={24}>
@@ -117,6 +125,18 @@ export default function UpsertProgressReport(props: IProps) {
               propsinput={{
                 placeholder: "Description",
                 disabled: true,
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormInputNumber
+              name="progressPercent"
+              rules={requiredField}
+              label="Current Project Percentage (%)"
+              propsinputnumber={{
+                placeholder: "Current Project Percentage (%)",
+                max: 100,
+                disabled: record?.status === "LOCKED",
               }}
             />
           </Col>

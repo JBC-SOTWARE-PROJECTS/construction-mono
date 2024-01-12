@@ -15,6 +15,7 @@ import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -79,6 +80,27 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         createQuery(query, params).resultList.sort { it.dateTransact }.reverse()
     }
 
+    @GraphQLQuery(name = "pMaterialByPage")
+    Page<ProjectUpdatesMaterials> pMaterialByPage(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+        String query = '''Select e from ProjectUpdatesMaterials e where lower(e.item.descLong) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
+
+        String countQuery = '''Select count(e) from ProjectUpdatesMaterials e where lower(e.item.descLong) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
+
+        Map<String, Object> params = new HashMap<>()
+
+        params.put('filter', filter)
+        params.put('id', id)
+
+        query += ''' ORDER BY e.dateTransact DESC'''
+
+        getPageable(query, countQuery, page, size, params)
+    }
+
     @GraphQLQuery(name = "getProjectMaterialsByMilestone")
     List<ProjectUpdatesMaterials> getProjectMaterialsByMilestone(
             @GraphQLArgument(name = "id") UUID id
@@ -103,15 +125,30 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertProjectMaterials")
     @Transactional
-    ProjectUpdatesMaterials upsertProjectMaterials(
+    GraphQLRetVal<Boolean> upsertProjectMaterials(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
-        upsertFromMap(id, fields, { ProjectUpdatesMaterials entity, boolean forInsert ->
+        def projectId = UUID.fromString(fields['project'].toString())
+        def proj = projectService.projectById(projectId)
+
+        def upsert = upsertFromMap(id, fields, { ProjectUpdatesMaterials entity, boolean forInsert ->
             if(forInsert){
                 //conditions here before save
+                entity.dateTransact = Instant.now()
             }
         })
+        if(!id){
+            // insert
+            def inv = inventoryLedgerService.expenseItemFromProjects(proj, upsert.item, upsert.qty, upsert.cost)
+            upsert.stockCardRefId = inv.id
+            save(upsert)
+            return new GraphQLRetVal<Boolean>(true,true,"Material Added Successfully")
+        }else {
+            inventoryLedgerService.editExpenseItemFromProjects(upsert.stockCardRefId, upsert.qty)
+            return new GraphQLRetVal<Boolean>(true,true,"Material Updated Successfully")
+        }
+
     }
 
     @GraphQLMutation(name = "upsertManyMaterials")
@@ -139,7 +176,7 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
                 n.onHand = it.onHand
                 n.qty = it.qty
                 n.balance = it.balance
-                n.wCost = it.wCost
+                n.cost = it.wCost
                 n.remarks = it.remarks
                 n.stockCardRefId = inv.id
                 save(n)
@@ -179,7 +216,7 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         n.dateTransact = Instant.now()
         n.item = item
         n.qty = qty
-        n.wCost = cost
+        n.cost = cost
         n.stockCardRefId = refId
         save(n)
 
