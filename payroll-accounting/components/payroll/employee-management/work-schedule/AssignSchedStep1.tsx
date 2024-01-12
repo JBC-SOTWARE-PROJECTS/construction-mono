@@ -115,9 +115,7 @@ function AssignSchedStep1({
         <EmployeeTable
           dataSource={employees as Employee[]}
           loading={loading}
-          totalElements={1 as number}
-          handleOpen={(record) => console.log("record => ", record)}
-          changePage={(page) =>
+          changePage={(page: any) =>
             setState((prev: any) => ({ ...prev, page: page }))
           }
           hideExtraColumns

@@ -76,14 +76,9 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
         <Head>
           <title>Employee Attendance</title>
         </Head>
-
         <EmployeeTable
           dataSource={employees as Employee[]}
           loading={loading}
-          totalElements={1 as number}
-          changePage={(page) =>
-            setFilters((prev: any) => ({ ...prev, page: page }))
-          }
           hideExtraColumns
           additionalColumns={columns}
         />
