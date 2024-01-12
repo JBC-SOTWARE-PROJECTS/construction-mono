@@ -28,7 +28,6 @@ class Shift extends AbstractAuditingEntity {
 	UUID id
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "terminal", referencedColumnName = "id")
 	Terminal terminal
@@ -54,7 +53,10 @@ class Shift extends AbstractAuditingEntity {
 	String remarks
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
+	@Column(name = "company")
+	UUID company
+
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "employee", referencedColumnName = "id")
 	Employee employee

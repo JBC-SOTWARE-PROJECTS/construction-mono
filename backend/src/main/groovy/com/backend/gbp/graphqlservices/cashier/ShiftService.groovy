@@ -54,23 +54,35 @@ class ShiftService {
 
 	@GraphQLQuery(name = "shiftList", description = "List of Shift Per emp")
 	List<Shift> shiftList() {
-		return shiftRepository.findAll().sort{ it.createdDate}.reverse(true)
+		def company = SecurityUtils.currentCompanyId()
+		return shiftRepository.getAllShift(company).sort{ it.createdDate}.reverse(true)
 	}
 
 	@GraphQLQuery(name = "shiftPerEmp", description = "List of Shift Per emp")
 	List<Shift> shiftPerEmp() {
+		def company = SecurityUtils.currentCompanyId()
 		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
 		Employee employee = employeeRepository.findOneByUser(user)
 
-		return shiftRepository.getShiftEmp(employee.id).sort{ it.createdDate}.reverse(true)
+		return shiftRepository.getShiftEmp(employee.id, company).sort{ it.createdDate}.reverse(true)
+	}
+
+	@GraphQLQuery(name = "activeShiftList", description = "List of Shift Per emp")
+	List<Shift> activeShiftList(@GraphQLArgument(name = "filter") String filter, @GraphQLArgument(name = "status") Boolean status) {
+		def company = SecurityUtils.currentCompanyId()
+		return shiftRepository.getActiveShiftList(company, filter, status)
 	}
 
 	@GraphQLQuery(name = "activeShift", description = "List of Shift Per emp")
 	Shift activeShift() {
-		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
-		Employee employee = employeeRepository.findOneByUser(user)
-
-		return shiftRepository.getActiveShift(employee.id)
+		def company = SecurityUtils.currentCompanyId()
+		def list =  shiftRepository.getActiveShift(company)
+		if(list.size() > 1){
+			return null
+		}else{
+			def result = list.findAll().first()
+			return result
+		}
 	}
 
 	//
@@ -78,42 +90,53 @@ class ShiftService {
 	@Transactional
 	@GraphQLMutation(name = "addShift", description = "add shift")
 	Shift addShift() {
+		def company = SecurityUtils.currentCompanyId()
 		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
 		Employee employee = employeeRepository.findOneByUser(user)
 
 		def terminal = terminalRepository.getTerminalByEmp(employee.id)
-		Shift term = new Shift()
+		def activeShift = shiftRepository.getActiveShift(company)
+		def result = new Shift()
 		try {
-			if (terminal) {
-				term.shiftNo = generatorService.getNextValue(GeneratorType.SHIFT_NO) { Long no ->
-					"SFT-" + StringUtils.leftPad(no.toString(), 6, "0")
+			if(activeShift.size() >= 1){
+				throw new Exception("There is currently active shift");
+			}else{
+				if (terminal) {
+					Shift term = new Shift()
+					term.shiftNo = generatorService.getNextValue(GeneratorType.SHIFT_NO) { Long no ->
+						"SFT-" + StringUtils.leftPad(no.toString(), 6, "0")
+					}
+					term.terminal = terminal
+					term.active = true
+					term.startShift = Instant.now()
+					term.employee = employee
+					term.company = company
+					def afterSave = shiftRepository.save(term)
+					result = afterSave
+				} else {
+					throw new Exception("No Terminal Assign in this account");
 				}
-				term.terminal = terminal
-				term.active = true
-				term.startShift = Instant.now()
-				term.employee = employee
-				shiftRepository.save(term)
-			} else {
-				throw new Exception("No Terminal Assign in this account");
 			}
+
 		} catch (Exception e) {
 			throw new Exception("Something was Wrong : " + e)
 		}
-		return term
+		return result
 	}
 
 	@Transactional
 	@GraphQLMutation(name = "closeShift", description = "close shift")
 	Shift closeShift() {
-		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
-		Employee employee = employeeRepository.findOneByUser(user)
-
-		Shift close = shiftRepository.getActiveShift(employee.id)
-		close.endShift = Instant.now()
-		close.active = false
-		shiftRepository.save(close)
-
-		return close
+		def company = SecurityUtils.currentCompanyId()
+		def upsert = new Shift()
+		def close = shiftRepository.getActiveShift(company)
+		close.each {
+			upsert = it
+			upsert.endShift = Instant.now()
+			upsert.active = false
+			shiftRepository.save(upsert)
+		}
+		return upsert
 	}
 
 	@Transactional

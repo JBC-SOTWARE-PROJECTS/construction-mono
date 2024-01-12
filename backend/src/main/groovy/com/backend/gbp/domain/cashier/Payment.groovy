@@ -9,8 +9,6 @@ import com.backend.gbp.domain.types.AutoIntegrateable
 import com.backend.gbp.graphqlservices.cashier.PaymentTarget
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
-import org.hibernate.annotations.NotFound
-import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
@@ -86,20 +84,16 @@ class Payment extends AbstractAuditingEntity implements AutoIntegrateable{
 	String remarks
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "billingid", referencedColumnName = "id")
 	Billing billing
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "billingitemid", referencedColumnName = "id")
 	BillingItem billingItem
 
-
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shiftid", referencedColumnName = "id")
 	Shift shift
