@@ -92,6 +92,18 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
         createQuery(query, params).resultList.sort { it.dateTransact }
     }
 
+    @GraphQLQuery(name = "pUpdatesByListNotIn")
+    List<ProjectUpdates> pUpdatesByListNotIn(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "projectUpdateId") UUID projectUpdateId
+    ) {
+        String query = '''Select e from ProjectUpdates e where e.id not in (:projectUpdateId) and e.project.id = :id'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('projectUpdateId', projectUpdateId)
+        params.put('id', id)
+        createQuery(query, params).resultList.sort { it.dateTransact }
+    }
+
     @GraphQLQuery(name = "pUpdatesByPage")
     Page<ProjectUpdates> pUpdatesByPage(
             @GraphQLArgument(name = "filter") String filter,
@@ -123,26 +135,43 @@ class ProjectUpdatesService extends AbstractDaoService<ProjectUpdates> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         Boolean checkpoint = false
+        def projectId = UUID.fromString(fields['project'].toString())
         if(!id){
-            def projectId = UUID.fromString(fields['project'].toString())
             checkpoint = this.checkpointGetProjectByDate(date, projectId)
         }
         if(!checkpoint) {
-            upsertFromMap(id, fields, { ProjectUpdates entity, boolean forInsert ->
+            def afterSave = upsertFromMap(id, fields, { ProjectUpdates entity, boolean forInsert ->
                 if(forInsert){
                     entity.transNo = generatorService.getNextValue(GeneratorType.DAR_NO, {
                         return "DAR" + StringUtils.leftPad(it.toString(), 6, "0")
                     })
+                    entity.status = "ACTIVE"
                 }
             })
             if(id) {
                 return new GraphQLRetVal<Boolean>(true, true, "Accomplishment Report Updated.")
             }else{
+                this.lockedOtherUpdates(projectId, afterSave.id)
                 return new GraphQLRetVal<Boolean>(true, true, "Accomplishment Report Added.")
             }
         }else{
             return new GraphQLRetVal<Boolean>(false, false, "Accomplishment Report already added with the same date.")
         }
+    }
+
+    @GraphQLMutation(name = "lockedOtherUpdates")
+    @Transactional
+    GraphQLRetVal<Boolean> lockedOtherUpdates(
+            @GraphQLArgument(name = "projectId") UUID projectId,
+            @GraphQLArgument(name = "projectUpdateId") UUID projectUpdateId
+    ) {
+        def list = this.pUpdatesByListNotIn(projectId, projectUpdateId)
+        list.each {
+            def update = it
+            update.status = "LOCKED"
+            save(update)
+        }
+        return new GraphQLRetVal<Boolean>(true, true, "Accomplishment Report Updated.")
     }
 
 }

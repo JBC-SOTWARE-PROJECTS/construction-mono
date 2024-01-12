@@ -50,8 +50,8 @@ const HorizontalNav = () => {
               <IntlMessages id="sidebar.dashboard.crypto"/>
             </AppLink>
           </Menu.Item>
-          <Menu.Item key="main/dashboard/crm">
-            <AppLink href="/main/dashboard/crm">
+          <Menu.Item key="/main/shop">
+            <AppLink href="/main/shop">
               <i className="icon icon-crm"/>
               <IntlMessages id="sidebar.dashboard.crm"/>
             </AppLink>

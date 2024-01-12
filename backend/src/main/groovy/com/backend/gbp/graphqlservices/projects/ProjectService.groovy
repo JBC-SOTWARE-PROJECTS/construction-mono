@@ -192,7 +192,7 @@ class ProjectService extends AbstractDaoService<Projects> {
     // ============== Mutation =======================//
     @GraphQLMutation(name = "upsertProject")
     @Transactional
-    Projects upsertSupplier(
+    Projects upsertProject(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ) {
@@ -212,6 +212,17 @@ class ProjectService extends AbstractDaoService<Projects> {
         }
         //return
         return project
+    }
+
+    @GraphQLMutation(name = "updatePercent")
+    @Transactional
+    Projects updatePercent(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "percent") BigDecimal percent
+    ) {
+        Projects update = findOne(id)
+        update.projectPercent = percent
+        save(update)
     }
 
 }

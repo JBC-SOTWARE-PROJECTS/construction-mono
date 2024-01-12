@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.projects
 
 import com.backend.gbp.domain.projects.ProjectProgress
+import com.backend.gbp.domain.projects.ProjectUpdates
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.rest.InventoryResource
@@ -40,6 +41,9 @@ class ProjectProgressService extends AbstractDaoService<ProjectProgress> {
     @Autowired
     InventoryResource inventoryResource
 
+    @Autowired
+    ProjectService projectService
+
 
     @GraphQLQuery(name = "pProgressById")
     ProjectProgress pProgressById(
@@ -73,9 +77,21 @@ class ProjectProgressService extends AbstractDaoService<ProjectProgress> {
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "id") UUID id
     ) {
-        String query = '''Select e from ProjectUpdates e where lower(e.description) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
+        String query = '''Select e from ProjectProgress e where lower(e.description) like lower(concat('%',:filter,'%')) and e.project.id = :id'''
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
+        params.put('id', id)
+        createQuery(query, params).resultList.sort { it.dateTransact }
+    }
+
+    @GraphQLQuery(name = "pProgressByListNotIn")
+    List<ProjectProgress> pProgressByListNotIn(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "projectUpdateId") UUID projectProgressId
+    ) {
+        String query = '''Select e from ProjectProgress e where e.id not in (:projectProgressId) and e.project.id = :id'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('projectProgressId', projectProgressId)
         params.put('id', id)
         createQuery(query, params).resultList.sort { it.dateTransact }
     }
@@ -111,26 +127,49 @@ class ProjectProgressService extends AbstractDaoService<ProjectProgress> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         Boolean checkpoint = false
+        def projectId = UUID.fromString(fields['project'].toString())
         if(!id){
-            def projectId = UUID.fromString(fields['project'].toString())
             checkpoint = this.checkpointGetProjectByDate(date, projectId)
         }
         if(!checkpoint) {
-            upsertFromMap(id, fields, { ProjectProgress entity, boolean forInsert ->
+            def updated = upsertFromMap(id, fields, { ProjectProgress entity, boolean forInsert ->
                 if(forInsert){
                     entity.transNo = generatorService.getNextValue(GeneratorType.PRS_NO, {
                         return "PRS" + StringUtils.leftPad(it.toString(), 6, "0")
                     })
+                    entity.status = "ACTIVE"
                 }
             })
             if(id) {
+                // ============= update project =================
+                if(updated.status.equalsIgnoreCase("ACTIVE")){
+                    projectService.updatePercent(projectId, updated.progressPercent)
+                }
                 return new GraphQLRetVal<Boolean>(true, true, "Progress Report Updated.")
             }else{
+                // ============= update project =================
+                projectService.updatePercent(projectId, updated.progressPercent)
+                this.lockedOtherProgress(projectId, updated.id)
                 return new GraphQLRetVal<Boolean>(true, true, "Progress Report Added.")
             }
         }else{
             return new GraphQLRetVal<Boolean>(false, false, "Progress Report already added with the same date.")
         }
+    }
+
+    @GraphQLMutation(name = "lockedOtherProgress")
+    @Transactional
+    GraphQLRetVal<Boolean> lockedOtherProgress(
+            @GraphQLArgument(name = "projectId") UUID projectId,
+            @GraphQLArgument(name = "projectProgressId") UUID projectProgressId
+    ) {
+        def list = this.pProgressByListNotIn(projectId, projectProgressId)
+        list.each {
+            def update = it
+            update.status = "LOCKED"
+            save(update)
+        }
+        return new GraphQLRetVal<Boolean>(true, true, "Progress Report Updated.")
     }
 
 }

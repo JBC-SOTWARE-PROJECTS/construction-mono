@@ -41,6 +41,7 @@ import org.xmlsoap.schemas.soap.encoding.Array
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -127,9 +128,31 @@ class EmployeeResource {
             @RequestParam(name = "fields") String fields
     ){
 
-
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> fieldMap = objectMapper.readValue(fields, Map.class);
+
+
+        String attType = (String) fieldMap.get("type");
+        String attTime = (String) fieldMap.get("attendance_time");
+        //String employeeId = (String) fieldMap.get("employee_id");
+
+        if(attType.equals("OUT")){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date dateAtt = sdf.parse(attTime);
+
+            List<EmployeeAttendance>   employeeAttendance = employeeAttendanceService.getAttTypeByDate(employee, Instant.parse(attTime),attType);
+
+            if(employeeAttendance.size() > 0) {
+                for (EmployeeAttendance ea : employeeAttendance){
+                    String fieldsToIgnore = "{\"isIgnored\": \"true\"}";
+                    Map<String, Object> fieldMapToIgnore = objectMapper.readValue(fieldsToIgnore, Map.class);
+                    GraphQLResVal<EmployeeAttendance> toIgnore = employeeAttendanceService.upsertEmployeeAttendance(ea.id, ea.employee.id, ea.project ? ea.project.id : null ,fieldMapToIgnore );
+                }
+            }
+
+
+        }
+
 
         projectId = projectId.equals("") ? null : projectId;
 
@@ -147,7 +170,7 @@ class EmployeeResource {
 
         File file = convertMultipartFileToFile(capture);
         //  MultipartFile file = request.getFile("image");
-      spaceService.uploadFileToSpace(file, env.getProperty("do.env.type")+"/ATTENDANCE_CAPTURE/");
+      spaceService.uploadFileToSpace(file, "ATTENDANCE_CAPTURE");
       return "File uploaded successfully!";
 
     }
@@ -165,7 +188,7 @@ class EmployeeResource {
             }
 
             //  MultipartFile file = request.getFile("image");
-            spaceService.uploadMultiFileToSpace(files, env.getProperty("do.env.type")+"/ATTENDANCE_CAPTURE/");
+            spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE");
            return "true";
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -188,9 +211,29 @@ class EmployeeResource {
         ObjectMapper objectMapper = new ObjectMapper();
         List<EmployeeAttendanceDto> reqEmpAttObj = objectMapper.readValue(attendanceList, new TypeReference<List<EmployeeAttendanceDto>>() {});
 
-        ArrayList<EmployeeAttendance> empAttendance = new ArrayList<>();
 
+        ArrayList<EmployeeAttendance> empAttendance = new ArrayList<>();
         for (EmployeeAttendanceDto reAtt : reqEmpAttObj){
+
+            // Check if naay prev
+//            if(reAtt.type.equals("OUT")){
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//                Date dateAtt = sdf.parse(reAtt.attendance_time);
+//
+//                List<EmployeeAttendance>   employeeAttendance = employeeAttendanceService.getAttTypeByDate(reAtt.employee, Instant.parse(reAtt.attendance_time),reAtt.type);
+//
+//                if( employeeAttendance != null && employeeAttendance.size() > 0) {
+//                    for (EmployeeAttendance ea : employeeAttendance){
+//                        String fieldsToIgnore = "{\"isIgnored\": \"true\"}";
+//                        Map<String, Object> fieldMapToIgnore = objectMapper.readValue(fieldsToIgnore, Map.class);
+//                        GraphQLResVal<EmployeeAttendance> toIgnore = employeeAttendanceService.upsertEmployeeAttendance(ea.id, ea.employee.id, ea.project ? ea.project.id : null ,fieldMapToIgnore );
+//
+//                    }
+//                }
+//
+//
+//            }
+            // Check if naay prev
 
             EmployeeAttendance attendance = new EmployeeAttendance();
             Employee selectedEmployee = employeeRepository.findById(reAtt.employee).get();
@@ -203,6 +246,7 @@ class EmployeeResource {
             attendance.original_attendance_time = attTime;
             attendance.type = reAtt.type;
             attendance.originalType = reAtt.type;
+
            // attendance.project = projectService.findOne(reAtt.project);
             attendance.additionalNote = reAtt.additionalNote;
             attendance.referenceId = reAtt.referenceId;
@@ -219,8 +263,8 @@ class EmployeeResource {
 
         }
 
-        List<EmployeeAttendance> savedAttendances = employeeAttendanceService.syncAttendance((List<EmployeeAttendance>) empAttendance);
-
+        List<EmployeeAttendance>  savedAttendances = employeeAttendanceService.syncAttendance((List<EmployeeAttendance>) empAttendance);
+        savedAttendances.addAll(savedAttendances);
         ArrayList<EmployeeAttendanceDto> employeeAttendanceDtos= new ArrayList<>();
 
         for(EmployeeAttendance savedAttendance : savedAttendances){

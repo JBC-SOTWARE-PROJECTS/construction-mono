@@ -66,6 +66,7 @@ export type TDiverseTradeMenu = {
   subtitle?: string;
   icon?: JSX.Element;
   path?: string;
+  customPath?: boolean;
 };
 
 export interface IPaginationFilters {
