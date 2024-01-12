@@ -8,6 +8,7 @@ import {
 import InvoiceForm from '@/components/accountReceivables/invoice/form'
 import { invoiceTypeDetails } from '@/components/accountReceivables/invoice/form/helper'
 import InvoiceViewing from '@/components/accountReceivables/invoice/viewing'
+import PaymentTerminal from '@/components/accountReceivables/received-payments/dialog/payment-terminal'
 import {
   InvoiceStatusColorEnum,
   InvoiceStatusLabelEnum,
@@ -40,7 +41,7 @@ import numeral from 'numeral'
 export default function Invoice() {
   const invoiceFormDialog = useDialog(InvoiceForm)
   const invoiceViewingDialog = useDialog(InvoiceViewing)
-  // const paymentFormDialog = useDialog(PaymentPostingForm)
+  const paymentDialog = useDialog(PaymentTerminal)
   const [showPasswordConfirmation] = ConfirmationPasswordHook()
 
   const [onRemoveInvoice, { loading: removeInvoiceLoading }] =
@@ -57,11 +58,7 @@ export default function Invoice() {
   })
 
   const handleButtonClick = (record: any) => {
-    const { id, invoiceType, status } = record
-    // paymentFormDialog(
-    //   { type: 'OR', invoiceType, transactionType: 'INVOICE' },
-    //   () => refetch()
-    // )
+    paymentDialog({ type: 'OR' }, () => refetch())
   }
 
   const handleMenuClick = (key: string, record: any) => {
