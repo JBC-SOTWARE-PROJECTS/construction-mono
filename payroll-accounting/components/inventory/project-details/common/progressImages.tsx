@@ -146,6 +146,7 @@ export default function ProjectProgressImagesLists({
                 {(data?.pProgressImagesByList as ProjectProgressImages[]).map(
                   (image: ProjectProgressImages) => (
                     <div
+                    key={image.id}
                       style={{ height: 200, width: 200, position: "relative" }}>
                       {showDelete && (
                         <div
