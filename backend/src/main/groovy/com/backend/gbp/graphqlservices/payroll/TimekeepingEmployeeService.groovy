@@ -193,7 +193,9 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
                 timekeepingEmployee.projectBreakdown = []
                 timekeepingEmployee.salaryBreakdown = []
                 if (timekeepingEmployee.payrollEmployee.employee.isExcludedFromAttendance) {
-                    timekeepingEmployee.salaryBreakdown.push(calculateSalaryBreakdown(multiplier, null, timekeepingEmployee.payrollEmployee.employee))
+                    EmployeeSalaryDto salaryDto = calculateSalaryBreakdown(multiplier, null, timekeepingEmployee.payrollEmployee.employee)
+                    timekeepingEmployee.salaryBreakdown.push(salaryDto)
+                    timekeepingEmployee.totalSalary = salaryDto
                 } else {
                     timekeepingEmployee.accumulatedLogs.each { AccumulatedLogs accumulatedLogs ->
                         accumulatedLogs.projectBreakdown.each {

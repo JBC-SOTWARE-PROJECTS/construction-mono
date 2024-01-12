@@ -21,17 +21,17 @@ const CashierSideBarMenu = {
             name: "Terminals",
           },
           {
-            path: "/accounting/cashier/cashier-admin",
-            name: "Cashier Admin",
-          },
-          {
             path: "/accounting/cashier/collection-report",
             name: "Collection Reports",
           },
-          {
-            path: "/accounting/cashier/consolidation-report",
-            name: "Consolidation Reports",
-          },
+          // {
+          //   path: "/accounting/cashier/cashier-admin",
+          //   name: "Cashier Admin",
+          // },
+          // {
+          //   path: "/accounting/cashier/consolidation-report",
+          //   name: "Consolidation Reports",
+          // },
         ],
       },
     ],
