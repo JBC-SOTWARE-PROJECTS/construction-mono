@@ -15,7 +15,7 @@ import javax.persistence.*
 @TypeChecked
 @Entity
 @Table(schema = "public", name = "office")
-class Office extends AbstractAuditingEntity {
+class Office extends AbstractAuditingEntity implements Serializable{
 
 	@GraphQLQuery
 	@Id
