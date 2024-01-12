@@ -42,6 +42,10 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	String refNo
 
 	@GraphQLQuery
+	@Column(name = "item_no")
+	String itemNo
+
+	@GraphQLQuery
 	@Column(name = "description")
 	String description
 
@@ -62,12 +66,20 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	BigDecimal cost
 
 	@GraphQLQuery
+	@Column(name = "relative_weight")
+	BigDecimal relativeWeight
+
+	@GraphQLQuery
 	@Column(name = "status")
 	Boolean status
 
 	@GraphQLQuery
 	@Column(name = "tag_no")
 	String tagNo
+
+	@GraphQLQuery
+	@Column(name = "billed_qty")
+	BigDecimal billedQty
 
 	@Transient
 	BigDecimal getTotalCost() {

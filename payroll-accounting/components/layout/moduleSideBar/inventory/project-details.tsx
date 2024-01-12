@@ -5,27 +5,32 @@ const InventoryProjectMenu = (query: string) => {
       routes: [
         {
           path: `/inventory/project-details/${query}`,
-          name: "Projects Menu",
+          name: 'Projects Menu',
           routes: [
             {
-              key: "bill-quantities",
+              key: 'bill-quantities',
               path: `/inventory/project-details/${query}/bill-quantities`,
-              name: "Bill of Quantities",
+              name: 'Bill of Quantities',
             },
             {
-              key: "accomplishments",
+              key: 'work-accomplishments',
+              path: `/inventory/project-details/${query}/work-accomplishments`,
+              name: 'Work Accomplishments',
+            },
+            {
+              key: 'accomplishments',
               path: `/inventory/project-details/${query}/accomplishments`,
-              name: "Accomplishment Reports",
+              name: 'Accomplishment Reports',
             },
             {
-              key: "progress",
+              key: 'progress',
               path: `/inventory/project-details/${query}/progress`,
-              name: "Progress Reports",
+              name: 'Progress Reports',
             },
             {
-              key: "materials",
+              key: 'materials',
               path: `/inventory/project-details/${query}/materials`,
-              name: "Project Materials Used",
+              name: 'Project Materials Used',
             },
             // {
             //   key: "expenses",
@@ -33,18 +38,18 @@ const InventoryProjectMenu = (query: string) => {
             //   name: "Project Expenses",
             // },
             {
-              key: "inventory",
+              key: 'inventory',
               path: `/inventory/project-details/${query}/inventory`,
-              name: "Inventory Monitoring",
+              name: 'Inventory Monitoring',
             },
           ],
         },
       ],
     },
     location: {
-      pathname: "/",
+      pathname: '/',
     },
-  };
-};
+  }
+}
 
-export default InventoryProjectMenu;
+export default InventoryProjectMenu
