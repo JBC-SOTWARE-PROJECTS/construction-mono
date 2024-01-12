@@ -511,3 +511,9 @@ export const endorsement = {
   tailLightRH: false,
   tailLightLH: false,
 };
+
+export const PR_PO_TYPE = [
+  { label: "PROJECTS", value: "PROJECTS" },
+  { label: "SPARE SPARTS", value: "SPARE_PARTS" },
+  { label: "PERSONAL", value: "PERSONAL" },
+];

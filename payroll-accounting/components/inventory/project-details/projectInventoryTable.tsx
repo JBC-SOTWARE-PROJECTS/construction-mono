@@ -45,6 +45,7 @@ export default function ProjectInventoryMonitoringTable({
       dataIndex: "brand",
       key: "brand",
       width: 140,
+      render: (text) => <span>{text ?? "--"}</span>,
     },
     {
       title: (

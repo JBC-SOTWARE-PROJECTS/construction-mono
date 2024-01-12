@@ -539,4 +539,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/77_wilson_update_inventory_views.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/78_wilson_PR_PO_DR_additional_column.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/79_wilson_transaction_inventory_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/80_wilson_update_inventory_supplier_company.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

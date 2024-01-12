@@ -41,7 +41,7 @@ export default function AccomplishmentsContent() {
       variables: {
         filter: state.filter,
         office: projectInfo?.location?.id ?? null,
-        groupId: groupId,
+        group: groupId,
         category: category,
         brand: state.brand ?? "",
         page: state.page,

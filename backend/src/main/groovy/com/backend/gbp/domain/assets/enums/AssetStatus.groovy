@@ -11,5 +11,6 @@ enum AssetStatus {
     RESERVED,
     UNDER_INSPECTION,
     IDLE,
-    ACTIVE
+    ACTIVE,
+    ON_SERVICE
 }

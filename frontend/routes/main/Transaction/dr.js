@@ -82,6 +82,11 @@ const GET_RECORDS = gql`
           id
           description
         }
+        category
+        assets {
+          id
+          description
+        }
         receivedRemarks
         fixDiscount
         grossAmount
