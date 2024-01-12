@@ -188,7 +188,8 @@ class EmployeeResource {
             }
 
             //  MultipartFile file = request.getFile("image");
-            spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE");
+           // spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE");
+            spaceService.uploadMultiFileToSpace(files, env.getProperty("do.env.type")+"/ATTENDANCE_CAPTURE/");
            return "true";
         } catch (InterruptedException e) {
             e.printStackTrace();
