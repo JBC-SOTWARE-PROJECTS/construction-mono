@@ -65,8 +65,15 @@ const useGetEmployeeAttendance = () => {
     (variables: IVariables) => void,
     any,
     boolean,
-    () => void
-  ] = [getEmployeeSchedule, data?.logs, loading, refetch];
+    () => void,
+    number
+  ] = [
+    getEmployeeSchedule,
+    data?.logs,
+    loading,
+    refetch,
+    data?.logs?.totalElements,
+  ];
 
   return returnValue;
 };

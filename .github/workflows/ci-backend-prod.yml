@@ -1,0 +1,56 @@
+name: CONSTRUCTION BACKEND PROD
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "backend/**"
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  build:
+    # if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'staging/')
+    # environment: staging
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version_getter.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: "8"
+          distribution: "adopt-openj9"
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -Pprofile=prod build --no-daemon
+          build-root-directory: backend
+          gradle-version: 6.8
+      - name: Get Version from Gradle build.gradle
+        id: version_getter
+        run: |
+          echo "DIR $(pwd)"echo "DIR $(pwd)"
+          echo "version=$(/home/runner/gradle-installations/installs/gradle-6.8/bin/gradle properties --no-daemon --console=plain -q --no-daemon | grep "^version:" | awk '{printf $2}')" >> $GITHUB_OUTPUT
+          /home/runner/gradle-installations/installs/gradle-6.8/bin/gradle properties --no-daemon --console=plain -q --no-daemon | grep "^version:" | awk '{printf $2}'
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Check Directory
+        run: |
+          echo "DIR $(pwd)"
+          echo "${{ steps.version_getter.outputs.version }}"
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./backend
+          push: true
+          tags: acemcbmis/ptk-backend-prod:${{ steps.version_getter.outputs.version }}
+          build-args: PROJ_VERSION=${{ steps.version_getter.outputs.version }}
