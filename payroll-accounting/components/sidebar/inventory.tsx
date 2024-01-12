@@ -101,7 +101,8 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     subtitle:
       "Quick Glance: Streamlined Inventory Reporting for Efficient Analysis.",
     icon: <BookOutlined className="diverse-trade-icon" />,
-    path: "/inventory/reports",
+    path: `${frontEndUrl}/main/reports/stockcard`,
+    customPath: true,
   },
 ];
 
