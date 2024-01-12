@@ -134,23 +134,27 @@ class PayrollReportResource {
 //
 //                }
 
+                def totalSalary = employee?.timekeepingEmployee?.totalSalary
+                def totalHours = employee?.timekeepingEmployee?.totalHours
 
-                    grossDtoList.push(new GrossDto(
+
+
+                grossDtoList.push(new GrossDto(
                             description: "Over Time",
-                            nohours: (overTime ?: 0) as Integer,
+                            nohours: totalHours.overtime,
                             rate: (hourlyRate * multiplier.regularOvertime) as Integer,
                             total: (employee?.timekeepingEmployee?.salaryBreakdown?.overtime ?: 0) as Integer
                     ))
                     grossDtoList.push(new GrossDto(
                             description: "Regular",
-                            nohours:( regular ?: 0) as Integer,
+                            nohours: totalHours?.regular,
                             rate: (hourlyRate * multiplier.regular) as Integer,
                             total: (employee?.timekeepingEmployee?.salaryBreakdown?.regular ?: 0) as Integer
                     ))
 
                     grossDtoList.push(new GrossDto(
                             description: "Regular Holiday",
-                            nohours: (regularHoliday ?: 0) as Integer,
+                            nohours:  totalHours.regularHoliday,
                             rate: (hourlyRate *  multiplier.regularHoliday) as Integer,
                             total: (employee?.timekeepingEmployee?.salaryBreakdown?.regularHoliday ?: 0) as Integer
                     ))
@@ -245,7 +249,7 @@ class PayrollReportResource {
                             description: "Withholding Tax",
                             nohours: 100,
                             rate: 100,
-                            total: 200
+                            total: 0
                     ))
 //
                     deductionDtoList.push(new DeductionDto(

@@ -71,26 +71,26 @@ class HeadersDto{
 @Canonical
 class GrossDto {
     String  description
-    Integer nohours
-    Integer rate
-    Integer total
+    BigDecimal nohours
+    BigDecimal rate
+    BigDecimal total
     Double totalGross
 }
 
 @Canonical
 class DeductionDto {
     String description
-    Integer nohours
-    Integer rate
-    Integer total
+    BigDecimal nohours
+    BigDecimal rate
+    BigDecimal total
 }
 
 @Canonical
 class  SummaryDto{
     String description
-    Integer nohours
-    Integer rate
-    Integer total
+    BigDecimal nohours
+    BigDecimal rate
+    BigDecimal total
 }
 
 

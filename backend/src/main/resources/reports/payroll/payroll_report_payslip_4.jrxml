@@ -94,34 +94,34 @@
 		<field name="dateprinted" class="java.sql.Date"/>
 	</subDataset>
 	<subDataset name="DatasetGross" uuid="341e8707-a064-49b3-92ea-f94ae838bb2d">
-		<parameter name="totalGross" class="java.lang.Double"/>
+		<parameter name="totalGross" class="java.math.BigDecimal"/>
 		<queryString>
 			<![CDATA[]]>
 		</queryString>
 		<field name="description" class="java.lang.String"/>
-		<field name="nohours" class="java.lang.Integer"/>
-		<field name="rate" class="java.lang.Integer"/>
-		<field name="total" class="java.lang.Integer"/>
+		<field name="nohours" class="java.math.BigDecimal"/>
+		<field name="rate" class="java.math.BigDecimal"/>
+		<field name="total" class="java.math.BigDecimal"/>
 	</subDataset>
 	<subDataset name="DatasetDeduction" uuid="1ffa0bec-4e10-42f8-80b3-53affa363d7a">
-		<parameter name="totalDeduction" class="java.lang.Double"/>
+		<parameter name="totalDeduction" class="java.math.BigDecimal"/>
 		<queryString>
 			<![CDATA[]]>
 		</queryString>
 		<field name="description" class="java.lang.String"/>
-		<field name="nohours" class="java.lang.Integer"/>
-		<field name="rate" class="java.lang.Integer"/>
-		<field name="total" class="java.lang.Integer"/>
+		<field name="nohours" class="java.math.BigDecimal"/>
+		<field name="rate" class="java.math.BigDecimal"/>
+		<field name="total" class="java.math.BigDecimal"/>
 	</subDataset>
 	<subDataset name="DatasetSummary" uuid="32b2a10c-3ae7-4114-b2af-7045d44d8b17">
-		<parameter name="totalAdjustment" class="java.lang.Double"/>
+		<parameter name="totalAdjustment" class="java.math.BigDecimal"/>
 		<queryString>
 			<![CDATA[]]>
 		</queryString>
 		<field name="description" class="java.lang.String"/>
-		<field name="nohours" class="java.lang.Integer"/>
-		<field name="rate" class="java.lang.Integer"/>
-		<field name="total" class="java.lang.Integer"/>
+		<field name="nohours" class="java.math.BigDecimal"/>
+		<field name="rate" class="java.math.BigDecimal"/>
+		<field name="total" class="java.math.BigDecimal"/>
 	</subDataset>
 	<parameter name="params1" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="params2" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
