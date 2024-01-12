@@ -34,6 +34,16 @@ class TimekeepingEmployee extends PayrollEmployeeAuditingEntity implements Seria
 
     @Type(type = "jsonb")
     @GraphQLQuery
+    @Column(name="total_hours",columnDefinition = "jsonb")
+    HoursLog totalHours
+
+    @Type(type = "jsonb")
+    @GraphQLQuery
+    @Column(name="total_salary",columnDefinition = "jsonb")
+    EmployeeSalaryDto totalSalary
+
+    @Type(type = "jsonb")
+    @GraphQLQuery
     @Column(name="project_breakdown",columnDefinition = "jsonb")
     List<HoursLog> projectBreakdown
 

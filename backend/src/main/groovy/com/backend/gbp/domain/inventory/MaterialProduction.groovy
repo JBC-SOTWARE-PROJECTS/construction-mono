@@ -35,8 +35,8 @@ class MaterialProduction extends AbstractAuditingEntity implements Serializable 
 	@GraphQLQuery
 	@Column(name = "mp_no", columnDefinition = "varchar")
 	String mpNo
-	
-	@NotFound(action = NotFoundAction.IGNORE)
+
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "office", referencedColumnName = "id")
 	Office office
@@ -46,8 +46,7 @@ class MaterialProduction extends AbstractAuditingEntity implements Serializable 
 	String description
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "produced_by", referencedColumnName = "id")
 	Employee producedBy
 
@@ -58,5 +57,9 @@ class MaterialProduction extends AbstractAuditingEntity implements Serializable 
 	@GraphQLQuery
 	@Column(name = "is_void")
 	Boolean isVoid
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 }

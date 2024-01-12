@@ -36,13 +36,11 @@ class BeginningBalance extends AbstractAuditingEntity {
 	Instant dateTrans
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "office", referencedColumnName = "id")
 	Office office
@@ -62,6 +60,10 @@ class BeginningBalance extends AbstractAuditingEntity {
 	@GraphQLQuery
 	@Column(name = "is_cancel")
 	Boolean isCancel
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 
 	@GraphQLQuery(name = "unitMeasurement")
 	@Transient

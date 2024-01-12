@@ -76,6 +76,11 @@ const GET_RECORDS = gql`
           id
           description
         }
+        category
+        assets {
+          id
+          description
+        }
         remarks
       }
       size

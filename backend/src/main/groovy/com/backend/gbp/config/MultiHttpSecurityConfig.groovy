@@ -145,6 +145,7 @@ class MultiHttpSecurityConfig {
 					.antMatchers("/public/**").permitAll()
 					.antMatchers("/").permitAll()
 					.antMatchers("/user/**").permitAll()
+					.antMatchers("/project/**").permitAll()
 		}
 	}
 

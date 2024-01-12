@@ -15,7 +15,13 @@ export default function MenuCard({ menus }: IProps) {
           <div
             className="menu-item-container cursor-pointer"
             key={index}
-            onClick={() => router.push(menu.path ?? "/")}
+            onClick={() => {
+              if(menu.customPath){
+                window.open(menu.path)
+              }else{
+                router.push(menu.path ?? "/")
+              }
+            }}
           >
             <div className="menu-icon">{menu.icon}</div>
             <div className="menu-item-left-container">

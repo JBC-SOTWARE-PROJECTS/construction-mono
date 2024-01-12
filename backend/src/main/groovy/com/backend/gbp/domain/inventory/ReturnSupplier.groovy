@@ -86,5 +86,9 @@ class ReturnSupplier extends AbstractAuditingEntity implements Serializable{
 	@GraphQLQuery
 	@Column(name = "is_void", columnDefinition = 'bool')
 	Boolean isVoid
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 }

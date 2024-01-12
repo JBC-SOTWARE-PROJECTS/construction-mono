@@ -8,6 +8,7 @@ import com.backend.gbp.domain.inventory.PurchaseRequestItem
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseDto
 import com.backend.gbp.rest.dto.PurchasePODto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -62,9 +63,11 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
 
     @GraphQLQuery(name = "poNotYetCompleted")
     List<PurchaseOrder> poNotYetCompleted() {
-        String query = '''Select e from PurchaseOrder e where e.isCompleted = :status or e.isCompleted is null'''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from PurchaseOrder e where e.isCompleted = :status or e.isCompleted is null and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', false)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.poNumber }
     }
 
@@ -84,7 +87,7 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
 			@GraphQLArgument(name = "size") Integer size
 	) {
 
-
+        def company = SecurityUtils.currentCompanyId()
 		String query = '''Select po from PurchaseOrder po where
 						(lower(po.prNos) like lower(concat('%',:filter,'%')) or
 						lower(po.poNumber) like lower(concat('%',:filter,'%')))
@@ -104,6 +107,13 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
         params.put('office', office)
         params.put('startDate', start)
         params.put('endDate', end)
+
+        if (company) {
+            query += ''' and (po.company = :company)'''
+            countQuery += ''' and (po.company = :company)'''
+            params.put("company", company)
+        }
+
 
         if(supplier){
             query += ''' and (po.supplier.id = :supplier)'''
@@ -126,15 +136,29 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
             @GraphQLArgument(name = "forRemove") ArrayList<Map<String, Object>> forRemove,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         def po = upsertFromMap(id, fields, { PurchaseOrder entity , boolean forInsert ->
             if(forInsert){
-                entity.poNumber = generatorService.getNextValue(GeneratorType.PO_NO, {
-                    return "PO-" + StringUtils.leftPad(it.toString(), 6, "0")
-                })
+                def code = "PO"
+
                 entity.status = "FOR APPROVAL"
                 entity.isApprove = false
                 entity.isVoided = false
                 entity.isCompleted = false
+                entity.company = company
+
+                if(entity.project?.id){
+                    code = entity.project?.prefixShortName
+                }else if(entity.assets?.id){
+                    code = entity.assets?.prefix
+                }
+
+                entity.poNumber = generatorService.getNextValue(GeneratorType.PO_NO, {
+                    return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+                })
+
+
             }
         })
         //remove items if there is

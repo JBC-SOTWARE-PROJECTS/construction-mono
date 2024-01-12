@@ -14,7 +14,6 @@ import ProjectHeader from "@/components/inventory/project-details/common/project
 import { useRouter } from "next/router";
 import _ from "lodash";
 import UpsertAccomplishmentReport from "@/components/inventory/project-details/dialogs/upsertAccomplishments";
-import AccessControl from "@/components/accessControl/AccessControl";
 import AccomplishmentLists from "@/components/inventory/project-details/accomplishmentLists";
 
 const { Search } = Input;
@@ -54,6 +53,7 @@ export default function AccomplishmentsContent() {
 
   return (
     <PageContainer
+      className="project-details"
       pageHeaderRender={(e) => <ProjectHeader id={query?.id as string} />}>
       <ProCard
         title="Accomplishment Reports"
@@ -64,17 +64,15 @@ export default function AccomplishmentsContent() {
         headerBordered
         size="small"
         extra={
-          <AccessControl allowedPermissions={["add_bill_of_quantities"]}>
-            <ProFormGroup size="small">
-              <Button
-                size="small"
-                type="primary"
-                icon={<PlusCircleOutlined />}
-                onClick={() => onUpsertRecord()}>
-                Add Accomplishment Report
-              </Button>
-            </ProFormGroup>
-          </AccessControl>
+          <ProFormGroup size="small">
+            <Button
+              size="small"
+              type="primary"
+              icon={<PlusCircleOutlined />}
+              onClick={() => onUpsertRecord()}>
+              Add Accomplishment Report
+            </Button>
+          </ProFormGroup>
         }>
         <div className="w-full mb-5">
           <Form layout="vertical" className="filter-form">
