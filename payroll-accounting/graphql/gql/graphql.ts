@@ -909,6 +909,7 @@ export enum AssetStatus {
   InRepair = 'IN_REPAIR',
   InService = 'IN_SERVICE',
   InTransit = 'IN_TRANSIT',
+  NoService = 'NO_SERVICE',
   OnService = 'ON_SERVICE',
   OutOfService = 'OUT_OF_SERVICE',
   Reserved = 'RESERVED',
@@ -10089,8 +10090,6 @@ export type Query = {
   activePositions?: Maybe<Array<Maybe<Position>>>;
   /** List of Shift Per emp */
   activeShift?: Maybe<Shift>;
-  /** List of Shift Per emp */
-  activeShiftList?: Maybe<Array<Maybe<Shift>>>;
   allItemBySupplier?: Maybe<Array<Maybe<SupplierItem>>>;
   allSupplierByItem?: Maybe<Array<Maybe<SupplierItem>>>;
   apAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
@@ -10817,13 +10816,6 @@ export type QueryItemExpenseArgs = {
 /** Query root */
 export type QueryAccountsItemsByParentArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Query root */
-export type QueryActiveShiftListArgs = {
-  active?: InputMaybe<Scalars['Boolean']['input']>;
-  filter?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -14605,7 +14597,6 @@ export type ServiceManagementInput = {
 export type Shift = {
   __typename?: 'Shift';
   active?: Maybe<Scalars['Boolean']['output']>;
-  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   employee?: Maybe<Employee>;
@@ -14874,7 +14865,6 @@ export type SupplierTypeInput = {
 
 export type Terminal = {
   __typename?: 'Terminal';
-  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
