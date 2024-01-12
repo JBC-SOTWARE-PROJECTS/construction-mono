@@ -311,7 +311,7 @@ export type AccumulatedLogs = {
   isRestDay?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<AccumulatedLogsMessage>;
   outTime?: Maybe<Scalars['Instant']['output']>;
   projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
   scheduleEnd?: Maybe<Scalars['Instant']['output']>;
@@ -319,6 +319,13 @@ export type AccumulatedLogs = {
   scheduleTitle?: Maybe<Scalars['String']['output']>;
   timekeepingEmployee?: Maybe<TimekeepingEmployee>;
 };
+
+export enum AccumulatedLogsMessage {
+  Absent = 'ABSENT',
+  Holiday = 'HOLIDAY',
+  Leave = 'LEAVE',
+  NoSchedule = 'NO_SCHEDULE'
+}
 
 export type AdjustmentCategory = {
   __typename?: 'AdjustmentCategory';
@@ -902,6 +909,7 @@ export enum AssetStatus {
   InRepair = 'IN_REPAIR',
   InService = 'IN_SERVICE',
   InTransit = 'IN_TRANSIT',
+  NoService = 'NO_SERVICE',
   OnService = 'ON_SERVICE',
   OutOfService = 'OUT_OF_SERVICE',
   Reserved = 'RESERVED',
@@ -10082,8 +10090,6 @@ export type Query = {
   activePositions?: Maybe<Array<Maybe<Position>>>;
   /** List of Shift Per emp */
   activeShift?: Maybe<Shift>;
-  /** List of Shift Per emp */
-  activeShiftList?: Maybe<Array<Maybe<Shift>>>;
   allItemBySupplier?: Maybe<Array<Maybe<SupplierItem>>>;
   allSupplierByItem?: Maybe<Array<Maybe<SupplierItem>>>;
   apAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
@@ -10810,13 +10816,6 @@ export type QueryItemExpenseArgs = {
 /** Query root */
 export type QueryAccountsItemsByParentArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
-};
-
-
-/** Query root */
-export type QueryActiveShiftListArgs = {
-  active?: InputMaybe<Scalars['Boolean']['input']>;
-  filter?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -14598,7 +14597,6 @@ export type ServiceManagementInput = {
 export type Shift = {
   __typename?: 'Shift';
   active?: Maybe<Scalars['Boolean']['output']>;
-  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   employee?: Maybe<Employee>;
@@ -14867,7 +14865,6 @@ export type SupplierTypeInput = {
 
 export type Terminal = {
   __typename?: 'Terminal';
-  company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
