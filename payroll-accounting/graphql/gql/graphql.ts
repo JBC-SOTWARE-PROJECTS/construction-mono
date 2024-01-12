@@ -311,7 +311,7 @@ export type AccumulatedLogs = {
   isRestDay?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<AccumulatedLogsMessage>;
   outTime?: Maybe<Scalars['Instant']['output']>;
   projectBreakdown?: Maybe<Array<Maybe<HoursLog>>>;
   scheduleEnd?: Maybe<Scalars['Instant']['output']>;
@@ -319,6 +319,13 @@ export type AccumulatedLogs = {
   scheduleTitle?: Maybe<Scalars['String']['output']>;
   timekeepingEmployee?: Maybe<TimekeepingEmployee>;
 };
+
+export enum AccumulatedLogsMessage {
+  Absent = 'ABSENT',
+  Holiday = 'HOLIDAY',
+  Leave = 'LEAVE',
+  NoSchedule = 'NO_SCHEDULE'
+}
 
 export type AdjustmentCategory = {
   __typename?: 'AdjustmentCategory';

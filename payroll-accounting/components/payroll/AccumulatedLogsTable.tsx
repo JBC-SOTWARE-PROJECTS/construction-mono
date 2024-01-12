@@ -1,5 +1,6 @@
 import {
   AccumulatedLogs,
+  AccumulatedLogsMessage,
   HoursLog,
   TimekeepingEmployeeDto,
 } from "@/graphql/gql/graphql";
@@ -46,11 +47,11 @@ function AccumulatedLogsTable({
   const onCellProps = (record: AccumulatedLogs, key: keyof HoursLog) => {
     const hours = record?.hours?.[key] || 0;
     var style: CSSProperties = { textAlign: "center" };
-    if (hours > 0)
+    if (hours > 0 && !isHolidayAndHasRawLogs(record))
       style = { ...style, backgroundColor: "#d7fada", color: "#2c8a34" };
     return { style };
   };
-  console.log(displayedEmployee?.status === "FINALIZED");
+
   const underPerformanceCell = (
     record: AccumulatedLogs,
     key: keyof HoursLog
@@ -62,8 +63,21 @@ function AccumulatedLogsTable({
     return { style };
   };
 
-  const render = (value: any) => {
-    return value && round(value, 4);
+  const isHolidayAndHasRawLogs = (record: AccumulatedLogs) => {
+    return (
+      record?.message === AccumulatedLogsMessage.Holiday &&
+      !record?.inTime &&
+      !record?.outTime
+    );
+  };
+
+  const render = (value: any, record: AccumulatedLogs) => {
+    if (
+      record?.message == AccumulatedLogsMessage.Leave ||
+      isHolidayAndHasRawLogs(record)
+    )
+      return 0;
+    else return value && round(value, 4);
   };
 
   const confirmRecalculate = (record: AccumulatedLogs) => {
@@ -86,10 +100,10 @@ function AccumulatedLogsTable({
       title: "Date",
       dataIndex: "date",
       key: "date",
-      width: 250,
+      width: 300,
       render: (value: any, record: AccumulatedLogs) => (
         <Row>
-          <Col span={16}>
+          <Col span={12}>
             {!record.isError ? (
               <CheckCircleOutlined style={{ color: "green" }} />
             ) : (
@@ -97,11 +111,17 @@ function AccumulatedLogsTable({
             )}{" "}
             {dayjs(value).format("ddd, MMM DD, YYYY  ")}
           </Col>
-          <Col span={8}>
+          <Col span={12}>
             {record?.message && (
-              <Tag color={record.isError ? "red" : "blue"}>
-                {record?.message}
-              </Tag>
+              <>
+                <Tag color={record.isError ? "red" : "blue"}>
+                  {record?.message}
+                </Tag>
+                {record?.message == AccumulatedLogsMessage.Leave &&
+                  record?.hours?.regular > 0 && (
+                    <Tag color="green">WITH PAY</Tag>
+                  )}
+              </>
             )}
           </Col>
         </Row>
@@ -352,9 +372,15 @@ function AccumulatedLogsTable({
           ];
           pageData.forEach((item: AccumulatedLogs) => {
             keys.forEach((key) => {
-              obj[key] =
-                (item?.hours ? item?.hours[key as keyof HoursLog] : 0) +
-                (obj[key] ? obj[key] : 0);
+              if (
+                item?.message == AccumulatedLogsMessage.Leave ||
+                isHolidayAndHasRawLogs(item)
+              )
+                obj[key] = 0;
+              else
+                obj[key] =
+                  (item?.hours ? item?.hours[key as keyof HoursLog] : 0) +
+                  (obj[key] ? obj[key] : 0);
             });
           });
 

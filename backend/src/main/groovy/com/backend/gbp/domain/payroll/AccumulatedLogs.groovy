@@ -5,6 +5,7 @@ import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.hrm.dto.AccumulatedLogsDto
 import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.payroll.common.PayrollEmployeeAuditingEntity
+import com.backend.gbp.domain.payroll.enums.AccumulatedLogsMessage
 import com.fasterxml.jackson.annotation.JsonIgnore
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -59,9 +60,10 @@ class AccumulatedLogs extends AbstractAuditingEntity implements Serializable {
     @Column(name = "out_time", columnDefinition = "timestamp")
     Instant outTime
 
+    @Enumerated(EnumType.STRING)
     @GraphQLQuery
     @Column(name = "message", columnDefinition = "varchar")
-    String message
+    AccumulatedLogsMessage message
 
     @GraphQLQuery
     @Column(name = "is_error", columnDefinition = "bool")
