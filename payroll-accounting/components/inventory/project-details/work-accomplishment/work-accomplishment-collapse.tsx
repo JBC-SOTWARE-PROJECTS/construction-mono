@@ -50,6 +50,43 @@ export default function WorkAccomplishmentsCollapse(
     )
   }
 
+  const ButtonLock = ({ record }: { record: ProjectWorkAccomplish }) => {
+    if (record.status == 'OPEN') {
+      return (
+        <Popconfirm
+          placement='topLeft'
+          title='Toggle Lock'
+          description='Proceed with toggling the lock?'
+          onConfirm={() => confirm(record?.id)}
+          okText='Yes'
+          cancelText='No'
+        >
+          <Button
+            type='primary'
+            size='small'
+            icon={<UnlockOutlined />}
+            style={{
+              background: '#4096ff',
+            }}
+          />
+        </Popconfirm>
+      )
+    }
+
+    return (
+      <Button
+        type='primary'
+        size='small'
+        icon={
+          record?.status == 'LOCKED' ? <LockOutlined /> : <UnlockOutlined />
+        }
+        style={{
+          background: record?.status == 'LOCKED' ? 'red' : '#4096ff',
+        }}
+      />
+    )
+  }
+
   return (
     <Row>
       <Col span={24}>
@@ -62,29 +99,7 @@ export default function WorkAccomplishmentsCollapse(
             children: <WorkAccomplishmentsTable projectId={works?.id} />,
             extra: (
               <Space>
-                <Popconfirm
-                  placement='topLeft'
-                  title='Toggle Lock'
-                  description='Proceed with toggling the lock?'
-                  onConfirm={() => confirm(works?.id)}
-                  okText='Yes'
-                  cancelText='No'
-                >
-                  <Button
-                    type='primary'
-                    size='small'
-                    icon={
-                      works?.status == 'LOCKED' ? (
-                        <LockOutlined />
-                      ) : (
-                        <UnlockOutlined />
-                      )
-                    }
-                    style={{
-                      background: works?.status == 'LOCKED' ? 'red' : '#4096ff',
-                    }}
-                  />
-                </Popconfirm>
+                <ButtonLock record={works} />
 
                 <Button
                   type='primary'

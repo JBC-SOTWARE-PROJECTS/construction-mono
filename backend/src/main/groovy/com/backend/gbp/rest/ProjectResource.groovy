@@ -53,6 +53,11 @@ class StatementOfWorkAccomplishedDto {
 	String contractor
 	String periodStart
 	String periodEnd
+	String preparedBy
+	String verifiedBy
+	String checkedBy
+	String recommendBy
+	String paymentBy
 }
 
 @RestController
@@ -87,11 +92,27 @@ class ProjectResource {
 			parameters.put('work_items', new JRBeanCollectionDataSource(items))
 		}
 
+		def inputFormat = new SimpleDateFormat("yyyy-MM-dd")
+		def outputFormat = new SimpleDateFormat("MMMM d,yyyy")
+
+		def start = inputFormat.parse(accomplish.periodStart)
+		def formattedStart = outputFormat.format(start)
+
+		def end = inputFormat.parse(accomplish.periodEnd)
+		def formattedEnd = outputFormat.format(end)
+
 		def dto = new StatementOfWorkAccomplishedDto(
 				contractId: project.contractId,
 				contractName: project.description,
 				location: project.location.fullAddress,
-				contractor: ""
+				contractor: "",
+				periodStart:formattedStart,
+				periodEnd: formattedEnd,
+				preparedBy: accomplish.preparedBy,
+				verifiedBy: accomplish.verifiedBy,
+				checkedBy: accomplish.checkedBy,
+				recommendBy: accomplish.recommendingApproval,
+				paymentBy: accomplish.approvedForPayment,
 		)
 
 		def gson = new Gson()

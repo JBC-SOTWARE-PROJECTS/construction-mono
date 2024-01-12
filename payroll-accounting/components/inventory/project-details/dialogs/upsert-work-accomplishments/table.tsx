@@ -224,7 +224,6 @@ export default function UpsertWorkAccomplishmentsTable(
           dataIndex: 'prevQty',
           align: 'right',
           width: 50,
-          editable: true,
           render: (text: number) => (text > 0 ? text : '-') ?? '-',
         },
         {
