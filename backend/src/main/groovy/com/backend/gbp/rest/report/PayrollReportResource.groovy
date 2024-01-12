@@ -170,7 +170,10 @@ class PayrollReportResource {
 
 
 
-                    grossDtoList.push(new GrossDto(
+                def totalNetPay = totalSalary?.regular + totalSalary?.overtime + totalSalary?.regularHoliday;
+                def deductio =  totalSalary?.late + totalSalary?.underTime;
+
+                grossDtoList.push(new GrossDto(
                             description: "Over Time",
                             nohours: ((totalHours?.overtime ?: 0.0) as BigDecimal).round(2),
                             rate: ((hourlyRate * multiplier?.regularOvertime ?: 0.0) as BigDecimal).round(2),
@@ -326,7 +329,7 @@ class PayrollReportResource {
 //                            totalGross: 1000,
 //                            totalDeduction: 1000,
 //                            totalAdjustment: 1000,
-//                            netpay: 1000
+                            netpay: totalNetPay,
                             dateprinted: formattedDate
 
                     )

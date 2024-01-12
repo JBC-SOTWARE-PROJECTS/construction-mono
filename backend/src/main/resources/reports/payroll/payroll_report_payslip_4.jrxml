@@ -77,7 +77,7 @@
 		<field name="descriptionField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="deductionField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="summaryField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-		<field name="netpay" class="java.lang.Double"/>
+		<field name="netpay" class="java.math.BigDecimal"/>
 		<field name="dateprinted" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="Dataset2" uuid="df8c833a-f638-4ebf-bd22-2dbdeed4fb59">
@@ -90,7 +90,7 @@
 		<field name="descriptionField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="deductionField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="summaryField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-		<field name="netpay" class="java.lang.Double"/>
+		<field name="netpay" class="java.math.BigDecimal"/>
 		<field name="dateprinted" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="DatasetGross" uuid="341e8707-a064-49b3-92ea-f94ae838bb2d">

@@ -22,7 +22,7 @@ class PayslipPayrollDto {
     Double totalGross
     Double totalDeduction
     Double totalAdjustment
-    Double netpay
+    BigDecimal netpay
     String dateprinted
 
 }
