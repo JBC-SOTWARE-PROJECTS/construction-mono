@@ -41,7 +41,7 @@ import {
 } from "@/hooks/payables";
 import { useConfirmationPasswordHook, useDialog } from "@/hooks";
 import ViewJournalEntries from "../journalentries/viewJournalEntries";
-import RPJournalEntries from "../journalentries/rpJournalEntries";
+import PCVJournalEntries from "../journalentries/pcvJournalEntries";
 import FormDatePicker from "@/components/common/formDatePicker/formDatePicker";
 import FormInputNumber from "@/components/common/formInputNumber/formInputNumber";
 import PCVPurchaseTable from "../pettycash/component/purchasesTable";
@@ -82,7 +82,7 @@ export default function PettyCashModal(props: IProps) {
 
   const [saveCloseLoading, setSaveCloseLoading] = useState(false);
   // ======================= Modal ===============================
-  const journalEntries = useDialog(RPJournalEntries);
+  const journalEntries = useDialog(PCVJournalEntries);
   const viewEntries = useDialog(ViewJournalEntries);
   // ===================== Queries ==============================
   const transactionList = useAPTransactionTypeOthers({

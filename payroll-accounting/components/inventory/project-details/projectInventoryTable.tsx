@@ -115,7 +115,7 @@ export default function ProjectInventoryMonitoringTable({
       render: (_, record) => {
         return (
           <Button
-            type="dashed"
+            type="primary"
             size="small"
             onClick={() => handleOpen(record)}
             icon={<EditFilled />}
