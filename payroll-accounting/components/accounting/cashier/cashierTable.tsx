@@ -1,7 +1,7 @@
 import { Billing } from "@/graphql/gql/graphql";
 import { currency } from "@/utility/constant";
-import { DateFormatter, NumberFormater } from "@/utility/helper";
-import { FolderOpenOutlined, MoneyCollectOutlined } from "@ant-design/icons";
+import { DateFormatterWithTime, NumberFormater } from "@/utility/helper";
+import { MoneyCollectOutlined } from "@ant-design/icons";
 import { Row, Col, Table, Pagination, Button, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import _ from "lodash";
@@ -26,7 +26,7 @@ export default function CashierTable({
       title: "Transaction Date",
       dataIndex: "dateTrans",
       key: "dateTrans",
-      render: (date) => DateFormatter(date),
+      render: (date) => DateFormatterWithTime(date),
     },
     {
       title: "Billing/Folio #",
@@ -39,9 +39,9 @@ export default function CashierTable({
           className="cursor-pointer"
           onClick={() => {
             if (_.isEmpty(record?.customer)) {
-              window.open(`/billing/otc/${record.id}`);
+              window.open(`/accounting/otc/folio/${record.id}`);
             } else {
-              window.open(`/billing/accounts/${record.id}`);
+              window.open(`/accounting/billing/folio/${record.id}`);
             }
           }}
         >
@@ -75,7 +75,7 @@ export default function CashierTable({
       dataIndex: "customer.fullName",
       key: "customer.fullName",
       render: (_, record) => (
-        <span>{record.customer?.accountName ?? record?.otcName}</span>
+        <span>{record.customer?.customerName ?? record?.otcName}</span>
       ),
     },
     {

@@ -555,4 +555,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/83_wilson_functions_update.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/84_wilson_cashiering.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
