@@ -9,6 +9,7 @@ import com.backend.gbp.domain.hrm.dto.HoursLog
 import com.backend.gbp.domain.hrm.dto.ScheduleDto
 import com.backend.gbp.domain.payroll.AccumulatedLogs
 import com.backend.gbp.domain.payroll.TimekeepingEmployee
+import com.backend.gbp.graphqlservices.payroll.TimekeepingService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.hrm.EmployeeAttendanceRepository
@@ -254,8 +255,10 @@ class AccumulatedLogsCalculator {
             Instant timeIn = attendanceList[i - 1].attendance_time
             Instant timeOut = attendanceList[i].attendance_time
             BigDecimal overtimeHours = 0
+
             BigDecimal regularHours = computeHours(regularSchedule, timeIn, timeOut)
-            hoursLog.late = getLateHours(regularSchedule.dateTimeStart, timeIn)
+            if (i == 1)
+                hoursLog.late = getLateHours(regularSchedule.dateTimeStart, timeIn)
             if (overtimeSchedule && !timeOut.isBefore(overtimeSchedule.dateTimeStart)) {
                 overtimeHours = computeHours(overtimeSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time)
             }
@@ -264,13 +267,24 @@ class AccumulatedLogsCalculator {
                 accumulatedLogs.message = 'Holiday'
                 calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
             } else {
-                hoursLog.regular = regularHours
+                hoursLog.regular = regularHours > 0 ? regularHours : 0
                 hoursLog.overtime = overtimeHours
             }
+
             hoursLogList.push(hoursLog)
 
         }
-        return hoursLogList.reverse()
+
+        Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
+        hoursLogList.each {
+            TimekeepingService.consolidateProjectBreakdown(employeeBreakdownMap, it)
+        }
+        List<HoursLog> returnArr = []
+        employeeBreakdownMap.keySet().each {
+            HoursLog hoursLog = employeeBreakdownMap.get(it.toString())
+            returnArr.push(hoursLog)
+        }
+        return returnArr.reverse()
     }
 
     static BigDecimal getLateHours(Instant scheduleStart, Instant firstIn) {
