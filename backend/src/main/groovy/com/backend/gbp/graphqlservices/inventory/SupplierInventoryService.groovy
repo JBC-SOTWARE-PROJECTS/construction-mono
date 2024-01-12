@@ -63,6 +63,7 @@ class SupplierInventoryService extends AbstractDaoService<SupplierInventory> {
 	) {
 		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
 		Employee employee = employeeRepository.findOneByUser(user)
+		def company = SecurityUtils.currentCompanyId()
 
 		String query = '''Select inv from SupplierInventory inv where
 						lower(concat(inv.descLong,inv.sku)) like lower(concat('%',:filter,'%'))
@@ -76,6 +77,13 @@ class SupplierInventoryService extends AbstractDaoService<SupplierInventory> {
 		params.put('filter', filter)
 		params.put('supplier', supplier)
 		params.put('office', employee.office.id)
+
+		if (company) {
+			query += ''' and (inv.company = :company)'''
+			countQuery += ''' and (inv.company = :company)'''
+			params.put("company", company)
+		}
+
 
 		query += ''' ORDER BY inv.descLong ASC'''
 

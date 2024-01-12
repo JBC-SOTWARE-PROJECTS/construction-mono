@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.inventory
 
 import com.backend.gbp.domain.inventory.StockIssue
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.backend.gbp.domain.inventory.QuantityAdjustment
 import com.backend.gbp.repository.inventory.QuantityAdjustmentRepository
@@ -39,7 +40,8 @@ class QuantityAdjustmentService {
 
 	@GraphQLQuery(name = "quantityListByItem", description = "List of Quantity Adjustment by Item")
 	List<QuantityAdjustment> getAdjustById(@GraphQLArgument(name = "item") UUID id) {
-		return quantityAdjustmentRepository.getAdjustById(id).sort { it.createdDate }.reverse(true)
+		def company = SecurityUtils.currentCompanyId()
+		return quantityAdjustmentRepository.getAdjustById(id, company).sort { it.createdDate }.reverse(true)
 	}
 	
 	//
@@ -49,6 +51,7 @@ class QuantityAdjustmentService {
 	QuantityAdjustment quantityAdjustmentInsert(
 			@GraphQLArgument(name = "fields") Map<String, Object> fields
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		QuantityAdjustment insert = new QuantityAdjustment()
 		def data
 		def adj = objectMapper.convertValue(fields, QuantityAdjustment)
@@ -65,6 +68,7 @@ class QuantityAdjustmentService {
 			insert.isCancel = false
 			insert.quantityAdjustmentType = adj.quantityAdjustmentType
 			insert.remarks = adj.remarks
+			insert.company = company
 
 			data = quantityAdjustmentRepository.save(insert)
 			

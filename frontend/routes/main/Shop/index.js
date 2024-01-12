@@ -17,6 +17,7 @@ import ColTitlePopUp from "../../../app/components/common/ColTitlePopUp";
 import { col4, col18 } from "../../../shared/constant";
 import FilterSelect from "../../../util/customForms/filterSelect";
 import numeral from "numeral";
+import DescLong from "../../../app/components/common/DescLong";
 
 const { Search } = Input;
 
@@ -40,24 +41,32 @@ const GET_RECORDS = gql`
     ) {
       content {
         id
+        itemCode
         sku
-        descLong
         item {
           id
-          descLong
-          item_conversion
-          vatable
-          unit_of_usage {
-            id
-            unitDescription
-          }
           item_category {
             id
             categoryDescription
           }
+          item_conversion
+          production
+          isMedicine
+          vatable
+          fixAsset
+          consignment
         }
+        descLong
+        uou
+        brand
         reOrderQty
+        actualCost
+        outputTax
+        sellingPrice
         onHand
+        lastUnitCost
+        last_wcost
+        markup
         status
       }
       size
@@ -137,27 +146,44 @@ const InvMonitoringContent = ({ account }) => {
 
   const columns = [
     {
+      title: "SKU/Barcode",
+      dataIndex: "sku",
+      key: "sku",
+      width: 140,
+    },
+    {
       title: "Description",
       dataIndex: "descLong",
       key: "descLong",
-    },
-
-    {
-      title: "Category",
-      dataIndex: "categoryDescription",
-      key: "categoryDescription",
       render: (text, record) => (
-        <span key={text}>
-          {record?.item?.item_category?.categoryDescription}
-        </span>
+        <DescLong descripton={text} record={record.item} />
       ),
     },
     {
-      title: <ColTitlePopUp descripton="Unit (UoU)" popup="Unit of Usage" />,
-      dataIndex: "unitDescription",
-      key: "unitDescription",
-      render: (text, record) => (
-        <span key={text}>{record?.item?.unit_of_usage?.unitDescription}</span>
+      title: "Brand",
+      dataIndex: "brand",
+      key: "brand",
+      width: 140,
+      render: (text) => <span>{text ?? "--"}</span>,
+    },
+    {
+      title: (
+        <ColTitlePopUp
+          descripton="Unit of Measurement (UoU)"
+          popup="Unit of Usage"
+        />
+      ),
+      dataIndex: "uou",
+      key: "uou",
+      width: 210,
+    },
+    {
+      title: "Category",
+      dataIndex: "item_category.categoryDescription",
+      key: "item_category.categoryDescription",
+      width: 250,
+      render: (_, record) => (
+        <span>{record?.item?.item_category?.categoryDescription}</span>
       ),
     },
     {
@@ -165,6 +191,7 @@ const InvMonitoringContent = ({ account }) => {
       dataIndex: "reOrderQty",
       key: "reOrderQty",
       align: "right",
+      width: 120,
       onCell: (e) => {
         return {
           onDoubleClick: () => {
@@ -185,12 +212,14 @@ const InvMonitoringContent = ({ account }) => {
       dataIndex: "onHand",
       key: "onHand",
       align: "right",
+      width: 120,
       render: (onHand) => <span>{numeral(onHand).format("0,0")}</span>,
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      width: 90,
       render: (status) => {
         let color = status === "Healthy" ? "green" : "orange";
         if (status === "No Stock") {

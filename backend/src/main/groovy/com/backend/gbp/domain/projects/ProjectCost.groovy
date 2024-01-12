@@ -29,8 +29,7 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	UUID id
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
 
@@ -41,6 +40,10 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "ref_no")
 	String refNo
+
+	@GraphQLQuery
+	@Column(name = "item_no")
+	String itemNo
 
 	@GraphQLQuery
 	@Column(name = "description")
@@ -63,12 +66,20 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	BigDecimal cost
 
 	@GraphQLQuery
+	@Column(name = "relative_weight")
+	BigDecimal relativeWeight
+
+	@GraphQLQuery
 	@Column(name = "status")
 	Boolean status
 
 	@GraphQLQuery
 	@Column(name = "tag_no")
 	String tagNo
+
+	@GraphQLQuery
+	@Column(name = "billed_qty")
+	BigDecimal billedQty
 
 	@Transient
 	BigDecimal getTotalCost() {

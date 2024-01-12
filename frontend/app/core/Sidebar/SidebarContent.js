@@ -68,7 +68,7 @@ const SidebarContent = ({ account }) => {
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.main" />}
             >
-              <SubMenu
+              {/* <SubMenu
                 key="dashboard"
                 popupClassName={getNavStyleSubMenuClass(navStyle)}
                 title={
@@ -87,9 +87,9 @@ const SidebarContent = ({ account }) => {
                     </span>
                   </Link>
                 </Menu.Item>
-              </SubMenu>
+              </SubMenu> */}
               {/* Masterfile */}
-              <SubMenu
+              {/* <SubMenu
                 key="masterfile"
                 popupClassName={getNavStyleSubMenuClass(navStyle)}
                 title={
@@ -129,7 +129,19 @@ const SidebarContent = ({ account }) => {
                     </span>
                   </Link>
                 </Menu.Item>
-              </SubMenu>
+              </SubMenu> */}
+
+              {/* SHOP */}
+              <Menu.Item key="main/shop">
+                <Link href="/main/shop">
+                  <a>
+                    <i className="icon icon-shopping-cart" />
+                    <span>
+                      <IntlMessages id="sidebar.shop" />
+                    </span>
+                  </a>
+                </Link>
+              </Menu.Item>
               {/* Transaction */}
               <SubMenu
                 key="transaction"
@@ -214,17 +226,7 @@ const SidebarContent = ({ account }) => {
                   </Link>
                 </Menu.Item>
               </SubMenu>
-              {/* SHOP */}
-              <Menu.Item key="main/shop">
-                <Link href="/main/shop">
-                  <a>
-                    <i className="icon icon-shopping-cart" />
-                    <span>
-                      <IntlMessages id="sidebar.shop" />
-                    </span>
-                  </a>
-                </Link>
-              </Menu.Item>
+
               {/* Reports */}
               <SubMenu
                 key="reports"
@@ -277,13 +279,13 @@ const SidebarContent = ({ account }) => {
                     </span>
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="main/reports/chargeditems">
+                {/* <Menu.Item key="main/reports/chargeditems">
                   <Link href="/main/reports/chargeditems">
                     <span>
                       <IntlMessages id="sidebar.reports.chargeditems" />
                     </span>
                   </Link>
-                </Menu.Item>
+                </Menu.Item> */}
               </SubMenu>
             </MenuItemGroup>
             {/* Service Management */}
@@ -305,7 +307,7 @@ const SidebarContent = ({ account }) => {
                   id="sidebar.gas-slip" /></span></a></Link>
               </Menu.Item>
             </MenuItemGroup> */}
-            <MenuItemGroup
+            {/* <MenuItemGroup
               key="project-management"
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.project-management" />}
@@ -330,9 +332,9 @@ const SidebarContent = ({ account }) => {
                   </a>
                 </Link>
               </Menu.Item>
-            </MenuItemGroup>
+            </MenuItemGroup> */}
             {/* Asset */}
-            <MenuItemGroup
+            {/* <MenuItemGroup
               key="asset-management"
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.asset-management" />}
@@ -401,14 +403,14 @@ const SidebarContent = ({ account }) => {
                   </Link>
                 </Menu.Item>
               </SubMenu>
-            </MenuItemGroup>
+            </MenuItemGroup> */}
             {/* Billing & Finances */}
-            <MenuItemGroup
+            {/* <MenuItemGroup
               key="billing-finances"
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.billing-finances" />}
             >
-              {/* <Menu.Item key="billing/jobs">
+              <Menu.Item key="billing/jobs">
                 <Link href="/billing/jobs">
                   <a>
                     <i className="icon icon-product-list" />
@@ -417,7 +419,7 @@ const SidebarContent = ({ account }) => {
                     </span>
                   </a>
                 </Link>
-              </Menu.Item> */}
+              </Menu.Item>
 
               <Menu.Item key="billing/billingaccounts">
                 <Link href="/billing/billingaccounts">
@@ -495,7 +497,7 @@ const SidebarContent = ({ account }) => {
                   </Link>
                 </Menu.Item>
               </SubMenu>
-              {/* Sales Report */}
+             
               <SubMenu
                 key="billing-finances-reports"
                 popupClassName={getNavStyleSubMenuClass(navStyle)}
@@ -523,9 +525,9 @@ const SidebarContent = ({ account }) => {
                   </Link>
                 </Menu.Item>
               </SubMenu>
-            </MenuItemGroup>
+            </MenuItemGroup> */}
             {/* Admintrator Menu */}
-            <MenuItemGroup
+            {/* <MenuItemGroup
               key="in-built-apps"
               className="gx-menu-group"
               title={<IntlMessages id="sidebar.admin" />}
@@ -579,7 +581,7 @@ const SidebarContent = ({ account }) => {
                   </Link>
                 </Menu.Item>
               </SubMenu>
-            </MenuItemGroup>
+            </MenuItemGroup> */}
             {/* Admintrator Menu */}
           </Menu>
         </CustomScrollbars>

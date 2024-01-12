@@ -26,6 +26,7 @@ import com.backend.gbp.rest.dto.POMonitoringDto
 import com.backend.gbp.rest.dto.PostDto
 import com.backend.gbp.rest.dto.PostLedgerDto
 import com.backend.gbp.rest.dto.StockCard
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
@@ -120,9 +121,11 @@ class InventoryLedgerService extends AbstractDaoService<InventoryLedger> {
 	List<InventoryLedger> getLedgerByRef(
 			@GraphQLArgument(name = "ref") String ref
 	) {
-		String query = '''Select e from InventoryLedger e where e.referenceNo = :ref'''
+		def company = SecurityUtils.currentCompanyId()
+		String query = '''Select e from InventoryLedger e where e.referenceNo = :ref and e.company = :company'''
 		Map<String, Object> params = new HashMap<>()
 		params.put('ref', ref)
+		params.put('company', company)
 		createQuery(query, params).resultList.sort { it.item.descLong }
 	}
 
@@ -145,14 +148,17 @@ class InventoryLedgerService extends AbstractDaoService<InventoryLedger> {
 			@GraphQLArgument(name = "dateEnd") String dateEnd,
 			@GraphQLArgument(name = "filter") String filter
 	){
+		def company = SecurityUtils.currentCompanyId()
+
 		String query = '''Select inv from InventoryLedger inv where inv.documentTypes.id IN (:id) and inv.isInclude = true 
 and to_date(to_char(inv.ledgerDate, 'YYYY-MM-DD'),'YYYY-MM-DD') between to_date(:dateStart,'YYYY-MM-DD') and  to_date(:dateEnd,'YYYY-MM-DD')
-and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
+and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company = :company'''
 		Map<String, Object> params = new HashMap<>()
 		params.put('id', id)
 		params.put('dateStart', dateStart)
 		params.put('dateEnd', dateEnd)
 		params.put('filter', filter)
+		params.put('company', company)
 		createQuery(query, params).resultList.sort { it.ledgerDate }
 	}
 
@@ -160,6 +166,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 	List<ChargeItemsDto> chargedItems(@GraphQLArgument(name = "start") String start,
 									  @GraphQLArgument(name = "end") String end,
 									  @GraphQLArgument(name = "filter") String filter) {
+
 		def uuids = new ArrayList<UUID>()
 		uuids.add(UUID.fromString("19c0c388-7e85-4abf-aa13-cdafecf8dc8c"));
 		uuids.add(UUID.fromString("5776d7f2-6972-4980-a0ef-360642ee7572"));
@@ -212,6 +219,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
 			@GraphQLArgument(name = "parentId") UUID parentId
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 		def postItems = items as ArrayList<PostLedgerDto>
 		postItems.each {
@@ -231,6 +239,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 				upsert.ledgerPhysical = 0
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
+				upsert.company = company
 				save(upsert)
 
 				//update receiving Item
@@ -265,6 +274,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
 			@GraphQLArgument(name = "parentId") UUID parentId
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 		def postItems = items as ArrayList<PostDto>
 		postItems.each {
@@ -285,6 +295,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 				upsert.ledgerPhysical = 0
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
+				upsert.company = company
 				save(upsert)
 
 				//update returns Item
@@ -303,6 +314,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
 			@GraphQLArgument(name = "parentId") UUID parentId
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 		def postItems = items as ArrayList<PostDto>
 		def parent = stockIssuanceService.stiById(parentId)
@@ -325,6 +337,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 				upsert.ledgerPhysical = 0
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
+				upsert.company = company
 				def afterSave = save(upsert)
 
 				//update issuance Item
@@ -354,6 +367,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
 			@GraphQLArgument(name = "parentId") UUID parentId
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 		def postItems = items as ArrayList<PostDto>
 		postItems.each {
@@ -374,6 +388,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 				upsert.ledgerPhysical = 0
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
+				upsert.company = company
 				save(upsert)
 
 				//update mp Item
@@ -390,6 +405,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 	InventoryLedger postInventoryLedgerQtyAdjustment(
 			@GraphQLArgument(name = "it") QuantityAdjustment it
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 
 		//insert
@@ -404,6 +420,8 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 		upsert.ledgerPhysical = 0
 		upsert.ledgerUnitCost = it.unit_cost
 		upsert.isInclude = true
+		upsert.company = company
+
 		save(upsert)
 
 		return upsert
@@ -414,6 +432,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 	InventoryLedger postInventoryLedgerBegBalance(
 			@GraphQLArgument(name = "it") BeginningBalance it
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 
 		//insert
@@ -428,6 +447,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 		upsert.ledgerPhysical = 0
 		upsert.ledgerUnitCost = it.unitCost
 		upsert.isInclude = true
+		upsert.company = company
 		save(upsert)
 
 		return upsert
@@ -442,6 +462,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			Integer qty,
 			BigDecimal wcost
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		String typeId = "19c0c388-7e85-4abf-aa13-cdafecf8dc8c"
 		if (type.equalsIgnoreCase('rcs')) {
 			typeId = '5776d7f2-6972-4980-a0ef-360642ee7572'
@@ -464,6 +485,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 		inv.ledgerPhysical = 0
 		inv.ledgerUnitCost = wcost
 		inv.isInclude = true
+		inv.company = company
 		save(inv)
 
 	}
@@ -475,6 +497,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			Integer serviceQty,
 			String reference_no
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		String typeId = "c17eb9d9-c0bd-432b-987e-b3c89edecab8"
 		def inv = new InventoryLedger()
 		def serviceItems = serviceItemsService.serviceItemByParentId(service)
@@ -494,6 +517,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			inv.ledgerPhysical = 0
 			inv.ledgerUnitCost = it.wcost
 			inv.isInclude = true
+			inv.company = company
 			save(inv)
 		}
 
@@ -544,6 +568,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 			@GraphQLArgument(name = "qty") Integer qty,
 			@GraphQLArgument(name = "cost") BigDecimal cost
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 
 		//insert 0f3c2b76-445a-4f78-a256-21656bd62872 -- EXPENSE DOC TYPES
@@ -558,9 +583,25 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 		upsert.ledgerPhysical = 0
 		upsert.ledgerUnitCost = cost
 		upsert.isInclude = true
+		upsert.company = company
 		save(upsert)
 
 		return upsert
+	}
+
+	@Transactional
+	@GraphQLMutation(name = "editExpenseItemFromProjects")
+	InventoryLedger editExpenseItemFromProjects(
+			@GraphQLArgument(name = "id") UUID id,
+			@GraphQLArgument(name = "qty") Integer qty
+	) {
+		if(id){
+			def upsert = findOne(id)
+			upsert.ledgerQtyOut = qty
+			def afterSave = save(upsert)
+			return afterSave
+		}
+		return null
 	}
 
 	@Transactional
@@ -578,6 +619,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 	InventoryLedger postInventoryGlobal(
 			@GraphQLArgument(name = "items") LedgerDto it
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def upsert = new InventoryLedger()
 		upsert.sourceOffice = it.sourceOffice
 		upsert.destinationOffice = it.destinationOffice
@@ -590,6 +632,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%'))'''
 		upsert.ledgerPhysical = it.ledgerPhysical
 		upsert.ledgerUnitCost = it.ledgerUnitCost
 		upsert.isInclude = true
+		upsert.company = company
 		def afterSave = save(upsert)
 		return afterSave
 	}

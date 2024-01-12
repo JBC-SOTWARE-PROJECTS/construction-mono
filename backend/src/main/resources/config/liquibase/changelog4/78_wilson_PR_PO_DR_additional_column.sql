@@ -1,0 +1,3 @@
+ALTER TABLE inventory.purchase_request ADD column IF NOT EXISTS asset uuid default null, ADD column IF NOT EXISTS category varchar default null;
+ALTER TABLE inventory.purchase_order ADD column IF NOT EXISTS asset uuid default null, ADD column IF NOT EXISTS category varchar default null;
+ALTER TABLE inventory.receiving_report ADD column IF NOT EXISTS asset uuid default null, ADD column IF NOT EXISTS category varchar default null;

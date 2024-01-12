@@ -22,7 +22,7 @@ export default function ProjectList({
   handleOpen,
   changePage,
   onRefresh,
-  handleOpenDetails
+  handleOpenDetails,
 }: IProps) {
   return (
     <>
@@ -100,7 +100,7 @@ export default function ProjectList({
                     width: "200px",
                   }}>
                   <div className="font-bold">Project Progress</div>
-                  <Progress percent={0} />
+                  <Progress percent={record?.projectPercent ?? 0} />
                 </div>
               </div>
             ),

@@ -2,6 +2,7 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -41,19 +42,22 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "pr_date_needed")
 	Instant prDateNeeded
 
-	@NotFound(action = NotFoundAction.IGNORE)
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset", referencedColumnName = "id")
+	Assets assets
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "supplier", referencedColumnName = "id")
 	Supplier supplier
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "requesting_office", referencedColumnName = "id")
 	Office requestingOffice
@@ -63,6 +67,10 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "requested_office", referencedColumnName = "id")
 	Office requestedOffice
+
+	@GraphQLQuery
+	@Column(name = "category", columnDefinition = "varchar")
+	String category
 	
 	@GraphQLQuery
 	@Column(name = "pr_type", columnDefinition = "varchar")
@@ -87,5 +95,9 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "remarks", columnDefinition = "varchar")
 	String remarks
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 }
