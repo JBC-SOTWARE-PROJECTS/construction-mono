@@ -1,9 +1,9 @@
 {
   "name": "diversetradesuite",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 7000",
+    "dev": "next dev -p 7001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

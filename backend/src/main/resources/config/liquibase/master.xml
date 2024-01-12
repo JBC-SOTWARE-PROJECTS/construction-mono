@@ -555,4 +555,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/84_michael_employee_loan_beginning_balance_permission.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/84_wilson_cashiering.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/84_donss_add_reports_layout.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -1,146 +1,78 @@
-import React, { useState } from 'react'
-import {
-  Card,
-  Row,
-  Col,
-  Table,
-  Button,
-  Input,
-  Divider,
-  Menu,
-  Dropdown,
-  message,
-} from 'antd'
-import { PlusCircleOutlined } from '@ant-design/icons'
-import { gql, useQuery } from '@apollo/client'
-import { useDialog } from '@/hooks'
-import TerminalForm from '@/components/accounting/cashier/dialog/terminalForm'
-import { Terminal } from '@/graphql/gql/graphql'
-import _ from 'lodash'
+import React, { useState } from "react";
+import { PageContainer, ProCard } from "@ant-design/pro-components";
+import { Input, Row, Col, App, Button } from "antd";
+import TerminalTable from "@/components/accounting/cashier/terminalTable";
+import { Query, Terminal } from "@/graphql/gql/graphql";
+import { useQuery } from "@apollo/client";
+import { GET_RECORD_TERMINAL_LIST } from "@/graphql/cashier/queries";
+import _ from "lodash";
+import { useDialog } from "@/hooks";
+import TerminalForm from "@/components/accounting/cashier/dialog/terminalForm";
+import { PlusCircleOutlined } from "@ant-design/icons";
 
-const { Search } = Input
+const { Search } = Input;
 
-const options = ['Edit']
+export default function TerminalComponent() {
+  const { message } = App.useApp();
+  const terminalDialog = useDialog(TerminalForm);
+  const [state, setState] = useState({
+    filter: "",
+  });
 
-//graphQL Queries
-const GET_RECORDS = gql`
-  query ($filter: String) {
-    list: terminalFilter(filter: $filter) {
-      id
-      terminal_no
-      description
-      mac_address
-      employee {
-        id
-        fullName
-      }
-    }
-  }
-`
-
-const TerminalContent = ({ account }: any) => {
-  const [filter, setFilter] = useState('')
-  //query
-  const { loading, data, refetch } = useQuery(GET_RECORDS, {
+  const { data, loading, refetch } = useQuery<Query>(GET_RECORD_TERMINAL_LIST, {
     variables: {
-      filter: filter,
+      filter: state.filter,
     },
-    fetchPolicy: 'network-only',
-  })
+    fetchPolicy: "cache-and-network",
+  });
 
-  const terminalDialog = useDialog(TerminalForm)
-  //
-  // ===================================================//
-
-  const menus = (record: Terminal) => (
-    <Menu
-      onClick={(e) => {
-        if (e.key === 'Edit') {
-          terminalDialog({ record }, () => refetch())
-        }
-      }}
-    >
-      {options.map((option) => (
-        <Menu.Item key={option}>{option}</Menu.Item>
-      ))}
-    </Menu>
-  )
-
-  const columns = [
-    {
-      title: 'Terminal #',
-      dataIndex: 'terminal_no',
-      key: 'terminal_no',
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
-    {
-      title: 'Assign Employee',
-      dataIndex: 'employee.fullName',
-      key: 'employee.fullName',
-      render: (_: any, record: Terminal) => (
-        <span>{record.employee?.fullName}</span>
-      ),
-    },
-    {
-      title: '#',
-      dataIndex: 'action',
-      key: 'action',
-      render: (_: any, record: Terminal) => (
-        <span>
-          <Dropdown
-            overlay={menus(record)}
-            placement='bottomRight'
-            trigger={['click']}
-          >
-            <i className='gx-icon-btn icon icon-ellipse-v' />
-          </Dropdown>
-        </span>
-      ),
-    },
-  ]
+  const upsertCashierTerminal = (record?: Terminal) => {
+    terminalDialog({ record: record }, (result: any) => {
+      if (result) {
+        message.success(result);
+        refetch();
+      }
+    });
+  };
 
   return (
-    <Card
-      title='Cashier Terminal Setup'
-      size='small'
-      extra={
-        <Button
-          size='small'
-          type='primary'
-          icon={<PlusCircleOutlined />}
-          className='margin-0'
-          onClick={() => terminalDialog({}, () => refetch())}
-        >
-          Add New Terminal
-        </Button>
-      }
-    >
-      <Row>
-        <Col span={24}>
-          <Search
-            placeholder='Search Terminals'
-            onSearch={(e) => setFilter(e)}
-            enterButton
-          />
-        </Col>
-        <Col span={24}>
-          <Divider />
-          <Table
-            loading={loading}
-            className='gx-table-responsive'
-            columns={columns}
-            dataSource={_.get(data, 'list')}
-            rowKey={(record) => record.id}
-            size='small'
-          />
-        </Col>
-      </Row>
-    </Card>
-  )
+    <PageContainer
+      title="Cashier Terminals"
+      content="Provide a reliable point of service for monetary interactions.">
+      <ProCard
+        title="Cashier Terminal List"
+        headStyle={{
+          flexWrap: "wrap",
+        }}
+        bordered
+        headerBordered
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusCircleOutlined />}
+            onClick={() => upsertCashierTerminal()}>
+            New Terminal
+          </Button>
+        }>
+        <div className="w-full">
+          <Row gutter={[8, 8]}>
+            <Col span={24}>
+              <Search
+                size="middle"
+                placeholder="Search here.."
+                onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+              />
+            </Col>
+            <Col span={24}>
+              <TerminalTable
+                dataSource={data?.terminalFilter as Terminal[]}
+                loading={loading}
+                handleOpen={(record) => upsertCashierTerminal(record)}
+              />
+            </Col>
+          </Row>
+        </div>
+      </ProCard>
+    </PageContainer>
+  );
 }
-
-export default TerminalContent

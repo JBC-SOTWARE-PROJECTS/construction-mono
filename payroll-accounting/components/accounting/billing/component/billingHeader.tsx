@@ -194,7 +194,9 @@ export default function BillingHeader(props: Iprops) {
     };
 
     if (otc) {
-      items.push(customer);
+      if (!hide) {
+        items.push(customer);
+      }
     } else {
       if (!hide) {
         items.push(project);
