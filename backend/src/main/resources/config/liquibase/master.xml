@@ -553,6 +553,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/82_wilson_transaction_inventory_company.sql"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog4/83_wilson_functions_update.sql"
+    <include file="classpath:config/liquibase/changelog4/84_michael_employee_loan_beginning_balance_permission.sql"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>
