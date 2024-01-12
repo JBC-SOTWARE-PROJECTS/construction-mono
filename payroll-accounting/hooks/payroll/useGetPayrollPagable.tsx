@@ -17,6 +17,9 @@ const PAYROLL_PAGABLE_QUERY = gql`
         status
         createdBy
         createdDate
+        type
+        cycle
+        code
       }
       totalElements
     }

@@ -14,6 +14,7 @@ import { DatePicker, Input, Space, Tag, Tooltip } from "antd";
 
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { capitalize } from "lodash";
 import { useState } from "react";
 const { Search } = Input;
 
@@ -45,6 +46,10 @@ export default function PayrollPage({ account }: IPageProps) {
 
   const columns: ColumnsType<Payroll> = [
     {
+      title: "Code",
+      dataIndex: "code",
+    },
+    {
       title: "Title",
       dataIndex: "title",
       key: "title",
@@ -63,6 +68,15 @@ export default function PayrollPage({ account }: IPageProps) {
           );
         }
       },
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+      render: (value) => capitalize(value?.replace("_", "-")),
+    },
+    {
+      title: "Cycle No.",
+      dataIndex: "cycle",
     },
     {
       title: "Status",
