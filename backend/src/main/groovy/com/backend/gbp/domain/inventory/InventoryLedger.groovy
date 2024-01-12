@@ -75,4 +75,8 @@ class InventoryLedger extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "is_include")
 	Boolean isInclude
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 }

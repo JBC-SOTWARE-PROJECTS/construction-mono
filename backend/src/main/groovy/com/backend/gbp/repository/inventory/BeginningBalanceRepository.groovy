@@ -7,10 +7,10 @@ import org.springframework.data.repository.query.Param
 
 interface BeginningBalanceRepository extends JpaRepository<BeginningBalance, UUID> {
 	
-	@Query(value = "select q from BeginningBalance q where q.item.id = :id")
-	List<BeginningBalance> getBeginningById(@Param('id') UUID id)
+	@Query(value = "select q from BeginningBalance q where q.item.id = :id and q.company = :company")
+	List<BeginningBalance> getBeginningById(@Param('id') UUID id, @Param('company') UUID company)
 
-	@Query(value = "select q from BeginningBalance q where q.item.id = :id and q.isPosted = true")
-	List<BeginningBalance> getBeginningByIdPosted(@Param('id') UUID id)
+	@Query(value = "select q from BeginningBalance q where q.item.id = :id and q.isPosted = true and q.company = :company")
+	List<BeginningBalance> getBeginningByIdPosted(@Param('id') UUID id, @Param('company') UUID company)
 	
 }

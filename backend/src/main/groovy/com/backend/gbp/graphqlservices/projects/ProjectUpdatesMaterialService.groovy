@@ -217,6 +217,9 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
         n.item = item
         n.qty = qty
         n.cost = cost
+        n.onHand = 0
+        n.balance = 0
+        n.remarks = null
         n.stockCardRefId = refId
         save(n)
 

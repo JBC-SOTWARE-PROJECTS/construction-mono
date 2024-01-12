@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { PageContainer, ProCard } from "@ant-design/pro-components";
-import { Input, Row, Col, Form } from "antd";
+import { Input, Row, Col, Form, App, message } from "antd";
 import { useQuery } from "@apollo/client";
 import { Inventory, Query } from "@/graphql/gql/graphql";
 import { GET_INVENTORY_BY_LOCATION } from "@/graphql/inventory/inventory-queries";
@@ -15,13 +15,17 @@ import {
 } from "@/hooks/inventory";
 import ProjectInventoryMonitoringTable from "@/components/inventory/project-details/projectInventoryTable";
 import { AppContext } from "@/components/accessControl/AppContext";
+import { useDialog } from "@/hooks";
+import UpsertCriticalQty from "@/components/inventory/project-details/dialogs/upsertCriticalQty";
 
 const { Search } = Input;
 
-export default function AccomplishmentsContent() {
+export default function InventoryProjectMonitoringContent() {
+  const { message } = App.useApp();
   const router = useRouter();
   const { query } = router;
   const { projectInfo } = useContext(AppContext);
+  const modal = useDialog(UpsertCriticalQty);
   const [category, setCategory] = useState<string[]>([]);
   const [groupId, setGroupId] = useState<string | null>(null);
   const [state, setState] = useState({
@@ -50,6 +54,15 @@ export default function AccomplishmentsContent() {
       fetchPolicy: "cache-and-network",
     }
   );
+
+  const onUpsertRecord = (record?: Inventory) => {
+    modal({ record: record }, (result: any) => {
+      if (result) {
+        message.success(result);
+        refetch();
+      }
+    });
+  };
 
   return (
     <PageContainer
@@ -136,7 +149,7 @@ export default function AccomplishmentsContent() {
               totalElements={
                 data?.inventoryListPageableByDep?.totalElements as number
               }
-              handleOpen={(e) => console.log(e)}
+              handleOpen={(e) => onUpsertRecord(e)}
               changePage={(e: number) =>
                 setState((prev) => ({ ...prev, page: e }))
               }

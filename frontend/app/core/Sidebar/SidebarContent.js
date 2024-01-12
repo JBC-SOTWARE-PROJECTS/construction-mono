@@ -279,13 +279,13 @@ const SidebarContent = ({ account }) => {
                     </span>
                   </Link>
                 </Menu.Item>
-                <Menu.Item key="main/reports/chargeditems">
+                {/* <Menu.Item key="main/reports/chargeditems">
                   <Link href="/main/reports/chargeditems">
                     <span>
                       <IntlMessages id="sidebar.reports.chargeditems" />
                     </span>
                   </Link>
-                </Menu.Item>
+                </Menu.Item> */}
               </SubMenu>
             </MenuItemGroup>
             {/* Service Management */}

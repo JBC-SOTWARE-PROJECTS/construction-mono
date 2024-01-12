@@ -55,3 +55,11 @@ export const GET_INVENTORY_BY_LOCATION = gql`
     }
   }
 `;
+
+export const UPSERT_CRITICAL_LEVEL_INVENTORY = gql`
+  mutation ($value: Int, $id: UUID) {
+    updateReOrderQty(value: $value, id: $id) {
+      id
+    }
+  }
+`;

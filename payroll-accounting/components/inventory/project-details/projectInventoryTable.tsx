@@ -113,7 +113,14 @@ export default function ProjectInventoryMonitoringTable({
       align: "center",
       fixed: "right",
       render: (_, record) => {
-        return <Button type="dashed" size="small" icon={<EditFilled />} />;
+        return (
+          <Button
+            type="dashed"
+            size="small"
+            onClick={() => handleOpen(record)}
+            icon={<EditFilled />}
+          />
+        );
       },
     },
   ];

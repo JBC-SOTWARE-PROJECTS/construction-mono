@@ -1,6 +1,7 @@
 package com.backend.gbp.graphqlservices.inventory
 
 import com.backend.gbp.domain.inventory.QuantityAdjustment
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.backend.gbp.domain.inventory.BeginningBalance
 import com.backend.gbp.repository.inventory.BeginningBalanceRepository
@@ -40,7 +41,8 @@ class BeginningBalanceService {
 	
 	@GraphQLQuery(name = "beginningListByItem", description = "List of Beginning Balance by Item")
 	List<BeginningBalance> getBeginningById(@GraphQLArgument(name = "item") UUID id) {
-		return beginningBalanceRepository.getBeginningById(id).sort { it.createdDate }.reverse(true)
+		def company = SecurityUtils.currentCompanyId()
+		return beginningBalanceRepository.getBeginningById(id, company).sort { it.createdDate }.reverse(true)
 	}
 	
 	//
@@ -51,26 +53,26 @@ class BeginningBalanceService {
 	BeginningBalance beginningBalanceInsert(
 			@GraphQLArgument(name = "fields") Map<String, Object> fields
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		BeginningBalance insert = new BeginningBalance()
 		def data = new BeginningBalance()
 		def beg = objectMapper.convertValue(fields, BeginningBalance)
 		try {
-			def check = inventoryResource.getLedger(beg.item.id as String, beg.office.id as String)
-			def checkIfExist = beginningBalanceRepository.getBeginningByIdPosted(beg.item.id)
-			if (!check) {
-				if (!checkIfExist) {
-					insert.refNum = generatorService.getNextValue(GeneratorType.BEGINNING) { Long no ->
-						'BEG-' + StringUtils.leftPad(no.toString(), 6, "0")
-					}
-					insert.dateTrans = beg.dateTrans
-					insert.item = beg.item
-					insert.office = beg.office
-					insert.quantity = beg.quantity
-					insert.unitCost = beg.unitCost
-					insert.isPosted = false
-					insert.isCancel = false
-					data = beginningBalanceRepository.save(insert)
+			//def check = inventoryResource.getLedger(beg.item.id as String, beg.office.id as String)
+			def checkIfExist = beginningBalanceRepository.getBeginningByIdPosted(beg.item.id, company)
+			if (!checkIfExist) {
+				insert.refNum = generatorService.getNextValue(GeneratorType.BEGINNING) { Long no ->
+					'BEG-' + StringUtils.leftPad(no.toString(), 6, "0")
 				}
+				insert.dateTrans = beg.dateTrans
+				insert.item = beg.item
+				insert.office = beg.office
+				insert.quantity = beg.quantity
+				insert.unitCost = beg.unitCost
+				insert.isPosted = false
+				insert.isCancel = false
+				insert.company = company
+				data = beginningBalanceRepository.save(insert)
 			}
 		} catch (Exception e) {
 			throw new Exception("Something was Wrong : " + e)
