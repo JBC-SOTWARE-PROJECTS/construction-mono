@@ -2,12 +2,10 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.Office
 import io.leangen.graphql.annotations.GraphQLQuery
-import org.hibernate.annotations.NotFound
-import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
-import java.time.LocalDateTime
+import java.math.RoundingMode
 
 @Entity
 @Table(schema = "inventory", name = "inventory")
@@ -20,13 +18,11 @@ class Inventory implements Serializable {
 	UUID id
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "office", referencedColumnName = "id")
 	Office office
@@ -59,10 +55,6 @@ class Inventory implements Serializable {
 	//@Column(name = "last_wcost")
 	//BigDecimal last_wcost //cost of sale (unit cost for charging, transfer, physical count, etc.)
 	//last_wcost g balhin nako sa contex
-
-	@GraphQLQuery
-	@Column(name = "expiration_date")
-	LocalDateTime expiration_date
 
 	@GraphQLQuery
 	@Column(name = "allow_trade")
@@ -120,14 +112,30 @@ class Inventory implements Serializable {
 	@Column(name = "vat_rate")
 	BigDecimal vatRate
 
-	@Transient
-	String getBrand() {
-		return item.brand
-	}
+	@GraphQLQuery
+	@Column(name = "brand")
+	String brand
+
+	@GraphQLQuery
+	@Column(name = "fix_asset")
+	Boolean fixAsset
+
+	@GraphQLQuery
+	@Column(name = "consignment")
+	Boolean consignment
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 
 	@Transient
 	String getUnitMeasurement() {
 		return "${item.unit_of_purchase?.unitDescription} (${item.item_conversion} ${item.unit_of_usage?.unitDescription})"
+	}
+
+	@Transient
+	String getUou() {
+		return item.unit_of_usage?.unitDescription
 	}
 
 	@GraphQLQuery(name = "status")
@@ -151,9 +159,9 @@ class Inventory implements Serializable {
 		def rate = 0.00
 		if(actualCost && sellingPrice){
 			def lprice = actualCost;
-			def sprice = (sellingPrice - outputTax) - actualCost;
+			def sprice = sellingPrice - actualCost;
 			rate = (sprice / lprice) * 100;
 		}
-		rate
+		rate.setScale(2, RoundingMode.HALF_EVEN)
 	}
 }

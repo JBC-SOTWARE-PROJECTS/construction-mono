@@ -4,9 +4,9 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 
 const { confirm } = Modal;
 
-const confirmDelete = (message: string, onComfirm: () => void) => {
+const confirmDelete = (message: string, onComfirm: () => void, title?: string) => {
   confirm({
-    title: "Are you sure delete this record?",
+    title: title ?? "Are you sure delete this record?",
     icon: <ExclamationCircleFilled />,
     content: message,
     okText: "Yes",

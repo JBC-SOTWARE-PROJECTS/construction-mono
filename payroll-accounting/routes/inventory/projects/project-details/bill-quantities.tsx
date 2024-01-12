@@ -121,6 +121,7 @@ export default function BillQuantitesContent() {
 
   return (
     <PageContainer
+      className="project-details"
       pageHeaderRender={(e) => <ProjectHeader id={query?.id as string} />}>
       <ProCard
         title="Project Bill of Quantities List"

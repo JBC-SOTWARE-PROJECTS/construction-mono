@@ -1,3 +1,4 @@
+import { frontEndUrl } from "@/shared/settings";
 import { TDiverseTradeMenu } from "@/utility/interfaces";
 import {
   BarcodeOutlined,
@@ -27,46 +28,53 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     subtitle:
       "From Request to Receipt: Enhancing Inventory Control with Purchase Requests and Orders.",
     icon: <ShoppingOutlined className="diverse-trade-icon" />,
-    path: "/inventory/purchases",
+    path: `${frontEndUrl}/main/transactions/pr`,
+    customPath: true,
   },
   {
     title: "Delivery Receiving  and Returns",
     subtitle:
       "Navigating the Inventory Lifecycle: Streamlining Delivery Receiving and Returns for Maximum Efficiency.",
     icon: <ShoppingCartOutlined className="diverse-trade-icon" />,
-    path: "/inventory/deliveries-and-returns",
+    path: `${frontEndUrl}/main/transactions/dr`,
+    customPath: true,
   },
   {
     title: "Item Issuances and Expense",
     subtitle:
       "Efficient Inventory Utilization: Mastering Item Issuances and Expense Tracking.",
     icon: <InteractionOutlined className="diverse-trade-icon" />,
-    path: "/inventory/issuances-and-expense",
+    path: `${frontEndUrl}/main/transactions/issuances`,
+    customPath: true,
   },
   {
     title: "Material Production (Repacking)",
     subtitle: "Smart Repacking: Streamlining Material Production in Inventory.",
     icon: <ApiOutlined className="diverse-trade-icon" />,
-    path: "/inventory/material-production",
+    path: `${frontEndUrl}/main/transactions/mp`,
+    customPath: true,
   },
   {
     title: "Quantity Adjustments",
     subtitle: "Fine-Tuning Inventory: Easy Steps for Quantity Adjustments.",
     icon: <InsertRowBelowOutlined className="diverse-trade-icon" />,
-    path: "/inventory/quantity-adjustments",
+    path: `${frontEndUrl}/main/transactions/adjustments`,
+    customPath: true,
   },
   {
     title: "Setup Beginning Balances",
     subtitle: "Inventory Head Start: Easy Beginning Balance Configuration.",
     icon: <TableOutlined className="diverse-trade-icon" />,
-    path: "/inventory/beginning-balance",
+    path: `${frontEndUrl}/main/transactions/bc`,
+    customPath: true,
   },
   {
     title: "Markup and Cost Control",
     subtitle:
       "Profit Optimization: Simplified Markup and Cost Control in Inventory.",
     icon: <WalletOutlined className="diverse-trade-icon" />,
-    path: "/inventory/markup-cost-control",
+    path: `${frontEndUrl}/main/transactions/markup`,
+    customPath: true,
   },
   {
     title: "Inventory Monitoring",

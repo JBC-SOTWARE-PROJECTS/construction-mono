@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
+import com.amazonaws.services.s3.model.DeleteObjectRequest
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.amazonaws.services.s3.transfer.TransferManager
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
+
 //import software.amazon.awssdk.core.sync.RequestBody
 //import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -44,22 +47,20 @@ public class DigitalOceanSpaceService {
                  .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
 
         String bucketName = env.getProperty("do.bucketname");
+        String saveType = env.getProperty("do.env.type");
 
         // Check if the bucket already exists
         if (!s3Client.doesBucketExist(bucketName)) {
             // Create the bucket
             s3Client.createBucket(bucketName);
             System.out.println("Bucket created successfully.");
-        } else {
-            System.out.println("Bucket already exists.");
         }
 
-        PutObjectRequest request = new PutObjectRequest(bucketName, folderPath + fileToUpload.getName(), fileToUpload);
+        PutObjectRequest request = new PutObjectRequest(bucketName, saveType+"/"+folderPath+"/"+ fileToUpload.getName(), fileToUpload);
         request.setCannedAcl(CannedAccessControlList.PublicRead);
 
         // Upload file to S3
         s3Client.putObject(request);
-
     }
 
     public void uploadMultiFileToSpace(List<File> filesToUpload, String folderPath) {
@@ -106,6 +107,38 @@ public class DigitalOceanSpaceService {
 
         // Shutdown TransferManager when done
         transferManager.shutdownNow();
+
+    }
+
+    public void deleteFileToSpace(String key) {
+
+        String accessKey = env.getProperty("do.accessKey");
+        String secretKey = env.getProperty("do.secretKey");
+
+        BasicAWSCredentials creds = new BasicAWSCredentials(accessKey, secretKey);
+
+        AmazonS3 s3Client = (AmazonS3Client) AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(env.getProperty("do.endpoint"), env.getProperty("do.region")))
+                .withCredentials(new AWSStaticCredentialsProvider(creds)).build();
+
+        String bucketName = env.getProperty("do.bucketname");
+
+        // Upload file to S3
+        s3Client.deleteObject(new DeleteObjectRequest(bucketName, key));
+    }
+
+    static File convertToFile(MultipartFile file) throws IOException {
+        File convFile = new File(file.getOriginalFilename());
+        convFile.createNewFile();
+        FileOutputStream fos = new FileOutputStream(convFile);
+        fos.write(file.getBytes());
+        fos.close();
+        return convFile;
+    }
+
+    static Boolean deleteToFile(File file) throws IOException {
+        File convFile = file;
+        return convFile.delete();
 
     }
 }

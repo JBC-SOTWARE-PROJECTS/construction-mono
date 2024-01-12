@@ -53,7 +53,6 @@ export default function UpsertAccomplishmentReport(props: IProps) {
   const onSubmit = (data: any) => {
     let payload = _.clone(data);
     payload.project = projectId;
-    payload.status = "ACTIVE";
     upsertRecord({
       variables: {
         id: record?.id,
@@ -99,10 +98,12 @@ export default function UpsertAccomplishmentReport(props: IProps) {
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
-          dateTransact: dayjs(),
-          description: `DAILY ACCOMPLISHMENT REPORT ${dayjs().format(
-            "MM/DD/YYYY"
-          )}`,
+          dateTransact: record?.id ? dayjs(record?.dateTransact) : dayjs(),
+          description: `DAILY ACCOMPLISHMENT REPORT ${
+            record?.id
+              ? dayjs(record?.dateTransact).format("MM/DD/YYYY")
+              : dayjs().format("MM/DD/YYYY")
+          }`,
         }}>
         <Row gutter={[8, 0]}>
           <Col span={24}>

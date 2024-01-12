@@ -533,4 +533,26 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/74_michael_timekeeping_employee_total_hours_and_salary.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/73_wilson_project_progress_images.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/74_wilson_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/75_wilson_project_percent.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/76_wilson_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/77_wilson_update_inventory_views.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/78_wilson_PR_PO_DR_additional_column.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/79_wilson_transaction_inventory_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/80_wilson_update_inventory_supplier_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/81_wilson_transaction_inventory_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/82_wilson_transaction_inventory_company.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/83_wilson_functions_update.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

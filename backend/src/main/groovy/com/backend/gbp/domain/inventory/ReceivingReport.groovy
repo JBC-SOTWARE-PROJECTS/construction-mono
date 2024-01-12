@@ -1,6 +1,7 @@
 package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.backend.gbp.domain.AbstractAuditingEntity
@@ -51,9 +52,15 @@ class ReceivingReport extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "user_fullname", columnDefinition = "varchar")
 	String userFullname
 
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset", referencedColumnName = "id")
+	Assets assets
 	
 	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -64,6 +71,10 @@ class ReceivingReport extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "received_ref_no", columnDefinition = 'varchar')
 	@UpperCase
 	String receivedRefNo
+
+	@GraphQLQuery
+	@Column(name = "category", columnDefinition = "varchar")
+	String category
 	
 	@GraphQLQuery
 	@Column(name = "received_ref_date", columnDefinition = 'timestamp without time zone')
@@ -156,6 +167,10 @@ class ReceivingReport extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "fix_asset", columnDefinition = 'bool')
 	Boolean fixAsset
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 	@JsonIgnore
 	@Transient

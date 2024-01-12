@@ -2,6 +2,7 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -34,21 +35,30 @@ class PurchaseOrder extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "eta_date", columnDefinition = "timestamp")
 	Instant etaDate
-	
-	@NotFound(action = NotFoundAction.IGNORE)
+
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "`supplier`", referencedColumnName = "id")
 	Supplier supplier
 
-	@NotFound(action = NotFoundAction.IGNORE)
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "`project`", referencedColumnName = "id")
 	Projects project
 
-	@NotFound(action = NotFoundAction.IGNORE)
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset", referencedColumnName = "id")
+	Assets assets
+
+	@GraphQLQuery
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "`payment_terms`", referencedColumnName = "id")
 	PaymentTerm paymentTerms
+
+	@GraphQLQuery
+	@Column(name = "category", columnDefinition = "varchar")
+	String category
 
 	@GraphQLQuery
 	@Column(name = "pr_nos", columnDefinition = "varchar")
@@ -90,6 +100,10 @@ class PurchaseOrder extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "is_completed", columnDefinition = "bool")
 	Boolean isCompleted
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 	@Transient
 	Instant getCreated() {

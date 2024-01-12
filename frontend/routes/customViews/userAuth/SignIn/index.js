@@ -42,7 +42,7 @@ const SignIn = () => {
           const searchObj = qs.parse(search);
           router.push(decodeURIComponent(searchObj.redirectUrl) || "/");
         } else {
-          router.push("/main/dashboard/crm");
+          router.push("/main/shop/");
         }
       })
       .catch((error) => {

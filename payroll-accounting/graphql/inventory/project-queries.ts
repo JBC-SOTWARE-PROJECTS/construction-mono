@@ -40,6 +40,7 @@ export const GET_PROJECTS_RECORDS = gql`
         prefixShortName
         projectColor
         projectStatusColor
+        projectPercent
         status
       }
       size
@@ -196,13 +197,30 @@ export const GET_RECORD_PROJECT_UPDATES_MATERIALS = gql`
       id
       dateTransact
       descLong
+      item {
+        id
+      }
       uou
       onHand
       qty
       balance
-      wCost
       subTotal
+      cost
       remarks
+      stockCardRefId
+      createdBy
+      lastModifiedBy
+      lastModifiedDate
+    }
+  }
+`;
+
+export const UPSERT_RECORD_PROJECT_ACCOMPLISHMENT_MATERIALS = gql`
+  mutation ($fields: Map_String_ObjectScalar, $id: UUID) {
+    upsertProjectMaterials(fields: $fields, id: $id) {
+      payload
+      success
+      message
     }
   }
 `
@@ -222,6 +240,14 @@ export const GET_INVENTORY_INFO = gql`
     }
   }
 `
+
+export const REMOVE_MATERIAL = gql`
+  mutation ($id: UUID) {
+    removedMaterial(id: $id) {
+      id
+    }
+  }
+`;
 
 export const GET_RECORD_PROJECT_UPDATES_WORKERS = gql`
   query ($id: UUID) {
@@ -274,6 +300,7 @@ export const GET_RECORDS_PROJECT_PROGRESS = gql`
         dateTransact
         description
         progress
+        progressPercent
         status
         createdBy
       }
@@ -293,3 +320,52 @@ export const UPSERT_RECORD_PROJECT_PROGRESS = gql`
     }
   }
 `
+
+export const GET_PROGRESS_IMAGES = gql`
+  query ($id: UUID) {
+    pProgressImagesByList(id: $id) {
+      id
+      dateTransact
+      folderName
+      fileName
+      mimetype
+      imageUrl
+    }
+  }
+`;
+
+export const REMOVE_PROGRESS_IMAGE = gql`
+  mutation ($id: UUID) {
+    removeProjectProgressImage(id: $id) {
+      payload
+      success
+      message
+    }
+  }
+`;
+
+export const GET_MATERIAL_USED_BY_PROJECT = gql`
+  query ($id: UUID, $filter: String, $page: Int, $size: Int) {
+    pMaterialByPage(id: $id, filter: $filter, page: $page, size: $size) {
+      content {
+        id
+        projectUpdates {
+          id
+          transNo
+        }
+        dateTransact
+        descLong
+        uou
+        onHand
+        qty
+        balance
+        cost
+        subTotal
+        remarks
+      }
+      size
+      totalElements
+      number
+    }
+  }
+`;

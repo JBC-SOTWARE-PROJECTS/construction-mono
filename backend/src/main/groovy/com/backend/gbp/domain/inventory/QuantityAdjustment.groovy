@@ -36,13 +36,11 @@ class QuantityAdjustment extends AbstractAuditingEntity {
 	Instant dateTrans
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
 	Item item
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "office", referencedColumnName = "id")
 	Office office
@@ -64,14 +62,17 @@ class QuantityAdjustment extends AbstractAuditingEntity {
 	Boolean isCancel
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "adjustment_type", referencedColumnName = "id")
 	QuantityAdjustmentType quantityAdjustmentType
 
 	@GraphQLQuery
 	@Column(name = "remarks")
 	String remarks
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 
 	@GraphQLQuery(name = "unitMeasurement")
 	@Transient

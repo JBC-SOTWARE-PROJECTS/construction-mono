@@ -7,6 +7,7 @@ import com.backend.gbp.domain.inventory.ReturnSupplier
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseRtsDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -63,8 +64,10 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
     List<ApReferenceDto> returnGetReferenceType(){
         List<ApReferenceDto> records = []
 
-        String query = '''select distinct p.reference_type as reference_type from inventory.return_supplier p where p.reference_type is not null '''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''select distinct p.reference_type as reference_type from inventory.return_supplier p where p.reference_type is not null and p.company = :company'''
         Map<String, Object> params = new HashMap<>()
+        params.put("company", company)
         def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
 
         recordsRaw.each {
@@ -85,7 +88,7 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
 			@GraphQLArgument(name = "size") Integer size
 	) {
 
-
+        def company = SecurityUtils.currentCompanyId()
 		String query = '''Select po from ReturnSupplier po where
 						(lower(po.rtsNo) like lower(concat('%',:filter,'%')) or
 						lower(po.receivedRefNo) like lower(concat('%',:filter,'%')))
@@ -99,6 +102,12 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
         params.put('office', office)
+
+        if (company) {
+            query += ''' and (po.company = :company)'''
+            countQuery += ''' and (po.company = :company)'''
+            params.put("company", company)
+        }
 
 
 		query += ''' ORDER BY po.rtsNo DESC'''
@@ -115,6 +124,8 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
             @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         ReturnSupplier rts = upsertFromMap(id, fields, { ReturnSupplier entity , boolean forInsert ->
             if(forInsert){
                 entity.rtsNo = generatorService.getNextValue(GeneratorType.RET_SUP, {
@@ -122,6 +133,7 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
                 })
                 entity.isPosted = false
                 entity.isVoid = false
+                entity.company = company
             }
         })
 //        items to be inserted
