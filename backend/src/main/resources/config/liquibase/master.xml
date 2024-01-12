@@ -527,4 +527,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/72_wilson_project_progress.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/73_donss_add_project_work_accomplish.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/73_michael_payroll_code.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/74_michael_timekeeping_employee_total_hours_and_salary.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

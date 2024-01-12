@@ -200,12 +200,65 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
                             TimekeepingService.consolidateProjectBreakdown(employeeBreakdownMap, it)
                         }
                     }
+                    HoursLog totalHours = new HoursLog()
+                    totalHours.late = 0
+                    totalHours.underTime = 0
+                    totalHours.absent = 0
+                    totalHours.regular = 0
+                    totalHours.overtime = 0
+                    totalHours.regularHoliday = 0
+                    totalHours.overtimeHoliday = 0
+                    totalHours.regularDoubleHoliday = 0
+                    totalHours.overtimeDoubleHoliday = 0
+                    totalHours.regularSpecialHoliday = 0
+                    totalHours.overtimeSpecialHoliday = 0
+
+                    EmployeeSalaryDto totalSalary = new EmployeeSalaryDto()
+                    totalSalary.late = 0
+                    totalSalary.underTime = 0
+                    totalSalary.absent = 0
+                    totalSalary.regular = 0
+                    totalSalary.overtime = 0
+                    totalSalary.regularHoliday = 0
+                    totalSalary.overtimeHoliday = 0
+                    totalSalary.regularDoubleHoliday = 0
+                    totalSalary.overtimeDoubleHoliday = 0
+                    totalSalary.regularSpecialHoliday = 0
+                    totalSalary.overtimeSpecialHoliday = 0
 
                     employeeBreakdownMap.keySet().each {
                         HoursLog hoursLog = employeeBreakdownMap.get(it.toString())
+
+                        totalHours.late += hoursLog.late
+                        totalHours.underTime += hoursLog.underTime
+                        totalHours.absent += hoursLog.absent
+                        totalHours.regular += hoursLog.regular
+                        totalHours.overtime += hoursLog.overtime
+                        totalHours.regularHoliday += hoursLog.regularHoliday
+                        totalHours.overtimeHoliday += hoursLog.overtimeHoliday
+                        totalHours.regularDoubleHoliday += hoursLog.regularDoubleHoliday
+                        totalHours.overtimeDoubleHoliday += hoursLog.overtimeDoubleHoliday
+                        totalHours.regularSpecialHoliday += hoursLog.regularSpecialHoliday
+                        totalHours.overtimeSpecialHoliday += hoursLog.overtimeSpecialHoliday
+
                         timekeepingEmployee.projectBreakdown.push(hoursLog)
                         timekeepingEmployee.salaryBreakdown.push(calculateSalaryBreakdown(multiplier, hoursLog, timekeepingEmployee.payrollEmployee.employee))
+                        timekeepingEmployee.salaryBreakdown.each {
+                            totalSalary.late += it.late
+                            totalSalary.underTime += it.underTime
+                            totalSalary.absent += it.absent
+                            totalSalary.regular += it.regular
+                            totalSalary.overtime += it.overtime
+                            totalSalary.regularHoliday += it.regularHoliday
+                            totalSalary.overtimeHoliday += it.overtimeHoliday
+                            totalSalary.regularDoubleHoliday += it.regularDoubleHoliday
+                            totalSalary.overtimeDoubleHoliday += it.overtimeDoubleHoliday
+                            totalSalary.regularSpecialHoliday += it.regularSpecialHoliday
+                            totalSalary.overtimeSpecialHoliday += it.overtimeSpecialHoliday
+                        }
                     }
+                    timekeepingEmployee.totalHours = totalHours
+                    timekeepingEmployee.totalSalary = totalSalary
                 }
             } else {
                 PayrollEmployee payrollEmployee = payrollEmployeeRepository.findById(timekeepingEmployee.payrollEmployee.id).get()

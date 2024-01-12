@@ -8,7 +8,6 @@ const GET_EMPLOYEES = gql`
       id
       fullName
       gender
-      status
       position {
         description
       }

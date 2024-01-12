@@ -36,12 +36,14 @@ function RawLogs({
   callback,
   hideAddButton = false,
 }: IProps) {
-  const [_, { onNextPage }] = usePaginationState({}, 0, 25);
+  const [state, { onNextPage }] = usePaginationState({}, 0, 25);
 
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [startDate, endDate, handleDateChange] = useDateRangeState();
-  const [getAttendance, data, loading, refetch] = useGetEmployeeAttendance();
+  const [getAttendance, data, loading, refetch, totalElements] =
+    useGetEmployeeAttendance();
+
   const [ignoreAttendance, loadingIgnore] = useIgnoreAttendance(() => {
     refetch();
     if (callback) callback();
@@ -52,7 +54,6 @@ function RawLogs({
     setRecord(record);
     setOpen(true);
   };
-  console.log("dat", data)
 
   const columns: ColumnsType<EmployeeAttendance> = [
     {
@@ -60,8 +61,15 @@ function RawLogs({
       dataIndex: "cameraCapture",
       key: "cameraCapture",
       render: (value) => {
-        return <DOImageViewer filename={value} folder="ATTENDANCE_CAPTURE" width={50} height={50}/>;
-      }
+        return (
+          <DOImageViewer
+            filename={value}
+            folder="ATTENDANCE_CAPTURE"
+            width={50}
+            height={50}
+          />
+        );
+      },
     },
     {
       title: "Date Time",
@@ -145,8 +153,8 @@ function RawLogs({
     if (useStaticData && employeeId) {
       getAttendance({
         id: employeeId,
-        size: 10,
-        page: 0,
+        size: state?.pageSize,
+        page: state?.page,
         startDate: startDateStatic?.startOf("day"),
         endDate: endDateStatic?.endOf("day"),
       });
@@ -157,13 +165,13 @@ function RawLogs({
     if (!useStaticData) {
       getAttendance({
         id: router?.query?.id,
-        size: 10,
-        page: 0,
+        size: state?.pageSize,
+        page: state?.page,
         startDate: startDate?.startOf("day"),
         endDate: endDate?.endOf("day"),
       });
     }
-  }, [router?.query?.id]);
+  }, [router?.query?.id, state]);
   return (
     <>
       {(!useStaticData || !hideAddButton) && (
@@ -193,8 +201,8 @@ function RawLogs({
                   onClick={() => {
                     getAttendance({
                       id: router?.query?.id || employeeId,
-                      size: 10,
-                      page: 0,
+                      size: state?.pageSize,
+                      page: state?.page,
                       startDate: startDate?.startOf("day"),
                       endDate: endDate?.endOf("day"),
                     });
@@ -226,7 +234,12 @@ function RawLogs({
         dataSource={data?.content}
         size="small"
         columns={columns}
-        onChange={onNextPage}
+        pagination={{
+          total: totalElements,
+          pageSize: state?.pageSize,
+          current: state.page + 1,
+          onChange: onNextPage,
+        }}
         loading={loading || loadingIgnore}
       />
       {open && (

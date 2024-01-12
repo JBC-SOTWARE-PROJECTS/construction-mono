@@ -98,6 +98,10 @@ class Projects extends AbstractAuditingEntity implements Serializable, Subaccoun
 	@Column(name = "company")
 	UUID company
 
+	@GraphQLQuery
+	@Column(name = "contract_id", columnDefinition = 'varchar')
+	String contractId
+
 	@Override
 	String getCode() {
 		return projectCode

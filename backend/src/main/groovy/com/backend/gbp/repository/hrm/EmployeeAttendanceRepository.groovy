@@ -19,6 +19,19 @@ interface EmployeeAttendanceRepository extends JpaRepository<EmployeeAttendance,
 
     @Query(
             value = """Select e from EmployeeAttendance e 
+				where e.employee.id = :id
+				and (e.type = :type)
+				and (e.isIgnored <> true or e.isIgnored is null)
+				and function('date', e.attendance_time) = function('date', :dateProvide)"""
+    )
+    List<EmployeeAttendance> getEmployeeAttListByDateType(
+            @Param("id") UUID id,
+            @Param("dateProvide") Instant dateProvide,
+            @Param("type") String type
+    )
+
+    @Query(
+            value = """Select e from EmployeeAttendance e 
 				join fetch e.employee emp
 				where emp.id = :id
 				and (e.attendance_time >= :startDate and e.attendance_time <= :endDate)""",

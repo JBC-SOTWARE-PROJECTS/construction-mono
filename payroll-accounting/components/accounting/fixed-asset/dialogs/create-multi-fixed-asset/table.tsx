@@ -178,10 +178,6 @@ export default function MultiFixedAssetItemTable(
     setDataSource(newData)
   }
 
-  // const columns: ColumnsType<any> = [
-
-  // ]
-
   const defaultColumns: (ColumnTypes[number] & {
     editable?: boolean
     dataIndex: string

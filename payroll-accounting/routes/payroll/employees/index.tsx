@@ -80,7 +80,7 @@ export default function EmployeesPage({ account }: IPageProps) {
             loading={loading}
             totalElements={1 as number}
             handleOpen={(record) => console.log("record => ", record)}
-            changePage={(page) =>
+            changePage={(page : any) =>
               setFilters((prev: any) => ({ ...prev, page: page }))
             }
           />
