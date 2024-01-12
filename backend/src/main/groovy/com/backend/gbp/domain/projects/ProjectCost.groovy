@@ -29,8 +29,7 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	UUID id
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
 

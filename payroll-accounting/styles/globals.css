@@ -488,6 +488,18 @@ th.ant-table-cell {
 }
 
 /* responsive */
+
+@media screen and (max-width: 767px) {
+  .project-page-header {
+    padding-inline-start: 10px;
+    padding-inline-end: 10px;
+  }
+
+  .project-details .ant-pro-page-container-children-container {
+    padding-inline: 10px !important;
+  }
+}
+
 @media screen and (max-width: 756px) {
   .billing-info-width {
     font-weight: 700;
@@ -513,4 +525,16 @@ th.ant-table-cell {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.project-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.ant-image-preview-mask {
+  background-color: rgba(0, 0, 0, 0.9) !important;
 }

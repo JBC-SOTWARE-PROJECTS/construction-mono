@@ -57,6 +57,10 @@ class SupplierInventory implements Serializable {
 	@Column(name = "item_code")
 	String itemCode
 
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
+
 	@Transient
 	String getBrand() {
 		return item.brand

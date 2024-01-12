@@ -7,6 +7,7 @@ import { gql } from "apollo-boost";
 import _ from "lodash";
 import numeral from "numeral";
 import { createObj } from "../../../shared/constant";
+import DescLong from "../../../app/components/common/DescLong";
 
 const { Search } = Input;
 
@@ -32,11 +33,15 @@ const GET_RECORDS = gql`
           id
           descLong
           item_conversion
-          vatable
           unit_of_usage {
             id
             unitDescription
           }
+          production
+          isMedicine
+          vatable
+          fixAsset
+          consignment
         }
         descLong
         unitMeasurement
@@ -121,6 +126,9 @@ const InventoryByOfficeModal = ({ visible, hide, ...props }) => {
       title: "Description",
       dataIndex: "descLong",
       key: "descLong",
+      render: (text, record) => (
+        <DescLong descripton={text} record={record.item} />
+      ),
     },
     {
       title: (

@@ -53,14 +53,12 @@ class Projects extends AbstractAuditingEntity implements Serializable, Subaccoun
 	Instant projectEnded
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "customer", referencedColumnName = "id")
 	ArCustomers customer
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "location", referencedColumnName = "id")
 	Office location
 
@@ -93,6 +91,12 @@ class Projects extends AbstractAuditingEntity implements Serializable, Subaccoun
 	@Column(name = "project_status_color", columnDefinition = 'varchar')
 	@UpperCase
 	String projectStatusColor
+
+	@GraphQLQuery
+	@Column(name = "project_percent")
+	BigDecimal projectPercent
+
+
 
 	@GraphQLQuery
 	@Column(name = "company")

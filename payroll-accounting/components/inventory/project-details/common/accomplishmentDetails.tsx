@@ -26,13 +26,13 @@ export default function AccomplishmentDetails(props: Iprops) {
       <Divider plain>Total Number of Workers</Divider>
       <Row>
         <Col span={24}>
-          <ProjectAccomplishmentWorkersTable projectUpdateId={record.id} />
+          <ProjectAccomplishmentWorkersTable projectUpdateId={record.id} isLocked={record?.status !== "ACTIVE"} />
         </Col>
       </Row>
       <Divider plain>Materials Report</Divider>
       <Row>
         <Col span={24}>
-          <ProjectAccomplishmentMaterialsTable projectUpdateId={record.id} />
+          <ProjectAccomplishmentMaterialsTable projectUpdateId={record.id} isLocked={record?.status !== "ACTIVE"}  />
         </Col>
       </Row>
     </div>

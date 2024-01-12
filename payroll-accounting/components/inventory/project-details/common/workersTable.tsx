@@ -20,19 +20,21 @@ import { DateFormatterWithTime } from "../../../../utility/helper";
 
 interface IProps {
   projectUpdateId: string;
+  isLocked?: boolean;
 }
 
 const { Text } = Typography;
 
 export default function ProjectAccomplishmentWorkersTable({
   projectUpdateId,
+  isLocked,
 }: IProps) {
   // ===================== menus ========================
   const { message } = App.useApp();
   const modal = useDialog(UpsertAccomplishmentWorkers);
   const router = useRouter();
   const { query } = router;
-
+  const account = useContext(AccountContext);
   // ===================== queries ========================
   const { data, loading, refetch } = useQuery<Query>(
     GET_RECORD_PROJECT_UPDATES_WORKERS,
@@ -142,13 +144,28 @@ export default function ProjectAccomplishmentWorkersTable({
             size="small"
             type="dashed"
             onClick={() => onUpsertRecord(record)}
-            disabled={false}>
+            disabled={
+              isLocked
+                ? accessControl(
+                    account?.user?.access,
+                    "overwrite_lock_accomplishment"
+                  )
+                : false
+            }>
             <EditOutlined />
           </Button>
           <Button
             size="small"
             danger
             type="dashed"
+            disabled={
+              isLocked
+                ? accessControl(
+                    account?.user?.access,
+                    "overwrite_lock_accomplishment"
+                  )
+                : false
+            }
             onClick={() => onConfirmRemove(record)}>
             <DeleteOutlined />
           </Button>
@@ -161,7 +178,17 @@ export default function ProjectAccomplishmentWorkersTable({
     <Row gutter={[0, 8]}>
       <Col span={24}>
         <div className="w-full dev-right">
-          <Button type="primary" onClick={() => onUpsertRecord()}>
+          <Button
+            type="primary"
+            disabled={
+              isLocked
+                ? accessControl(
+                    account?.user?.access,
+                    "overwrite_lock_accomplishment"
+                  )
+                : false
+            }
+            onClick={() => onUpsertRecord()}>
             Record Number of Workers
           </Button>
         </div>
