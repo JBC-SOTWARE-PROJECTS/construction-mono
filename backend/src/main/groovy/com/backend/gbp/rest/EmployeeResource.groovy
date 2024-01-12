@@ -211,10 +211,10 @@ class EmployeeResource {
         ObjectMapper objectMapper = new ObjectMapper();
         List<EmployeeAttendanceDto> reqEmpAttObj = objectMapper.readValue(attendanceList, new TypeReference<List<EmployeeAttendanceDto>>() {});
 
-        ArrayList<EmployeeAttendance> empAttendance = new ArrayList<>();
+        List<EmployeeAttendance> savedAttendances = new ArrayList<>();
 
         for (EmployeeAttendanceDto reAtt : reqEmpAttObj){
-
+            ArrayList<EmployeeAttendance> empAttendance = new ArrayList<>();
             // Check if naay prev
             if(reAtt.type.equals("OUT")){
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -222,13 +222,16 @@ class EmployeeResource {
 
                 List<EmployeeAttendance>   employeeAttendance = employeeAttendanceService.getAttTypeByDate(reAtt.employee, Instant.parse(reAtt.attendance_time),reAtt.type);
 
-                if(employeeAttendance.size() > 0) {
+                if( employeeAttendance != null && employeeAttendance.size() > 0) {
                     for (EmployeeAttendance ea : employeeAttendance){
                         String fieldsToIgnore = "{\"isIgnored\": \"true\"}";
                         Map<String, Object> fieldMapToIgnore = objectMapper.readValue(fieldsToIgnore, Map.class);
                         GraphQLResVal<EmployeeAttendance> toIgnore = employeeAttendanceService.upsertEmployeeAttendance(ea.id, ea.employee.id, ea.project ? ea.project.id : null ,fieldMapToIgnore );
+
                     }
                 }
+
+
             }
             // Check if naay prev
 
@@ -256,10 +259,10 @@ class EmployeeResource {
 
 
             empAttendance.add(attendance);
-
+            List<EmployeeAttendance>  savedAttendancesNew = employeeAttendanceService.syncAttendance((List<EmployeeAttendance>) empAttendance);
+            savedAttendances.addAll(savedAttendancesNew);
         }
 
-        List<EmployeeAttendance> savedAttendances = employeeAttendanceService.syncAttendance((List<EmployeeAttendance>) empAttendance);
 
         ArrayList<EmployeeAttendanceDto> employeeAttendanceDtos= new ArrayList<>();
 
