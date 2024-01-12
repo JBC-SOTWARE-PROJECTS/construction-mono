@@ -12,6 +12,10 @@ const GET_PAYROLL = gql`
       dateEnd
       description
       status
+      payrollEmployees {
+        withholdingTax
+        status
+      }
       timekeeping {
         status
         salaryBreakdown {
