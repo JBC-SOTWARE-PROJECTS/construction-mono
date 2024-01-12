@@ -14,7 +14,7 @@ export const GET_ACCOUNTS_FOLIO_RECORD = gql`
         billNo
         customer {
           id
-          fullName
+          customerName
         }
         project {
           id
@@ -32,5 +32,82 @@ export const GET_ACCOUNTS_FOLIO_RECORD = gql`
       number
     }
     totalBalances
+  }
+`;
+
+export const GET_SHIFTING_RECORDS = gql`
+  query ($filter: String, $status: Boolean) {
+    activeShiftList(filter: $filter, status: $status) {
+      id
+      terminal {
+        id
+        terminal_no
+      }
+      employee {
+        id
+        fullName
+      }
+      shiftNo
+      active
+      startShift
+      endShift
+      remarks
+    }
+  }
+`;
+
+export const GET_RECORD_TERMINAL_LIST = gql`
+  query ($filter: String) {
+    terminalFilter(filter: $filter) {
+      id
+      terminal_no
+      employee {
+        id
+        fullName
+      }
+      description
+      mac_address
+    }
+  }
+`;
+
+export const UPSERT_RECORD_TERMINAL = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    addTerminal(id: $id, fields: $fields) {
+      id
+    }
+  }
+`;
+
+export const GET_CASHIER_EMPLOYEE = gql`
+  query ($role: String, $filter: String) {
+    searchEmployeesByRole(role: $role, filter: $filter) {
+      value: id
+      label: fullName
+    }
+  }
+`;
+
+export const OPEN_SHIFT = gql`
+  mutation {
+    addShift {
+      id
+    }
+  }
+`;
+
+export const CLOSE_SHIFT = gql`
+  mutation {
+    closeShift {
+      id
+    }
+  }
+`;
+
+export const UPSERT_RECORD_REMARKS = gql`
+  mutation ($id: UUID, $remarks: String) {
+    addRemarks(id: $id, remarks: $remarks) {
+      id
+    }
   }
 `;

@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.accounting.AccountCategory
 import com.backend.gbp.domain.accounting.AccountType
 import com.backend.gbp.domain.accounting.ParentAccount
+import com.backend.gbp.domain.accounting.ReportType
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.security.SecurityUtils
@@ -38,6 +39,10 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 	ParentAccountServices() {
 		super(ParentAccount.class)
 	}
+
+	@Autowired
+	ReportsLayoutItemServices layoutItemServices
+
 
 	@GraphQLQuery(name = "parentAccountsPerCategory", description = "List of parents account")
 	List<AccountTypeDto> parentAccountsPerCategory() {
@@ -166,6 +171,17 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 		""")
 			.setParameter('companyID',companyID)
 			.resultList
+	}
+
+	@GraphQLQuery(name = "getParentAccountForReportLayout", description = "List of Parent Accounts")
+	List<ParentAccount> getParentAccountForReportLayout(
+			@GraphQLArgument(name = "reportType") ReportType reportType
+	) {
+		def existingUUID = layoutItemServices.getAccountsUUIDOnActiveRL(reportType)
+		return 	getParentAccountList()
+				.findAll { it -> existingUUID[it.id] ? false : true }
+				.sort {it-> it.accountName }
+
 	}
 }
 

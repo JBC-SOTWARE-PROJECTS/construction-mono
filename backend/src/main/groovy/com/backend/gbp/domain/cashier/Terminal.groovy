@@ -39,7 +39,10 @@ class Terminal extends AbstractAuditingEntity {
 	String mac_address
 
 	@GraphQLQuery
-    @NotFound(action = NotFoundAction.IGNORE)
+	@Column(name = "company")
+	UUID company
+
+	@GraphQLQuery
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee", referencedColumnName = "id")
     Employee employee
