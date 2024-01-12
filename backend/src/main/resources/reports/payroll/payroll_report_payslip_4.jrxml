@@ -78,7 +78,7 @@
 		<field name="deductionField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="summaryField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="netpay" class="java.lang.Double"/>
-		<field name="dateprinted" class="java.sql.Date"/>
+		<field name="dateprinted" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="Dataset2" uuid="df8c833a-f638-4ebf-bd22-2dbdeed4fb59">
 		<queryString>
@@ -91,7 +91,7 @@
 		<field name="deductionField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="summaryField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 		<field name="netpay" class="java.lang.Double"/>
-		<field name="dateprinted" class="java.sql.Date"/>
+		<field name="dateprinted" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="DatasetGross" uuid="341e8707-a064-49b3-92ea-f94ae838bb2d">
 		<parameter name="totalGross" class="java.math.BigDecimal"/>
@@ -102,6 +102,13 @@
 		<field name="nohours" class="java.math.BigDecimal"/>
 		<field name="rate" class="java.math.BigDecimal"/>
 		<field name="total" class="java.math.BigDecimal"/>
+		<field name="totalGross" class="java.math.BigDecimal"/>
+		<variable name="totalGross" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{total}]]></variableExpression>
+		</variable>
+		<variable name="totalGross2" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{total}]]></variableExpression>
+		</variable>
 	</subDataset>
 	<subDataset name="DatasetDeduction" uuid="1ffa0bec-4e10-42f8-80b3-53affa363d7a">
 		<parameter name="totalDeduction" class="java.math.BigDecimal"/>
@@ -112,6 +119,13 @@
 		<field name="nohours" class="java.math.BigDecimal"/>
 		<field name="rate" class="java.math.BigDecimal"/>
 		<field name="total" class="java.math.BigDecimal"/>
+		<field name="totalDeduction" class="java.math.BigDecimal"/>
+		<variable name="totalDeduction" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{total}]]></variableExpression>
+		</variable>
+		<variable name="totalDeduction2" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{total}]]></variableExpression>
+		</variable>
 	</subDataset>
 	<subDataset name="DatasetSummary" uuid="32b2a10c-3ae7-4114-b2af-7045d44d8b17">
 		<parameter name="totalAdjustment" class="java.math.BigDecimal"/>
@@ -122,6 +136,12 @@
 		<field name="nohours" class="java.math.BigDecimal"/>
 		<field name="rate" class="java.math.BigDecimal"/>
 		<field name="total" class="java.math.BigDecimal"/>
+		<variable name="totalAdjustment" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{total}]]></variableExpression>
+		</variable>
+		<variable name="totalAdjustment2" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{total}]]></variableExpression>
+		</variable>
 	</subDataset>
 	<parameter name="params1" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="params2" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
@@ -453,7 +473,7 @@
 											<textElement textAlignment="Center" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
-											<textFieldExpression><![CDATA[$P{totalGross}]]></textFieldExpression>
+											<textFieldExpression><![CDATA[$V{totalGross}]]></textFieldExpression>
 										</textField>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
@@ -489,7 +509,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="200" height="20" uuid="f10ffae3-fbd3-4886-a2a6-2e0ec336c3d6"/>
+											<reportElement positionType="Float" x="0" y="0" width="200" height="20" uuid="f10ffae3-fbd3-4886-a2a6-2e0ec336c3d6"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7" isBold="true"/>
 											</textElement>
@@ -498,7 +518,7 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="200" height="20" uuid="0647327d-ea5e-4c5e-a331-52a2dc1c78e5"/>
+											<reportElement positionType="Float" x="0" y="0" width="200" height="20" uuid="0647327d-ea5e-4c5e-a331-52a2dc1c78e5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -507,7 +527,7 @@
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="200" height="20" uuid="ff7b8c53-8179-402a-b26a-730bcdea324f"/>
+											<reportElement positionType="Float" x="0" y="0" width="200" height="20" uuid="ff7b8c53-8179-402a-b26a-730bcdea324f"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -520,7 +540,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="86dbca0b-6ad5-4875-a320-5d9ae750853e"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="86dbca0b-6ad5-4875-a320-5d9ae750853e"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -529,13 +549,13 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="ae639e64-65a6-4683-ae1c-80e2190bb80f"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="ae639e64-65a6-4683-ae1c-80e2190bb80f"/>
 											<text><![CDATA[]]></text>
 										</staticText>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="6efea54d-1176-42bf-a15d-31cfc88188e0"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="6efea54d-1176-42bf-a15d-31cfc88188e0"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -548,7 +568,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="3587c653-8a51-45aa-a8ef-5b3054d98c54"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="3587c653-8a51-45aa-a8ef-5b3054d98c54"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -557,13 +577,13 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="0cdea19b-3fb8-4003-94c3-803e02e07aa0"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="0cdea19b-3fb8-4003-94c3-803e02e07aa0"/>
 											<text><![CDATA[]]></text>
 										</staticText>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="150b9dec-7b81-4549-a3cf-6ba02dfa4835"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="150b9dec-7b81-4549-a3cf-6ba02dfa4835"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -576,7 +596,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" uuid="0fd2bf42-031f-4e9e-9584-1f8aea19f72e"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" uuid="0fd2bf42-031f-4e9e-9584-1f8aea19f72e"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -585,16 +605,16 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" uuid="b894bab3-3844-4f88-a153-aafd0cd34fbe"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" uuid="b894bab3-3844-4f88-a153-aafd0cd34fbe"/>
 											<textElement textAlignment="Center" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
-											<textFieldExpression><![CDATA[$P{totalDeduction}]]></textFieldExpression>
+											<textFieldExpression><![CDATA[$V{totalDeduction}]]></textFieldExpression>
 										</textField>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" uuid="2ef40298-2ea9-47e5-ac0f-f420233d848b"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" uuid="2ef40298-2ea9-47e5-ac0f-f420233d848b"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -620,7 +640,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="200" height="20" uuid="ef0e1df0-a683-43d3-aca2-283aa0a15a25"/>
+											<reportElement positionType="Float" x="0" y="0" width="200" height="20" uuid="ef0e1df0-a683-43d3-aca2-283aa0a15a25"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7" isBold="true"/>
 											</textElement>
@@ -629,7 +649,7 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="200" height="20" isPrintWhenDetailOverflows="true" uuid="947eab9d-a969-428e-9909-25190a416f5d"/>
+											<reportElement positionType="Float" x="0" y="0" width="200" height="20" isPrintWhenDetailOverflows="true" uuid="947eab9d-a969-428e-9909-25190a416f5d"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -638,7 +658,7 @@
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="200" height="20" isPrintWhenDetailOverflows="true" uuid="08000d3d-33dc-43e4-b259-ececbb6f8a88"/>
+											<reportElement positionType="Float" x="0" y="0" width="200" height="20" isPrintWhenDetailOverflows="true" uuid="08000d3d-33dc-43e4-b259-ececbb6f8a88"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -651,7 +671,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="06ce952b-d826-474b-bcc2-e5b51fa55f4e"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="06ce952b-d826-474b-bcc2-e5b51fa55f4e"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -660,13 +680,13 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="c78fe128-570b-4a48-b167-6005e0880bf4"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="c78fe128-570b-4a48-b167-6005e0880bf4"/>
 											<text><![CDATA[]]></text>
 										</staticText>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="1badab80-95a6-4306-a62d-2e8bbf395a86"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="1badab80-95a6-4306-a62d-2e8bbf395a86"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -679,7 +699,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" uuid="79ef5dc1-9214-4ae4-81be-403860d25270"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" uuid="79ef5dc1-9214-4ae4-81be-403860d25270"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -688,13 +708,13 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="93f7f4d4-e08f-4009-b179-83f325bc244c"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="93f7f4d4-e08f-4009-b179-83f325bc244c"/>
 											<text><![CDATA[]]></text>
 										</staticText>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="7f4e08c3-75df-46c0-9f17-88f72cc96b9c"/>
+											<reportElement positionType="Float" x="0" y="0" width="70" height="20" isPrintWhenDetailOverflows="true" uuid="7f4e08c3-75df-46c0-9f17-88f72cc96b9c"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -707,7 +727,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" uuid="c3603428-b8f2-408a-9605-e31116c3e15d"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" uuid="c3603428-b8f2-408a-9605-e31116c3e15d"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
@@ -716,16 +736,16 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="3ff74514-ba8c-4bba-9e29-fdc7eb85c7d1"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="3ff74514-ba8c-4bba-9e29-fdc7eb85c7d1"/>
 											<textElement textAlignment="Center" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
-											<textFieldExpression><![CDATA[$P{totalAdjustment}]]></textFieldExpression>
+											<textFieldExpression><![CDATA[$V{totalAdjustment}]]></textFieldExpression>
 										</textField>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="c2708b61-808f-45ed-89e6-ec21fda6c0ee"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="c2708b61-808f-45ed-89e6-ec21fda6c0ee"/>
 											<box leftPadding="5"/>
 											<textElement verticalAlignment="Middle">
 												<font size="7"/>
@@ -1095,7 +1115,7 @@
 											<textElement textAlignment="Center" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
-											<textFieldExpression><![CDATA[$P{totalGross}]]></textFieldExpression>
+											<textFieldExpression><![CDATA[$V{totalGross2}]]></textFieldExpression>
 										</textField>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
@@ -1294,7 +1314,7 @@
 											<textElement textAlignment="Center" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
-											<textFieldExpression><![CDATA[$P{totalDeduction}]]></textFieldExpression>
+											<textFieldExpression><![CDATA[$V{totalDeduction2}]]></textFieldExpression>
 										</textField>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
@@ -1330,7 +1350,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="188" height="20" uuid="46e9c6e2-a8a7-4404-a0f1-c050fd9526b2"/>
+											<reportElement positionType="Float" x="0" y="0" width="188" height="20" uuid="46e9c6e2-a8a7-4404-a0f1-c050fd9526b2"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1345,7 +1365,7 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="188" height="20" isPrintWhenDetailOverflows="true" uuid="02438b6b-e427-4773-8236-17de869c81bd"/>
+											<reportElement positionType="Float" x="0" y="0" width="188" height="20" isPrintWhenDetailOverflows="true" uuid="02438b6b-e427-4773-8236-17de869c81bd"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1360,7 +1380,7 @@
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="188" height="20" isPrintWhenDetailOverflows="true" uuid="94ce1d77-d85a-4896-b251-61b34e21ff36"/>
+											<reportElement positionType="Float" x="0" y="0" width="188" height="20" isPrintWhenDetailOverflows="true" uuid="94ce1d77-d85a-4896-b251-61b34e21ff36"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1378,7 +1398,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="20" uuid="f5cde465-ebe0-419b-8e95-142f3c9c79e6"/>
+											<reportElement positionType="Float" x="0" y="0" width="62" height="20" uuid="f5cde465-ebe0-419b-8e95-142f3c9c79e6"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1393,7 +1413,7 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="20" isPrintWhenDetailOverflows="true" uuid="2bcaa4bf-4305-4710-a38d-0bb6fe564ad3"/>
+											<reportElement positionType="Float" x="0" y="0" width="62" height="20" isPrintWhenDetailOverflows="true" uuid="2bcaa4bf-4305-4710-a38d-0bb6fe564ad3"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1405,7 +1425,7 @@
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="20" isPrintWhenDetailOverflows="true" uuid="d66eca5a-670f-4444-8da1-033a0102afda"/>
+											<reportElement positionType="Float" x="0" y="0" width="62" height="20" isPrintWhenDetailOverflows="true" uuid="d66eca5a-670f-4444-8da1-033a0102afda"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1423,7 +1443,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" uuid="4d3ae9c1-016c-46b1-b468-e72c5a1452ae"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" uuid="4d3ae9c1-016c-46b1-b468-e72c5a1452ae"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1438,7 +1458,7 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="43a89aba-c410-4cc9-8e7e-b6807cf6a11b"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="43a89aba-c410-4cc9-8e7e-b6807cf6a11b"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1450,7 +1470,7 @@
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="52b2a8f6-64bd-444b-bd22-145f75ed8f63"/>
+											<reportElement positionType="Float" x="0" y="0" width="60" height="20" isPrintWhenDetailOverflows="true" uuid="52b2a8f6-64bd-444b-bd22-145f75ed8f63"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1468,7 +1488,7 @@
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 									<jr:tableHeader style="Table_TH" height="20" rowSpan="1">
 										<staticText>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="66" height="20" uuid="6d018123-60b0-472c-b584-909c307fb8ec"/>
+											<reportElement positionType="Float" x="0" y="0" width="66" height="20" uuid="6d018123-60b0-472c-b584-909c307fb8ec"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1483,7 +1503,7 @@
 									</jr:tableHeader>
 									<jr:tableFooter style="Table_TH" height="20" rowSpan="1">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="66" height="20" isPrintWhenDetailOverflows="true" uuid="2d504b8c-5b64-4c31-9abf-e942d844578c"/>
+											<reportElement positionType="Float" x="0" y="0" width="66" height="20" isPrintWhenDetailOverflows="true" uuid="2d504b8c-5b64-4c31-9abf-e942d844578c"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1493,12 +1513,12 @@
 											<textElement textAlignment="Center" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
-											<textFieldExpression><![CDATA[$P{totalAdjustment}]]></textFieldExpression>
+											<textFieldExpression><![CDATA[$V{totalAdjustment2}]]></textFieldExpression>
 										</textField>
 									</jr:tableFooter>
 									<jr:detailCell style="Table_TD" height="20">
 										<textField>
-											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="66" height="20" isPrintWhenDetailOverflows="true" uuid="307b00b1-7a42-4568-adfa-03fdf56185cf"/>
+											<reportElement positionType="Float" x="0" y="0" width="66" height="20" isPrintWhenDetailOverflows="true" uuid="307b00b1-7a42-4568-adfa-03fdf56185cf"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1565,7 +1585,7 @@
 								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 							</box>
-							<textElement verticalAlignment="Middle">
+							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="7"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$F{dateprinted}]]></textFieldExpression>

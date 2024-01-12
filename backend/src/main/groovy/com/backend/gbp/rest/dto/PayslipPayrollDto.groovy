@@ -23,7 +23,7 @@ class PayslipPayrollDto {
     Double totalDeduction
     Double totalAdjustment
     Double netpay
-    Date dateprinted
+    String dateprinted
 
 }
 
@@ -74,7 +74,7 @@ class GrossDto {
     BigDecimal nohours
     BigDecimal rate
     BigDecimal total
-    Double totalGross
+    BigDecimal totalGross
 }
 
 @Canonical
@@ -83,6 +83,7 @@ class DeductionDto {
     BigDecimal nohours
     BigDecimal rate
     BigDecimal total
+    BigDecimal totalDeduction
 }
 
 @Canonical

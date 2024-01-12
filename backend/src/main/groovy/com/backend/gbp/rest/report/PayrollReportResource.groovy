@@ -4,6 +4,7 @@ package com.backend.gbp.rest.report
 import com.backend.gbp.domain.accounting.AccountsPayable
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.SalaryRateMultiplier
+import com.backend.gbp.domain.hrm.enums.AllowanceType
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.hrm.SalaryRateMultiplierService
@@ -41,6 +42,12 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.xmlsoap.schemas.soap.encoding.Int
+
+import javax.swing.text.DateFormatter
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @TypeChecked
 @RestController
@@ -92,6 +99,17 @@ class PayrollReportResource {
             parameters.put("logo", logo?.inputStream)
         }
 
+        Instant currentInstant = Instant.now();
+
+        // Convert the instant to a ZonedDateTime in a specific time zone (e.g., UTC)
+        ZonedDateTime zonedDateTime = currentInstant.atZone(ZoneId.of("UTC"));
+
+        // Define the desired date format pattern
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+        // Format the ZonedDateTime using the specified pattern
+        String formattedDate = formatter.format(zonedDateTime);
+
 //        List<Employee> employeeList = employeeRepository.getAllEmployee(null)
 //
         List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.getAllPayrollEmpById(id)
@@ -111,214 +129,205 @@ class PayrollReportResource {
                 SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
 
 
-                def grossBreakdown = employee?.timekeepingEmployee
-                def allowance = employee?.allowanceEmployee?.allowanceItems
+                def grossTotal = employee;
+                def grossBreakdown = employee?.timekeepingEmployee;
+                def allowance = employee?.allowanceEmployee;
+                def contribution = employee?.payrollEmployeeContribution;
+                def summary = employee?.employeeAdjustment;
 
 
 
-                BigDecimal regular = 0
-                BigDecimal regularHoliday = 0
-                BigDecimal late = 0
-                BigDecimal overTime = 0
-                BigDecimal underTime = 0
+
+
+                BigDecimal regular = 0.0
+                BigDecimal regularHoliday = 0.0
+                BigDecimal late = 0.0
+                BigDecimal overTime = 0.0
+                BigDecimal underTime = 0.0
 
                 grossBreakdown.projectBreakdown.each {
                     regular += it.regular
-                    regularHoliday += it.regularHoliday
-                    late += it.late
-                    overTime += it.overtime
-                    underTime += it.underTime
+                    regularHoliday += it.regularHoliday ?: 0.0
+                    late += it.late ?: 0.0
+                    overTime += it.overtime ?: 0.0
+                    underTime += it.underTime ?: 0.0
                 }
 
-//                allowance.allowanceItems.each{
-//
-//                }
+
+                BigDecimal overtime = 0.0
+                BigDecimal basicRegular = 0.0
+                BigDecimal basicRegularHoliday = 0.0
+                BigDecimal allItem = 0.0
+
+                grossTotal.each{ it ->
+
+                }
+
+
 
                 def totalSalary = employee?.timekeepingEmployee?.totalSalary
                 def totalHours = employee?.timekeepingEmployee?.totalHours
 
 
 
-                grossDtoList.push(new GrossDto(
+                    grossDtoList.push(new GrossDto(
                             description: "Over Time",
-                            nohours: totalHours.overtime,
-                            rate: (hourlyRate * multiplier.regularOvertime) as Integer,
-                            total: (employee?.timekeepingEmployee?.salaryBreakdown?.overtime ?: 0) as Integer
+                            nohours: ((totalHours?.overtime ?: 0.0) as BigDecimal).round(2),
+                            rate: ((hourlyRate * multiplier?.regularOvertime ?: 0.0) as BigDecimal).round(2),
+                            total: ((totalSalary?.overtime ?: 0.0) as BigDecimal).round(2),
                     ))
+
+
+
                     grossDtoList.push(new GrossDto(
                             description: "Regular",
-                            nohours: totalHours?.regular,
-                            rate: (hourlyRate * multiplier.regular) as Integer,
-                            total: (employee?.timekeepingEmployee?.salaryBreakdown?.regular ?: 0) as Integer
+                            nohours: ((totalHours?.regular ?: 0.0) as BigDecimal).round(2),
+                            rate: ((hourlyRate * multiplier?.regular ?: 0.0) as BigDecimal).round(2),
+                            total: ((totalSalary?.regular ?: 0.0) as BigDecimal).round(2),
                     ))
 
                     grossDtoList.push(new GrossDto(
                             description: "Regular Holiday",
-                            nohours:  totalHours.regularHoliday,
-                            rate: (hourlyRate *  multiplier.regularHoliday) as Integer,
-                            total: (employee?.timekeepingEmployee?.salaryBreakdown?.regularHoliday ?: 0) as Integer
+                            nohours:  ((totalHours?.regularHoliday ?: 0.0) as BigDecimal).round(2),
+                            rate: ((hourlyRate *  multiplier?.regularHoliday ?: 0.0) as BigDecimal).round(2),
+                            total: ((totalSalary?.regularHoliday ?: 0.0) as BigDecimal).round(2),
+
                     ))
 
-//                    if(allowance){
-//                       allowance.each {it ->
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Special Non-Working",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 0
-                           ))
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Vacation Leave",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 0
-                           ))
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Sick leave",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 0
-                           ))
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Semi Monthly Allowance",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 200
-                           ))
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Daily Allowance",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 0
-                           ))
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Load Allowance",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 200
-                           ))
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Transportation Allowance",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 200
-                           ))
-
-                           grossDtoList.push(new GrossDto(
-                                   description: "Food Allowance",
-                                   nohours: 0,
-                                   rate: 100,
-                                   total: 200
-                           ))
 //
-//                       }
-//                    }
+//                           grossDtoList.push(new GrossDto(
+//                                   description: "Special Non-Working",
+//                                   nohours: 0.0,
+//                                   rate: 0.0,
+//                                   total: 0.0
+//                           ))
+//
+
+                            allowance.allowanceItems.each {
+                                grossDtoList.push(new GrossDto(
+                                        description: it?.name ?: '',
+                                        nohours: 0.0,
+                                        rate: 0.0,
+                                        total: it?.amount ?: 0.0
+                                ))
+                            }
 
 
 
-                    grossDtoList.push(new GrossDto(
-                            totalGross: 0
-                    ))
+////
+//                    grossDtoList.push(new GrossDto(
+//                            totalGross: 0.0
+//                    ))
 
                 //-------- deduction----
 
+
+
                     deductionDtoList.push(new DeductionDto(
                             description: "Late",
-                            nohours: (late ?:0) as Integer,
-                            rate: 0,
-                            total: (employee?.timekeepingEmployee?.salaryBreakdown?.late ?: 0) as Integer
+                            nohours: ((totalHours?.late ?: 0.0) as BigDecimal).round(2),
+                            rate: 0.0,
+                            total: ((totalSalary?.late ?: 0.0) as BigDecimal).round(2),
                     ))
 
                     deductionDtoList.push(new DeductionDto(
                             description: "Under Time",
-                            nohours: (underTime ?: 0) as Integer,
-                            rate: 0,
-                            total: (employee?.timekeepingEmployee?.salaryBreakdown?.underTime ?: 0) as Integer
+                            nohours: ((totalHours?.underTime ?: 0.0) as BigDecimal).round(2),
+                            rate: 0.0,
+                            total: ((totalSalary?.underTime ?: 0.0) as BigDecimal).round(2)
                     ))
 
 
 
                     deductionDtoList.push(new DeductionDto(
                             description: "Withholding Tax",
-                            nohours: 100,
-                            rate: 100,
-                            total: 0
+                            nohours: 0.0,
+                            rate: 0.0,
+                            total:  employee?.withholdingTax ?: 0.0
                     ))
 //
                     deductionDtoList.push(new DeductionDto(
                             description: "SSS",
-                            nohours: 100,
-                            rate: 100,
-                            total: 200
+                            nohours: 0.0,
+                            rate: 0.0,
+                            total: contribution?.sssEE ?: 0.0
                     ))
 
                     deductionDtoList.push(new DeductionDto(
                             description: "HDMF",
-                            nohours: 100,
-                            rate: 100,
-                            total: 200
+                            nohours: 0.0,
+                            rate: 0.0,
+                            total: ((contribution?.hdmfEE ?: 0.0) as BigDecimal).round(2)
                     ))
 
                     deductionDtoList.push(new DeductionDto(
                             description: "PHIC",
-                            nohours: 100,
-                            rate: 100,
-                            total: 200
+                            nohours: 0.0,
+                            rate: 0.0,
+                            total: ((contribution?.phicEE ?: 0.0) as BigDecimal).round(2)
                     ))
 
 //                deductionDtoList.push( new DeductionDto(
 //                        description: "HMO Insurance",
 //                        nohours: 100,
 //                        rate: 100,
-//                        total: 200
+//                        total: contribution?.
 //                ))
 ////
 //                deductionDtoList.push( new DeductionDto(
 //                        description: "Cash Advance",
-//                        nohours: 100,
-//                        rate: 100,
-//                        total: 200
+//                        nohours: 100.0,
+//                        rate: 100.0,
+//                        total: 200.0
 //                ))
-//
+////
 //                deductionDtoList.push( new DeductionDto(
 //                        description: "Item Credit",
-//                        nohours: 100,
-//                        rate: 100,
-//                        total: 200
+//                        nohours: 100.0,
+//                        rate: 100.0,
+//                        total: 200.0
 //                ))
 
-                    summaryDtoList.push(new SummaryDto(
-                            description: "Sample 1",
-                            nohours: 100,
-                            rate: 100,
-                            total: 200
-                    ))
+
+
+
+                summaryDtoList.push(new SummaryDto(
+                        description:  '',
+                        nohours: 0.0,
+                        rate: 0.0,
+                        total:0.0
+                ))
+
+                if(summary.adjustmentItems){
+                    summary.adjustmentItems.each {it->
+                        summaryDtoList.push(new SummaryDto(
+                                description: it.name ?: '',
+                                nohours: 0.0,
+                                rate: 0.0,
+                                total: ((it.amount ?: 0.0) as BigDecimal).round(2)
+                        ))
+                    }
+                }
 
 
                     def data = new PayslipPayrollDto(
                             empId: employee?.employee?.employeeNo ?: "",
                             empname: employee?.employee?.fullName ?: "",
-                            department: employee?.company?.companyName ?: "",
+                            department: employee?.employee?.office?.officeDescription ?: "",
 //                            regularNoHrs: 0,
 //                            regularRate: 100.0,
 //                            regularTotal: 123.0,
                             descriptionField: new JRBeanCollectionDataSource(grossDtoList),
                             deductionField: new JRBeanCollectionDataSource(deductionDtoList),
                             summaryField: new JRBeanCollectionDataSource(summaryDtoList),
-                            payrollCode: '0',
-//                            payPeriod: null,
+                            payrollCode: employee?.payroll?.code ?: '',
+//                            payPeriod: '',
 //                            paycheckdate: null,
-                            totalGross: 1000,
-                            totalDeduction: 1000,
-                            totalAdjustment: 1000,
-                            netpay: 1000
+//                            totalGross: 1000,
+//                            totalDeduction: 1000,
+//                            totalAdjustment: 1000,
+//                            netpay: 1000
+                            dateprinted: formattedDate
 
                     )
 
