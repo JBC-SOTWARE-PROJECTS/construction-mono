@@ -231,12 +231,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
             salaryBreakDown.regular = employee.monthlyRate
             return salaryBreakDown
         }
-        if (employee?.isFixedRate) {
-            BigDecimal dailyRate = (employee.monthlyRate / 2) / daysInCutoff
-            hourlyRate = dailyRate / 8
-        } else {
-            hourlyRate = employee.hourlyRate
-        }
+        hourlyRate = getHourlyRate(employee, daysInCutoff)
 
         if (hoursLog.project) {
             salaryBreakDown.project = hoursLog.project
@@ -282,6 +277,17 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
 
         return salaryBreakDown
 
+    }
+
+    static BigDecimal getHourlyRate(Employee employee, int daysInCutoff) {
+        BigDecimal hourlyRate
+        if (employee?.isFixedRate) {
+            BigDecimal dailyRate = (employee.monthlyRate / 2) / daysInCutoff
+            hourlyRate = dailyRate / 8
+        } else {
+            hourlyRate = employee.hourlyRate
+        }
+        hourlyRate
     }
 
     static BigDecimal calculateHoliday(

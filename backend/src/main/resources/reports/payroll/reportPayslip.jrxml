@@ -2,6 +2,15 @@
 <!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportPayslip" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="51917e40-cf69-44df-bbc6-1788b3d879eb">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.unit." value="mm"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="mm"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="mm"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="mm"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="mm"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="mm"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="mm"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="mm"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="mm"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -149,25 +158,43 @@
 		<field name="rate" class="java.lang.Integer"/>
 		<field name="total" class="java.lang.Integer"/>
 	</subDataset>
+	<subDataset name="Dataset2" uuid="ff801941-dc93-4e21-a5f6-63247e6c280e">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="empId" class="java.lang.String"/>
+		<field name="empname" class="java.lang.String"/>
+		<field name="department" class="java.lang.String"/>
+		<field name="payrollCode" class="java.lang.String"/>
+		<field name="payPeriod" class="java.lang.String"/>
+		<field name="paycheckdate" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="Dataset3" uuid="423a9b9d-4cea-4993-9bd3-07cf757661f5">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+	</subDataset>
 	<parameter name="params1" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="params2" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
 	<field name="totalNetPay" class="java.lang.String"/>
+	<field name="detail1" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<columnHeader>
-		<band height="330">
+	<detail>
+		<band height="285">
 			<componentElement>
-				<reportElement x="0" y="0" width="280" height="330" uuid="243d2dfa-4e49-4c08-b792-ae641127d23a"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="280" height="280" uuid="243d2dfa-4e49-4c08-b792-ae641127d23a"/>
 				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 					<datasetRun subDataset="Dataset1" uuid="a5af0a56-9fa0-4e5a-9a39-91ebd9b9ecb8">
 						<dataSourceExpression><![CDATA[$P{params1}]]></dataSourceExpression>
 					</datasetRun>
-					<jr:listContents height="330" width="280">
+					<jr:listContents height="280" width="280">
 						<staticText>
-							<reportElement x="0" y="0" width="280" height="42" uuid="70d8da6c-774b-455c-b6ca-6a0496a5bae5"/>
+							<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="280" height="42" uuid="70d8da6c-774b-455c-b6ca-6a0496a5bae5"/>
 							<box padding="2">
 								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -304,7 +331,7 @@
 							<textFieldExpression><![CDATA[$F{payPeriod}]]></textFieldExpression>
 						</textField>
 						<componentElement>
-							<reportElement style="Table_TH" x="0" y="96" width="280" height="20" uuid="5370573e-2979-402b-8ca4-3e1e102cbdf1">
+							<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="96" width="280" height="50" uuid="5370573e-2979-402b-8ca4-3e1e102cbdf1">
 								<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 								<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 								<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -316,9 +343,9 @@
 								</datasetRun>
 								<jr:column width="140" uuid="8c090868-14fd-494d-8911-6131a7435993">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
-									<jr:columnHeader style="Table_CH" height="10" rowSpan="1">
+									<jr:columnHeader style="Table_CH" height="17" rowSpan="1">
 										<staticText>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="140" height="10" uuid="5e60efb2-1451-48f0-bfb9-8b3f838ad78b"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="140" height="17" isPrintWhenDetailOverflows="true" uuid="5e60efb2-1451-48f0-bfb9-8b3f838ad78b"/>
 											<box topPadding="0" leftPadding="5" bottomPadding="0">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -331,31 +358,33 @@
 											<text><![CDATA[Gross]]></text>
 										</staticText>
 									</jr:columnHeader>
-									<jr:columnFooter style="Table_CH" height="10" rowSpan="1">
+									<jr:columnFooter style="Table_CH" height="16" rowSpan="1">
 										<staticText>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="140" height="10" uuid="3190c509-adcc-40db-8475-613663e765c0"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="140" height="16" isPrintWhenDetailOverflows="true" uuid="3190c509-adcc-40db-8475-613663e765c0">
+												<property name="com.jaspersoft.studio.unit.height" value="px"/>
+											</reportElement>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											</box>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<text><![CDATA[  Total Gross Pay]]></text>
 										</staticText>
 									</jr:columnFooter>
-									<jr:detailCell style="Table_TD" height="10">
+									<jr:detailCell style="Table_TD" height="17">
 										<textField>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="140" height="10" uuid="c1070d40-b079-47cd-8f5e-ec7704ba17b9"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="140" height="17" isPrintWhenDetailOverflows="true" uuid="c1070d40-b079-47cd-8f5e-ec7704ba17b9"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											</box>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
@@ -364,9 +393,9 @@
 								</jr:column>
 								<jr:column width="50" uuid="29071a3d-7825-42db-a1a2-37135894398b">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-									<jr:columnHeader style="Table_CH" height="10" rowSpan="1">
+									<jr:columnHeader style="Table_CH" height="17" rowSpan="1">
 										<staticText>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="50" height="10" uuid="f8dfd217-5da2-41b7-8abf-678fd54ff7a7"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="50" height="17" isPrintWhenDetailOverflows="true" uuid="f8dfd217-5da2-41b7-8abf-678fd54ff7a7"/>
 											<box topPadding="0" leftPadding="5" bottomPadding="0" rightPadding="0">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -379,25 +408,25 @@
 											<text><![CDATA[No. of Hours]]></text>
 										</staticText>
 									</jr:columnHeader>
-									<jr:columnFooter style="Table_CH" height="10" rowSpan="1">
+									<jr:columnFooter style="Table_CH" height="16" rowSpan="1">
 										<staticText>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="50" height="10" uuid="e06b705c-018e-424e-9301-60a6257cd3db"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="50" height="16" isPrintWhenDetailOverflows="true" uuid="e06b705c-018e-424e-9301-60a6257cd3db"/>
 											<textElement>
 												<font size="7"/>
 											</textElement>
 											<text><![CDATA[]]></text>
 										</staticText>
 									</jr:columnFooter>
-									<jr:detailCell style="Table_TD" height="10">
+									<jr:detailCell style="Table_TD" height="17">
 										<textField>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="50" height="10" uuid="08c71fef-e215-447a-a58b-5d964cf1bbf5"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="50" height="17" isPrintWhenDetailOverflows="true" uuid="08c71fef-e215-447a-a58b-5d964cf1bbf5"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											</box>
-											<textElement textAlignment="Left">
+											<textElement textAlignment="Left" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{nohours}]]></textFieldExpression>
@@ -406,9 +435,9 @@
 								</jr:column>
 								<jr:column width="40" uuid="81fc7089-da40-4982-9d51-54baf7788a71">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
-									<jr:columnHeader style="Table_CH" height="10" rowSpan="1">
+									<jr:columnHeader style="Table_CH" height="17" rowSpan="1">
 										<staticText>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="40" height="10" uuid="306f9065-9f34-40fd-95ba-43d881de4e64"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="17" isPrintWhenDetailOverflows="true" uuid="306f9065-9f34-40fd-95ba-43d881de4e64"/>
 											<box topPadding="0" leftPadding="5" bottomPadding="0" rightPadding="0">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -421,25 +450,25 @@
 											<text><![CDATA[Rate]]></text>
 										</staticText>
 									</jr:columnHeader>
-									<jr:columnFooter style="Table_CH" height="10" rowSpan="1">
+									<jr:columnFooter style="Table_CH" height="16" rowSpan="1">
 										<staticText>
-											<reportElement style="Table_CH" positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="40" height="10" uuid="60039c8c-6c76-40fd-bfd8-c1f89e6a332f"/>
+											<reportElement style="Table_CH" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="16" isPrintWhenDetailOverflows="true" uuid="60039c8c-6c76-40fd-bfd8-c1f89e6a332f"/>
 											<textElement>
 												<font size="7"/>
 											</textElement>
 											<text><![CDATA[]]></text>
 										</staticText>
 									</jr:columnFooter>
-									<jr:detailCell style="Table_TD" height="10">
+									<jr:detailCell style="Table_TD" height="17">
 										<textField>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="40" height="10" uuid="0caa4897-80c4-48f2-aa0b-aa4be172cff2"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="17" isPrintWhenDetailOverflows="true" uuid="0caa4897-80c4-48f2-aa0b-aa4be172cff2"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											</box>
-											<textElement textAlignment="Left">
+											<textElement textAlignment="Left" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{rate}]]></textFieldExpression>
@@ -448,9 +477,9 @@
 								</jr:column>
 								<jr:column width="50" uuid="9ac07e28-efb5-4056-b176-d107bd729d1c">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
-									<jr:columnHeader style="Table_CH" height="10" rowSpan="1">
+									<jr:columnHeader style="Table_CH" height="17" rowSpan="1">
 										<staticText>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="50" height="10" uuid="13720c6f-989a-4353-8aab-471b9c87e0f0"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="50" height="17" isPrintWhenDetailOverflows="true" uuid="13720c6f-989a-4353-8aab-471b9c87e0f0"/>
 											<box topPadding="0" leftPadding="5" bottomPadding="0" rightPadding="0">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -463,31 +492,31 @@
 											<text><![CDATA[ Total]]></text>
 										</staticText>
 									</jr:columnHeader>
-									<jr:columnFooter style="Table_CH" height="10" rowSpan="1">
+									<jr:columnFooter style="Table_CH" height="16" rowSpan="1">
 										<textField>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="50" height="10" uuid="0fa082b9-c9f8-41a1-9d8e-1e40e4a1e40b"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="50" height="16" isPrintWhenDetailOverflows="true" uuid="0fa082b9-c9f8-41a1-9d8e-1e40e4a1e40b"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											</box>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$P{totalGross}]]></textFieldExpression>
 										</textField>
 									</jr:columnFooter>
-									<jr:detailCell style="Table_TD" height="10">
+									<jr:detailCell style="Table_TD" height="17">
 										<textField>
-											<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="50" height="10" uuid="8fdc7b92-86eb-4b91-8603-a8afa4c09b1a"/>
+											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="50" height="17" isPrintWhenDetailOverflows="true" uuid="8fdc7b92-86eb-4b91-8603-a8afa4c09b1a"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 												<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											</box>
-											<textElement textAlignment="Left">
+											<textElement textAlignment="Left" verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
@@ -497,7 +526,7 @@
 							</jr:table>
 						</componentElement>
 						<componentElement>
-							<reportElement x="0" y="126" width="280" height="30" uuid="334697ba-61ba-4b8a-b030-f68c8a153d15">
+							<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="146" width="280" height="49" uuid="334697ba-61ba-4b8a-b030-f68c8a153d15">
 								<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 								<property name="com.jaspersoft.studio.table.style.table_header" value="Table 2_TH"/>
 								<property name="com.jaspersoft.studio.table.style.column_header" value="Table 2_CH"/>
@@ -509,30 +538,30 @@
 								</datasetRun>
 								<jr:column width="140" uuid="b6388342-d3ba-4ddb-ba1f-0b733a7a9d75">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
-									<jr:columnHeader style="Table 2_CH" height="10" rowSpan="1">
+									<jr:columnHeader style="Table 2_CH" height="17" rowSpan="1">
 										<staticText>
-											<reportElement x="0" y="0" width="140" height="10" uuid="6796c43b-d4ad-4a99-aa68-a1142925354b"/>
-											<textElement>
+											<reportElement x="0" y="0" width="140" height="17" uuid="6796c43b-d4ad-4a99-aa68-a1142925354b"/>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<text><![CDATA[  Payroll Deduction]]></text>
 										</staticText>
 									</jr:columnHeader>
-									<jr:columnFooter style="Table 2_CH" height="10" rowSpan="1">
+									<jr:columnFooter style="Table 2_CH" height="15" rowSpan="1">
 										<staticText>
-											<reportElement x="0" y="0" width="140" height="10" uuid="e401da5a-1fa6-4c39-a5ae-85d9f5c84294"/>
+											<reportElement x="0" y="0" width="140" height="15" uuid="e401da5a-1fa6-4c39-a5ae-85d9f5c84294"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<text><![CDATA[Total Deduction]]></text>
 										</staticText>
 									</jr:columnFooter>
-									<jr:detailCell style="Table 2_TD" height="10">
+									<jr:detailCell style="Table 2_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="140" height="10" uuid="ead78a22-186b-45fd-a614-6adb93cf3bfb"/>
+											<reportElement x="0" y="0" width="140" height="17" uuid="ead78a22-186b-45fd-a614-6adb93cf3bfb"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
@@ -541,13 +570,13 @@
 								</jr:column>
 								<jr:column width="50" uuid="5f40c31c-1346-424d-b01e-615365ae6eb3">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-									<jr:columnHeader style="Table 2_CH" height="10" rowSpan="1"/>
-									<jr:columnFooter style="Table 2_CH" height="10" rowSpan="1"/>
-									<jr:detailCell style="Table 2_TD" height="10">
+									<jr:columnHeader style="Table 2_CH" height="17" rowSpan="1"/>
+									<jr:columnFooter style="Table 2_CH" height="15" rowSpan="1"/>
+									<jr:detailCell style="Table 2_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="50" height="10" uuid="7044818c-5fbb-4e2b-9c9c-258f83e6fddc"/>
+											<reportElement x="0" y="0" width="50" height="17" uuid="7044818c-5fbb-4e2b-9c9c-258f83e6fddc"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{nohours}]]></textFieldExpression>
@@ -556,13 +585,13 @@
 								</jr:column>
 								<jr:column width="40" uuid="bc6f2156-8bac-410a-96ee-ede3387bf314">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
-									<jr:columnHeader style="Table 2_CH" height="10" rowSpan="1"/>
-									<jr:columnFooter style="Table 2_CH" height="10" rowSpan="1"/>
-									<jr:detailCell style="Table 2_TD" height="10">
+									<jr:columnHeader style="Table 2_CH" height="17" rowSpan="1"/>
+									<jr:columnFooter style="Table 2_CH" height="15" rowSpan="1"/>
+									<jr:detailCell style="Table 2_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="40" height="10" uuid="a7e36480-2dbf-4048-9e8c-17d9aa4f9bce"/>
+											<reportElement x="0" y="0" width="40" height="17" uuid="a7e36480-2dbf-4048-9e8c-17d9aa4f9bce"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{rate}]]></textFieldExpression>
@@ -571,13 +600,13 @@
 								</jr:column>
 								<jr:column width="50" uuid="904598b4-03cc-4475-96a2-ca47ed71f4be">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
-									<jr:columnHeader style="Table 2_CH" height="10" rowSpan="1"/>
-									<jr:columnFooter style="Table 2_CH" height="10" rowSpan="1"/>
-									<jr:detailCell style="Table 2_TD" height="10">
+									<jr:columnHeader style="Table 2_CH" height="17" rowSpan="1"/>
+									<jr:columnFooter style="Table 2_CH" height="15" rowSpan="1"/>
+									<jr:detailCell style="Table 2_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="50" height="10" uuid="465bc4e8-e969-4ac2-97a2-2dad24007ac2"/>
+											<reportElement x="0" y="0" width="50" height="17" uuid="465bc4e8-e969-4ac2-97a2-2dad24007ac2"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
@@ -587,7 +616,7 @@
 							</jr:table>
 						</componentElement>
 						<componentElement>
-							<reportElement x="0" y="156" width="280" height="30" uuid="244c3c87-aae6-4bdc-b28c-2df6db0d06e1">
+							<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="195" width="280" height="50" uuid="244c3c87-aae6-4bdc-b28c-2df6db0d06e1">
 								<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 								<property name="com.jaspersoft.studio.table.style.table_header" value="Table 3_TH"/>
 								<property name="com.jaspersoft.studio.table.style.column_header" value="Table 3_CH"/>
@@ -595,35 +624,35 @@
 							</reportElement>
 							<jr:table>
 								<datasetRun subDataset="Empty Dataset4" uuid="4622a0fd-1130-44eb-9079-afcad77f01fe">
-									<dataSourceExpression><![CDATA[$F{summaryField} ]]></dataSourceExpression>
+									<dataSourceExpression><![CDATA[$F{summaryField}]]></dataSourceExpression>
 								</datasetRun>
 								<jr:column width="140" uuid="3b9ed1a9-d129-475a-9c47-11cd26745d16">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
-									<jr:columnHeader style="Table 3_CH" height="10" rowSpan="1">
+									<jr:columnHeader style="Table 3_CH" height="17" rowSpan="1">
 										<staticText>
-											<reportElement x="0" y="0" width="140" height="10" uuid="20862d2c-a443-451d-9105-793786aa6400"/>
+											<reportElement x="0" y="0" width="140" height="17" uuid="20862d2c-a443-451d-9105-793786aa6400"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<text><![CDATA[ Adjustment]]></text>
 										</staticText>
 									</jr:columnHeader>
-									<jr:columnFooter style="Table 3_CH" height="10" rowSpan="1">
+									<jr:columnFooter style="Table 3_CH" height="16" rowSpan="1">
 										<staticText>
-											<reportElement x="0" y="0" width="140" height="10" uuid="1f9553ac-8090-4a41-8ff5-4c61b7bb70df"/>
+											<reportElement x="0" y="0" width="140" height="16" uuid="1f9553ac-8090-4a41-8ff5-4c61b7bb70df"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
-											<text><![CDATA[Total Summary]]></text>
+											<text><![CDATA[Total Adjustment]]></text>
 										</staticText>
 									</jr:columnFooter>
-									<jr:detailCell style="Table 3_TD" height="10">
+									<jr:detailCell style="Table 3_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="140" height="10" uuid="0679b6ff-5fa2-452e-8e55-42cef19842a7"/>
+											<reportElement x="0" y="0" width="140" height="17" uuid="0679b6ff-5fa2-452e-8e55-42cef19842a7"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
@@ -632,13 +661,13 @@
 								</jr:column>
 								<jr:column width="50" uuid="96960bb9-54ca-49f9-ac86-e8ce521a64ce">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-									<jr:columnHeader style="Table 3_CH" height="10" rowSpan="1"/>
-									<jr:columnFooter style="Table 3_CH" height="10" rowSpan="1"/>
-									<jr:detailCell style="Table 3_TD" height="10">
+									<jr:columnHeader style="Table 3_CH" height="17" rowSpan="1"/>
+									<jr:columnFooter style="Table 3_CH" height="16" rowSpan="1"/>
+									<jr:detailCell style="Table 3_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="50" height="10" uuid="7445e9b3-b285-40e6-a197-58cf22a85e30"/>
+											<reportElement x="0" y="0" width="50" height="17" uuid="7445e9b3-b285-40e6-a197-58cf22a85e30"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{nohours}]]></textFieldExpression>
@@ -647,13 +676,13 @@
 								</jr:column>
 								<jr:column width="40" uuid="e558d703-3ef1-41d3-ad7e-ba4ff23cf388">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
-									<jr:columnHeader style="Table 3_CH" height="10" rowSpan="1"/>
-									<jr:columnFooter style="Table 3_CH" height="10" rowSpan="1"/>
-									<jr:detailCell style="Table 3_TD" height="10">
+									<jr:columnHeader style="Table 3_CH" height="17" rowSpan="1"/>
+									<jr:columnFooter style="Table 3_CH" height="16" rowSpan="1"/>
+									<jr:detailCell style="Table 3_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="40" height="10" uuid="2cb212c1-3d1b-44aa-a1ae-12aa9b1ad313"/>
+											<reportElement x="0" y="0" width="40" height="17" uuid="2cb212c1-3d1b-44aa-a1ae-12aa9b1ad313"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{rate}]]></textFieldExpression>
@@ -662,13 +691,13 @@
 								</jr:column>
 								<jr:column width="50" uuid="3c7b2a7a-14bb-4158-9e71-c1e3c56041b8">
 									<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
-									<jr:columnHeader style="Table 3_CH" height="10" rowSpan="1"/>
-									<jr:columnFooter style="Table 3_CH" height="10" rowSpan="1"/>
-									<jr:detailCell style="Table 3_TD" height="10">
+									<jr:columnHeader style="Table 3_CH" height="17" rowSpan="1"/>
+									<jr:columnFooter style="Table 3_CH" height="16" rowSpan="1"/>
+									<jr:detailCell style="Table 3_TD" height="17">
 										<textField>
-											<reportElement x="0" y="0" width="50" height="10" uuid="f015f253-2044-4f2f-b658-29de073fca11"/>
+											<reportElement x="0" y="0" width="50" height="17" uuid="f015f253-2044-4f2f-b658-29de073fca11"/>
 											<box leftPadding="5"/>
-											<textElement>
+											<textElement verticalAlignment="Middle">
 												<font size="7"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
@@ -677,9 +706,190 @@
 								</jr:column>
 							</jr:table>
 						</componentElement>
+						<staticText>
+							<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="245" width="280" height="18" uuid="9e2284c4-f0a7-484b-8e1a-5f4c00690a5f">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box topPadding="0" leftPadding="5" bottomPadding="0" rightPadding="0">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" size="8" isBold="false"/>
+							</textElement>
+							<text><![CDATA[ Net Pay]]></text>
+						</staticText>
+						<staticText>
+							<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="263" width="280" height="17" uuid="559afc6f-499d-4eda-a337-e3655e281afc">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box topPadding="0" leftPadding="5" bottomPadding="0" rightPadding="0">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" size="8" isBold="false"/>
+							</textElement>
+							<text><![CDATA[Date and time printed]]></text>
+						</staticText>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<componentElement>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="280" y="0" width="274" height="280" uuid="31bfd7a5-b1d9-444a-82e4-37e0ecda0d8b"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="Dataset2" uuid="a7ddde92-e47b-4b32-9d6c-246c18669616">
+						<dataSourceExpression><![CDATA[$P{params2}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="280" width="274">
+						<staticText>
+							<reportElement x="0" y="0" width="274" height="42" uuid="4ead68b2-f77a-439a-afaa-949740fa22d7"/>
+							<box padding="2">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle"/>
+							<text><![CDATA[]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="0" y="42" width="140" height="18" uuid="df50c626-4f2a-43dd-99bf-6a60dd2f8d57">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" size="8" isBold="false"/>
+							</textElement>
+							<text><![CDATA[ ID ]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="140" y="42" width="134" height="18" uuid="356e9204-e774-46fe-9f9e-cbb03fc63808"/>
+							<box padding="2">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<text><![CDATA[ Payroll Code ]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="0" y="60" width="140" height="18" uuid="3fd5964d-c8ce-4324-83a0-461ad188f79e">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" size="8" isBold="false"/>
+							</textElement>
+							<text><![CDATA[ Emp Name]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="140" y="60" width="134" height="18" uuid="f4da59a7-6100-468f-8dd7-5d7110e16f4f"/>
+							<box padding="2">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<text><![CDATA[Pay Period]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="0" y="78" width="140" height="18" uuid="96332b9e-49f0-4475-9890-ddfed3c66158">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" size="8" isBold="false"/>
+							</textElement>
+							<text><![CDATA[ Department]]></text>
+						</staticText>
+						<staticText>
+							<reportElement x="140" y="78" width="134" height="18" uuid="7f4a0356-18ae-4ca4-b6ad-ade20f5e53d0"/>
+							<box padding="2">
+								<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<text><![CDATA[Paycheck Date]]></text>
+						</staticText>
+						<textField>
+							<reportElement x="20" y="42" width="120" height="18" uuid="ab9b2585-090f-419e-92e0-0b00b3b3d5be"/>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{empId}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="50" y="60" width="90" height="18" uuid="ba55c922-fef8-4cde-a194-bd1babb7841f"/>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{empname}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="50" y="78" width="90" height="18" uuid="b59a3acc-9bf5-4e1e-8f98-df9f032363ec"/>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{department}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="190" y="42" width="84" height="18" uuid="6ee83698-5b2c-45e0-adc6-67cdca78210e"/>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{payrollCode}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="182" y="60" width="92" height="18" uuid="436fffed-5dc5-4d36-9749-d38903c8c963"/>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{payPeriod}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="196" y="78" width="78" height="18" uuid="d2aea774-9bcc-47b1-b0a8-2759f4099e45"/>
+							<textElement verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{paycheckdate}]]></textFieldExpression>
+						</textField>
+						<staticText>
+							<reportElement x="80" y="130" width="100" height="30" uuid="321b0b9a-a40f-425a-a487-309d9b79e54a"/>
+							<text><![CDATA[hello]]></text>
+						</staticText>
 					</jr:listContents>
 				</jr:list>
 			</componentElement>
 		</band>
-	</columnHeader>
+	</detail>
 </jasperReport>

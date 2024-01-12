@@ -3,6 +3,7 @@ import { Button, Col, Input, Row, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EyeOutlined } from '@ant-design/icons';
 import { getUrlPrefix } from '@/utility/graphql-client';
+import { useRouter } from 'next/router';
 
 const { Search } = Input;
 
@@ -13,7 +14,7 @@ interface DataType {
 }
 
 interface FormProps {
-  dataSource: any;
+  data: any;
   filter: string;
   loading: boolean;
   viewEmp: any;
@@ -21,7 +22,7 @@ interface FormProps {
 }
 
 function PayslipSearchForm({
-  dataSource,
+  data,
   filter,
   loading,
   viewEmp,
@@ -29,6 +30,7 @@ function PayslipSearchForm({
 }: FormProps) {
   const [state, setState] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<React.Key[]>([]);
+  const router = useRouter();
 
   const handleSearch = (value: any) => {
     setState(value);
@@ -47,13 +49,11 @@ function PayslipSearchForm({
     viewEmp(record);
   };
 
-  console.log('data', selectedRows);
-
   const columns: ColumnsType<DataType> = [
     {
-      key: 'id',
+      key: 'employee',
       title: 'Employee',
-      dataIndex: 'fullName',
+      dataIndex: ['employee', 'fullName'],
     },
     {
       title: 'Action',
@@ -116,7 +116,7 @@ function PayslipSearchForm({
             }}
             rowKey='id'
             columns={columns}
-            dataSource={dataSource}
+            dataSource={data?.data || []}
           />
         </div>
       </Row>
