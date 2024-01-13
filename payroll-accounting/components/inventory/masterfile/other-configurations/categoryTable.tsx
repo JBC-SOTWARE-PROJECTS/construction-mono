@@ -25,6 +25,15 @@ export default function ItemCategoryTable({
       width: 140,
     },
     {
+      title: "Prefix Code",
+      dataIndex: "prefixCode",
+      key: "prefixCode",
+      width: 100,
+      render: (text) => {
+        return <span>{text ?? "--"}</span>;
+      },
+    },
+    {
       title: "Description",
       dataIndex: "categoryDescription",
       key: "categoryDescription",

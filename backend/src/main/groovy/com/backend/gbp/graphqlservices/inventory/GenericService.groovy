@@ -80,7 +80,7 @@ class GenericService extends AbstractDaoService<Generic> {
         upsertFromMap(id, fields, { Generic entity, boolean forInsert ->
             if(forInsert){
                 entity.genericCode = generatorService.getNextValue(GeneratorType.GENERIC, {
-                    return "GEN-" + StringUtils.leftPad(it.toString(), 6, "0")
+                    return StringUtils.leftPad(it.toString(), 3, "0")
                 })
                 entity.company = company
             }
