@@ -30,6 +30,7 @@ export default function ProjectList({
         locale={{
           emptyText: <Empty description="No Project Available" />,
         }}
+        className="project-list"
         style={{ minHeight: 500 }}
         toolBarRender={() => {
           return [
@@ -68,6 +69,29 @@ export default function ProjectList({
                       {NumberFormater(record?.totals)}
                     </span>
                   </p>
+                  <div
+                    className="project-progress-list"
+                    style={{
+                      width: "100%",
+                      marginTop: 10,
+                    }}>
+                    <div className="project-progress-content">
+                      <div className="font-bold">Project Progress</div>
+                      <Progress percent={record?.projectPercent ?? 0} />
+                    </div>
+                  </div>
+                  <div className="flex-column project-list-action">
+                    <Button
+                      type="primary"
+                      onClick={() => handleOpen(record)}>
+                      Project Information
+                    </Button>
+                    <Button
+                      type="dashed"
+                      onClick={() => handleOpenDetails(record)}>
+                      View Project Details
+                    </Button>
+                  </div>
                 </>
               );
             },
@@ -89,6 +113,7 @@ export default function ProjectList({
           content: {
             render: (_, record) => (
               <div
+                className="project-progress-list"
                 style={{
                   minWidth: 200,
                   flex: 1,

@@ -204,7 +204,6 @@ export default function PCVJournalEntries(props: IProps) {
       { defaultSelected: ledger ?? undefined },
       (selected: any) => {
         if (selected) {
-          console.log("mapped", selected);
           setLedger(
             selected.map((item: any) => {
               return {

@@ -491,11 +491,20 @@ th.ant-table-cell {
 
 @media screen and (max-width: 767px) {
   .project-page-header {
-    padding-inline-start: 10px;
-    padding-inline-end: 10px;
+    padding-inline-start: 10px !important;
+    padding-inline-end: 10px !important;
   }
 
-  .project-details .ant-pro-page-container-children-container {
+  .ant-pro-page-container .ant-pro-page-container-warp-page-header {
+    padding-inline-start: 10px !important;
+    padding-inline-end: 10px !important;
+  }
+
+  .my-prefix-layout .my-prefix-layout-content {
+    padding-inline: 10px !important;
+  }
+
+  .ant-pro-page-container-children-container {
     padding-inline: 10px !important;
   }
 }
@@ -537,4 +546,51 @@ th.ant-table-cell {
 
 .ant-image-preview-mask {
   background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.project-progress-list {
+  display: none;
+}
+
+.project-list-action {
+  display: none;
+}
+
+@media screen and (max-width: 1285px) {
+  .project-list .ant-pro-list-row .ant-pro-list-row-content {
+    display: none !important;
+  }
+
+  .project-progress-content {
+    width: 500px;
+  }
+
+  .project-progress-list {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 921px) {
+  .project-list .ant-pro-list-row .ant-list-item-action {
+    display: none !important;
+  }
+
+  .project-progress-content {
+    width: 100%;
+  }
+
+  .project-list-action {
+    margin-top: 10px;
+    display: flex;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .project-list .ant-pro-list-row .ant-list-item-meta-avatar {
+    display: none !important;
+  }
+
+  .project-list .ant-pro-card-body {
+    padding-inline: 10px !important;
+  }
 }
