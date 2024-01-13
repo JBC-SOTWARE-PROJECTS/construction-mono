@@ -3,6 +3,7 @@ import { Button, Col, Input, Row, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EyeOutlined } from '@ant-design/icons';
 import { getUrlPrefix } from '@/utility/graphql-client';
+import { useRouter } from 'next/router';
 
 const { Search } = Input;
 
@@ -13,7 +14,7 @@ interface DataType {
 }
 
 interface FormProps {
-  dataSource: any;
+  data: any;
   filter: string;
   loading: boolean;
   viewEmp: any;
@@ -21,7 +22,7 @@ interface FormProps {
 }
 
 function PayslipSearchForm({
-  dataSource,
+  data,
   filter,
   loading,
   viewEmp,
@@ -29,6 +30,7 @@ function PayslipSearchForm({
 }: FormProps) {
   const [state, setState] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<React.Key[]>([]);
+  const router = useRouter();
 
   const handleSearch = (value: any) => {
     setState(value);
@@ -47,36 +49,60 @@ function PayslipSearchForm({
     viewEmp(record);
   };
 
-  console.log('data', selectedRows);
-
   const columns: ColumnsType<DataType> = [
     {
-      key: 'id',
+      key: 'employee',
       title: 'Employee',
-      dataIndex: 'fullName',
+      dataIndex: ['employee', 'fullName'],
     },
-    {
-      title: 'Action',
-      key: 'action',
-      dataIndex: 'action',
-      render: (_, record, index) => {
-        let item = record;
-        return (
-          <Button
-            type='primary'
-            onClick={() => onView(item, index)}
-            size='small'
-            icon={<EyeOutlined />}
-          />
-        );
-      },
-    },
+    // {
+    //   title: 'Action',
+    //   key: 'action',
+    //   dataIndex: 'action',
+    //   render: (_, record, index) => {
+    //     let item = record;
+    //     return (
+    //       <Button
+    //         type='primary'
+    //         onClick={() => onView(item, index)}
+    //         size='small'
+    //         icon={<EyeOutlined />}
+    //       />
+    //     );
+    //   },
+    // },
   ];
 
   return (
     <div>
-      <Row gutter={4}>
-        <Col md={18}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'right',
+          gap: 5,
+        }}
+      >
+        <Search
+          allowClear
+          style={{ width: '30%', marginBottom: 10 }}
+          size='middle'
+          placeholder='Search here..'
+          className='select-header-list'
+          // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+        />
+        <Button
+          type='primary'
+          onClick={() =>
+            window.open(
+              `${getUrlPrefix()}/reports/payroll/print/payslipPayroll/${selectedRows}`
+            )
+          }
+        >
+          DownLoad Payslip
+        </Button>
+      </div>
+      {/* <Row gutter={4}>
+        <Col md={8}>
           <Search
             allowClear
             style={{ width: '100%', marginBottom: 10 }}
@@ -86,7 +112,7 @@ function PayslipSearchForm({
             // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
           />
         </Col>
-        <Col md={4}>
+        <Col md={6}>
           <Button
             type='primary'
             onClick={() =>
@@ -98,7 +124,7 @@ function PayslipSearchForm({
             DownLoad Payslip
           </Button>
         </Col>
-      </Row>
+      </Row> */}
       <Row>
         <div
           style={{
@@ -116,7 +142,7 @@ function PayslipSearchForm({
             }}
             rowKey='id'
             columns={columns}
-            dataSource={dataSource}
+            dataSource={data?.data || []}
           />
         </div>
       </Row>

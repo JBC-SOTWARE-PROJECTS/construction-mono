@@ -67,6 +67,13 @@ order by pe.employee.fullName asc"""
             value = """Select te from PayrollEmployee te where te.payroll.id = :id"""
     )
     List<PayrollEmployee> findByPayrollId(@Param("id") UUID id)
+
+    @Query(
+            value = "SELECT te FROM PayrollEmployee te LEFT JOIN FETCH te.payroll WHERE te.id IN :idList"
+    )
+    List<PayrollEmployee> getAllPayrollEmpById(@Param("idList") List<UUID> idList);
+
+
 //
 //    @Query("""Select te from PayrollEmployee te left join te.payroll p left join p.otherDeduction od where od = otherDeduction""")
 //    List<PayrollEmployee> findByPayrollOtherDeduction(@Param("otherDeduction") PayrollOtherDeduction otherDeduction)
