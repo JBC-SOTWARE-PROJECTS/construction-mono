@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const GET_COMPANY_RECORDS = gql`
   query ($filter: String!, $size: Int, $page: Int) {
@@ -367,6 +367,56 @@ export const UPSERT_ALLOWANCE_PACKAGE_ITEM = gql`
       }
       message
       success
+    }
+  }
+`;
+
+export const GET_ALL_PAYROLL_EMPLOYEE = gql`
+  query payrollEmp($id: UUID) {
+    data: getAllPayrollEmployee(id: $id) {
+      id
+      employee {
+        id
+        fullName
+        employeeNo
+        hourlyRate
+      }
+      company {
+        id
+        companyName
+      }
+      timekeepingEmployee {
+        id
+        timekeeping {
+          id
+          salaryBreakdown {
+            late
+            underTime
+            absent
+          }
+        }
+        salaryBreakdown {
+          late
+          underTime
+          absent
+          regular
+          overtime
+          regularHoliday
+          overtimeHoliday
+          regularDoubleHoliday
+          overtimeDoubleHoliday
+          regularSpecialHoliday
+          overtimeSpecialHoliday
+        }
+      }
+      employeeOtherDeduction {
+        id
+        deductionItems {
+          id
+          name
+          description
+        }
+      }
     }
   }
 `;
