@@ -184,11 +184,12 @@ class EmployeeResource {
             ArrayList<File> files = new ArrayList<>();
             for (MultipartFile capt: capture){
                 File file = convertMultipartFileToFile(capt);
+               // spaceService.uploadFileToSpace(file, "ATTENDANCE_CAPTURE");
                 files.add(file);
             }
 
             //  MultipartFile file = request.getFile("image");
-           // spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE");
+           // spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE/");
             spaceService.uploadMultiFileToSpace(files, env.getProperty("do.env.type")+"/ATTENDANCE_CAPTURE/");
            return "true";
         } catch (InterruptedException e) {
@@ -254,9 +255,9 @@ class EmployeeResource {
             attendance.cameraCapture = reAtt.cameraCapture;
 
             if(reAtt.project.equals("")){
-                attendance.project = projectService.findOne(reAtt.project);
-            }else{
                 attendance.project = null;
+            }else{
+                attendance.project = projectService.findOne(reAtt.project);
             }
 
 

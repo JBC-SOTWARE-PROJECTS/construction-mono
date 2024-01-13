@@ -54,7 +54,7 @@ const useManageTableMatrix = ({ upsertGQL, queryGQL, initialValues }: any) => {
       isEditable: true,
       ...(type ? { type } : {}),
     };
-    setEditableRow(row);
+    // setEditableRow(row);
     setDataSource([row, ...dataSource]);
   };
 
