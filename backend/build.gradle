@@ -8,7 +8,7 @@ apply plugin: 'idea'
 group = 'com.backend'
 
 
-version = '1.0.32'
+version = '1.0.33'
 sourceCompatibility = '1.8'
 repositories {
 
