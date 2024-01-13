@@ -61,7 +61,7 @@ class AssetResource {
 
 
         File file = convertMultipartFileToFile(capture);
-        spaceService.uploadFileToSpace(file, env.getProperty("do.env.type") + "/VEHICLE_USAGE_DOCS/");
+        spaceService.uploadFileToSpace(file,"VEHICLE_USAGE_DOCS");
 
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> fieldMap = objectMapper.readValue(fields, Map.class);
