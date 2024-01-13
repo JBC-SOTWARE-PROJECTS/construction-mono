@@ -1,8 +1,8 @@
 export let apiUrlPrefix: string = "";
 export let frontEndUrl: string = "";
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-  apiUrlPrefix = "http://192.168.2.157:5827";
-  frontEndUrl = "http://192.168.2.157:6060";
+  apiUrlPrefix = "http://localhost:5827";
+  frontEndUrl = "http://localhost:6060";
 } else {
   if (typeof window) {
     apiUrlPrefix = "https://api-demo.megaptk.com";

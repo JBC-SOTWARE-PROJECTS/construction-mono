@@ -260,29 +260,33 @@ class ItemService extends AbstractDaoService<Item> {
             upsertFromMap(id, fields, { Item entity, boolean forInsert ->
                 if(forInsert){
                     String prefix = (entity.item_category.prefixCode ?: "").toString()
-//                    def genericAuto = generatorService.getNextValueCustom(entity.item_generics.genericCode, {
-//                        return StringUtils.leftPad(it.toString(), 3, "0")
-//                    })
-//                    String lastCodeNumber = "${prefix}${genericAuto}".toString()
-//                    def lastCodeGenerator = generatorService.getNextValueCustom(lastCodeNumber, {
-//                        return StringUtils.leftPad(it.toString(), 4, "0")
-//                    })
-//                    if(entity.sku.isEmpty()){
-//                        entity.sku = "${lastCodeNumber}${lastCodeGenerator}".toString()
-//                        entity.itemCode = "${lastCodeNumber}${lastCodeGenerator}".toString()
-//                    }else{
-//                        entity.itemCode = "${lastCodeNumber}${lastCodeGenerator}".toString()
-//                    }
-                    def autoGenerate = generatorService.getNextValue(GeneratorType.ITEM_NO, {
-                        return "${prefix}" + StringUtils.leftPad(it.toString(), 6, "0")
+                    String generic = (entity.item_generics.genericCode ?: "").toString()
+
+                    String lastCodeNumber = "${prefix}${generic}".toString()
+                    def lastCodeGenerator = generatorService.getCustomGenerate(lastCodeNumber, {
+                        return StringUtils.leftPad(it.toString(), 4, "0")
                     })
-                    if((entity.sku ?: "").isEmpty()){
-                        entity.sku = autoGenerate
-                        entity.itemCode = autoGenerate
+                    if(entity.sku){
+                        entity.itemCode = "${prefix}${generic}${lastCodeGenerator}".toString()
                     }else{
-                        entity.itemCode = autoGenerate
+                        entity.sku = "${prefix}${generic}${lastCodeGenerator}".toString()
+                        entity.itemCode = "${prefix}${generic}${lastCodeGenerator}".toString()
                     }
                     entity.company = company
+                }else {
+                    if((entity.itemCode ?: "").isEmpty()){
+                        String prefix = (entity.item_category.prefixCode ?: "").toString()
+                        String generic = (entity.item_generics.genericCode ?: "").toString()
+
+                        String lastCodeNumber = "${prefix}${generic}".toString()
+                        def lastCodeGenerator = generatorService.getCustomGenerate(lastCodeNumber, {
+                            return StringUtils.leftPad(it.toString(), 4, "0")
+                        })
+                        entity.itemCode = "${prefix}${generic}${lastCodeGenerator}".toString()
+                        if((entity.sku ?: "").isEmpty()){
+                            entity.sku = "${prefix}${generic}${lastCodeGenerator}".toString()
+                        }
+                    }
                 }
             })
             if(id){

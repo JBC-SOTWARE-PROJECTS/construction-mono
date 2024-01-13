@@ -59,6 +59,7 @@ const DiverseTradeLayout = (props: IProps) => {
     fixedHeader: true,
     siderMenuType: "group",
     footerRender: false,
+    suppressSiderWhenMenuEmpty: true,
   };
 
   const [pathname, setPathname] = useState(router.pathname || "/");
@@ -226,7 +227,7 @@ const DiverseTradeLayout = (props: IProps) => {
               if (document.body.clientWidth < 1400) {
                 return defaultDom;
               }
-              if (_.isMobile) return <>defaultDom {"sadasdasdasdas"}</>;
+              if (_.isMobile) return defaultDom;
               return <>{defaultDom}</>;
             }}
             menuFooterRender={(props) => {

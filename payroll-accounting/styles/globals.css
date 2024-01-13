@@ -487,43 +487,6 @@ th.ant-table-cell {
   padding: 0 !important;
 }
 
-/* responsive */
-
-@media screen and (max-width: 767px) {
-  .project-page-header {
-    padding-inline-start: 10px !important;
-    padding-inline-end: 10px !important;
-  }
-
-  .ant-pro-page-container .ant-pro-page-container-warp-page-header {
-    padding-inline-start: 10px !important;
-    padding-inline-end: 10px !important;
-  }
-
-  .my-prefix-layout .my-prefix-layout-content {
-    padding-inline: 10px !important;
-  }
-
-  .ant-pro-page-container-children-container {
-    padding-inline: 10px !important;
-  }
-}
-
-@media screen and (max-width: 756px) {
-  .billing-info-width {
-    font-weight: 700;
-    width: 100%;
-  }
-
-  .billing-flex-div {
-    display: block;
-  }
-
-  .billing-info-value {
-    width: 100%;
-  }
-}
-
 .px-5 {
   padding-left: 20px;
   padding-right: 20px;
@@ -546,6 +509,43 @@ th.ant-table-cell {
 
 .ant-image-preview-mask {
   background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* responsive here onwards */
+
+@media screen and (max-width: 767px) {
+  .project-page-header {
+    padding-inline-start: 5px !important;
+    padding-inline-end: 5px !important;
+  }
+
+  .ant-pro-page-container .ant-pro-page-container-warp-page-header {
+    padding-inline-start: 5px !important;
+    padding-inline-end: 5px !important;
+  }
+
+  .my-prefix-layout .my-prefix-layout-content {
+    padding-inline: 5px !important;
+  }
+
+  .ant-pro-page-container-children-container {
+    padding-inline: 5px !important;
+  }
+}
+
+@media screen and (max-width: 756px) {
+  .billing-info-width {
+    font-weight: 700;
+    width: 100%;
+  }
+
+  .billing-flex-div {
+    display: block;
+  }
+
+  .billing-info-value {
+    width: 100%;
+  }
 }
 
 .project-progress-list {
@@ -591,6 +591,6 @@ th.ant-table-cell {
   }
 
   .project-list .ant-pro-card-body {
-    padding-inline: 10px !important;
+    padding-inline: 5px !important;
   }
 }

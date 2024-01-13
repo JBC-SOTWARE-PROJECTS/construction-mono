@@ -131,15 +131,15 @@ class GeneratorService {
 	Long soaStart
 
 
-	String getNextSoaNumber(String registryType, Closure closure) {
-		initNextSOANumberFromRegistryType(registryType)
+	String getCustomGenerate(String registryType, Closure closure) {
+		initNextNumberFromCustom(registryType)
 
 		def name = registryType.toLowerCase()
 		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
 		return closure(nextVal)
 	}
 	// No special characters and spaces please
-	private void initNextSOANumberFromRegistryType(String registryType) {
+	private void initNextNumberFromCustom(String registryType) {
 
 		def name = registryType.toLowerCase() + "_gen"
 		def count = jdbcTemplate.queryForObject(" SELECT count(*) FROM pg_class where relkind='S' and relname = ? ",
@@ -150,7 +150,7 @@ class GeneratorService {
 		if (!count) {
 
 			try {
-				jdbcTemplate.execute(" CREATE SEQUENCE ${name} INCREMENT 1  MINVALUE 1 START ${soaStart} ")
+				jdbcTemplate.execute(" CREATE SEQUENCE ${name} INCREMENT 1  MINVALUE 1 START 1 ")
 			} catch (Exception e) {
 				e.printStackTrace()
 			}
@@ -184,26 +184,6 @@ class GeneratorService {
 		
 	}
 
-	private void initGeneratorCustom(String codeString) {
-
-		def name = codeString.toString()
-		def count = jdbcTemplate.queryForObject(" SELECT count(*) FROM pg_class where relkind='S' and relname = ? ",
-				Long,
-				"${name}_gen"
-		)
-
-		if (!count) {
-
-			try {
-				jdbcTemplate.execute(" CREATE SEQUENCE " + (name + "_gen") + " INCREMENT 1  MINVALUE 1 START 1 ")
-			} catch (Exception e) {
-				e.printStackTrace()
-			}
-
-		}
-
-	}
-	
 	Long getCurrentValue(GeneratorType type) {
 		initGenerator(type)
 		def name = type.name().toLowerCase()
@@ -217,15 +197,6 @@ class GeneratorService {
 		def name = type.name().toLowerCase()
 		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
 		
-		return nextVal?.toString() + ""
-	}
-
-	String getNextValueCustom(String codeString) {
-		initGeneratorCustom(codeString)
-
-		def name = codeString.toString()
-		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
-
 		return nextVal?.toString() + ""
 	}
 	
