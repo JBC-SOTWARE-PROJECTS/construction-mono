@@ -55,28 +55,54 @@ function PayslipSearchForm({
       title: 'Employee',
       dataIndex: ['employee', 'fullName'],
     },
-    {
-      title: 'Action',
-      key: 'action',
-      dataIndex: 'action',
-      render: (_, record, index) => {
-        let item = record;
-        return (
-          <Button
-            type='primary'
-            onClick={() => onView(item, index)}
-            size='small'
-            icon={<EyeOutlined />}
-          />
-        );
-      },
-    },
+    // {
+    //   title: 'Action',
+    //   key: 'action',
+    //   dataIndex: 'action',
+    //   render: (_, record, index) => {
+    //     let item = record;
+    //     return (
+    //       <Button
+    //         type='primary'
+    //         onClick={() => onView(item, index)}
+    //         size='small'
+    //         icon={<EyeOutlined />}
+    //       />
+    //     );
+    //   },
+    // },
   ];
 
   return (
     <div>
-      <Row gutter={4}>
-        <Col md={18}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'right',
+          gap: 5,
+        }}
+      >
+        <Search
+          allowClear
+          style={{ width: '30%', marginBottom: 10 }}
+          size='middle'
+          placeholder='Search here..'
+          className='select-header-list'
+          // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+        />
+        <Button
+          type='primary'
+          onClick={() =>
+            window.open(
+              `${getUrlPrefix()}/reports/payroll/print/payslipPayroll/${selectedRows}`
+            )
+          }
+        >
+          DownLoad Payslip
+        </Button>
+      </div>
+      {/* <Row gutter={4}>
+        <Col md={8}>
           <Search
             allowClear
             style={{ width: '100%', marginBottom: 10 }}
@@ -86,7 +112,7 @@ function PayslipSearchForm({
             // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
           />
         </Col>
-        <Col md={4}>
+        <Col md={6}>
           <Button
             type='primary'
             onClick={() =>
@@ -98,7 +124,7 @@ function PayslipSearchForm({
             DownLoad Payslip
           </Button>
         </Col>
-      </Row>
+      </Row> */}
       <Row>
         <div
           style={{

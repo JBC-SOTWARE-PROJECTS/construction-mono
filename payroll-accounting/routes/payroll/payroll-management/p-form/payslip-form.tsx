@@ -104,7 +104,7 @@ function PayslipForm() {
   return (
     <div>
       <Row gutter={4}>
-        <Col md={14}>
+        {/* <Col md={14}>
           {!isEmpty(viewEmp) ? (
             <>
               <Card style={styles}>
@@ -147,8 +147,8 @@ function PayslipForm() {
           ) : (
             <Skeleton active />
           )}
-        </Col>
-        <Col md={10}>
+        </Col> */}
+        <Col md={24}>
           <Card style={styles}>
             <div>
               <PayslipSearchForm

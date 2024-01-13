@@ -6,6 +6,7 @@ import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.SalaryRateMultiplier
 import com.backend.gbp.domain.hrm.enums.AllowanceType
 import com.backend.gbp.domain.payroll.PayrollEmployee
+import com.backend.gbp.domain.payroll.enums.AdjustmentOperation
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.hrm.SalaryRateMultiplierService
 import com.backend.gbp.graphqlservices.payroll.TimekeepingEmployeeService
@@ -154,14 +155,8 @@ class PayrollReportResource {
                 }
 
 
-                BigDecimal overtime = 0.0
-                BigDecimal basicRegular = 0.0
-                BigDecimal basicRegularHoliday = 0.0
-                BigDecimal allItem = 0.0
 
-                grossTotal.each{ it ->
 
-                }
 
 
 
@@ -169,9 +164,28 @@ class PayrollReportResource {
                 def totalHours = employee?.timekeepingEmployee?.totalHours
 
 
+                BigDecimal grossTT = 0.0
+
+                allowance.allowanceItems.each{
+                    grossTT = it.amount
+                }
+
+                BigDecimal adjustTotal = 0.0
+
+                summary.adjustmentItems.each{
+                    if(it.operation == AdjustmentOperation.ADDITION){
+                        adjustTotal += it.amount
+                    }else if(it.operation == AdjustmentOperation.SUBTRACTION){
+                        adjustTotal -= it.amount
+                    }
+
+                }
 
                 def totalNetPay = totalSalary?.regular + totalSalary?.overtime + totalSalary?.regularHoliday;
-                def deductio =  totalSalary?.late + totalSalary?.underTime;
+                def deduction = (totalSalary?.late ?: 0.0) + (totalSalary?.underTime ?: 0.0) + (employee?.withholdingTax ?: 0.0) + (contribution?.sssEE ?: 0.0) + (contribution?.hdmfEE ?: 0.0) + (contribution?.phicEE ?: 0.0);
+
+
+                def finalTotalPay = totalNetPay + grossTT - deduction + adjustTotal;
 
                 grossDtoList.push(new GrossDto(
                             description: "Over Time",
@@ -329,7 +343,7 @@ class PayrollReportResource {
 //                            totalGross: 1000,
 //                            totalDeduction: 1000,
 //                            totalAdjustment: 1000,
-                            netpay: totalNetPay,
+                            netpay: finalTotalPay,
                             dateprinted: formattedDate
 
                     )
