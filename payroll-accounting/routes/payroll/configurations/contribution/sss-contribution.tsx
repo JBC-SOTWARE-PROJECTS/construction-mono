@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   CloseOutlined,
   EditOutlined,
@@ -8,13 +6,13 @@ import {
 } from "@ant-design/icons";
 import { Button, Space, Table } from "antd";
 
-import { ProCard, ProFormGroup } from "@ant-design/pro-components";
-import type { ColumnsType } from "antd/es/table";
-import useGetScheduleTypes from "@/hooks/configurations/useManageContribution";
 import {
   GET_SSS_CONTRIBUTIONS,
   UPSERT_SSS_CONTRIBUTION,
 } from "@/graphql/company/queries";
+import useManageTableMatrix from "@/hooks/configurations/useManageTableMatrix";
+import { ProCard, ProFormGroup } from "@ant-design/pro-components";
+import type { ColumnsType } from "antd/es/table";
 
 interface DataType {
   isEditable: boolean;
@@ -53,7 +51,7 @@ function SSSContribution() {
       handleCancelEdit,
       renderInput,
     },
-  ] = useGetScheduleTypes({
+  ] = useManageTableMatrix({
     initialValues,
     upsertGQL: UPSERT_SSS_CONTRIBUTION,
     queryGQL: GET_SSS_CONTRIBUTIONS,

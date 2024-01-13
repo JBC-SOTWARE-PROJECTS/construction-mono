@@ -5,6 +5,7 @@ import com.backend.gbp.domain.inventory.StockIssue
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.projects.ProjectUpdatesMaterialService
 import com.backend.gbp.rest.dto.PurchaseIssuanceDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -65,7 +66,7 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
 			@GraphQLArgument(name = "size") Integer size
 	) {
 
-
+        def company = SecurityUtils.currentCompanyId()
 		String query = '''Select po from StockIssue po where
 						(lower(po.issueNo) like lower(concat('%',:filter,'%')))
 						and po.issueFrom.id = :office'''
@@ -78,8 +79,14 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
 		params.put('filter', filter)
         params.put('office', office)
 
+        if (company) {
+            query += ''' and (po.company = :company)'''
+            countQuery += ''' and (po.company = :company)'''
+            params.put("company", company)
+        }
 
-		query += ''' ORDER BY po.issueNo DESC'''
+
+        query += ''' ORDER BY po.issueNo DESC'''
 
 		Page<StockIssue> result = getPageable(query, countQuery, page, size, params)
 		return result
@@ -93,6 +100,8 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
             @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
+
         StockIssue sti = upsertFromMap(id, fields, { StockIssue entity , boolean forInsert ->
             if(forInsert){
                 entity.issueNo = generatorService.getNextValue(GeneratorType.ISSUE_NO, {
@@ -100,6 +109,7 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
                 })
                 entity.isPosted = false
                 entity.isCancel = false
+                entity.company = company
             }
         })
 //        items to be inserted

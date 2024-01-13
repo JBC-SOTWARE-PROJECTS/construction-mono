@@ -6,29 +6,19 @@ import com.backend.gbp.domain.hrm.EmployeeAttendance
 import com.backend.gbp.domain.hrm.EmployeeSchedule
 import com.backend.gbp.domain.hrm.EventCalendar
 import com.backend.gbp.domain.hrm.dto.HoursLog
-import com.backend.gbp.domain.hrm.dto.ScheduleDto
 import com.backend.gbp.domain.payroll.AccumulatedLogs
-import com.backend.gbp.domain.payroll.TimekeepingEmployee
-import com.backend.gbp.graphqlservices.types.GraphQLResVal
-import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.domain.payroll.enums.AccumulatedLogsMessage
+import com.backend.gbp.graphqlservices.payroll.TimekeepingService
 import com.backend.gbp.repository.hrm.EmployeeAttendanceRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.hrm.EmployeeScheduleRepository
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.leangen.graphql.annotations.GraphQLArgument
-import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
-import org.springframework.jdbc.core.JdbcTemplate
+
 import org.springframework.stereotype.Component
 
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
-import javax.validation.constraints.NotNull
 import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoField
@@ -53,17 +43,6 @@ class AccumulatedLogsCalculator {
     @Autowired
     EventCalendarService eventCalendarService
 
-    @Autowired
-    JdbcTemplate jdbcTemplate
-
-    @Autowired
-    EmployeeScheduleService employeeScheduleService
-
-    @PersistenceContext
-    EntityManager entityManager
-
-    @Autowired
-    ObjectMapper objectMapper
 
     @GraphQLQuery(name = "getAccumulatedLogs")
     List<AccumulatedLogs> getAccumulatedLogsGraphql(
@@ -94,6 +73,8 @@ class AccumulatedLogsCalculator {
     ) {
         if (!startDate || !endDate || !id) throw new RuntimeException("Failed to get employee attendance.")
 
+        if (!employee)
+            employee = employeeRepository.findById(id).get()
         List<AccumulatedLogs> accumulatedLogsList = []
         Map<String, List<EmployeeAttendance>> attendanceMap = getAttendanceLogs(startDate, endDate, id)
         Map<String, List<EmployeeSchedule>> scheduleMap = getSchedules(startDate, endDate, id)
@@ -123,18 +104,24 @@ class AccumulatedLogsCalculator {
 
                 HoursLog hoursLog = new HoursLog()
                 if (!firstIn && !out) {
+//                    HoursLog temp = new HoursLog()
                     if (holidays?.size() > 0 && !employee.isExcludedFromAttendance) {
-                        HoursLog temp = new HoursLog()
                         calculateHolidayHours(holidays, 0 as BigDecimal, hoursLog, 0 as BigDecimal)
-                        temp.regular = 8
-                        temp.company = employee.currentCompany.id
-                        temp.companyName = employee.currentCompany.companyName
-                        accumulatedLogs.projectBreakdown = [temp]
-                        accumulatedLogs.message = 'Holiday'
+                        hoursLog.regular = 8
+                        hoursLog.company = employee.currentCompany.id
+                        hoursLog.companyName = employee.currentCompany.companyName
+                        accumulatedLogs.projectBreakdown = [hoursLog]
+                        accumulatedLogs.message = AccumulatedLogsMessage.HOLIDAY
+                    } else if (regularSchedule.isLeave) {
+                        hoursLog.regular = regularSchedule.withPay ? 8 : 0
+                        hoursLog.company = employee.currentCompany.id
+                        hoursLog.companyName = employee.currentCompany.companyName
+                        accumulatedLogs.projectBreakdown = [hoursLog]
+                        accumulatedLogs.message = AccumulatedLogsMessage.LEAVE
                     } else {
                         hoursLog.absent = regularSchedule.scheduleDuration
                         accumulatedLogs.isError = true
-                        accumulatedLogs.message = "Absent"
+                        accumulatedLogs.message = AccumulatedLogsMessage.ABSENT
 
                     }
                     accumulatedLogs.hours = hoursLog
@@ -167,7 +154,7 @@ class AccumulatedLogsCalculator {
                     BigDecimal regularHours = computeHours(regularSchedule, firstIn, out)
                     BigDecimal overtimeHours = overtimeSchedule ? computeHours(overtimeSchedule, firstIn, out) : 0
                     if (holidays?.size() > 0) {
-                        accumulatedLogs.message = 'Holiday'
+                        accumulatedLogs.message = AccumulatedLogsMessage.HOLIDAY
                         calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
                     } else {
                         hoursLog.regular = regularHours
@@ -187,7 +174,7 @@ class AccumulatedLogsCalculator {
                 AccumulatedLogs accumulatedLogs = new AccumulatedLogs()
                 accumulatedLogs.date = date
                 accumulatedLogs.isError = true
-                accumulatedLogs.message = "No Schedule"
+                accumulatedLogs.message = AccumulatedLogsMessage.NO_SCHEDULE
                 accumulatedLogs.employeeId = id
                 accumulatedLogsList.push(accumulatedLogs)
             }
@@ -254,23 +241,36 @@ class AccumulatedLogsCalculator {
             Instant timeIn = attendanceList[i - 1].attendance_time
             Instant timeOut = attendanceList[i].attendance_time
             BigDecimal overtimeHours = 0
+
             BigDecimal regularHours = computeHours(regularSchedule, timeIn, timeOut)
-            hoursLog.late = getLateHours(regularSchedule.dateTimeStart, timeIn)
+            if (i == 1)
+                hoursLog.late = getLateHours(regularSchedule.dateTimeStart, timeIn)
             if (overtimeSchedule && !timeOut.isBefore(overtimeSchedule.dateTimeStart)) {
                 overtimeHours = computeHours(overtimeSchedule, attendanceList[i - 1].attendance_time, attendanceList[i].attendance_time)
             }
 
             if (holidays?.size() > 0) {
-                accumulatedLogs.message = 'Holiday'
+                accumulatedLogs.message = AccumulatedLogsMessage.HOLIDAY
                 calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
             } else {
-                hoursLog.regular = regularHours
+                hoursLog.regular = regularHours > 0 ? regularHours : 0
                 hoursLog.overtime = overtimeHours
             }
+
             hoursLogList.push(hoursLog)
 
         }
-        return hoursLogList.reverse()
+
+        Map<String, HoursLog> employeeBreakdownMap = new HashMap<>()
+        hoursLogList.each {
+            TimekeepingService.consolidateProjectBreakdown(employeeBreakdownMap, it)
+        }
+        List<HoursLog> returnArr = []
+        employeeBreakdownMap.keySet().each {
+            HoursLog hoursLog = employeeBreakdownMap.get(it.toString())
+            returnArr.push(hoursLog)
+        }
+        return returnArr.reverse()
     }
 
     static BigDecimal getLateHours(Instant scheduleStart, Instant firstIn) {

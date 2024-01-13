@@ -8,6 +8,7 @@ import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseRecDto
 import com.backend.gbp.rest.dto.ReceivingAmountDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -74,9 +75,10 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
     @GraphQLQuery(name = "srrGetReferenceType")
     List<ApReferenceDto> srrGetReferenceType(){
         List<ApReferenceDto> records = []
-
-        String query = '''select distinct p.reference_type as reference_type from inventory.receiving_report p where p.reference_type is not null '''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''select distinct p.reference_type as reference_type from inventory.receiving_report p where p.reference_type is not null and p.company = :company'''
         Map<String, Object> params = new HashMap<>()
+        params.put("params", company)
         def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
 
         recordsRaw.each {
@@ -100,7 +102,7 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 			@GraphQLArgument(name = "size") Integer size
 	) {
 
-
+        def company = SecurityUtils.currentCompanyId()
 		String query = '''Select r from ReceivingReport r where
 						(lower(r.rrNo) like lower(concat('%',:filter,'%')) or
 						lower(r.receivedRefNo) like lower(concat('%',:filter,'%')))
@@ -121,6 +123,12 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
         params.put('startDate', start)
         params.put('endDate', end)
 
+        if (company) {
+            query += ''' and (r.company = :company)'''
+            countQuery += ''' and (r.company = :company)'''
+            params.put("company", company)
+        }
+
         if(supplier){
             query += ''' and (r.supplier.id = :supplier)'''
             countQuery += ''' and (r.supplier.id = :supplier)'''
@@ -136,9 +144,11 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 
     @GraphQLQuery(name = "srrList")
     List<ReceivingReport> srrList() {
-        String query = '''Select e from ReceivingReport e where e.isPosted = :status'''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from ReceivingReport e where e.isPosted = :status and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.rrNo }
     }
 
@@ -150,18 +160,19 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 
         Instant fromDate = start.atZone(ZoneId.systemDefault()).toInstant()
         Instant toDate = end.atZone(ZoneId.systemDefault()).toInstant()
-
+        def company = SecurityUtils.currentCompanyId()
         String query = '''Select s from ReceivingReport s
 						where
 						(s.isVoid = false or s.isVoid is null) AND
 						s.receiveDate >= :startDate AND
 						s.receiveDate <= :endDate AND
 						(lower(s.rrNo) like lower(concat('%',:filter,'%')) OR
-						lower(s.supplier.supplierFullname) like lower(concat('%',:filter,'%')))'''
+						lower(s.supplier.supplierFullname) like lower(concat('%',:filter,'%'))) and s.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('startDate', fromDate)
         params.put('endDate', toDate)
         params.put('filter', filter)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.receiveDate }
     }
 
@@ -173,14 +184,25 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
             @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         def rr = upsertFromMap(id, fields, { ReceivingReport entity , boolean forInsert ->
             if(forInsert){
-                entity.rrNo = generatorService.getNextValue(GeneratorType.SRR_NO, {
-                    return "SRR-" + StringUtils.leftPad(it.toString(), 6, "0")
-                })
-                entity.receivedType = "SRR"
+                def code = "SRR"
+
                 entity.isPosted = false
                 entity.isVoid = false
+
+                if(entity.project?.id){
+                    code = entity.project?.prefixShortName
+                }else if(entity.assets?.id){
+                    code = entity.assets?.prefix
+                }
+
+                entity.rrNo = generatorService.getNextValue(GeneratorType.SRR_NO, {
+                    return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+                })
+                entity.receivedType = code
+                entity.company = company
             }
         })
         //items to be inserted

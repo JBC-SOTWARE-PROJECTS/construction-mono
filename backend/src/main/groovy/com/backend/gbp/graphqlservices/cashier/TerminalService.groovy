@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.cashier
 
+import com.backend.gbp.security.SecurityUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.backend.gbp.domain.cashier.Terminal
 import com.backend.gbp.repository.UserRepository
@@ -52,7 +53,8 @@ class TerminalService {
 	List<Terminal> terminalFilter(
 			@GraphQLArgument(name = "filter") String filter
 	) {
-		return terminalRepository.getTerminalFilter(filter).sort { it.terminal_no }
+		def company = SecurityUtils.currentCompanyId()
+		return terminalRepository.getTerminalFilter(filter, company).sort { it.terminal_no }
 	}
 
 
@@ -64,6 +66,7 @@ class TerminalService {
 			@GraphQLArgument(name = "fields") Map<String, Object> fields,
 			@GraphQLArgument(name = "id") UUID id
 	) {
+		def company = SecurityUtils.currentCompanyId()
 		def value = objectMapper.convertValue(fields, Terminal.class)
 
 		Terminal term = new Terminal()
@@ -77,6 +80,7 @@ class TerminalService {
 		term.description = value.description
 		term.mac_address = value.mac_address
 		term.employee = value.employee
+		term.company = company
 		terminalRepository.save(term)
 
 		return term

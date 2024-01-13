@@ -6,6 +6,7 @@ import com.backend.gbp.domain.inventory.StockIssue
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseIssuanceDto
 import com.backend.gbp.rest.dto.PurchaseMPDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -62,6 +63,7 @@ class MaterialProductionService extends AbstractDaoService<MaterialProduction> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
+        def company = SecurityUtils.currentCompanyId()
 
 		String query = '''Select po from MaterialProduction po where
 						(lower(po.mpNo) like lower(concat('%',:filter,'%')) or
@@ -77,6 +79,11 @@ class MaterialProductionService extends AbstractDaoService<MaterialProduction> {
 		params.put('filter', filter)
         params.put('office', office)
 
+        if (company) {
+            query += ''' and (po.company = :company)'''
+            countQuery += ''' and (po.company = :company)'''
+            params.put("company", company)
+        }
 
 		query += ''' ORDER BY po.mpNo DESC'''
 
@@ -92,6 +99,7 @@ class MaterialProductionService extends AbstractDaoService<MaterialProduction> {
             @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         MaterialProduction mp = upsertFromMap(id, fields, { MaterialProduction entity , boolean forInsert ->
             if(forInsert){
                 entity.mpNo = generatorService.getNextValue(GeneratorType.MP_NO, {
@@ -99,6 +107,7 @@ class MaterialProductionService extends AbstractDaoService<MaterialProduction> {
                 })
                 entity.isPosted = false
                 entity.isVoid = false
+                entity.company = company
             }
         })
 //        items to be inserted

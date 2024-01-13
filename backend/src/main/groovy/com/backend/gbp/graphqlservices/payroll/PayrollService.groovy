@@ -11,6 +11,7 @@ import com.backend.gbp.domain.payroll.Timekeeping
 import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.domain.payroll.enums.PayrollType
 import com.backend.gbp.graphqlservices.accounting.ArInvoiceServices
 import com.backend.gbp.graphqlservices.accounting.HeaderGroupServices
 import com.backend.gbp.graphqlservices.accounting.IntegrationServices
@@ -39,7 +40,10 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.Month
+import java.time.Year
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -137,7 +141,10 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
             Payroll payroll = payrollRepository.findById(id).get()
             if (fields) {
                 payroll = objectMapper.updateValue(payroll, fields)
-
+                payroll.code = """${payroll.type == PayrollType.SEMI_MONTHLY ? 'S' : 'W'}""" +
+                        """${Year.from(payroll.dateStart.atZone(ZoneId.systemDefault())).toString()}""" +
+                        """${payroll.dateStart.atZone(ZoneId.systemDefault()).getMonthValue().toString()}""" +
+                        """${payroll.cycle.toString()}"""
             }
 
             List<PayrollEmployee> employeesToRemove = []
@@ -267,7 +274,6 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
     Payroll postToLedgerAccounting(Payroll payroll) {
         def yearFormat = DateTimeFormatter.ofPattern("yyyy")
         def actPay = super.save(payroll) as Payroll
-
         HeaderLedgerGroup headerLedgerGroup = new HeaderLedgerGroup()
         headerLedgerGroup.recordNo = generatorService.getNextValue(GeneratorType.HEADER_GROUP) {
             StringUtils.leftPad(it.toString(), 5, "0")
@@ -360,10 +366,16 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         totalSalary = totalSalary - totalOtherDeduction - totalLoan - totalContributions
         Instant now = Instant.now()
 
+        BigDecimal totalWithholdingTax = 0
+        payroll.payrollEmployees.each {
+            totalWithholdingTax += it.withholdingTax
+        }
+
         def headerLedger = integrationServices.generateAutoEntries(payroll) { it, mul ->
             it.flagValue = "PAYROLL_PROCESSING"
-            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary - totalAdjustmentDebit - totalLateAmount
+            it.salariesPayableTotalCredit = totalAllowance + totalAdjustmentCredit + totalSalary - totalAdjustmentDebit - totalLateAmount - totalWithholdingTax
             it.salariesPayableTotalDebit = 0
+            it.withholdingTax = totalWithholdingTax
         }
 
         entryMap.keySet().each { key ->
@@ -394,17 +406,22 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         }
 
         details["PAYROLL_ID"] = actPay.id.toString()
-        details["PAYROLL_CODE"] = ''
+        details["PAYROLL_CODE"] = payroll.code
 
         headerLedger.transactionNo = ''
         headerLedger.transactionType = ''
         headerLedger.referenceType = ''
         headerLedger.referenceNo = ''
         headerLedger.headerLedgerGroup = newSave.id
+
+        def dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        def startDate = dateFormat.format(Date.from(payroll.dateStart))
+        def endDate = dateFormat.format(Date.from(payroll.dateEnd))
+
         def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
                 "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
-                payroll.description,
-                "${payroll.description ?: ""}",
+                payroll.company.companyName + 'Payroll',
+                "To record the payroll for period ${startDate} - ${endDate}",
                 LedgerDocType.PRL,
                 JournalType.GENERAL,
                 now,
@@ -434,8 +451,8 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
         def pHeaderContribution = ledgerServices.persistHeaderLedger(headerLedgerContribution,
                 "${now.atZone(ZoneId.systemDefault()).format(yearFormat)}-${'PAYROLL_CODE'}",
-                payroll.description,
-                "${payroll.description ?: ""}",
+                payroll.company.companyName + 'Contributions',
+                "To record the employer counterpart of the mandatory contributions for payroll period ${startDate} - ${endDate}",
                 LedgerDocType.PRL,
                 JournalType.GENERAL,
                 now,

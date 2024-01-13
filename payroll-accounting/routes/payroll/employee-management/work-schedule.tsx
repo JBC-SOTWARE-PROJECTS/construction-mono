@@ -78,7 +78,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
         title: currentDate.format("MMM DD, YYYY (ddd)"),
         dataIndex: ["schedule", currentDate.format("MM_DD_YYYY")],
         key: currentDate.format("MM_DD_YYYY"),
-        width: 150,
+        width: 200,
         onCell: () => ({ className: "employee_schedule_table_cell" }),
         render: (val: any, { id, position, fullName }: any) => {
           return (

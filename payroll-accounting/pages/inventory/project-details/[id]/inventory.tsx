@@ -4,7 +4,7 @@ import Head from "next/head";
 import AccessManager from "@/components/accessControl/AccessManager";
 
 const ProjectDetailsComponent = asyncComponent(
-  () => import("@/routes/inventory/projects/project-details/bill-quantities")
+  () => import("@/routes/inventory/projects/project-details/inventory")
 );
 
 const ProjectsDetailsPage = () => {
@@ -13,7 +13,7 @@ const ProjectsDetailsPage = () => {
       <Head>
         <title>Project Management</title>
       </Head>
-      <AccessManager roles={["ROLE_ADMIN", "ROLE_PROJECT_BILL_QUANTITIES"]}>
+      <AccessManager roles={["ROLE_ADMIN", "ROLE_PROJECT_INVENTORY"]}>
         <div className="w-full">
           <ProjectDetailsComponent />
         </div>

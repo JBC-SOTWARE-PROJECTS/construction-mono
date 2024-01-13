@@ -576,4 +576,6 @@ export const AssetStatusColor = {
   UNDER_INSPECTION: "magenta",
   UNDER_MAINTENANCE: "red",
   NO_STATUS: "gold",
+  ON_SERVICE: "teal",
+  NO_SERVICE: "gold"
 };

@@ -29,7 +29,7 @@ function EmployeeSchedulePage() {
 
   return (
     <>
-      <PageHeader title="Employee Allowance" onBack={() => router?.back()} />
+      <PageHeader title="Employee Attendance" onBack={() => router?.back()} />
       <EmployeeDetails
         fullName={employee?.fullName}
         position={employee?.position?.description}

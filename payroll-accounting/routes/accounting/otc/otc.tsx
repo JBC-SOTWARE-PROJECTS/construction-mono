@@ -96,7 +96,7 @@ export default function OTCTransactionComponent() {
                 data?.billingOTCByFiltersPage?.totalElements as number
               }
               handleOpen={(record) =>
-                router.push(`/accounting/billing/folio/${record?.id}`)
+                router.push(`/accounting/otc/folio/${record?.id}`)
               }
               changePage={(page) =>
                 setState((prev) => ({ ...prev, page: page }))

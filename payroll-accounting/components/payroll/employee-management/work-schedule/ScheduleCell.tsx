@@ -100,7 +100,9 @@ function ScheduleCell({
               .map((item: any) => {
                 return (
                   <>
-                    <b>{item.label}</b>
+                    <b>
+                      {item.label} {employeeSchedule?.length > 1 && "(OT)"}
+                    </b>
                     {`${dayjs(item.date_time_start)
                       .add(8, "hour")
                       .format("h:mm a")} - ${dayjs(item.date_time_end)

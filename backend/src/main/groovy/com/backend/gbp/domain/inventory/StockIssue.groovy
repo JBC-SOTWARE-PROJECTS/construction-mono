@@ -73,6 +73,10 @@ class StockIssue extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "is_posted")
 	Boolean isPosted
+
+	@GraphQLQuery
+	@Column(name = "company")
+	UUID company
 	
 	@Transient
 	Instant getCreated() {

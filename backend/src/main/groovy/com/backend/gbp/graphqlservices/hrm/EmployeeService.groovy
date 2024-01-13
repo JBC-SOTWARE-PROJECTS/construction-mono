@@ -195,7 +195,7 @@ class EmployeeService {
             employee.office = officeRepository.findById(officeId).get()
             employee.position = positionRepository.findById(position).get()
             employee.currentCompany = companySettingsService.comById(company)
-            employee.dob = employee.dob.plusDays(1)
+            employee.dob = employee.dob ? employee.dob.plusDays(1) : null;
 
             return employeeRepository.save(employee)
         } else {

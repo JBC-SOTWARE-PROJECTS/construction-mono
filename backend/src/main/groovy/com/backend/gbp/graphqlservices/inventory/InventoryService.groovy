@@ -73,10 +73,12 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			@GraphQLArgument(name = "office") UUID office,
 			@GraphQLArgument(name = "itemId") UUID itemId
 	) {
-		String query = '''Select inv from Inventory inv where inv.officeId = :office and inv.itemId = :itemId'''
+		def company = SecurityUtils.currentCompanyId()
+		String query = '''Select inv from Inventory inv where inv.officeId = :office and inv.itemId = :itemId and inv.company = :company'''
 		Map<String, Object> params = new HashMap<>()
 		params.put('office', office)
 		params.put('itemId', itemId)
+		params.put('company', company)
 		createQuery(query, params).resultList.find()
 	}
 
@@ -85,11 +87,12 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			@GraphQLArgument(name = "filter") String filter,
 			@GraphQLArgument(name = "group") UUID group,
 			@GraphQLArgument(name = "category") List<UUID> category,
+			@GraphQLArgument(name = "brand") String brand,
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
 
-		Instant start = Instant.now();
+		def company = SecurityUtils.currentCompanyId()
 		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
 		Employee employee = employeeRepository.findOneByUser(user)
 
@@ -119,6 +122,19 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			params.put("category", category)
 		}
 
+		if (company) {
+			query += ''' and (inv.company = :company)'''
+			countQuery += ''' and (inv.company = :company)'''
+			params.put("company", company)
+		}
+
+		if (brand) {
+			query += ''' and (inv.brand = :brand)'''
+			countQuery += ''' and (inv.brand = :brand)'''
+			params.put("brand", brand)
+		}
+
+
 		query += ''' ORDER BY inv.descLong ASC'''
 
 		Page<Inventory> result = getPageable(query, countQuery, page, size, params)
@@ -131,10 +147,11 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			@GraphQLArgument(name = "office") UUID office,
 			@GraphQLArgument(name = "group") UUID group,
 			@GraphQLArgument(name = "category") List<UUID> category,
+			@GraphQLArgument(name = "brand") String brand,
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-
+		def company = SecurityUtils.currentCompanyId()
 		String query = '''Select inv from Inventory inv where
 						lower(concat(inv.descLong,inv.sku)) like lower(concat('%',:filter,'%'))
 						and inv.officeId=:officeid and
@@ -161,6 +178,18 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			params.put("category", category)
 		}
 
+		if (company) {
+			query += ''' and (inv.company = :company)'''
+			countQuery += ''' and (inv.company = :company)'''
+			params.put("company", company)
+		}
+
+		if (brand) {
+			query += ''' and (inv.brand = :brand)'''
+			countQuery += ''' and (inv.brand = :brand)'''
+			params.put("brand", brand)
+		}
+
 		query += ''' ORDER BY inv.descLong ASC'''
 
 		Page<Inventory> result = getPageable(query, countQuery, page, size, params)
@@ -174,7 +203,7 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-		Instant start = Instant.now();
+		def company = SecurityUtils.currentCompanyId()
 		String query = '''Select inv from Inventory inv where
 						lower(concat(inv.descLong,inv.sku)) like lower(concat('%',:filter,'%'))
 						and inv.officeId=:officeid and
@@ -189,6 +218,12 @@ class InventoryService extends AbstractDaoService<Inventory> {
 		params.put('officeid', office)
 		params.put('filter', filter)
 
+		if (company) {
+			query += ''' and (inv.company = :company)'''
+			countQuery += ''' and (inv.company = :company)'''
+			params.put("company", company)
+		}
+
 		query += ''' ORDER BY inv.descLong ASC'''
 
 		Page<Inventory> result = getPageable(query, countQuery, page, size, params)
@@ -202,7 +237,7 @@ class InventoryService extends AbstractDaoService<Inventory> {
 			@GraphQLArgument(name = "page") Integer page,
 			@GraphQLArgument(name = "size") Integer size
 	) {
-		Instant start = Instant.now();
+		def company = SecurityUtils.currentCompanyId()
 		String query = '''Select inv from Inventory inv where
 						lower(concat(inv.descLong,inv.sku)) like lower(concat('%',:filter,'%'))
 						and inv.officeId=:officeid and
@@ -216,6 +251,12 @@ class InventoryService extends AbstractDaoService<Inventory> {
 		Map<String, Object> params = new HashMap<>()
 		params.put('officeid', office)
 		params.put('filter', filter)
+
+		if (company) {
+			query += ''' and (inv.company = :company)'''
+			countQuery += ''' and (inv.company = :company)'''
+			params.put("company", company)
+		}
 
 		query += ''' ORDER BY inv.descLong ASC'''
 

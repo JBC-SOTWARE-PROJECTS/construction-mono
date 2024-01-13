@@ -17,7 +17,7 @@ interface IProps {
   module: PayrollModule;
   showTitle?: boolean;
   status?: string;
-  handleClickFinalize: any;
+  handleClickFinalize?: any;
   loading: boolean;
 }
 
@@ -53,18 +53,23 @@ function PayrollHeader({
         extra={
           <>
             {extra}
-            {payroll?.status === PayrollStatus.Active && (
-              <CustomButton
-                type="primary"
-                icon={
-                  status === "FINALIZED" ? <EditOutlined /> : <CheckOutlined />
-                }
-                onClick={handleClickFinalize}
-                loading={loading}
-              >
-                Set as {statusMap[status as any]}
-              </CustomButton>
-            )}
+            {payroll?.status === PayrollStatus.Active &&
+              module !== PayrollModule.WithholdingTax && (
+                <CustomButton
+                  type="primary"
+                  icon={
+                    status === "FINALIZED" ? (
+                      <EditOutlined />
+                    ) : (
+                      <CheckOutlined />
+                    )
+                  }
+                  onClick={handleClickFinalize}
+                  loading={loading}
+                >
+                  Set as {statusMap[status as any]}
+                </CustomButton>
+              )}
           </>
         }
       />

@@ -423,9 +423,29 @@ export const GET_RP_AUTO_ENTRIES = gql`
     }
   }
 `;
+
+export const GET_PCV_AUTO_ENTRIES = gql`
+  query ($id: UUID, $status: Boolean) {
+    pettyCashAccountView(id: $id, status: $status) {
+      code
+      desc
+      debit
+      credit
+    }
+  }
+`;
+
 export const POST_REAPPLICATION_PAYABLE = gql`
   mutation ($id: UUID, $status: Boolean) {
     postReapplication(id: $id, status: $status) {
+      id
+    }
+  }
+`;
+
+export const POST_PETTY_CASH_PAYABLE = gql`
+  mutation ($id: UUID, $status: Boolean) {
+    postPettyCash(id: $id, status: $status) {
       id
     }
   }
@@ -438,6 +458,20 @@ export const POST_ACCOUNT_REAPPLICATION_MANUAL = gql`
     $entries: [Map_String_ObjectScalar]
   ) {
     postReappManual(id: $id, header: $header, entries: $entries) {
+      payload
+      success
+      message
+    }
+  }
+`;
+
+export const POST_ACCOUNT_PETTYCASH_MANUAL = gql`
+  mutation (
+    $id: UUID
+    $header: Map_String_ObjectScalar
+    $entries: [Map_String_ObjectScalar]
+  ) {
+    postPettyCashManual(id: $id, header: $header, entries: $entries) {
       payload
       success
       message

@@ -5,6 +5,7 @@ import com.backend.gbp.domain.inventory.PurchaseRequest
 import com.backend.gbp.domain.inventory.PurchaseRequestItem
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -63,7 +64,7 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
 			@GraphQLArgument(name = "size") Integer size
 	) {
 
-
+        def company = SecurityUtils.currentCompanyId()
 		String query = '''Select pr from PurchaseRequest pr where
 						(lower(pr.prNo) like lower(concat('%',:filter,'%')))
 						and pr.requestingOffice.id = :office and
@@ -82,7 +83,14 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
         params.put('startDate', start)
         params.put('endDate', end)
 
-		query += ''' ORDER BY pr.prNo DESC'''
+        if (company) {
+            query += ''' and (pr.company = :company)'''
+            countQuery += ''' and (pr.company = :company)'''
+            params.put("company", company)
+        }
+
+
+        query += ''' ORDER BY pr.prNo DESC'''
 
 		Page<PurchaseRequest> result = getPageable(query, countQuery, page, size, params)
 		return result
@@ -90,9 +98,11 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
 
     @GraphQLQuery(name = "prItemNoPo")
     List<PurchaseRequest> prItemNoPo() {
-        String query = '''SELECT DISTINCT pi.purchaseRequest from PurchaseRequestItem pi where pi.purchaseRequest.isApprove = :status and pi.refPo is null'''
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''SELECT DISTINCT pi.purchaseRequest from PurchaseRequestItem pi where pi.purchaseRequest.isApprove = :status and pi.refPo is null and pi.purchaseRequest.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('status', true)
+        params.put('company', company)
         createQuery(query, params).resultList.sort { it.prNo }
     }
 
@@ -104,13 +114,22 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
             @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
             @GraphQLArgument(name = "id") UUID id
     ) {
+        def company = SecurityUtils.currentCompanyId()
         def pr = upsertFromMap(id, fields, { PurchaseRequest entity , boolean forInsert ->
             if(forInsert){
-                entity.prNo = generatorService.getNextValue(GeneratorType.PR_NO, {
-                    return "PR-" + StringUtils.leftPad(it.toString(), 6, "0")
-                })
+                def code = "PR"
                 entity.prDateRequested = Instant.now()
                 entity.status = "FOR APPROVAL"
+                entity.company = company
+                if(entity.project?.id){
+                    code = entity.project?.prefixShortName
+                }else if(entity.assets?.id){
+                    code = entity.assets?.prefix
+                }
+
+                entity.prNo = generatorService.getNextValue(GeneratorType.PR_NO, {
+                    return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+                })
             }
         })
         //items

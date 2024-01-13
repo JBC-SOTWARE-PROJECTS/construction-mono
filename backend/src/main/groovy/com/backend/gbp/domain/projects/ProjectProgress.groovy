@@ -26,7 +26,7 @@ class ProjectProgress extends AbstractAuditingEntity implements Serializable {
 	UUID id
 
     @GraphQLQuery
-    @Column(name = "transaction_no")
+    @Column(name = "trans_no")
     @UpperCase
     String transNo
 
@@ -52,5 +52,9 @@ class ProjectProgress extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "status")
 	String status
+
+	@GraphQLQuery
+	@Column(name = "progress_percent")
+	BigDecimal progressPercent
 
 }
