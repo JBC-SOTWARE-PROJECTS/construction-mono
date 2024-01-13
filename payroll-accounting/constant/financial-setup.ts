@@ -155,3 +155,21 @@ export const AccountType = [
     value: 'sub-child-account',
   },
 ]
+interface Months {
+  [key: string]: string
+}
+
+export const monthsValue: Months = {
+  lockJanuary: '01',
+  lockFebruary: '02',
+  lockMarch: '03',
+  lockApril: '04',
+  lockMay: '05',
+  lockJune: '06',
+  lockJuly: '07',
+  lockAugust: '08',
+  lockSeptember: '09',
+  lockOctober: '10',
+  lockNovember: '11',
+  lockDecember: '12',
+}

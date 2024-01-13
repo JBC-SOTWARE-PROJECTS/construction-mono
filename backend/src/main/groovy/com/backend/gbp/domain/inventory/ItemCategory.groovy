@@ -51,6 +51,11 @@ class ItemCategory extends AbstractAuditingEntity implements Serializable, Subac
 	@Column(name = "company")
 	UUID company
 
+	@GraphQLQuery
+	@Column(name = "prefix_code")
+	@UpperCase
+	String prefixCode
+
 	@Override
 	String getCode() {
 		return categoryCode
