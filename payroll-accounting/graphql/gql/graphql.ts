@@ -3592,6 +3592,7 @@ export type ItemCategory = {
   itemGroup?: Maybe<ItemGroup>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  prefixCode?: Maybe<Scalars['String']['output']>;
 };
 
 export type ItemCategoryInput = {
@@ -3601,6 +3602,7 @@ export type ItemCategoryInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   itemGroup?: InputMaybe<ItemGroupInput>;
+  prefixCode?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ItemGroup = {

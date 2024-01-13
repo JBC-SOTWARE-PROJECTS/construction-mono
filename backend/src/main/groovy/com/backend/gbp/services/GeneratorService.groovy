@@ -115,7 +115,8 @@ enum GeneratorType {
 	LOAN_NO,
 	LOAN_RECORD,
 	DAR_NO,
-	PRS_NO
+	PRS_NO,
+	ITEM_NO
 }
 
 @Service
@@ -182,6 +183,26 @@ class GeneratorService {
 		}
 		
 	}
+
+	private void initGeneratorCustom(String codeString) {
+
+		def name = codeString.toString()
+		def count = jdbcTemplate.queryForObject(" SELECT count(*) FROM pg_class where relkind='S' and relname = ? ",
+				Long,
+				"${name}_gen"
+		)
+
+		if (!count) {
+
+			try {
+				jdbcTemplate.execute(" CREATE SEQUENCE " + (name + "_gen") + " INCREMENT 1  MINVALUE 1 START 1 ")
+			} catch (Exception e) {
+				e.printStackTrace()
+			}
+
+		}
+
+	}
 	
 	Long getCurrentValue(GeneratorType type) {
 		initGenerator(type)
@@ -196,6 +217,15 @@ class GeneratorService {
 		def name = type.name().toLowerCase()
 		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
 		
+		return nextVal?.toString() + ""
+	}
+
+	String getNextValueCustom(String codeString) {
+		initGeneratorCustom(codeString)
+
+		def name = codeString.toString()
+		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
+
 		return nextVal?.toString() + ""
 	}
 	

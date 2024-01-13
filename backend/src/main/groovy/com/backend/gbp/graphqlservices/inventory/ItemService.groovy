@@ -7,6 +7,7 @@ import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.BrandDto
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
+import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -258,6 +259,29 @@ class ItemService extends AbstractDaoService<Item> {
         }else{
             upsertFromMap(id, fields, { Item entity, boolean forInsert ->
                 if(forInsert){
+                    String prefix = (entity.item_category.prefixCode ?: "").toString()
+//                    def genericAuto = generatorService.getNextValueCustom(entity.item_generics.genericCode, {
+//                        return StringUtils.leftPad(it.toString(), 3, "0")
+//                    })
+//                    String lastCodeNumber = "${prefix}${genericAuto}".toString()
+//                    def lastCodeGenerator = generatorService.getNextValueCustom(lastCodeNumber, {
+//                        return StringUtils.leftPad(it.toString(), 4, "0")
+//                    })
+//                    if(entity.sku.isEmpty()){
+//                        entity.sku = "${lastCodeNumber}${lastCodeGenerator}".toString()
+//                        entity.itemCode = "${lastCodeNumber}${lastCodeGenerator}".toString()
+//                    }else{
+//                        entity.itemCode = "${lastCodeNumber}${lastCodeGenerator}".toString()
+//                    }
+                    def autoGenerate = generatorService.getNextValue(GeneratorType.ITEM_NO, {
+                        return "${prefix}" + StringUtils.leftPad(it.toString(), 6, "0")
+                    })
+                    if((entity.sku ?: "").isEmpty()){
+                        entity.sku = autoGenerate
+                        entity.itemCode = autoGenerate
+                    }else{
+                        entity.itemCode = autoGenerate
+                    }
                     entity.company = company
                 }
             })

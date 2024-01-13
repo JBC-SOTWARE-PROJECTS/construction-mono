@@ -1,0 +1,1 @@
+ALTER TABLE inventory.item_categories ADD COLUMN IF NOT EXISTS prefix_code varchar default null;

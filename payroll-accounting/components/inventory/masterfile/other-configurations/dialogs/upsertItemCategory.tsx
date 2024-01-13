@@ -102,10 +102,20 @@ export default function UpsertItemCategoryModal(props: IProps) {
           <Col span={24}>
             <FormInput
               name="categoryCode"
-              rules={requiredField}
               label="Item Category Code"
               propsinput={{
-                placeholder: "Item Category Code",
+                placeholder: "Auto Generated",
+                disabled: true,
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              name="prefixCode"
+              rules={requiredField}
+              label="Item Category Prefix Code"
+              propsinput={{
+                placeholder: "e.g CM = CONSTRUCTION MATERIALS",
               }}
             />
           </Col>
