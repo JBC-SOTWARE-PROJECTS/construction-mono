@@ -184,12 +184,13 @@ class EmployeeResource {
             ArrayList<File> files = new ArrayList<>();
             for (MultipartFile capt: capture){
                 File file = convertMultipartFileToFile(capt);
+                spaceService.uploadFileToSpace(file, "ATTENDANCE_CAPTURE");
                 files.add(file);
             }
 
             //  MultipartFile file = request.getFile("image");
            // spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE");
-            spaceService.uploadMultiFileToSpace(files, env.getProperty("do.env.type")+"/ATTENDANCE_CAPTURE/");
+          //  spaceService.uploadMultiFileToSpace(files, env.getProperty("do.env.type")+"/ATTENDANCE_CAPTURE/");
            return "true";
         } catch (InterruptedException e) {
             e.printStackTrace();
