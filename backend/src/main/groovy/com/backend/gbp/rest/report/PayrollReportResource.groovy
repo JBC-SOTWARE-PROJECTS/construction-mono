@@ -167,21 +167,21 @@ class PayrollReportResource {
                 BigDecimal grossTT = 0.0
 
                 allowance.allowanceItems.each{
-                    grossTT = it.amount
+                    grossTT = it.amount ?: 0.0
                 }
 
                 BigDecimal adjustTotal = 0.0
 
                 summary.adjustmentItems.each{
                     if(it.operation == AdjustmentOperation.ADDITION){
-                        adjustTotal += it.amount
+                        adjustTotal += it.amount ?: 0.0
                     }else if(it.operation == AdjustmentOperation.SUBTRACTION){
-                        adjustTotal -= it.amount
+                        adjustTotal -= it.amount ?: 0.0
                     }
 
                 }
 
-                def totalNetPay = totalSalary?.regular + totalSalary?.overtime + totalSalary?.regularHoliday;
+                def totalNetPay = (totalSalary?.regular ?: 0.0) + (totalSalary?.overtime ?: 0.0) + (totalSalary?.regularHoliday ?: 0.0);
                 def deduction = (totalSalary?.late ?: 0.0) + (totalSalary?.underTime ?: 0.0) + (employee?.withholdingTax ?: 0.0) + (contribution?.sssEE ?: 0.0) + (contribution?.hdmfEE ?: 0.0) + (contribution?.phicEE ?: 0.0);
 
 
