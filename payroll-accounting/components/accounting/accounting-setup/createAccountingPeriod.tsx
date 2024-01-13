@@ -4,9 +4,11 @@ import {
   FormSwitch,
   FormTextArea,
 } from '@/components/common'
+import { monthsValue } from '@/constant/financial-setup'
 import { Fiscal } from '@/graphql/gql/graphql'
 import { gql, useMutation } from '@apollo/client'
 import { Checkbox, Divider, Form, List, Modal, message } from 'antd'
+import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import dayjs from 'dayjs'
 import moment from 'moment'
 
@@ -29,11 +31,28 @@ interface CreateAccountingPeriodI {
   hide: () => void
   record: Fiscal | any
 }
+
 const UPDATE_INSERT_RECORD = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     upsertFiscal(id: $id, fields: $fields) {
       id
     }
+  }
+`
+
+const SAVE_MONTHLY_ACCOUNT = gql`
+  mutation (
+    $start: String
+    $end: String
+    $fiscalId: UUID
+    $fields: Map_String_ObjectScalar
+  ) {
+    onGenerateMonthlyTrialBalance(
+      start: $start
+      end: $end
+      fiscalId: $fiscalId
+      fields: $fields
+    )
   }
 `
 
@@ -53,6 +72,8 @@ export default function CreateAccountingPeriod(props: CreateAccountingPeriodI) {
   }
 
   const [form] = Form.useForm()
+
+  const [onSaved, { loading }] = useMutation(SAVE_MONTHLY_ACCOUNT)
 
   const [updateInsert, { loading: resultLoading }] = useMutation(
     UPDATE_INSERT_RECORD,
@@ -88,6 +109,32 @@ export default function CreateAccountingPeriod(props: CreateAccountingPeriodI) {
         fields,
       },
     })
+  }
+
+  const onLockMonths = (props: CheckboxChangeEvent) => {
+    const { value, checked } = props?.target
+    if (checked) {
+      const start = dayjs()
+        .set('month', parseInt(monthsValue[value]) - 1)
+        .startOf('month')
+        .format('YYYY-MM-DD')
+      const end = dayjs()
+        .set('month', parseInt(monthsValue[value]) - 1)
+        .endOf('month')
+        .endOf('day')
+        .format('YYYY-MM-DD')
+
+      onSaved({
+        variables: {
+          start,
+          end,
+          fiscalId: record?.id,
+          fields: {
+            [value]: true,
+          },
+        },
+      })
+    }
   }
 
   return (
@@ -130,7 +177,13 @@ export default function CreateAccountingPeriod(props: CreateAccountingPeriodI) {
                 renderItem={(item) => (
                   <List.Item
                     key={item.label}
-                    actions={[<Checkbox key='lock' value={item.value} />]}
+                    actions={[
+                      <Checkbox
+                        key='lock'
+                        value={item.value}
+                        onChange={onLockMonths}
+                      />,
+                    ]}
                   >
                     {item.label}
                   </List.Item>

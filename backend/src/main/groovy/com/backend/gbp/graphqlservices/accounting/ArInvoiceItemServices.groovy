@@ -95,7 +95,6 @@ class ArInvoiceItemServices extends  ArAbstractFormulaHelper<ArInvoiceItems> {
                 if(entity.arInvoice.invoiceType.equalsIgnoreCase('REGULAR')){
                     entity.itemType = entity?.invoiceParticulars?.itemCategory ?: ''
                     entity.itemName = entity?.invoiceParticulars?.itemName ?: ''
-                    entity.description = entity?.invoiceParticulars?.description ?: ''
                 }
 
                 entity.cwtRate = entity.arInvoice.cwtRate
