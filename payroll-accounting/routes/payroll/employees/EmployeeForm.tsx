@@ -384,9 +384,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                 <Col {...col4}>
                   <FormDatePicker
                     label={"Date of Birth"}
-                    rules={[
-                      { required: true, message: "This Field is required" },
-                    ]}
                     initialValue={dayjs(_?.get(data, "emp.dob"))}
                     name="dob"
                     propsdatepicker={{}}
@@ -468,9 +465,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                 <Col {...col4}>
                   <FormSelect
                     label={"Civil/Marital Status"}
-                    rules={[
-                      { required: true, message: "This Field is required" },
-                    ]}
                     initialValue={_.get(data, "emp.civilStatus")}
                     name="civilStatus"
                     propsselect={{
@@ -816,12 +810,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                         <FormInput
                           label={"Username"}
                           name="login"
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
                           propsinput={{ placeholder: "username (e.g jdcruz)" }}
                         />
                       </Col>
@@ -831,12 +819,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                           label={"Username"}
                           name="login"
                           initialValue={_.get(data, "emp.user.login")}
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
                           propsinput={{ placeholder: "username (e.g jdcruz)" }}
                         />
                       </Col>
@@ -846,12 +828,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                       <Col {...col3}>
                         <FormInput
                           label={"Password"}
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
                           name="password"
                           propsinput={{
                             placeholder: "Password",
@@ -863,12 +839,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                       <Col {...col2}>
                         <FormInput
                           label={"Password"}
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
                           name="password"
                           initialValue={_.get(data, "emp.user.password")}
                           propsinput={{

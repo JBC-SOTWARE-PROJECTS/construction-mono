@@ -41,10 +41,7 @@ const initialState: IState = {
 };
 
 export default function ScheduleTypeSetup({ account }: IPageProps) {
-  const [dates, setDates] = useState([
-    dayjs().startOf("month"),
-    dayjs().endOf("month"),
-  ]);
+  const [dates, setDates] = useState([null as any, null as any]);
 
   const [filterData] = useGetFilters();
   const [state, setState] = useState(initialState);
@@ -69,6 +66,9 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
   const additionalColumns = () => {
     const start = dates[0];
     const end = dates[1];
+
+    if (!start || !end) return [];
+
     let currentDate = start.clone(); // Use .clone() to avoid modifying the original date
     let newColumns = [];
 
@@ -189,7 +189,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
           size="small"
           dataSource={employees}
           columns={columns}
-          pagination={false}
+          // pagination={false}
           loading={loadingEmployees || loadingSchedules || loadingUpsert}
           scroll={{ x: 1600, y: "calc(100vh - 330px)" }}
         />

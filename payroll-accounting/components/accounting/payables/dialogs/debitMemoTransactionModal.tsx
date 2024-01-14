@@ -30,7 +30,7 @@ export default function DebitMemoTransactionModal(props: IProps) {
   const [form] = Form.useForm();
   const { setFieldValue } = form;
   const [calculationType, setCalculationType] = useState<string>(
-    type === "DEBITADVICE" ? "FIX" : "PERCENTAGE"
+    type === "DEBITADVICE" ? "FIXED" : "PERCENTAGE"
   );
   const [selectedOffice, setOffice] = useState("");
   // ================== Queries =====================
@@ -195,12 +195,12 @@ export default function DebitMemoTransactionModal(props: IProps) {
                 showSearch: true,
                 options: [
                   { label: "PERCENTAGE", value: "PERCENTAGE" },
-                  { label: "FIX", value: "FIX" },
+                  { label: "FIXED", value: "FIXED" },
                 ],
                 placeholder: "Select Type",
                 onChange: (e) => {
                   setCalculationType(e);
-                  if (e === "FIX") {
+                  if (e === "FIXED") {
                     setFieldValue("percent", 0);
                   }
                 },
