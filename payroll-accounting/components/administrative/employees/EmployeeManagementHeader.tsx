@@ -1,3 +1,4 @@
+import EmployeeFilter from "@/components/common/EmployeeFilter";
 import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
 import { Employee } from "@/graphql/gql/graphql";
 import useGetEmployeesBasic from "@/hooks/employee/useGetEmployeesBasic";
@@ -16,7 +17,7 @@ function EmployeeManagementHeader({ title, children }: IParams) {
 
   const basePathName = "/payroll/employees/[id]";
   const basePath = `/payroll/employees/${router?.query?.id}`;
-  const [employeeList, loading] = useGetEmployeesBasic();
+  const [employeeList, loading, setFilters] = useGetEmployeesBasic();
   const pathname = router.pathname;
 
   const menus = [
@@ -94,23 +95,26 @@ function EmployeeManagementHeader({ title, children }: IParams) {
         )
       }
       extra={
-        <EmployeeDrawer
-          selectedEmployees={employeeList as Employee[]}
-          loading={false}
-          usage="EMPLOYEE_SWITCHING"
-          icon={<SwapOutlined />}
-          onSelect={(employee) => {
-            console.log(
-              router.push({
-                pathname: router?.pathname,
-                query: { id: employee?.id },
-              })
-            );
-          }}
-          selectedRowKeys={[router?.query?.id] as string[]}
-        >
-          Switch Employee
-        </EmployeeDrawer>
+        <>
+          <EmployeeDrawer
+            selectedEmployees={employeeList as Employee[]}
+            loading={false}
+            usage="EMPLOYEE_SWITCHING"
+            icon={<SwapOutlined />}
+            onSelect={(employee) => {
+              console.log(
+                router.push({
+                  pathname: router?.pathname,
+                  query: { id: employee?.id },
+                })
+              );
+            }}
+            selectedRowKeys={[router?.query?.id] as string[]}
+            setFilters={setFilters}
+          >
+            Switch Employee
+          </EmployeeDrawer>
+        </>
       }
     >
       {children}

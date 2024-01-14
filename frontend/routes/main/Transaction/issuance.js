@@ -28,7 +28,7 @@ import PostIssuance from "../postDialogs/postIssuance";
 
 const { Search } = Input;
 const { confirm } = Modal;
-const options = ["Edit", "Post", "Void"];
+const options = ["Edit", "Post", "Void", "Print"];
 
 //graphQL Queries
 const GET_RECORDS = gql`
@@ -166,6 +166,7 @@ const IssuanceContent = ({ account }) => {
           showPostModal({ show: true, myProps: record });
         } else if (e.key === "Void") {
           _approve(record?.id, false, "void");
+        } else if (e.key === "Print") {
         }
       }}
     >

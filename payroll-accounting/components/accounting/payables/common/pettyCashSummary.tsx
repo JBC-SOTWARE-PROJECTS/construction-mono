@@ -14,7 +14,7 @@ export default function PettyCashSummaryFooter(props: IProps) {
     <Table.Summary fixed>
       <Table.Summary.Row>
         <Table.Summary.Cell index={0} className="font-bold">
-          Ammount Unused
+          Amount Unused
         </Table.Summary.Cell>
         <Table.Summary.Cell
           index={1}

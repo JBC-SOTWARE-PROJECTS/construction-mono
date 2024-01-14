@@ -115,7 +115,8 @@ enum GeneratorType {
 	LOAN_NO,
 	LOAN_RECORD,
 	DAR_NO,
-	PRS_NO
+	PRS_NO,
+	ITEM_NO
 }
 
 @Service
@@ -130,15 +131,15 @@ class GeneratorService {
 	Long soaStart
 
 
-	String getNextSoaNumber(String registryType, Closure closure) {
-		initNextSOANumberFromRegistryType(registryType)
+	String getCustomGenerate(String registryType, Closure closure) {
+		initNextNumberFromCustom(registryType)
 
 		def name = registryType.toLowerCase()
 		def nextVal = jdbcTemplate.queryForObject(" select nextval('" + (name + "_gen") + "')", Long) as Long
 		return closure(nextVal)
 	}
 	// No special characters and spaces please
-	private void initNextSOANumberFromRegistryType(String registryType) {
+	private void initNextNumberFromCustom(String registryType) {
 
 		def name = registryType.toLowerCase() + "_gen"
 		def count = jdbcTemplate.queryForObject(" SELECT count(*) FROM pg_class where relkind='S' and relname = ? ",
@@ -149,7 +150,7 @@ class GeneratorService {
 		if (!count) {
 
 			try {
-				jdbcTemplate.execute(" CREATE SEQUENCE ${name} INCREMENT 1  MINVALUE 1 START ${soaStart} ")
+				jdbcTemplate.execute(" CREATE SEQUENCE ${name} INCREMENT 1  MINVALUE 1 START 1 ")
 			} catch (Exception e) {
 				e.printStackTrace()
 			}
@@ -182,7 +183,7 @@ class GeneratorService {
 		}
 		
 	}
-	
+
 	Long getCurrentValue(GeneratorType type) {
 		initGenerator(type)
 		def name = type.name().toLowerCase()

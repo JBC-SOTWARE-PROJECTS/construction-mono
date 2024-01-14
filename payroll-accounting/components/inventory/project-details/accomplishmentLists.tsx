@@ -81,7 +81,7 @@ export default function AccomplishmentLists({
                 items={itemLists}
               />
             )}
-            {totalElements && (
+            {totalElements ? (
               <div className="w-full project-accomplishments-pagination">
                 <Pagination
                   defaultCurrent={1}
@@ -89,7 +89,7 @@ export default function AccomplishmentLists({
                   onChange={(e) => handleChangePage(e - 1)}
                 />
               </div>
-            )}
+            ) : null}
           </div>
         </Spin>
       </Col>

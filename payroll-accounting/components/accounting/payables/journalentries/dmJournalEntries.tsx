@@ -218,7 +218,7 @@ export default function RPJournalEntries(props: IProps) {
             selected.map((item: any) => {
               return {
                 ...item,
-                desc: item?.description ?? "",
+                desc: item?.accountName ?? "",
                 debit: 0.0,
                 credit: 0.0,
               };

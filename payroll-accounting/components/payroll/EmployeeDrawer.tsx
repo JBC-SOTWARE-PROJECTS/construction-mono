@@ -2,6 +2,7 @@ import { Employee } from "@/graphql/gql/graphql";
 import { getStatusColor } from "@/utility/helper";
 import { Button, Divider, Drawer, Input, Select, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
+import EmployeeFilter from "../common/EmployeeFilter";
 
 interface IProps {
   selectedEmployees: Employee[];
@@ -11,6 +12,7 @@ interface IProps {
   icon?: any;
   onSelect?: (any: any) => void;
   selectedRowKeys?: string[];
+  setFilters?: () => any;
 }
 
 const EmployeeDrawer = ({
@@ -21,6 +23,7 @@ const EmployeeDrawer = ({
   children,
   icon,
   selectedRowKeys,
+  setFilters,
 }: IProps) => {
   const [open, setOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
@@ -88,7 +91,7 @@ const EmployeeDrawer = ({
         onClose={onClose}
         open={open}
         destroyOnClose
-        width={800}
+        width={"50%"}
       >
         {usage === "TIMEKEEPING" && (
           <>
@@ -110,6 +113,13 @@ const EmployeeDrawer = ({
               showSearch
             />
             <Divider />
+          </>
+        )}
+
+        {usage === "EMPLOYEE_SWITCHING" && (
+          <>
+            <EmployeeFilter setFilters={setFilters} /> <br />
+            <br />
           </>
         )}
 
