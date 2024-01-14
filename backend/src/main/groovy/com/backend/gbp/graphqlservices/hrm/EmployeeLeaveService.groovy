@@ -16,7 +16,10 @@ import com.backend.gbp.repository.hrm.ScheduleTypeRepository
 import com.backend.gbp.repository.payroll.EmployeeLeaveDto
 import com.backend.gbp.repository.payroll.EmployeeLeaveRepository
 import com.backend.gbp.security.SecurityUtils
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.type.CollectionType
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -25,12 +28,30 @@ import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.hibernate.sql.Insert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
 import java.time.Duration
+import java.time.Instant
+
+
+class EmployeeLeaveDtoBasic {
+    UUID id
+    String reason;
+    LeaveType type
+    LeaveStatus status;
+    List<SelectedDate> dates
+    Boolean withPay
+}
+
+class EmployeeLeaveWithCount {
+    Page<EmployeeLeaveDtoBasic> data
+    Integer dateCount
+}
 
 @TypeChecked
 @Component
@@ -49,13 +70,71 @@ class EmployeeLeaveService {
     @Autowired
     ObjectMapper objectMapper
 
+    @Autowired
+    JdbcTemplate jdbcTemplate
 
     //================================Query================================\\
     @GraphQLQuery(name = "getEmployeeLeaveByEmp")
-    List<EmployeeLeave> getEmployeeLeaveByEmp(
-            @GraphQLArgument(name = "employeeId") UUID employeeId
+    EmployeeLeaveWithCount getEmployeeLeaveByEmp(
+            @GraphQLArgument(name = "employeeId") UUID employeeId,
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "startDate") Instant startDate,
+            @GraphQLArgument(name = "endDate") Instant endDate
     ) {
-        return employeeLeaveRepository.findByEmployeeId(employeeId).sort({ it.createdDate }).reverse()
+
+        String startDateTime = (startDate.toEpochMilli() / 1000.0).toString()
+        String endDateTime = (endDate.toEpochMilli() / 1000.0).toString()
+
+        def leavesRaw = jdbcTemplate.queryForList("""
+SELECT DISTINCT e.*
+FROM hrm.employee_leave e,
+     LATERAL JSONB_ARRAY_ELEMENTS(e.dates) AS d
+WHERE CAST(d->>'startDatetime' AS double precision) BETWEEN ${startDateTime} AND ${endDateTime}
+AND e.employee =  '${employeeId}'
+limit ${size} offset ${size * page}  
+    ;
+""")
+        def count = jdbcTemplate.queryForObject("""
+SELECT  count(DISTINCT e.id)
+FROM hrm.employee_leave e,
+     LATERAL JSONB_ARRAY_ELEMENTS(e.dates) AS d
+WHERE CAST(d->>'startDatetime' AS double precision) BETWEEN ${startDateTime} AND ${endDateTime}
+AND e.employee =  '${employeeId}'
+limit ${size} offset ${size * page}  
+""", Long.class)
+
+        def countDates = jdbcTemplate.queryForObject("""
+SELECT 
+count (d)
+FROM hrm.employee_leave e,
+     LATERAL JSONB_ARRAY_ELEMENTS(e.dates) AS d
+WHERE CAST(d->>'startDatetime' AS double precision) BETWEEN ${startDateTime} AND ${endDateTime}
+AND e.employee =  '${employeeId}'
+""", Long.class)
+
+        List<EmployeeLeaveDtoBasic> employeeLeaves = []
+        leavesRaw.each {
+            EmployeeLeaveDtoBasic item = new EmployeeLeaveDtoBasic()
+            item.id = it.get('id') as UUID
+            item.reason = it.get('reason') as String
+            item.type = it.get('leave_type') as LeaveType
+            item.withPay = it.get('with_pay') as Boolean
+            item.status = it.get('status') as LeaveStatus
+
+            String jsonString = it.get('dates') as String
+            CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List, SelectedDate)
+            List<SelectedDate> selectedDates = objectMapper.readValue(jsonString, listType) as List<SelectedDate>
+            item.dates = selectedDates
+            employeeLeaves.push(item)
+        }
+
+        Page pageRes = (new PageImpl<EmployeeLeaveDtoBasic>(employeeLeaves.reverse(), PageRequest.of(page, size),
+                count))
+        EmployeeLeaveWithCount returnVal = new EmployeeLeaveWithCount()
+        returnVal.data = pageRes
+        returnVal.dateCount = countDates.toInteger()
+        return returnVal
     }
 
     @GraphQLQuery(name = "getEmployeeLeavePageable")
