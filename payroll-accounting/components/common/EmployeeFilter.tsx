@@ -42,6 +42,9 @@ function EmployeeFilter({ setFilters }: any) {
           setFilters((prev: any) => ({ ...prev, status: value }));
         }}
         options={filterOptions}
+        showSearch
+        filterOption
+        optionFilterProp="label"
       />
       <Select
         allowClear
@@ -51,7 +54,10 @@ function EmployeeFilter({ setFilters }: any) {
         onChange={(value) => {
           setFilters((prev: any) => ({ ...prev, office: value }));
         }}
+        showSearch
         options={filterData?.office}
+        filterOption
+        optionFilterProp="label"
       />
       <Select
         allowClear
@@ -61,7 +67,10 @@ function EmployeeFilter({ setFilters }: any) {
         onChange={(value) => {
           setFilters((prev: any) => ({ ...prev, position: value }));
         }}
+        showSearch
         options={filterData.position}
+        filterOption
+        optionFilterProp="label"
       />
     </Space>
   );

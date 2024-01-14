@@ -175,6 +175,7 @@ export const GET_RECORDS_ITEM_CATEGORY = gql`
         id
         itemDescription
       }
+      prefixCode
       categoryCode
       categoryDescription
       isActive

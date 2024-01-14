@@ -59,6 +59,7 @@ const DiverseTradeLayout = (props: IProps) => {
     fixedHeader: true,
     siderMenuType: "group",
     footerRender: false,
+    suppressSiderWhenMenuEmpty: true,
   };
 
   const [pathname, setPathname] = useState(router.pathname || "/");

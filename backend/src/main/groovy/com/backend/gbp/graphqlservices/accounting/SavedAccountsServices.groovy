@@ -274,37 +274,37 @@ class SavedAccountsServices extends AbstractDaoCompanyService<SavedAccounts> {
             entityManager.createNativeQuery("""
             select
                 cast(
-                jsonb_build_object(
-                'motherCode',l.journal_account -> 'motherAccount'->>'code',
-                'motherAccount',l.journal_account -> 'motherAccount'->>'description',
-                'subCode', l.journal_account -> 'subAccount' ->> 'code',
-                'subAccount', l.journal_account -> 'subAccount' ->> 'description',
-                'subSubCode', l.journal_account -> 'subSubAccount' ->> 'code',
-                'subSubAccount', l.journal_account -> 'subSubAccount' ->> 'description',
-                'code',l.journal_account ->> 'code',
-                'description', l.journal_account ->> 'description',
-                'normalSide',l.journal_account -> 'motherAccount'->>'normalSide',
-                'account_type',coa.account_type,
-                'debit',sum(l.debit),
-                'credit', sum(l.credit),
-                'balance', sum(l.debit) - sum(l.credit)
-                ) as text) as fields
-            from accounting.ledger l 
-            left join accounting.chart_of_accounts coa on coa.account_code = l.journal_account -> 'motherAccount'->>'code'
-            where (l.transaction_date_only  >= cast(:startDate as date) and l.transaction_date_only  <= cast(:endDate as date))
-            and l.approved_by is not null
-            and coa.account_type is not null
-            group by  l.journal_account -> 'motherAccount'->>'code',
-             l.journal_account -> 'motherAccount'->>'description',
-             l.journal_account -> 'subAccount' ->> 'code',
-             l.journal_account -> 'subAccount' ->> 'description',
-             l.journal_account -> 'subSubAccount' ->> 'code',
-             l.journal_account -> 'subSubAccount' ->> 'description',
-             l.journal_account -> 'motherAccount'->>'normalSide',
-             l.journal_account ->> 'code',
-             l.journal_account ->> 'description',
-             coa.account_type
-            order by  l.journal_account -> 'motherAccount'->>'description'
+                    jsonb_build_object(
+                    'motherCode',l.journal_account -> 'motherAccount'->>'code',
+                    'motherAccount',l.journal_account -> 'motherAccount'->>'accountName',
+                    'subCode', l.journal_account -> 'subAccount' ->> 'code',
+                    'subAccount', l.journal_account -> 'subAccount' ->> 'accountName',
+                    'subSubCode', l.journal_account -> 'subSubAccount' ->> 'code',
+                    'subSubAccount', l.journal_account -> 'subSubAccount' ->> 'accountName',
+                    'code',l.journal_account ->> 'code',
+                    'accountName', l.journal_account ->> 'accountName',
+                    'normalSide',l.journal_account -> 'motherAccount'->>'normalSide',
+                    'account_type',coa.account_type,
+                    'debit',sum(l.debit),
+                    'credit', sum(l.credit),
+                    'balance', sum(l.debit) - sum(l.credit)
+                    ) as text) as fields
+                from accounting.ledger l 
+                left join accounting.parent_account coa on coa.code  = l.journal_account -> 'motherAccount'->>'code'
+                where (l.transaction_date_only  >= cast(:startDate as date) and l.transaction_date_only  <= cast(:endDate as date))
+                and l.approved_by is not null
+                and coa.account_type is not null
+                group by  l.journal_account -> 'motherAccount'->>'code',
+                 l.journal_account -> 'motherAccount'->>'accountName',
+                 l.journal_account -> 'subAccount' ->> 'code',
+                 l.journal_account -> 'subAccount' ->> 'accountName',
+                 l.journal_account -> 'subSubAccount' ->> 'code',
+                 l.journal_account -> 'subSubAccount' ->> 'accountName',
+                 l.journal_account -> 'motherAccount'->>'normalSide',
+                 l.journal_account ->> 'code',
+                 l.journal_account ->> 'accountName',
+                 coa.account_type
+                order by  l.journal_account -> 'motherAccount'->>'accountName'
         """).setParameter('startDate',start).setParameter('endDate',end).getResultList()
         }
         catch (e) {
@@ -332,7 +332,7 @@ class SavedAccountsServices extends AbstractDaoCompanyService<SavedAccounts> {
                     monthAccounts.each {
                         it ->
                             def json = new JsonSlurper()
-                            Map<String, Object> resultMap = json.parseText(it)
+                            Map<String, Object> resultMap = json.parseText(it) as Map<String, Object>
                             upsertFromMap(null, resultMap, { sa, isInsert ->
                                 if (isInsert) {
                                     sa.transactionDate = LocalDate.parse(start)
