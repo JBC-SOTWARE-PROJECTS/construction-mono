@@ -556,6 +556,13 @@ th.ant-table-cell {
   display: none;
 }
 
+.upload-justify-between {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
 @media screen and (max-width: 1285px) {
   .project-list .ant-pro-list-row .ant-pro-list-row-content {
     display: none !important;
@@ -592,5 +599,19 @@ th.ant-table-cell {
 
   .project-list .ant-pro-card-body {
     padding-inline: 5px !important;
+  }
+
+  .upload-justify-between {
+    display: block;
+    width: 100%;
+  }
+
+  .upload-switch-action {
+    margin-bottom: 20px;
+  }
+
+  .project-upload .ant-upload-select,
+  .project-upload .ant-upload-select button {
+    width: 100%;
   }
 }

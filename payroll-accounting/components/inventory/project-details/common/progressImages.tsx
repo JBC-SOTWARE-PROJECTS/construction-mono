@@ -104,8 +104,8 @@ export default function ProjectProgressImagesLists({
   return (
     <Row gutter={[0, 16]}>
       <Col span={24}>
-        <div className="w-full dev-between">
-          <div>
+        <div className="w-full upload-justify-between">
+          <div className="upload-switch-action">
             Delete Images:{" "}
             <Switch
               checked={showDelete}
@@ -114,7 +114,7 @@ export default function ProjectProgressImagesLists({
               unCheckedChildren="No"
             />
           </div>
-          <Upload {...uploadProps}>
+          <Upload {...uploadProps} className="project-upload">
             <Button
               type="primary"
               loading={uploading}

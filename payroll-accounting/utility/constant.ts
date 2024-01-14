@@ -215,14 +215,14 @@ export const RPTOTALS = [
 
 export const PETTYTOTALS = [
   {
-    id: 'amountIssued',
-    description: 'Ammount Issued',
+    id: "amountIssued",
+    description: "Amount Issued",
     debit: 0,
     credit: null,
   },
   {
-    id: 'amountUsed',
-    description: 'Ammount Used',
+    id: "amountUsed",
+    description: "Amount Used",
     debit: null,
     credit: 0,
   },
