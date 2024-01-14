@@ -81,6 +81,10 @@ const GET_CONSTANT = gql`
       value: id
       label: description
     }
+    list: getAllEmployeesBasic {
+      value: id
+      label: fullName
+    }
   }
 `;
 
@@ -92,6 +96,7 @@ const IssuanceForm = ({ visible, hide, ...props }) => {
   const [items, setItems] = useState([]);
   const [form] = Form.useForm();
   const [projects, setProjects] = useState([]);
+  const [emp, setEmp] = useState([]);
   const [location, setLocation] = useState(props?.issueTo?.id || null);
 
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
@@ -101,21 +106,23 @@ const IssuanceForm = ({ visible, hide, ...props }) => {
     fetchPolicy: "network-only",
   });
 
-  const { loading: projectLoading } = useQuery(
-    GET_CONSTANT,
-    {
-      variables: {
-        id: location,
-      },
-      onCompleted: (data) => {
-        if (!_.isEmpty(data?.projects)) {
-          setProjects(data?.projects);
-        }else{
-            setProjects([]);
-        }
-      },
-    }
-  );
+  const { loading: projectLoading } = useQuery(GET_CONSTANT, {
+    variables: {
+      id: location,
+    },
+    onCompleted: (data) => {
+      if (!_.isEmpty(data?.projects)) {
+        setProjects(data?.projects);
+      } else {
+        setProjects([]);
+      }
+      if (!_.isEmpty(data?.list)) {
+        setEmp(data?.list);
+      } else {
+        setEmp([]);
+      }
+    },
+  });
 
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
     UPSERT_RECORD,
@@ -412,7 +419,7 @@ const IssuanceForm = ({ visible, hide, ...props }) => {
                   disabled={props?.isPosted || props?.isCancel}
                 />
               </Col>
-              <Col {...col2}>
+              <Col {...col3}>
                 <FormSelect
                   loading={loading}
                   description={"Issue/Expense to"}
@@ -430,7 +437,7 @@ const IssuanceForm = ({ visible, hide, ...props }) => {
                   disabled={props?.isPosted || props?.isCancel}
                 />
               </Col>
-              <Col {...col2}>
+              <Col {...col3}>
                 <FormSelect
                   loading={projectLoading}
                   description={"Project"}
@@ -439,6 +446,18 @@ const IssuanceForm = ({ visible, hide, ...props }) => {
                   field="project"
                   placeholder="Project"
                   list={projects}
+                  disabled={props?.isPosted || props?.isCancel}
+                />
+              </Col>
+              <Col {...col3}>
+                <FormSelect
+                  loading={projectLoading}
+                  description={"Received By"}
+                  initialValue={props?.received_by?.id}
+                  name="received_by"
+                  field="received_by"
+                  placeholder="Claimed By"
+                  list={emp}
                   disabled={props?.isPosted || props?.isCancel}
                 />
               </Col>

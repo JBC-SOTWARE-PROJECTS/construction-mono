@@ -48,7 +48,7 @@ const UserInfo = ({ account }) => {
       trigger="click"
     >
       <div className="gx-flex-row">
-        <span className="gx-mr-2 gx-mt-2">{account?.fullName}</span>
+        <span className="gx-mr-2 gx-mt-2 user-name-full">{account?.fullName}</span>
         <Avatar
           src={account?.gender === "MALE" ? avatar[0] : avatar[1]}
           className="gx-avatar gx-pointer"

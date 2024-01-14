@@ -190,3 +190,9 @@ Version        : 1.0
   align-items: center !important;
   width: 100% !important;
 }
+
+@media screen and (max-width: 500px) {
+  .user-name-full {
+    display: none;
+  }
+}
