@@ -79,8 +79,15 @@ class EmployeeService {
     }
 
     @GraphQLQuery(name = "getAllEmployeesBasic", description = "Get All Employees")
-    List<EmployeeBasicDetails> getAllEmployeesBasic() {
-        employeeRepository.getAllEmployeesBasic().sort { it.fullName }
+    List<EmployeeBasicDetails> getAllEmployeesBasic(@GraphQLArgument(name = "filter") String filter,
+                                                    @GraphQLArgument(name = "position") UUID position,
+                                                    @GraphQLArgument(name = "office") UUID office
+    ) {
+        employeeRepository.getAllEmployeesBasic(
+                filter,
+                position ? position.toString() : '',
+                office ? office.toString() : ''
+        ).sort { it.fullName }
     }
 
     @GraphQLQuery(name = "searchEmployees", description = "Search employees")
