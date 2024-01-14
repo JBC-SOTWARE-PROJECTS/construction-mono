@@ -122,9 +122,9 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
                 entity.status = "FOR APPROVAL"
                 entity.company = company
                 if(entity.project?.id){
-                    code = entity.project?.prefixShortName
+                    code = entity.project?.prefixShortName ?: "PJ"
                 }else if(entity.assets?.id){
-                    code = entity.assets?.prefix
+                    code = entity.assets?.prefix ?: "SP"
                 }
 
                 entity.prNo = generatorService.getNextValue(GeneratorType.PR_NO, {

@@ -25,6 +25,7 @@ import FilterSelect from "../../../util/customForms/filterSelect";
 import moment from "moment";
 import RTSForm from "./dialogs/rtsForm";
 import PostSupplierReturns from "../postDialogs/postReturn";
+import { getUrlPrefix } from "../../../shared/global";
 
 const { Search } = Input;
 const { confirm } = Modal;
@@ -167,6 +168,9 @@ const RTSContent = ({ account }) => {
         } else if (e.key === "Void") {
           _approve(record?.id, false, "void");
         } else if (e.key === "Print") {
+          window.open(
+            `${getUrlPrefix()}/reports/inventory/print/return_sup/${record.id}`
+          );
         }
       }}
     >

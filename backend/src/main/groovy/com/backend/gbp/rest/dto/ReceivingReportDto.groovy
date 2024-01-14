@@ -11,7 +11,8 @@ class ReceivingReportDto {
            supplier,
            remarks,
            fullname,
-            project
+            project,
+            projTitle
 //    BigDecimal grossAmount,
 //               totalDiscount,
 //               netDiscount,
