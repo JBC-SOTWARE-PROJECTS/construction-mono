@@ -3,19 +3,27 @@ package com.backend.gbp.rest.dto
 import groovy.transform.Canonical
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
 
+import java.sql.Date
+
 @Canonical
 class PayslipPayrollDto {
     String empId
     String empname
     String department
     String payrollCode
-    String payPeriod
-    String paycheckdate
+    Date payPeriod
+    Date paycheckdate
     Integer regularNoHrs
     BigDecimal regularRate
     BigDecimal regularTotal
     JRBeanCollectionDataSource descriptionField
     JRBeanCollectionDataSource deductionField
+    JRBeanCollectionDataSource summaryField
+    Double totalGross
+    Double totalDeduction
+    Double totalAdjustment
+    BigDecimal netpay
+    String dateprinted
 
 }
 
@@ -35,6 +43,12 @@ class HeaderDto {
     String transportation
     String foodAllowance
 }
+
+@Canonical
+class DetailDto{
+  String detail1
+}
+
 
 @Canonical
 class HeadersDto{
@@ -57,17 +71,27 @@ class HeadersDto{
 @Canonical
 class GrossDto {
     String  description
-    Integer nohours
-    Integer rate
-    Integer total
+    BigDecimal nohours
+    BigDecimal rate
+    BigDecimal total
+    BigDecimal totalGross
 }
 
 @Canonical
 class DeductionDto {
-    String deduction
-    Integer nohours
-    Integer rate
-    Integer total
+    String description
+    BigDecimal nohours
+    BigDecimal rate
+    BigDecimal total
+    BigDecimal totalDeduction
+}
+
+@Canonical
+class  SummaryDto{
+    String description
+    BigDecimal nohours
+    BigDecimal rate
+    BigDecimal total
 }
 
 

@@ -81,6 +81,11 @@ class PayrollEmployeeService {
         return payrollEmployeeRepository.findPayrollEmployee(id)
     }
 
+        @GraphQLQuery(name = "getAllPayrollEmployee", description = "get all employee")
+    List<PayrollEmployee> getAllPayrollEmployee(@GraphQLArgument(name = "id") UUID id){
+        return payrollEmployeeRepository.findByPayrollId(id)
+    }
+
     //=================================MUTATIONS=================================\\
 
 

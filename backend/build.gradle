@@ -7,7 +7,8 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'idea'
 group = 'com.backend'
 
-version = '1.0.31'
+
+version = '1.0.36'
 sourceCompatibility = '1.8'
 repositories {
 
