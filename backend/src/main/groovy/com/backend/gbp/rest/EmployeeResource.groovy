@@ -254,7 +254,7 @@ class EmployeeResource {
             attendance.referenceId = reAtt.referenceId;
             attendance.cameraCapture = reAtt.cameraCapture;
 
-            if(reAtt.project.equals("")){
+            if(reAtt.project.equals("") || reAtt.project == null){
                 attendance.project = null;
             }else{
                 attendance.project = projectService.findOne(reAtt.project);
