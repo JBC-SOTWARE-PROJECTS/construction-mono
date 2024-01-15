@@ -39,20 +39,17 @@ class StockIssue extends AbstractAuditingEntity implements Serializable {
 	Instant issueDate
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "issue_from", referencedColumnName = "id")
 	Office issueFrom
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "issue_to", referencedColumnName = "id")
 	Office issueTo
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
 	
@@ -61,10 +58,14 @@ class StockIssue extends AbstractAuditingEntity implements Serializable {
 	String issueType
 	
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "issued_by", referencedColumnName = "id")
 	Employee issued_by
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "received_by", referencedColumnName = "id")
+	Employee received_by
 
 	@GraphQLQuery
 	@Column(name = "is_cancel")

@@ -141,6 +141,7 @@ class PayrollContributionsService implements IPayrollModuleBaseOperations<Payrol
                 break;
         }
         payrollContributionRepository.save(contribution)
+        calculateAllContributions(payrollId)
         return new GraphQLResVal<PayrollContribution>(contribution, true, "Successfully updated contribution")
 
     }
