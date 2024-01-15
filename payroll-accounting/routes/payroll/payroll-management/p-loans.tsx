@@ -1,8 +1,11 @@
+import CustomButton from "@/components/common/CustomButton";
 import TablePaginated from "@/components/common/TablePaginated";
 import PayrollHeader from "@/components/payroll/PayrollHeader";
+import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/PayrollEmployeeFilter";
+import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
+import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
-  PayrollEmployeeLoan,
   PayrollEmployeeLoanDto,
   PayrollEmployeeStatus,
   PayrollLoanItem,
@@ -10,26 +13,27 @@ import {
   PayrollStatus,
 } from "@/graphql/gql/graphql";
 import { variables } from "@/hooks/payroll/contributions/useGetContributionEmployees";
+import useDeleteLoanItem from "@/hooks/payroll/loans/useDeleteLoanItem";
 import useGetPayrollEmployeeLoan from "@/hooks/payroll/loans/useGetPayrollEmployeeLoan";
+import useGetPayrollLoan from "@/hooks/payroll/loans/useGetPayrollLoan";
 import useUpdateLoanItemAmount from "@/hooks/payroll/loans/useUpdateLoanItemAmount";
+import useUpdatePayrollLoanStatus from "@/hooks/payroll/loans/useUpdatePayrollLoanStatus";
 import usePaginationState from "@/hooks/usePaginationState";
+import { statusMap } from "@/utility/constant";
+import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { CheckOutlined, EditOutlined } from "@ant-design/icons";
-import { InputNumber, Table, Tag, message } from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
+import { InputNumber, Modal, Table, Tag, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { capitalize } from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { recalculateButton } from "./p-contributions";
-import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
-import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
-import { getStatusColor } from "@/utility/helper";
-import useGetPayrollLoan from "@/hooks/payroll/loans/useGetPayrollLoan";
-import CustomButton from "@/components/common/CustomButton";
-import { statusMap } from "@/utility/constant";
-import useUpdatePayrollLoanStatus from "@/hooks/payroll/loans/useUpdatePayrollLoanStatus";
-import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/PayrollEmployeeFilter";
 
 const initialState: variables = {
   filter: "",
@@ -52,6 +56,9 @@ function PayrollLoans({ account }: IPageProps) {
 
   const [updateStatus, loadingUpdateStatus] = useUpdatePayrollLoanStatus(() => {
     refetchLoan();
+    refetch();
+  });
+  const [deleteItem, loadingDeletItem] = useDeleteLoanItem(() => {
     refetch();
   });
 
@@ -91,6 +98,40 @@ function PayrollLoans({ account }: IPageProps) {
     ...(loan?.status === PayrollStatus.Draft ? action : []),
   ];
 
+  const confirmDelete = (id: string) => {
+    Modal.confirm({
+      content: "Are you sure you want to delete this item?",
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        deleteItem(id);
+      },
+      onCancel() {},
+    });
+  };
+
+  const expandedRowAction: ColumnsType<PayrollLoanItem> = [
+    {
+      title: "Action",
+      dataIndex: "id",
+      render: (value) => {
+        return (
+          <>
+            <CustomButton
+              id={value}
+              icon={<DeleteOutlined />}
+              danger
+              type="primary"
+              shape="circle"
+              onClick={() => {
+                confirmDelete(value);
+              }}
+            />
+          </>
+        );
+      },
+    },
+  ];
+
   let expandedRowColumns: ColumnsType<PayrollLoanItem> = [
     {
       title: "Category",
@@ -123,6 +164,7 @@ function PayrollLoans({ account }: IPageProps) {
           </div>
         ),
     },
+    ...(loan?.status === PayrollStatus.Draft ? expandedRowAction : []),
   ];
 
   const editAmount = () => {

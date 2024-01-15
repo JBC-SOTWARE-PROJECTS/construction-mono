@@ -10,7 +10,7 @@ class PRItemReportDto {
 
 @TupleConstructor
 class PRReportDto {
-    String prNo, date, supplier, fullname, project, location
+    String prNo, date, supplier, fullname, project, location, projTitle
 }
 
 @TupleConstructor

@@ -561,4 +561,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/85_category_prefix_code.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/86_stock_issue_received_by.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

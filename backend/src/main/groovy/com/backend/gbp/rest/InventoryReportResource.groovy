@@ -10,6 +10,10 @@ import com.backend.gbp.graphqlservices.inventory.PurchaseRequestItemService
 import com.backend.gbp.graphqlservices.inventory.PurchaseRequestService
 import com.backend.gbp.graphqlservices.inventory.ReceivingReportItemService
 import com.backend.gbp.graphqlservices.inventory.ReceivingReportService
+import com.backend.gbp.graphqlservices.inventory.ReturnSupplierItemsService
+import com.backend.gbp.graphqlservices.inventory.ReturnSupplierService
+import com.backend.gbp.graphqlservices.inventory.StockIssuanceService
+import com.backend.gbp.graphqlservices.inventory.StockIssueItemsService
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.google.gson.Gson
 import com.backend.gbp.domain.hrm.Employee
@@ -98,6 +102,18 @@ class InventoryReportResource {
     @Autowired
     SignatureRepository signatureRepository
 
+	@Autowired
+	ReturnSupplierService returnSupplierService
+
+	@Autowired
+	ReturnSupplierItemsService returnSupplierItemsService
+
+	@Autowired
+	StockIssuanceService stockIssuanceService
+
+	@Autowired
+	StockIssueItemsService stockIssueItemsService
+
     @RequestMapping(value = ['/po_report/{id}'], produces = ['application/pdf'])
     ResponseEntity<byte[]> poReport(@PathVariable('id') UUID id) {
 
@@ -121,6 +137,13 @@ class InventoryReportResource {
         DateTimeFormatter dateFormat =
                 DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
 
+		String desc = purchaseOrder.category.equalsIgnoreCase("PROJECTS") ? purchaseOrder?.project?.description ?: "" : purchaseOrder?.assets?.description ?: ""
+		String title = purchaseOrder.category.equalsIgnoreCase("PROJECTS") ? "Project: " : "Asset Equipment: "
+		if(purchaseOrder.category.equalsIgnoreCase("PERSONAL")){
+			desc = ""
+			title = ""
+		}
+
         def dto = new POReportDto(
                 date: dateFormat.format(purchaseOrder?.preparedDate),
                 poNum: purchaseOrder?.poNumber,
@@ -128,7 +151,8 @@ class InventoryReportResource {
                 supplier: purchaseOrder?.supplier?.supplierFullname,
 				office: purchaseOrder?.office?.officeDescription,
                 terms: purchaseOrder?.paymentTerms?.paymentDesc,
-				project: purchaseOrder?.project?.description ?: "",
+				project: desc,
+				projTitle: title,
 				location: purchaseOrder?.project?.location?.fullAddress ?: "",
                 fullname: emp?.fullName
 
@@ -302,12 +326,21 @@ class InventoryReportResource {
 
 		DateTimeFormatter dateFormat =
 				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
+
+		String desc = purchaseRequest.category.equalsIgnoreCase("PROJECTS") ? purchaseRequest?.project?.description ?: "" : purchaseRequest?.assets?.description ?: ""
+		String title = purchaseRequest.category.equalsIgnoreCase("PROJECTS") ? "Project: " : "Asset Equipment: "
+		if(purchaseRequest.category.equalsIgnoreCase("PERSONAL")){
+			desc = ""
+			title = ""
+		}
+
 		def dto = new PRReportDto(
 				prNo: purchaseRequest?.prNo,
 				date: dateFormat.format(purchaseRequest?.prDateRequested),
 				supplier: purchaseRequest?.supplier?.supplierFullname ? purchaseRequest?.supplier?.supplierFullname : '',
 				fullname: purchaseRequest?.userFullname,
-				project: purchaseRequest?.project?.description ?: "",
+				project: desc,
+				projTitle: title,
 				location: purchaseRequest?.project?.location?.fullAddress ?: "",
 
 		)
@@ -443,6 +476,13 @@ class InventoryReportResource {
 
 		DateTimeFormatter dateFormat =
 				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
+		String desc = receiving.category.equalsIgnoreCase("PROJECTS") ? receiving?.project?.description ?: "" : receiving?.assets?.description ?: ""
+		String title = receiving.category.equalsIgnoreCase("PROJECTS") ? "Project: " : "Asset Equipment: "
+		if(receiving.category.equalsIgnoreCase("PERSONAL")){
+			desc = ""
+			title = ""
+		}
+
 		def dto = new ReceivingReportDto(
 				srrNo: receiving?.rrNo,
 				date: dateFormat.format(receiving?.receiveDate),
@@ -450,7 +490,8 @@ class InventoryReportResource {
 				refNo: receiving.receivedRefNo,
 				supplier: receiving?.supplier?.supplierFullname,
 				remarks: receiving?.receivedRemarks ? receiving?.receivedRemarks : '',
-				project: receiving?.project?.description ?: "",
+				project: desc,
+				projTitle: title,
 //				totalDiscount: receiving.totalDiscount,
 //				netDiscount: receiving.netDiscount,
 //				amount: receiving.amount,
@@ -833,6 +874,207 @@ class InventoryReportResource {
 		def params = new LinkedMultiValueMap<String, String>()
 		//params.add("Content-Disposition", "inline;filename=Discharge-Instruction-of-\"" + caseDto?.patient?.fullName + "\".pdf")
 		params.add("Content-Disposition", "inline;filename=SRR-Item-Report.pdf")
+		return new ResponseEntity(data, params, HttpStatus.OK)
+	}
+
+	@RequestMapping(value = ['/return_sup/{id}'], produces = ['application/pdf'])
+	ResponseEntity<byte[]> returnReport(@PathVariable('id') UUID id) {
+
+		ReturnSupplier returnSupplierDetails = returnSupplierService.rtsById(id)
+		List<ReturnSupplierItem> returnSupplierItem = returnSupplierItemsService.rtsItemByParent(id)
+		Employee emp = employeeRepository.findByUsername(returnSupplierDetails?.createdBy).first()
+
+		def res = applicationContext?.getResource("classpath:/reports/inventory/return_sup_report.jasper")
+		def bytearray = new ByteArrayInputStream()
+		def os = new ByteArrayOutputStream()
+		def parameters = [:] as Map<String, Object>
+		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def itemsDto = new ArrayList<ReturnSuppItemReportDto>()
+
+		DateTimeFormatter dateFormat =
+				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
+
+		def dto = new ReturnSuppReportDto(
+				date: dateFormat.format(Instant.now()),
+				rts: returnSupplierDetails?.rtsNo,
+				refNo: "${returnSupplierDetails?.refSrr}${returnSupplierDetails?.receivedRefNo ? "/${returnSupplierDetails?.receivedRefNo}" : ""}",
+				supplierCode: returnSupplierDetails?.supplier?.supplierCode,
+				supplierName: returnSupplierDetails?.supplier?.supplierFullname,
+				returnBy: emp?.fullName,
+				returnDate: dateFormat.format(returnSupplierDetails?.returnDate),
+				receivedBy: returnSupplierDetails?.received_by,
+				receivedDate: dateFormat.format(returnSupplierDetails?.returnDate)
+		)
+
+		def gson = new Gson()
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSource = new JsonDataSource(dataSourceByteArray)
+
+		if (returnSupplierItem) {
+			returnSupplierItem.each {
+				it ->
+
+					def itemDto = new ReturnSuppItemReportDto(
+							stockCode: it.item.sku,
+							itemDesc: it.item.descLong,
+							uom: it.item.unit_of_usage.unitDescription,
+							quantityReturn: it.returnQty,
+							reasonForReturn: it.return_remarks
+					)
+					itemsDto.add(itemDto)
+			}
+		}
+
+		if (logo.exists()) {
+			parameters.put("logo", logo?.getURL())
+		}
+
+		if (itemsDto) {
+			parameters.put('items', new JRBeanCollectionDataSource(itemsDto))
+		}
+
+
+		Office officeData = officeRepository.findById(emp.office.id).get()
+		def com = companySettingsService.comById()
+
+		String tel = officeData.telNo ?: "N/A";String phone = officeData.phoneNo ?: "N/A"
+		String company = com.companyName ?: "";String addr = officeData.fullAddress ?: ""
+		parameters.put("company_name",  company)
+		parameters.put("com_address",  addr)
+		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("tel_no", "Tel No: "+tel)
+		parameters.put("email", officeData.emailAdd ?: "N/A")
+
+		//printing
+		try {
+			def jrprint = JasperFillManager.fillReport(res.inputStream, parameters, dataSource)
+
+			def pdfExporter = new JRPdfExporter()
+
+			def outputStreamExporterOutput = new SimpleOutputStreamExporterOutput(os)
+
+			pdfExporter.setExporterInput(new SimpleExporterInput(jrprint))
+			pdfExporter.setExporterOutput(outputStreamExporterOutput)
+			def configuration = new SimplePdfExporterConfiguration()
+			pdfExporter.setConfiguration(configuration)
+			pdfExporter.exportReport()
+
+		} catch (JRException e) {
+			e.printStackTrace()
+		} catch (IOException e) {
+			e.printStackTrace()
+		}
+
+		if (bytearray != null)
+			IOUtils.closeQuietly(bytearray)
+		//end
+
+		def data = os.toByteArray()
+		def params = new LinkedMultiValueMap<String, String>()
+		params.add("Content-Disposition", "inline;filename=RETURN-SUPPLIER-Report-of-\"" + returnSupplierDetails?.rtsNo + "\".pdf")
+		return new ResponseEntity(data, params, HttpStatus.OK)
+	}
+
+	@RequestMapping(value = ['/issue_report/{id}'], produces = ['application/pdf'])
+	ResponseEntity<byte[]> issueReport(@PathVariable('id') UUID id) {
+
+
+		StockIssue parent = stockIssuanceService.stiById(id)
+		List<StockIssueItems> items = stockIssueItemsService.stiItemByParent(id).sort {
+			it.item.descLong
+		}
+		String issueBy = parent.issued_by.fullName
+		String receivedBy = parent.received_by.fullName
+
+		def res = applicationContext?.getResource("classpath:/reports/inventory/stock_transfer.jasper")
+		def bytearray = new ByteArrayInputStream()
+		def os = new ByteArrayOutputStream()
+		def parameters = [:] as Map<String, Object>
+		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def itemsDto = new ArrayList<STSReportItemDto>()
+
+		DateTimeFormatter dateFormat =
+				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
+
+		def dto = new STSReportDto(
+				date: dateFormat.format(parent?.issueDate),
+				stsNo: parent?.issueNo,
+				issuing_location: parent?.issueFrom?.officeDescription,
+				receiving_location: parent?.issueTo?.officeDescription,
+				project: parent?.project?.description ?: "N/A",
+				issuedBy: issueBy,
+				receivedBy: receivedBy,
+
+		)
+		def gson = new Gson()
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSource = new JsonDataSource(dataSourceByteArray)
+
+		if (items) {
+			items.each {
+				it ->
+					BigDecimal total = it.issueQty * (it.unitCost ?: BigDecimal.ZERO)
+					def itemDto = new STSReportItemDto(
+							code: it.item.itemCode ?: "",
+							description: it.item.descLong ?: "",
+							uom: it.item?.unit_of_usage?.unitDescription ?: "",
+							issued: it.issueQty,
+							unitCost: it.unitCost,
+							total: total,
+
+					)
+					itemsDto.add(itemDto)
+			}
+		}
+
+
+		if (logo.exists()) {
+			parameters.put("logo", logo?.getURL())
+		}
+
+		if (itemsDto) {
+			parameters.put('items', new JRBeanCollectionDataSource(itemsDto))
+		}
+		UUID officeId = parent?.issued_by?.office?.id ?: null
+		Office officeData = officeRepository.findById(officeId).get()
+		def com = companySettingsService.comById()
+
+		String tel = officeData.telNo ?: "N/A";String phone = officeData.phoneNo ?: "N/A"
+		String company = com.companyName ?: "";String addr = officeData.fullAddress ?: ""
+		parameters.put("company_name",  company)
+		parameters.put("com_address",  addr)
+		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("tel_no", "Tel No: "+tel)
+		parameters.put("email", officeData.emailAdd ?: "N/A")
+
+		//printing
+		try {
+			def jrprint = JasperFillManager.fillReport(res.inputStream, parameters, dataSource)
+
+			def pdfExporter = new JRPdfExporter()
+
+			def outputStreamExporterOutput = new SimpleOutputStreamExporterOutput(os)
+
+			pdfExporter.setExporterInput(new SimpleExporterInput(jrprint))
+			pdfExporter.setExporterOutput(outputStreamExporterOutput)
+			def configuration = new SimplePdfExporterConfiguration()
+			pdfExporter.setConfiguration(configuration)
+			pdfExporter.exportReport()
+
+		} catch (JRException e) {
+			e.printStackTrace()
+		} catch (IOException e) {
+			e.printStackTrace()
+		}
+
+		if (bytearray != null)
+			IOUtils.closeQuietly(bytearray)
+		//end
+
+		def data = os.toByteArray()
+		def params = new LinkedMultiValueMap<String, String>()
+		//params.add("Content-Disposition", "inline;filename=Discharge-Instruction-of-\"" + caseDto?.patient?.fullName + "\".pdf")
+		params.add("Content-Disposition", "inline;filename=STI-Report-of-\"" + parent?.issueNo + "\".pdf")
 		return new ResponseEntity(data, params, HttpStatus.OK)
 	}
 

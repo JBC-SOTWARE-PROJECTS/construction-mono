@@ -137,6 +137,14 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
         return new GraphQLResVal<PayrollEmployeeLoan>(employee, true, "Successfully updated employee loan status!")
     }
 
+    @GraphQLMutation(name = "deleteLoanItem")
+    GraphQLResVal<String> deleteLoanItem(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        payrollLoanItemRepository.deleteById(id)
+        return new GraphQLResVal<String>('Success', true, "Successfully updated employee loan status!")
+    }
+
 
     //=========================== Interface Methods ============================
 
@@ -187,11 +195,11 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
                 payrollLoanItem.category = it.category
                 switch (it.category) {
                     case EmployeeLoanCategory.CASH_ADVANCE:
-                        if(!payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount) return
+                        if (!payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount) return
                         payrollLoanItem.amount = payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount ?: 0
                         break;
                     case EmployeeLoanCategory.EQUIPMENT_LOAN:
-                        if(!payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount) return
+                        if (!payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount) return
                         payrollLoanItem.amount = payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount ?: 0
                         break;
                 }
