@@ -89,7 +89,10 @@ function PayrollContributionsPage() {
   });
 
   const [updateContributionStatus, loadingContributionStatus] =
-    useUpdateContributionTypeStatus(() => refetchContribution());
+    useUpdateContributionTypeStatus(() => {
+      refetchContribution();
+      refetch();
+    });
 
   const [updateStatus, loadingUpdateStatus] =
     useUpdatePayrollContributionStatus(() => {
@@ -255,8 +258,23 @@ function PayrollContributionsPage() {
       title: "Total",
       dataIndex: "total",
       key: "total",
-      render: (text: number) => (
-        <NumeralFormatter value={text} format="0,0.00" />
+      render: (
+        text: number,
+        { sssEE, sssER, sssWispER, sssWispEE, phicEE, phicER, hdmfER, hdmfEE }
+      ) => (
+        <NumeralFormatter
+          value={
+            sssEE +
+            sssER +
+            sssWispER +
+            sssWispEE +
+            phicEE +
+            phicER +
+            hdmfER +
+            hdmfEE
+          }
+          format="0,0.00"
+        />
       ),
     },
     {

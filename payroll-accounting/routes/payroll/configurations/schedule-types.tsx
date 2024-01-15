@@ -72,7 +72,7 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
       dataIndex: "mealBreakStart",
       key: "mealBreakStart",
       render: (value) => {
-        return dayjs(value).format("h:mm a");
+        return value ? dayjs(value).format("h:mm a") : "No Meal Break";
       },
     },
     {
@@ -80,7 +80,8 @@ export default function ScheduleTypeSetup({ account }: IPageProps) {
       dataIndex: "mealBreakEnd",
       key: "mealBreakEnd",
       render: (value) => {
-        return dayjs(value).format("h:mm a");
+        console.log(value);
+        return value ? dayjs(value).format("h:mm a") : "No Meal Break";
       },
     },
     {

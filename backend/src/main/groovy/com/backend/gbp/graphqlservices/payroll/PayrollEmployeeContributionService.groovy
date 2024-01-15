@@ -70,7 +70,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
             employee.isActiveHDMF = !employee.isActiveHDMF
 
         generateTotal(employee)
-
+        recalculateEmployee(employee.payrollEmployee, employee.contribution.payroll)
         payrollEmployeeContributionRepository.save(employee)
         return new GraphQLResVal<PayrollEmployeeContribution>(
                 employee,
@@ -154,8 +154,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
                 employee.contribution = contribution
                 employee.company = company
                 employee.basicSalary = it.employee.basicSalary
-                resetEmployeeContribution(employee)
-
+                resetEmployeeContribution(employee, contribution)
                 employeeList.push(employee)
             }
         }
@@ -174,7 +173,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
     PayrollEmployeeContribution recalculateEmployee(PayrollEmployee payrollEmployee, Payroll payroll) {
         PayrollEmployeeContribution employee = payrollEmployee.payrollEmployeeContribution
         employee.status = PayrollEmployeeStatus.DRAFT
-        resetEmployeeContribution(employee)
+        resetEmployeeContribution(employee, payroll.contribution)
         payrollEmployee.status = PayrollEmployeeStatus.DRAFT
         payrollEmployeeRepository.save(payrollEmployee)
         payrollEmployeeContributionRepository.save(employee)
@@ -187,7 +186,7 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
         payroll.contribution.contributionEmployees.each {
             PayrollEmployeeContribution employee = it
             employee.status = PayrollEmployeeStatus.DRAFT
-            resetEmployeeContribution(employee)
+            resetEmployeeContribution(employee, payroll.contribution)
             employeeList.push(employee)
         }
         List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.findByPayrollId(payroll.id)
@@ -201,41 +200,53 @@ class PayrollEmployeeContributionService extends AbstractPayrollEmployeeStatusSe
 
 
     //================================= UTILITY METHODS ====================================================================
-    private void resetEmployeeContribution(PayrollEmployeeContribution employee) {
+    private void resetEmployeeContribution(PayrollEmployeeContribution employee, PayrollContribution contribution) {
         Employee emp = employee.payrollEmployee.employee
 
         employee.isActiveSSS = emp.isActiveSSS
         employee.isActivePHIC = emp.isActivePHIC
         employee.isActiveHDMF = emp.isActiveHDMF
-        assignContributionAmounts(employee)
+        assignContributionAmounts(employee, contribution)
     }
 
 
-    private void assignContributionAmounts(PayrollEmployeeContribution employee) {
+    private void assignContributionAmounts(PayrollEmployeeContribution employee, PayrollContribution contribution) {
         PayrollEmployeeContributionsView employeeView = payrollEmployeeContributionsViewRepository.findById(employee.payrollEmployee.employee.id).get()
 
-        employee.sssEE = employeeView?.sssEE ?: 0.00
-        employee.sssER = (employeeView?.sssER ?: 0.00) + (employeeView?.sssER_EC ?: 0.00)
-        employee.sssWispEE = employeeView?.sssWispEE ?: 0.00
-        employee.sssWispER = employeeView?.sssWispER ?: 0.00
-        employee.phicEE = employeeView?.phicEE ?: 0.00
-        employee.phicER = employeeView?.phicER ?: 0.00
-        employee.hdmfEE = employeeView?.hdmfEE ?: 0.00
-        employee.hdmfER = employeeView?.hdmfER ?: 0.00
+        Boolean isActiveSSS = contribution.isActiveSSS && employee.payrollEmployee.employee.isActiveSSS
+        Boolean isActivePHIC = contribution.isActivePHIC && employee.payrollEmployee.employee.isActivePHIC
+        Boolean isActiveHDMF = contribution.isActiveHDMF && employee.payrollEmployee.employee.isActiveHDMF
 
-        employee.total = 0
-        employee.basicSalary = employeeView?.basicSalary ?: 0.00
-        generateTotal(employee)
+        if (isActiveSSS) {
+            employee.sssEE = employeeView?.sssEE ? employeeView?.sssEE : 0.00
+            employee.sssER = (employeeView?.sssER ?: 0.00) + (employeeView?.sssER_EC ?: 0.00)
+            employee.sssWispEE = employeeView?.sssWispEE ?: 0.00
+            employee.sssWispER = employeeView?.sssWispER ?: 0.00
+        } else {
+            employee.sssEE = 0.00
+            employee.sssER = 0.00
+            employee.sssWispEE = 0.00
+            employee.sssWispER = 0.00
+        }
+
+        if (isActivePHIC) {
+            employee.phicEE = employeeView?.phicEE ?: 0.00
+            employee.phicER = employeeView?.phicER ?: 0.00
+        } else {
+            employee.phicEE = 0.00
+            employee.phicER = 0.00
+        }
+
+        if (isActiveHDMF) {
+            employee.hdmfEE = employeeView?.hdmfEE ?: 0.00
+            employee.hdmfER = employeeView?.hdmfER ?: 0.00
+        } else {
+            employee.hdmfEE = 0.00
+            employee.hdmfER = 0.00
+
+            employee.basicSalary = employeeView?.basicSalary ?: 0.00
+        }
     }
 
 
-    private static void generateTotal(PayrollEmployeeContribution employee) {
-        employee.total = 0
-        if (employee.isActiveSSS)
-            employee.total = employee.total + employee.sssEE + employee.sssER + employee.sssWispEE + employee.sssWispER
-        if (employee.isActivePHIC)
-            employee.total = employee.total + employee.phicEE + employee.phicER
-        if (employee.isActiveHDMF)
-            employee.total = employee.total + employee.hdmfEE + employee.hdmfER
-    }
 }

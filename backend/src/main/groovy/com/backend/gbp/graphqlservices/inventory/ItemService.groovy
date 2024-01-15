@@ -87,7 +87,7 @@ class ItemService extends AbstractDaoService<Item> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def company = SecurityUtils.currentCompanyId()
-        String query = '''Select e from Item e where lower(e.descLong) like lower(concat('%',:name,'%')) and e.company = :company'''
+        String query = '''Select e from Item e where lower(e.descLong) like lower(:name) and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('name', name)
         params.put('company', company)
@@ -128,18 +128,23 @@ class ItemService extends AbstractDaoService<Item> {
 
 		String query = '''Select inv from Item inv where
 						(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-						lower(inv.sku) like lower(concat('%',:filter,'%')) or
-						lower(inv.brand) like lower(concat('%',:brand,'%')))'''
+						lower(inv.sku) like lower(concat('%',:filter,'%')))'''
 
 		String countQuery = '''Select count(inv) from Item inv where
 							(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-							lower(inv.sku) like lower(concat('%',:filter,'%')) or
-						lower(inv.brand) like lower(concat('%',:brand,'%')))'''
+							lower(inv.sku) like lower(concat('%',:filter,'%')))'''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
-        params.put('brand', brand)
-		if (group) {
+
+
+        if (brand) {
+            query += ''' and (inv.brand = :brand)'''
+            countQuery += ''' and (inv.brand = :brand)'''
+            params.put('brand', brand)
+        }
+
+        if (group) {
 			query += ''' and (inv.item_group.id = :group)'''
 			countQuery += ''' and (inv.item_group.id = :group)'''
 			params.put("group", group)

@@ -149,9 +149,9 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
                 entity.company = company
 
                 if(entity.project?.id){
-                    code = entity.project?.prefixShortName
+                    code = entity.project?.prefixShortName ?: "PJ"
                 }else if(entity.assets?.id){
-                    code = entity.assets?.prefix
+                    code = entity.assets?.prefix ?: "SP"
                 }
 
                 entity.poNumber = generatorService.getNextValue(GeneratorType.PO_NO, {
