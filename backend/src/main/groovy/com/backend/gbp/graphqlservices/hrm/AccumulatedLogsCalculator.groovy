@@ -24,11 +24,9 @@ import java.time.Instant
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 
+
 @Component
 @GraphQLApi
-
-
-
 class AccumulatedLogsCalculator {
 
     @Autowired
@@ -103,7 +101,7 @@ class AccumulatedLogsCalculator {
                 accumulatedLogs.scheduleEnd = overtimeSchedule ? overtimeSchedule.dateTimeEnd : regularSchedule.dateTimeEnd
 
                 HoursLog hoursLog = new HoursLog()
-                if (!firstIn && !out) {
+                if (!firstIn || !out) {
 //                    HoursLog temp = new HoursLog()
                     if (holidays?.size() > 0 && !employee.isExcludedFromAttendance) {
                         calculateHolidayHours(holidays, 0 as BigDecimal, hoursLog, 0 as BigDecimal)
@@ -119,9 +117,12 @@ class AccumulatedLogsCalculator {
                         accumulatedLogs.projectBreakdown = [hoursLog]
                         accumulatedLogs.message = AccumulatedLogsMessage.LEAVE
                     } else {
+                        if (!firstIn && out) accumulatedLogs.message = AccumulatedLogsMessage.NO_TIME_IN
+                        else if (firstIn && !out) accumulatedLogs.message = AccumulatedLogsMessage.NO_TIME_OUT
+                        else accumulatedLogs.message = AccumulatedLogsMessage.ABSENT
+
                         hoursLog.absent = regularSchedule.scheduleDuration
                         accumulatedLogs.isError = true
-                        accumulatedLogs.message = AccumulatedLogsMessage.ABSENT
 
                     }
                     accumulatedLogs.hours = hoursLog
@@ -282,6 +283,7 @@ class AccumulatedLogsCalculator {
         }
 
     }
+
 
     static BigDecimal computeHours(EmployeeSchedule schedule, Instant logStart, Instant logEnd) {
         logStart = logStart.with(ChronoField.MILLI_OF_SECOND, 0)

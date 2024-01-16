@@ -35,7 +35,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         <ApolloProvider client={client}>
           <AuthManager>
             <Component {...pageProps} />
-            <TawkToChat/>
+            {/* <TawkToChat/> */}
           </AuthManager>
         </ApolloProvider>
       </React.Fragment>
