@@ -9,7 +9,7 @@ group = 'com.backend'
 
 
 
-version = '1.0.39'
+version = '1.0.40'
 sourceCompatibility = '1.8'
 repositories {
 
