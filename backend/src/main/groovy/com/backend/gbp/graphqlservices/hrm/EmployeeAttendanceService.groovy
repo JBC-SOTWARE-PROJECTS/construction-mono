@@ -96,8 +96,8 @@ class EmployeeAttendanceService {
 //
 //        Instant endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
 
-        List<EmployeeAttendance>   employeeAttendance = employeeAttendanceRepository.getEmployeeAttListByDateType(employee, specificDate, type )
-        return  employeeAttendance;
+        List<EmployeeAttendance> employeeAttendance = employeeAttendanceRepository.getEmployeeAttListByDateType(employee, specificDate, type)
+        return employeeAttendance;
     }
 
     //=============================QUERY=============================\\
@@ -118,6 +118,7 @@ class EmployeeAttendanceService {
             Employee selectedEmployee = employeeRepository.findById(employee).get()
             attendance.employee = selectedEmployee
             attendance.project = project_id ? projectService.findOne(project_id) : null
+            attendance.isManual = true
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully updated employee attendance.")
         } else {
@@ -127,6 +128,7 @@ class EmployeeAttendanceService {
             attendance.original_attendance_time = attendance.attendance_time
             attendance.originalType = attendance.type
             attendance.project = project_id ? projectService.findOne(project_id) : null
+            attendance.isManual = true
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully created employee attendance.", attendance.id)
         }
