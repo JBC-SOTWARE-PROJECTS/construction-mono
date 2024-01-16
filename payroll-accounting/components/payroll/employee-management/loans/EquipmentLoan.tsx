@@ -4,10 +4,15 @@ import FormInputNumber from "@/components/common/formInputNumber/formInputNumber
 import { EmployeeLoan, EmployeeLoanCategory } from "@/graphql/gql/graphql";
 import useGetEmployeeLoans from "@/hooks/employee-loans/useGetEmployeeLoans";
 import useUpsertEmployeeLoans from "@/hooks/employee-loans/useUpsertEmployeeLoans";
+import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import usePaginationState from "@/hooks/usePaginationState";
 import { requiredField } from "@/utility/helper";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import { Button, Form, Modal } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { Table } from "antd/lib";
@@ -31,6 +36,7 @@ function EquipmentLoan() {
     EmployeeLoanCategory.EquipmentLoan,
     router?.query?.id as string
   );
+  const [showPasswordConfirmation] = ConfirmationPasswordHook();
 
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
@@ -60,13 +66,25 @@ function EquipmentLoan() {
   ];
 
   const onSubmit = (values: any) => {
-    upsert({
-      employeeId: router?.query?.id as string,
-      category: EmployeeLoanCategory.EquipmentLoan,
-      amount: values?.amount,
-      description: values?.description,
+    Modal.confirm({
+      title: <>Are you sure you want to add this loan item?</>,
+      content: <>This action is irreversible. Proceed?</>,
+      okText: "Confirm",
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        showPasswordConfirmation(() => {
+          upsert({
+            employeeId: router?.query?.id as string,
+            category: EmployeeLoanCategory.EquipmentLoan,
+            amount: values?.amount,
+            description: values?.description,
+          });
+        });
+      },
+      onCancel() {},
     });
   };
+
   return (
     <>
       <div style={{ marginBottom: 10, display: "flex", justifyContent: "end" }}>
@@ -95,7 +113,7 @@ function EquipmentLoan() {
             type="primary"
             size="large"
             htmlType="submit"
-            form="upsertForm"
+            form="equipment_loan_form"
             loading={loadingUpsert}
             icon={<SaveOutlined />}
           >
@@ -104,7 +122,7 @@ function EquipmentLoan() {
         }
       >
         <Form
-          name="upsertForm"
+          name="equipment_loan_form"
           layout="vertical"
           onFinish={onSubmit}
           form={form}

@@ -4,10 +4,15 @@ import FormSelect from "@/components/common/formSelect/formSelect";
 import { EmployeeLoan, EmployeeLoanCategory } from "@/graphql/gql/graphql";
 import useGetEmployeeLoans from "@/hooks/employee-loans/useGetEmployeeLoans";
 import useUpsertEmployeeLoans from "@/hooks/employee-loans/useUpsertEmployeeLoans";
+import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import usePaginationState from "@/hooks/usePaginationState";
 import { requiredField } from "@/utility/helper";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SaveOutlined,
+} from "@ant-design/icons";
 import { Button, Form, Modal, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -28,6 +33,7 @@ function CashAdvance() {
   const [form] = Form.useForm();
   const [state, { onNextPage }] = usePaginationState(initialState, 0, 25);
   const [open, setOpen] = useState(false);
+  const [showPasswordConfirmation] = ConfirmationPasswordHook();
 
   const [data, loading, refetch] = useGetEmployeeLoans(
     state,
@@ -59,11 +65,22 @@ function CashAdvance() {
   ];
 
   const onSubmit = (values: any) => {
-    upsert({
-      employeeId: router?.query?.id as string,
-      category: EmployeeLoanCategory.CashAdvance,
-      amount: values?.amount,
-      description: values?.description,
+    Modal.confirm({
+      title: <>Are you sure you want to add this loan item?</>,
+      content: <>This action is irreversible. Proceed?</>,
+      okText: "Confirm",
+      icon: <ExclamationCircleOutlined />,
+      onOk() {
+        showPasswordConfirmation(() => {
+          upsert({
+            employeeId: router?.query?.id as string,
+            category: EmployeeLoanCategory.CashAdvance,
+            amount: values?.amount,
+            description: values?.description,
+          });
+        });
+      },
+      onCancel() {},
     });
   };
   return (
@@ -93,7 +110,7 @@ function CashAdvance() {
             type="primary"
             size="large"
             htmlType="submit"
-            form="upsertForm"
+            form="cash_advance_form"
             loading={loadingUpsert}
             icon={<SaveOutlined />}
           >
@@ -102,7 +119,7 @@ function CashAdvance() {
         }
       >
         <Form
-          name="upsertForm"
+          name="cash_advance_form"
           layout="vertical"
           onFinish={onSubmit}
           form={form}
