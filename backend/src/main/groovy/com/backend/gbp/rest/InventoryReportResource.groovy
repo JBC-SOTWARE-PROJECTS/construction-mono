@@ -131,7 +131,7 @@ class InventoryReportResource {
         def bytearray = new ByteArrayInputStream()
         def os = new ByteArrayOutputStream()
         def parameters = [:] as Map<String, Object>
-        def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+        def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
         def itemsDto = new ArrayList<POItemReportDto>()
 
         DateTimeFormatter dateFormat =
@@ -158,7 +158,7 @@ class InventoryReportResource {
 
         )
         def gson = new Gson()
-        def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+        def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
         def dataSource = new JsonDataSource(dataSourceByteArray)
 
         if (purchaseOrderItems) {
@@ -268,9 +268,9 @@ class InventoryReportResource {
 
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
-		parameters.put("company_name",  company)
-		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("company_name", company)
+		parameters.put("com_address", addr.trim())
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -320,7 +320,7 @@ class InventoryReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<PRItemReportDto>()
 
 
@@ -335,17 +335,16 @@ class InventoryReportResource {
 		}
 
 		def dto = new PRReportDto(
-				prNo: purchaseRequest?.prNo,
+				prNo: purchaseRequest?.prNo ?: "",
 				date: dateFormat.format(purchaseRequest?.prDateRequested),
-				supplier: purchaseRequest?.supplier?.supplierFullname ? purchaseRequest?.supplier?.supplierFullname : '',
-				fullname: purchaseRequest?.userFullname,
-				project: desc,
-				projTitle: title,
-				location: purchaseRequest?.project?.location?.fullAddress ?: "",
+				supplier: purchaseRequest?.supplier?.supplierFullname ?: "",
+				fullname: purchaseRequest?.userFullname ?: "",
+				project: desc ?: "",
+				projTitle: title ?: "",
 
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		if (purchaseRequestItems) {
@@ -354,7 +353,7 @@ class InventoryReportResource {
 					Inventory inv = inventoryService.getOnHandByItem(emp.office.id, it.item.id)
 					def itemDto = new PRItemReportDto(
 							description: it.item.descLong,
-							brand: it.item.brand,
+							brand: it.item.brand ?: "",
 							uop: it.item.unit_of_purchase.unitDescription,
 							uou: it.item.unit_of_usage.unitDescription,
 							content_ratio: it.item.item_conversion,
@@ -426,7 +425,7 @@ class InventoryReportResource {
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 		//printing
@@ -464,6 +463,7 @@ class InventoryReportResource {
 	@RequestMapping(value = ['/receiving_report/{id}'], produces = ['application/pdf'])
 	ResponseEntity<byte[]> reReport(@PathVariable('id') UUID id) {
 		//query
+		def com = companySettingsService.comById()
 		def receiving = receivingReportService.recById(id)
 		def receivingItem = receivingReportItemService.recItemByParent(id).sort { it.item.descLong }
 
@@ -471,7 +471,7 @@ class InventoryReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<ReceivingReportItemDto>()
 
 		DateTimeFormatter dateFormat =
@@ -500,7 +500,7 @@ class InventoryReportResource {
 //				netAmount: receiving.netAmount,
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		if (receivingItem) {
@@ -528,7 +528,7 @@ class InventoryReportResource {
 		def signColumn2 = new ArrayList<SignatureReportDto>()
 
 		Office office = officeRepository.findById(emp.office.id).get()
-		def com = companySettingsService.comById()
+
 
 		if (signList) {
 			Integer count = 1
@@ -578,7 +578,7 @@ class InventoryReportResource {
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: +"+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -618,12 +618,12 @@ class InventoryReportResource {
 		//query
 		def stockcard = inventoryLedgerService.getStockCard(itemId, officeId)
 		def item = itemService.itemById(UUID.fromString(itemId))
-
+		def com = companySettingsService.comById()
 		def res = applicationContext?.getResource("classpath:/reports/inventory/stockcard_report.jasper")
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<StockCardPrint>()
 
 		DateTimeFormatter dateFormat =
@@ -632,7 +632,7 @@ class InventoryReportResource {
 				descLong: item.descLong,
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		if (stockcard) {
@@ -668,13 +668,13 @@ class InventoryReportResource {
 
 		Employee emp = employeeRepository.findByUsername(SecurityUtils.currentLogin()).first()
 		Office office = officeRepository.findById(emp.office.id).get()
-		def com = companySettingsService.comById()
+
 
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -714,12 +714,12 @@ class InventoryReportResource {
 		//query
 		def items = inventoryResource.getOnHandReport(date,id, '')
 		def office = officeRepository.findById(UUID.fromString(id)).get()
-
+		def com = companySettingsService.comById()
 		def res = applicationContext?.getResource("classpath:/reports/inventory/onhand_report.jasper")
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 
 		DateTimeFormatter dateFormat =
 				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
@@ -728,7 +728,7 @@ class InventoryReportResource {
 				office: office.officeDescription,
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		if (logo.exists()) {
@@ -741,13 +741,13 @@ class InventoryReportResource {
 
 		Employee emp = employeeRepository.findByUsername(SecurityUtils.currentLogin()).first()
 		Office officeData = officeRepository.findById(emp.office.id).get()
-		def com = companySettingsService.comById()
+
 
 		String tel = officeData.telNo ?: "N/A";String phone = officeData.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = officeData.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", officeData.emailAdd ?: "N/A")
 
@@ -789,12 +789,12 @@ class InventoryReportResource {
 	) {
 		//query
 		def itemList = receivingReportItemService.getSrrItemByDateRange(fromDate,toDate,'')
-
+		def com = companySettingsService.comById()
 		def res = applicationContext?.getResource("classpath:/reports/inventory/srr_item_report.jasper")
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<SrrItemDto>()
 
 		DateTimeFormatter dateFormat =
@@ -803,7 +803,7 @@ class InventoryReportResource {
 				descLong: dateFormat.format(fromDate)+ " - "+ dateFormat.format(toDate.minus(Duration.ofHours(8))),
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		println("to date => "+ toDate)
@@ -836,13 +836,13 @@ class InventoryReportResource {
 
 		Employee emp = employeeRepository.findByUsername(SecurityUtils.currentLogin()).first()
 		Office officeData = officeRepository.findById(emp.office.id).get()
-		def com = companySettingsService.comById()
+
 
 		String tel = officeData.telNo ?: "N/A";String phone = officeData.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = officeData.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", officeData.emailAdd ?: "N/A")
 
@@ -883,12 +883,12 @@ class InventoryReportResource {
 		ReturnSupplier returnSupplierDetails = returnSupplierService.rtsById(id)
 		List<ReturnSupplierItem> returnSupplierItem = returnSupplierItemsService.rtsItemByParent(id)
 		Employee emp = employeeRepository.findByUsername(returnSupplierDetails?.createdBy).first()
-
+		def com = companySettingsService.comById()
 		def res = applicationContext?.getResource("classpath:/reports/inventory/return_sup_report.jasper")
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<ReturnSuppItemReportDto>()
 
 		DateTimeFormatter dateFormat =
@@ -907,7 +907,7 @@ class InventoryReportResource {
 		)
 
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		if (returnSupplierItem) {
@@ -935,13 +935,13 @@ class InventoryReportResource {
 
 
 		Office officeData = officeRepository.findById(emp.office.id).get()
-		def com = companySettingsService.comById()
+
 
 		String tel = officeData.telNo ?: "N/A";String phone = officeData.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = officeData.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", officeData.emailAdd ?: "N/A")
 
@@ -978,7 +978,7 @@ class InventoryReportResource {
 	@RequestMapping(value = ['/issue_report/{id}'], produces = ['application/pdf'])
 	ResponseEntity<byte[]> issueReport(@PathVariable('id') UUID id) {
 
-
+		def com = companySettingsService.comById()
 		StockIssue parent = stockIssuanceService.stiById(id)
 		List<StockIssueItems> items = stockIssueItemsService.stiItemByParent(id).sort {
 			it.item.descLong
@@ -990,7 +990,7 @@ class InventoryReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<STSReportItemDto>()
 
 		DateTimeFormatter dateFormat =
@@ -1007,7 +1007,7 @@ class InventoryReportResource {
 
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		if (items) {
@@ -1037,13 +1037,13 @@ class InventoryReportResource {
 		}
 		UUID officeId = parent?.issued_by?.office?.id ?: null
 		Office officeData = officeRepository.findById(officeId).get()
-		def com = companySettingsService.comById()
+
 
 		String tel = officeData.telNo ?: "N/A";String phone = officeData.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = officeData.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", officeData.emailAdd ?: "N/A")
 

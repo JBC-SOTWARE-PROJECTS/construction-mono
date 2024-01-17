@@ -94,7 +94,7 @@ class PayrollReportResource {
         def bytearray = new ByteArrayInputStream()
         def os = new ByteArrayOutputStream()
         def parameters = [:] as Map<String, Object>
-        def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+        def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 
         if (logo.exists()) {
             parameters.put("logo", logo?.inputStream)
@@ -379,7 +379,7 @@ class PayrollReportResource {
             )
 
             def gson = new Gson()
-            def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+            def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
             def dataSource = new JsonDataSource(dataSourceByteArray)
 
 

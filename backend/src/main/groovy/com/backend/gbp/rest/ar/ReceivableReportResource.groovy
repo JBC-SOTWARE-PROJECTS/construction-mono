@@ -132,7 +132,7 @@ class ReceivableReportResource {
 		)
 
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 
@@ -246,7 +246,7 @@ class ReceivableReportResource {
 		)
 
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 
@@ -341,7 +341,7 @@ class ReceivableReportResource {
 //		)
 //
 //		def gson = new Gson()
-//		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+//		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 //		def dataSource = new JsonDataSource(dataSourceByteArray)
 //
 //

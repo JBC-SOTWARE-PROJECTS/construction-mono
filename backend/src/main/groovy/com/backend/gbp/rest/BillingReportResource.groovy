@@ -127,7 +127,7 @@ class BillingReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 
 		DateTimeFormatter dateFormat =
 				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
@@ -154,7 +154,7 @@ class BillingReportResource {
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -305,12 +305,12 @@ class BillingReportResource {
 	ResponseEntity<byte[]> collections(
 			@PathVariable('id') String id
 	) {
-
+		def com = companySettingsService.comById()
 		def shift = shiftRepository.findById(UUID.fromString(id)).get()
 
 		def res = applicationContext.getResource("classpath:/reports/billing/printdctr.jasper")
 		def os = new ByteArrayOutputStream()
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 
 		if (!res.exists()) {
 			return ResponseEntity.notFound().build()
@@ -524,13 +524,13 @@ class BillingReportResource {
 		def emp = employeeRepository.findOneByUser(user)
 
 		Office office = officeRepository.findById(emp.office.id).get()
-		def com = companySettingsService.comById()
+
 
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -566,6 +566,7 @@ class BillingReportResource {
 	@RequestMapping(value = ['/receipt/{id}'], produces = ['application/pdf'])
 	ResponseEntity<byte[]> receipt(@PathVariable('id') String id) {
 		//query
+		def com = companySettingsService.comById()
 		def payment = paymentRepository.findById(UUID.fromString(id)).get()
 		def outputTax = paymentItemRepository.getOutputTax(UUID.fromString(id), 'ITEM')
 		def vatable = paymentItemRepository.getVatableNonVatable(UUID.fromString(id), 'ITEM')
@@ -578,7 +579,7 @@ class BillingReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 
 
 
@@ -599,7 +600,7 @@ class BillingReportResource {
 				orNumber: payment.orNumber ?: "",
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 
@@ -657,7 +658,7 @@ class BillingReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = itemList
 
 		DateTimeFormatter dateFormat =
@@ -666,14 +667,14 @@ class BillingReportResource {
 				descLong: start+' - '+end,
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -763,6 +764,7 @@ class BillingReportResource {
 	@RequestMapping(value = ['/job-order/{id}'], produces = ['application/pdf'])
 	ResponseEntity<byte[]> job_estimate(@PathVariable('id') String jobId) {
 		//query
+
 		def job = jobService.jobById(UUID.fromString(jobId))
 		def jobItems = jobItemService.jobItemByServiceCategory(UUID.fromString(jobId))
 		def items = jobItemService.jobItemByItems(UUID.fromString(jobId))
@@ -776,7 +778,7 @@ class BillingReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<JobItemsReportDto>()
 
 		DateTimeFormatter dateFormat =
@@ -835,7 +837,7 @@ class BillingReportResource {
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -913,7 +915,7 @@ class BillingReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def car = applicationContext?.getResource("classpath:/reports/car-overview.jpg")
 		def e = job.endorsement
 
@@ -982,7 +984,7 @@ class BillingReportResource {
 
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		DateTimeFormatter dateFormat =
@@ -997,7 +999,7 @@ class BillingReportResource {
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -1073,14 +1075,14 @@ class BillingReportResource {
 		def bytearray = new ByteArrayInputStream()
 		def os = new ByteArrayOutputStream()
 		def parameters = [:] as Map<String, Object>
-		def logo = applicationContext?.getResource("classpath:/reports/logo.png")
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
 		def itemsDto = new ArrayList<CashFlowPrintDto>()
 
 		def dto = new HeaderDtoPrint(
 				descLong: start+' - '+end,
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		DateTimeFormatter dateFormat =
@@ -1106,7 +1108,7 @@ class BillingReportResource {
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
 		parameters.put("com_address",  addr)
-		parameters.put("phone_no", "Phone No: +63"+phone)
+		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
 
@@ -1175,7 +1177,7 @@ class BillingReportResource {
 				descLong: "",
 		)
 		def gson = new Gson()
-		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).bytes)
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
 		def dataSource = new JsonDataSource(dataSourceByteArray)
 
 		DateTimeFormatter dateFormat =
