@@ -153,7 +153,7 @@ class BillingReportResource {
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
-		parameters.put("com_address",  addr)
+		parameters.put("com_address",  addr.trim())
 		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
@@ -529,7 +529,7 @@ class BillingReportResource {
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress?: ""
 		parameters.put("company_name",  company)
-		parameters.put("com_address",  addr)
+		parameters.put("com_address",  addr.trim())
 		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
@@ -673,7 +673,7 @@ class BillingReportResource {
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
-		parameters.put("com_address",  addr)
+		parameters.put("com_address",  addr.trim())
 		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
@@ -836,7 +836,7 @@ class BillingReportResource {
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
-		parameters.put("com_address",  addr)
+		parameters.put("com_address",  addr.trim())
 		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
@@ -998,7 +998,7 @@ class BillingReportResource {
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
-		parameters.put("com_address",  addr)
+		parameters.put("com_address",  addr.trim())
 		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
@@ -1107,7 +1107,7 @@ class BillingReportResource {
 		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
 		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
 		parameters.put("company_name",  company)
-		parameters.put("com_address",  addr)
+		parameters.put("com_address",  addr.trim())
 		parameters.put("phone_no", "Phone No: "+phone)
 		parameters.put("tel_no", "Tel No: "+tel)
 		parameters.put("email", office.emailAdd ?: "N/A")
