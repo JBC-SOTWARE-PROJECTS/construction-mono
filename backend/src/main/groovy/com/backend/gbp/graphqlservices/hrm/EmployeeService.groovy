@@ -222,6 +222,23 @@ class EmployeeService {
         }
     }
 
+    @GraphQLMutation
+    @Transactional
+    Employee upsertMobileData(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "fields") Map<String, Object> fields
+    ) {
+        if (id) {
+            Employee employee = employeeRepository.findById(id).get()
+            objectMapper.updateValue(employee, fields)
+
+            return employeeRepository.save(employee)
+        } else {
+
+            return new Employee();
+        }
+    }
+
     @GraphQLMutation(name = "employeeUpdateStatus")
     @Transactional
     Employee employeeUpdateStatus(
