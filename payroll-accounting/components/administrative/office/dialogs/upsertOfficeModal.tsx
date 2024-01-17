@@ -203,7 +203,7 @@ export default function UpsertOfficeModal(props: IProps) {
           <Divider plain>Office Address</Divider>
           <Col span={24}>
             <FormInput
-              name="emailAdd"
+              name="officeStreet"
               rules={requiredField}
               label="Street"
               propsinput={{
