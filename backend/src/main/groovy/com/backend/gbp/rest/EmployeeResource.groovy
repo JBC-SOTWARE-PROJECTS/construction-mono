@@ -146,7 +146,7 @@ class EmployeeResource {
                 for (EmployeeAttendance ea : employeeAttendance){
                     String fieldsToIgnore = "{\"isIgnored\": \"true\"}";
                     Map<String, Object> fieldMapToIgnore = objectMapper.readValue(fieldsToIgnore, Map.class);
-                    GraphQLResVal<EmployeeAttendance> toIgnore = employeeAttendanceService.upsertEmployeeAttendance(ea.id, ea.employee.id, ea.project ? ea.project.id : null ,fieldMapToIgnore );
+                    GraphQLResVal<EmployeeAttendance> toIgnore = employeeAttendanceService.upsertEmployeeAttendance(ea.id, ea.employee.id, ea.project ? ea.project.id : null ,fieldMapToIgnore ,null);
                 }
             }
 
@@ -156,7 +156,7 @@ class EmployeeResource {
 
         projectId = projectId.equals("") ? null : projectId;
 
-        GraphQLResVal<EmployeeAttendance> empAttendance = employeeAttendanceService.upsertEmployeeAttendance(null, employee, projectId,fieldMap );
+        GraphQLResVal<EmployeeAttendance> empAttendance = employeeAttendanceService.upsertEmployeeAttendance(null, employee, projectId,fieldMap,null );
 
 
         return empAttendance.returnId;
