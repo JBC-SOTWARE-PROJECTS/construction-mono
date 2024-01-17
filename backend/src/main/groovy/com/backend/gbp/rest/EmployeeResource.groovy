@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.xmlsoap.schemas.soap.encoding.Array
+//import org.xmlsoap.schemas.soap.encoding.Array
 //import com.digitalocean.spaces.SpacesClient
 //import com.digitalocean.spaces.model.ObjectWriteResponse
 
@@ -313,7 +313,8 @@ class EmployeeResource {
                 // Check for existing pin code
                 Boolean isPinCodeUnique = employeeService.isPinCodeUnique(pinCode);
                 if(isPinCodeUnique){
-                    upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+                  //  upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+                    upsertResult = employeeService.upsertMobileData(employee, fieldMap);
 
                     employeeDetailsDto.pinCode = upsertResult.pinCode;
                     employeeDetailsDto.id = upsertResult.id;
@@ -328,7 +329,8 @@ class EmployeeResource {
                             HttpStatus.CONFLICT)
                 }
             }else{
-                upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+               // upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+                upsertResult = employeeService.upsertMobileData(employee, fieldMap);
 
 
                 employeeDetailsDto.facialData = upsertResult.facialData;
