@@ -11,7 +11,8 @@ FROM albertoclarit/hisd3base:1.0.3
 
 
 
-ARG PROJ_VERSION=1.2.7
+
+ARG PROJ_VERSION=1.2.8
 VOLUME /tmp
 WORKDIR /app
 ADD build/libs/backend-$PROJ_VERSION.jar /app/BACKEND.jar

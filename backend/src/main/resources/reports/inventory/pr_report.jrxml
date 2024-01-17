@@ -243,7 +243,7 @@
 				</textElement>
 				<text><![CDATA[Date		:]]></text>
 			</staticText>
-			<textField pattern="EEEEE dd MMMMM yyyy">
+			<textField>
 				<reportElement x="610" y="32" width="139" height="12" uuid="bb10dbe1-0a4f-4722-9953-c163b63cf979">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -252,7 +252,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
-			<textField pattern="EEEEE dd MMMMM yyyy">
+			<textField>
 				<reportElement x="610" y="44" width="139" height="12" uuid="3836ce65-eca3-4cad-a6de-b1818def0a2b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -281,7 +281,7 @@
 				</textElement>
 				<text><![CDATA[Supplier	:]]></text>
 			</staticText>
-			<textField pattern="EEEEE dd MMMMM yyyy">
+			<textField>
 				<reportElement x="609" y="56" width="140" height="12" uuid="6bd9ca97-3271-43f4-88ae-ddf4d1127f7f"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="10"/>
@@ -342,7 +342,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{company_name}]]></textFieldExpression>
 			</textField>
-			<textField pattern="EEEEE dd MMMMM yyyy">
+			<textField>
 				<reportElement x="100" y="99" width="649" height="12" uuid="c21c1319-5231-4078-889e-af91d4201829"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="10"/>
