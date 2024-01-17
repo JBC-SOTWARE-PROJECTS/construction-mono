@@ -195,6 +195,7 @@ class EmployeeService {
                             employee.user.permissions.add(pm)
                     }
                 }
+                employee.user.login = fields["login"].toString().toLowerCase()
                 userRepository.save(employee.user)
 
             }
