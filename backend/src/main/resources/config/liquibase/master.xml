@@ -563,4 +563,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/86_stock_issue_received_by.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/87_michael_remove_total_from_contributions_employee.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
