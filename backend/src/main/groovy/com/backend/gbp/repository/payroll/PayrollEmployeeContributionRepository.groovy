@@ -91,6 +91,7 @@ ec.isActiveSSS,
 ec.isActivePHIC ,
 ec.isActiveHDMF ,
 e.firstName, e.lastName, e.middleName, e.nameSuffix
+ORDER BY e.fullName
 """,
             countQuery = """
 SELECT COUNT(DISTINCT ec.id) 

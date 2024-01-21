@@ -79,7 +79,11 @@ interface variables {
 
 function PayrollContributionsPage() {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
   const [activeTab, setActiveTab] = useState<string>("ALL");
 
   const [contribution, loadingContribution, refetchContribution] =
@@ -348,9 +352,9 @@ function PayrollContributionsPage() {
         loading={loading || loadingContribution || loadingContributionStatus}
         size={"small"}
         dataSource={data?.response?.content}
-        total={data?.totalElements}
+        total={data?.response?.totalElements}
         pageSize={state.size}
-        onChange={() => {}}
+        onChangePagination={onNextPage}
         current={state.page}
         rowKey={rowKey}
       />
