@@ -7,6 +7,7 @@ export interface variables {
   size: number;
   filter: string;
   status: [PayrollEmployeeStatus] | [];
+  withItems?: boolean;
 }
 
 interface IParams {

@@ -420,7 +420,7 @@ function PayrollContributionsPage() {
         }
       />
 
-      <PayrollEmployeeFilter onQueryChange={onQueryChange} />
+      <PayrollEmployeeFilter onQueryChange={onQueryChange} withItems={false} />
 
       <Tabs
         defaultActiveKey="ALL"
