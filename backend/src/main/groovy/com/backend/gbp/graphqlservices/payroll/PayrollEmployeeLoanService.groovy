@@ -75,14 +75,15 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status,
+            @GraphQLArgument(name = "withItems") Boolean withItems
     ) {
         Payroll payroll = payrollRepository.getOne(id)
         return payrollEmployeeLoanRepository.getEmployeesPageable(
                 id,
                 filter,
                 status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
-//                SecurityUtils.currentCompanyId(),
+                withItems,
                 PageRequest.of(page, size))
     }
 
