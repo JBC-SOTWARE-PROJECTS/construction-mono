@@ -1,0 +1,1 @@
+ALTER TABLE asset.asset_preventive_maintenance  add column start_basis varchar null;

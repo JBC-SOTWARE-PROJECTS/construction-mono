@@ -17,7 +17,7 @@ import { FormCheckBox, FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { UPSERT_ASSET_RECORD } from "@/graphql/assets/queries";
 
-import ItemSelector from "@/components/inventory/itemSelector";
+
 import FixedAssetSelector from "@/components/inventory/fixedAssetSelector";
 import { useMutation, useQuery } from "@apollo/client";
 import { useDialog } from "@/hooks";

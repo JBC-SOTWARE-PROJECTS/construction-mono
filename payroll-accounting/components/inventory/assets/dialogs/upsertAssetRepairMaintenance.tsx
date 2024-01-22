@@ -30,7 +30,7 @@ import {
   UPSERT_REPAIR_MAINTENANCE_RECORD,
 } from "@/graphql/assets/queries";
 
-import ItemSelector from "@/components/inventory/itemSelector";
+
 import { useMutation, useQuery } from "@apollo/client";
 import { useDialog } from "@/hooks";
 import _ from "lodash";

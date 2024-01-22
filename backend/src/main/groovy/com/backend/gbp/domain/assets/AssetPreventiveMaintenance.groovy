@@ -31,6 +31,10 @@ class AssetPreventiveMaintenance extends AbstractAuditingEntity implements Seria
 	@Column(name = "note")
 	String note
 
+	@GraphQLQuery
+	@Column(name = "start_basis")
+	String startBasis
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "schedule_type")
 	PreventiveScheduleType scheduleType
