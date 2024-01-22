@@ -3,6 +3,8 @@ package com.backend.gbp.repository.payroll
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -72,6 +74,42 @@ order by pe.employee.fullName asc"""
             value = "SELECT te FROM PayrollEmployee te LEFT JOIN FETCH te.payroll WHERE te.id IN :idList"
     )
     List<PayrollEmployee> getAllPayrollEmpById(@Param("idList") List<UUID> idList);
+
+    @Query(
+            value = """
+Select 
+e.fullName as fullName, 
+e.position.description as position,
+pe.withholdingTax as withholdingTax,
+pe.status as status,
+te.status as timekeepingStatus,
+ce.status as contributionStatus,
+pe.id as id from 
+PayrollEmployee pe 
+left join pe.timekeepingEmployee te
+left join pe.payrollEmployeeContribution ce
+left join pe.employee e
+where pe.payroll.id = :payroll 
+and upper(e.fullName) like upper(concat('%',:filter,'%'))
+and pe.status in :status
+order by e.fullName 
+""",
+            countQuery = """
+Select count(pe.id) from 
+PayrollEmployee pe 
+left join pe.employee e
+where pe.payroll.id = :payroll 
+and upper(e.fullName) like upper(concat('%',:filter,'%'))
+and pe.status in :status
+
+"""
+    )
+    Page<PayrollEmployeeListDto> findByPayrollPageable(
+            @Param("payroll") UUID payroll,
+            @Param("filter") String filter,
+            @Param("status") List<PayrollEmployeeStatus> status,
+            Pageable pageable
+    )
 
 
 //

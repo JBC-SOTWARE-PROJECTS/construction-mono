@@ -10,6 +10,7 @@ import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.domain.payroll.enums.PayrollType
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
+import com.backend.gbp.repository.payroll.PayrollEmployeeAdjustmentDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeListDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
@@ -20,6 +21,8 @@ import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 import javax.persistence.EntityManager
@@ -81,8 +84,23 @@ class PayrollEmployeeService {
         return payrollEmployeeRepository.findPayrollEmployee(id)
     }
 
-        @GraphQLQuery(name = "getAllPayrollEmployee", description = "get all employee")
-    List<PayrollEmployee> getAllPayrollEmployee(@GraphQLArgument(name = "id") UUID id){
+    @GraphQLQuery(name = "getPayrollEmployeesPageable", description = "Gets all the employees by payroll id")
+    Page<PayrollEmployeeListDto> getPayrollEmployeesPageable(
+            @GraphQLArgument(name = "payroll") UUID payroll,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+    ) {
+        payrollEmployeeRepository.findByPayrollPageable(
+                payroll,
+                filter,
+                status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
+                PageRequest.of(page, size))
+    }
+
+    @GraphQLQuery(name = "getAllPayrollEmployee", description = "get all employee")
+    List<PayrollEmployee> getAllPayrollEmployee(@GraphQLArgument(name = "id") UUID id) {
         return payrollEmployeeRepository.findByPayrollId(id)
     }
 

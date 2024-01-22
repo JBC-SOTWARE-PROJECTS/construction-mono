@@ -70,7 +70,7 @@ export const PayrollEmployeeFilter = ({
         />
       </Col>
 
-      <Col md={4}>
+      <Col md={8}>
         <FormSelect
           label="Status"
           name="status"

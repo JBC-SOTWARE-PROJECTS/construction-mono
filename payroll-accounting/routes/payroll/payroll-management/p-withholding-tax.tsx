@@ -34,6 +34,8 @@ import {
 } from "@ant-design/icons";
 import useRecalculateWithholdingTax from "@/hooks/payroll/useRecalculateWithholdingTax";
 import useUpdatePayrollEmployeeStatus from "@/hooks/payroll/useUpdatePayrollEmployeeStatus";
+import useGetPayrollEmployeesPageable from "@/hooks/payroll/useGetPayrollEmployeesPageable";
+import TablePaginated from "@/components/common/TablePaginated";
 const initialState: variables = {
   filter: "",
   size: 25,
@@ -42,10 +44,14 @@ const initialState: variables = {
 };
 function WithholdingTax({ account }: IPageProps) {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
 
-  const [employees, loadingPayrollEmployees, refetch] =
-    useGetPayrollEmployees();
+  const [employees, loadingPayrollEmployees, refetch, totalElements] =
+    useGetPayrollEmployeesPageable({ variables: state });
 
   const [payroll] = useGetOnePayroll();
   const [recalculateWithholdingTax, loadingRecalculate] =
@@ -155,16 +161,21 @@ function WithholdingTax({ account }: IPageProps) {
         }}
       >
         <div style={{ width: "80%", marginRight: 10 }}>
-          <PayrollEmployeeFilter onQueryChange={onQueryChange} />
+          <PayrollEmployeeFilter
+            onQueryChange={onQueryChange}
+            withItems={false}
+          />
         </div>
       </div>
-
-      <Table
+      <TablePaginated
         columns={columns}
-        loading={false}
+        loading={loadingPayrollEmployees || loadingUpdateStatus}
         size={"small"}
         dataSource={employees}
-        onChange={onQueryChange}
+        total={totalElements}
+        pageSize={state.size}
+        onChangePagination={onNextPage}
+        current={state.page}
         rowKey={(record: any) => {
           return record?.id;
         }}
