@@ -77,10 +77,10 @@ class AssetsService extends AbstractDaoService<Assets> {
     ) {
 
         String query = '''Select p from Assets p where
-						lower(concat(p.assetCode,p.description,p.brand, p.item.descLong)) like lower(concat('%',:filter,'%'))'''
+						lower(concat(p.assetCode,p.brand, p.item.descLong)) like lower(concat('%',:filter,'%'))'''
 
         String countQuery = '''Select count(p) from Assets p where
-							lower(concat(p.assetCode,p.description,p.brand, p.item.descLong)) like lower(concat('%',:filter,'%'))'''
+							lower(concat(p.assetCode,p.brand, p.item.descLong)) like lower(concat('%',:filter,'%'))'''
 
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
