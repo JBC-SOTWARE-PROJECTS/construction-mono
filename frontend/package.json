@@ -1,6 +1,6 @@
 {
   "name": "wieldt-nextjs",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "scripts": {
     "dev": "next dev -p 6060",
     "build": "next build",
