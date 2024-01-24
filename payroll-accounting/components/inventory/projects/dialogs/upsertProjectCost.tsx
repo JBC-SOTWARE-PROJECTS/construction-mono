@@ -207,14 +207,14 @@ export default function UpsertProjectCost(props: IProps) {
           </Col>
           <Col span={24}>
             <FormInputNumber
-              label="Relative Weight"
+              label="Relative Weight (%)"
               name="relativeWeight"
               rules={requiredField}
               propsinputnumber={{
                 formatter: (value) =>
                   `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 parser: (value) => value!.replace(/\$\s?|(,*)/g, ""),
-                placeholder: "Relative Weight",
+                placeholder: "Relative Weight (e.g 1% - 100%)",
                 max: 100,
               }}
             />

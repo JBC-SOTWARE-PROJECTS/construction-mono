@@ -214,7 +214,7 @@ export default function ReviseProjectCost(props: IProps) {
                 formatter: (value) =>
                   `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 parser: (value) => value!.replace(/\$\s?|(,*)/g, ""),
-                placeholder: "Relative Weight",
+                placeholder: "Relative Weight (e.g 1% - 100%)",
                 max: 100,
               }}
             />
