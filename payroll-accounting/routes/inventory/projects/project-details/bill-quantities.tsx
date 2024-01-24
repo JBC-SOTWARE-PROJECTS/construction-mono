@@ -4,7 +4,7 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, Row, Col, Form, App, Tag } from "antd";
+import { Input, Button, Row, Col, Form, App, Tag, Statistic } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { confirmDelete, useDialog } from "@/hooks";
 import UpsertProjectCost from "@/components/inventory/projects/dialogs/upsertProjectCost";
@@ -28,6 +28,8 @@ import _ from "lodash";
 import { ExtendedProjectCostRevisions } from "@/interface/projects";
 import ReviseProjectCost from "@/components/inventory/projects/dialogs/reviseProjectCost";
 import AccessControl from "@/components/accessControl/AccessControl";
+import Alert from "antd/es/alert/Alert";
+import { NumberFormater } from "@/utility/helper";
 
 const { Search } = Input;
 
@@ -145,6 +147,12 @@ export default function BillQuantitesContent() {
           </AccessControl>
         }>
         <div className="w-full mb-5">
+          <Alert
+            type="info"
+            message="Please ensure that the relative weights do not exceed 100%. Kindly review the relative weights assigned to each item number."
+          />
+        </div>
+        <div className="w-full mb-5">
           <Form layout="vertical" className="filter-form">
             <Row gutter={[16, 16]}>
               <Col span={24}>
@@ -157,6 +165,16 @@ export default function BillQuantitesContent() {
               </Col>
             </Row>
           </Form>
+        </div>
+        <div className="w-full mb-5 dev-right">
+          <Statistic
+            title="Total Relative Weight (%)"
+            value={Number(_.sumBy(data?.pCostByList, "relativeWeight"))}
+            formatter={(e) => {
+              let value = Number(e);
+              return `${NumberFormater(value)}%`;
+            }}
+          />
         </div>
         <BillQuantitesTable
           dataSource={data?.pCostByList as ProjectCost[]}
