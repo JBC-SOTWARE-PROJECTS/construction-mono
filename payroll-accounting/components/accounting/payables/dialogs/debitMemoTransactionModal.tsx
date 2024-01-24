@@ -213,7 +213,7 @@ export default function DebitMemoTransactionModal(props: IProps) {
               name="percent"
               rules={requiredField}
               propsinputnumber={{
-                readOnly: calculationType === "FIX",
+                readOnly: calculationType === "FIXED",
                 min: 0,
                 max: 100,
                 formatter: (value) =>
