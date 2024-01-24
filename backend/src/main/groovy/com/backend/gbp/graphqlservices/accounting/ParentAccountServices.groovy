@@ -173,6 +173,20 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 			.resultList
 	}
 
+	@GraphQLQuery(name = "getAllActiveParentAccount", description = "Get coa list")
+	List<ParentAccount> getAllActiveParentAccount() {
+		UUID companyID = SecurityUtils.currentCompanyId()
+		createQuery(""" 
+					Select p from ParentAccount p
+					left join fetch p.company
+					where p.company.id = :companyID
+					and (p.deprecated is false or p.deprecated is null)
+					order by p.accountCode
+		""")
+				.setParameter('companyID',companyID)
+				.resultList
+	}
+
 	@GraphQLQuery(name = "getParentAccountForReportLayout", description = "List of Parent Accounts")
 	List<ParentAccount> getParentAccountForReportLayout(
 			@GraphQLArgument(name = "reportType") ReportType reportType

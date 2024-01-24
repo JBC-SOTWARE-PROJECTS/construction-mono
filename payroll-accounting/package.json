@@ -1,6 +1,8 @@
 {
   "name": "diversetradesuite",
-  "version": "0.0.30",
+
+
+  "version": "1.2.9",
   "private": true,
   "scripts": {
     "dev": "next dev -p 7001",

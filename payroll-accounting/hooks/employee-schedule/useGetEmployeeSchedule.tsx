@@ -40,6 +40,7 @@ const useGetEmployeeSchedule = ({
   position,
 }: IParams) => {
   const { data, loading, refetch } = useQuery(QUERY, {
+    skip: !startDate && !endDate ? true : false,
     variables: {
       startDate,
       endDate,

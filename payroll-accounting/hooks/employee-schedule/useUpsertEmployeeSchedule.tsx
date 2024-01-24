@@ -1,4 +1,5 @@
 import { EmployeeSchedule } from "@/graphql/gql/graphql";
+import { transformDate } from "@/utility/helper";
 import { Key } from "@ant-design/pro-components";
 import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
@@ -10,7 +11,7 @@ const QUERY = gql`
     $employeeId: UUID
     $fields: Map_String_ObjectScalar
     $employeeIdList: [UUID]
-    $dates: [String]
+    $dates: [DateWithScheduleInput]
   ) {
     upsertEmployeeSchedule(
       id: $id
@@ -31,7 +32,7 @@ export interface IUpsertEmployeeScheduleParams {
     id?: string | null;
     employeeId?: string;
     fields?: EmployeeSchedule;
-    dates?: string[];
+    dates?: any[];
     employeeIdList?: Key[];
   };
 }
@@ -59,8 +60,27 @@ const useUpsertEmployeeSchedule = (callBack: () => void) => {
       variables.dates?.length !== 0 &&
       variables.employeeIdList?.length !== 0
     ) {
-      variables.dates?.map((item) => {
-        return dayjs(item).format("DD/MM/YYYY");
+      variables.dates = variables.dates?.map((item) => {
+        var dateString = item.substring(0, 10);
+        return {
+          dateString: dateString,
+          dateTimeStart: transformDate(
+            dayjs(item),
+            variables?.fields?.dateTimeStart
+          ),
+          dateTimeEnd: transformDate(
+            dayjs(item),
+            variables?.fields?.dateTimeEnd
+          ),
+          mealBreakStart: transformDate(
+            dayjs(item),
+            variables?.fields?.mealBreakStart
+          ),
+          mealBreakEnd: transformDate(
+            dayjs(item),
+            variables?.fields?.mealBreakEnd
+          ),
+        };
       });
     }
     upsert({ variables: variables });

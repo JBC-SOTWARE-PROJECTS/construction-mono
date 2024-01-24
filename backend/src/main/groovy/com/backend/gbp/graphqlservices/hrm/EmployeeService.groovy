@@ -79,8 +79,15 @@ class EmployeeService {
     }
 
     @GraphQLQuery(name = "getAllEmployeesBasic", description = "Get All Employees")
-    List<EmployeeBasicDetails> getAllEmployeesBasic() {
-        employeeRepository.getAllEmployeesBasic().sort { it.fullName }
+    List<EmployeeBasicDetails> getAllEmployeesBasic(@GraphQLArgument(name = "filter") String filter,
+                                                    @GraphQLArgument(name = "position") UUID position,
+                                                    @GraphQLArgument(name = "office") UUID office
+    ) {
+        employeeRepository.getAllEmployeesBasic(
+                filter,
+                position ? position.toString() : '',
+                office ? office.toString() : ''
+        ).sort { it.fullName }
     }
 
     @GraphQLQuery(name = "searchEmployees", description = "Search employees")
@@ -188,6 +195,7 @@ class EmployeeService {
                             employee.user.permissions.add(pm)
                     }
                 }
+                employee.user.login = fields["login"].toString().toLowerCase()
                 userRepository.save(employee.user)
 
             }
@@ -211,6 +219,23 @@ class EmployeeService {
             }
 
             return employeeRepository.save(employee)
+        }
+    }
+
+    @GraphQLMutation
+    @Transactional
+    Employee upsertMobileData(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "fields") Map<String, Object> fields
+    ) {
+        if (id) {
+            Employee employee = employeeRepository.findById(id).get()
+            objectMapper.updateValue(employee, fields)
+
+            return employeeRepository.save(employee)
+        } else {
+
+            return new Employee();
         }
     }
 

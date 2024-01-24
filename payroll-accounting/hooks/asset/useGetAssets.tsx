@@ -36,6 +36,7 @@ const GET_RECORDS = gql`
           id
           serialNo
           assetNo
+          itemName
         }
       }
       size

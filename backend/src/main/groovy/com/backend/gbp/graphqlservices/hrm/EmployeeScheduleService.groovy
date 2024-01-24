@@ -42,6 +42,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.function.Consumer
 import java.util.function.Predicate
 
@@ -62,6 +63,14 @@ class EmployeeScheduleDetailsDto {
     EmployeeSchedule regularSchedule
     EmployeeSchedule overtimeSchedule
     Projects project
+}
+
+class DateWithSchedule {
+    Instant dateTimeStart;
+    Instant dateTimeEnd;
+    Instant mealBreakStart;
+    Instant mealBreakEnd;
+    String dateString;
 }
 
 @TypeChecked
@@ -220,7 +229,7 @@ class EmployeeScheduleService {
             @GraphQLArgument(name = "employeeId") UUID employeeId,
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "employeeIdList") List<UUID> employeeIdList,
-            @GraphQLArgument(name = "dates") List<String> dates = [],
+            @GraphQLArgument(name = "dates") List<DateWithSchedule> dates = [],
             @GraphQLArgument(name = "isOverTime") Boolean isOverTime = false
 
     ) {
@@ -230,22 +239,19 @@ class EmployeeScheduleService {
             List<EmployeeSchedule> scheduleList = []
             List<Employee> employeeList = employeeRepository.findAllById(employeeIdList)
 
-            def dateFormatter = new SimpleDateFormat('yyyy-MM-dd')
 
             List<String> trimmedDates = []
             dates.each {
-                trimmedDates.push(it.substring(0, 10))
+                trimmedDates.push(it.dateString)
             }
 
             employeeList.each { Employee employee ->
-                List<EmployeeSchedule> all = employeeScheduleRepository.findAll()
-
                 List<EmployeeSchedule> employeeSchedules = employeeScheduleRepository.getRegularSchedules(trimmedDates, employee.id)
 
-                trimmedDates.each { String date ->
+                dates.each { DateWithSchedule date ->
 
                     EmployeeSchedule employeeSchedule = null
-                    Predicate<EmployeeSchedule> filterPredicate = { EmployeeSchedule it -> it.dateString == date }
+                    Predicate<EmployeeSchedule> filterPredicate = { EmployeeSchedule it -> it.dateString == date.dateString }
                     Consumer<EmployeeSchedule> consumer = { EmployeeSchedule it -> employeeSchedule = it }
 
                     employeeSchedules.stream()
@@ -258,13 +264,13 @@ class EmployeeScheduleService {
                     else
                         employeeSchedule = objectMapper.updateValue(employeeSchedule, fields)
 
-                    employeeSchedule.dateTimeStart = Instant.parse(date + (fields.get('dateTimeStart') as String).substring(10))
-                    employeeSchedule.dateTimeEnd = Instant.parse(date + (fields.get('dateTimeEnd') as String).substring(10))
-                    employeeSchedule.mealBreakStart = Instant.parse(date + (fields.get('mealBreakStart') as String).substring(10))
-                    employeeSchedule.mealBreakEnd = Instant.parse(date + (fields.get('mealBreakEnd') as String).substring(10))
+                    employeeSchedule.dateTimeStart = date.dateTimeStart
+                    employeeSchedule.dateTimeEnd = date.dateTimeEnd
+                    employeeSchedule.mealBreakStart = date?.mealBreakStart
+                    employeeSchedule.mealBreakEnd = date?.mealBreakEnd
                     employeeSchedule.employee = employee
                     employeeSchedule.company = company
-                    employeeSchedule.dateString = date
+                    employeeSchedule.dateString = date.dateString
                     employeeSchedule.project = fields.get('project_id') ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null
                     scheduleList.push(employeeSchedule)
 
@@ -282,7 +288,9 @@ class EmployeeScheduleService {
             } else {
                 employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
             }
-            employeeSchedule.dateString = (fields.get('dateTimeStart') as String).substring(0, 10)
+            employeeSchedule.dateString = (Instant.parse((fields.get('dateTimeStart') as String)).plus(8, ChronoUnit.HOURS)).toString().substring(0, 10)
+
+
             employeeSchedule.employee = employeeRepository.findById(employeeId).get()
             employeeSchedule.company = SecurityUtils.currentCompany()
             employeeSchedule.project = fields.get('project_id') ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null
