@@ -83,7 +83,7 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
         params.put('id', id)
-        createQuery(query, params).resultList.sort { it.dateTransact }.reverse()
+        createQuery(query, params).resultList.sort { it.itemNo }
     }
 
     @GraphQLQuery(name = "getCategoryProjects")
