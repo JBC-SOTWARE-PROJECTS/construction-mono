@@ -28,6 +28,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/en"; // Import the English locale
 import { useSidebarMenuSelection } from "@/hooks/common";
+import { softwareName } from "@/shared/settings";
 interface IProps {
   account: IUserEmployee;
   children: ReactNode;
@@ -121,7 +122,7 @@ const DiverseTradeLayout = (props: IProps) => {
           }}>
           <ProLayout
             loading={loading}
-            title="DiverseTrade."
+            title={softwareName}
             logo="/images/DTLogo.svg"
             prefixCls="my-prefix"
             {...sidebar}

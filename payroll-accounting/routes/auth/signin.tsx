@@ -62,7 +62,7 @@ export default function SingIn() {
             height: "100vh",
           }}>
           <LoginFormPage
-            backgroundImageUrl="/images/bannerSyncpro2.png"
+            backgroundImageUrl="/images/image1.png"
             logo="/images/DTLogo.svg"
             title={softwareName}
             subTitle="Inventory | Accounting | Payroll"
