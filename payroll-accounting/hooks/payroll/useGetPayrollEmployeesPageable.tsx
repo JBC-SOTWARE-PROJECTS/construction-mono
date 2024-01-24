@@ -31,6 +31,7 @@ const GET_EMPLOYEES = gql`
         id
         fullName
         position
+        isDisabledWithholdingTax
         withholdingTax
         status
         timekeepingStatus

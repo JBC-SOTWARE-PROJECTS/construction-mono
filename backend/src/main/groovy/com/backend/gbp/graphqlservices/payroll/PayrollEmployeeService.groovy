@@ -178,7 +178,7 @@ class PayrollEmployeeService {
 
         PayrollEmployee payrollEmployee = payrollEmployeeRepository.findById(id).get()
         if (payrollEmployee.timekeepingEmployee.status == PayrollEmployeeStatus.DRAFT &&
-                payrollEmployee.payrollEmployeeContribution.status == PayrollEmployeeStatus.DRAFT) {
+                payrollEmployee.payrollEmployeeContribution.status == PayrollEmployeeStatus.DRAFT && !payrollEmployee.employee.isDisabledWithholdingTax) {
             return new GraphQLResVal<String>(null, false, "Timekeeping and Contributions for this employee must be finalized first")
         }
 
@@ -194,7 +194,7 @@ class PayrollEmployeeService {
     ) {
 
 
-        List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.findByPayrollId(id)
+        List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.findByPayrollJoinHrmEmpId(id)
 
         List<PayrollEmployee> save = []
         payrollEmployees.each {
@@ -211,21 +211,29 @@ class PayrollEmployeeService {
     private PayrollEmployee getWithholdingTax(PayrollEmployee payrollEmployee) {
         BigDecimal taxableAmount = 0
 
+        if (payrollEmployee.employee.isDisabledWithholdingTax) {
+            payrollEmployee.status = PayrollEmployeeStatus.FINALIZED
+            payrollEmployee.withholdingTax = 0
+            return payrollEmployee
+        }
+
         payrollEmployee.timekeepingEmployee.salaryBreakdown.each {
             taxableAmount += it.regular
             taxableAmount += it.overtime
         }
-
         WithholdingTaxMatrix tax = withholdingTaxMatrixRepository.findByAmountRangeAndType(taxableAmount,
                 payrollEmployee.payroll.type,
                 payrollEmployee.employee.currentCompany.id
         )[0]
+        payrollEmployee.status = PayrollEmployeeStatus.DRAFT
 
 
         if (tax) {
             BigDecimal percent = tax.percentage / 100
             payrollEmployee.withholdingTax = tax.baseAmount + ((taxableAmount - tax.thresholdAmount) * percent)
         } else payrollEmployee.withholdingTax = 0
+
+
         return payrollEmployee
 
     }
