@@ -13,13 +13,14 @@ import { ICredentials } from "@/utility/interfaces";
 import { post } from "@/utility/graphql-client";
 import qs from "qs";
 import { useRouter } from "next/router";
+import { softwareName } from "@/shared/settings";
 
 type LoginType = "account";
 
 const items: TabsProps["items"] = [
   {
     key: "account",
-    label: "DiverseTrade Suite Login",
+    label: "Synpro Login",
   },
 ];
 
@@ -49,7 +50,7 @@ export default function SingIn() {
         console.log("error login: ", error);
         setLoading(false);
       });
-    console.log("record => ", record);
+    
   };
 
   return (
@@ -61,9 +62,9 @@ export default function SingIn() {
             height: "100vh",
           }}>
           <LoginFormPage
-            backgroundImageUrl="/images/banner.svg"
+            backgroundImageUrl="/images/bannerSyncpro2.png"
             logo="/images/DTLogo.svg"
-            title="DiverseTrade Suite"
+            title={softwareName}
             subTitle="Inventory | Accounting | Payroll"
             onFinish={onLogin}
             onFinishFailed={onFinishFailed}
@@ -96,7 +97,7 @@ export default function SingIn() {
                       fontWeight: "normal",
                       fontSize: 14,
                     }}>
-                    DiverseTrade Suite
+                    {softwareName}
                   </span>
                 </Divider>
                 <Space align="center" size={24}>

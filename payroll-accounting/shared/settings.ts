@@ -1,3 +1,4 @@
+export let softwareName: string = "SyncPro";
 export let apiUrlPrefix: string = "";
 export let frontEndUrl: string = "";
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
