@@ -37,6 +37,7 @@ import useRecalculateWithholdingTax from "@/hooks/payroll/useRecalculateWithhold
 import useUpdatePayrollEmployeeStatus from "@/hooks/payroll/useUpdatePayrollEmployeeStatus";
 import useGetPayrollEmployeesPageable from "@/hooks/payroll/useGetPayrollEmployeesPageable";
 import TablePaginated from "@/components/common/TablePaginated";
+import useGetPayrollTotals from "@/hooks/payroll/useGetPayrollTotals";
 const initialState: variables = {
   filter: "",
   size: 25,
@@ -54,7 +55,7 @@ function WithholdingTax({ account }: IPageProps) {
   const [employees, loadingPayrollEmployees, refetch, totalElements] =
     useGetPayrollEmployeesPageable({ variables: state });
 
-  const [payroll] = useGetOnePayroll();
+  const [payroll] = useGetPayrollTotals();
   const [recalculateWithholdingTax, loadingRecalculate] =
     useRecalculateWithholdingTax(() => refetch());
 
