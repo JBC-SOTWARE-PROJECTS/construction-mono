@@ -863,6 +863,7 @@ export type AssetPreventiveMaintenance = {
   occurrence?: Maybe<Scalars['String']['output']>;
   reminderSchedule?: Maybe<Scalars['String']['output']>;
   scheduleType?: Maybe<PreventiveScheduleType>;
+  startBasis?: Maybe<Scalars['String']['output']>;
 };
 
 export type AssetRepairMaintenance = {
@@ -942,6 +943,21 @@ export type AssetUpcomingPreventiveMaintenance = {
   reminderDate?: Maybe<Scalars['Instant']['output']>;
   reminderSchedule?: Maybe<Scalars['String']['output']>;
   scheduleType?: Maybe<PreventiveScheduleType>;
+};
+
+export type AssetUpcomingPreventiveMaintenanceKms = {
+  __typename?: 'AssetUpcomingPreventiveMaintenanceKms';
+  asset?: Maybe<Assets>;
+  assetMaintenanceType?: Maybe<AssetMaintenanceTypes>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  latestUsage?: Maybe<Scalars['BigDecimal']['output']>;
+  nextNearest?: Maybe<Scalars['BigDecimal']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  occurrence?: Maybe<Scalars['String']['output']>;
+  reminderSchedule?: Maybe<Scalars['String']['output']>;
+  scheduleType?: Maybe<PreventiveScheduleType>;
+  startBasis?: Maybe<Scalars['String']['output']>;
 };
 
 export type Assets = {
@@ -7631,6 +7647,25 @@ export type Page_AssetUpcomingPreventiveMaintenance = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_AssetUpcomingPreventiveMaintenanceKms = {
+  __typename?: 'Page_AssetUpcomingPreventiveMaintenanceKms';
+  content?: Maybe<Array<Maybe<AssetUpcomingPreventiveMaintenanceKms>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_Assets = {
   __typename?: 'Page_Assets';
   content?: Maybe<Array<Maybe<Assets>>>;
@@ -9646,6 +9681,7 @@ export type PositionInput = {
 
 export enum PreventiveScheduleType {
   Daily = 'DAILY',
+  Kilometers = 'KILOMETERS',
   Monthly = 'MONTHLY',
   Weekly = 'WEEKLY',
   Yearly = 'YEARLY'
@@ -10978,6 +11014,7 @@ export type Query = {
   uopList?: Maybe<Array<Maybe<UnitMeasurement>>>;
   uouList?: Maybe<Array<Maybe<UnitMeasurement>>>;
   upcomingMaintenance?: Maybe<Page_AssetUpcomingPreventiveMaintenance>;
+  upcomingMaintenanceKms?: Maybe<Page_AssetUpcomingPreventiveMaintenanceKms>;
   useGetLoanBalance?: Maybe<Scalars['BigDecimal']['output']>;
   /** List of Payments By shift ID */
   vatable_non?: Maybe<Scalars['BigDecimal']['output']>;
@@ -14359,6 +14396,14 @@ export type QueryUnitMeasurementListArgs = {
 
 /** Query root */
 export type QueryUpcomingMaintenanceArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryUpcomingMaintenanceKmsArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
