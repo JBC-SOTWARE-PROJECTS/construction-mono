@@ -565,4 +565,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_alter_preventive_start_basis.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/44_jacky_create_view_preventive_kms.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
