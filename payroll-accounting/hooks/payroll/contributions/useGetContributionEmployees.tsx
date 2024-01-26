@@ -76,7 +76,6 @@ const useGetContributionEmployees = ({ variables, onCompleted }: IParams) => {
               isActivePHIC
               isActiveHDMF
               basicSalary
-              total
             }
             totalElements
           }

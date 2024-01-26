@@ -34,6 +34,7 @@ where e.payroll.id = :payroll""")
         el as employee,
         e.fullName as employeeName
     FROM PayrollEmployeeLoan el
+    LEFT JOIN el.loanItems li
     LEFT JOIN el.payrollLoan pl  
     LEFT JOIN pl.payroll p  
     LEFT JOIN el.payrollEmployee pe  
@@ -46,9 +47,12 @@ where e.payroll.id = :payroll""")
         el.id,
         el.status,
         e.fullName
+    HAVING (:withItems = false OR COALESCE(count(li.amount), 0) != 0)
+    ORDER BY e.fullName
 """, countQuery = """
     SELECT COUNT(DISTINCT el.id) 
     FROM PayrollEmployeeLoan el
+    LEFT JOIN el.loanItems li
     LEFT JOIN el.payrollLoan pl  
     LEFT JOIN pl.payroll p  
     LEFT JOIN el.payrollEmployee pe  
@@ -58,11 +62,13 @@ where e.payroll.id = :payroll""")
         and upper(e.fullName) like upper(concat('%',:filter,'%'))
         and el.status in :status
     GROUP BY el.id
+    HAVING (:withItems = false OR COALESCE(count(li.amount), 0) != 0)
 """)
     Page<PayrollEmployeeLoanDto> getEmployeesPageable(
             @Param("payroll") UUID payroll,
             @Param("filter") String filter,
             @Param("status") List<PayrollEmployeeStatus> status,
+            @Param("withItems") Boolean withItems,
             Pageable pageable)
 
 

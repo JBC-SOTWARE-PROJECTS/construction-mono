@@ -1,7 +1,11 @@
+import CustomButton from "@/components/common/CustomButton";
 import TablePaginated from "@/components/common/TablePaginated";
 import PayrollHeader from "@/components/payroll/PayrollHeader";
 import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/PayrollEmployeeFilter";
+import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
+import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
+import AddOtherDeductionItemsModal from "@/components/payroll/payroll-management/other-deductions/AddOtherDeductionItemsModal";
 import {
   PayrollEmployeeOtherDeductionDto,
   PayrollEmployeeStatus,
@@ -9,34 +13,28 @@ import {
   PayrollOtherDeductionItem,
 } from "@/graphql/gql/graphql";
 import { variables } from "@/hooks/payroll/contributions/useGetContributionEmployees";
+import useDeleteOtherDeductionItem from "@/hooks/payroll/other-deductions/useDeleteOtherDeductionItem";
 import useGetPayrollEmployeeOtherDeduction from "@/hooks/payroll/other-deductions/useGetPayrollEmployeeOtherDeduction";
+import useGetPayrollOtherDeduction from "@/hooks/payroll/other-deductions/useGetPayrollOtherDeduction";
+import useUpdatePayrollOtherDeductionStatus from "@/hooks/payroll/other-deductions/useUpdatePayrollOtherDeductionStatus";
+import useUpsertOtherDeductionItem from "@/hooks/payroll/other-deductions/useUpsertOtherDeductionItem";
+import { PayrollStatus } from "@/hooks/payroll/useUpdatePayrollStatus";
 import usePaginationState from "@/hooks/usePaginationState";
+import { statusMap } from "@/utility/constant";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { InputNumber, Modal, Select, Tag, message } from "antd";
-import { ColumnsType } from "antd/es/table";
-import { recalculateButton } from "./p-contributions";
-import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
-import { useRef, useState } from "react";
 import {
-  CheckOutlined,
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import CustomButton from "@/components/common/CustomButton";
-import useUpsertOtherDeductionItem from "@/hooks/payroll/other-deductions/useUpsertOtherDeductionItem";
-import useDeleteOtherDeductionItem from "@/hooks/payroll/other-deductions/useDeleteOtherDeductionItem";
-import useGetPayrollOtherDeduction from "@/hooks/payroll/other-deductions/useGetPayrollOtherDeduction";
-import AddOtherDeductionItemsModal from "@/components/payroll/payroll-management/other-deductions/AddOtherDeductionItemsModal";
-import { PayrollStatus } from "@/hooks/payroll/useUpdatePayrollStatus";
+import { InputNumber, Modal, Tag, message } from "antd";
+import { ColumnsType } from "antd/es/table";
 import { Table } from "antd/lib";
-import PayrollModuleRecalculateAllEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateAllEmployeeAction";
 import { useRouter } from "next/router";
-import { statusMap } from "@/utility/constant";
-import useUpdatePayrollAdjustmentStatus from "@/hooks/payroll/adjustments/useUpdatePayrollAdjustmentStatus";
-import useUpdatePayrollOtherDeductionStatus from "@/hooks/payroll/other-deductions/useUpdatePayrollOtherDeductionStatus";
+import { useRef, useState } from "react";
+import { recalculateButton } from "./p-contributions";
 const initialState: variables = {
   filter: "",
   size: 25,
@@ -45,7 +43,11 @@ const initialState: variables = {
 };
 function OtherDeductions({ account }: IPageProps) {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
   const [editing, setEditing] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<String>("");
   const amountRef = useRef<any>(null);
@@ -302,7 +304,9 @@ function OtherDeductions({ account }: IPageProps) {
 
       <TablePaginated
         columns={columns}
-        loading={false}
+        loading={
+          loading || loadingOtherDeduction || loadingUpsert || loadingDelete
+        }
         size={"small"}
         dataSource={data?.content}
         expandable={{
@@ -320,7 +324,7 @@ function OtherDeductions({ account }: IPageProps) {
         }}
         total={data?.totalElements}
         pageSize={state.size}
-        onChange={onQueryChange}
+        onChangePagination={onNextPage}
         current={state.page}
         rowKey={(record: any) => {
           return record?.id;

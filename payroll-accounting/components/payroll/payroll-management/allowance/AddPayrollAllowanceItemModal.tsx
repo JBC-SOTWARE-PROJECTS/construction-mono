@@ -7,7 +7,7 @@ import useGetAllAllowances from "@/hooks/allowance/useGetAllAllowances";
 import useUpsertPayrollAllowanceItem from "@/hooks/payroll/allowance/useUpsertPayrollAllowanceItem";
 import NumeralFormatter from "@/utility/numeral-formatter";
 import { PlusOutlined, SaveOutlined } from "@ant-design/icons";
-import { Button, Form, Modal, Space, Tag } from "antd";
+import { Button, Form, Modal, Space, Spin, Tag } from "antd";
 import { useState } from "react";
 
 interface IParams {
@@ -15,10 +15,9 @@ interface IParams {
   employees: PayrollEmployeeAllowanceDto[];
 }
 
-function AddPayrollAllowanceItemModal({ refetch, employees }: IParams) {
+function AddPayrollAllowanceItemModal({ refetch, employees = [] }: IParams) {
   const [form] = Form.useForm();
   const [open, setOpen] = useState<boolean>(false);
-  const [ids, setIds] = useState<string[]>([]);
   const [upsertItem, loadingUpsertItem] = useUpsertPayrollAllowanceItem(() => {
     setOpen(false);
     refetch();
@@ -62,60 +61,53 @@ function AddPayrollAllowanceItemModal({ refetch, employees }: IParams) {
           </Space>
         }
       >
-        <Form
-          name={`upsertform-adjustment`}
-          layout="vertical"
-          onFinish={onSubmit}
-          form={form}
-          initialValues={{}}
-        >
-          <FormSelect
-            name="employeeId"
-            label="Employee"
-            propsselect={{
-              options: employees?.map((item: any) => ({
-                value: item.id,
-                label: item.employeeName,
-              })),
-            }}
-            rules={[{ required: true }]}
-          />
+        <Spin spinning={loadingUpsertItem || loadingAllowances}>
+          <Form
+            name={`upsertform-adjustment`}
+            layout="vertical"
+            onFinish={onSubmit}
+            form={form}
+            initialValues={{}}
+          >
+            <FormSelect
+              name="employeeId"
+              label="Employee"
+              propsselect={{
+                showSearch: true,
+                options: employees?.map((item: any) => ({
+                  value: item.id,
+                  label: item.employeeName,
+                })),
+                mode: "multiple",
+              }}
+              rules={[{ required: true }]}
+            />
 
-          <FormSelect
-            name="allowanceId"
-            label="Allowance"
-            propsselect={{
-              options: allowances?.map((item: any) => ({
-                value: item.id,
-                label: item.name,
-                amount: item.amount,
-              })),
-              onChange: (value, option: any) => {
-                form.setFieldValue("amount", option?.amount);
-              },
-            }}
-            rules={[{ required: true }]}
-          />
-          {/* <FormSelect
-            name="employee"
-            label="Employee"
-            propsselect={{
-              options: employeeList?.map((item) => ({
-                value: item.id,
-                label: item.employeeName,
-              })),
-            }}
-            rules={[{ required: true }]}
-          /> */}
+            <FormSelect
+              name="allowanceId"
+              label="Allowance"
+              propsselect={{
+                options: allowances?.map((item: any) => ({
+                  value: item.id,
+                  label: item.name,
+                  amount: item.amount,
+                })),
+                onChange: (value, option: any) => {
+                  form.setFieldValue("amount", option?.amount);
+                },
+              }}
+              rules={[{ required: true }]}
+            />
 
-          <FormInputNumber
-            name="amount"
-            label="Amount"
-            propsinputnumber={{
-              placeholder: "Description",
-            }}
-          />
-        </Form>
+            <FormInputNumber
+              name="amount"
+              label="Amount"
+              propsinputnumber={{
+                placeholder: "Description",
+              }}
+            />
+          </Form>
+        </Spin>
       </Modal>
     </>
   );
