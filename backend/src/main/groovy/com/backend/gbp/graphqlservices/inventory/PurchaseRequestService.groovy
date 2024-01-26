@@ -66,22 +66,27 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
 
         def company = SecurityUtils.currentCompanyId()
 		String query = '''Select pr from PurchaseRequest pr where
-						(lower(pr.prNo) like lower(concat('%',:filter,'%')))
-						and pr.requestingOffice.id = :office and
-						to_date(to_char(pr.prDateRequested, 'YYYY-MM-DD'),'YYYY-MM-DD')
+    					(lower(pr.prNo) like lower(concat('%',:filter,'%'))) and to_date(to_char(pr.prDateRequested, 'YYYY-MM-DD'),'YYYY-MM-DD') 
              	        between to_date(:startDate,'YYYY-MM-DD') and  to_date(:endDate,'YYYY-MM-DD')'''
+
+
 
 		String countQuery = '''Select count(pr) from PurchaseRequest pr where
 						(lower(pr.prNo) like lower(concat('%',:filter,'%')))
-						and pr.requestingOffice.id = :office and
-						to_date(to_char(pr.prDateRequested, 'YYYY-MM-DD'),'YYYY-MM-DD')
+						and to_date(to_char(pr.prDateRequested, 'YYYY-MM-DD'),'YYYY-MM-DD')
              	        between to_date(:startDate,'YYYY-MM-DD') and  to_date(:endDate,'YYYY-MM-DD')'''
+
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
-        params.put('office', office)
         params.put('startDate', start)
         params.put('endDate', end)
+
+        if(office){
+            query += ''' and (pr.requestingOffice.id = :office)''';
+            countQuery += ''' and (pr.requestingOffice.id = :office)''';
+            params.put('office', office)
+        }
 
         if (company) {
             query += ''' and (pr.company = :company)'''

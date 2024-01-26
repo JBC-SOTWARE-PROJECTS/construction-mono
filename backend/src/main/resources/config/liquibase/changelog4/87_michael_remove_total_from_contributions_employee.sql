@@ -1,0 +1,1 @@
+alter table payroll.payroll_employee_contributions drop column total;
