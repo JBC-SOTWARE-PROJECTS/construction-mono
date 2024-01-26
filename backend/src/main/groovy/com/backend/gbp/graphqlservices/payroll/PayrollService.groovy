@@ -5,9 +5,9 @@ import com.backend.gbp.domain.accounting.HeaderLedgerGroup
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.hrm.Employee
+import com.backend.gbp.domain.payroll.EmployeeLoanLedgerItem
 import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
-import com.backend.gbp.domain.payroll.Timekeeping
 import com.backend.gbp.domain.payroll.enums.AccountingEntryType
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
@@ -19,7 +19,7 @@ import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.payroll.common.AbstractPayrollStatusService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.hrm.EmployeeRepository
-import com.backend.gbp.repository.payroll.PayrollAllowanceRepository
+import com.backend.gbp.repository.payroll.EmployeeLoanLedgerItemRepository
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import com.backend.gbp.security.SecurityUtils
@@ -39,10 +39,8 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
-import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.time.Month
 import java.time.Year
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -65,12 +63,9 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
 
     @Autowired
     List<IPayrollEmployeeBaseOperation> payrollEmployeeOperations
-//
-    @Autowired
-    PayrollLoanService payrollLoanService
 
     @Autowired
-    PayrollAllowanceRepository payrollAllowanceRepository
+    EmployeeLoanLedgerItemRepository employeeLoanLedgerItemRepository
 
     @Autowired
     ObjectMapper objectMapper
@@ -464,8 +459,30 @@ class PayrollService extends AbstractPayrollStatusService<Payroll> {
         actPay.posted = true
         actPay.postedBy = SecurityUtils.currentLogin()
 
+        generateLoanLedgerItems(payroll)
         save(actPay)
 
+    }
+
+    void generateLoanLedgerItems(Payroll payroll) {
+
+        List<EmployeeLoanLedgerItem> ledgerItems = []
+        payroll.payrollEmployees.each { PayrollEmployee payrollEmployee ->
+
+            payrollEmployee.payrollEmployeeLoan.loanItems.each {
+                EmployeeLoanLedgerItem ledgerItem = new EmployeeLoanLedgerItem()
+                ledgerItem.employeeLoan = null
+                ledgerItem.employee = payrollEmployee.employee
+                ledgerItem.debit = 0
+                ledgerItem.credit = it.amount
+                ledgerItem.category = it.category
+                ledgerItem.company = payrollEmployee.company
+                ledgerItem.description = payroll.code + ' - Loan Repayment'
+                ledgerItem.status = true
+                ledgerItems.push(ledgerItem)
+            }
+        }
+        employeeLoanLedgerItemRepository.saveAll(ledgerItems)
     }
 
     private static Map<String, Object> generateEntry(SubAccountBreakdownDto it, Map<String, Map<String, Object>> entryMap) {

@@ -252,6 +252,10 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@Column(name = "hourly_rate_amount", columnDefinition = "numeric")
 	BigDecimal hourlyRate
 
+	@GraphQLQuery
+	@Column(name = "is_disabled_withholding_tax", columnDefinition = "bool")
+	Boolean isDisabledWithholdingTax
+
 
 
 }

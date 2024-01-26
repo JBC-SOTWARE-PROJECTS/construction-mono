@@ -20,7 +20,7 @@ const documents = {
     "\n  mutation TransferIntegration($id: UUID, $fields: Map_String_ObjectScalar) {\n    transferIntegration(id: $id, fields: $fields)\n  }\n": types.TransferIntegrationDocument,
     "\n  mutation updatePayrollAllowanceStatus(\n    $payrollId: UUID\n    $status: PayrollStatus\n  ) {\n    data: updatePayrollAllowanceStatus(payrollId: $payrollId, status: $status) {\n      success\n      message\n      response\n    }\n  }\n": types.UpdatePayrollAllowanceStatusDocument,
     "\n  mutation updatePayrollContributionStatus(\n    $payrollId: UUID\n    $status: PayrollStatus\n  ) {\n    data: updatePayrollContributionStatus(\n      payrollId: $payrollId\n      status: $status\n    ) {\n      success\n      message\n      response\n    }\n  }\n": types.UpdatePayrollContributionStatusDocument,
-    "\n  mutation ChangePassword($username: String) {\n    newPassword: changePassword(username: $username)\n  }\n": types.ChangePasswordDocument,
+    "\n  mutation ChangePassword($username: String, $password: String) {\n    newPassword: changePassword(username: $username, password: $password)\n  }\n": types.ChangePasswordDocument,
 };
 
 /**
@@ -68,7 +68,7 @@ export function graphql(source: "\n  mutation updatePayrollContributionStatus(\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation ChangePassword($username: String) {\n    newPassword: changePassword(username: $username)\n  }\n"): (typeof documents)["\n  mutation ChangePassword($username: String) {\n    newPassword: changePassword(username: $username)\n  }\n"];
+export function graphql(source: "\n  mutation ChangePassword($username: String, $password: String) {\n    newPassword: changePassword(username: $username, password: $password)\n  }\n"): (typeof documents)["\n  mutation ChangePassword($username: String, $password: String) {\n    newPassword: changePassword(username: $username, password: $password)\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
