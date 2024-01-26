@@ -3,22 +3,23 @@ import { PayrollEmployeeFilter } from "@/components/payroll/payroll-management/P
 import PayrollEmployeeStatusAction from "@/components/payroll/payroll-management/PayrollEmployeeStatusAction";
 import PayrollModuleRecalculateEmployeeAction from "@/components/payroll/payroll-management/PayrollModuleRecalculateEmployeeAction";
 import {
+  PayrollEmployeeListDto,
   PayrollEmployeeOtherDeductionDto,
   PayrollEmployeeStatus,
   PayrollModule,
+  PayrollStatus,
 } from "@/graphql/gql/graphql";
 import { variables } from "@/hooks/payroll/contributions/useGetContributionEmployees";
 import useGetPayrollEmployeeOtherDeduction from "@/hooks/payroll/other-deductions/useGetPayrollEmployeeOtherDeduction";
 import useGetPayrollOtherDeduction from "@/hooks/payroll/other-deductions/useGetPayrollOtherDeduction";
 import useUpdatePayrollOtherDeductionStatus from "@/hooks/payroll/other-deductions/useUpdatePayrollOtherDeductionStatus";
 import useGetPayrollHRMEmployees from "@/hooks/payroll/useGetPayrollHRMEmployees";
-import { PayrollStatus } from "@/hooks/payroll/useUpdatePayrollStatus";
 import usePaginationState from "@/hooks/usePaginationState";
 import { statusMap } from "@/utility/constant";
 import { getStatusColor } from "@/utility/helper";
 import { IPageProps } from "@/utility/interfaces";
 import NumeralFormatter from "@/utility/numeral-formatter";
-import { Modal, Space, Tag, message } from "antd";
+import { Empty, Modal, Space, Tag, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
 import { recalculateButton } from "./p-contributions";
@@ -34,6 +35,9 @@ import {
 } from "@ant-design/icons";
 import useRecalculateWithholdingTax from "@/hooks/payroll/useRecalculateWithholdingTax";
 import useUpdatePayrollEmployeeStatus from "@/hooks/payroll/useUpdatePayrollEmployeeStatus";
+import useGetPayrollEmployeesPageable from "@/hooks/payroll/useGetPayrollEmployeesPageable";
+import TablePaginated from "@/components/common/TablePaginated";
+import useGetPayrollTotals from "@/hooks/payroll/useGetPayrollTotals";
 const initialState: variables = {
   filter: "",
   size: 25,
@@ -42,12 +46,16 @@ const initialState: variables = {
 };
 function WithholdingTax({ account }: IPageProps) {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
 
-  const [employees, loadingPayrollEmployees, refetch] =
-    useGetPayrollEmployees();
+  const [employees, loadingPayrollEmployees, refetch, totalElements] =
+    useGetPayrollEmployeesPageable({ variables: state });
 
-  const [payroll] = useGetOnePayroll();
+  const [payroll] = useGetPayrollTotals();
   const [recalculateWithholdingTax, loadingRecalculate] =
     useRecalculateWithholdingTax(() => refetch());
 
@@ -67,7 +75,7 @@ function WithholdingTax({ account }: IPageProps) {
       onCancel() {},
     });
   };
-  const actionColumn: ColumnsType<PayrollEmployeeOtherDeductionDto> = [
+  const actionColumn: ColumnsType<PayrollEmployeeListDto> = [
     {
       title: "Action",
       dataIndex: "id",
@@ -98,7 +106,7 @@ function WithholdingTax({ account }: IPageProps) {
     },
   ];
 
-  const columns: ColumnsType<PayrollEmployeeOtherDeductionDto> = [
+  const columns: ColumnsType<PayrollEmployeeListDto> = [
     { title: "Name", dataIndex: "fullName" },
     {
       title: "Timekeeping",
@@ -118,11 +126,15 @@ function WithholdingTax({ account }: IPageProps) {
     {
       title: "Withholding Tax Payable",
       dataIndex: "withholdingTax",
-      render: (value) => {
-        return <NumeralFormatter value={value} />;
+      render: (value, { isDisabledWithholdingTax }) => {
+        return isDisabledWithholdingTax ? (
+          "Disabled Withholding Tax"
+        ) : (
+          <NumeralFormatter value={value} />
+        );
       },
     },
-    ...(payroll?.status === PayrollStatus.ACTIVE ? actionColumn : []),
+    ...(payroll?.status === PayrollStatus.Active ? actionColumn : []),
   ];
 
   return (
@@ -134,41 +146,56 @@ function WithholdingTax({ account }: IPageProps) {
         // handleClickFinalize={handleClickFinalize}
         loading={loadingPayrollEmployees}
         extra={
-          <>
-            <CustomButton
-              icon={<ReloadOutlined />}
-              onClick={() => confirmRecalculate()}
-              danger
-              type="primary"
-            >
-              Recalculate all employee withholding tax
-            </CustomButton>
-          </>
+          payroll?.timekeeping?.status === PayrollStatus.Finalized &&
+          payroll?.contribution?.status === PayrollStatus.Finalized && (
+            <>
+              <CustomButton
+                icon={<ReloadOutlined />}
+                onClick={() => confirmRecalculate()}
+                danger
+                type="primary"
+              >
+                Recalculate all employee withholding tax
+              </CustomButton>
+            </>
+          )
         }
       />
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "end",
-          width: "100%",
-        }}
-      >
-        <div style={{ width: "80%", marginRight: 10 }}>
-          <PayrollEmployeeFilter onQueryChange={onQueryChange} />
-        </div>
-      </div>
-
-      <Table
-        columns={columns}
-        loading={false}
-        size={"small"}
-        dataSource={employees}
-        onChange={onQueryChange}
-        rowKey={(record: any) => {
-          return record?.id;
-        }}
-      />
+      {payroll?.timekeeping?.status === PayrollStatus.Finalized &&
+      payroll?.contribution?.status === PayrollStatus.Finalized ? (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "end",
+              width: "100%",
+            }}
+          >
+            <div style={{ width: "80%", marginRight: 10 }}>
+              <PayrollEmployeeFilter
+                onQueryChange={onQueryChange}
+                withItems={false}
+              />
+            </div>
+          </div>
+          <TablePaginated
+            columns={columns}
+            loading={loadingPayrollEmployees || loadingUpdateStatus}
+            size={"small"}
+            dataSource={employees}
+            total={totalElements}
+            pageSize={state.size}
+            onChangePagination={onNextPage}
+            current={state.page}
+            rowKey={(record: any) => {
+              return record?.id;
+            }}
+          />
+        </>
+      ) : (
+        <Empty description="Timekeeping and Contribution must be FINALIZED first before proceeding with Withholding Tax" />
+      )}
     </>
   );
 }

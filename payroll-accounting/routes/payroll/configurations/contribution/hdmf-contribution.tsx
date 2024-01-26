@@ -156,7 +156,7 @@ function HDMFContribution() {
               form="upsertForm"
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={handleClickAdd}
+              onClick={() => handleClickAdd()}
               disabled={isEditing}
               loading={loading}
             >

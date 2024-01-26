@@ -14,6 +14,7 @@ import {
 } from "@/graphql/gql/graphql";
 import { variables } from "@/hooks/payroll/adjustments/useGetPayrollEmployeeAdjustment";
 import useDeletePayrollAllowanceItem from "@/hooks/payroll/allowance/useDeletePayrollAllowanceItem";
+import useGenerateDailyAllowances from "@/hooks/payroll/allowance/useGenerateDailyAllowances";
 import useGetPayrollAllowance from "@/hooks/payroll/allowance/useGetPayrollAllowance";
 import useGetPayrollEmployeeAllowance from "@/hooks/payroll/allowance/useGetPayrollEmployeeAllowance";
 import useUpdateAllowanceItemAmount from "@/hooks/payroll/allowance/useUpdateAllowanceItemAmount";
@@ -37,22 +38,26 @@ import { capitalize } from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { recalculateButton } from "./p-contributions";
-import useGenerateDailyAllowances from "@/hooks/payroll/allowance/useGenerateDailyAllowances";
 
 const initialState: variables = {
   filter: "",
   size: 25,
   page: 0,
   status: [],
+  withItems: true,
 };
 function PayrollAllowance({ account }: IPageProps) {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
   const [editingKey, setEditingKey] = useState<string | undefined>();
 
-  const [employees, loadingEmployees, refetchEmployees, totalElements] =
+  const [employees, loadingEmployees, refetchEmployees, totalElements, allEmp] =
     useGetPayrollEmployeeAllowance({
-      variables: { ...state, withItems: false },
+      variables: { ...state },
       onCompleted: () => {},
     });
 
@@ -289,7 +294,7 @@ function PayrollAllowance({ account }: IPageProps) {
         {allowance?.status === PayrollStatus.DRAFT && (
           <AddPayrollAllowanceItemModal
             refetch={refetchEmployees}
-            employees={employees as PayrollEmployeeAllowanceDto[]}
+            employees={(allEmp || []) as PayrollEmployeeAllowanceDto[]}
           />
         )}
 
@@ -312,7 +317,6 @@ function PayrollAllowance({ account }: IPageProps) {
         dataSource={employees}
         expandable={{
           expandedRowRender: (record) => {
-            console.log(record);
             return (
               <Table
                 pagination={false}
@@ -326,7 +330,7 @@ function PayrollAllowance({ account }: IPageProps) {
         }}
         total={totalElements}
         pageSize={state.size}
-        onChange={onQueryChange}
+        onChangePagination={onNextPage}
         current={state.page}
         rowKey={(record: any) => record?.employee?.id}
       />

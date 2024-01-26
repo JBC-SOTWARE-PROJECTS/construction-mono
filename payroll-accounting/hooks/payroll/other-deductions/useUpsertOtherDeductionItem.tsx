@@ -4,7 +4,7 @@ import { message } from "antd";
 const MUTATION = gql`
   mutation (
     $id: UUID
-    $employee: UUID
+    $employee: [UUID]
     $amount: BigDecimal
     $description: String
     $deductionType: UUID
@@ -26,7 +26,7 @@ const MUTATION = gql`
 
 interface IParams {
   id?: string;
-  employee: string;
+  employee: [string];
   amount: number;
   name: string;
   description: string;

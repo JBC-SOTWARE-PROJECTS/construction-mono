@@ -43,7 +43,11 @@ const initialState: variables = {
 };
 function PayrollLoans({ account }: IPageProps) {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
   const [editing, setEditing] = useState<string | null>(null);
   const amountRef = useRef<any>(null);
   const [loan, loadingLoan, refetchLoan] = useGetPayrollLoan();
@@ -222,7 +226,6 @@ function PayrollLoans({ account }: IPageProps) {
         dataSource={data?.content}
         expandable={{
           expandedRowRender: (record) => {
-            console.log(record);
             return (
               <Table
                 pagination={false}
@@ -235,7 +238,7 @@ function PayrollLoans({ account }: IPageProps) {
         }}
         total={data?.totalElements}
         pageSize={state.size}
-        onChange={onQueryChange}
+        onChangePagination={onNextPage}
         current={state.page}
         rowKey={(record: any) => record?.employee?.id}
       />

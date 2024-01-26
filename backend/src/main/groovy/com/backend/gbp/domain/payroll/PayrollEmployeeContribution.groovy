@@ -62,10 +62,6 @@ class PayrollEmployeeContribution extends PayrollEmployeeAuditingEntity{
     @Column(name = "is_active_hdmf", columnDefinition = "boolean")
     Boolean isActiveHDMF
 
-    @GraphQLQuery
-    @Column(name = "total", columnDefinition = "numeric")
-    BigDecimal total
-
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company", referencedColumnName = "id")
