@@ -567,4 +567,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/44_jacky_create_view_preventive_kms.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/87_michael_remove_total_from_contributions_employee.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/88_michael_add_disable_withholding_tax.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

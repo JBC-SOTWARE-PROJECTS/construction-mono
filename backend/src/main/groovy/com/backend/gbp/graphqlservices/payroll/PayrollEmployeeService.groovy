@@ -10,6 +10,7 @@ import com.backend.gbp.domain.payroll.enums.PayrollStatus
 import com.backend.gbp.domain.payroll.enums.PayrollType
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
+import com.backend.gbp.repository.payroll.PayrollEmployeeAdjustmentDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeListDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
@@ -20,6 +21,8 @@ import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 import javax.persistence.EntityManager
@@ -81,8 +84,23 @@ class PayrollEmployeeService {
         return payrollEmployeeRepository.findPayrollEmployee(id)
     }
 
-        @GraphQLQuery(name = "getAllPayrollEmployee", description = "get all employee")
-    List<PayrollEmployee> getAllPayrollEmployee(@GraphQLArgument(name = "id") UUID id){
+    @GraphQLQuery(name = "getPayrollEmployeesPageable", description = "Gets all the employees by payroll id")
+    Page<PayrollEmployeeListDto> getPayrollEmployeesPageable(
+            @GraphQLArgument(name = "payroll") UUID payroll,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+    ) {
+        payrollEmployeeRepository.findByPayrollPageable(
+                payroll,
+                filter,
+                status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
+                PageRequest.of(page, size))
+    }
+
+    @GraphQLQuery(name = "getAllPayrollEmployee", description = "get all employee")
+    List<PayrollEmployee> getAllPayrollEmployee(@GraphQLArgument(name = "id") UUID id) {
         return payrollEmployeeRepository.findByPayrollId(id)
     }
 
@@ -160,7 +178,7 @@ class PayrollEmployeeService {
 
         PayrollEmployee payrollEmployee = payrollEmployeeRepository.findById(id).get()
         if (payrollEmployee.timekeepingEmployee.status == PayrollEmployeeStatus.DRAFT &&
-                payrollEmployee.payrollEmployeeContribution.status == PayrollEmployeeStatus.DRAFT) {
+                payrollEmployee.payrollEmployeeContribution.status == PayrollEmployeeStatus.DRAFT && !payrollEmployee.employee.isDisabledWithholdingTax) {
             return new GraphQLResVal<String>(null, false, "Timekeeping and Contributions for this employee must be finalized first")
         }
 
@@ -176,7 +194,7 @@ class PayrollEmployeeService {
     ) {
 
 
-        List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.findByPayrollId(id)
+        List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.findByPayrollJoinHrmEmpId(id)
 
         List<PayrollEmployee> save = []
         payrollEmployees.each {
@@ -193,21 +211,29 @@ class PayrollEmployeeService {
     private PayrollEmployee getWithholdingTax(PayrollEmployee payrollEmployee) {
         BigDecimal taxableAmount = 0
 
+        if (payrollEmployee.employee.isDisabledWithholdingTax) {
+            payrollEmployee.status = PayrollEmployeeStatus.FINALIZED
+            payrollEmployee.withholdingTax = 0
+            return payrollEmployee
+        }
+
         payrollEmployee.timekeepingEmployee.salaryBreakdown.each {
             taxableAmount += it.regular
             taxableAmount += it.overtime
         }
-
         WithholdingTaxMatrix tax = withholdingTaxMatrixRepository.findByAmountRangeAndType(taxableAmount,
                 payrollEmployee.payroll.type,
                 payrollEmployee.employee.currentCompany.id
         )[0]
+        payrollEmployee.status = PayrollEmployeeStatus.DRAFT
 
 
         if (tax) {
             BigDecimal percent = tax.percentage / 100
             payrollEmployee.withholdingTax = tax.baseAmount + ((taxableAmount - tax.thresholdAmount) * percent)
         } else payrollEmployee.withholdingTax = 0
+
+
         return payrollEmployee
 
     }

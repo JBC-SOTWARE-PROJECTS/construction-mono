@@ -65,11 +65,6 @@ class ProjectService extends AbstractDaoService<Projects> {
         return projectMaterialService.getTotalMaterials(projects.id)
     }
 
-    @GraphQLQuery(name = "totalExpenses", description = "totalExpenses")
-    BigDecimal totalExpenses(@GraphQLContext Projects projects) {
-        return pettyCashService.totalExpenseProject(projects.id)
-    }
-
     @GraphQLQuery(name = "projectById")
     Projects projectById(
             @GraphQLArgument(name = "id") UUID id

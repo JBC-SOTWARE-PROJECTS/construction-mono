@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 
 
 @Component
@@ -160,7 +161,8 @@ class PettyCashService extends AbstractDaoService<PettyCash> {
                      e.project.id = :project and e.isPosted = true'''
         Map<String, Object> params = new HashMap<>()
         params.put('project', project)
-        getSum(query, params)
+        def result = getSum(query, params)
+        return result.setScale(2, RoundingMode.HALF_EVEN)
     }
 
     @GraphQLQuery(name = "totalCashBalance")

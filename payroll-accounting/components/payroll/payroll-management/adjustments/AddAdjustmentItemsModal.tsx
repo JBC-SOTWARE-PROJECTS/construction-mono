@@ -86,6 +86,8 @@ function AddAdjustmentItemsModal({ refetch, employeeList }: IParams) {
                 value: item.id,
                 label: item.employeeName,
               })),
+              showSearch: true,
+              mode: "multiple",
             }}
             rules={[{ required: true }]}
           />

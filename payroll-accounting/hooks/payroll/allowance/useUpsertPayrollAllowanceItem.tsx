@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
 
 const MUTATION = gql`
-  mutation ($employeeId: UUID, $allowanceId: UUID, $amount: BigDecimal) {
+  mutation ($employeeId: [UUID], $allowanceId: UUID, $amount: BigDecimal) {
     data: upsertPayrollAllowanceItem(
       employeeId: $employeeId
       allowanceId: $allowanceId
@@ -15,7 +15,7 @@ const MUTATION = gql`
 `;
 
 interface params {
-  allowanceId: string;
+  allowanceId: [string];
   employeeId: string;
   amount: number;
 }

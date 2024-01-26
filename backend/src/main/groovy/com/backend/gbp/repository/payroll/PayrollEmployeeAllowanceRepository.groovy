@@ -56,6 +56,7 @@ and upper(e.fullName) like upper(concat('%',:filter,'%'))
 and ae.status in :status
 GROUP BY ae.id, pe.id, e.fullName, e.firstName, e.lastName, e.middleName, e.nameSuffix, pos.description ,ae.status 
 HAVING (:withItems = false OR COALESCE(sum(ai.amount), 0) != 0)
+ORDER BY e.fullName
 """,
             countQuery = """
 SELECT COUNT(DISTINCT ae.id)
@@ -79,7 +80,26 @@ HAVING (:withItems = false OR COALESCE(sum(ai.amount), 0) != 0)
             Pageable pageable)
 
 
-
+    @Query(value = """
+SELECT ae.id as id,
+pe.id as payrollEmployeeId,
+e.fullName as employeeName,
+e.firstName,
+e.lastName,
+e.middleName,
+e.nameSuffix 
+FROM PayrollEmployeeAllowance ae
+LEFT JOIN ae.allowance a
+LEFT JOIN a.payroll p
+LEFT JOIN ae.payrollEmployee pe
+LEFT JOIN pe.employee e
+WHERE
+p.id = :payroll
+GROUP BY ae.id, pe.id, e.fullName, e.firstName, e.lastName, e.middleName, e.nameSuffix
+ORDER BY e.fullName
+""")
+    List<PayrollEmployeeAllowanceDto> getAllByPayroll(
+            @Param("payroll") UUID payroll)
 
 
 }

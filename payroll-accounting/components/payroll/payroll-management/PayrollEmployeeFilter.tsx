@@ -6,6 +6,7 @@ import { capitalize } from "lodash";
 import PayrollEmployeeStatusTag, {
   payrollEmployeeStatusColorGenerator,
 } from "./PayrollEmployeeStatusTag";
+import { FormCheckBox } from "@/components/common";
 
 export const employeeStatusOptions = () => {
   let arr = Object.keys(PayrollEmployeeStatus)?.map((key: any) => {
@@ -19,7 +20,10 @@ export const employeeStatusOptions = () => {
   return arr;
 };
 
-export const PayrollEmployeeFilter = ({ onQueryChange }: any) => {
+export const PayrollEmployeeFilter = ({
+  onQueryChange,
+  withItems = true,
+}: any) => {
   const tagRenderStatus = ({ label, value, closable, onClose }: any): any => {
     const onPreventMouseDown = (event: any) => {
       event.preventDefault();
@@ -38,6 +42,20 @@ export const PayrollEmployeeFilter = ({ onQueryChange }: any) => {
   };
   return (
     <Row gutter={[12, 12]} justify="end">
+      {withItems && (
+        <Col md={2}>
+          <FormCheckBox
+            label="With Items"
+            propscheckbox={{
+              defaultChecked: true,
+              onChange: (value) => {
+                onQueryChange("withItems", value?.target?.checked);
+              },
+            }}
+          />
+        </Col>
+      )}
+
       <Col md={8}>
         <FormSearch
           label="Search Employee"
@@ -52,7 +70,7 @@ export const PayrollEmployeeFilter = ({ onQueryChange }: any) => {
         />
       </Col>
 
-      <Col md={4}>
+      <Col md={8}>
         <FormSelect
           label="Status"
           name="status"

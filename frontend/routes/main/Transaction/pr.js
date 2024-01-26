@@ -102,20 +102,25 @@ const UPSERT_RECORD = gql`
   }
 `;
 
+const currentDate = moment(); // Get the current date
+const dateSixMonthsAgo = currentDate.subtract(6, 'months')
+
 const PRContent = ({ account }) => {
   const [office, setOffice] = useState(account?.office?.id);
   const [state, setState] = useState({
-    start: moment(new Date()).format("YYYY-MM-DD"),
+    start: dateSixMonthsAgo.format("YYYY-MM-DD"),
     end: moment(new Date()).format("YYYY-MM-DD"),
     filter: "",
     page: 0,
     size: 20,
+    office: null
   });
+  console.log("office", state.office)
   //query
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     variables: {
       filter: state.filter,
-      office: office,
+      office: state.office,
       start: state.start + "T00:00:00Z",
       end: state.end + "T23:00:00Z",
       page: state.page,
@@ -225,6 +230,14 @@ const PRContent = ({ account }) => {
       ),
     },
     {
+      title: "Date Needed",
+      dataIndex: "prDateNeeded",
+      key: "prDateNeeded",
+      render: (text, record) => (
+        <span>{moment(record?.prDateNeeded).format("MMM DD, YYYY")}</span>
+      ),
+    },
+    {
       title: "PR #",
       dataIndex: "prNo",
       key: "prNo",
@@ -328,12 +341,16 @@ const PRContent = ({ account }) => {
         <Col {...col4}>
           <FilterSelect
             allowClear
-            defaultValue={account?.office?.id}
+            //defaultValue={account?.office?.id}
             loading={loading}
             field="office"
             placeholder="Filter By Office"
             onChange={(e) => {
               setOffice(e);
+              setState({
+                ...state,
+                office: e
+              });
             }}
             list={_.get(data, "offices")}
           />
