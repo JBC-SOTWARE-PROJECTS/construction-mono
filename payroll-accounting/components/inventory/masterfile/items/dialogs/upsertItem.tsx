@@ -389,7 +389,7 @@ export default function UpsertItemModal(props: IProps) {
             <FormCheckBox
               name="fixAsset"
               valuePropName="checked"
-              checkBoxLabel="Set as Fix Asset"
+              checkBoxLabel="Set as Fixed Asset"
               propscheckbox={{
                 defaultChecked: false,
               }}
