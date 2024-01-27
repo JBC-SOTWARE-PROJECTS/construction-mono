@@ -571,4 +571,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/88_michael_add_disable_withholding_tax.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/49_jacky_asset_vehicle_usage_monitoring_employee.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
