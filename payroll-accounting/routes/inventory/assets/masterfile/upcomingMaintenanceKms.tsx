@@ -11,9 +11,11 @@ import { useDialog } from "@/hooks";
 import UpsertPreventiveMaintenanceModal from "@/components/inventory/assets/dialogs/upsertPreventiveMaintenanceModal";
 import useGetPreventiveByAsset from "@/hooks/asset/useGetPreventiveByAsset";
 import { useRouter } from "next/router";
-import { AssetPreventiveMaintenance, AssetUpcomingPreventiveMaintenance } from "@/graphql/gql/graphql";
+import { AssetPreventiveMaintenance, AssetUpcomingPreventiveMaintenance, AssetUpcomingPreventiveMaintenanceKms } from "@/graphql/gql/graphql";
 import useGetUpcomingPreventive from "@/hooks/asset/useGetUpcomingPreventive";
 import AssetUpcomingPreventiveMaintenanceTable from "@/components/inventory/assets/masterfile/assetUpcomingPreventiveMaintenanceTable";
+import useGetUpcomingPreventivKms from "@/hooks/asset/useGetUpcomingPreventiveKms";
+import AssetUpcomingPreventiveMaintenanceKmTable from "@/components/inventory/assets/masterfile/assetUpcomingPreventiveMaintenanceTableKm";
 
 type Props = {};
 const { Search } = Input;
@@ -30,12 +32,12 @@ const initialState: IUMState = {
   size: 10,
 };
 
-export default function UpcomingMaintenance({}: Props) {
+export default function UpcomingMaintenanceKms({}: Props) {
   const modal = useDialog(UpsertPreventiveMaintenanceModal);
   const router = useRouter();
   const [state, setState] = useState(initialState);
 
-  const [preventives, loadingAsset, refetch] = useGetUpcomingPreventive({
+  const [preventives, loadingAsset, refetch] = useGetUpcomingPreventivKms({
     variables: {
       ...state
     },
@@ -48,7 +50,7 @@ export default function UpcomingMaintenance({}: Props) {
   return (
     <>
       <ProCard
-        title={`Upcoming Maintenance By Schedules`}
+        title={`Upcoming Maintenance By Kilometers`}
         headStyle={{
           flexWrap: "wrap",
         }}
@@ -65,8 +67,8 @@ export default function UpcomingMaintenance({}: Props) {
           </ProFormGroup>
         }
       >
-        <AssetUpcomingPreventiveMaintenanceTable
-          dataSource={preventives?.content as AssetUpcomingPreventiveMaintenance[]}
+        <AssetUpcomingPreventiveMaintenanceKmTable
+          dataSource={preventives?.content as AssetUpcomingPreventiveMaintenanceKms[]}
           loading={false}
           totalElements={preventives?.totalElements as number}
           handleOpen={(record) => {}}

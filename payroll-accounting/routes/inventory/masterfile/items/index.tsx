@@ -80,7 +80,7 @@ export default function ItemComponent({ type }: { type: string }) {
         title = "Material Production Item";
         break;
       case "fix":
-        title = "Fix Asset Item";
+        title = "Fixed Asset Item";
         break;
       case "consignment":
         title = "Consignment Item";
