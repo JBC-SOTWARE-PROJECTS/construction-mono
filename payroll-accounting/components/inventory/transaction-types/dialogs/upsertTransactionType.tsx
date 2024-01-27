@@ -117,7 +117,7 @@ export default function UpsertTransactionTypeModal(props: IProps) {
             <FormCheckBox
               name="fixAsset"
               valuePropName="checked"
-              checkBoxLabel="Set as Fix Asset Transaction"
+              checkBoxLabel="Set as Fixed Asset Transaction"
               propscheckbox={{
                 defaultChecked: false,
               }}
