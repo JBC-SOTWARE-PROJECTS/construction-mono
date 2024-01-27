@@ -16,7 +16,7 @@ const AccountingAccountsPayableMenu = {
           },
           {
             path: "/inventory/masterfile/items/fix-assets",
-            name: "Fix Assets",
+            name: "Fixed Assets",
           },
           {
             path: "/inventory/masterfile/items/consignments",

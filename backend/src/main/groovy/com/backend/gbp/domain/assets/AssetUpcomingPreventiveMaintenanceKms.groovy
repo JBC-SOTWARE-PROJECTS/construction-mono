@@ -1,28 +1,21 @@
 package com.backend.gbp.domain.assets
 
-import com.backend.gbp.domain.AbstractAuditingEntity
+
 import com.backend.gbp.domain.assets.enums.PreventiveScheduleType
-import com.backend.gbp.domain.inventory.Item
 import io.leangen.graphql.annotations.GraphQLQuery
-import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
 import org.hibernate.annotations.NotFoundAction
-import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
-import org.hibernate.annotations.Where
 
 import javax.persistence.*
+import java.time.Instant
 
 @Entity
-@Table(schema = "asset", name = "asset_preventive_maintenance")
-@SQLDelete(sql = "UPDATE asset.asset_preventive_maintenance SET deleted = true WHERE id = ?")
-@Where(clause = "deleted <> true or deleted is  null ")
-class AssetPreventiveMaintenance extends AbstractAuditingEntity implements Serializable{
+@Table(schema = "asset", name = "asset_preventive_kms")
+class AssetUpcomingPreventiveMaintenanceKms implements Serializable{
 
 	@GraphQLQuery
 	@Id
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
 	@Column(name = "id", columnDefinition = "uuid")
 	@Type(type = "pg-uuid")
 	UUID id
@@ -34,6 +27,15 @@ class AssetPreventiveMaintenance extends AbstractAuditingEntity implements Seria
 	@GraphQLQuery
 	@Column(name = "start_basis")
 	String startBasis
+
+	@GraphQLQuery
+	@Column(name = "latest_usage")
+	BigDecimal latestUsage
+
+	@GraphQLQuery
+	@Column(name = "next_nearest")
+	BigDecimal nextNearest
+
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "schedule_type")

@@ -153,7 +153,7 @@ function RawLogs({
     if (useStaticData && employeeId) {
       getAttendance({
         id: employeeId,
-        size: state?.pageSize,
+        size: state?.size,
         page: state?.page,
         startDate: startDateStatic?.startOf("day"),
         endDate: endDateStatic?.endOf("day"),
@@ -165,7 +165,7 @@ function RawLogs({
     if (!useStaticData) {
       getAttendance({
         id: router?.query?.id,
-        size: state?.pageSize,
+        size: state?.size,
         page: state?.page,
         startDate: startDate?.startOf("day"),
         endDate: endDate?.endOf("day"),
@@ -201,7 +201,7 @@ function RawLogs({
                   onClick={() => {
                     getAttendance({
                       id: router?.query?.id || employeeId,
-                      size: state?.pageSize,
+                      size: state?.size,
                       page: state?.page,
                       startDate: startDate?.startOf("day"),
                       endDate: endDate?.endOf("day"),
@@ -236,7 +236,7 @@ function RawLogs({
         columns={columns}
         pagination={{
           total: totalElements,
-          pageSize: state?.pageSize,
+          pageSize: state?.size,
           current: state.page + 1,
           onChange: onNextPage,
         }}
