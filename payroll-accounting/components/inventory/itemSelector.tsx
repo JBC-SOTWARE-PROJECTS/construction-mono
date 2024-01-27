@@ -158,7 +158,7 @@ export default function ItemSelector(props: IProps) {
         <span>
           {text}&nbsp;
           {record.consignment && <Tag color="magenta">Consignment</Tag>}
-          {record.fixAsset && <Tag color="geekblue">Fix Asset</Tag>}
+          {record.fixAsset && <Tag color="geekblue">Fixed Asset</Tag>}
         </span>
       ),
     },

@@ -150,7 +150,7 @@ export default function CreateFixedAsset(props: CreateFixedAssetI) {
             <Col flex='100%'>
               <FormInputNumber
                 name='accumulatedDepreciation'
-                label='Accumulated Depreciation as at 31 Dec 2022'
+                label='Accumulated Depreciation as of 31 Dec 2023'
                 bold
               />
             </Col>
