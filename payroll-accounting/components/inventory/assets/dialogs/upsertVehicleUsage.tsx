@@ -1,4 +1,4 @@
-import { Assets, VehicleUsageMonitoring } from "@/graphql/gql/graphql";
+import { Assets, Employee, VehicleUsageMonitoring } from "@/graphql/gql/graphql";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -7,6 +7,7 @@ import {
   Modal,
   Row,
   Space,
+  Table,
   Typography,
   message,
 } from "antd";
@@ -23,6 +24,17 @@ import { useRouter } from "next/router";
 import useGetAssetById from "@/hooks/asset/useGetAssetById";
 import moment from "moment";
 import dayjs from "dayjs";
+import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
+import useGetEmployeesBasic from "@/hooks/employee/useGetEmployeesBasic";
+import { ColumnsType } from "antd/es/table";
+import { DataType } from "@/components/accountReceivables/invoice/form/types";
+import { FAEditableContext } from "@/components/accounting/fixed-asset/dialogs/create-multi-fixed-asset/table";
+type EditableTableProps = Parameters<typeof Table>[0]
+type ColumnTypes = Exclude<EditableTableProps['columns'], undefined> 
+
+interface EditableRowProps {
+  index: number
+}
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -30,6 +42,16 @@ interface IProps {
   projectOpts: any
 }
 
+const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
+  const [form] = Form.useForm()
+  return (
+    <Form form={form} component={false}>
+      {/* <FAEditableContext.Provider value={form}> */}
+        <tr {...props} />
+      {/* </FAEditableContext.Provider> */}
+    </Form>
+  )
+}
 const defRec = {
   usagePurpose :null,
   route: null,
@@ -46,6 +68,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   const { hide, record, projectOpts } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [initRecord, setinitRecord] = useState<VehicleUsageMonitoring | null>(null);
+  const [selectedEmps, setSelectedEmps] = useState<Employee[]>([]);
   const router = useRouter();
   moment.locale('en')
   
@@ -107,7 +130,47 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     message.error("Something went wrong. Please contact administrator.");
   };
 
+  const [employeeList, loading, setFilters] = useGetEmployeesBasic();
+
+  // const columns: ColumnsType<Employee> = 
+  // [
+    
+  //   {
+  //     title: "Name",
+  //     dataIndex: "fullName",
+  //     key: "fullName",
+  //     editable: true
+  //   }]
  
+  const defaultColumns: (ColumnTypes[number] & {
+    editable?: boolean
+    dataIndex: string
+  })[] = 
+    [
+  {
+    title: "Name",
+    dataIndex: "fullName",
+    key: "fullName",
+    editable: true
+  }]
+
+
+  const columns = defaultColumns.map((col) => {
+    if (!col.editable) {
+      return col
+    }
+    return {
+      ...col,
+      onCell: (record: any) => ({
+        record,
+        editable: col.editable,
+        dataIndex: col.dataIndex,
+        title: col.title,
+      //  handleSave,
+      }),
+    }
+  })
+
   return (
     <Modal
       title={
@@ -252,6 +315,33 @@ export default function UpsertVehicleUsageModal(props: IProps) {
             </Col>
        
         </Row>
+
+        <EmployeeDrawer
+        selectedEmployees={employeeList}
+        loading={false}
+        usage="MULTI"
+        onSelect={(selected : Employee[])=>{
+         
+          const elementExists =_.filter(selectedEmps, emp => emp.id == selected[0].id);
+        
+          if(elementExists.length == 0){
+            setSelectedEmps(_.concat(selectedEmps, selected))
+          }
+        
+        }}
+        >
+          <>Select Employee</>
+        </EmployeeDrawer>
+
+
+        <Table
+          rowKey="id"
+          size="small"
+          columns={columns  as ColumnTypes}
+          dataSource={selectedEmps}
+          pagination={false}
+          rowClassName={() => 'editable-row'}
+        />
       </Form>
       }
       </>

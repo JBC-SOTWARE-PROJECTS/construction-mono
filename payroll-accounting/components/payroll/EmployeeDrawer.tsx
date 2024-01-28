@@ -93,7 +93,7 @@ const EmployeeDrawer = ({
         destroyOnClose
         width={"50%"}
       >
-        {usage === "TIMEKEEPING" && (
+        {usage === "TIMEKEEPING" || usage === "MULTI" && (
           <>
             <Input.Search
               size="middle"
@@ -126,7 +126,7 @@ const EmployeeDrawer = ({
         <Table
           columns={columns}
           dataSource={
-            usage === "TIMEKEEPING" ? filterEmployees() : selectedEmployees
+            usage === "TIMEKEEPING" || usage === "MULTI" ? filterEmployees() : selectedEmployees
           }
           size="small"
           pagination={false}
@@ -143,6 +143,14 @@ const EmployeeDrawer = ({
                     ? { selectedRowKeys: selectedRowKeys }
                     : {}),
                 }
+              : usage === "MULTI" 
+                ? {
+                  onChange: (selectedRowKeys, selectedRows) => {
+                    if (onSelect) onSelect(selectedRows);
+                    onClose()
+                  },
+                  type: "checkbox",
+                } 
               : (null as any)
           }
           showHeader={false}
