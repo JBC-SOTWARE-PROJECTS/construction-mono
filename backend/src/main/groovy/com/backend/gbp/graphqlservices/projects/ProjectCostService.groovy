@@ -109,21 +109,22 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
 
         if(projectId){
             def project = projectService.projectById(projectId)
-            def billing = billingService.billingByProject(project.id)
+            //def billing = billingService.billingByProject(project.id)
             //add to billing
-            if(billing){
-                if(billing.locked){
-                    return new GraphQLRetVal<Boolean>(false, false, "Billing is locked. Please unlocked to charge additional items/service.")
-                }else{
-                    def costing = upsertFromMap(id, fields, { ProjectCost entity, boolean forInsert ->
-                        if(forInsert){
-                            //conditions here before save
-                        }
-                    })
-                    billingItemService.upsertBillingItemByProject(costing, billing)
-                }
+            //if(billing){
+            //    if(billing.locked){
+            //        return new GraphQLRetVal<Boolean>(false, false, "Billing is locked. Please unlocked to charge additional items/service.")
+            //   }else{
 
-            }
+            //        billingItemService.upsertBillingItemByProject(costing, billing)
+            //    }
+
+           // }
+           upsertFromMap(id, fields, { ProjectCost entity, boolean forInsert ->
+                if(forInsert){
+                    //conditions here before save
+                }
+            })
             return new GraphQLRetVal<Boolean>(true, true, "Bill of Quantities added successfully")
         }else{
             return new GraphQLRetVal<Boolean>(false, false, "Project ID is missing")
