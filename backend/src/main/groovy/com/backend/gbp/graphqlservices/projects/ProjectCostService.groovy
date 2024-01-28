@@ -155,7 +155,6 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     ) {
         if(id) {
             def projCost = findOne(id)
-            def project = projCost.project
 
             def rev = projectCostRevisionService.upsertProjectRevCost(projCost, tag, null)
             if(rev?.id){
@@ -166,7 +165,7 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
                     }
                 })
                 //update billing
-                billingItemService.updateBillingItemForRevisions(costing.id, costing)
+                //billingItemService.updateBillingItemForRevisions(costing.id, costing)
                 return  costing
             }
             return  projCost
