@@ -202,9 +202,10 @@ class ProjectService extends AbstractDaoService<Projects> {
         })
 
         //create billing if id is missing
-        if (!id) {
-            billingService.createBillingProject(project)
-        }
+        //billing creation is on the statement of Work accomplishment
+        //if (!id) {
+        //    billingService.createBillingProject(project)
+        //}
         //return
         return project
     }
