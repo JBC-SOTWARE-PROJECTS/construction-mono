@@ -8,7 +8,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     apiUrlPrefix = "https://api-demo.megaptk.com";
     frontEndUrl = "https://inventory.megaptk.com";
   } else {
-    apiUrlPrefix = "https://api-prod.megaptk.com";
+    apiUrlPrefix = "https://api-demo.megaptk.com";
     frontEndUrl = "https://inventory.megaptk.com";
   }
 }

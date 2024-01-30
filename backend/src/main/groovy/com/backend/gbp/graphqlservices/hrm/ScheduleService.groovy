@@ -59,7 +59,7 @@ class ScheduleService {
         if (id) {
             Schedule schedule = scheduleTypeRepository.findById(id).get()
             schedule = objectMapper.updateValue(schedule, fields)
-            schedule.project = projectService.findOne(UUID.fromString(fields.get('project_id') as String))
+            schedule.project = fields.get('project_id') as String ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null
             schedule.company = SecurityUtils.currentCompany()
             scheduleTypeRepository.save(schedule)
             return new GraphQLResVal<Schedule>(schedule, true, "Successfully updated department schedule.")

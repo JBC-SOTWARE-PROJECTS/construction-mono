@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.xmlsoap.schemas.soap.encoding.Array
+//import org.xmlsoap.schemas.soap.encoding.Array
 //import com.digitalocean.spaces.SpacesClient
 //import com.digitalocean.spaces.model.ObjectWriteResponse
 
@@ -146,7 +146,7 @@ class EmployeeResource {
                 for (EmployeeAttendance ea : employeeAttendance){
                     String fieldsToIgnore = "{\"isIgnored\": \"true\"}";
                     Map<String, Object> fieldMapToIgnore = objectMapper.readValue(fieldsToIgnore, Map.class);
-                    GraphQLResVal<EmployeeAttendance> toIgnore = employeeAttendanceService.upsertEmployeeAttendance(ea.id, ea.employee.id, ea.project ? ea.project.id : null ,fieldMapToIgnore );
+                    GraphQLResVal<EmployeeAttendance> toIgnore = employeeAttendanceService.upsertEmployeeAttendance(ea.id, ea.employee.id, ea.project ? ea.project.id : null ,fieldMapToIgnore ,null);
                 }
             }
 
@@ -156,7 +156,7 @@ class EmployeeResource {
 
         projectId = projectId.equals("") ? null : projectId;
 
-        GraphQLResVal<EmployeeAttendance> empAttendance = employeeAttendanceService.upsertEmployeeAttendance(null, employee, projectId,fieldMap );
+        GraphQLResVal<EmployeeAttendance> empAttendance = employeeAttendanceService.upsertEmployeeAttendance(null, employee, projectId,fieldMap,null );
 
 
         return empAttendance.returnId;
@@ -184,11 +184,12 @@ class EmployeeResource {
             ArrayList<File> files = new ArrayList<>();
             for (MultipartFile capt: capture){
                 File file = convertMultipartFileToFile(capt);
+               // spaceService.uploadFileToSpace(file, "ATTENDANCE_CAPTURE");
                 files.add(file);
             }
 
             //  MultipartFile file = request.getFile("image");
-           // spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE");
+           // spaceService.uploadMultiFileToSpace(files, "ATTENDANCE_CAPTURE/");
             spaceService.uploadMultiFileToSpace(files, env.getProperty("do.env.type")+"/ATTENDANCE_CAPTURE/");
            return "true";
         } catch (InterruptedException e) {
@@ -253,10 +254,10 @@ class EmployeeResource {
             attendance.referenceId = reAtt.referenceId;
             attendance.cameraCapture = reAtt.cameraCapture;
 
-            if(reAtt.project.equals("")){
-                attendance.project = projectService.findOne(reAtt.project);
-            }else{
+            if(reAtt.project.equals("") || reAtt.project == null){
                 attendance.project = null;
+            }else{
+                attendance.project = projectService.findOne(reAtt.project);
             }
 
 
@@ -312,7 +313,8 @@ class EmployeeResource {
                 // Check for existing pin code
                 Boolean isPinCodeUnique = employeeService.isPinCodeUnique(pinCode);
                 if(isPinCodeUnique){
-                    upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+                  //  upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+                    upsertResult = employeeService.upsertMobileData(employee, fieldMap);
 
                     employeeDetailsDto.pinCode = upsertResult.pinCode;
                     employeeDetailsDto.id = upsertResult.id;
@@ -327,7 +329,8 @@ class EmployeeResource {
                             HttpStatus.CONFLICT)
                 }
             }else{
-                upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+               // upsertResult = employeeService.upsertEmployee(employee, fieldMap, null, null, office, position, company);
+                upsertResult = employeeService.upsertMobileData(employee, fieldMap);
 
 
                 employeeDetailsDto.facialData = upsertResult.facialData;

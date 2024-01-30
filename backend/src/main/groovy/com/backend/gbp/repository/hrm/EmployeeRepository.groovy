@@ -96,7 +96,14 @@ interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
 
     @Query(
-            value = "Select e.id as id, e.fullName as fullName from Employee e"
+            value = """Select e.id as id, e.fullName as fullName from Employee e
+where lower(e.fullName) like lower(concat('%',:filter,'%'))
+           AND (:position = '' OR CAST(e.position.id AS text) = :position)
+           AND (:office = '' OR CAST(e.office.id AS text) = :office)
+"""
     )
-    List<EmployeeBasicDetails> getAllEmployeesBasic()
+    List<EmployeeBasicDetails> getAllEmployeesBasic(@Param("filter") String filter,
+                                                    @Param("position") String position,
+                                                    @Param("office") String office
+    )
 }

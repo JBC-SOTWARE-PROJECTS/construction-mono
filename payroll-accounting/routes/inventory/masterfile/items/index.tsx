@@ -80,7 +80,7 @@ export default function ItemComponent({ type }: { type: string }) {
         title = "Material Production Item";
         break;
       case "fix":
-        title = "Fix Asset Item";
+        title = "Fixed Asset Item";
         break;
       case "consignment":
         title = "Consignment Item";
@@ -105,12 +105,6 @@ export default function ItemComponent({ type }: { type: string }) {
         headerBordered
         extra={
           <ProFormGroup>
-            <Search
-              size="middle"
-              placeholder="Search here.."
-              onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-              className="w-full"
-            />
             <Button
               type="primary"
               icon={<PlusCircleOutlined />}
@@ -122,6 +116,14 @@ export default function ItemComponent({ type }: { type: string }) {
         <div className="w-full mb-5">
           <Form layout="vertical" className="filter-form">
             <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <Search
+                  size="middle"
+                  placeholder="Search here.."
+                  onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+                  className="w-full"
+                />
+              </Col>
               <Col xs={24} sm={12} md={8}>
                 <FormSelect
                   label="Filter Item Group"

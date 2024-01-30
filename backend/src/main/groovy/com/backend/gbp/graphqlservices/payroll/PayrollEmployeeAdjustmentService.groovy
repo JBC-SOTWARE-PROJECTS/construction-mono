@@ -55,13 +55,15 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status,
+            @GraphQLArgument(name = "withItems") Boolean withItems
     ) {
         if (payroll) {
             Page<PayrollEmployeeAdjustmentDto> pageRes = payrollEmployeeAdjustmentRepository.getEmployeesPageable(
                     payroll,
                     filter,
                     status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
+                    withItems,
                     PageRequest.of(page, size))
 
             return pageRes
@@ -82,21 +84,40 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
     //=========================== MUTATIONS ============================
 
     @GraphQLMutation(name = "upsertAdjustmentItem")
-    GraphQLResVal<PayrollAdjustmentItem> upsertAdjustmentItem(
+    GraphQLResVal<String> upsertAdjustmentItem(
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "employee") UUID employee,
+            @GraphQLArgument(name = "employee") List<UUID> employee,
             @GraphQLArgument(name = "category") UUID category,
             @GraphQLArgument(name = "amount") BigDecimal amount,
             @GraphQLArgument(name = "description") String description,
             @GraphQLArgument(name = "subaccountCode") String subaccountCode
 
     ) {
+
+        List<PayrollAdjustmentItem> items = []
+        if (employee) {
+            List<PayrollEmployeeAdjustment> employees = payrollEmployeeAdjustmentRepository.findAllById(employee)
+            employees.each {
+                PayrollAdjustmentItem item = generateItems(id, category, amount, subaccountCode, description)
+                item.employeeAdjustment = it
+                items.push(item)
+            }
+        } else {
+            PayrollAdjustmentItem item = generateItems(id, category, amount, subaccountCode, description)
+            items.push(item)
+        }
+
+        payrollAdjustmentItemRepository.saveAll(items)
+        return new GraphQLResVal<String>('success', true, "Successfully updated employee adjustment status!")
+    }
+
+    private generateItems(UUID id, UUID category, BigDecimal amount, String subaccountCode, String description) {
         PayrollAdjustmentItem item = new PayrollAdjustmentItem()
+
         if (id) {
             item = payrollAdjustmentItemRepository.findById(id).get()
         }
-        if (employee)
-            item.employeeAdjustment = payrollEmployeeAdjustmentRepository.findById(employee).get()
+
 
         if (category) {
             item.category = adjustmentCategoryRepository.findById(category).get()
@@ -111,9 +132,7 @@ class PayrollEmployeeAdjustmentService extends AbstractPayrollEmployeeStatusServ
 
         item.description = description ? description : item.category.description
         item.company = SecurityUtils.currentCompany()
-        payrollAdjustmentItemRepository.save(item)
-
-        return new GraphQLResVal<PayrollAdjustmentItem>(item, true, "Successfully updated employee adjustment status!")
+        item
     }
 
 

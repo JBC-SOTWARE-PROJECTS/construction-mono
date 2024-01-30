@@ -21,11 +21,11 @@ const TablePaginated = ({
         style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}
       >
         <Pagination
-          defaultCurrent={1}
           total={total}
           pageSize={pageSize}
           onChange={onChangePagination}
-          current={current}
+          current={current + 1}
+          size="small"
         />
       </div>
       <Table {...props} pagination={false} />
@@ -33,11 +33,11 @@ const TablePaginated = ({
         style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}
       >
         <Pagination
-          defaultCurrent={1}
           total={total}
           pageSize={pageSize}
           onChange={onChangePagination}
-          current={current}
+          current={current + 1}
+          size="small"
         />
       </div>
     </>

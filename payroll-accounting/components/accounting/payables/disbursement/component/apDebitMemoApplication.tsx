@@ -60,11 +60,12 @@ export default function APDebitMemoApplicationsTable(props: IProps) {
   });
   //========================= functions ==============================
   const showModal = () => {
+    console.log("type", type);
     showSelectAP(
       {
         supplier: supplier,
         payload: dataSource,
-        singleSelect: true,
+        singleSelect: type === "DM" ? true : false,
         debitMemo: type === "DM",
       },
       (result: IDisbursementApplication[]) => {

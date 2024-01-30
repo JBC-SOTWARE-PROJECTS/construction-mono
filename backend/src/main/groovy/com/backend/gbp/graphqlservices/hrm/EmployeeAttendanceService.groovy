@@ -96,8 +96,8 @@ class EmployeeAttendanceService {
 //
 //        Instant endOfDay = startOfDay.plus(1, ChronoUnit.DAYS);
 
-        List<EmployeeAttendance>   employeeAttendance = employeeAttendanceRepository.getEmployeeAttListByDateType(employee, specificDate, type )
-        return  employeeAttendance;
+        List<EmployeeAttendance> employeeAttendance = employeeAttendanceRepository.getEmployeeAttListByDateType(employee, specificDate, type)
+        return employeeAttendance;
     }
 
     //=============================QUERY=============================\\
@@ -109,7 +109,9 @@ class EmployeeAttendanceService {
             @GraphQLArgument(name = "id") UUID id,
             @GraphQLArgument(name = "employee") UUID employee,
             @GraphQLArgument(name = "project_id") UUID project_id,
-            @GraphQLArgument(name = "fields") Map<String, Object> fields
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "isManual") Boolean isManual
+
     ) {
         if (!employee) return new GraphQLResVal<EmployeeAttendance>(null, false, "Failed to ${id ? 'update' : 'create'} employee attendance.")
         if (id) {
@@ -118,6 +120,7 @@ class EmployeeAttendanceService {
             Employee selectedEmployee = employeeRepository.findById(employee).get()
             attendance.employee = selectedEmployee
             attendance.project = project_id ? projectService.findOne(project_id) : null
+            attendance.isManual = isManual
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully updated employee attendance.")
         } else {
@@ -127,6 +130,7 @@ class EmployeeAttendanceService {
             attendance.original_attendance_time = attendance.attendance_time
             attendance.originalType = attendance.type
             attendance.project = project_id ? projectService.findOne(project_id) : null
+            attendance.isManual = isManual
             attendance = employeeAttendanceRepository.save(attendance)
             return new GraphQLResVal<EmployeeAttendance>(attendance, true, "Successfully created employee attendance.", attendance.id)
         }

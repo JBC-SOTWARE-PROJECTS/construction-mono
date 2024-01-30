@@ -1050,27 +1050,29 @@ sum(older) as older,sum(total) as total from accounting.aging_report('${filter}'
     static BigDecimal calculateVat(Boolean vatInclusive,
                                    BigDecimal amount,
                                    BigDecimal vatRate) {
-
-        def vat = (amount) / (vatRate + 1)
-        def vatAmount = vatInclusive ?
-                vat.round(2) * vatRate :
-                (amount) * vatRate
-
+        def vatAmount = BigDecimal.ZERO
+        if(vatInclusive){
+            vatAmount = (amount / (vatRate + 1)) * vatRate
+        }else{
+            if(vatRate){
+                vatAmount = amount * vatRate
+            }
+        }
         return vatAmount.setScale(2, RoundingMode.HALF_EVEN)
     }
 
     static calculateEwt(Boolean vatInclusive, BigDecimal amount, BigDecimal vatRate, BigDecimal ewtRate) {
         def netOfdiscount = amount;
-        def vat = netOfdiscount / (vatRate + 1)
-        def ewt = 0;
+        BigDecimal ewt = BigDecimal.ZERO;
         if (vatRate <= 0) {
             ewt = netOfdiscount * ewtRate;
         } else {
-            ewt = vatInclusive ?
-                    vat.round(2) * ewtRate :
-                    netOfdiscount * ewtRate;
+            if(vatInclusive){
+                ewt = (netOfdiscount / (vatRate + 1)) * ewtRate
+            }else{
+                ewt = netOfdiscount * ewtRate
+            }
         }
-
         return ewt.setScale(2, RoundingMode.HALF_EVEN)
     }
 

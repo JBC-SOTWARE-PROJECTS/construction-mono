@@ -11,7 +11,6 @@ import AssetTable from "@/components/inventory/assets/masterfile/assetTable";
 import { AssetStatus, AssetType, Assets } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import UpsertAssetModal from "@/components/inventory/assets/dialogs/upsertAssetModal";
-import ItemSelector from "@/components/inventory/itemSelector";
 import _ from "lodash";
 import useGetAssets from "@/hooks/asset/useGetAssets";
 

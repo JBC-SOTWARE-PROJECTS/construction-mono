@@ -16,6 +16,7 @@ const UPSERT_EMPLOYEE_ATTENDANCE = gql`
       employee: $employee
       fields: $fields
       project_id: $project_id
+      isManual: true
     ) {
       success
       message
@@ -36,12 +37,12 @@ const useUpsertEmployeeAttendance = (callBack: () => void) => {
       const data = value?.data || {};
       if (data?.success) {
         message.success(
-          data?.message || "Successfully created department schedule"
+          data?.message || "Successfully added attendance raw log"
         );
 
         if (callBack) callBack();
       } else {
-        message.error(data?.message || "Failed to create department schedule");
+        message.error(data?.message || "Failed to add attendance raw log");
       }
     },
   });

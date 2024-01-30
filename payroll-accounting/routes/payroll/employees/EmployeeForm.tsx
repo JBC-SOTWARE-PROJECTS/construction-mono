@@ -20,6 +20,7 @@ import {
   Col,
   Divider,
   Form,
+  Input,
   Modal,
   Row,
   Skeleton,
@@ -29,7 +30,7 @@ import dayjs from "dayjs";
 import _ from "lodash";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const GET_RECORDS = gql`
   query ($id: UUID) {
@@ -82,6 +83,7 @@ const GET_RECORDS = gql`
       monthlyRate
       hourlyRate
       isFixedRate
+      isDisabledWithholdingTax
       isExcludedFromAttendance
       user {
         login
@@ -158,8 +160,8 @@ const UPSERT_RECORD = gql`
 `;
 
 const CHANGE_PASSWORD = gql`
-  mutation ChangePassword($username: String) {
-    newPassword: changePassword(username: $username)
+  mutation ChangePassword($username: String, $password: String) {
+    newPassword: changePassword(username: $username, password: $password)
   }
 `;
 
@@ -222,13 +224,11 @@ const EmployeeForm = ({ account }: IPageProps) => {
     {
       ignoreResults: false,
       onCompleted: (data) => {
+        refetch();
         Modal.info({
           title: "Success",
           icon: <InfoCircleOutlined />,
-          content:
-            "The temporary password is " +
-            data.newPassword +
-            ". Please copy and email this to the user",
+          content: "Password successfully changed",
           onOk() {},
           onCancel() {},
         });
@@ -290,17 +290,37 @@ const EmployeeForm = ({ account }: IPageProps) => {
     }
   };
 
+  const passwordRef = useRef(null as any);
+  const password2Ref = useRef(null as any);
+
   const changePassword = (login: any) => {
-    Modal.confirm({
-      title: "Change Password Confirmation?",
-      content: "Please Confirm to reset Password",
-      icon: <ExclamationCircleOutlined />,
-      onOk() {
-        changePasswordNow({
-          variables: {
-            username: login,
-          },
-        });
+    Modal.info({
+      icon: null,
+      title: "Change Password",
+      content: (
+        <>
+          <label>New Password</label>
+          <Input ref={passwordRef} type="password" />
+          <label>Re-enter New Password</label>
+          <Input ref={password2Ref} type="password" />
+        </>
+      ),
+      okText: "Confirm",
+      cancelText: "Cancel",
+      onOk: (close) => {
+        if (
+          passwordRef.current.input.value !== password2Ref.current.input.value
+        ) {
+          message.warning("Passwords do not match.");
+        } else {
+          changePasswordNow({
+            variables: {
+              username: login,
+              password: passwordRef.current.input.value,
+            },
+          });
+          close();
+        }
       },
       onCancel() {},
     });
@@ -384,9 +404,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                 <Col {...col4}>
                   <FormDatePicker
                     label={"Date of Birth"}
-                    rules={[
-                      { required: true, message: "This Field is required" },
-                    ]}
                     initialValue={dayjs(_?.get(data, "emp.dob"))}
                     name="dob"
                     propsdatepicker={{}}
@@ -468,9 +485,6 @@ const EmployeeForm = ({ account }: IPageProps) => {
                 <Col {...col4}>
                   <FormSelect
                     label={"Civil/Marital Status"}
-                    rules={[
-                      { required: true, message: "This Field is required" },
-                    ]}
                     initialValue={_.get(data, "emp.civilStatus")}
                     name="civilStatus"
                     propsselect={{
@@ -769,6 +783,15 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     }}
                   />
                 </Col>
+                <Col {...col4}>
+                  <FormCheckBox
+                    name="isDisabledWithholdingTax"
+                    valuePropName="checked"
+                    checkBoxLabel="Disable Withholding Tax"
+                    initialValue={_.get(data, "emp.isDisabledWithholdingTax")}
+                    propscheckbox={{}}
+                  />
+                </Col>
                 {/* 9th Row */}
                 <Divider>In Case of Emergency</Divider>
                 <Col {...col2}>
@@ -816,61 +839,33 @@ const EmployeeForm = ({ account }: IPageProps) => {
                         <FormInput
                           label={"Username"}
                           name="login"
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
                           propsinput={{ placeholder: "username (e.g jdcruz)" }}
                         />
                       </Col>
                     ) : (
-                      <Col {...col2}>
+                      <Col
+                        {...{
+                          xl: 4,
+                          lg: 4,
+                          md: 4,
+                          sm: 24,
+                          xs: 24,
+                        }}
+                      >
                         <FormInput
                           label={"Username"}
                           name="login"
                           initialValue={_.get(data, "emp.user.login")}
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
                           propsinput={{ placeholder: "username (e.g jdcruz)" }}
                         />
                       </Col>
                     )}
 
-                    {_.isEmpty(_.get(data, "emp.user")) ? (
+                    {_.isEmpty(_.get(data, "emp.user")) && (
                       <Col {...col3}>
                         <FormInput
                           label={"Password"}
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
                           name="password"
-                          propsinput={{
-                            placeholder: "Password",
-                            type: "password",
-                          }}
-                        />
-                      </Col>
-                    ) : (
-                      <Col {...col2}>
-                        <FormInput
-                          label={"Password"}
-                          // rules={[
-                          //   {
-                          //     required: true,
-                          //     message: "This Field is required",
-                          //   },
-                          // ]}
-                          name="password"
-                          initialValue={_.get(data, "emp.user.password")}
                           propsinput={{
                             placeholder: "Password",
                             type: "password",
@@ -892,7 +887,17 @@ const EmployeeForm = ({ account }: IPageProps) => {
                       </Col>
                     )}
                     {/* 12th Row */}
-                    <Col {...col2}>
+                    <Col
+                      {...(_.isEmpty(_.get(data, "emp.user"))
+                        ? col2
+                        : {
+                            xl: 10,
+                            lg: 10,
+                            md: 10,
+                            sm: 24,
+                            xs: 24,
+                          })}
+                    >
                       <FormSelect
                         label={"Roles"}
                         name="authorities"
@@ -904,7 +909,17 @@ const EmployeeForm = ({ account }: IPageProps) => {
                         }}
                       />
                     </Col>
-                    <Col {...col2}>
+                    <Col
+                      {...(_.isEmpty(_.get(data, "emp.user"))
+                        ? col2
+                        : {
+                            xl: 10,
+                            lg: 10,
+                            md: 10,
+                            sm: 24,
+                            xs: 24,
+                          })}
+                    >
                       <FormSelect
                         label={"Permissions"}
                         name="permissions"
@@ -940,6 +955,7 @@ const EmployeeForm = ({ account }: IPageProps) => {
                         },
                         btnlabel: "Change Password",
                         icon: <LockOutlined />,
+                        htmlType: "button",
                       }}
                     />
                   )}

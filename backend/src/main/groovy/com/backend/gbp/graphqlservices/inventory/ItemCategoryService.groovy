@@ -84,7 +84,7 @@ class ItemCategoryService extends AbstractDaoService<ItemCategory> {
         upsertFromMap(id, fields, { ItemCategory entity, boolean forInsert ->
             if(forInsert){
                 entity.categoryCode = generatorService.getNextValue(GeneratorType.CATCODE, {
-                    return "CAT-" + StringUtils.leftPad(it.toString(), 6, "0")
+                    return StringUtils.leftPad(it.toString(), 6, "0")
                 })
                 entity.company = company
             }

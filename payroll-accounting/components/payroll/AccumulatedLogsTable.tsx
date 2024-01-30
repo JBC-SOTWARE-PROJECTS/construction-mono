@@ -70,6 +70,14 @@ function AccumulatedLogsTable({
       !record?.outTime
     );
   };
+  const accumulatedLogsMessage = {
+    NO_SCHEDULE: "No Schedule",
+    ABSENT: "Absent",
+    HOLIDAY: "Holiday",
+    LEAVE: "Leave",
+    NO_TIME_IN: "No Time-in",
+    NO_TIME_OUT: "No TIme-out",
+  };
 
   const render = (value: any, record: AccumulatedLogs) => {
     if (
@@ -115,7 +123,7 @@ function AccumulatedLogsTable({
             {record?.message && (
               <>
                 <Tag color={record.isError ? "red" : "blue"}>
-                  {record?.message}
+                  {accumulatedLogsMessage[record?.message]}
                 </Tag>
                 {record?.message == AccumulatedLogsMessage.Leave &&
                   record?.hours?.regular > 0 && (

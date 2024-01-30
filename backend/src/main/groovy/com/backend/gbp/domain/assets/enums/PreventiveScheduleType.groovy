@@ -4,5 +4,6 @@ enum PreventiveScheduleType {
     DAILY,
     WEEKLY,
     MONTHLY,
-    YEARLY
+    YEARLY,
+    KILOMETERS
 }

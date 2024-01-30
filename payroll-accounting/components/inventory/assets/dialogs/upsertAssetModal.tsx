@@ -17,7 +17,7 @@ import { FormCheckBox, FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { UPSERT_ASSET_RECORD } from "@/graphql/assets/queries";
 
-import ItemSelector from "@/components/inventory/itemSelector";
+
 import FixedAssetSelector from "@/components/inventory/fixedAssetSelector";
 import { useMutation, useQuery } from "@apollo/client";
 import { useDialog } from "@/hooks";
@@ -30,13 +30,14 @@ interface IProps {
 
 export default function UpsertAssetModal(props: IProps) {
   const { hide, record } = props;
+  console.log("asset",record )
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const showItems = useDialog(FixedAssetSelector);
   const [selectedItem, setSelectedItem] = useState<FixedAssetItems>();
 
   useEffect(() => {
     if (record) {
-      setSelectedItem(record?.item as FixedAssetItems);
+      setSelectedItem(record?.fixedAssetItem as FixedAssetItems);
     }
   }, [record]);
 
@@ -57,7 +58,7 @@ export default function UpsertAssetModal(props: IProps) {
       { defaultSelected: [], defaultKey: [], isSingleSelection: true },
       (newItem: FixedAssetItems) => {
         if (!_.isEmpty(newItem)) {
-          console.log("newItem", newItem)
+      
           setSelectedItem(newItem);
         }
       }

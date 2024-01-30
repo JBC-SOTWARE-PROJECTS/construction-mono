@@ -487,34 +487,6 @@ th.ant-table-cell {
   padding: 0 !important;
 }
 
-/* responsive */
-
-@media screen and (max-width: 767px) {
-  .project-page-header {
-    padding-inline-start: 10px;
-    padding-inline-end: 10px;
-  }
-
-  .project-details .ant-pro-page-container-children-container {
-    padding-inline: 10px !important;
-  }
-}
-
-@media screen and (max-width: 756px) {
-  .billing-info-width {
-    font-weight: 700;
-    width: 100%;
-  }
-
-  .billing-flex-div {
-    display: block;
-  }
-
-  .billing-info-value {
-    width: 100%;
-  }
-}
-
 .px-5 {
   padding-left: 20px;
   padding-right: 20px;
@@ -537,4 +509,109 @@ th.ant-table-cell {
 
 .ant-image-preview-mask {
   background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* responsive here onwards */
+
+@media screen and (max-width: 767px) {
+  .project-page-header {
+    padding-inline-start: 5px !important;
+    padding-inline-end: 5px !important;
+  }
+
+  .ant-pro-page-container .ant-pro-page-container-warp-page-header {
+    padding-inline-start: 5px !important;
+    padding-inline-end: 5px !important;
+  }
+
+  .my-prefix-layout .my-prefix-layout-content {
+    padding-inline: 5px !important;
+  }
+
+  .ant-pro-page-container-children-container {
+    padding-inline: 5px !important;
+  }
+}
+
+@media screen and (max-width: 756px) {
+  .billing-info-width {
+    font-weight: 700;
+    width: 100%;
+  }
+
+  .billing-flex-div {
+    display: block;
+  }
+
+  .billing-info-value {
+    width: 100%;
+  }
+}
+
+.project-progress-list {
+  display: none;
+}
+
+.project-list-action {
+  display: none;
+}
+
+.upload-justify-between {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media screen and (max-width: 1285px) {
+  .project-list .ant-pro-list-row .ant-pro-list-row-content {
+    display: none !important;
+  }
+
+  .project-progress-content {
+    width: 500px;
+  }
+
+  .project-progress-list {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 921px) {
+  .project-list .ant-pro-list-row .ant-list-item-action {
+    display: none !important;
+  }
+
+  .project-progress-content {
+    width: 100%;
+  }
+
+  .project-list-action {
+    margin-top: 10px;
+    display: flex;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .project-list .ant-pro-list-row .ant-list-item-meta-avatar {
+    display: none !important;
+  }
+
+  .project-list .ant-pro-card-body {
+    padding-inline: 5px !important;
+  }
+
+  .upload-justify-between {
+    display: block;
+    width: 100%;
+  }
+
+  .upload-switch-action {
+    margin-bottom: 20px;
+  }
+
+  .project-upload .ant-upload-select,
+  .project-upload .ant-upload-select button {
+    width: 100%;
+  }
 }

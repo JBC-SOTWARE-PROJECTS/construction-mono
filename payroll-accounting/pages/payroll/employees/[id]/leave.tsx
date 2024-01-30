@@ -1,4 +1,5 @@
 import EmployeeManagementHeader from "@/components/administrative/employees/EmployeeManagementHeader";
+import { FormDateRange } from "@/components/common";
 import EmployeeDetails from "@/components/common/EmployeeDetails";
 import UpsertEmployeeLeaveModal from "@/components/payroll/employee-management/leave/UpsertEmployeeLeaveModal";
 import {
@@ -8,6 +9,8 @@ import {
 } from "@/graphql/gql/graphql";
 import { useGetEmployeeById } from "@/hooks/employee";
 import useGetEmployeeLeave from "@/hooks/employee-leave/useGetEmployeeLeave";
+import useDateRangeState from "@/hooks/useDateRangeState";
+import usePaginationState from "@/hooks/usePaginationState";
 import { getStatusColor } from "@/utility/helper";
 import { Divider, Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
@@ -16,8 +19,11 @@ import { useRouter } from "next/router";
 
 function EmployeeLoansPage() {
   const router = useRouter();
+  const [state, { onNextPage }] = usePaginationState({}, 0, 25);
+  const [startDate, endDate, handleDateChange] = useDateRangeState();
   const [employee, loadingEmployee] = useGetEmployeeById(router?.query?.id);
-  const [leave, loadingLeave, refetch] = useGetEmployeeLeave();
+  const [leave, loadingLeave, refetch, totalElements, dateCount] =
+    useGetEmployeeLeave(startDate, endDate);
   const columns: ColumnsType<EmployeeLeave> = [
     {
       title: "Created Date",
@@ -30,7 +36,7 @@ function EmployeeLoansPage() {
       render: (value) => value.replace("_", " "),
     },
     {
-      title: "Selecteed Leave Dates",
+      title: "Selected Leave Dates",
       dataIndex: "dates",
       render: (value: SelectedDate[]) => {
         return value?.map((item) => {
@@ -79,12 +85,37 @@ function EmployeeLoansPage() {
         />
       </EmployeeManagementHeader>
       <Divider />
-
       <div style={{ display: "flex", justifyContent: "end", marginBottom: 15 }}>
         <UpsertEmployeeLeaveModal refetch={refetch} />
       </div>
-
-      <Table columns={columns} dataSource={leave} />
+      <FormDateRange
+        name="dateRange"
+        label="Date Range"
+        propsrangepicker={{
+          format: "MMMM D, YYYY",
+          use12Hours: true,
+          onChange: (dates: any) => {
+            handleDateChange(dates);
+          },
+        }}
+      />
+      <Divider style={{ marginTop: 20, marginBottom: 10 }} />
+      <p style={{ fontSize: 20 }}>
+        Total Number of Leave Dates Within Date Range: <b>{dateCount || 0}</b>
+      </p>
+      <br />
+      <Table
+        columns={columns}
+        loading={loadingLeave}
+        dataSource={leave}
+        pagination={{
+          total: totalElements,
+          pageSize: state?.pageSize,
+          current: state.page + 1,
+          onChange: onNextPage,
+          showSizeChanger: true,
+        }}
+      />
     </>
   );
 }

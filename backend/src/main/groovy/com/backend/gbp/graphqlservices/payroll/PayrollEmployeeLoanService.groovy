@@ -75,14 +75,15 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status,
+            @GraphQLArgument(name = "withItems") Boolean withItems
     ) {
         Payroll payroll = payrollRepository.getOne(id)
         return payrollEmployeeLoanRepository.getEmployeesPageable(
                 id,
                 filter,
                 status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
-//                SecurityUtils.currentCompanyId(),
+                withItems,
                 PageRequest.of(page, size))
     }
 
@@ -137,6 +138,14 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
         return new GraphQLResVal<PayrollEmployeeLoan>(employee, true, "Successfully updated employee loan status!")
     }
 
+    @GraphQLMutation(name = "deleteLoanItem")
+    GraphQLResVal<String> deleteLoanItem(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        payrollLoanItemRepository.deleteById(id)
+        return new GraphQLResVal<String>('Success', true, "Successfully updated employee loan status!")
+    }
+
 
     //=========================== Interface Methods ============================
 
@@ -187,11 +196,11 @@ class PayrollEmployeeLoanService extends AbstractPayrollEmployeeStatusService<Pa
                 payrollLoanItem.category = it.category
                 switch (it.category) {
                     case EmployeeLoanCategory.CASH_ADVANCE:
-                        if(!payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount) return
+                        if (!payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount) return
                         payrollLoanItem.amount = payrollEmployee?.employee?.employeeLoanConfig?.cashAdvanceAmount ?: 0
                         break;
                     case EmployeeLoanCategory.EQUIPMENT_LOAN:
-                        if(!payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount) return
+                        if (!payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount) return
                         payrollLoanItem.amount = payrollEmployee?.employee?.employeeLoanConfig?.equipmentLoanAmount ?: 0
                         break;
                 }

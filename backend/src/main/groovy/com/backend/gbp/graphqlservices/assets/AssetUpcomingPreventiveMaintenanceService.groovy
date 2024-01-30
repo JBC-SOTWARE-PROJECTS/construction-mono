@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.assets
 
 import com.backend.gbp.domain.assets.AssetPreventiveMaintenance
 import com.backend.gbp.domain.assets.AssetUpcomingPreventiveMaintenance
+import com.backend.gbp.domain.assets.AssetUpcomingPreventiveMaintenanceKms
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
@@ -52,6 +53,7 @@ class AssetUpcomingPreventiveMaintenanceService extends AbstractDaoService<Asset
 
 
     }
+
 
 
 

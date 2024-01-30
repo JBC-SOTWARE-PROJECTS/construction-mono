@@ -79,7 +79,11 @@ interface variables {
 
 function PayrollContributionsPage() {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
   const [activeTab, setActiveTab] = useState<string>("ALL");
 
   const [contribution, loadingContribution, refetchContribution] =
@@ -89,7 +93,10 @@ function PayrollContributionsPage() {
   });
 
   const [updateContributionStatus, loadingContributionStatus] =
-    useUpdateContributionTypeStatus(() => refetchContribution());
+    useUpdateContributionTypeStatus(() => {
+      refetchContribution();
+      refetch();
+    });
 
   const [updateStatus, loadingUpdateStatus] =
     useUpdatePayrollContributionStatus(() => {
@@ -255,8 +262,23 @@ function PayrollContributionsPage() {
       title: "Total",
       dataIndex: "total",
       key: "total",
-      render: (text: number) => (
-        <NumeralFormatter value={text} format="0,0.00" />
+      render: (
+        text: number,
+        { sssEE, sssER, sssWispER, sssWispEE, phicEE, phicER, hdmfER, hdmfEE }
+      ) => (
+        <NumeralFormatter
+          value={
+            sssEE +
+            sssER +
+            sssWispER +
+            sssWispEE +
+            phicEE +
+            phicER +
+            hdmfER +
+            hdmfEE
+          }
+          format="0,0.00"
+        />
       ),
     },
     {
@@ -330,9 +352,9 @@ function PayrollContributionsPage() {
         loading={loading || loadingContribution || loadingContributionStatus}
         size={"small"}
         dataSource={data?.response?.content}
-        total={data?.totalElements}
+        total={data?.response?.totalElements}
         pageSize={state.size}
-        onChange={() => {}}
+        onChangePagination={onNextPage}
         current={state.page}
         rowKey={rowKey}
       />
@@ -402,7 +424,7 @@ function PayrollContributionsPage() {
         }
       />
 
-      <PayrollEmployeeFilter onQueryChange={onQueryChange} />
+      <PayrollEmployeeFilter onQueryChange={onQueryChange} withItems={false} />
 
       <Tabs
         defaultActiveKey="ALL"

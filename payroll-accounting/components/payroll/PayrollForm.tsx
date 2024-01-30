@@ -39,6 +39,7 @@ import { IState } from "@/routes/payroll/employees";
 import usePaginationState from "@/hooks/usePaginationState";
 import FormSelect from "../common/formSelect/formSelect";
 import FormInputNumber from "../common/formInputNumber/formInputNumber";
+import EmployeeFilter from "../common/EmployeeFilter";
 const initialState: IState = {
   filter: "",
   status: true,
@@ -57,13 +58,13 @@ export const PayrollFormUsage = {
 interface IProps {
   usage: string;
 }
+
 function PayrollForm({ usage }: IProps) {
   const [form] = useForm();
   const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>([]);
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<Key[]>([]);
   const [state, { onNextPage }] = usePaginationState(initialState, 0, 25);
-
   const [_, loadingPayrollEmployees] = useGetPayrollHRMEmployees(
     usage,
     (result) => {
@@ -84,8 +85,7 @@ function PayrollForm({ usage }: IProps) {
     });
   });
 
-  const [employees, loadingEmployees] = useGetEmployeesByFilter({
-    variables: state,
+  const [employees, loadingEmployees, setFilters] = useGetEmployeesByFilter({
     fetchPolicy: "network-only",
   });
 
@@ -258,15 +258,17 @@ function PayrollForm({ usage }: IProps) {
               >
                 View Selected ({selectedEmployees?.length})
               </EmployeeDrawer>
-
-              <EmployeeTable
-                dataSource={employees as Employee[]}
-                loading={loadingEmployees}
-                changePage={onNextPage}
-                hideExtraColumns
-                rowSelection={rowSelection}
-              />
             </Form>
+            <EmployeeFilter setFilters={setFilters} />
+            <br />
+            <br />
+            <EmployeeTable
+              dataSource={employees as Employee[]}
+              loading={loadingEmployees}
+              changePage={onNextPage}
+              hideExtraColumns
+              rowSelection={rowSelection}
+            />
           </Spin>
         </ProCard>
       </AccessControl>

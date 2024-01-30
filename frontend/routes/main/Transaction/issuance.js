@@ -25,10 +25,11 @@ import FilterSelect from "../../../util/customForms/filterSelect";
 import moment from "moment";
 import IssuanceForm from "./dialogs/issuanceForm";
 import PostIssuance from "../postDialogs/postIssuance";
+import { getUrlPrefix } from "../../../shared/global";
 
 const { Search } = Input;
 const { confirm } = Modal;
-const options = ["Edit", "Post", "Void"];
+const options = ["Edit", "Post", "Void", "Print"];
 
 //graphQL Queries
 const GET_RECORDS = gql`
@@ -53,6 +54,10 @@ const GET_RECORDS = gql`
         }
         issueType
         issued_by {
+          id
+          fullName
+        }
+        received_by {
           id
           fullName
         }
@@ -154,6 +159,9 @@ const IssuanceContent = ({ account }) => {
     if (option === "Void") {
       result = !record?.isPosted;
     }
+    if (option === "Print" && record.issueType === "EXPENSE") {
+      result = true;
+    }
     return result;
   };
 
@@ -166,6 +174,10 @@ const IssuanceContent = ({ account }) => {
           showPostModal({ show: true, myProps: record });
         } else if (e.key === "Void") {
           _approve(record?.id, false, "void");
+        } else if (e.key === "Print") {
+          window.open(
+            `${getUrlPrefix()}/reports/inventory/print/issue_report/${record.id}`
+          );
         }
       }}
     >

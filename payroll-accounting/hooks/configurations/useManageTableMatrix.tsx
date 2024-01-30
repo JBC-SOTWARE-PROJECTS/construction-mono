@@ -42,8 +42,9 @@ const useManageTableMatrix = ({ upsertGQL, queryGQL, initialValues }: any) => {
           refetch();
         }
       },
-      onError: () => {
-        message.error("Something went wrong. Please try again later.");
+      onError: (e) => {
+        console.log(e);
+        // message.error("Something went wrong. Please try again later.");
       },
     }
   );
@@ -54,7 +55,7 @@ const useManageTableMatrix = ({ upsertGQL, queryGQL, initialValues }: any) => {
       isEditable: true,
       ...(type ? { type } : {}),
     };
-    // setEditableRow(row);
+    setEditableRow(row);
     setDataSource([row, ...dataSource]);
   };
 
@@ -82,7 +83,7 @@ const useManageTableMatrix = ({ upsertGQL, queryGQL, initialValues }: any) => {
       );
       return;
     }
-
+    console.log(editableRow);
     upsert({
       variables: {
         fields: editableRow,

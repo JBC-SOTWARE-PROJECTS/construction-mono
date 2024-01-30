@@ -90,7 +90,7 @@ function LeaveManagementComponent({ account }: IPageProps) {
       render: (value) => value?.replace("_", " "),
     },
     {
-      title: "Selecteed Leave Dates",
+      title: "Selected Leave Dates",
       dataIndex: "dates",
       render: (value: SelectedDate[]) => {
         return value?.map((item) => {

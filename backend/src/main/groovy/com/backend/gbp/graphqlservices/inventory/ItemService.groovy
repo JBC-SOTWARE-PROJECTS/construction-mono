@@ -7,6 +7,7 @@ import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.BrandDto
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
+import com.backend.gbp.services.GeneratorType
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -86,7 +87,7 @@ class ItemService extends AbstractDaoService<Item> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def company = SecurityUtils.currentCompanyId()
-        String query = '''Select e from Item e where lower(e.descLong) like lower(concat('%',:name,'%')) and e.company = :company'''
+        String query = '''Select e from Item e where lower(e.descLong) like lower(:name) and e.company = :company'''
         Map<String, Object> params = new HashMap<>()
         params.put('name', name)
         params.put('company', company)
@@ -127,18 +128,23 @@ class ItemService extends AbstractDaoService<Item> {
 
 		String query = '''Select inv from Item inv where
 						(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-						lower(inv.sku) like lower(concat('%',:filter,'%')) or
-						lower(inv.brand) like lower(concat('%',:brand,'%')))'''
+						lower(inv.sku) like lower(concat('%',:filter,'%')))'''
 
 		String countQuery = '''Select count(inv) from Item inv where
 							(lower(inv.descLong) like lower(concat('%',:filter,'%')) or
-							lower(inv.sku) like lower(concat('%',:filter,'%')) or
-						lower(inv.brand) like lower(concat('%',:brand,'%')))'''
+							lower(inv.sku) like lower(concat('%',:filter,'%')))'''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
-        params.put('brand', brand)
-		if (group) {
+
+
+        if (brand) {
+            query += ''' and (inv.brand = :brand)'''
+            countQuery += ''' and (inv.brand = :brand)'''
+            params.put('brand', brand)
+        }
+
+        if (group) {
 			query += ''' and (inv.item_group.id = :group)'''
 			countQuery += ''' and (inv.item_group.id = :group)'''
 			params.put("group", group)
@@ -258,7 +264,34 @@ class ItemService extends AbstractDaoService<Item> {
         }else{
             upsertFromMap(id, fields, { Item entity, boolean forInsert ->
                 if(forInsert){
+                    String prefix = (entity.item_category.prefixCode ?: "").toString()
+                    String generic = (entity.item_generics.genericCode ?: "").toString()
+
+                    String lastCodeNumber = "${prefix}${generic}".toString()
+                    def lastCodeGenerator = generatorService.getCustomGenerate(lastCodeNumber, {
+                        return StringUtils.leftPad(it.toString(), 4, "0")
+                    })
+                    if(entity.sku){
+                        entity.itemCode = "${prefix}${generic}${lastCodeGenerator}".toString()
+                    }else{
+                        entity.sku = "${prefix}${generic}${lastCodeGenerator}".toString()
+                        entity.itemCode = "${prefix}${generic}${lastCodeGenerator}".toString()
+                    }
                     entity.company = company
+                }else {
+                    if((entity.itemCode ?: "").isEmpty()){
+                        String prefix = (entity.item_category.prefixCode ?: "").toString()
+                        String generic = (entity.item_generics.genericCode ?: "").toString()
+
+                        String lastCodeNumber = "${prefix}${generic}".toString()
+                        def lastCodeGenerator = generatorService.getCustomGenerate(lastCodeNumber, {
+                            return StringUtils.leftPad(it.toString(), 4, "0")
+                        })
+                        entity.itemCode = "${prefix}${generic}${lastCodeGenerator}".toString()
+                        if((entity.sku ?: "").isEmpty()){
+                            entity.sku = "${prefix}${generic}${lastCodeGenerator}".toString()
+                        }
+                    }
                 }
             })
             if(id){

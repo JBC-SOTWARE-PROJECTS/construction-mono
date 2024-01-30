@@ -112,6 +112,24 @@ export default function BillQuantitesTable({
       },
     },
     {
+      title: "Item No",
+      dataIndex: "itemNo",
+      key: "itemNo",
+      width: 80,
+      align: "center",
+      render: (itemNo, record) => {
+        if (record.status) {
+          return <span>{itemNo}</span>;
+        } else {
+          return (
+            <Text delete type="danger">
+              {itemNo}
+            </Text>
+          );
+        }
+      },
+    },
+    {
       title: "Description",
       dataIndex: "description",
       key: "description",
@@ -191,6 +209,24 @@ export default function BillQuantitesTable({
           return (
             <Text delete type="danger">
               {NumberFormater(totalCost)}
+            </Text>
+          );
+        }
+      },
+    },
+    {
+      title: "RW (%)",
+      dataIndex: "relativeWeight",
+      key: "relativeWeight",
+      width: 80,
+      align: "center",
+      render: (relativeWeight, record) => {
+        if (record.status) {
+          return <span>{NumberFormater(relativeWeight) + "%"}</span>;
+        } else {
+          return (
+            <Text delete type="danger">
+              {NumberFormater(relativeWeight) + "%"}
             </Text>
           );
         }

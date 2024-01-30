@@ -42,7 +42,9 @@ interface IProps {
 export default function UpsertItemModal(props: IProps) {
   const { hide, record } = props;
   const [form] = Form.useForm();
-  const [groupId, setGroupId] = useState<string | null>(record?.item_group ? record?.item_group?.id : null);
+  const [groupId, setGroupId] = useState<string | null>(
+    record?.item_group ? record?.item_group?.id : null
+  );
   const { setFieldValue } = form;
   // ===================== Queries ==============================
   const groups = useItemGroups();
@@ -63,8 +65,8 @@ export default function UpsertItemModal(props: IProps) {
       onCompleted: (data) => {
         if (data?.upsertItem?.success) {
           hide(data?.upsertItem?.message);
-        }else{
-          message.error(data?.upsertItem?.message)
+        } else {
+          message.error(data?.upsertItem?.message);
         }
       },
     }
@@ -177,7 +179,6 @@ export default function UpsertItemModal(props: IProps) {
           <Col {...responsiveColumn4}>
             <FormInput
               name="sku"
-              rules={requiredField}
               label="SKU/Barcode"
               propsinput={{
                 placeholder: "SKU/Barcode",
@@ -187,10 +188,10 @@ export default function UpsertItemModal(props: IProps) {
           <Col {...responsiveColumn4}>
             <FormInput
               name="itemCode"
-              rules={requiredField}
               label="Stock Code"
               propsinput={{
-                placeholder: "Stock Code",
+                placeholder: "Stock Code (Auto Generated)",
+                disabled: true,
               }}
             />
           </Col>
@@ -388,7 +389,7 @@ export default function UpsertItemModal(props: IProps) {
             <FormCheckBox
               name="fixAsset"
               valuePropName="checked"
-              checkBoxLabel="Set as Fix Asset"
+              checkBoxLabel="Set as Fixed Asset"
               propscheckbox={{
                 defaultChecked: false,
               }}

@@ -194,7 +194,7 @@ export default function APJournalEntries(props: IProps) {
               credit: 0.0,
             };
           });
-          console.log("mapped", mapped);
+
           setLedger(mapped);
         }
       }

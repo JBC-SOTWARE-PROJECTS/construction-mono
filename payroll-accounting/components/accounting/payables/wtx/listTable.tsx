@@ -158,7 +158,7 @@ export default function WTXListTable({
             icon={<ReconciliationOutlined />}
             disabled={_.isEmpty(props.selected) || _.isEmpty(supplier?.value)}
             onClick={onConsolidate}>
-            Considate 2307
+            Consolidate 2307
           </Button>
         </div>
       </Col>
