@@ -1,4 +1,4 @@
-import { Assets, Employee, VehicleUsageMonitoring } from "@/graphql/gql/graphql";
+import { Assets, Employee, VehicleUsageEmployee, VehicleUsageMonitoring } from "@/graphql/gql/graphql";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -29,12 +29,9 @@ import useGetEmployeesBasic from "@/hooks/employee/useGetEmployeesBasic";
 import { ColumnsType } from "antd/es/table";
 import { DataType } from "@/components/accountReceivables/invoice/form/types";
 import { FAEditableContext } from "@/components/accounting/fixed-asset/dialogs/create-multi-fixed-asset/table";
+import VehicleUsageEmployeeTable from "../masterfile/vehicleUsageEmployee";
 type EditableTableProps = Parameters<typeof Table>[0]
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined> 
-
-interface EditableRowProps {
-  index: number
-}
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -42,16 +39,6 @@ interface IProps {
   projectOpts: any
 }
 
-const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
-  const [form] = Form.useForm()
-  return (
-    <Form form={form} component={false}>
-      {/* <FAEditableContext.Provider value={form}> */}
-        <tr {...props} />
-      {/* </FAEditableContext.Provider> */}
-    </Form>
-  )
-}
 const defRec = {
   usagePurpose :null,
   route: null,
@@ -68,7 +55,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   const { hide, record, projectOpts } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [initRecord, setinitRecord] = useState<VehicleUsageMonitoring | null>(null);
-  const [selectedEmps, setSelectedEmps] = useState<Employee[]>([]);
+  const [selectedEmps, setSelectedEmps] = useState<VehicleUsageEmployee[]>([]);
   const router = useRouter();
   moment.locale('en')
   
@@ -115,6 +102,18 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     payload.asset = assetType?.id;
     payload.project = values?.projectId;
 
+    var usageEmps = selectedEmps.map((record: VehicleUsageEmployee)=> {
+      return {
+        ...record, ...{
+          employee : record.employee?.id,
+          asset : record.asset?.id,
+          item: record.item?.id
+        }
+      }
+    })
+      console.log("usageEmps", usageEmps)
+     
+
       showPasswordConfirmation(() => {
         upsert({
           variables: {
@@ -123,6 +122,10 @@ export default function UpsertVehicleUsageModal(props: IProps) {
           },
         });
       });
+
+
+     
+     
     
   };
 
@@ -132,44 +135,14 @@ export default function UpsertVehicleUsageModal(props: IProps) {
 
   const [employeeList, loading, setFilters] = useGetEmployeesBasic();
 
-  // const columns: ColumnsType<Employee> = 
-  // [
-    
-  //   {
-  //     title: "Name",
-  //     dataIndex: "fullName",
-  //     key: "fullName",
-  //     editable: true
-  //   }]
+
+  const handleSelected = (record : VehicleUsageEmployee[])=>{
+    console.log("handleSelected", record)
+    setSelectedEmps(record)
+  }
  
-  const defaultColumns: (ColumnTypes[number] & {
-    editable?: boolean
-    dataIndex: string
-  })[] = 
-    [
-  {
-    title: "Name",
-    dataIndex: "fullName",
-    key: "fullName",
-    editable: true
-  }]
 
 
-  const columns = defaultColumns.map((col) => {
-    if (!col.editable) {
-      return col
-    }
-    return {
-      ...col,
-      onCell: (record: any) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-      //  handleSave,
-      }),
-    }
-  })
 
   return (
     <Modal
@@ -184,7 +157,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       maskClosable={false}
       open={true}
       width={"100%"}
-      style={{ maxWidth: "800px" }}
+      style={{ maxWidth: "1300px" }}
       onCancel={() => hide(false)}
       footer={
         <Space>
@@ -315,17 +288,31 @@ export default function UpsertVehicleUsageModal(props: IProps) {
             </Col>
        
         </Row>
-
+        {record?<>
         <EmployeeDrawer
         selectedEmployees={employeeList}
         loading={false}
         usage="MULTI"
         onSelect={(selected : Employee[])=>{
          
-          const elementExists =_.filter(selectedEmps, emp => emp.id == selected[0].id);
+          const elementExists =_.filter(selectedEmps, emp => emp.employee?.id == selected[0].id);
         
           if(elementExists.length == 0){
-            setSelectedEmps(_.concat(selectedEmps, selected))
+            dayjs.locale('en');
+           var recEmp : VehicleUsageEmployee[] = selected.map((rec: Employee)=>({
+              employee: rec,
+              company: initRecord.company,
+              item: initRecord.item,
+              asset: initRecord.asset,
+              vehicleUsage: initRecord.id,
+              designation: "DRIVER",
+              timeRenderedEnd: dayjs(new Date()).format("MMMM D, YYYY, h:mm:ss A"),
+              timeRenderedStart: dayjs(new Date()).format("MMMM D, YYYY, h:mm:ss A"),
+              remarks: "N/A",
+           }))
+
+
+            setSelectedEmps(_.concat(selectedEmps, recEmp))
           }
         
         }}
@@ -333,15 +320,11 @@ export default function UpsertVehicleUsageModal(props: IProps) {
           <>Select Employee</>
         </EmployeeDrawer>
 
-
-        <Table
-          rowKey="id"
-          size="small"
-          columns={columns  as ColumnTypes}
-          dataSource={selectedEmps}
-          pagination={false}
-          rowClassName={() => 'editable-row'}
-        />
+      
+        <VehicleUsageEmployeeTable
+        selectedEmps={selectedEmps}
+        handleSelected={handleSelected}
+        />  </>: <></>}
       </Form>
       }
       </>

@@ -43,7 +43,7 @@ class VehicleUsageEmployee extends AbstractAuditingEntity implements Serializabl
 	Instant timeRenderedStart
 
 	@GraphQLQuery
-	@Column(name = "timeRenderedEnd")
+	@Column(name = "time_rendered_end")
 	Instant timeRenderedEnd
 
 	@GraphQLQuery
@@ -63,6 +63,12 @@ class VehicleUsageEmployee extends AbstractAuditingEntity implements Serializabl
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "asset", referencedColumnName = "id")
 	Assets asset
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "vehicle_usage", referencedColumnName = "id")
+	VehicleUsageMonitoring vehicleUsage
 
 	@GraphQLQuery
 	@Column(name = "company")

@@ -91,4 +91,19 @@ export const REGISTERED_FIXED_ASSET_PAGEABLE = gql`
   }
 `
 
+export const UPSERT_ALLOWANCE_ITEM = gql`
+  mutation (
+    $usageId: UUID
+    $employeeList: [VehicleUsageEmployee]
+  ) {
+    data: upsertMultiVehicleUsageEmployee(
+      usageId: $usageId
+      employeeList: $employeeList
+    ) {
+      id
+    }
+  }
+`;
+
+
 
