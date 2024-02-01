@@ -276,7 +276,7 @@ class AccumulatedLogsCalculator {
 
     static BigDecimal getLateHours(Instant scheduleStart, Instant firstIn) {
         BigDecimal lateHours = Duration.between(scheduleStart, firstIn).toMillis() / 3600000.0
-        if (lateHours >= 0) {
+        if (lateHours > 0 && lateHours * 1000 > 900) {
             return lateHours
         } else {
             return 0
@@ -296,7 +296,7 @@ class AccumulatedLogsCalculator {
         Instant consideredIn
         Instant consideredOut
         BigDecimal workedHours
-        Long ALLOWANCE = 60
+        Long ALLOWANCE = 900
         Long scheduleStartLogStartDiff = Duration.between(scheduleStart, logStart).getSeconds()
 
         if (scheduleStartLogStartDiff < ALLOWANCE)

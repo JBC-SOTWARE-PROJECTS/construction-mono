@@ -7,6 +7,7 @@ export interface variables {
   size: number;
   filter: string;
   status: [PayrollEmployeeStatus] | [];
+  withItems?: boolean;
 }
 
 interface IParams {
@@ -26,6 +27,7 @@ const useGetPayrollEmployeeAdjustment = ({
         $size: Int!
         $filter: String
         $status: [PayrollEmployeeStatus]
+        $withItems: Boolean
       ) {
         data: getAdjustmentEmployees(
           payroll: $payroll
@@ -33,6 +35,7 @@ const useGetPayrollEmployeeAdjustment = ({
           size: $size
           filter: $filter
           status: $status
+          withItems: $withItems
         ) {
           content {
             id

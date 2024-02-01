@@ -26,7 +26,6 @@ import { FormCheckBox, FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import { UPSERT_PREVENTIVE_MAINTENANCE_RECORD } from "@/graphql/assets/queries";
 import useGetAssetMaintenanceType from "@/hooks/asset/useGetAssetMaintenanceType";
-import ItemSelector from "@/components/inventory/itemSelector";
 import { useMutation, useQuery } from "@apollo/client";
 import { useDialog } from "@/hooks";
 import _ from "lodash";
@@ -104,7 +103,22 @@ const OccurrenceComponent = ({ schedType }: { schedType: String }) => {
         </Col>
       );
       break;
-    case "YEARLY":
+      case "KILOMETERS":
+        return (
+          <Col span={12}>
+            <FormInput
+              name="occurrence"
+              rules={requiredField}
+              label="Occurrence (Kilometers)"
+              propsinput={{
+                placeholder: "Occurrence",
+                type: "number"
+              }}
+            />
+          </Col>
+        );
+        break;
+      case "YEARLY":
       return (
         <Col span={12}>
           <FormDatePicker
@@ -123,6 +137,8 @@ const OccurrenceComponent = ({ schedType }: { schedType: String }) => {
       break;
   }
 };
+
+
 
 const preventiveSchedOptions = Object.values(PreventiveScheduleType).map(
   (item) => ({
@@ -322,11 +338,28 @@ export default function UpsertPreventiveMaintenanceModal(props: IProps) {
                 <></>
               )}
 
+            {selectedScheduleType == PreventiveScheduleType.Kilometers ? (
+                 <Col span={12}>
+                 <FormInput
+                   name="startBasis"
+                   rules={requiredField}
+                   label="Start basis"
+                   propsinput={{
+                     placeholder: "Start basis",
+                     type: "number"
+                   }}
+                 />
+               </Col>
+              ) : (
+                <></>
+              )}
+
               <Col span={12}>
                 <FormInput
                   name="reminderSchedule"
                   rules={requiredField}
-                  label="Reminder Schedule (Hrs/Days before the occurence)"
+                  label="Reminder Schedule (Hrs/Days/Kms)"
+                  // label="Reminder Schedule (Hrs/Days/Kms before the occurence)"
                   propsinput={{
                     placeholder: "Set reminder schedule",
                   }}

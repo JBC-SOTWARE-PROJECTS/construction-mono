@@ -47,7 +47,11 @@ const initialState: variables = {
 };
 function PayrollAdjustments({ account }: IPageProps) {
   const router = useRouter();
-  const [state, { onQueryChange }] = usePaginationState(initialState, 0, 25);
+  const [state, { onQueryChange, onNextPage }] = usePaginationState(
+    initialState,
+    0,
+    25
+  );
   const [editing, setEditing] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<String>("");
   const amountRef = useRef<any>(null);
@@ -176,15 +180,15 @@ function PayrollAdjustments({ account }: IPageProps) {
           />
         ) : (
           <div
-            onClick={() => {
-              if (adjustment?.status === PayrollStatus.Draft) {
-                setEditing(record.id as string);
-                setEditingField("CATEGORY");
-              }
-            }}
+          // onClick={() => {
+          //   if (adjustment?.status === PayrollStatus.Draft) {
+          //     setEditing(record.id as string);
+          //     setEditingField("CATEGORY");
+          //   }
+          // }}
           >
             {value}{" "}
-            {adjustment?.status === PayrollStatus.Draft && <EditOutlined />}
+            {/* {adjustment?.status === PayrollStatus.Draft && <EditOutlined />} */}
           </div>
         ),
     },
@@ -394,7 +398,7 @@ function PayrollAdjustments({ account }: IPageProps) {
         }}
         total={data?.totalElements}
         pageSize={state.size}
-        onChange={onQueryChange}
+        onChangePagination={onNextPage}
         current={state.page}
         rowKey={(record: any) => {
           return record?.id;

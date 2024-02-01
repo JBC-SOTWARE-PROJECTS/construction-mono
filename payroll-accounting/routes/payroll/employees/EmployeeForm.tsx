@@ -83,6 +83,7 @@ const GET_RECORDS = gql`
       monthlyRate
       hourlyRate
       isFixedRate
+      isDisabledWithholdingTax
       isExcludedFromAttendance
       user {
         login
@@ -780,6 +781,15 @@ const EmployeeForm = ({ account }: IPageProps) => {
                     propscheckbox={{
                       defaultChecked: true,
                     }}
+                  />
+                </Col>
+                <Col {...col4}>
+                  <FormCheckBox
+                    name="isDisabledWithholdingTax"
+                    valuePropName="checked"
+                    checkBoxLabel="Disable Withholding Tax"
+                    initialValue={_.get(data, "emp.isDisabledWithholdingTax")}
+                    propscheckbox={{}}
                   />
                 </Col>
                 {/* 9th Row */}
