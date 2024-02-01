@@ -28,8 +28,9 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     subtitle:
       "From Request to Receipt: Enhancing Inventory Control with Purchase Requests and Orders.",
     icon: <ShoppingOutlined className="diverse-trade-icon" />,
-    path: `${frontEndUrl}/main/transactions/pr`,
-    customPath: true,
+    path: "/inventory/purchases/purchase-request/all",
+    // path: `${frontEndUrl}/main/transactions/pr`,
+    // customPath: true,
   },
   {
     title: "Delivery Receiving  and Returns",
