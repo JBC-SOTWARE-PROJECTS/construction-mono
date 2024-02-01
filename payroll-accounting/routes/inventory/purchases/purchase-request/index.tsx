@@ -28,7 +28,7 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
   const [office, setOffice] = useState<string | null>(null);
   const [state, setState] = useState({
     filter: "",
-    status: true,
+    status: null,
     page: 0,
     size: 10,
   });
