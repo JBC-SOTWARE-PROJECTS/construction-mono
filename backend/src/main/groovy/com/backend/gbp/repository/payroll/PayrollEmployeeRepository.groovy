@@ -92,7 +92,12 @@ where pe.payroll.id = :id"""
     List<PayrollEmployee> getAllPayrollEmpById(@Param("idList") List<UUID> idList);
 
     @Query(
-            value = """
+            value = "SELECT te FROM PayrollEmployee te LEFT JOIN FETCH te.payroll WHERE te.payroll.id =:idList"
+    )
+    List<PayrollEmployee> getPayrollEmpById(@Param("idList") UUID idList);
+  
+@Query(
+value = """
 Select 
 e.fullName as fullName, 
 e.position.description as position,
@@ -127,6 +132,7 @@ and pe.status in :status
             @Param("status") List<PayrollEmployeeStatus> status,
             Pageable pageable
     )
+
 
 
 //
