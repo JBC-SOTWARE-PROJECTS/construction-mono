@@ -132,7 +132,8 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   options: designationOpts,
                   allowClear: true,
                   placeholder: "Select day",
-                  onBlur: save
+                  onBlur: save,
+                  onChange: save
                 }}
                
                  
@@ -209,10 +210,11 @@ interface DataType {
 type ColumnTypes = Exclude<EditableTableProps["columns"], undefined>;
 type Iprops = {
   selectedEmps: VehicleUsageEmployee[];
-  handleSelected: (record : VehicleUsageEmployee[])=>void
+  handleSelected: (record : VehicleUsageEmployee[])=>void;
+  handleDeleted: (deleted : string)=>void
 };
 
-const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected }: Iprops) => {
+const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected, handleDeleted }: Iprops) => {
   const [dataSource, setDataSource] =
     useState<VehicleUsageEmployee[]>(selectedEmps);
 
@@ -220,12 +222,16 @@ const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected }: Iprops) => 
     handleSet(selectedEmps);
   }, [selectedEmps]);
 
-console.log("dataSource", dataSource)
+
 
   const [count, setCount] = useState(2);
 
-  const handleDelete = (employee: string) => {
+  const handleDelete = (employee: string, id: string) => {
     const newData = dataSource.filter((item) => item.employee?.id !== employee);
+    if(id){
+      handleDeleted(id)
+    }
+    
     handleSet(newData);
   };
 
@@ -281,7 +287,7 @@ console.log("dataSource", dataSource)
         dataSource.length >= 1 ? (
           <Popconfirm
             title="Sure to delete?"
-            onConfirm={() => handleDelete(record?.employee?.id)}
+            onConfirm={() => handleDelete(record?.employee?.id, record?.id)}
           >
             <DeleteFilled color="red-6" />
           </Popconfirm>

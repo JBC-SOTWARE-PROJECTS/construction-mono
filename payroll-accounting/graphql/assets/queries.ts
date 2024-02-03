@@ -91,19 +91,22 @@ export const REGISTERED_FIXED_ASSET_PAGEABLE = gql`
   }
 `
 
-export const UPSERT_ALLOWANCE_ITEM = gql`
+export const UPSERT_USAGE_EMPLOYEE_ITEM = gql`
   mutation (
-    $usageId: UUID
-    $employeeList: [VehicleUsageEmployee]
+    $employeeList:[Map_String_ObjectScalar],
+    $usageID: UUID, 
+    $toDelete: [UUID]
   ) {
     data: upsertMultiVehicleUsageEmployee(
-      usageId: $usageId
-      employeeList: $employeeList
+      employeeList: $employeeList,
+      usageID: $usageID,
+      toDelete: $toDelete
     ) {
-      id
+      payload
+      message
+      success
     }
   }
 `;
-
 
 

@@ -15,7 +15,7 @@ import { SaveOutlined } from "@ant-design/icons";
 import { requiredField } from "@/utility/helper";
 import {  FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
-import {  UPSERT_VEHICLE_USAGE_RECORD } from "@/graphql/assets/queries";
+import {  UPSERT_USAGE_EMPLOYEE_ITEM, UPSERT_VEHICLE_USAGE_RECORD } from "@/graphql/assets/queries";
 import { useMutation, useQuery } from "@apollo/client";
 import _, { set } from "lodash";
 import FormDateTimePicker from "@/components/common/formDateTimePicker/formDateTimePicker";
@@ -30,6 +30,8 @@ import { ColumnsType } from "antd/es/table";
 import { DataType } from "@/components/accountReceivables/invoice/form/types";
 import { FAEditableContext } from "@/components/accounting/fixed-asset/dialogs/create-multi-fixed-asset/table";
 import VehicleUsageEmployeeTable from "../masterfile/vehicleUsageEmployee";
+import useGetVehicleUsageEmployee from "@/hooks/asset/useGetVehicleUsageEmployee";
+import { IPMState } from "./vehicleUsageAttachment";
 type EditableTableProps = Parameters<typeof Table>[0]
 type ColumnTypes = Exclude<EditableTableProps['columns'], undefined> 
 
@@ -51,13 +53,30 @@ const defRec = {
   projectId: null
 }
 
+const initialState: IPMState = {
+  filter: "",
+  page: 0,
+  size: 10,
+};
+
+
 export default function UpsertVehicleUsageModal(props: IProps) {
   const { hide, record, projectOpts } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [initRecord, setinitRecord] = useState<VehicleUsageMonitoring | null>(null);
   const [selectedEmps, setSelectedEmps] = useState<VehicleUsageEmployee[]>([]);
+  const [deletedEmps, setDeletedEmps] = useState<string[]>([]);
+  const [statePage, setState] = useState(initialState);
   const router = useRouter();
   moment.locale('en')
+
+  const [dataEmployee, loadingEMPS, refetch] = useGetVehicleUsageEmployee({
+    variables: {
+      ...statePage,
+       usageID: record?.id,
+    },
+    fetchPolicy: "network-only",
+  });
   
   useEffect(() => {
     
@@ -73,6 +92,21 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       setinitRecord(defRec);
     }
   }, [record])
+
+
+  useEffect(() => {
+    
+    if(dataEmployee){
+      var empContent = dataEmployee?.content;
+
+      empContent = empContent.map((record : VehicleUsageEmployee)=>({
+        ...record, 
+        timeRenderedEnd: dayjs(record.timeRenderedEnd).format("MMMM D, YYYY, h:mm:ss A"),
+        timeRenderedStart:  dayjs(record.timeRenderedStart).format("MMMM D, YYYY, h:mm:ss A")
+      }))
+      setSelectedEmps(empContent);
+    }
+  }, [dataEmployee])
   
   const [asset, loadingAsset] = useGetAssetById(router?.query?.id);
   const assetType = asset as Assets
@@ -83,6 +117,21 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       onCompleted: (data) => {
         if (data) {
           hide(data);
+        }
+      },
+    }
+  );
+
+  
+
+  const [upsertUsageEmployee, { loading: upsertUEmpLoading }] = useMutation(
+    UPSERT_USAGE_EMPLOYEE_ITEM,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+       
+        if (data) {
+         console.log("respData", data)
         }
       },
     }
@@ -103,24 +152,42 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     payload.project = values?.projectId;
 
     var usageEmps = selectedEmps.map((record: VehicleUsageEmployee)=> {
-      return {
+      
+      var newProp = {
         ...record, ...{
           employee : record.employee?.id,
           asset : record.asset?.id,
-          item: record.item?.id
+          item: record.item?.id,
+          vehicleUsage : record?.id,
+          timeRenderedEnd: dayjs(record.timeRenderedEnd).millisecond(0),
+          timeRenderedStart: dayjs(record.timeRenderedStart).millisecond(0)
         }
       }
+
+      delete newProp["__typename"];
+
+      return newProp
     })
-      console.log("usageEmps", usageEmps)
+     
      
 
       showPasswordConfirmation(() => {
+        upsertUsageEmployee({
+          variables: {
+           employeeList: usageEmps,
+           usageID: record?.id,
+           toDelete: deletedEmps
+          }
+        })
+
         upsert({
           variables: {
             fields: payload,
             id: record?.id,
           },
         });
+
+       
       });
 
 
@@ -141,7 +208,13 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     setSelectedEmps(record)
   }
  
+  const handleDeleted = (record : string)=>{
+    var allDeleted = deletedEmps;
+    allDeleted.push(record);
+    setDeletedEmps(allDeleted)
+  }
 
+  console.log("deletedEmps", deletedEmps)
 
 
   return (
@@ -324,6 +397,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
         <VehicleUsageEmployeeTable
         selectedEmps={selectedEmps}
         handleSelected={handleSelected}
+        handleDeleted={handleDeleted}
         />  </>: <></>}
       </Form>
       }
