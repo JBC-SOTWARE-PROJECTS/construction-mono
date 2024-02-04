@@ -4,7 +4,7 @@ const theme: ThemeConfig = {
   token: {
     fontSize: 14,
    // colorPrimary: "#399B53",
-    colorPrimary: "#0e153d",
+    colorPrimary: "#ee9f27",
   },
   components: {
     Input: {
@@ -16,7 +16,9 @@ const theme: ThemeConfig = {
       // itemSelectedColor: "white",
     },
     Button: {
-      colorPrimary: "#0e153d",
+      colorPrimary: "#dc6601" //darker orange
+     // colorPrimary: "#ee9f27", //logo orange
+      //colorPrimary: "#0e153d",
       //colorPrimary: "#399B53",
     },
   },
