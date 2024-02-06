@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import moment from "moment";
 import { parse } from "path";
 import { integer } from "aws-sdk/clients/cloudfront";
+import CustomButton from "@/components/common/CustomButton";
 
 type IProps = {
   dataSource: AssetPreventiveMaintenance[];
@@ -102,12 +103,13 @@ export default function AssetPreventiveMaintenanceTable({
       fixed: "right",
       render: (_, record) => {
         return (
-          <Button
+          <CustomButton
             icon={<EditOutlined />}
             type="primary"
             onClick={() => {
               handleOpen(record);
             }}
+            allowedPermissions={["manage_pms"]}
           />
         );
       },
