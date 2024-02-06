@@ -12,7 +12,7 @@ class PayslipPayrollDto {
     String empname
     String department
     String payrollCode
-    Instant payPeriod
+    String payPeriod
     Date paycheckdate
     Integer regularNoHrs
     BigDecimal regularRate

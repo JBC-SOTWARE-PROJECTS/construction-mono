@@ -72,7 +72,7 @@
 		<field name="empname" class="java.lang.String"/>
 		<field name="empId" class="java.lang.String"/>
 		<field name="payrollCode" class="java.lang.String"/>
-		<field name="payPeriod" class="java.util.Date"/>
+		<field name="payPeriod" class="java.lang.String"/>
 		<field name="department" class="java.lang.String"/>
 		<field name="paycheckdate" class="java.sql.Date"/>
 		<field name="descriptionField" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
@@ -96,7 +96,7 @@
 		<field name="netpay" class="java.math.BigDecimal"/>
 		<field name="dateprinted" class="java.lang.String"/>
 		<field name="payrollCode" class="java.lang.String"/>
-		<field name="payPeriod" class="java.sql.Date"/>
+		<field name="payPeriod" class="java.lang.String"/>
 		<field name="paycheckdate" class="java.sql.Date"/>
 		<field name="logo" class="java.io.InputStream"/>
 	</subDataset>
@@ -341,7 +341,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="3e85d576-073c-4e2d-a07b-48bef0fb5400"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -512,7 +512,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="10" isPrintWhenDetailOverflows="true" uuid="8606f56a-6d77-4c2a-b030-7652343acdfc"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -533,7 +533,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField isBlankWhenNull="false">
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="10" isPrintWhenDetailOverflows="true" uuid="25a92b63-90bc-4e8b-8fa5-52b322b59a0a"/>
 											<box leftPadding="0">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -612,7 +612,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement positionType="Float" x="0" y="0" width="170" height="10" uuid="ff7b8c53-8179-402a-b26a-730bcdea324f"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -783,7 +783,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement positionType="Float" x="0" y="0" width="60" height="10" uuid="b894bab3-3844-4f88-a153-aafd0cd34fbe"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -883,7 +883,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement positionType="Float" x="0" y="0" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="08000d3d-33dc-43e4-b259-ececbb6f8a88"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1054,7 +1054,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement positionType="Float" x="0" y="0" width="60" height="10" isPrintWhenDetailOverflows="true" uuid="3ff74514-ba8c-4bba-9e29-fdc7eb85c7d1"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1092,7 +1092,7 @@
 								</jr:column>
 							</jr:table>
 						</componentElement>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement positionType="Float" x="280" y="164" width="60" height="12" uuid="f94e11df-8504-4ae0-88e8-83037ba6a150"/>
 							<box>
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1105,7 +1105,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[$F{netpay}]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement positionType="Float" x="280" y="176" width="60" height="12" uuid="f5515208-22ff-4e29-afc7-b75c26055efa"/>
 							<box>
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1247,7 +1247,7 @@
 							</box>
 							<text><![CDATA[]]></text>
 						</staticText>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement x="50" y="50" width="120" height="12" uuid="7ce1a989-67d8-454f-99eb-5a8d9722b9a5"/>
 							<box>
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1260,7 +1260,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[$F{empname}]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement x="50" y="38" width="120" height="12" uuid="9b671ad9-fd29-4026-9b68-550f3e885b03"/>
 							<box>
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1273,7 +1273,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[$F{empId}]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement x="50" y="62" width="120" height="12" uuid="5aae549e-e446-4e5b-a5ab-fea342f1d285"/>
 							<box>
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1348,7 +1348,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="aa6ad87b-d46e-45b7-8d3d-5c48deb58166"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1519,7 +1519,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="10" isPrintWhenDetailOverflows="true" uuid="bb7734fc-a642-4c59-86c4-5d11737fc183"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1540,7 +1540,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="10" isPrintWhenDetailOverflows="true" uuid="0b289cc3-b8cb-4a38-b2bb-32a5236bc7d4"/>
 											<box leftPadding="0">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1619,7 +1619,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="25e24416-ef71-4f51-b4c5-5a500b8f4d55"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1790,7 +1790,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="10" isPrintWhenDetailOverflows="true" uuid="28c30058-64d8-47cc-8161-8e120f5b6077"/>
 											<box leftPadding="0">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1890,7 +1890,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement positionType="Float" x="0" y="0" width="170" height="10" isPrintWhenDetailOverflows="true" uuid="94ce1d77-d85a-4896-b251-61b34e21ff36"/>
 											<box leftPadding="5">
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -2061,7 +2061,7 @@
 											<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 											<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 										</box>
-										<textField>
+										<textField isBlankWhenNull="true">
 											<reportElement positionType="Float" x="0" y="0" width="60" height="10" isPrintWhenDetailOverflows="true" uuid="2d504b8c-5b64-4c31-9abf-e942d844578c"/>
 											<box>
 												<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -2099,7 +2099,7 @@
 								</jr:column>
 							</jr:table>
 						</componentElement>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement positionType="Float" x="280" y="164" width="60" height="12" uuid="2ff72ae9-4045-4782-864b-f39a0e9e5576"/>
 							<box>
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -2112,7 +2112,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[$F{netpay}]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement positionType="Float" x="250" y="176" width="90" height="12" uuid="b8ba32bd-d932-41fe-b8b3-8a2e8aaac705"/>
 							<box leftPadding="5">
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -2245,7 +2245,7 @@
 							</textElement>
 							<text><![CDATA[ Date/Time Printed]]></text>
 						</staticText>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement x="230" y="38" width="110" height="12" uuid="463d8875-0187-46e7-82c4-f77a604f47db"/>
 							<box>
 								<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
