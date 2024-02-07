@@ -9,6 +9,8 @@ import { Button, Card, Divider, Typography } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
+
+const { Meta } = Card;
 import React from "react";
 
 const gridStyle: React.CSSProperties = {
@@ -73,11 +75,18 @@ const ViewEmployee = ({ account }: IPageProps) => {
             }}
           >
             <EmployeeManagementHeader title="Employee Management">
-              <EmployeeDetails
+            <Card
+              hoverable
+              style={{ width: 240, marginBottom: 20 }}
+              cover={<img alt="example" height={200} style={{objectFit: 'cover'}} src="https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=1380&t=st=1707239619~exp=1707240219~hmac=a39f2138ffae5270dd2812f14625ba8cd87ba5782043aba7c2ddc05afb7ec94d" />}
+            >
+              <Meta title={employee?.fullName} description={employee?.position?.description} />
+            </Card>
+              {/* <EmployeeDetails
                 loading={loadingEmployee}
                 fullName={employee?.fullName}
                 position={employee?.position?.description}
-              />
+              /> */}
               <Button
                 icon={<EditOutlined />}
                 type="default"
