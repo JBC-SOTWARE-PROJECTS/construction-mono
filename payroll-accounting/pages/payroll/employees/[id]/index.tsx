@@ -1,17 +1,18 @@
 import AccessManager from "@/components/accessControl/AccessManager";
 import EmployeeManagementHeader from "@/components/administrative/employees/EmployeeManagementHeader";
 import EmployeeDetails from "@/components/common/EmployeeDetails";
+import ProfilePicture from "@/components/payroll/employee-management/documents/profilePicture";
 import { useGetEmployeeById } from "@/hooks/employee";
 import { IPageProps } from "@/utility/interfaces";
-import { EditOutlined, FieldTimeOutlined } from "@ant-design/icons";
+import { EditOutlined, FieldTimeOutlined, LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { ProCard } from "@ant-design/pro-components";
-import { Button, Card, Divider, Typography } from "antd";
+import { Button, Card, Divider, Typography, Upload } from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 const { Meta } = Card;
-import React from "react";
+import React, { useState } from "react";
 
 const gridStyle: React.CSSProperties = {
   width: "33%",
@@ -62,6 +63,7 @@ const ViewEmployee = ({ account }: IPageProps) => {
   const router = useRouter();
   const [employee, loadingEmployee] = useGetEmployeeById(router?.query?.id);
 
+
   return (
     <React.Fragment>
       <Head>
@@ -75,13 +77,7 @@ const ViewEmployee = ({ account }: IPageProps) => {
             }}
           >
             <EmployeeManagementHeader title="Employee Management">
-            <Card
-              hoverable
-              style={{ width: 240, marginBottom: 20 }}
-              cover={<img alt="example" height={200} style={{objectFit: 'cover'}} src="https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=1380&t=st=1707239619~exp=1707240219~hmac=a39f2138ffae5270dd2812f14625ba8cd87ba5782043aba7c2ddc05afb7ec94d" />}
-            >
-              <Meta title={employee?.fullName} description={employee?.position?.description} />
-            </Card>
+            <ProfilePicture record={employee}/>
               {/* <EmployeeDetails
                 loading={loadingEmployee}
                 fullName={employee?.fullName}
