@@ -1,4 +1,4 @@
-package com.hisd3.hismk2.config
+package com.backend.gbp.config
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
