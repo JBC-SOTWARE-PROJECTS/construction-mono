@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react'
 interface props {
   filename: string
   folder: string
-  width: number
+  width: any
   height: number
   key?: number
 }

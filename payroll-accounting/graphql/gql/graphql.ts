@@ -2252,6 +2252,7 @@ export type Employee = {
   philhealthNo?: Maybe<Scalars['String']['output']>;
   pinCode?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Position>;
+  profilePicture?: Maybe<Scalars['String']['output']>;
   shortName?: Maybe<Scalars['String']['output']>;
   sssNo?: Maybe<Scalars['String']['output']>;
   stateProvince?: Maybe<Scalars['String']['output']>;
@@ -2380,6 +2381,7 @@ export type EmployeeInput = {
   philhealthNo?: InputMaybe<Scalars['String']['input']>;
   pinCode?: InputMaybe<Scalars['String']['input']>;
   position?: InputMaybe<PositionInput>;
+  profilePicture?: InputMaybe<Scalars['String']['input']>;
   shortName?: InputMaybe<Scalars['String']['input']>;
   sssNo?: InputMaybe<Scalars['String']['input']>;
   stateProvince?: InputMaybe<Scalars['String']['input']>;
@@ -9919,8 +9921,6 @@ export type Projects = {
   projectStatusColor?: Maybe<Scalars['String']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
-  /** totalExpenses */
-  totalExpenses?: Maybe<Scalars['BigDecimal']['output']>;
   total_cost?: Maybe<Scalars['BigDecimal']['output']>;
   /** totals */
   totals?: Maybe<Scalars['BigDecimal']['output']>;

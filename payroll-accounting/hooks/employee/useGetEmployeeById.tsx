@@ -6,6 +6,7 @@ const GET_RECORDS = gql`
       id
       employeeNo
       fullName
+      profilePicture
       position {
         id
         description
