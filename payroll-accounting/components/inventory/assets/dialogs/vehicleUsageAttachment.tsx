@@ -57,7 +57,6 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
     fetchPolicy: "network-only",
   });
 
-  console.log("vh-data", data?.content);
 
   const handleUpload = (info: any) => {
     const { status } = info.file;

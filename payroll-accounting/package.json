@@ -1,7 +1,5 @@
 {
   "name": "diversetradesuite",
-
-
   "version": "1.2.16",
   "private": true,
   "scripts": {
@@ -20,7 +18,7 @@
     "@ant-design/pro-components": "^2.6.10",
     "@apollo/client": "^3.7.17",
     "amcharts3": "^3.21.15",
-    "antd": "^5.8.6",
+    "antd": "^5.14.0",
     "apollo-link-error": "^1.1.13",
     "aws-sdk": "^2.1528.0",
     "axios": "^1.4.0",
