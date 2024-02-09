@@ -71,7 +71,7 @@ export default function MainMenu({ account }: IPageProps) {
             )}
           </p>
         }
-        type="success"
+        type="info"
         showIcon
         // eslint-disable-next-line jsx-a11y/alt-text
         icon={<img src={logo.src} className="diverse-trade"  />}
