@@ -28,6 +28,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -121,6 +122,7 @@ class EmployeeResource {
         return mobileInitializerDto;
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(method = RequestMethod.POST, value = ['/employee-profile-picture/upload'])
     String uploadEmployeeProfilePic(
             @RequestPart("file") MultipartFile capture,
