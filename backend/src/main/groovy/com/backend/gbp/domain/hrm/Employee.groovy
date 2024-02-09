@@ -64,6 +64,10 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	String lastName
 
 	@GraphQLQuery
+	@Column(name = "profile_picture", columnDefinition = "varchar")
+	String profilePicture
+
+	@GraphQLQuery
 	@Column(name = "middle_name", columnDefinition = "varchar")
 	String middleName
 

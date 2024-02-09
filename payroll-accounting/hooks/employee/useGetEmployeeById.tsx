@@ -6,6 +6,7 @@ const GET_RECORDS = gql`
       id
       employeeNo
       fullName
+      profilePicture
       position {
         id
         description
@@ -16,6 +17,8 @@ const GET_RECORDS = gql`
       }
       emailAddress
       employeeCelNo
+      fullAddress
+      employeeType
       gender
       isActive
     }
