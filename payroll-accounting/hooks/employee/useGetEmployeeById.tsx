@@ -17,6 +17,8 @@ const GET_RECORDS = gql`
       }
       emailAddress
       employeeCelNo
+      fullAddress
+      employeeType
       gender
       isActive
     }

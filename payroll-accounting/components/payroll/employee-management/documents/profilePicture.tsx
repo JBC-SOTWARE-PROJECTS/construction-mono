@@ -15,7 +15,7 @@ type Props = {
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 function ProfilePicture({ record }: Props) {
-  console.log("record", record);
+
   const [imageUrl, setImageUrl] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
@@ -116,6 +116,7 @@ function ProfilePicture({ record }: Props) {
                     folder="EMPLOYEE_PROFILE_PICS"
                     height={200}
                     width={"100%"}
+                    style={{ objectFit: "cover" }}
                   />
                 ) : (
                   <img

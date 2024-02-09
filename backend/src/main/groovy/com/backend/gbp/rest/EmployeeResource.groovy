@@ -136,7 +136,7 @@ class EmployeeResource {
         fieldMap.put("profilePicture", file.getName());
         Employee employeeDocResult = employeeService.upsertMobileData(empRecord.id,fieldMap );
 
-        return employeeDocResult.id.toString();
+        return employeeDocResult.profilePicture;
     }
 
 
