@@ -345,11 +345,13 @@ th.ant-table-cell {
   border-radius: 9999px;
   border-width: 1px;
   /* border-color: #399b53; */
-  border-color: #14213d;
+  border-color: #dc6601;
   width: 48px;
   height: 48px;
-  /* background-color: #399b53; */
-  background-color: #14213d;
+  /* background-color: #399b53; */ /*original color*/
+  /* background-color: #14213d; */ /*blue color*/
+  background-color: #dc6601;
+  
 }
 
 .menu-item-title {
@@ -366,8 +368,9 @@ th.ant-table-cell {
 }
 
 .diverse-trade-icon {
-  color: #ee9f27;
-  /* color: white; */
+  /* color: #14213d; */
+  /* color: #ee9f27; */
+  color: white;
   font-size: 24px;
 }
 
