@@ -4,6 +4,7 @@ package com.backend.gbp.graphqlservices.assets
 import com.backend.gbp.domain.assets.AssetRepairMaintenanceItems
 import com.backend.gbp.domain.inventory.MaterialProductionItem
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.hrm.EmployeeService
 import com.backend.gbp.graphqlservices.inventory.ItemService
 import com.backend.gbp.rest.dto.AssetRepairMaintenanceItemDto
 import com.backend.gbp.rest.dto.PurchaseMPDto
