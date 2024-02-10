@@ -1,7 +1,9 @@
 package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.assets.VehicleUsageMonitoring
 import com.backend.gbp.graphqlservices.CompanySettingsService
+import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.repository.AuthorityRepository
 import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.PermissionRepository
@@ -35,7 +37,9 @@ import javax.transaction.Transactional
 @TypeChecked
 @Component
 @GraphQLApi
-class EmployeeService {
+class EmployeeService  {
+
+
 
     @Autowired
     private UserRepository userRepository
