@@ -7,12 +7,13 @@ import React, { useEffect, useState } from 'react'
 interface props {
   filename: string
   folder: string
-  width: number
+  width: any
   height: number
   key?: number
+  style?: React.CSSProperties
 }
 
-const DOImageViewer = ({ filename, folder, width, height, key }: props) => {
+const DOImageViewer = ({ filename, folder, width, height, key, style }: props) => {
   const [imageURL, setImageURL] = useState<string>('')
 
   useEffect(() => {
@@ -45,6 +46,7 @@ const DOImageViewer = ({ filename, folder, width, height, key }: props) => {
           height={height}
           src={imageURL + '&w=200&quality=50'}
           alt='DigitalOcean Spaces Image'
+          style={style??{}}
         />
       )}
     </div>

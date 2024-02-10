@@ -84,7 +84,7 @@ function PayslipSearchForm({
       >
         <Search
           allowClear
-          style={{ width: '30%', marginBottom: 10 }}
+          style={{ width: '100%', marginBottom: 10 }}
           size='middle'
           placeholder='Search here..'
           className='select-header-list'

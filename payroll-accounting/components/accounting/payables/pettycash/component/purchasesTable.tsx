@@ -572,7 +572,7 @@ export default function PCVPurchaseTable(props: IProps) {
           format={dateFormat}
           placeholder="Enter Value"
           className="w-full"
-          onBlur={(e) => {
+          onBlur={(e : any) => {
             let value = e?.target?.value as string;
             onChangeOthers(value, element, record);
             setEditable((prev: any) => ({
@@ -580,7 +580,7 @@ export default function PCVPurchaseTable(props: IProps) {
               [`${id}${element}`]: false,
             }));
           }}
-          onKeyDown={(e) => {
+          onKeyDown={(e : any) => {
             if (e.key === "Enter") {
               e.preventDefault();
               let value = e.currentTarget.value as string;

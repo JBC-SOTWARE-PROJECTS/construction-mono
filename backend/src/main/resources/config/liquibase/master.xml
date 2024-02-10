@@ -575,4 +575,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/89_asset_roles_and_permissions.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_add_profile_pic_emplpoyee.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

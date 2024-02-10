@@ -11,7 +11,7 @@ group = 'com.backend'
 
 
 
-version = '1.2.15'
+version = '1.2.22'
 sourceCompatibility = '1.8'
 repositories {
 
