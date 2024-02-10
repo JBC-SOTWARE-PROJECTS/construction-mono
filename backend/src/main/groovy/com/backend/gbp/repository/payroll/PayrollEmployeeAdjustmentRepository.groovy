@@ -32,6 +32,7 @@ interface PayrollEmployeeAdjustmentRepository extends JpaRepository<PayrollEmplo
         ea as employee,
         e.fullName as employeeName
     FROM PayrollEmployeeAdjustment ea
+    LEFT JOIN ea.adjustmentItems ai
     LEFT JOIN ea.payrollAdjustment pa  
     LEFT JOIN pa.payroll p  
     LEFT JOIN ea.payrollEmployee pe  
@@ -44,9 +45,12 @@ interface PayrollEmployeeAdjustmentRepository extends JpaRepository<PayrollEmplo
         ea.id,
         ea.status,
         e.fullName
+    HAVING (:withItems = false OR COALESCE(count(ai.amount), 0) != 0)
+    ORDER BY e.fullName
 """, countQuery = """
     SELECT COUNT(DISTINCT ea.id) 
     FROM PayrollEmployeeAdjustment ea
+    LEFT JOIN ea.adjustmentItems ai
     LEFT JOIN ea.payrollAdjustment pa  
     LEFT JOIN pa.payroll p  
     LEFT JOIN ea.payrollEmployee pe  
@@ -56,11 +60,13 @@ interface PayrollEmployeeAdjustmentRepository extends JpaRepository<PayrollEmplo
         and upper(e.fullName) like upper(concat('%',:filter,'%'))
         and ea.status in :status
     GROUP BY ea.id
+    HAVING (:withItems = false OR COALESCE(count(ai.amount), 0) != 0)
 """)
     Page<PayrollEmployeeAdjustmentDto> getEmployeesPageable(
             @Param("payroll") UUID payroll,
             @Param("filter") String filter,
             @Param("status") List<PayrollEmployeeStatus> status,
+            @Param("withItems") Boolean withItems,
             Pageable pageable)
 
     @Query(value = """
@@ -77,6 +83,7 @@ interface PayrollEmployeeAdjustmentRepository extends JpaRepository<PayrollEmplo
     GROUP BY 
         ea.id,
         e.fullName
+    ORDER BY e.fullName
 """)
     List<PayrollEmployeeAdjustmentDto> getEmployeesList(
             @Param("payroll") UUID payroll

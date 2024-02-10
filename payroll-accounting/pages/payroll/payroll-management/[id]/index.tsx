@@ -89,7 +89,11 @@ const ViewPayroll = ({ account }: IPageProps) => {
       description:
         "Manages various deductions, such as healthcare premiums and union dues.",
       show: true,
-      status: "FINALIZED",
+      status:
+        payroll?.timekeeping?.status === PayrollStatus.Finalized &&
+        payroll?.contribution?.status === PayrollStatus.Finalized
+          ? PayrollStatus.Finalized
+          : PayrollStatus.Draft,
     },
     {
       title: "Payroll Payslip",

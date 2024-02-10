@@ -13,6 +13,7 @@ import {
 } from "@/graphql/gql/graphql";
 import { useRouter } from "next/router";
 import moment from "moment";
+import CustomButton from "@/components/common/CustomButton";
 
 type IProps = {
   dataSource: VehicleUsageMonitoring[];
@@ -111,21 +112,23 @@ export default function VehicleUsageMonitoringTable({
         return (
           <Row gutter={5}>
             <Col>
-              <Button
+              <CustomButton
                 icon={<EditOutlined />}
                 type="primary"
                 onClick={() => {
                   handleOpen(record);
                 }}
+                allowedPermissions={["manage_vehicle_usage"]}
               />
             </Col>
             <Col>
-              <Button
+              <CustomButton
                 icon={<PaperClipOutlined />}
                 type="primary"
                 onClick={() => {
                   handleAttachment(record);
                 }}
+                allowedPermissions={["manage_vehicle_usage"]}
               />
             </Col>
           </Row>

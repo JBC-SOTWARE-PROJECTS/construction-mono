@@ -393,6 +393,10 @@ th.ant-table-cell {
   color: rgb(39, 39, 39) !important;
 }
 
+.ant-upload{
+  width: 100% !important;
+}
+
 .billing-info-width {
   font-weight: 700;
   width: 300px;

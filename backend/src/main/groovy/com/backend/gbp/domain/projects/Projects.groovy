@@ -96,8 +96,6 @@ class Projects extends AbstractAuditingEntity implements Serializable, Subaccoun
 	@Column(name = "project_percent")
 	BigDecimal projectPercent
 
-
-
 	@GraphQLQuery
 	@Column(name = "company")
 	UUID company

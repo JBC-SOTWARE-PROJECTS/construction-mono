@@ -4,6 +4,7 @@ import groovy.transform.Canonical
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
 
 import java.sql.Date
+import java.time.Instant
 
 @Canonical
 class PayslipPayrollDto {
@@ -11,7 +12,7 @@ class PayslipPayrollDto {
     String empname
     String department
     String payrollCode
-    Date payPeriod
+    String payPeriod
     Date paycheckdate
     Integer regularNoHrs
     BigDecimal regularRate
@@ -19,11 +20,13 @@ class PayslipPayrollDto {
     JRBeanCollectionDataSource descriptionField
     JRBeanCollectionDataSource deductionField
     JRBeanCollectionDataSource summaryField
+    JRBeanCollectionDataSource  totalNetPay
     Double totalGross
     Double totalDeduction
     Double totalAdjustment
     BigDecimal netpay
     String dateprinted
+    InputStream logo
 
 }
 
@@ -71,8 +74,8 @@ class HeadersDto{
 @Canonical
 class GrossDto {
     String  description
-    BigDecimal nohours
-    BigDecimal rate
+    String nohours
+    String rate
     BigDecimal total
     BigDecimal totalGross
 }
@@ -80,8 +83,8 @@ class GrossDto {
 @Canonical
 class DeductionDto {
     String description
-    BigDecimal nohours
-    BigDecimal rate
+    String nohours
+    String rate
     BigDecimal total
     BigDecimal totalDeduction
 }
@@ -90,9 +93,16 @@ class DeductionDto {
 class  SummaryDto{
     String description
     BigDecimal nohours
-    BigDecimal rate
+    String rate
     BigDecimal total
 }
+
+@Canonical
+class  TotalNetPay{
+    BigDecimal totalNetPay
+}
+
+
 
 
 

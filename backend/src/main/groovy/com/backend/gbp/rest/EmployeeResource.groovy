@@ -2,6 +2,7 @@ package com.backend.gbp.rest
 
 import com.amazonaws.AmazonClientException
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.assets.VehicleUsageDocs
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
 import com.backend.gbp.domain.projects.Projects
@@ -27,6 +28,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -118,6 +120,25 @@ class EmployeeResource {
         mobileInitializerDto.projects = allProjects;
 
         return mobileInitializerDto;
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(method = RequestMethod.POST, value = ['/employee-profile-picture/upload'])
+    String uploadEmployeeProfilePic(
+            @RequestPart("file") MultipartFile capture,
+            @RequestPart("fields") String fields
+    ) {
+        File file = convertMultipartFileToFile(capture);
+        spaceService.uploadFileToSpace(file,"EMPLOYEE_PROFILE_PICS");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Employee empRecord = objectMapper.readValue(fields, Employee.class);
+
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put("profilePicture", file.getName());
+        Employee employeeDocResult = employeeService.upsertMobileData(empRecord.id,fieldMap );
+
+        return employeeDocResult.profilePicture;
     }
 
 

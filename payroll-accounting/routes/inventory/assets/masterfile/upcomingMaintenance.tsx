@@ -48,7 +48,7 @@ export default function UpcomingMaintenance({}: Props) {
   return (
     <>
       <ProCard
-        title={`Upcoming Maintenance`}
+        title={`Upcoming Maintenance By Schedules`}
         headStyle={{
           flexWrap: "wrap",
         }}

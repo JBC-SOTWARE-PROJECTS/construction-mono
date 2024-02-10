@@ -64,6 +64,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
     EmployeeAllowanceRepository employeeAllowanceRepository
 //==============================================Queries==========================================
 
+
     @GraphQLQuery(name = 'getPayrollEmployeeAllowance')
     Page<PayrollEmployeeAllowanceDto> getPayrollEmployeeAllowance(
             @GraphQLArgument(name = "payroll") UUID payroll,
@@ -75,11 +76,6 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
     ) {
         Payroll foundPayroll = null
         payrollRepository.findById(payroll).ifPresent { foundPayroll = it }
-//        if (!foundPayroll) return new GraphQLResVal<Page<PayrollEmployeeAllowanceDto>>(
-//                null,
-//                false,
-//                "Failed to get Payroll Other Deduction Employee List"
-//        )
 
         Page<PayrollEmployeeAllowanceDto> employees = payrollEmployeeAllowanceRepository.findAllByPayrollWithItemsWithTotal(
                 foundPayroll.id,
@@ -91,6 +87,17 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
         return employees
     }
 
+    @GraphQLQuery(name = 'getAllPayrollEmployeeAllowance')
+    List<PayrollEmployeeAllowanceDto> getAllPayrollEmployeeAllowance(
+            @GraphQLArgument(name = "payroll") UUID payroll
+
+    ) {
+        Payroll foundPayroll = null
+        payrollRepository.findById(payroll).ifPresent { foundPayroll = it }
+        return payrollEmployeeAllowanceRepository.getAllByPayroll(
+                foundPayroll.id
+        )
+    }
 
 //==============================================Mutations========================================
     @Override
@@ -137,21 +144,24 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
 
     @GraphQLMutation(name = "upsertPayrollAllowanceItem")
     GraphQLResVal<Boolean> upsertPayrollAllowanceItem(
-            @GraphQLArgument(name = "employeeId") UUID employeeId,
+            @GraphQLArgument(name = "employeeId") List<UUID> employeeId,
             @GraphQLArgument(name = "allowanceId") UUID allowanceId,
             @GraphQLArgument(name = "amount") BigDecimal amount
 
     ) {
         Allowance allowance = allowanceRepository.findById(allowanceId).get()
-        PayrollEmployeeAllowance employee = payrollEmployeeAllowanceRepository.findById(employeeId).get()
-
-        PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
-        allowanceItem.allowance = allowance
-        allowanceItem.name = allowance.name
-        allowanceItem.amount = amount
-        allowanceItem.originalAmount = allowance.amount
-        allowanceItem.payrollEmployeeAllowance = employee
-        payrollAllowanceItemRepository.save(allowanceItem)
+        List<PayrollEmployeeAllowance> employees = payrollEmployeeAllowanceRepository.findAllById(employeeId)
+        List<PayrollAllowanceItem> items = []
+        employees.each {
+            PayrollAllowanceItem allowanceItem = new PayrollAllowanceItem()
+            allowanceItem.allowance = allowance
+            allowanceItem.name = allowance.name
+            allowanceItem.amount = amount
+            allowanceItem.originalAmount = allowance.amount
+            allowanceItem.payrollEmployeeAllowance = it
+            items.push(allowanceItem)
+        }
+        payrollAllowanceItemRepository.saveAll(items)
         return new GraphQLResVal<Boolean>(true, true, "Successfully created employee allowance items")
 
     }

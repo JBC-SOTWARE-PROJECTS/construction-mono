@@ -12,6 +12,7 @@ import UpsertPreventiveMaintenanceModal from "@/components/inventory/assets/dial
 import useGetPreventiveByAsset from "@/hooks/asset/useGetPreventiveByAsset";
 import { useRouter } from "next/router";
 import { AssetPreventiveMaintenance } from "@/graphql/gql/graphql";
+import CustomButton from "@/components/common/CustomButton";
 
 type Props = {};
 const { Search } = Input;
@@ -71,13 +72,14 @@ export default function PreventiveMaintenance({}: Props) {
               onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
               className="w-full"
             />
-            <Button
+            <CustomButton
               type="primary"
               icon={<PlusCircleOutlined />}
               onClick={() => onUpsertRecord()}
+              allowedPermissions={["manage_pms"]}
             >
               Create New
-            </Button>
+            </CustomButton>
           </ProFormGroup>
         }
       >

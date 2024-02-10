@@ -65,11 +65,6 @@ class ProjectService extends AbstractDaoService<Projects> {
         return projectMaterialService.getTotalMaterials(projects.id)
     }
 
-    @GraphQLQuery(name = "totalExpenses", description = "totalExpenses")
-    BigDecimal totalExpenses(@GraphQLContext Projects projects) {
-        return pettyCashService.totalExpenseProject(projects.id)
-    }
-
     @GraphQLQuery(name = "projectById")
     Projects projectById(
             @GraphQLArgument(name = "id") UUID id
@@ -207,9 +202,10 @@ class ProjectService extends AbstractDaoService<Projects> {
         })
 
         //create billing if id is missing
-        if (!id) {
-            billingService.createBillingProject(project)
-        }
+        //billing creation is on the statement of Work accomplishment
+        //if (!id) {
+        //    billingService.createBillingProject(project)
+        //}
         //return
         return project
     }

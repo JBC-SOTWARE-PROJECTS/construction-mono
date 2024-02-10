@@ -15,6 +15,7 @@ import { accountingMenu } from "@/components/sidebar";
 import { post } from "@/utility/graphql-client";
 import qs from "qs";
 import invetoryMenu from "@/components/sidebar/inventory";
+import otherOperationsMenu from "@/components/sidebar/otherOperations";
 import { softwareName } from "@/shared/settings";
 
 export default function MainMenu({ account }: IPageProps) {
@@ -91,6 +92,10 @@ export default function MainMenu({ account }: IPageProps) {
       <Divider orientation="left">Administrative Module</Divider>
       <div className="w-full">
         <MenuCard menus={administrativeMenu} />
+      </div>
+      <Divider orientation="left">Other Operations</Divider>
+      <div className="w-full">
+        <MenuCard menus={otherOperationsMenu} />
       </div>
     </div>
   );

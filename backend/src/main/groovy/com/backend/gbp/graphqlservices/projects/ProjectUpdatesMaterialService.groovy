@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 import java.time.Instant
 
 @Component
@@ -61,11 +62,12 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
     BigDecimal getTotalMaterials(
             @GraphQLArgument(name = "id") UUID id
     ){
-        String query = '''Select coalesce(round(sum(j.cost * j.qty),2), 0) from ProjectUpdatesMaterials j where 
+        String query = '''Select coalesce(sum(j.cost * j.qty), 0) from ProjectUpdatesMaterials j where 
         j.project.id = :id'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
-        getSum(query, params)
+        def result = getSum(query, params)
+        return result.setScale(2, RoundingMode.HALF_EVEN)
     }
 
     @GraphQLQuery(name = "pMaterialByList")

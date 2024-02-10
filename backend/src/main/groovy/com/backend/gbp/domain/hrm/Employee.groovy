@@ -64,6 +64,10 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	String lastName
 
 	@GraphQLQuery
+	@Column(name = "profile_picture", columnDefinition = "varchar")
+	String profilePicture
+
+	@GraphQLQuery
 	@Column(name = "middle_name", columnDefinition = "varchar")
 	String middleName
 
@@ -251,6 +255,10 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@GraphQLQuery
 	@Column(name = "hourly_rate_amount", columnDefinition = "numeric")
 	BigDecimal hourlyRate
+
+	@GraphQLQuery
+	@Column(name = "is_disabled_withholding_tax", columnDefinition = "bool")
+	Boolean isDisabledWithholdingTax
 
 
 
