@@ -26,7 +26,7 @@ interface EditableRowProps {
   index: number;
 }
 
-const designationList = ["DRIVER", "CHECKER", "ASSISTANT"];
+export const VUDesignationList = ["DRIVER", "CHECKER", "ASSISTANT"];
 
 const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -101,7 +101,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
     }
   };
 
-  var designationOpts = designationList.map((item: string) => {
+  var designationOpts = VUDesignationList.map((item: string) => {
     return {
       value: item,
       label: item,
