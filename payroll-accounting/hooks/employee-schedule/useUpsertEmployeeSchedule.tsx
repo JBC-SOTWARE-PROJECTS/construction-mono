@@ -1,5 +1,6 @@
+import { OvertimeDetails } from "@/components/payroll/employee-management/work-schedule/AssignEmployeeScheduleModal";
 import { EmployeeSchedule } from "@/graphql/gql/graphql";
-import { transformDate } from "@/utility/helper";
+import { transformDate, transformDateRange } from "@/utility/helper";
 import { Key } from "@ant-design/pro-components";
 import { gql, useMutation } from "@apollo/client";
 import { message } from "antd";
@@ -11,14 +12,18 @@ const QUERY = gql`
     $employeeId: UUID
     $fields: Map_String_ObjectScalar
     $employeeIdList: [UUID]
-    $dates: [DateWithScheduleInput]
+    $datesWithSchedule: [DateWithScheduleInput]
+    $overtimeProject: String
+    $mode: String
   ) {
     upsertEmployeeSchedule(
       id: $id
       employeeId: $employeeId
       fields: $fields
       employeeIdList: $employeeIdList
-      dates: $dates
+      datesWithSchedule: $datesWithSchedule
+      overtimeProject: $overtimeProject
+      mode: $mode
     ) {
       response
       success
@@ -34,6 +39,9 @@ export interface IUpsertEmployeeScheduleParams {
     fields?: EmployeeSchedule;
     dates?: any[];
     employeeIdList?: Key[];
+    overtimeDetails?: OvertimeDetails;
+    mode?: string;
+    datesWithSchedule?: any[];
   };
 }
 
@@ -60,8 +68,17 @@ const useUpsertEmployeeSchedule = (callBack: () => void) => {
       variables.dates?.length !== 0 &&
       variables.employeeIdList?.length !== 0
     ) {
-      variables.dates = variables.dates?.map((item) => {
+      variables.datesWithSchedule = variables.dates?.map((item) => {
         var dateString = item.substring(0, 10);
+        var overtimeMap;
+        if (variables.overtimeDetails?.overtimeType === "FIXED") {
+          overtimeMap = transformDateRange(
+            dayjs(item),
+            variables.overtimeDetails?.start?.toString(),
+            variables.overtimeDetails?.end?.toString()
+          );
+        }
+
         return {
           dateString: dateString,
           dateTimeStart: transformDate(
@@ -80,10 +97,18 @@ const useUpsertEmployeeSchedule = (callBack: () => void) => {
             dayjs(item),
             variables?.fields?.mealBreakEnd
           ),
+          overtimeStart: overtimeMap?.start,
+          overtimeEnd: overtimeMap?.end,
+          overtimeType: variables.overtimeDetails?.overtimeType,
         };
       });
     }
-    upsert({ variables: variables });
+    upsert({
+      variables: {
+        ...variables,
+        overtimeProject: variables.overtimeDetails?.project,
+      },
+    });
   };
 
   return { upsertEmployeeSchedule, loadingUpsert: loading };

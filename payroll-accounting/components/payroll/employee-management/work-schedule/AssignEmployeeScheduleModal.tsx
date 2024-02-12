@@ -25,6 +25,12 @@ interface IProps {
   record?: Schedule | null | undefined;
 }
 
+export interface OvertimeDetails {
+  start: dayjs.Dayjs | null;
+  end: dayjs.Dayjs | null;
+  overtimeType: string;
+  project: string | null;
+}
 interface ISelectedSchedule {
   year: number;
   month: string;
@@ -59,14 +65,30 @@ function AssignEmployeeScheduleModal(props: IProps) {
 
   const checkStep = (step: number) => {
     if (step === 1) {
-      if (current === 0 && (!scheduleType || selectedIds.length === 0)) {
+      if (
+        current === 0 &&
+        ((mode === "REGULAR" && !scheduleType) ||
+          (mode === "REGULAR_WITH_OVERTIME" &&
+            overtimeDetails.overtimeType === "FIXED" &&
+            (!scheduleType ||
+              !overtimeDetails.start ||
+              !overtimeDetails.end)) ||
+          (mode === "OVERTIME" &&
+            overtimeDetails.overtimeType === "FIXED" &&
+            (!overtimeDetails.start || !overtimeDetails.end)) ||
+          selectedIds.length === 0)
+      ) {
+        debugger;
         message.warning(
           <>
             Please select <b>employees</b> and a <b>schedule type</b>
           </>
         );
         return false;
-      } else return true;
+      } else {
+        debugger;
+        return true;
+      }
     } else if (step === 2) {
       if (current === 1 && selectedDates.length === 0) {
         message.warning(
@@ -91,6 +113,7 @@ function AssignEmployeeScheduleModal(props: IProps) {
           dateTimeEnd: transformDate(date, scheduleType?.dateTimeEndRaw),
           mealBreakStart: transformDate(date, scheduleType?.mealBreakStart),
           mealBreakEnd: transformDate(date, scheduleType?.mealBreakEnd),
+          overtimeType: overtimeDetails.overtimeType as any,
           label: scheduleType?.label,
           title: scheduleType?.title,
           project_id: scheduleType?.project?.id,
@@ -100,6 +123,8 @@ function AssignEmployeeScheduleModal(props: IProps) {
             employeeIdList: selectedIds,
             dates: selectedDates,
             fields: fields,
+            overtimeDetails: overtimeDetails,
+            mode,
           },
         });
       },
@@ -120,8 +145,16 @@ function AssignEmployeeScheduleModal(props: IProps) {
   });
 
   const [scheduleType, setScheduleType] = useState<Schedule | null>(null);
+
   const [selectedIds, setSelectedIds] = useState<Key[]>([]);
   const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>([]);
+  const [mode, setMode] = useState<string>("REGULAR");
+  const [overtimeDetails, setOvertimeDetails] = useState<OvertimeDetails>({
+    start: null,
+    end: null,
+    overtimeType: "FIXED",
+    project: null,
+  });
 
   const rowSelection: TableRowSelection<Employee> = {
     type: "checkbox",
@@ -215,6 +248,10 @@ function AssignEmployeeScheduleModal(props: IProps) {
           state={state}
           employees={employees}
           loading={loading}
+          mode={mode}
+          setMode={setMode}
+          overtimeDetails={overtimeDetails}
+          setOvertimeDetails={setOvertimeDetails}
         />
       )}
 

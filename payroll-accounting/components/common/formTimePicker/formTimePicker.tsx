@@ -10,7 +10,7 @@ const FormTimePicker = (
   ref: any
 ) => {
   return (
-    <Form.Item {...props} style={{ marginBottom: "6px" }}>
+    <Form.Item {...props} style={{ marginBottom: "6px", ...props?.style }}>
       <TimePicker {...propstimepicker} ref={ref} className="w-full" />
     </Form.Item>
   );

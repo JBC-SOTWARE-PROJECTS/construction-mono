@@ -41,6 +41,7 @@ const QUERY = gql`
         title
         isCustom
         dateString
+        overtimeType
         project {
           id
           description

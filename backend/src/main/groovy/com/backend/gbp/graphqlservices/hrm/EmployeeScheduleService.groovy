@@ -17,6 +17,7 @@ import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.*
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.hrm.EmployeeScheduleRepository
+import com.backend.gbp.repository.projects.ProjectsRepository
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
@@ -65,12 +66,19 @@ class EmployeeScheduleDetailsDto {
     Projects project
 }
 
+enum OvertimeType {
+    FLEXIBLE, FIXED
+}
+
 class DateWithSchedule {
     Instant dateTimeStart;
     Instant dateTimeEnd;
     Instant mealBreakStart;
     Instant mealBreakEnd;
+    Instant overtimeStart;
+    Instant overtimeEnd;
     String dateString;
+    OvertimeType overtimeType;
 }
 
 @TypeChecked
@@ -79,40 +87,22 @@ class DateWithSchedule {
 class EmployeeScheduleService {
 
     @Autowired
-    private UserRepository userRepository
-
-    @Autowired
     private EmployeeRepository employeeRepository
 
     @Autowired
     EmployeeScheduleRepository employeeScheduleRepository
 
     @Autowired
-    PositionRepository positionRepository
+    ProjectsRepository projectsRepository
 
     @Autowired
     JdbcTemplate jdbcTemplate
-
-    @Autowired
-    GeneratorService generatorService
 
     @Autowired
     ProjectService projectService
 
     @Autowired
     ObjectMapper objectMapper
-
-    @Autowired
-    PasswordEncoder passwordEncoder
-
-    @Autowired
-    PermissionRepository permissionRepository
-
-    @Autowired
-    AuthorityRepository authorityRepository
-
-    @Autowired
-    CompanySettingsService companySettingsService
 
     //============== All Queries =====================
 
@@ -194,7 +184,7 @@ class EmployeeScheduleService {
 
         }
 
-        return employeeSchedules
+        return employeeSchedules.sort({ it.fullName })
     }
 
 
@@ -229,52 +219,59 @@ class EmployeeScheduleService {
             @GraphQLArgument(name = "employeeId") UUID employeeId,
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "employeeIdList") List<UUID> employeeIdList,
-            @GraphQLArgument(name = "dates") List<DateWithSchedule> dates = [],
-            @GraphQLArgument(name = "isOverTime") Boolean isOverTime = false
-
+            @GraphQLArgument(name = "datesWithSchedule") List<DateWithSchedule> datesWithSchedule = [],
+            @GraphQLArgument(name = "overtimeProject") String overtimeProject,
+            @GraphQLArgument(name = "mode") String mode // 'REGULAR', 'REGULAR_WITH_OVERTIME', 'OVERTIME'
     ) {
-        if (dates?.size() > 0) {
+        if (datesWithSchedule?.size() > 0) {
             CompanySettings company = SecurityUtils.currentCompany()
 
             List<EmployeeSchedule> scheduleList = []
             List<Employee> employeeList = employeeRepository.findAllById(employeeIdList)
 
+            Map<String, Projects> projectMap = new HashMap<>()
+            projectsRepository.findAll().each {
+                projectMap.put(it.id.toString(), it)
+            }
 
             List<String> trimmedDates = []
-            dates.each {
+            datesWithSchedule.each {
                 trimmedDates.push(it.dateString)
             }
 
             employeeList.each { Employee employee ->
                 List<EmployeeSchedule> employeeSchedules = employeeScheduleRepository.getRegularSchedules(trimmedDates, employee.id)
+                List<EmployeeSchedule> overtimeSchedules = employeeScheduleRepository.getOvertimeSchedules(trimmedDates, employee.id)
 
-                dates.each { DateWithSchedule date ->
-
-                    EmployeeSchedule employeeSchedule = null
-                    Predicate<EmployeeSchedule> filterPredicate = { EmployeeSchedule it -> it.dateString == date.dateString }
-                    Consumer<EmployeeSchedule> consumer = { EmployeeSchedule it -> employeeSchedule = it }
-
-                    employeeSchedules.stream()
-                            .filter(filterPredicate)
-                            .findFirst()
-                            .ifPresent(consumer)
-
-                    if (employeeSchedule == null)
-                        employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
-                    else
-                        employeeSchedule = objectMapper.updateValue(employeeSchedule, fields)
-
-                    employeeSchedule.dateTimeStart = date.dateTimeStart
-                    employeeSchedule.dateTimeEnd = date.dateTimeEnd
-                    employeeSchedule.mealBreakStart = date?.mealBreakStart
-                    employeeSchedule.mealBreakEnd = date?.mealBreakEnd
-                    employeeSchedule.employee = employee
-                    employeeSchedule.company = company
-                    employeeSchedule.dateString = date.dateString
-                    employeeSchedule.project = fields.get('project_id') ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null
-                    scheduleList.push(employeeSchedule)
-
+                datesWithSchedule.each { DateWithSchedule date ->
+                    if (['REGULAR', 'REGULAR_WITH_OVERTIME'].contains(mode)) {
+                        scheduleList.push(generateEmployeeSchedule(
+                                false,
+                                date,
+                                employeeSchedules,
+                                fields,
+                                employee,
+                                company,
+                                fields.get('project_id') ? projectMap.get(fields.get('project_id') as String) : null))
+                    }
+                    if (["OVERTIME", "REGULAR_WITH_OVERTIME"].contains(mode)) {
+                        if (mode == 'OVERTIME' && date.overtimeType == OvertimeType.FIXED) {
+                            EmployeeSchedule employeeSchedule = findExistingSchedule(date, employeeSchedules)
+                            if (date.overtimeStart.isBefore(employeeSchedule.dateTimeEnd)) {
+                                date.overtimeStart = employeeSchedule.dateTimeEnd
+                            }
+                        }
+                        scheduleList.push(generateEmployeeSchedule(
+                                true,
+                                date,
+                                overtimeSchedules,
+                                fields,
+                                employee,
+                                company,
+                                overtimeProject ? projectMap.get(overtimeProject) : null))
+                    }
                 }
+
 
             }
             employeeScheduleRepository.saveAll(scheduleList)
@@ -304,4 +301,50 @@ class EmployeeScheduleService {
 
 
     //Utility methods
+
+    EmployeeSchedule generateEmployeeSchedule(
+            Boolean isOvertime,
+            DateWithSchedule date,
+            List<EmployeeSchedule> employeeSchedules,
+            Map<String, Object> fields, Employee employee,
+            CompanySettings company,
+            Projects project) {
+        EmployeeSchedule employeeSchedule = findExistingSchedule(date, employeeSchedules)
+
+        if (employeeSchedule == null)
+            employeeSchedule = objectMapper.convertValue(fields, EmployeeSchedule)
+        else
+            employeeSchedule = objectMapper.updateValue(employeeSchedule, fields)
+
+        if (isOvertime) {
+            employeeSchedule.label = 'Overtime Schedule'
+            employeeSchedule.title = 'Overtime Schedule'
+        }
+
+        if (isOvertime) employeeSchedule.overtimeType = date.overtimeType
+        employeeSchedule.dateTimeStart = isOvertime ? date?.overtimeStart : date?.dateTimeStart
+        employeeSchedule.dateTimeEnd = isOvertime ? date?.overtimeEnd : date?.dateTimeEnd
+        employeeSchedule.mealBreakStart = isOvertime ? null : date?.mealBreakStart
+        employeeSchedule.mealBreakEnd = isOvertime ? null : date?.mealBreakEnd
+        employeeSchedule.employee = employee
+        employeeSchedule.company = company
+        employeeSchedule.dateString = date.dateString
+        employeeSchedule.isOvertime = isOvertime
+        employeeSchedule.project = project
+
+        return employeeSchedule
+    }
+
+    static EmployeeSchedule findExistingSchedule(DateWithSchedule date, List<EmployeeSchedule> employeeSchedules) {
+        EmployeeSchedule employeeSchedule = null
+        Predicate<EmployeeSchedule> predicate = { EmployeeSchedule it -> it.dateString == date.dateString }
+        Consumer<EmployeeSchedule> consumer = { EmployeeSchedule it ->
+            employeeSchedule = it
+        }
+        employeeSchedules.stream()
+                .filter(predicate)
+                .findFirst()
+                .ifPresent(consumer)
+        return employeeSchedule
+    }
 }
