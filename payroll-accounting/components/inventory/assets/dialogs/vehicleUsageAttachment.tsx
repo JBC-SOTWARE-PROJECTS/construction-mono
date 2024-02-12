@@ -2,7 +2,7 @@ import {
   VehicleUsageDocs,
   VehicleUsageMonitoring,
 } from "@/graphql/gql/graphql";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Col,
@@ -14,9 +14,10 @@ import {
   message,
   Upload,
   Divider,
+  Card,
 } from "antd";
 import _ from "lodash";
-import { UploadOutlined } from "@ant-design/icons";
+import { EditOutlined, UploadOutlined } from "@ant-design/icons";
 import DOImageViewer from "@/components/thirdParty/doImageViewer";
 import { apiUrlPrefix } from "@/shared/settings";
 import { RcFile } from "antd/es/upload";
@@ -24,6 +25,7 @@ import useGetVehicleUsageDocs from "@/hooks/asset/useGetVehicleUsageDocs";
 import { FormInput, FormSelect } from "@/components/common";
 import { requiredField } from "@/utility/helper";
 import { VUDesignationList } from "../masterfile/vehicleUsageEmployee";
+import Meta from "antd/es/card/Meta";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -43,15 +45,16 @@ const initialState: IPMState = {
   size: 10,
 };
 
-const initialFormState : any={
-  designation : null,
-  description: null
-}
+const initialFormState: any = {
+  designation: null,
+  description: null,
+};
 
 export default function VehicleUsageAttachemntModal(props: IProps) {
   const { hide, record, projectOpts } = props;
   const [state, setState] = useState(initialState);
   const [formState, setFormState] = useState(initialFormState);
+  const [segregatedAttch, setSegregatedAttch] = useState<any>({});
   const [hasRequired, sethasRequired] = useState(true);
   const [form] = Form.useForm();
 
@@ -62,6 +65,14 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
     },
     fetchPolicy: "network-only",
   });
+
+  useEffect(() => {
+    if (data?.content) {
+      const segregatedObjects = segregateObjectsByDesignation(data?.content);
+      console.log("segregatedObjects", segregatedObjects);
+      setSegregatedAttch(segregatedObjects);
+    }
+  }, [data]);
 
   const handleUpload = (info: any) => {
     const { status } = info.file;
@@ -88,16 +99,13 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
   };
 
   const handleFormValuesChange = (changedValues: any, allValues: any) => {
-  
-    if( _.some(allValues, value => _.isUndefined(value) || value === '')){
-      sethasRequired(true)
-    }else{
-      sethasRequired(false)
+    if (_.some(allValues, (value) => _.isUndefined(value) || value === "")) {
+      sethasRequired(true);
+    } else {
+      sethasRequired(false);
     }
-    setFormState({...allValues});
+    setFormState({ ...allValues });
   };
-
-  
 
   const uploadProps = {
     name: "file",
@@ -107,7 +115,6 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
     headers: { "X-Requested-With": "XMLHttpRequest" },
     xsrfCookieName: "CSRF-TOKEN",
     xsrfHeaderName: "X-Csrf-Token",
- 
 
     onChange: handleUpload,
   };
@@ -115,10 +122,9 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
   const fields = JSON.stringify({
     vehicleUsage: record?.id,
     item: record?.item?.id,
-    ...formState
+    ...formState,
   });
 
-  console.log("fields", fields)
 
   var designationOpts = VUDesignationList.map((item: string) => {
     return {
@@ -126,6 +132,28 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
       label: item,
     };
   });
+
+  function segregateObjectsByDesignation(
+    objects: VehicleUsageDocs[]
+  ): _.Dictionary<VehicleUsageDocs[]> {
+    // Extract unique designations
+    const uniqueDesignations = _.uniq(objects.map((obj) => obj.designation));
+
+    // Create an object to hold segregated objects
+    const segregatedObjects: _.Dictionary<VehicleUsageDocs[]> = {};
+
+    // Initialize segregatedObjects with empty arrays for each unique designation
+    uniqueDesignations.forEach((designation) => {
+      segregatedObjects[designation ?? "OTHERS"] = [];
+    });
+
+    // Populate segregatedObjects with objects grouped by designation
+    objects.forEach((obj) => {
+      segregatedObjects[obj.designation ?? "OTHERS"].push(obj);
+    });
+
+    return segregatedObjects;
+  }
 
   return (
     <Modal
@@ -184,32 +212,74 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
                 {...uploadProps}
                 data={{ fields: fields }}
                 beforeUpload={beforeUpload}
-               disabled={hasRequired}
+                disabled={hasRequired}
               >
-                <Button  disabled={hasRequired}  icon={<UploadOutlined />}>Click to Upload</Button>
+                <Button disabled={hasRequired} icon={<UploadOutlined />}>
+                  Click to Upload
+                </Button>
               </Upload>
             </Col>
           </Row>
         </Form>
         <Divider />
         <div>
-          <Row>
-            {data?.content.length > 0 && (
-              <>
-                {data?.content.map((r: VehicleUsageDocs, index: number) => (
-                  <Col span={12} key={index}>
-                    <DOImageViewer
+          {Object.keys(segregatedAttch).map((designation) => (
+            <div key={designation}>
+             <Divider orientation="left">{designation}</Divider>
+              {/* <ul>
+                        {segregatedObjects[designation].map(obj => (
+                            <li key={obj.id}>
+                                Property Name: {Object.keys(obj)[1]}, Value: {obj.designation}
+                            </li>
+                        ))}
+                    </ul> */}
+
+              <Row gutter={16}>
+                {segregatedAttch[designation].length > 0 && (
+                  <>
+                    {segregatedAttch[designation].map((r: VehicleUsageDocs, index: number) => (
+                      <Col className="gutter-row" span={6} key={index}>
+                        {/* <DOImageViewer
                       key={index}
                       filename={r.file ?? ""}
                       folder="VEHICLE_USAGE_DOCS"
-                      width={300}
-                      height={300}
+                      width={150}
+                      height={150}
+                      style={{objectFit: "cover", borderRadius: "10px", padding: "5px"}}
                     />
-                  </Col>
-                ))}
-              </>
-            )}
-          </Row>
+                    <span>{r.description}</span> */}
+                        <Card
+                          hoverable
+                          style={{ marginBottom: 20 }}
+                          cover={
+                            <>
+                              <DOImageViewer
+                                key={index}
+                                filename={r.file ?? ""}
+                                folder="VEHICLE_USAGE_DOCS"
+                                width={200}
+                                height={250}
+                                style={{
+                                  objectFit: "cover",
+                                  // borderRadius: "10px",
+                                  // padding: "5px",
+                                }}
+                              />
+                            </>
+                          }
+                          actions={[
+                            <EditOutlined key="edit" onClick={() => {}} />,
+                          ]}
+                        >
+                          <Meta title={""} description={r.description} />
+                        </Card>
+                      </Col>
+                    ))}
+                  </>
+                )}
+              </Row>
+            </div>
+          ))}
         </div>
       </>
     </Modal>
