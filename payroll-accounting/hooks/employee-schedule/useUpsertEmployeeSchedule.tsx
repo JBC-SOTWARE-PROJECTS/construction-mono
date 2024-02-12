@@ -97,7 +97,9 @@ const useUpsertEmployeeSchedule = (callBack: () => void) => {
             dayjs(item),
             variables?.fields?.mealBreakEnd
           ),
-          overtimeStart: overtimeMap?.start,
+          overtimeStart:
+            overtimeMap?.start ||
+            transformDate(dayjs(item), variables?.fields?.dateTimeStart),
           overtimeEnd: overtimeMap?.end,
           overtimeType: variables.overtimeDetails?.overtimeType,
         };
