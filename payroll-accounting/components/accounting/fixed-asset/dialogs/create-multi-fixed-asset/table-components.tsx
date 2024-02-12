@@ -182,7 +182,7 @@ const DepreciationDatePicker = React.memo((props: TableCellPropsI) => {
       <DatePicker
         bordered={false}
         autoFocus
-        onSelect={props.save}
+        onChange={props.save}
         onBlur={props.save}
         style={{ width: '100%' }}
       />
@@ -224,7 +224,7 @@ const PurchaseDatePicker = React.memo((props: TableCellPropsI) => {
       <DatePicker
         bordered={false}
         autoFocus
-        onSelect={props.save}
+        onChange={props.save}
         onBlur={props.save}
         style={{ width: '100%' }}
       />

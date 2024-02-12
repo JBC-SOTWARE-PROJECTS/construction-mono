@@ -13,6 +13,7 @@ import { useDialog } from "@/hooks";
 import UpsertAssetModal from "@/components/inventory/assets/dialogs/upsertAssetModal";
 import _ from "lodash";
 import useGetAssets from "@/hooks/asset/useGetAssets";
+import CustomButton from "@/components/common/CustomButton";
 
 const { Search } = Input;
 type Props = {};
@@ -87,13 +88,14 @@ export default function AssetsComponent({}: Props) {
               onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
               className="w-full"
             />
-            <Button
+            <CustomButton
               type="primary"
               icon={<PlusCircleOutlined />}
               onClick={() => onUpsertRecord()}
+              allowedPermissions={["manage_asset"]}
             >
               Create New
-            </Button>
+            </CustomButton>
           </ProFormGroup>
         }
       >
