@@ -145,9 +145,29 @@ export function transformDate(currentDate: dayjs.Dayjs, referenceDate: string) {
   const transformedDate = currentDate.set("hour", hour).set("minute", minute);
   return transformedDate;
 }
+export function transformDateRange(
+  currentDate: dayjs.Dayjs,
+  refStartDate: string | undefined | null,
+  refEndDate: string | undefined | null
+) {
+  const refStart = dayjs(refStartDate);
+  const refEnd = dayjs(refEndDate);
 
+  const hour = refStart.get("h");
+  const minute = refStart.get("m");
+  const start = currentDate.set("hour", hour).set("minute", minute);
+
+  const hourEnd = refEnd.get("h");
+  const minuteEnd = refEnd.get("m");
+  let end = currentDate.set("hour", hourEnd).set("minute", minuteEnd);
+  if (end.isBefore(start)) {
+    end = end.add(1, "day");
+  }
+
+  return { start, end };
+}
 export function getTimeFromDate(date: dayjs.Dayjs) {
-  return dayjs(date).format("h:mm a");
+  return dayjs(date).format("hh:mm A");
 }
 
 export function getStatusColor(status: string) {
