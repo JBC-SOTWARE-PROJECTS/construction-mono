@@ -89,7 +89,7 @@ class AccumulatedLogsCalculator {
                 List<EventCalendar> holidays = holidayMap.get(dateString)
 
                 Instant firstIn = attendanceList?.find({ it.type == 'IN' && !it.isTransfer })?.attendance_time
-                Instant out = attendanceList.reverse()?.find({ it.type == 'OUT' && !it.isTransfer })?.attendance_time
+                Instant out = attendanceList?.reverse()?.find({ it.type == 'OUT' && !it.isTransfer })?.attendance_time
 
                 if (out && firstIn?.isAfter(out)) out = null
 

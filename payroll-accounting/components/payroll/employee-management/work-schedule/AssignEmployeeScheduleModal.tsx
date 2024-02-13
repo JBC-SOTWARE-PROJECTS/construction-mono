@@ -30,6 +30,7 @@ export interface OvertimeDetails {
   end: dayjs.Dayjs | null;
   overtimeType: string;
   project: string | null;
+  projectDescription: string | null;
 }
 interface ISelectedSchedule {
   year: number;
@@ -154,6 +155,7 @@ function AssignEmployeeScheduleModal(props: IProps) {
     end: null,
     overtimeType: "FIXED",
     project: null,
+    projectDescription: null,
   });
 
   const rowSelection: TableRowSelection<Employee> = {
@@ -212,7 +214,6 @@ function AssignEmployeeScheduleModal(props: IProps) {
             <Button
               size="large"
               type="primary"
-              danger
               htmlType="submit"
               form="upsertForm"
               icon={<SaveOutlined />}
@@ -268,6 +269,8 @@ function AssignEmployeeScheduleModal(props: IProps) {
           selectedDates={selectedDates}
           scheduleType={scheduleType}
           selectedEmployees={selectedEmployees}
+          overtimeDetails={overtimeDetails}
+          mode={mode}
         />
       )}
     </Modal>

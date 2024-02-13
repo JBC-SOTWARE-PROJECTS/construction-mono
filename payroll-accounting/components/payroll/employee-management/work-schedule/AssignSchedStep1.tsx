@@ -87,6 +87,7 @@ function AssignSchedStep1({
         <Radio.Group
           buttonStyle="solid"
           onChange={(e) => {
+            if (e.target.value === "OVERTIME") setScheduleType(null);
             setMode(e.target.value);
           }}
           defaultValue="REGULAR"
@@ -224,10 +225,14 @@ function AssignSchedStep1({
                     }))
                   : []),
               ]}
-              onChange={(value) =>
-                setOvertimeDetails({ ...overtimeDetails, project: value })
+              onChange={(value, option: any) =>
+                setOvertimeDetails({
+                  ...overtimeDetails,
+                  project: value,
+                  projectDescription: option.label,
+                })
               }
-              defaultValue={null}
+              defaultValue={overtimeDetails?.project}
               allowClear={true}
               placeholder="Select Project"
             />
@@ -267,7 +272,6 @@ function AssignSchedStep1({
                 style={{ width: "100%" }}
                 allowClear
                 placeholder="Status"
-                defaultValue={null}
                 onChange={(value) => {
                   setState({ ...state, status: value });
                 }}

@@ -287,7 +287,12 @@ class EmployeeScheduleService {
             }
             employeeSchedule.dateString = (Instant.parse((fields.get('dateTimeStart') as String)).plus(8, ChronoUnit.HOURS)).toString().substring(0, 10)
 
-
+            if (employeeSchedule.isOvertime && employeeSchedule.overtimeType == OvertimeType.FIXED) {
+                EmployeeSchedule regularSchedule = employeeScheduleRepository.getRegularSchedules([employeeSchedule.dateString], employeeId)[0]
+                if (regularSchedule && employeeSchedule.dateTimeStart.isBefore(regularSchedule.dateTimeEnd)) {
+                    employeeSchedule.dateTimeStart = regularSchedule.dateTimeEnd
+                }
+            }
             employeeSchedule.employee = employeeRepository.findById(employeeId).get()
             employeeSchedule.company = SecurityUtils.currentCompany()
             employeeSchedule.project = fields.get('project_id') ? projectService.findOne(UUID.fromString(fields.get('project_id') as String)) : null

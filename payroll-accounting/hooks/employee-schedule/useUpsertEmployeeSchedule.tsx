@@ -105,9 +105,22 @@ const useUpsertEmployeeSchedule = (callBack: () => void) => {
         };
       });
     }
+    var schedMap;
+    var obj;
+    schedMap = transformDateRange(
+      dayjs(variables.fields?.dateTimeStart),
+      variables.fields?.dateTimeStart?.toString(),
+      variables.fields?.dateTimeEnd?.toString()
+    );
+    obj = {
+      dateTimeStart: schedMap.start,
+      dateTimeEnd: schedMap.end,
+    };
+
     upsert({
       variables: {
         ...variables,
+        fields: { ...variables?.fields, ...obj },
         overtimeProject: variables.overtimeDetails?.project,
       },
     });
