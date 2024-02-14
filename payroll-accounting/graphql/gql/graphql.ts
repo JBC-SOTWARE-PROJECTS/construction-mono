@@ -15589,6 +15589,7 @@ export type VehicleUsageDocs = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  designation?: Maybe<Scalars['String']['output']>;
   docType?: Maybe<Scalars['String']['output']>;
   file?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;

@@ -1,0 +1,1 @@
+alter table asset.vehicle_usage_docs add column designation varchar NULL;

@@ -66,6 +66,7 @@ class AssetResource {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> fieldMap = objectMapper.readValue(fields, Map.class);
         fieldMap.put("file", file.getName());
+
         VehicleUsageDocs vehicleUsageDocResult = vehicleUsageDocsService.upsertVehicleUsageDocs(fieldMap,null );
 
         return vehicleUsageDocResult.id;

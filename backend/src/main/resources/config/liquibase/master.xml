@@ -579,4 +579,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/89_jacky_add_profile_pic_emplpoyee.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_veh_usage_att_designation.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
