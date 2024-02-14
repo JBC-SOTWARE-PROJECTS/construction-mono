@@ -24,6 +24,15 @@ export const UPSERT_VEHICLE_USAGE_RECORD = gql`
   }
 `;
 
+export const UPSERT_VEHICLE_USAGE_DOCS_RECORD = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertVehicleUsageDocs(id: $id, fields: $fields) {
+      id
+      description
+    }
+  }
+`;
+
 
 export const UPSERT_PREVENTIVE_MAINTENANCE_RECORD = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {

@@ -17,7 +17,7 @@ import {
   Card,
 } from "antd";
 import _ from "lodash";
-import { EditOutlined, UploadOutlined } from "@ant-design/icons";
+import { EditOutlined, SaveOutlined, UploadOutlined } from "@ant-design/icons";
 import DOImageViewer from "@/components/thirdParty/doImageViewer";
 import { apiUrlPrefix } from "@/shared/settings";
 import { RcFile } from "antd/es/upload";
@@ -26,6 +26,8 @@ import { FormInput, FormSelect } from "@/components/common";
 import { requiredField } from "@/utility/helper";
 import { VUDesignationList } from "../masterfile/vehicleUsageEmployee";
 import Meta from "antd/es/card/Meta";
+import { UPSERT_VEHICLE_USAGE_DOCS_RECORD } from "@/graphql/assets/queries";
+import { useMutation } from "@apollo/client";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -56,6 +58,7 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
   const [formState, setFormState] = useState(initialFormState);
   const [segregatedAttch, setSegregatedAttch] = useState<any>({});
   const [hasRequired, sethasRequired] = useState(true);
+  const [toUpdate, setToUpdate] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   const [data, loading, refetch] = useGetVehicleUsageDocs({
@@ -66,22 +69,46 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
     fetchPolicy: "network-only",
   });
 
+  const [upsert, { loading: upsertLoading }] = useMutation(
+    UPSERT_VEHICLE_USAGE_DOCS_RECORD,
+    {
+      ignoreResults: false,
+      onCompleted: (dataResp : VehicleUsageDocs) => {
+        if (dataResp) {
+         
+          message.success("File updated successfully");
+          const newDocs = _.map(data?.content, (e)=>{
+            return {
+              ...e,
+              description: dataResp?.description
+            }
+          })
+          const segregatedObjects = segregateObjectsByDesignation(newDocs);
+          setSegregatedAttch(segregatedObjects);
+
+          setToUpdate(null);
+          // refetch();
+          // hide(data);
+        }
+      },
+    }
+  );
+
   useEffect(() => {
     if (data?.content) {
       const segregatedObjects = segregateObjectsByDesignation(data?.content);
-      console.log("segregatedObjects", segregatedObjects);
       setSegregatedAttch(segregatedObjects);
     }
   }, [data]);
 
   const handleUpload = (info: any) => {
     const { status } = info.file;
-    // console.log("info", info)
+    
     if (status !== "uploading") {
-      // console.log(info.file, info.fileList);
     }
     if (status === "done") {
       message.success(`${info.file.name} file uploaded successfully.`);
+      refetch();
     } else if (status === "error") {
       message.error(`${info.file.name} file upload failed.`);
     }
@@ -125,13 +152,24 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
     ...formState,
   });
 
-
   var designationOpts = VUDesignationList.map((item: string) => {
     return {
       value: item,
       label: item,
     };
   });
+
+  const saveUpdate =({description}: VehicleUsageDocs)=>{
+    console.log("hello", description)
+    upsert({
+      variables: {
+        fields: {
+          description: description
+        },
+        id: toUpdate,
+      },
+    });
+  }
 
   function segregateObjectsByDesignation(
     objects: VehicleUsageDocs[]
@@ -225,56 +263,77 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
         <div>
           {Object.keys(segregatedAttch).map((designation) => (
             <div key={designation}>
-             <Divider orientation="left">{designation}</Divider>
-              {/* <ul>
-                        {segregatedObjects[designation].map(obj => (
-                            <li key={obj.id}>
-                                Property Name: {Object.keys(obj)[1]}, Value: {obj.designation}
-                            </li>
-                        ))}
-                    </ul> */}
+              <Divider orientation="left">{designation}</Divider>
 
               <Row gutter={16}>
                 {segregatedAttch[designation].length > 0 && (
                   <>
-                    {segregatedAttch[designation].map((r: VehicleUsageDocs, index: number) => (
-                      <Col className="gutter-row" span={6} key={index}>
-                        {/* <DOImageViewer
-                      key={index}
-                      filename={r.file ?? ""}
-                      folder="VEHICLE_USAGE_DOCS"
-                      width={150}
-                      height={150}
-                      style={{objectFit: "cover", borderRadius: "10px", padding: "5px"}}
-                    />
-                    <span>{r.description}</span> */}
-                        <Card
-                          hoverable
-                          style={{ marginBottom: 20 }}
-                          cover={
-                            <>
-                              <DOImageViewer
-                                key={index}
-                                filename={r.file ?? ""}
-                                folder="VEHICLE_USAGE_DOCS"
-                                width={200}
-                                height={250}
-                                style={{
-                                  objectFit: "cover",
-                                  // borderRadius: "10px",
-                                  // padding: "5px",
+                    {segregatedAttch[designation].map(
+                      (r: VehicleUsageDocs, index: number) => (
+                        <Col className="gutter-row" span={6} key={index}>
+                          <Card
+                            hoverable
+                            style={{ marginBottom: 20 }}
+                            cover={
+                              <>
+                                <DOImageViewer
+                                  key={index}
+                                  filename={r.file ?? ""}
+                                  folder="VEHICLE_USAGE_DOCS"
+                                  width={"100%"}
+                                  height={250}
+                                  style={{
+                                    objectFit: "cover",
+                                  }}
+                                />
+                              </>
+                            }
+                            actions={[
+                              <EditOutlined
+                                key="edit"
+                                onClick={() => {
+                                  toUpdate
+                                    ? setToUpdate(null)
+                                    : setToUpdate(r.id);
                                 }}
-                              />
-                            </>
-                          }
-                          actions={[
-                            <EditOutlined key="edit" onClick={() => {}} />,
-                          ]}
-                        >
-                          <Meta title={""} description={r.description} />
-                        </Card>
-                      </Col>
-                    ))}
+                              />,
+                            ]}
+                          >
+                            {toUpdate && toUpdate == r.id ? (
+                              <Form
+                                name="updateAtt"
+                                layout="vertical"
+                                onFinish={saveUpdate}
+                                onFinishFailed={() => {}}
+                                onValuesChange={() => {}}
+                              >
+                                <FormInput
+                                  name="description"
+                                  label="Description"
+                                  rules={requiredField}
+                                  propsinput={{
+                                    placeholder: "Type purpose here",
+                                    defaultValue: r?.description ?? ""
+                                  }}
+                                />
+                                <Button
+                                  type="primary"
+                                  size="small"
+                                  htmlType="submit"
+                                  form="updateAtt"
+                                  // loading={upsertLoading}
+                                  icon={<SaveOutlined />}
+                                >
+                                  Save
+                                </Button>
+                              </Form>
+                            ) : (
+                              <Meta title={""} description={r.description} />
+                            )}
+                          </Card>
+                        </Col>
+                      )
+                    )}
                   </>
                 )}
               </Row>
