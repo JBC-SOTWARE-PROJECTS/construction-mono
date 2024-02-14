@@ -80,16 +80,17 @@ function PayslipSearchForm({
           display: 'flex',
           justifyContent: 'right',
           gap: 5,
+          marginBottom: 10,
         }}
       >
-        <Search
+        {/* <Search
           allowClear
           style={{ width: '100%', marginBottom: 10 }}
           size='middle'
           placeholder='Search here..'
           className='select-header-list'
           // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-        />
+        /> */}
         <Button
           type='primary'
           onClick={() =>

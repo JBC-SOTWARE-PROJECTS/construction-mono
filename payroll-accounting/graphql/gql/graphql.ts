@@ -1405,6 +1405,9 @@ export type DateWithScheduleInput = {
   dateTimeStart?: InputMaybe<Scalars['Instant']['input']>;
   mealBreakEnd?: InputMaybe<Scalars['Instant']['input']>;
   mealBreakStart?: InputMaybe<Scalars['Instant']['input']>;
+  overtimeEnd?: InputMaybe<Scalars['Instant']['input']>;
+  overtimeStart?: InputMaybe<Scalars['Instant']['input']>;
+  overtimeType?: InputMaybe<OvertimeType>;
 };
 
 export type DebitMemo = {
@@ -2536,6 +2539,7 @@ export type EmployeeSchedule = {
   locked?: Maybe<Scalars['Boolean']['output']>;
   mealBreakEnd?: Maybe<Scalars['Instant']['output']>;
   mealBreakStart?: Maybe<Scalars['Instant']['output']>;
+  overtimeType?: Maybe<OvertimeType>;
   project?: Maybe<Projects>;
   request?: Maybe<Scalars['UUID']['output']>;
   scheduleDuration?: Maybe<Scalars['BigDecimal']['output']>;
@@ -6384,12 +6388,13 @@ export type MutationUpsertEmployeeLoanConfigArgs = {
 
 /** Mutation root */
 export type MutationUpsertEmployeeScheduleArgs = {
-  dates?: InputMaybe<Array<InputMaybe<DateWithScheduleInput>>>;
+  datesWithSchedule?: InputMaybe<Array<InputMaybe<DateWithScheduleInput>>>;
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
   employeeIdList?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
-  isOverTime?: InputMaybe<Scalars['Boolean']['input']>;
+  mode?: InputMaybe<Scalars['String']['input']>;
+  overtimeProject?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -7237,6 +7242,11 @@ export type OtherDeductionTypes = {
   status?: Maybe<Scalars['Boolean']['output']>;
   subaccountCode?: Maybe<Scalars['String']['output']>;
 };
+
+export enum OvertimeType {
+  Fixed = 'FIXED',
+  Flexible = 'FLEXIBLE'
+}
 
 export type PcvItemsDtoInput = {
   discAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
