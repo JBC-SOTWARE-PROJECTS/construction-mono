@@ -11,6 +11,7 @@ import "@/styles/loader.css";
 import 'react-virtualized/styles.css'
 import "@/styles/virtualtable.css";
 import TawkToChat from "@/components/thirdParty/tawkToSupport";
+import { softwareName } from "@/shared/settings";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     return (
       <React.Fragment>
         <Head>
-          <title>DiverseTrade Suite</title>
+          <title>{softwareName}</title>
         </Head>
         <ApolloProvider client={client}>
           <Component {...pageProps} />
@@ -30,7 +31,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     return (
       <React.Fragment>
         <Head>
-          <title>DiverseTrade Suite</title>
+          <title>{softwareName}</title>
         </Head>
         <ApolloProvider client={client}>
           <AuthManager>
