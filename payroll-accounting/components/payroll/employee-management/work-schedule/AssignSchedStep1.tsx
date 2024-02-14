@@ -28,7 +28,7 @@ interface IProps {
 }
 
 type onChange =
-  | ((value: dayjs.Dayjs | null, dateString: string) => void)
+  | ((value: dayjs.Dayjs | null, dateString: string | string[]) => void)
   | undefined;
 
 function AssignSchedStep1({
@@ -193,7 +193,7 @@ function AssignSchedStep1({
                     format="hh:mm a"
                     use12Hours={true}
                     value={overtimeDetails?.end && dayjs(overtimeDetails?.end)}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       setOvertimeDetails({ ...overtimeDetails, end: e });
                     }}
                     disabled={overtimeDetails?.overtimeType === "FLEXIBLE"}

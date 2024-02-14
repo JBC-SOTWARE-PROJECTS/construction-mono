@@ -11,7 +11,7 @@ interface IProps {
   extra?: React.ReactNode;
   isCustom?: Maybe<boolean>;
   overtimeDetails?: OvertimeDetails;
-  mode: string;
+  mode?: string | null;
 }
 function ScheduleCard({
   scheduleType,
@@ -117,7 +117,7 @@ function ScheduleCard({
             </>
           )}
           {overtimeDetails &&
-            ["OVERTIME", "REGULAR_WITH_OVERTIME"].includes(mode) && (
+            ["OVERTIME", "REGULAR_WITH_OVERTIME"].includes(mode || "") && (
               <>
                 <b> Overtime</b>
                 <table style={{ width: "100%" }}>
