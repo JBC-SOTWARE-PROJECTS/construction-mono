@@ -129,8 +129,9 @@ class PayrollReportResource {
                 def allowance = employee?.allowanceEmployee;
                 def contribution = employee?.payrollEmployeeContribution;
                 def summary = employee?.employeeAdjustment;
+                def otherDeduction = employee?.employeeOtherDeduction;
 
-                DateTimeFormatter formatterD = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
+                DateTimeFormatter formatterD = DateTimeFormatter.ofPattern("MM-dd-yyyy").withZone(ZoneId.systemDefault())
                 String startDate = formatterD.format(employee?.payroll?.dateStart)
                 String endDate = formatterD.format(employee?.payroll?.dateEnd)
 
@@ -150,6 +151,7 @@ class PayrollReportResource {
                         underTime += it.underTime
                     }
                 }
+
 
 
 
@@ -175,11 +177,19 @@ class PayrollReportResource {
                         }
                     }
                 }
+                 BigDecimal otherDeduct = 0.0
+                if(otherDeduction != null && otherDeduction.deductionItems != null){
+                    otherDeduction.deductionItems.each {
+                        otherDeduct += it.amount
+                    }
+                }
 
                 def totalNetPay = (totalSalary?.regular ?: 0.0) + (totalSalary?.overtime ?: 0.0) + (totalSalary?.regularHoliday ?: 0.0);
                 def deduction = (totalSalary?.late ?: 0.0) + (totalSalary?.underTime ?: 0.0) + (employee?.withholdingTax ?: 0.0) +
                         (contribution?.sssEE ?: 0.0) + (contribution?.hdmfEE ?: 0.0) + (contribution?.phicEE ?: 0.0);
-                def finalTotalPay = totalNetPay + grossTT - deduction + adjustTotal;
+                def totalDeductions = deduction + otherDeduct;
+
+                def finalTotalPay = totalNetPay + grossTT - totalDeductions + adjustTotal;
 
                 grossDtoList.push(new GrossDto(
                         description: "Over Time",
@@ -226,6 +236,16 @@ class PayrollReportResource {
 
                 //-------- deduction---- \\
 
+                if(otherDeduction != null && otherDeduction.deductionItems != null){
+                    otherDeduction.deductionItems.each {
+                        deductionDtoList.push( new DeductionDto(
+                                description: it.name ?: '',
+                                nohours: '',
+                                rate: '',
+                                total: it.amount ?: 0.0
+                        ))
+                    }
+                }
 
                 deductionDtoList.push(new DeductionDto(
                         description: "Late",
@@ -270,6 +290,8 @@ class PayrollReportResource {
 //                            rate: 0.0,
                         total: ((contribution?.phicEE ?: 0.0) as BigDecimal).round(2)
                 ))
+
+
 
 //                deductionDtoList.push( new DeductionDto(
 //                        description: "HMO Insurance",
