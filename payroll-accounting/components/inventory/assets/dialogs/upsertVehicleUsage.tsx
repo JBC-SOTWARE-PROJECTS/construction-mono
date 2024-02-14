@@ -26,14 +26,9 @@ import moment from "moment";
 import dayjs from "dayjs";
 import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
 import useGetEmployeesBasic from "@/hooks/employee/useGetEmployeesBasic";
-import { ColumnsType } from "antd/es/table";
-import { DataType } from "@/components/accountReceivables/invoice/form/types";
-import { FAEditableContext } from "@/components/accounting/fixed-asset/dialogs/create-multi-fixed-asset/table";
 import VehicleUsageEmployeeTable from "../masterfile/vehicleUsageEmployee";
 import useGetVehicleUsageEmployee from "@/hooks/asset/useGetVehicleUsageEmployee";
 import { IPMState } from "./vehicleUsageAttachment";
-type EditableTableProps = Parameters<typeof Table>[0]
-type ColumnTypes = Exclude<EditableTableProps['columns'], undefined> 
 
 interface IProps {
   hide: (hideProps: any) => void;
