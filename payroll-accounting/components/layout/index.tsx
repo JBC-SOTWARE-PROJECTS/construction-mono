@@ -243,7 +243,7 @@ const DiverseTradeLayout = (props: IProps) => {
                   <div>
                     © 2024 {softwareName} <sup>+</sup>
                   </div>
-                  <div>{systemTagline}</div>
+                  {/* <div>{systemTagline}</div> */}
                 </div>
               );
             }}
