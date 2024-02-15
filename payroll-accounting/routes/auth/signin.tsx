@@ -6,27 +6,20 @@ import {
   ProFormText,
 } from "@ant-design/pro-components";
 import { ConfigProvider, Divider, Space, Tabs, TabsProps, message } from "antd";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import enUS from "antd/locale/en_US";
 import { devpassword, devusername } from "@/shared/devsettings";
 import { ICredentials } from "@/utility/interfaces";
 import { post } from "@/utility/graphql-client";
 import qs from "qs";
 import { useRouter } from "next/router";
-import { softwareName, systemTagline } from "@/shared/settings";
-
-import type { Container, Engine } from "tsparticles-engine";
-import Particles from "react-tsparticles";
-//import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
-import { loadSlim } from "tsparticles-slim"; // if you are going to use `loadSlim`, install the "tsparticles-slim" package too.
-
 
 type LoginType = "account";
 
 const items: TabsProps["items"] = [
   {
     key: "account",
-    label: "SyncPro Login",
+    label: "DiverseTrade Suite Login",
   },
 ];
 
@@ -56,27 +49,8 @@ export default function SingIn() {
         console.log("error login: ", error);
         setLoading(false);
       });
-    
+    console.log("record => ", record);
   };
-
-  const particlesInit = useCallback(async (engine: Engine) => {
-    console.log(engine);
-    await loadSlim(engine);
-}, []);
-
-const particlesLoaded = useCallback(async (container: Container | undefined) => {
-    await console.log(container);
-}, []);
-
-const TitleCont = ({  title }: {title: string}) => {
-  return (
-    <div style={{
-      color: "#ffffff"
-    }}>
-      <span>{title}</span>
-      </div>
-  );
-};
 
   return (
     <ProConfigProvider hashed={false}>
@@ -85,21 +59,13 @@ const TitleCont = ({  title }: {title: string}) => {
           style={{
             backgroundColor: "white",
             height: "100vh",
-            color: "white"
           }}>
           <LoginFormPage
-          //  backgroundImageUrl="https://mdn.alipayobjects.com/huamei_gcee1x/afts/img/A*y0ZTS6WLwvgAAAAAAAAAAAAADml6AQ/fmt.webp"
-          //  backgroundVideoUrl="/video/pexels-rodnae-productions.mp4"
-            backgroundVideoUrl="https://gw.alipayobjects.com/v/huamei_gcee1x/afts/video/jXRBRK_VAwoAAAAAAAAAAAAAK4eUAQBr"
-            backgroundImageUrl="/images/bgImage-old.svg"
-            logo={"/images/syncpro-logoword-white.png"}
-            title={""}
-            subTitle={<TitleCont title={systemTagline}/>}
+            backgroundImageUrl="/images/banner.svg"
+            logo="/images/DTLogo.svg"
+            title="DiverseTrade Suite"
+            subTitle="Inventory | Accounting | Payroll"
             onFinish={onLogin}
-            containerStyle={{
-              backgroundColor: 'rgba(0, 0, 0,0.65)',
-              backdropFilter: 'blur(4px)',
-            }}
             onFinishFailed={onFinishFailed}
             initialValues={{
               username: devusername,
@@ -112,7 +78,7 @@ const TitleCont = ({  title }: {title: string}) => {
               submitButtonProps: {
                 loading: loading,
                 block: true,
-                style: { backgroundColor: "#dc6601" },
+                style: { backgroundColor: "#399B53" },
               },
             }}
             actions={
@@ -130,7 +96,7 @@ const TitleCont = ({  title }: {title: string}) => {
                       fontWeight: "normal",
                       fontSize: 14,
                     }}>
-                    SyncPro Solutions
+                    DiverseTrade Suite
                   </span>
                 </Divider>
                 <Space align="center" size={24}>
