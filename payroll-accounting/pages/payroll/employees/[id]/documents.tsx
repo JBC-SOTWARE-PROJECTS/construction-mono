@@ -8,7 +8,8 @@ import { Divider, Tabs } from "antd";
 import { Button } from "antd/lib";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import UseDialog from "@/hooks/useDialog";
-import UpsertEmployeeDocsModal from "@/components/administrative/employees/upsertEmployeeDocs";
+import UpsertEmployeeDocsModal from "@/components/payroll/employee-management/documents/upsertEmployeeDocs";
+import EmployeeDocList from "@/components/payroll/employee-management/documents/employeeDocList";
 
 type Props = {};
 
@@ -48,6 +49,8 @@ function documents({}: Props) {
       >
         Create New
       </Button>
+
+      <EmployeeDocList employeeId={employee?.id}/>
     </>
   );
 }

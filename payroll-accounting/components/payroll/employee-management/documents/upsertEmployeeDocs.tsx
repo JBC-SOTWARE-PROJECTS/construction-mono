@@ -1,4 +1,10 @@
-import { AssetStatus, AssetType, Assets, Employee, Item } from "@/graphql/gql/graphql";
+import {
+  AssetStatus,
+  AssetType,
+  Assets,
+  Employee,
+  Item,
+} from "@/graphql/gql/graphql";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -11,21 +17,23 @@ import {
   Typography,
   message,
   Upload,
-  GetProp
+  GetProp,
 } from "antd";
 import { LoadingOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
 import { requiredField } from "@/utility/helper";
 import { FormCheckBox, FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
-import { UPSERT_ASSET_RECORD, UPSERT_MAINTENANCE_TYPE_RECORD } from "@/graphql/assets/queries";
-
+import {
+  UPSERT_ASSET_RECORD,
+  UPSERT_MAINTENANCE_TYPE_RECORD,
+} from "@/graphql/assets/queries";
 
 import { useMutation, useQuery } from "@apollo/client";
 import { useDialog } from "@/hooks";
 import _ from "lodash";
 import { apiUrlPrefix } from "@/shared/settings";
 import { RcFile } from "antd/es/upload";
-import { UploadProps } from "antd/lib";
+import { UploadFile, UploadProps } from "antd/lib";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -40,13 +48,23 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
   const [imageUrl, setImageUrl] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [previewTitle, setPreviewTitle] = useState("");
 
-  const getBase64 = (img: FileType, callback: (url: string) => void) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", () => callback(reader.result as string));
-    reader.readAsDataURL(img);
-  };
+  // const getBase64 = (img: FileType, callback: (url: string) => void) => {
+  //   const reader = new FileReader();
+  //   reader.addEventListener("load", () => callback(reader.result as string));
+  //   reader.readAsDataURL(img);
+  // };
 
+  const getBase64 = (file: FileType): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
 
   const [upsert, { loading: upsertLoading }] = useMutation(
     UPSERT_MAINTENANCE_TYPE_RECORD,
@@ -65,16 +83,14 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
       ...values,
     };
 
-    
-      showPasswordConfirmation(() => {
-        upsert({
-          variables: {
-            fields: payload,
-            id: record?.id,
-          },
-        });
+    showPasswordConfirmation(() => {
+      upsert({
+        variables: {
+          fields: payload,
+          id: record?.id,
+        },
       });
-    
+    });
   };
 
   const onFinishFailed = () => {
@@ -92,25 +108,38 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
     });
   };
 
-  const handleChange: UploadProps["onChange"] = (info) => {
-    if (info.file.status === "uploading") {
-      setLoading(true);
-      return;
+  // const handleChange: UploadProps["onChange"] = (info) => {
+  //   if (info.file.status === "uploading") {
+  //     setLoading(true);
+  //     return;
+  //   }
+  //   if (info.file.status === "done") {
+  //     // Get this url from response in real world.
+  //     getBase64(info.file.originFileObj as FileType, (url) => {
+  //       setLoading(false);
+  //       setIsUpdating(false);
+  //       setImageUrl(url);
+  //     });
+  //   }
+  // };
+
+  const handleCancel = () => setPreviewOpen(false);
+
+  const handlePreview = async (file: UploadFile) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj as FileType);
     }
-    if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj as FileType, (url) => {
-        setLoading(false);
-        setIsUpdating(false);
-        setImageUrl(url);
-      });
-    }
+
+    setPreviewImage(file.url || (file.preview as string));
+    setPreviewOpen(true);
+    setPreviewTitle(
+      file.name || file.url!.substring(file.url!.lastIndexOf("/") + 1)
+    );
   };
 
-  
   const uploadProps = {
     name: "file",
-    action: `${apiUrlPrefix}/api/employee/employee-documents/upload`, 
+    action: `${apiUrlPrefix}/api/employee/employee-documents/upload`,
     withCredentials: true,
     crossDomain: true,
     headers: { "X-Requested-With": "XMLHttpRequest" },
@@ -121,24 +150,33 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
 
   const fields = JSON.stringify({
     id: null,
-    employee: record?.id
+    employee: record?.id,
   });
 
+  // const uploadButton = (
+  //   <button style={{ border: 0, background: "none", width: 240 }} type="button">
+  //     {loading ? <LoadingOutlined /> : <PlusOutlined />}
+  //     <div style={{ marginTop: 8 }}>Upload</div>
+  //   </button>
+  // );
+
+  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) =>
+    setFileList(newFileList);
+
   const uploadButton = (
-    <button style={{ border: 0, background: "none", width: 240 }} type="button">
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+    <button style={{ border: 0, background: "none" }} type="button">
+      <PlusOutlined />
       <div style={{ marginTop: 8 }}>Upload</div>
     </button>
   );
 
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   return (
     <Modal
       title={
         <Typography.Title level={4}>
-          <Space align="center">{`${
-            record?.id ? "Edit" : "Add"
-          } Employee Documnets`}</Space>
+          <Space align="center">Upload Document</Space>
         </Typography.Title>
       }
       destroyOnClose={true}
@@ -147,20 +185,6 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
       width={"100%"}
       style={{ maxWidth: "800px" }}
       onCancel={() => hide(false)}
-      footer={
-        <Space>
-          <Button
-            type="primary"
-            size="large"
-            htmlType="submit"
-            form="upsertMaintenanceType"
-            loading={upsertLoading}
-            icon={<SaveOutlined />}
-          >
-            {`${record?.id ? "Save Changes" : "Save"} & Close`}
-          </Button>
-        </Space>
-      }
     >
       <Form
         name="upsertMaintenanceType"
@@ -171,7 +195,7 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
           ...record,
         }}
       >
-         <Upload
+        {/* <Upload
                 {...uploadProps}
                 data={{ fields: fields }}
                 listType="picture-card"
@@ -181,30 +205,28 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
                 onChange={handleChange}
               >
                 {uploadButton}
-              </Upload>
-        {/* <Row gutter={[8, 0]}>
-          <Col span={12}>
-            <FormInput
-              name="name"
-              label="Type Name"
-              rules={requiredField}
-              propsinput={{
-                placeholder: "Type name",
-              }}
-            />
-          </Col>
+              </Upload> */}
 
-          <Col span={12}>
-            <FormInput
-              name="description"
-              rules={requiredField}
-              label="Description"
-              propsinput={{
-                placeholder: "Description",
-              }}
-            />
-          </Col>
-        </Row> */}
+        <Upload
+          {...uploadProps}
+          data={{ fields: fields }}
+          listType="picture-card"
+          fileList={fileList}
+          beforeUpload={beforeUpload}
+          onChange={handleChange}
+          onPreview={handlePreview}
+          onRemove={()=>{message.error("You need to manually remove the image on the uploaded document itself")}}
+        >
+          {uploadButton}
+        </Upload>
+        <Modal
+          open={previewOpen}
+          title={previewTitle}
+          footer={null}
+          onCancel={handleCancel}
+        >
+          <img alt="example" style={{ width: "100%" }} src={previewImage} />
+        </Modal>
       </Form>
     </Modal>
   );

@@ -2,6 +2,7 @@ package com.backend.gbp.graphqlservices.hrm
 
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.assets.AssetRepairMaintenance
+import com.backend.gbp.domain.assets.VehicleUsageDocs
 import com.backend.gbp.domain.hrm.Allowance
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeDocs
@@ -45,6 +46,29 @@ class EmployeeDocsService extends AbstractDaoService<EmployeeDocs> {
     @GraphQLQuery(name ="fetchAllEmpDocs", description = "get all fetch Emp Docs")
     List<EmployeeDocs>fetchAllEmpDocs(){
         return findAll()
+    }
+
+    @GraphQLQuery(name = "employeeDocsListPageable")
+    Page<EmployeeDocs> employeeDocsListPageable(
+            @GraphQLArgument(name = "employee") UUID employee,
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+
+    ) {
+
+        String query = '''Select p from EmployeeDocs p where p.employee.id = :employee '''
+
+        String countQuery = '''Select count(p) from EmployeeDocs p where p.employee.id = :employee '''
+
+        Map<String, Object> params = new HashMap<>()
+        //  params.put('filter', filter)
+        params.put('employee', employee)
+
+        // query += ''' ORDER BY p.description DESC'''
+
+        Page<EmployeeDocs> result = getPageable(query, countQuery, page, size, params)
+        return result
     }
 
 //    @GraphQLQuery(name ="fetchAllowancePageable", description = "get all allowance")
