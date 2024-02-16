@@ -5,9 +5,11 @@ import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.assets.VehicleUsageDocs
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
+import com.backend.gbp.domain.hrm.EmployeeDocs
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.hrm.EmployeeAttendanceService
+import com.backend.gbp.graphqlservices.hrm.EmployeeDocsService
 import com.backend.gbp.graphqlservices.hrm.EmployeeFilterService
 import com.backend.gbp.graphqlservices.hrm.EmployeeService
 import com.backend.gbp.graphqlservices.projects.ProjectService
@@ -60,6 +62,9 @@ class EmployeeResource {
 
     @Autowired
     EmployeeService employeeService
+
+    @Autowired
+    EmployeeDocsService employeeDocsService
 
     @Autowired
     EmployeeRepository employeeRepository
@@ -139,6 +144,26 @@ class EmployeeResource {
         Employee employeeDocResult = employeeService.upsertMobileData(empRecord.id,fieldMap );
 
         return employeeDocResult.profilePicture;
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(method = RequestMethod.POST, value = ['/employee-documents/upload'])
+    String uploadEmployeeDocuments(
+            @RequestPart("file") MultipartFile capture,
+            @RequestPart("fields") String fields
+    ) {
+
+        File file = convertMultipartFileToFile(capture);
+        spaceService.uploadFileToSpace(file,"EMPLOYEE_DOCUMENTS");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> fieldMapString = objectMapper.readValue(fields, Map.class);
+
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put("file", file.getName());
+        EmployeeDocs employeeDocResult = employeeDocsService.upsertEmpDocs( null,  UUID.fromString(fieldMapString.get("employee") as String),fieldMap);
+
+        return employeeDocResult.id;
     }
 
 
