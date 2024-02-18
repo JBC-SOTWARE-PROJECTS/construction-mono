@@ -35,7 +35,7 @@ function documents({}: Props) {
     },
     fetchPolicy: "cache-and-network",
   });
-console.log("employeeDocs", data)
+
 
   const onUpsertRecord = (record?: any) => {
     modal({ record: record , refetch: refetch}, (result: any) => {
