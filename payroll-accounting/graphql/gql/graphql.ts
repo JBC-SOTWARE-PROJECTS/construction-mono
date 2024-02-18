@@ -2336,6 +2336,21 @@ export type EmployeeBasicDetails = {
   position?: Maybe<Scalars['String']['output']>;
 };
 
+export type EmployeeDocs = {
+  __typename?: 'EmployeeDocs';
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  designation?: Maybe<Scalars['String']['output']>;
+  docType?: Maybe<Scalars['String']['output']>;
+  employee?: Maybe<Employee>;
+  file?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+};
+
 export type EmployeeInput = {
   allowanceItems?: InputMaybe<Array<InputMaybe<EmployeeAllowanceInput>>>;
   allowancePackageId?: InputMaybe<Scalars['UUID']['input']>;
@@ -4216,6 +4231,8 @@ export type Mutation = {
   deleteBillingItem?: Maybe<BillingItem>;
   /** Delete one department schedule config. */
   deleteDepartmentSchedule?: Maybe<GraphQlRetVal_String>;
+  /** Delete deleteEmpDocs */
+  deleteEmpDocs?: Maybe<GraphQlRetVal_String>;
   deleteEmployeeAttendance?: Maybe<GraphQlRetVal_String>;
   /** Delete one event calender. */
   deleteEventCalendar?: Maybe<GraphQlRetVal_String>;
@@ -4434,6 +4451,7 @@ export type Mutation = {
   upsertDisDM?: Maybe<DisbursementAp>;
   upsertDisReap?: Maybe<DisbursementAp>;
   upsertDmDetials?: Maybe<DebitMemoDetails>;
+  upsertEmpDocs?: Maybe<EmployeeDocs>;
   upsertEmployee?: Maybe<Employee>;
   upsertEmployeeAllowances?: Maybe<GraphQlResVal_String>;
   upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
@@ -4901,6 +4919,12 @@ export type MutationDeleteBillingItemArgs = {
 
 /** Mutation root */
 export type MutationDeleteDepartmentScheduleArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteEmpDocsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -6328,6 +6352,13 @@ export type MutationUpsertDisReapArgs = {
 export type MutationUpsertDmDetialsArgs = {
   it?: InputMaybe<DmDetailsDtoInput>;
   parent?: InputMaybe<DebitMemoInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertEmpDocsArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -10496,6 +10527,8 @@ export type Query = {
   fetchAllAllowance?: Maybe<Array<Maybe<Allowance>>>;
   /** get all fetch allowance package */
   fetchAllAllowancePackage?: Maybe<Array<Maybe<AllowancePackage>>>;
+  /** get all fetch Emp Docs */
+  fetchAllEmpDocs?: Maybe<Array<Maybe<EmployeeDocs>>>;
   fetchAllOtherDeduction?: Maybe<Array<Maybe<OtherDeductionTypes>>>;
   /** fetch all allowance Item */
   fetchAllowanceItemByPackagePageable?: Maybe<Page_AllowanceItem>;

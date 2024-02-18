@@ -209,8 +209,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     setDeletedEmps(allDeleted)
   }
 
-  console.log("deletedEmps", deletedEmps)
-
+ 
 
   return (
     <Modal
