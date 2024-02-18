@@ -3,8 +3,7 @@ import EmployeeManagementHeader from "@/components/administrative/employees/Empl
 import EmployeeDetails from "@/components/common/EmployeeDetails";
 import { useGetEmployeeById } from "@/hooks/employee";
 import { useRouter } from "next/router";
-import type { TabsProps } from "antd";
-import { Divider, Tabs, message } from "antd";
+import { Divider, message } from "antd";
 import { Button } from "antd/lib";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import UseDialog from "@/hooks/useDialog";
@@ -12,7 +11,6 @@ import UpsertEmployeeDocsModal from "@/components/payroll/employee-management/do
 import EmployeeDocList from "@/components/payroll/employee-management/documents/employeeDocList";
 import useGetEmployeeDocs from "@/hooks/employee-documents/useGetEmployeeDocs";
 import { IPMState } from "@/components/inventory/assets/dialogs/vehicleUsageAttachment";
-import { PageLoading } from "@ant-design/pro-components";
 
 type Props = {};
 

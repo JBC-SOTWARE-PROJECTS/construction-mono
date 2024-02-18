@@ -1,9 +1,7 @@
 import FormInput from "@/components/common/formInput/formInput";
-import { IPMState } from "@/components/inventory/assets/dialogs/vehicleUsageAttachment";
 import DOImageViewer from "@/components/thirdParty/doImageViewer";
 import { UPSERT_EMPLOYEE_DOCS } from "@/graphql/employee/queries";
 import { EmployeeDocs } from "@/graphql/gql/graphql";
-import useGetEmployeeDocs from "@/hooks/employee-documents/useGetEmployeeDocs";
 import { requiredField } from "@/utility/helper";
 import { EditOutlined, SaveOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
