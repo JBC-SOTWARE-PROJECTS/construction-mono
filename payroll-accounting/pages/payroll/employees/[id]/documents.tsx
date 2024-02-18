@@ -21,7 +21,7 @@ const initialState: IPMState = {
 };
 
 
-function documents({}: Props) {
+function Documents({}: Props) {
   const router = useRouter();
   const [employee, loadingEmployee] = useGetEmployeeById(router?.query?.id);
   const [statePage, setState] = useState(initialState);
@@ -75,4 +75,4 @@ function documents({}: Props) {
   );
 }
 
-export default documents;
+export default Documents;
