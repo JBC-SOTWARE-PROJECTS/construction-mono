@@ -27,7 +27,7 @@ const useGetEmployeeDocs = (props: QueryHookOptions) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     ...props
   });
-  return [data?.list, loading, , refetch];
+  return [data?.list, loading,  refetch];
 };
 
 export default useGetEmployeeDocs;

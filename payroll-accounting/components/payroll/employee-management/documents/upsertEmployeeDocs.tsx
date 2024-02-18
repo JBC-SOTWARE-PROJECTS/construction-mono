@@ -37,13 +37,15 @@ import { UploadFile, UploadProps } from "antd/lib";
 
 interface IProps {
   hide: (hideProps: any) => void;
+  submitted: (sub: any) => void;
   record?: Employee | null | undefined;
+  refetch: () => void;
 }
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 export default function UpsertEmployeeDocsModal(props: IProps) {
-  const { hide, record } = props;
+  const { hide, record, refetch } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [imageUrl, setImageUrl] = useState<string>();
   const [loading, setLoading] = useState(false);
@@ -51,6 +53,7 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
+
 
   // const getBase64 = (img: FileType, callback: (url: string) => void) => {
   //   const reader = new FileReader();
@@ -65,33 +68,6 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
       reader.onload = () => resolve(reader.result as string);
       reader.onerror = (error) => reject(error);
     });
-
-  const [upsert, { loading: upsertLoading }] = useMutation(
-    UPSERT_MAINTENANCE_TYPE_RECORD,
-    {
-      ignoreResults: false,
-      onCompleted: (data) => {
-        if (data) {
-          hide(data);
-        }
-      },
-    }
-  );
-
-  const onSubmit = (values: any) => {
-    let payload = {
-      ...values,
-    };
-
-    showPasswordConfirmation(() => {
-      upsert({
-        variables: {
-          fields: payload,
-          id: record?.id,
-        },
-      });
-    });
-  };
 
   const onFinishFailed = () => {
     message.error("Something went wrong. Please contact administrator.");
@@ -108,20 +84,7 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
     });
   };
 
-  // const handleChange: UploadProps["onChange"] = (info) => {
-  //   if (info.file.status === "uploading") {
-  //     setLoading(true);
-  //     return;
-  //   }
-  //   if (info.file.status === "done") {
-  //     // Get this url from response in real world.
-  //     getBase64(info.file.originFileObj as FileType, (url) => {
-  //       setLoading(false);
-  //       setIsUpdating(false);
-  //       setImageUrl(url);
-  //     });
-  //   }
-  // };
+ 
 
   const handleCancel = () => setPreviewOpen(false);
 
@@ -153,15 +116,16 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
     employee: record?.id,
   });
 
-  // const uploadButton = (
-  //   <button style={{ border: 0, background: "none", width: 240 }} type="button">
-  //     {loading ? <LoadingOutlined /> : <PlusOutlined />}
-  //     <div style={{ marginTop: 8 }}>Upload</div>
-  //   </button>
-  // );
 
-  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) =>
+  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) =>{
+    console.log("newFileList", newFileList)
     setFileList(newFileList);
+    // hide(newFileList[0]);
+    refetch()
+  }
+    
+  
+
 
   const uploadButton = (
     <button style={{ border: 0, background: "none" }} type="button">
@@ -189,7 +153,7 @@ export default function UpsertEmployeeDocsModal(props: IProps) {
       <Form
         name="upsertMaintenanceType"
         layout="vertical"
-        onFinish={onSubmit}
+        onFinish={()=>{}}
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,

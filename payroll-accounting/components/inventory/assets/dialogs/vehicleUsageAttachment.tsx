@@ -160,7 +160,6 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
   });
 
   const saveUpdate =({description}: VehicleUsageDocs)=>{
-    console.log("hello", description)
     upsert({
       variables: {
         fields: {
