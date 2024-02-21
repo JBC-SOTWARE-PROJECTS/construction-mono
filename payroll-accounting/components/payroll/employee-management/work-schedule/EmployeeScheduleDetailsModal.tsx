@@ -63,7 +63,7 @@ function EmployeeScheduleDetailsModal({
         hide(false);
       }}
       maskClosable={false}
-      width={"45vw"}
+      width={"60vw"}
       title={"Employee Schedule Details"}
       footer={null}
     >
@@ -107,7 +107,12 @@ function EmployeeScheduleDetailsModal({
         <br />
         <ScheduleCard
           employeeSchedule={data?.overtimeSchedule}
-          title="Overtime Schedule"
+          title={
+            <>
+              Overtime Schedule{" "}
+              <Tag color="geekblue">{data?.overtimeSchedule?.overtimeType}</Tag>
+            </>
+          }
           extra={
             <UpsertEmployeeScheduleModal
               employeeSchedule={data?.overtimeSchedule}

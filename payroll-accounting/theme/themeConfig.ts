@@ -10,8 +10,7 @@ const theme: ThemeConfig = {
       fontSize: 14,
     },
     Segmented: {
-      itemSelectedBg: "#399B53",
-      // itemSelectedColor: "white",
+       itemSelectedColor: "white",
     },
     Button: {
       colorPrimary: "#399B53",

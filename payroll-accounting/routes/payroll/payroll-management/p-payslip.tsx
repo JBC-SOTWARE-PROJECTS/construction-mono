@@ -28,7 +28,7 @@ const items: TabsProps['items'] = [
   {
     key: '3',
     label: 'Payroll Register per Project',
-    children: 'Content of Tab Pane 3',
+    // children: 'Content of Tab Pane 3',
   },
 ];
 

@@ -58,7 +58,13 @@ a {
 .my-prefix-base-menu-inline-group-item-title {
   font-weight: bold !important;
   color: #399b53 !important;
+  /* color: #dc6601 !important; */
 }
+
+/* .ant-pro-form-login-page-logo{
+  width: 400px !important;
+  height: 100px !important;
+} */
 
 .ant-form-item-explain-error {
   font-size: 12px !important;
@@ -109,6 +115,7 @@ a {
 } */
 
 th.ant-table-cell {
+  /* background: #14213d !important; */
   background: #399b53 !important;
   color: #fff !important;
 }
@@ -186,7 +193,7 @@ th.ant-table-cell {
 
 .diverse-trade {
   width: 40px;
-  height: 40px;
+  height: 30px;
 }
 
 .custom-title {
@@ -340,7 +347,8 @@ th.ant-table-cell {
   border-color: #399b53;
   width: 48px;
   height: 48px;
-  background-color: #399b53;
+  background-color: #399b53; 
+  
 }
 
 .menu-item-title {
@@ -357,6 +365,8 @@ th.ant-table-cell {
 }
 
 .diverse-trade-icon {
+  /* color: #14213d; */
+  /* color: #ee9f27; */
   color: white;
   font-size: 24px;
 }
@@ -378,6 +388,10 @@ th.ant-table-cell {
 .custom_calendar_cell:hover {
   background-color: rgb(236, 234, 234) !important;
   color: rgb(39, 39, 39) !important;
+}
+
+.ant-upload{
+  width: 100% !important;
 }
 
 .billing-info-width {

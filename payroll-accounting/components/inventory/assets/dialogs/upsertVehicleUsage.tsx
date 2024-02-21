@@ -1,4 +1,4 @@
-import { Assets, VehicleUsageMonitoring } from "@/graphql/gql/graphql";
+import { Assets, Employee, VehicleUsageEmployee, VehicleUsageMonitoring } from "@/graphql/gql/graphql";
 import React, { useState, useEffect } from "react";
 import {
   Button,
@@ -7,6 +7,7 @@ import {
   Modal,
   Row,
   Space,
+  Table,
   Typography,
   message,
 } from "antd";
@@ -14,7 +15,7 @@ import { SaveOutlined } from "@ant-design/icons";
 import { requiredField } from "@/utility/helper";
 import {  FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
-import {  UPSERT_VEHICLE_USAGE_RECORD } from "@/graphql/assets/queries";
+import {  UPSERT_USAGE_EMPLOYEE_ITEM, UPSERT_VEHICLE_USAGE_RECORD } from "@/graphql/assets/queries";
 import { useMutation, useQuery } from "@apollo/client";
 import _, { set } from "lodash";
 import FormDateTimePicker from "@/components/common/formDateTimePicker/formDateTimePicker";
@@ -23,6 +24,11 @@ import { useRouter } from "next/router";
 import useGetAssetById from "@/hooks/asset/useGetAssetById";
 import moment from "moment";
 import dayjs from "dayjs";
+import EmployeeDrawer from "@/components/payroll/EmployeeDrawer";
+import useGetEmployeesBasic from "@/hooks/employee/useGetEmployeesBasic";
+import VehicleUsageEmployeeTable from "../masterfile/vehicleUsageEmployee";
+import useGetVehicleUsageEmployee from "@/hooks/asset/useGetVehicleUsageEmployee";
+import { IPMState } from "./vehicleUsageAttachment";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -42,12 +48,30 @@ const defRec = {
   projectId: null
 }
 
+const initialState: IPMState = {
+  filter: "",
+  page: 0,
+  size: 10,
+};
+
+
 export default function UpsertVehicleUsageModal(props: IProps) {
   const { hide, record, projectOpts } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [initRecord, setinitRecord] = useState<VehicleUsageMonitoring | null>(null);
+  const [selectedEmps, setSelectedEmps] = useState<VehicleUsageEmployee[]>([]);
+  const [deletedEmps, setDeletedEmps] = useState<string[]>([]);
+  const [statePage, setState] = useState(initialState);
   const router = useRouter();
   moment.locale('en')
+
+  const [dataEmployee, loadingEMPS, refetch] = useGetVehicleUsageEmployee({
+    variables: {
+      ...statePage,
+       usageID: record?.id,
+    },
+    fetchPolicy: "network-only",
+  });
   
   useEffect(() => {
     
@@ -63,6 +87,21 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       setinitRecord(defRec);
     }
   }, [record])
+
+
+  useEffect(() => {
+    
+    if(dataEmployee){
+      var empContent = dataEmployee?.content;
+
+      empContent = empContent.map((record : VehicleUsageEmployee)=>({
+        ...record, 
+        timeRenderedEnd: dayjs(record.timeRenderedEnd).format("MMMM D, YYYY, h:mm:ss A"),
+        timeRenderedStart:  dayjs(record.timeRenderedStart).format("MMMM D, YYYY, h:mm:ss A")
+      }))
+      setSelectedEmps(empContent);
+    }
+  }, [dataEmployee])
   
   const [asset, loadingAsset] = useGetAssetById(router?.query?.id);
   const assetType = asset as Assets
@@ -73,6 +112,21 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       onCompleted: (data) => {
         if (data) {
           hide(data);
+        }
+      },
+    }
+  );
+
+  
+
+  const [upsertUsageEmployee, { loading: upsertUEmpLoading }] = useMutation(
+    UPSERT_USAGE_EMPLOYEE_ITEM,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+       
+        if (data) {
+         console.log("respData", data)
         }
       },
     }
@@ -92,14 +146,48 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     payload.asset = assetType?.id;
     payload.project = values?.projectId;
 
+    var usageEmps = selectedEmps.map((record: VehicleUsageEmployee)=> {
+      
+      var newProp = {
+        ...record, ...{
+          employee : record.employee?.id,
+          asset : record.asset?.id,
+          item: record.item?.id,
+          vehicleUsage : record?.id,
+          timeRenderedEnd: dayjs(record.timeRenderedEnd).millisecond(0),
+          timeRenderedStart: dayjs(record.timeRenderedStart).millisecond(0)
+        }
+      }
+
+      delete newProp["__typename"];
+
+      return newProp
+    })
+     
+     
+
       showPasswordConfirmation(() => {
+        upsertUsageEmployee({
+          variables: {
+           employeeList: usageEmps,
+           usageID: record?.id,
+           toDelete: deletedEmps
+          }
+        })
+
         upsert({
           variables: {
             fields: payload,
             id: record?.id,
           },
         });
+
+       
       });
+
+
+     
+     
     
   };
 
@@ -107,7 +195,22 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     message.error("Something went wrong. Please contact administrator.");
   };
 
+  const [employeeList, loading, setFilters] = useGetEmployeesBasic();
+
+
+  const handleSelected = (record : VehicleUsageEmployee[])=>{
+    console.log("handleSelected", record)
+    setSelectedEmps(record)
+  }
  
+  const handleDeleted = (record : string)=>{
+    var allDeleted = deletedEmps;
+    allDeleted.push(record);
+    setDeletedEmps(allDeleted)
+  }
+
+ 
+
   return (
     <Modal
       title={
@@ -121,7 +224,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       maskClosable={false}
       open={true}
       width={"100%"}
-      style={{ maxWidth: "800px" }}
+      style={{ maxWidth: "1300px" }}
       onCancel={() => hide(false)}
       footer={
         <Space>
@@ -252,6 +355,44 @@ export default function UpsertVehicleUsageModal(props: IProps) {
             </Col>
        
         </Row>
+        {record?<>
+        <EmployeeDrawer
+        selectedEmployees={employeeList}
+        loading={false}
+        usage="MULTI"
+        onSelect={(selected : Employee[])=>{
+         
+          const elementExists =_.filter(selectedEmps, emp => emp.employee?.id == selected[0].id);
+        
+          if(elementExists.length == 0){
+            dayjs.locale('en');
+           var recEmp : VehicleUsageEmployee[] = selected.map((rec: Employee)=>({
+              employee: rec,
+              company: initRecord.company,
+              item: initRecord.item,
+              asset: initRecord.asset,
+              vehicleUsage: initRecord.id,
+              designation: "DRIVER",
+              timeRenderedEnd: dayjs(new Date()).format("MMMM D, YYYY, h:mm:ss A"),
+              timeRenderedStart: dayjs(new Date()).format("MMMM D, YYYY, h:mm:ss A"),
+              remarks: "N/A",
+           }))
+
+
+            setSelectedEmps(_.concat(selectedEmps, recEmp))
+          }
+        
+        }}
+        >
+          <>Select Employee</>
+        </EmployeeDrawer>
+
+      
+        <VehicleUsageEmployeeTable
+        selectedEmps={selectedEmps}
+        handleSelected={handleSelected}
+        handleDeleted={handleDeleted}
+        />  </>: <></>}
       </Form>
       }
       </>

@@ -7,6 +7,7 @@ import { AssetStatus, Assets } from "@/graphql/gql/graphql";
 import DescLong from "../../desclong";
 import { AssetStatusColor } from "@/utility/constant";
 import { useRouter } from "next/router";
+import CustomButton from "@/components/common/CustomButton";
 
 type IProps = {
   dataSource: Assets[];
@@ -88,21 +89,23 @@ export default function AssetTable({
         return (
           <Row gutter={5}>
             <Col>
-              <Button
+              <CustomButton
                 icon={<EyeOutlined />}
                 type="primary"
                 onClick={() => {
                   router.push(`/inventory/assets/${record?.id}`);
                 }}
+                allowedPermissions={["manage_asset"]}
               />
             </Col>
             <Col>
-              <Button
+              <CustomButton
                 icon={<EditOutlined />}
                 type="primary"
                 onClick={() => {
                   handleOpen(record);
                 }}
+                allowedPermissions={["manage_asset"]}
               />
             </Col>
           </Row>

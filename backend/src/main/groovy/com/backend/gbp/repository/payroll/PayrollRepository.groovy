@@ -20,6 +20,9 @@ interface PayrollRepository extends JpaRepository<Payroll, UUID> {
 //
     @Query(value = "select p from Payroll p left join fetch p.payrollEmployees pe where p.id = :id")
     Optional<Payroll> findByIdJoinFetchPayrollEmployees(@Param("id")UUID id)
+
+    @Query(value = "select p from Payroll p where p.id= :id ")
+    Payroll getPayrollById(@Param("id") UUID id)
 //
 //    @Query(value = "select p from Payroll p left join fetch p.adjustment where p.id = :id")
 //    Optional<Payroll> getPayrollWithAdjustment(@Param("id")UUID id)

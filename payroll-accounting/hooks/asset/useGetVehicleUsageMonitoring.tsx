@@ -18,6 +18,10 @@ const GET_RECORDS = gql`
           endDatetime
           startFuelReading
           endFuelReading
+          company
+          asset{
+            id
+          }
           project{
             id
             description
