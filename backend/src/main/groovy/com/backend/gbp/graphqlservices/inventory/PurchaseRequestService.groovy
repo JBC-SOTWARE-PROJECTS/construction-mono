@@ -95,7 +95,7 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
         }
 
 
-        query += ''' ORDER BY pr.prNo DESC'''
+        query += ''' ORDER BY pr.prDateRequested DESC'''
 
 		Page<PurchaseRequest> result = getPageable(query, countQuery, page, size, params)
 		return result
