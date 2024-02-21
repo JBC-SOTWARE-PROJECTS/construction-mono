@@ -15,6 +15,8 @@ import { accountingMenu } from "@/components/sidebar";
 import { post } from "@/utility/graphql-client";
 import qs from "qs";
 import invetoryMenu from "@/components/sidebar/inventory";
+import otherOperationsMenu from "@/components/sidebar/otherOperations";
+import { softwareName } from "@/shared/settings";
 
 export default function MainMenu({ account }: IPageProps) {
   const roles = account.user.roles;
@@ -57,7 +59,7 @@ export default function MainMenu({ account }: IPageProps) {
           <p>
             {`We're delighted to see you again and have the opportunity to
             continue supporting you. Your engagement is what drives us, and
-            we're committed to making your experience here at DiverseTrade Suite
+            we're committed to making your experience here at ${softwareName}
             truly exceptional. As you navigate through this session, remember
             that you're current company is `}
             <span className="font-bold">
@@ -73,7 +75,7 @@ export default function MainMenu({ account }: IPageProps) {
         type="success"
         showIcon
         // eslint-disable-next-line jsx-a11y/alt-text
-        icon={<img src={logo.src} className="diverse-trade" />}
+        icon={<img src={logo.src} className="diverse-trade"  />}
       />
       <Divider orientation="left">Inventory Module</Divider>
       <div className="w-full">
@@ -90,6 +92,10 @@ export default function MainMenu({ account }: IPageProps) {
       <Divider orientation="left">Administrative Module</Divider>
       <div className="w-full">
         <MenuCard menus={administrativeMenu} />
+      </div>
+      <Divider orientation="left">Other Operations</Divider>
+      <div className="w-full">
+        <MenuCard menus={otherOperationsMenu} />
       </div>
     </div>
   );

@@ -1405,6 +1405,9 @@ export type DateWithScheduleInput = {
   dateTimeStart?: InputMaybe<Scalars['Instant']['input']>;
   mealBreakEnd?: InputMaybe<Scalars['Instant']['input']>;
   mealBreakStart?: InputMaybe<Scalars['Instant']['input']>;
+  overtimeEnd?: InputMaybe<Scalars['Instant']['input']>;
+  overtimeStart?: InputMaybe<Scalars['Instant']['input']>;
+  overtimeType?: InputMaybe<OvertimeType>;
 };
 
 export type DebitMemo = {
@@ -2252,6 +2255,7 @@ export type Employee = {
   philhealthNo?: Maybe<Scalars['String']['output']>;
   pinCode?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Position>;
+  profilePicture?: Maybe<Scalars['String']['output']>;
   shortName?: Maybe<Scalars['String']['output']>;
   sssNo?: Maybe<Scalars['String']['output']>;
   stateProvince?: Maybe<Scalars['String']['output']>;
@@ -2332,6 +2336,21 @@ export type EmployeeBasicDetails = {
   position?: Maybe<Scalars['String']['output']>;
 };
 
+export type EmployeeDocs = {
+  __typename?: 'EmployeeDocs';
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  designation?: Maybe<Scalars['String']['output']>;
+  docType?: Maybe<Scalars['String']['output']>;
+  employee?: Maybe<Employee>;
+  file?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+};
+
 export type EmployeeInput = {
   allowanceItems?: InputMaybe<Array<InputMaybe<EmployeeAllowanceInput>>>;
   allowancePackageId?: InputMaybe<Scalars['UUID']['input']>;
@@ -2380,6 +2399,7 @@ export type EmployeeInput = {
   philhealthNo?: InputMaybe<Scalars['String']['input']>;
   pinCode?: InputMaybe<Scalars['String']['input']>;
   position?: InputMaybe<PositionInput>;
+  profilePicture?: InputMaybe<Scalars['String']['input']>;
   shortName?: InputMaybe<Scalars['String']['input']>;
   sssNo?: InputMaybe<Scalars['String']['input']>;
   stateProvince?: InputMaybe<Scalars['String']['input']>;
@@ -2534,6 +2554,7 @@ export type EmployeeSchedule = {
   locked?: Maybe<Scalars['Boolean']['output']>;
   mealBreakEnd?: Maybe<Scalars['Instant']['output']>;
   mealBreakStart?: Maybe<Scalars['Instant']['output']>;
+  overtimeType?: Maybe<OvertimeType>;
   project?: Maybe<Projects>;
   request?: Maybe<Scalars['UUID']['output']>;
   scheduleDuration?: Maybe<Scalars['BigDecimal']['output']>;
@@ -4210,6 +4231,8 @@ export type Mutation = {
   deleteBillingItem?: Maybe<BillingItem>;
   /** Delete one department schedule config. */
   deleteDepartmentSchedule?: Maybe<GraphQlRetVal_String>;
+  /** Delete deleteEmpDocs */
+  deleteEmpDocs?: Maybe<GraphQlRetVal_String>;
   deleteEmployeeAttendance?: Maybe<GraphQlRetVal_String>;
   /** Delete one event calender. */
   deleteEventCalendar?: Maybe<GraphQlRetVal_String>;
@@ -4428,6 +4451,7 @@ export type Mutation = {
   upsertDisDM?: Maybe<DisbursementAp>;
   upsertDisReap?: Maybe<DisbursementAp>;
   upsertDmDetials?: Maybe<DebitMemoDetails>;
+  upsertEmpDocs?: Maybe<EmployeeDocs>;
   upsertEmployee?: Maybe<Employee>;
   upsertEmployeeAllowances?: Maybe<GraphQlResVal_String>;
   upsertEmployeeAttendance?: Maybe<GraphQlResVal_EmployeeAttendance>;
@@ -4467,6 +4491,7 @@ export type Mutation = {
   upsertMobileData?: Maybe<Employee>;
   upsertMpItem?: Maybe<MaterialProductionItem>;
   upsertMultiFixedAssetItems?: Maybe<GraphQlResVal_Boolean>;
+  upsertMultiVehicleUsageEmployee?: Maybe<GraphQlRetVal_String>;
   upsertOffice?: Maybe<Office>;
   upsertOfficeItem?: Maybe<OfficeItem>;
   upsertOtherDeductionItem?: Maybe<GraphQlResVal_String>;
@@ -4529,6 +4554,7 @@ export type Mutation = {
   upsertTransType?: Maybe<TransactionType>;
   upsertUnitMeasurement?: Maybe<UnitMeasurement>;
   upsertVehicleUsageDocs?: Maybe<VehicleUsageDocs>;
+  upsertVehicleUsageEmployee?: Maybe<VehicleUsageEmployee>;
   upsertVehicleUsageMonitoring?: Maybe<VehicleUsageMonitoring>;
   upsertWithholdingTaxMatrix?: Maybe<GraphQlRetVal_WithholdingTaxMatrix>;
   upsertWtx?: Maybe<DisbursementWtx>;
@@ -4893,6 +4919,12 @@ export type MutationDeleteBillingItemArgs = {
 
 /** Mutation root */
 export type MutationDeleteDepartmentScheduleArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationDeleteEmpDocsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -6324,6 +6356,13 @@ export type MutationUpsertDmDetialsArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertEmpDocsArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertEmployeeArgs = {
   authorities?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   company?: InputMaybe<Scalars['UUID']['input']>;
@@ -6380,12 +6419,13 @@ export type MutationUpsertEmployeeLoanConfigArgs = {
 
 /** Mutation root */
 export type MutationUpsertEmployeeScheduleArgs = {
-  dates?: InputMaybe<Array<InputMaybe<DateWithScheduleInput>>>;
+  datesWithSchedule?: InputMaybe<Array<InputMaybe<DateWithScheduleInput>>>;
   employeeId?: InputMaybe<Scalars['UUID']['input']>;
   employeeIdList?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
-  isOverTime?: InputMaybe<Scalars['Boolean']['input']>;
+  mode?: InputMaybe<Scalars['String']['input']>;
+  overtimeProject?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -6594,6 +6634,14 @@ export type MutationUpsertMpItemArgs = {
 /** Mutation root */
 export type MutationUpsertMultiFixedAssetItemsArgs = {
   fields?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertMultiVehicleUsageEmployeeArgs = {
+  employeeList?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  toDelete?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
+  usageID?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -7040,6 +7088,13 @@ export type MutationUpsertVehicleUsageDocsArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertVehicleUsageEmployeeArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertVehicleUsageMonitoringArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -7218,6 +7273,11 @@ export type OtherDeductionTypes = {
   status?: Maybe<Scalars['Boolean']['output']>;
   subaccountCode?: Maybe<Scalars['String']['output']>;
 };
+
+export enum OvertimeType {
+  Fixed = 'FIXED',
+  Flexible = 'FLEXIBLE'
+}
 
 export type PcvItemsDtoInput = {
   discAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -8673,6 +8733,25 @@ export type Page_VehicleUsageDocs = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_VehicleUsageEmployee = {
+  __typename?: 'Page_VehicleUsageEmployee';
+  content?: Maybe<Array<Maybe<VehicleUsageEmployee>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_VehicleUsageMonitoring = {
   __typename?: 'Page_VehicleUsageMonitoring';
   content?: Maybe<Array<Maybe<VehicleUsageMonitoring>>>;
@@ -9919,8 +9998,6 @@ export type Projects = {
   projectStatusColor?: Maybe<Scalars['String']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
-  /** totalExpenses */
-  totalExpenses?: Maybe<Scalars['BigDecimal']['output']>;
   total_cost?: Maybe<Scalars['BigDecimal']['output']>;
   /** totals */
   totals?: Maybe<Scalars['BigDecimal']['output']>;
@@ -10450,6 +10527,8 @@ export type Query = {
   fetchAllAllowance?: Maybe<Array<Maybe<Allowance>>>;
   /** get all fetch allowance package */
   fetchAllAllowancePackage?: Maybe<Array<Maybe<AllowancePackage>>>;
+  /** get all fetch Emp Docs */
+  fetchAllEmpDocs?: Maybe<Array<Maybe<EmployeeDocs>>>;
   fetchAllOtherDeduction?: Maybe<Array<Maybe<OtherDeductionTypes>>>;
   /** fetch all allowance Item */
   fetchAllowanceItemByPackagePageable?: Maybe<Page_AllowanceItem>;
@@ -11019,6 +11098,7 @@ export type Query = {
   /** List of Payments By shift ID */
   vatable_non?: Maybe<Scalars['BigDecimal']['output']>;
   vehicleUsageDocsListPageable?: Maybe<Page_VehicleUsageDocs>;
+  vehicleUsageEmployeeListPageable?: Maybe<Page_VehicleUsageEmployee>;
   vehicleUsageMonitoringPageable?: Maybe<Page_VehicleUsageMonitoring>;
   version?: Maybe<Scalars['String']['output']>;
   weatherList?: Maybe<Array<Maybe<Weather>>>;
@@ -14434,6 +14514,15 @@ export type QueryVehicleUsageDocsListPageableArgs = {
 
 
 /** Query root */
+export type QueryVehicleUsageEmployeeListPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  usageID?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryVehicleUsageMonitoringPageableArgs = {
   asset?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
@@ -15533,12 +15622,31 @@ export type VehicleUsageDocs = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  designation?: Maybe<Scalars['String']['output']>;
   docType?: Maybe<Scalars['String']['output']>;
   file?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   item?: Maybe<Item>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  vehicleUsage?: Maybe<VehicleUsageMonitoring>;
+};
+
+export type VehicleUsageEmployee = {
+  __typename?: 'VehicleUsageEmployee';
+  asset?: Maybe<Assets>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  designation?: Maybe<Scalars['String']['output']>;
+  employee?: Maybe<Employee>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  item?: Maybe<Item>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  timeRenderedEnd?: Maybe<Scalars['Instant']['output']>;
+  timeRenderedStart?: Maybe<Scalars['Instant']['output']>;
   vehicleUsage?: Maybe<VehicleUsageMonitoring>;
 };
 

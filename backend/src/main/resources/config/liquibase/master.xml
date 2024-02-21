@@ -571,4 +571,16 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/88_michael_add_disable_withholding_tax.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_michael_add_overtime_type.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/49_jacky_asset_vehicle_usage_monitoring_employee.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_asset_roles_and_permissions.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_add_profile_pic_emplpoyee.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_veh_usage_att_designation.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/90_jacky_employee_documents.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

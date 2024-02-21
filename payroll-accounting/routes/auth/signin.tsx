@@ -92,7 +92,7 @@ export default function SingIn() {
                 <Divider plain>
                   <span
                     style={{
-                      color: "#CCC",
+                      color: "gray",
                       fontWeight: "normal",
                       fontSize: 14,
                     }}>
@@ -102,7 +102,7 @@ export default function SingIn() {
                 <Space align="center" size={24}>
                   <p
                     style={{
-                      color: "#CCC",
+                      color: "gray",
                       fontWeight: "normal",
                       fontSize: 14,
                     }}>

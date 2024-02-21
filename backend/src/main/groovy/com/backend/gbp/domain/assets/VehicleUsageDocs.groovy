@@ -42,6 +42,10 @@ class VehicleUsageDocs extends AbstractAuditingEntity implements Serializable {
 	String file
 
 	@GraphQLQuery
+	@Column(name = "designation")
+	String designation
+
+	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item", referencedColumnName = "id")
