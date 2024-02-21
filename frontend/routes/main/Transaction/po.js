@@ -112,10 +112,13 @@ const UPSERT_RECORD = gql`
   }
 `;
 
+const currentDate = moment(); // Get the current date
+const dateSixMonthsAgo = currentDate.subtract(6, 'months')
+
 const POContent = ({ account }) => {
   const [office, setOffice] = useState(account?.office?.id);
   const [state, setState] = useState({
-    start: moment(new Date()).format("YYYY-MM-DD"),
+    start: dateSixMonthsAgo.format("YYYY-MM-DD"),
     end: moment(new Date()).format("YYYY-MM-DD"),
     filter: "",
     page: 0,
