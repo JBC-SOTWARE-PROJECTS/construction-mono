@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Col, Input, Row, Table } from 'antd';
+import { Button, Divider, Input, Row, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EyeOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, PrinterOutlined } from '@ant-design/icons';
 import { getUrlPrefix } from '@/utility/graphql-client';
 import { useRouter } from 'next/router';
 
@@ -15,26 +15,20 @@ interface DataType {
 
 interface FormProps {
   data: any;
-  filter: string;
+  filter: '';
   loading: boolean;
   viewEmp: any;
   setSelectedEmp: any;
 }
 
-function PayslipSearchForm({
-  data,
-  filter,
-  loading,
-  viewEmp,
-  setSelectedEmp,
-}: FormProps) {
-  const [state, setState] = useState<any[]>([]);
+function PayslipSearchForm({ data, filter, loading, viewEmp }: FormProps) {
+  const [state, setState] = useState<String>(filter);
   const [selectedRows, setSelectedRows] = useState<React.Key[]>([]);
   const router = useRouter();
 
-  const handleSearch = (value: any) => {
-    setState(value);
-  };
+  // const handleSearch = (value: any) => {
+  //   setState(value);
+  // };
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRows(newSelectedRowKeys);
@@ -53,24 +47,8 @@ function PayslipSearchForm({
     {
       key: 'employee',
       title: 'Employee',
-      dataIndex: ['employee', 'fullName'],
+      dataIndex: 'fullName',
     },
-    // {
-    //   title: 'Action',
-    //   key: 'action',
-    //   dataIndex: 'action',
-    //   render: (_, record, index) => {
-    //     let item = record;
-    //     return (
-    //       <Button
-    //         type='primary'
-    //         onClick={() => onView(item, index)}
-    //         size='small'
-    //         icon={<EyeOutlined />}
-    //       />
-    //     );
-    //   },
-    // },
   ];
 
   return (
@@ -83,16 +61,18 @@ function PayslipSearchForm({
           marginBottom: 10,
         }}
       >
-        {/* <Search
+        <Search
           allowClear
           style={{ width: '100%', marginBottom: 10 }}
           size='middle'
-          placeholder='Search here..'
+          placeholder='Search emplyee here...'
           className='select-header-list'
-          // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-        /> */}
+          onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+        />
+
         <Button
           type='primary'
+          icon={<ArrowDownOutlined />}
           onClick={() =>
             window.open(
               `${getUrlPrefix()}/reports/payroll/print/payslipPayroll/${selectedRows}`
@@ -101,31 +81,23 @@ function PayslipSearchForm({
         >
           DownLoad Payslip
         </Button>
+        <Divider type='vertical' />
+        <Button
+          type='primary'
+          icon={<PrinterOutlined />}
+          size='middle'
+          onClick={() =>
+            window.open(
+              getUrlPrefix() +
+                '/reports/payroll/print/payrollLedgerDownload?id=' +
+                router?.query?.id
+            )
+          }
+        >
+          DownLoad Payroll Per Register
+        </Button>
       </div>
-      {/* <Row gutter={4}>
-        <Col md={8}>
-          <Search
-            allowClear
-            style={{ width: '100%', marginBottom: 10 }}
-            size='middle'
-            placeholder='Search here..'
-            className='select-header-list'
-            // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
-          />
-        </Col>
-        <Col md={6}>
-          <Button
-            type='primary'
-            onClick={() =>
-              window.open(
-                `${getUrlPrefix()}/reports/payroll/print/payslipPayroll/${selectedRows}`
-              )
-            }
-          >
-            DownLoad Payslip
-          </Button>
-        </Col>
-      </Row> */}
+
       <Row>
         <div
           style={{
@@ -143,7 +115,7 @@ function PayslipSearchForm({
             }}
             rowKey='id'
             columns={columns}
-            dataSource={data?.data || []}
+            dataSource={data || []}
           />
         </div>
       </Row>
