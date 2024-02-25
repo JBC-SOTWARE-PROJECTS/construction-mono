@@ -37,7 +37,7 @@ const AccountingAccountsPayableMenu = {
         name: "Return to Supplier",
         routes: [
           {
-            path: "/inventory/purchases/returns",
+            path: "/inventory/deliveries/returns",
             name: "Returns",
           },
         ],

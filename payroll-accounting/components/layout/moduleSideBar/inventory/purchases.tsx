@@ -62,6 +62,16 @@ const AccountingAccountsPayableMenu = {
           },
         ],
       },
+      {
+        path: "/inventory/purchases/purchase-order-monitoring",
+        name: "Purchase Order Monitoring",
+        routes: [
+          {
+            path: "/inventory/purchases/purchase-order-monitoring/all",
+            name: "All",
+          },
+        ],
+      },
     ],
   },
   location: {

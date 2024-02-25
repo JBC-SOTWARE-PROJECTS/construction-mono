@@ -157,7 +157,9 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
                 <Search
                   size="middle"
                   placeholder="Search here.."
-                  onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+                  onSearch={(e) =>
+                    setState((prev) => ({ ...prev, filter: e, page: 0 }))
+                  }
                   className="w-full"
                 />
               </Col>

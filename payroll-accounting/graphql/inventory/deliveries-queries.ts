@@ -77,6 +77,42 @@ export const GET_RECORDS_DELIVERY_RECEIVING = gql`
   }
 `;
 
+export const GET_RECORDS_RETURNS = gql`
+  query ($filter: String, $office: UUID, $page: Int, $size: Int) {
+    rtsByFiltersPage(
+      filter: $filter
+      office: $office
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        rtsNo
+        returnDate
+        refSrr
+        receivedRefNo
+        receivedRefDate
+        office {
+          id
+          officeDescription
+        }
+        supplier {
+          id
+          supplierFullname
+        }
+        received_by
+        returnBy
+        returnUser
+        isPosted
+        isVoid
+      }
+      size
+      totalElements
+      number
+    }
+  }
+`;
+
 export const UPSERT_RECORD_ITEM = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     upsertItem(id: $id, fields: $fields) {

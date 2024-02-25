@@ -29,8 +29,6 @@ const invetoryMenu: TDiverseTradeMenu[] = [
       "From Request to Receipt: Enhancing Inventory Control with Purchase Requests and Orders.",
     icon: <ShoppingOutlined className="diverse-trade-icon" />,
     path: "/inventory/purchases/purchase-request/all",
-    // path: `${frontEndUrl}/main/transactions/pr`,
-    // customPath: true,
   },
   {
     title: "Delivery Receiving  and Returns",
@@ -38,24 +36,23 @@ const invetoryMenu: TDiverseTradeMenu[] = [
       "Navigating the Inventory Lifecycle: Streamlining Delivery Receiving and Returns for Maximum Efficiency.",
     icon: <ShoppingCartOutlined className="diverse-trade-icon" />,
     path: "/inventory/deliveries/receiving/all",
-    // path: `${frontEndUrl}/main/transactions/dr`,
-    // customPath: true,
   },
   {
     title: "Item Issuances and Expense",
     subtitle:
       "Efficient Inventory Utilization: Mastering Item Issuances and Expense Tracking.",
     icon: <InteractionOutlined className="diverse-trade-icon" />,
-    path: `${frontEndUrl}/main/transactions/issuances`,
-    customPath: true,
+    path: "/inventory/issuances/all",
+    // path: `${frontEndUrl}/main/transactions/issuances`,
+    // customPath: true,
   },
-  {
-    title: "Material Production (Repacking)",
-    subtitle: "Smart Repacking: Streamlining Material Production in Inventory.",
-    icon: <ApiOutlined className="diverse-trade-icon" />,
-    path: `${frontEndUrl}/main/transactions/mp`,
-    customPath: true,
-  },
+  // {
+  //   title: "Material Production (Repacking)",
+  //   subtitle: "Smart Repacking: Streamlining Material Production in Inventory.",
+  //   icon: <ApiOutlined className="diverse-trade-icon" />,
+  //   path: `${frontEndUrl}/main/transactions/mp`,
+  //   customPath: true,
+  // },
   {
     title: "Quantity Adjustments",
     subtitle: "Fine-Tuning Inventory: Easy Steps for Quantity Adjustments.",
