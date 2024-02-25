@@ -9919,8 +9919,6 @@ export type Projects = {
   projectStatusColor?: Maybe<Scalars['String']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['String']['output']>;
-  /** totalExpenses */
-  totalExpenses?: Maybe<Scalars['BigDecimal']['output']>;
   total_cost?: Maybe<Scalars['BigDecimal']['output']>;
   /** totals */
   totals?: Maybe<Scalars['BigDecimal']['output']>;
@@ -10843,6 +10841,7 @@ export type Query = {
   pettyTypeAll?: Maybe<Array<Maybe<PettyType>>>;
   pettyTypeList?: Maybe<Array<Maybe<PettyType>>>;
   poByFiltersPage?: Maybe<Page_PurchaseOrder>;
+  poByFiltersPageNoDate?: Maybe<Page_PurchaseOrder>;
   poById?: Maybe<PurchaseOrder>;
   poItemById?: Maybe<PurchaseOrderItems>;
   poItemByParent?: Maybe<Array<Maybe<PurchaseOrderItems>>>;
@@ -10860,6 +10859,7 @@ export type Query = {
   /** Search Positions */
   positionPage?: Maybe<Page_Position>;
   prByFiltersPage?: Maybe<Page_PurchaseRequest>;
+  prByFiltersPageNoDate?: Maybe<Page_PurchaseRequest>;
   prById?: Maybe<PurchaseRequest>;
   prItemById?: Maybe<PurchaseRequestItem>;
   prItemByParent?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
@@ -10888,6 +10888,7 @@ export type Query = {
   reapplicationPageFilter?: Maybe<Page_Reapplication>;
   reapplyAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
   recByFiltersPage?: Maybe<Page_ReceivingReport>;
+  recByFiltersPageNoDate?: Maybe<Page_ReceivingReport>;
   recById?: Maybe<ReceivingReport>;
   recItemById?: Maybe<ReceivingReportItem>;
   recItemByParent?: Maybe<Array<Maybe<ReceivingReportItem>>>;
@@ -13685,6 +13686,19 @@ export type QueryPoByFiltersPageArgs = {
 
 
 /** Query root */
+export type QueryPoByFiltersPageNoDateArgs = {
+  asset?: InputMaybe<Scalars['UUID']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  office?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  project?: InputMaybe<Scalars['UUID']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryPoByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -13750,6 +13764,19 @@ export type QueryPrByFiltersPageArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   start?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryPrByFiltersPageNoDateArgs = {
+  asset?: InputMaybe<Scalars['UUID']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  office?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  project?: InputMaybe<Scalars['UUID']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -13892,6 +13919,19 @@ export type QueryRecByFiltersPageArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   start?: InputMaybe<Scalars['String']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryRecByFiltersPageNoDateArgs = {
+  asset?: InputMaybe<Scalars['UUID']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  office?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  project?: InputMaybe<Scalars['UUID']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
   supplier?: InputMaybe<Scalars['UUID']['input']>;
 };
 

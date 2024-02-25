@@ -1,24 +1,23 @@
-import { PurchaseRequest } from "@/graphql/gql/graphql";
+import { ReceivingReport } from "@/graphql/gql/graphql";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
 import { ColumnsType } from "antd/es/table";
-import DescLong from "../../desclong";
 import { DateFormatter, accessControl } from "@/utility/helper";
 import { getUrlPrefix } from "@/utility/graphql-client";
 import { useContext } from "react";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 
 interface IProps {
-  dataSource: PurchaseRequest[];
+  dataSource: ReceivingReport[];
   loading: boolean;
   totalElements: number;
-  handleOpen: (record: PurchaseRequest) => void;
-  handleUpdateStatus: (record: PurchaseRequest, status: boolean) => void;
+  handleOpen: (record: ReceivingReport) => void;
+  handleUpdateStatus: (record: ReceivingReport, status: boolean) => void;
   changePage: (page: number) => void;
 }
 
-export default function PurchaseRequestTable({
+export default function DeliveryReceivingTable({
   dataSource,
   loading,
   totalElements = 1,
@@ -29,30 +28,27 @@ export default function PurchaseRequestTable({
   // ===================== menus ========================
   const account = useContext(AccountContext);
   // ===================== columns ========================
-  const columns: ColumnsType<PurchaseRequest> = [
+  const columns: ColumnsType<ReceivingReport> = [
     {
-      title: "PR Date",
-      dataIndex: "prDateRequested",
-      key: "prDateRequested",
+      title: "Receiving Date",
+      dataIndex: "preparedDate",
+      key: "preparedDate",
       width: 120,
       render: (text) => {
         return <span>{DateFormatter(text)}</span>;
       },
     },
     {
-      title: "PR No.",
-      dataIndex: "prNo",
-      key: "prNo",
+      title: "Receiving No.",
+      dataIndex: "poNumber",
+      key: "poNumber",
       width: 140,
     },
     {
-      title: "PR Date Needed",
-      dataIndex: "prDateNeeded",
-      key: "prDateNeeded",
-      width: 130,
-      render: (text) => {
-        return <span>{DateFormatter(text)}</span>;
-      },
+      title: "PO No.",
+      dataIndex: "prNos",
+      key: "prNos",
+      width: 200,
     },
     {
       title: "Supplier",
@@ -85,21 +81,6 @@ export default function PurchaseRequestTable({
       },
     },
     {
-      title: "Type",
-      dataIndex: "prType",
-      key: "prType",
-      width: 140,
-      render: (text) => {
-        let color = "green";
-        if (text === "URGENT") {
-          color = "orange";
-        } else if (text === "EMERGENCY") {
-          color = "red";
-        }
-        return <Tag color={color}>{text}</Tag>;
-      },
-    },
-    {
       title: "Status",
       dataIndex: "isApprove",
       key: "isApprove",
@@ -107,11 +88,13 @@ export default function PurchaseRequestTable({
       fixed: "right",
       width: 110,
       render: (text, record) => {
-        let color = "orange";
-        if (text) {
-          color = "green";
+        let color = text ? "green" : "blue";
+        let status = text ? "POSTED" : "NEW";
+        if (record.isVoid) {
+          color = "red";
+          status = "VOIDED";
         }
-        return <Tag color={color}>{record.status}</Tag>;
+        return <Tag color={color}>{status}</Tag>;
       },
     },
     {
@@ -125,20 +108,20 @@ export default function PurchaseRequestTable({
           {
             label: "Approve",
             onClick: () => handleUpdateStatus(record, true),
-            disabled: accessControl(account?.user?.access, "pr_approver"),
+            disabled: accessControl(account?.user?.access, "po_approver"),
             key: "1",
           },
           {
             label: "Void",
             onClick: () => handleUpdateStatus(record, false),
-            disabled: accessControl(account?.user?.access, "pr_approver"),
+            disabled: accessControl(account?.user?.access, "po_approver"),
             key: "2",
           },
           {
             label: "Print",
             onClick: () =>
               window.open(
-                `${getUrlPrefix()}/reports/inventory/print/pr_report/${
+                `${getUrlPrefix()}/reports/inventory/print/receiving_report/${
                   record.id
                 }`
               ),

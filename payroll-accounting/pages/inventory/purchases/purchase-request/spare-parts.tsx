@@ -5,9 +5,9 @@ const Component = asyncComponent(
   () => import("@/routes/inventory/purchases/purchase-request")
 );
 
-const PurchaseRequestAll = () => {
+const PurchaseRequestSpareParts = () => {
   // projects, spare-parts, personal, fixed-assets, consignment
-  return <Component type="all" />;
+  return <Component type="spare-parts" />;
 };
 
-export default PurchaseRequestAll;
+export default PurchaseRequestSpareParts;

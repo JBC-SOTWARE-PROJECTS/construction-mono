@@ -37,8 +37,9 @@ const invetoryMenu: TDiverseTradeMenu[] = [
     subtitle:
       "Navigating the Inventory Lifecycle: Streamlining Delivery Receiving and Returns for Maximum Efficiency.",
     icon: <ShoppingCartOutlined className="diverse-trade-icon" />,
-    path: `${frontEndUrl}/main/transactions/dr`,
-    customPath: true,
+    path: "/inventory/deliveries/receiving/all",
+    // path: `${frontEndUrl}/main/transactions/dr`,
+    // customPath: true,
   },
   {
     title: "Item Issuances and Expense",

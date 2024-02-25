@@ -61,6 +61,7 @@ function FormDebounceSelect(
         showSearch
         loading={loading}
         onSearch={debounceFetcher}
+        onClear={() => getFirstData("")}
         onDropdownVisibleChange={(open) => {
           if (open && _.isEmpty(options)) {
             getFirstData("");

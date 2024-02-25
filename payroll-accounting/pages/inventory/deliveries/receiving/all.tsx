@@ -2,11 +2,11 @@ import React from "react";
 import asyncComponent from "@/utility/asyncComponent";
 
 const Component = asyncComponent(
-  () => import("@/routes/inventory/purchases/purchase-order")
+  () => import("@/routes/inventory/deliveries/receiving")
 );
 
-const PurchaseOrderAll = () => {
+const ReceivingAll = () => {
   return <Component type="all" />;
 };
 
-export default PurchaseOrderAll;
+export default ReceivingAll;

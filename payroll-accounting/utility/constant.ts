@@ -601,13 +601,13 @@ export const AssetStatusColor = {
 };
 
 export const PURCHASE_CATEGORY = [
-  { label: "PERSONAL", value: "PERSONAL" },
   { label: "PROJECTS", value: "PROJECTS" },
   { label: "SPARE PARTS", value: "SPARE_PARTS" },
+  { label: "PERSONAL", value: "PERSONAL" },
   { label: "FIXED ASSET", value: "FIXED_ASSET" },
   { label: "CONSIGNMENT", value: "CONSIGNMENT" },
 ];
 export const PR_STATUS = [
-  { label: "APPROVED", value: "APPROVED" },
   { label: "FOR APPROVAL", value: "FOR APPROVAL" },
+  { label: "APPROVED", value: "APPROVED" },
 ];

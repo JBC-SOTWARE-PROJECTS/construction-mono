@@ -15,19 +15,19 @@ const AccountingAccountsPayableMenu = {
             name: "Projects",
           },
           {
-            path: "/inventory/purchases/purchase-request/projects",
+            path: "/inventory/purchases/purchase-request/spare-parts",
             name: "Spare Parts",
           },
           {
-            path: "/inventory/purchase-request/personal",
+            path: "/inventory/purchases/purchase-request/personal",
             name: "Personal",
           },
           {
-            path: "/inventory/purchase-request/fixed-assets",
+            path: "/inventory/purchases/purchase-request/fixed-assets",
             name: "Fixed Assets",
           },
           {
-            path: "/inventory/purchase-request/consignments",
+            path: "/inventory/purchases/purchase-request/consignments",
             name: "Consignments",
           },
         ],
@@ -41,23 +41,23 @@ const AccountingAccountsPayableMenu = {
             name: "All",
           },
           {
-            path: "/inventory/purchase-order/productions",
+            path: "/inventory/purchases/purchase-order/projects",
             name: "Projects",
           },
           {
-            path: "/inventory/purchase-order/fix-assets",
+            path: "/inventory/purchases/purchase-order/spare-parts",
             name: "Spare Parts",
           },
           {
-            path: "/inventory/purchase-order/consignments",
+            path: "/inventory/purchases/purchase-order/personal",
             name: "Personal",
           },
           {
-            path: "/inventory/purchase-order/fixed-assets",
+            path: "/inventory/purchases/purchase-order/fixed-assets",
             name: "Fixed Assets",
           },
           {
-            path: "/inventory/purchase-order/consignments",
+            path: "/inventory/purchases/purchase-order/consignments",
             name: "Consignments",
           },
         ],

@@ -2,12 +2,12 @@ import React from "react";
 import asyncComponent from "@/utility/asyncComponent";
 
 const Component = asyncComponent(
-  () => import("@/routes/inventory/purchases/purchase-request")
+  () => import("@/routes/inventory/deliveries/receiving")
 );
 
-const PurchaseRequestAll = () => {
+const ReceivingPersonal = () => {
   // projects, spare-parts, personal, fixed-assets, consignment
-  return <Component type="all" />;
+  return <Component type="personal" />;
 };
 
-export default PurchaseRequestAll;
+export default ReceivingPersonal;
