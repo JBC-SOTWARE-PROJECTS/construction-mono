@@ -31,8 +31,8 @@ export default function DeliveryReceivingTable({
   const columns: ColumnsType<ReceivingReport> = [
     {
       title: "Receiving Date",
-      dataIndex: "preparedDate",
-      key: "preparedDate",
+      dataIndex: "receiveDate",
+      key: "receiveDate",
       width: 120,
       render: (text) => {
         return <span>{DateFormatter(text)}</span>;
@@ -40,15 +40,18 @@ export default function DeliveryReceivingTable({
     },
     {
       title: "Receiving No.",
-      dataIndex: "poNumber",
-      key: "poNumber",
+      dataIndex: "rrNo",
+      key: "rrNo",
       width: 140,
     },
     {
       title: "PO No.",
-      dataIndex: "prNos",
-      key: "prNos",
-      width: 200,
+      dataIndex: "purchaseOrder",
+      key: "purchaseOrder",
+      width: 140,
+      render: (text, record) => (
+        <span key={text}>{record?.purchaseOrder?.poNumber}</span>
+      ),
     },
     {
       title: "Supplier",
@@ -82,19 +85,19 @@ export default function DeliveryReceivingTable({
     },
     {
       title: "Status",
-      dataIndex: "isApprove",
-      key: "isApprove",
+      dataIndex: "isPosted",
+      key: "isPosted",
       align: "center",
       fixed: "right",
       width: 110,
-      render: (text, record) => {
-        let color = text ? "green" : "blue";
-        let status = text ? "POSTED" : "NEW";
+      render: (status, record) => {
+        let color = status ? "green" : "blue";
+        let text = status ? "POSTED" : "NEW";
         if (record.isVoid) {
           color = "red";
-          status = "VOIDED";
+          text = "VOIDED";
         }
-        return <Tag color={color}>{status}</Tag>;
+        return <Tag color={color}>{text}</Tag>;
       },
     },
     {
@@ -106,15 +109,13 @@ export default function DeliveryReceivingTable({
       render: (_, record) => {
         const items: MenuProps["items"] = [
           {
-            label: "Approve",
+            label: "Post",
             onClick: () => handleUpdateStatus(record, true),
-            disabled: accessControl(account?.user?.access, "po_approver"),
             key: "1",
           },
           {
             label: "Void",
             onClick: () => handleUpdateStatus(record, false),
-            disabled: accessControl(account?.user?.access, "po_approver"),
             key: "2",
           },
           {

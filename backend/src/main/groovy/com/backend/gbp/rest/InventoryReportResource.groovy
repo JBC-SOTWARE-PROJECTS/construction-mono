@@ -202,7 +202,7 @@ class InventoryReportResource {
 
                     def itemDto = new POItemReportDto(
                             description: it.item.descLong,
-                            uom: it.item.unit_of_purchase.unitDescription + '(' + it.item.item_conversion + ')',
+                            uom: it.item.unit_of_purchase.unitDescription,
                             deals: deals,
                             discount: discount as BigDecimal,
                             no: counter,

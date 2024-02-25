@@ -91,17 +91,20 @@ class ReturnSupplierService extends AbstractDaoService<ReturnSupplier> {
         def company = SecurityUtils.currentCompanyId()
 		String query = '''Select po from ReturnSupplier po where
 						(lower(po.rtsNo) like lower(concat('%',:filter,'%')) or
-						lower(po.receivedRefNo) like lower(concat('%',:filter,'%')))
-						and po.office.id = :office'''
+						lower(po.receivedRefNo) like lower(concat('%',:filter,'%'))) '''
 
 		String countQuery = '''Select count(po) from ReturnSupplier po where
 						(lower(po.rtsNo) like lower(concat('%',:filter,'%')) or
-						lower(po.receivedRefNo) like lower(concat('%',:filter,'%')))
-						and po.office.id = :office'''
+						lower(po.receivedRefNo) like lower(concat('%',:filter,'%'))) '''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
-        params.put('office', office)
+
+        if (office) {
+            query += ''' and (po.office.id = :office)'''
+            countQuery += ''' and (po.office.id = :office)'''
+            params.put("office", office)
+        }
 
         if (company) {
             query += ''' and (po.company = :company)'''

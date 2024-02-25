@@ -101,6 +101,68 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
 		return result
 	}
 
+    @GraphQLQuery(name = "prByFiltersPageNoDate")
+    Page<PurchaseRequest> prByFiltersPageNoDate(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "category") String category,
+            @GraphQLArgument(name = "status") String status,
+            @GraphQLArgument(name = "project") UUID project,
+            @GraphQLArgument(name = "asset") UUID asset,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select pr from PurchaseRequest pr where
+    					(lower(pr.prNo) like lower(concat('%',:filter,'%')))'''
+
+
+
+        String countQuery = '''Select count(pr) from PurchaseRequest pr where
+						(lower(pr.prNo) like lower(concat('%',:filter,'%')))'''
+
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+
+        if(office){
+            query += ''' and (pr.requestingOffice.id = :office)''';
+            countQuery += ''' and (pr.requestingOffice.id = :office)''';
+            params.put('office', office)
+        }
+        if(category){
+            query += ''' and (pr.category = :category)''';
+            countQuery += ''' and (pr.category = :category)''';
+            params.put('category', category)
+        }
+        if(status){
+            query += ''' and (pr.status = :status)''';
+            countQuery += ''' and (pr.status = :status)''';
+            params.put('status', status)
+        }
+        if(project){
+            query += ''' and (pr.project.id = :project)''';
+            countQuery += ''' and (pr.project.id = :project)''';
+            params.put('project', project)
+        }
+        if(asset){
+            query += ''' and (pr.assets.id = :asset)''';
+            countQuery += ''' and (pr.assets.id = :asset)''';
+            params.put('asset', asset)
+        }
+        if (company) {
+            query += ''' and (pr.company = :company)'''
+            countQuery += ''' and (pr.company = :company)'''
+            params.put("company", company)
+        }
+
+        query += ''' ORDER BY pr.prDateRequested DESC'''
+
+        Page<PurchaseRequest> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
     @GraphQLQuery(name = "prItemNoPo")
     List<PurchaseRequest> prItemNoPo() {
         def company = SecurityUtils.currentCompanyId()
@@ -154,8 +216,21 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def upsert = findOne(id)
-        upsert.isApprove = status
-        upsert.status = status ? "APPROVED" : "FOR APPROVAL"
-        save(upsert)
+        if(status){
+            upsert.isApprove = status
+            upsert.status = status ? "APPROVED" : "FOR APPROVAL"
+            save(upsert)
+        }else{
+            def items = purchaseRequestItemService.prItemByParent(upsert.id)
+            def list =  items.findAll({it.refPo != null})
+            if(list.size()){
+                return null
+            }else{
+                upsert.isApprove = status
+                upsert.status = status ? "APPROVED" : "FOR APPROVAL"
+                save(upsert)
+            }
+        }
+
     }
 }
