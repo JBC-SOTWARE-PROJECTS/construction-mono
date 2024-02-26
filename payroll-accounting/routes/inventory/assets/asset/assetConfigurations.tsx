@@ -1,11 +1,26 @@
-import React from 'react'
+import { Tabs } from "antd";
+import React from "react";
+import RentalRates from "./rentalRates";
 
-type Props = {}
+type Props = {};
 
 const AssetConfigurations = (props: Props) => {
-  return (
-    <div>AssetConfigurations</div>
-  )
-}
 
-export default AssetConfigurations
+  const configItems = [
+    {
+      label: `Rental Rates`,
+      key: "1",
+      children: <RentalRates/>,
+    }
+  ]
+  return (
+    <div>
+      <Tabs
+        tabPosition={"left"}
+        items={configItems}
+      />
+    </div>
+  );
+};
+
+export default AssetConfigurations;
