@@ -15,7 +15,7 @@ interface DataType {
 
 interface FormProps {
   data: any;
-  filter: '';
+  filter: '' | any;
   loading: boolean;
   viewEmp: any;
   setSelectedEmp: any;
