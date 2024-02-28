@@ -49,8 +49,6 @@ for (let i = 0; i < 100; i++) {
 function PayrollRegisterEmp() {
   const router = useRouter();
 
-  console.log('router query', router?.query?.id);
-
   const columns: ColumnsType<DataType> = [
     {
       title: 'Account No.',
@@ -173,23 +171,23 @@ function PayrollRegisterEmp() {
         </span>
       ),
     },
-    // {
-    //   title: 'Action',
-    //   key: 'action',
-    //   fixed: 'right',
-    //   width: 100,
-    //   render: () => (
-    //     <div
-    //       style={{
-    //         display: 'flex',
-    //         gap: '10px',
-    //       }}
-    //     >
-    //       {/* <Button type='primary' icon={<EditOutlined />} size='middle' /> */}
-    //       <Button type='primary' icon={<PrinterOutlined />} size='middle' />
-    //     </div>
-    //   ),
-    // },
+    {
+      title: 'Action',
+      key: 'action',
+      fixed: 'right',
+      width: 100,
+      render: () => (
+        <div
+          style={{
+            display: 'flex',
+            gap: '10px',
+          }}
+        >
+          {/* <Button type='primary' icon={<EditOutlined />} size='middle' /> */}
+          <Button type='primary' icon={<PrinterOutlined />} size='middle' />
+        </div>
+      ),
+    },
   ];
 
   return (
