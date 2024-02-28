@@ -78,7 +78,7 @@ const AssetRentalRates = (props: Props) => {
         dataSource={rates?.content as RentalRates[]}
         loading={false}
         totalElements={rates?.totalElements as number}
-        handleOpen={(record) => {}}
+        handleOpen={(record) => {onUpsertRecord(record)}}
         changePage={(page) => {
             setState((prev) => ({ ...prev, page: page }));
         }}

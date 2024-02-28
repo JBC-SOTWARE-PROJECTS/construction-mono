@@ -141,11 +141,21 @@ export default function UpsertRentalRatesModal(props: IProps) {
           </Col>
           <Col span={12}>
             <FormInput
-              name="measurement"
+              name="coverageStart"
               rules={requiredField}
-              label="Measurement"
+              label="Coverage Start"
               propsinput={{
-                placeholder: "Measurement",
+                placeholder: "coverageStart",
+              }}
+            />
+          </Col>
+          <Col span={12}>
+            <FormInput
+              name="coverageEnd"
+              rules={requiredField}
+              label="Coverage End"
+              propsinput={{
+                placeholder: "coverageEnd",
               }}
             />
           </Col>

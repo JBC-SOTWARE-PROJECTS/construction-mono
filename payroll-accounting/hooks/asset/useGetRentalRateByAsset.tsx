@@ -15,6 +15,8 @@ const GET_RECORDS = gql`
           measurement
           amount
           unit
+          coverageStart
+          coverageEnd
           asset{
             id
           }

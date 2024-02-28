@@ -585,4 +585,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/90_jacky_create_asset_rent_rate.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_add_coverage_range.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

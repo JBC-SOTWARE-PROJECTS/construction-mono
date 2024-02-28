@@ -52,6 +52,16 @@ class RentalRates extends AbstractAuditingEntity implements Serializable {
 	BigDecimal amount
 
 	@GraphQLQuery
+	@Column(name = "coverage_start")
+	@UpperCase
+	BigDecimal coverageStart
+
+	@GraphQLQuery
+	@Column(name = "coverage_end")
+	@UpperCase
+	BigDecimal coverageEnd
+
+	@GraphQLQuery
 	@Column(name = "unit")
 	String unit
 

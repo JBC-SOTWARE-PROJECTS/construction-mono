@@ -11023,7 +11023,7 @@ export type Query = {
   releaseCheckById?: Maybe<ReleaseCheck>;
   /** Filter Checks */
   releaseChecksFilter?: Maybe<Page_ReleaseCheck>;
-  rentalRateListPageable?: Maybe<Page_RentalRates>;
+  rentalRateListByAssetPageable?: Maybe<Page_RentalRates>;
   repairTypeActive?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeAll?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeList?: Maybe<Array<Maybe<RepairType>>>;
@@ -14076,8 +14076,9 @@ export type QueryReleaseChecksFilterArgs = {
 
 
 /** Query root */
-export type QueryRentalRateListPageableArgs = {
+export type QueryRentalRateListByAssetPageableArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -14868,6 +14869,8 @@ export type RentalRates = {
   amount?: Maybe<Scalars['BigDecimal']['output']>;
   asset?: Maybe<Assets>;
   company?: Maybe<Scalars['UUID']['output']>;
+  coverageEnd?: Maybe<Scalars['BigDecimal']['output']>;
+  coverageStart?: Maybe<Scalars['BigDecimal']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
