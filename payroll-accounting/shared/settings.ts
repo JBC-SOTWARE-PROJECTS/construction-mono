@@ -2,6 +2,9 @@ export let softwareName: string = "DiverseTrade";
 export let systemTagline: string = "Business Solutions Systems";
 export let apiUrlPrefix: string = "";
 export let frontEndUrl: string = "";
+export let currencyDisplay: string = "₱";
+
+
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   apiUrlPrefix = "http://localhost:5827";
   frontEndUrl = "http://localhost:6060";

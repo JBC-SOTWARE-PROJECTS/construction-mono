@@ -2342,7 +2342,6 @@ export type EmployeeDocs = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   description?: Maybe<Scalars['String']['output']>;
-  designation?: Maybe<Scalars['String']['output']>;
   docType?: Maybe<Scalars['String']['output']>;
   employee?: Maybe<Employee>;
   file?: Maybe<Scalars['String']['output']>;
@@ -4531,6 +4530,7 @@ export type Mutation = {
   upsertRec?: Maybe<ReceivingReport>;
   upsertRecItem?: Maybe<ReceivingReportItem>;
   upsertReleaseCheck?: Maybe<ReleaseCheck>;
+  upsertRentalRates?: Maybe<RentalRates>;
   upsertRepairType?: Maybe<RepairType>;
   upsertRtsItem?: Maybe<ReturnSupplierItem>;
   upsertSSSContribution?: Maybe<GraphQlRetVal_SssContribution>;
@@ -6357,6 +6357,7 @@ export type MutationUpsertDmDetialsArgs = {
 
 /** Mutation root */
 export type MutationUpsertEmpDocsArgs = {
+  employee?: InputMaybe<Scalars['UUID']['input']>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -6938,6 +6939,13 @@ export type MutationUpsertRecItemArgs = {
 export type MutationUpsertReleaseCheckArgs = {
   date?: InputMaybe<Scalars['Instant']['input']>;
   fields?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertRentalRatesArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -7878,6 +7886,25 @@ export type Page_EmployeeAttendance = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_EmployeeDocs = {
+  __typename?: 'Page_EmployeeDocs';
+  content?: Maybe<Array<Maybe<EmployeeDocs>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_EmployeeLeaveDto = {
   __typename?: 'Page_EmployeeLeaveDto';
   content?: Maybe<Array<Maybe<EmployeeLeaveDto>>>;
@@ -8584,6 +8611,25 @@ export type Page_ReceivingReport = {
 export type Page_ReleaseCheck = {
   __typename?: 'Page_ReleaseCheck';
   content?: Maybe<Array<Maybe<ReleaseCheck>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_RentalRates = {
+  __typename?: 'Page_RentalRates';
+  content?: Maybe<Array<Maybe<RentalRates>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -10517,6 +10563,7 @@ export type Query = {
   employeeById?: Maybe<Employee>;
   /** Get Employee By Pin Code */
   employeeByPinCode?: Maybe<Employee>;
+  employeeDocsListPageable?: Maybe<Page_EmployeeDocs>;
   /** Get All Employees */
   employees?: Maybe<Array<Maybe<Employee>>>;
   /** Transaction List */
@@ -10976,6 +11023,7 @@ export type Query = {
   releaseCheckById?: Maybe<ReleaseCheck>;
   /** Filter Checks */
   releaseChecksFilter?: Maybe<Page_ReleaseCheck>;
+  rentalRateListByAssetPageable?: Maybe<Page_RentalRates>;
   repairTypeActive?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeAll?: Maybe<Array<Maybe<RepairType>>>;
   repairTypeList?: Maybe<Array<Maybe<RepairType>>>;
@@ -11809,6 +11857,15 @@ export type QueryEmployeeByIdArgs = {
 /** Query root */
 export type QueryEmployeeByPinCodeArgs = {
   pinCode?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryEmployeeDocsListPageableArgs = {
+  employee?: InputMaybe<Scalars['UUID']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -14019,6 +14076,15 @@ export type QueryReleaseChecksFilterArgs = {
 
 
 /** Query root */
+export type QueryRentalRateListByAssetPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryRepairTypeListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
 };
@@ -14796,6 +14862,24 @@ export type ReleaseCheck = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   releaseDate?: Maybe<Scalars['Instant']['output']>;
   release_by?: Maybe<Scalars['String']['output']>;
+};
+
+export type RentalRates = {
+  __typename?: 'RentalRates';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  asset?: Maybe<Assets>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  coverageEnd?: Maybe<Scalars['BigDecimal']['output']>;
+  coverageStart?: Maybe<Scalars['BigDecimal']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  measurement?: Maybe<Scalars['String']['output']>;
+  rentType?: Maybe<Scalars['String']['output']>;
+  unit?: Maybe<Scalars['String']['output']>;
 };
 
 export enum RepairMaintenanceItemType {
@@ -15653,6 +15737,7 @@ export type VehicleUsageEmployee = {
 export type VehicleUsageMonitoring = {
   __typename?: 'VehicleUsageMonitoring';
   asset?: Maybe<Assets>;
+  calculatedRentalFee?: Maybe<Scalars['BigDecimal']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
@@ -15664,6 +15749,10 @@ export type VehicleUsageMonitoring = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   project?: Maybe<Projects>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  rentUnitMeasureQuantity?: Maybe<Scalars['BigDecimal']['output']>;
+  rentalBasis?: Maybe<RentalRates>;
+  rentalRate?: Maybe<Scalars['BigDecimal']['output']>;
   route?: Maybe<Scalars['String']['output']>;
   startDatetime?: Maybe<Scalars['Instant']['output']>;
   startFuelReading?: Maybe<Scalars['String']['output']>;

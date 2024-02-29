@@ -13,6 +13,7 @@ import PreventiveMaintenance from "./preventiveMaintenance";
 import AssetRepairMaintenance from "./repairMaintenance";
 import AssetRepairMaintenanceComponent from "./repairMaintenance";
 import VehicleUsageMonitoringComponent from "./vehicleUsageMonitoring";
+import AssetConfigurations from "./assetConfigurations";
 
 type Props = {};
 const items: TabsProps["items"] = [
@@ -31,6 +32,11 @@ const items: TabsProps["items"] = [
     label: "Vehicle Usage Monitoring",
     children: <VehicleUsageMonitoringComponent/>,
   },
+  {
+    key: "4",
+    label: "Configurations",
+    children: <AssetConfigurations/>,
+  }
 ];
 
 export default function AssetComponent({}: Props) {
