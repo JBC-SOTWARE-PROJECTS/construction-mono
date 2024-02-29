@@ -16,10 +16,28 @@ export const UPSERT_MAINTENANCE_TYPE_RECORD = gql`
   }
 `;
 
+
+export const UPSERT_RENTAL_RATES_RECORD = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertRentalRates(id: $id, fields: $fields) {
+      id
+    }
+  }
+`;
+
 export const UPSERT_VEHICLE_USAGE_RECORD = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     upsertVehicleUsageMonitoring(id: $id, fields: $fields) {
       id
+    }
+  }
+`;
+
+export const UPSERT_VEHICLE_USAGE_DOCS_RECORD = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertVehicleUsageDocs(id: $id, fields: $fields) {
+      id
+      description
     }
   }
 `;

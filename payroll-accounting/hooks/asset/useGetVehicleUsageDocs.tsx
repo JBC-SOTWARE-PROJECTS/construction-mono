@@ -12,6 +12,7 @@ const GET_RECORDS = gql`
           id
           file
           description
+          designation
           vehicleUsage{
             id
           }

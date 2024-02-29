@@ -45,6 +45,12 @@ function EmployeeManagementHeader({ title, children }: IParams) {
       path: `${basePath}/allowance`,
       disabled: pathname === `${basePathName}/allowance`,
     },
+    {
+      key: `${basePath}/documents`,
+      title: "Documents",
+      path: `${basePath}/documents`,
+      disabled: pathname === `${basePathName}/documents`,
+    },
   ];
 
   const routes = [

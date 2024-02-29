@@ -5,7 +5,7 @@ const config: CodegenConfig = {
     {
       "http://localhost:5827/graphql": {
         headers: {
-          Cookie: "SESSION=NGI2YmM0ZWYtMDMxNC00N2U2LWI1OGYtNmFkZTZmMzdlZmI1",
+          Cookie: "SESSION=ODgyOTAxMDktMzc0Yy00MjU4LThkNDQtZGVkMGJkMjk5MzVi",
         },
       },
     },

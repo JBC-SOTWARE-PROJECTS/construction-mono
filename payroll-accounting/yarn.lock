@@ -2826,7 +2826,7 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
-antd@^5.14.0:
+antd@5.14.0:
   version "5.14.0"
   resolved "https://registry.yarnpkg.com/antd/-/antd-5.14.0.tgz#a9e75aad7c1c6c1310504c845ef000f09172f9ac"
   integrity sha512-LdRJnYd8dTykR2xr483zNE0mBKmWHMLqmjkfcX4otQRD0kaZjOwSmN74vMC70jnMM8oqhWILFjWy3dEy/E1W6w==

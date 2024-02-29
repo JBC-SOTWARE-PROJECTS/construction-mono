@@ -64,6 +64,13 @@ const menuItems = [
     description: "Tracks and manages employee leave requests .",
     show: true,
   },
+  {
+    title: "Documents",
+    icon: <FieldTimeOutlined />,
+    link: "/documents",
+    description: "Manage employee documents",
+    show: true,
+  },
   // {
   //   title: "Other Deduction",
   //   icon: <FieldTimeOutlined />,

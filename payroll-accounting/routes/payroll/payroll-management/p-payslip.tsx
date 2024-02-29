@@ -1,43 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Button, Input, Tabs } from 'antd';
-import { ArrowLeftOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
-import {
-  PageContainer,
-  ProCard,
-  ProFormGroup,
-} from '@ant-design/pro-components';
-import type { TabsProps } from 'antd';
-import PayslipForm from './p-form/payslip-form';
-import PayrollRegisterEmp from './p-form/payroll-register-emp';
+import { PageContainer, ProCard } from '@ant-design/pro-components';
 
-const { Search } = Input;
+import PayslipSearchForm from './p-form/payslip-search-form';
+import { useQuery } from '@apollo/client';
+import { GET_ALL_PAYROLL_EMPLOYEE } from '@/graphql/company/queries';
+import useGetPayrollEmployeesPageable, {
+  variables,
+} from '@/hooks/payroll/useGetPayrollEmployeesPageable';
 
-const items: TabsProps['items'] = [
-  {
-    key: '1',
-    label: 'Payslip',
-    children: <PayslipForm />,
-  },
-  {
-    key: '2',
-    label: 'Payroll Register per Employee',
-    children: <PayrollRegisterEmp />,
-  },
-  {
-    key: '3',
-    label: 'Payroll Register per Project',
-    children: 'Content of Tab Pane 3',
-  },
-];
+// const initialState: IState = {
+//   filter: '',
+//   status: true,
+//   page: 0,
+//   size: 10,
+//   office: null,
+//   position: null,
+// };
+
+const initialState: variables = {
+  filter: '',
+  size: 25,
+  page: 0,
+  status: [],
+};
 
 function PayrollPayslip() {
   const router = useRouter();
+  const [state, setState] = useState(initialState);
+  const [selectedEmp, setSelectedEmp] = useState<any[]>([]);
+  const [viewEmp, setViewEmp] = useState<any>();
 
-  const onChange = (key: string) => {
-    console.log(key);
-  };
+  const { data, loading, refetch } = useQuery(GET_ALL_PAYROLL_EMPLOYEE, {
+    variables: {
+      id: router?.query?.id,
+    },
+  });
+
+  // const { data: payrollEmp } = useQuery(FETCH_PAYROLL_EMP, {
+  //   variables: {
+  //     filter: state.filter,
+  //     page: state.page,
+  //     pageSize: state.size,
+  //     payrollId: router?.query?.id,
+  //   },
+  // });
+
+  const [employees, loadingPayrollEmployees, totalElements] =
+    useGetPayrollEmployeesPageable({ variables: state });
 
   return (
     <div>
@@ -61,11 +74,12 @@ function PayrollPayslip() {
           bordered
           headerBordered
         >
-          <Tabs
-            type='card'
-            defaultActiveKey='1'
-            items={items}
-            onChange={onChange}
+          <PayslipSearchForm
+            setSelectedEmp={setSelectedEmp}
+            viewEmp={setViewEmp}
+            loading={loadingPayrollEmployees}
+            data={employees || []}
+            filter={state.filter}
           />
         </ProCard>
       </PageContainer>
