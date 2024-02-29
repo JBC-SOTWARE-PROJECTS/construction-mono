@@ -34,14 +34,20 @@ export default function AssetRentalRateTable({
       key: "desc",
       width: 100,
     },
+    // {
+    //   title: "Coverage Range",
+    //   dataIndex: "coverage",
+    //   key: "coverage",
+    //   width: 100,
+    //   render: (_, record: RentalRates) => {
+    //     return (<>  {record?.coverageStart} - {record?.coverageEnd}</>)
+    //   }
+    // },
     {
-      title: "Coverage Range",
-      dataIndex: "coverage",
-      key: "coverage",
+      title: "Unit Measurement",
+      dataIndex: "measurement",
+      key: "measurement",
       width: 100,
-      render: (_, record: RentalRates) => {
-        return (<>  {record?.coverageStart} - {record?.coverageEnd}</>)
-      }
     },
     {
       title: "Unit",

@@ -587,4 +587,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/89_jacky_add_coverage_range.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_veh_monitoring_rental_details.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_veh_monitoring_other_details.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

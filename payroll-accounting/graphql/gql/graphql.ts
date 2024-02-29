@@ -15737,6 +15737,7 @@ export type VehicleUsageEmployee = {
 export type VehicleUsageMonitoring = {
   __typename?: 'VehicleUsageMonitoring';
   asset?: Maybe<Assets>;
+  calculatedRentalFee?: Maybe<Scalars['BigDecimal']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
@@ -15748,6 +15749,10 @@ export type VehicleUsageMonitoring = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   project?: Maybe<Projects>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  rentUnitMeasureQuantity?: Maybe<Scalars['BigDecimal']['output']>;
+  rentalBasis?: Maybe<RentalRates>;
+  rentalRate?: Maybe<Scalars['BigDecimal']['output']>;
   route?: Maybe<Scalars['String']['output']>;
   startDatetime?: Maybe<Scalars['Instant']['output']>;
   startFuelReading?: Maybe<Scalars['String']['output']>;
