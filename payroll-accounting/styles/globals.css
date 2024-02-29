@@ -57,14 +57,14 @@ a {
 /* ant d overrides */
 .my-prefix-base-menu-inline-group-item-title {
   font-weight: bold !important;
-  color: #399b53 !important;
-  /* color: #dc6601 !important; */
+  /* color: #399b53 !important; */
+  color: #dc6601 !important;
 }
 
-/* .ant-pro-form-login-page-logo{
+.ant-pro-form-login-page-logo{
   width: 400px !important;
   height: 100px !important;
-} */
+}
 
 .ant-form-item-explain-error {
   font-size: 12px !important;
@@ -99,7 +99,7 @@ a {
 }
 
 .ant-table-thead tr td.ant-table-row-expand-icon-cell {
-  background-color: #399b53 !important;
+  background-color: #14213d !important;
 }
 
 .ant-pro-form-login-page-title {
@@ -116,7 +116,7 @@ a {
 
 th.ant-table-cell {
   /* background: #14213d !important; */
-  background: #399b53 !important;
+  background: #14213d !important;
   color: #fff !important;
 }
 
@@ -344,10 +344,10 @@ th.ant-table-cell {
   align-items: center;
   border-radius: 9999px;
   border-width: 1px;
-  border-color: #399b53;
+  border-color: #dc6601;
   width: 48px;
   height: 48px;
-  background-color: #399b53; 
+  background-color: #dc6601; 
   
 }
 

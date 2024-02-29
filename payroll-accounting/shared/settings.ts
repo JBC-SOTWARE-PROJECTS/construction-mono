@@ -1,4 +1,4 @@
-export let softwareName: string = "DiverseTrade";
+export let softwareName: string = "SyncPro";
 export let systemTagline: string = "Business Solutions Systems";
 export let apiUrlPrefix: string = "";
 export let frontEndUrl: string = "";

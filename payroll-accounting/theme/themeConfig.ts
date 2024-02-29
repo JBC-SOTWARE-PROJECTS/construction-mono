@@ -3,17 +3,17 @@ import type { ThemeConfig } from "antd";
 const theme: ThemeConfig = {
   token: {
     fontSize: 14,
-    colorPrimary: "#399B53",
+    colorPrimary: "#ee9f27",
   },
   components: {
     Input: {
       fontSize: 14,
     },
     Segmented: {
-       itemSelectedColor: "white",
+      itemSelectedBg: "#fca311",
     },
     Button: {
-      colorPrimary: "#399B53",
+      colorPrimary: "#dc6601" //darker orange
     },
   },
 };

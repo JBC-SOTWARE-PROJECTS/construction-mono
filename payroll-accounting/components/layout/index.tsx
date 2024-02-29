@@ -122,9 +122,9 @@ const DiverseTradeLayout = (props: IProps) => {
           }}>
           <ProLayout
             loading={loading}
-            //title={""}
-            title={softwareName}
-            logo="/images/DTLogo.svg"
+            title={""}
+            //title={softwareName}
+            logo="/images/syncpro-logoword-black.png"
             prefixCls="my-prefix"
             {...sidebar}
             bgLayoutImgList={[
@@ -243,7 +243,7 @@ const DiverseTradeLayout = (props: IProps) => {
                   <div>
                     © 2024 {softwareName} <sup>+</sup>
                   </div>
-                  {/* <div>{systemTagline}</div> */}
+                  <div>{systemTagline}</div>
                 </div>
               );
             }}
