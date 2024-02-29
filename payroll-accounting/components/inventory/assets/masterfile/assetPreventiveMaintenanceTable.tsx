@@ -13,6 +13,9 @@ import DescLong from "../../desclong";
 import { AssetStatusColor } from "@/utility/constant";
 import { useRouter } from "next/router";
 import moment from "moment";
+import { parse } from "path";
+import { integer } from "aws-sdk/clients/cloudfront";
+import CustomButton from "@/components/common/CustomButton";
 
 type IProps = {
   dataSource: AssetPreventiveMaintenance[];
@@ -58,7 +61,10 @@ export default function AssetPreventiveMaintenanceTable({
           case PreventiveScheduleType.Daily:
             return record?.occurrence + " Hr/s";
             break;
-          case PreventiveScheduleType.Yearly:
+            case PreventiveScheduleType.Kilometers:
+              return "Every " + record?.occurrence + " km";
+              break;
+            case PreventiveScheduleType.Yearly:
             return <>{moment(record?.occurrence, "YYYY-MM-DD").format('MMM DD')}</>;
             break;
 
@@ -69,18 +75,22 @@ export default function AssetPreventiveMaintenanceTable({
       },
     },
     {
-      title: "Reminder Schedule (Before Occurence)",
+      title: "Reminder Schedule",
       dataIndex: "reminderSchedule",
       key: "reminderSchedule",
       width: 100,
       render: (_, record) => {
         switch (record?.scheduleType) {
           case PreventiveScheduleType.Daily:
-            return record?.reminderSchedule + " Hr/s";
+            return record?.reminderSchedule + " Hr/s before occurrence";
             break;
 
-          default:
-            return record?.reminderSchedule + " Day/s";
+          case PreventiveScheduleType.Kilometers:
+              return parseInt(record?.reminderSchedule ?? "0") + " km before & after ";
+              break;
+  
+            default:
+            return record?.reminderSchedule + " Day/s before occurrence";
             break;
         }
       },
@@ -93,12 +103,13 @@ export default function AssetPreventiveMaintenanceTable({
       fixed: "right",
       render: (_, record) => {
         return (
-          <Button
+          <CustomButton
             icon={<EditOutlined />}
             type="primary"
             onClick={() => {
               handleOpen(record);
             }}
+            allowedPermissions={["manage_pms"]}
           />
         );
       },

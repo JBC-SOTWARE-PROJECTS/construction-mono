@@ -160,28 +160,29 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
     static BigDecimal calculateVat(Boolean vatInclusive,
                                    BigDecimal amount,
                                    BigDecimal vatRate) {
-
-        def vat = (amount) / (vatRate + 1)
-
-        def vatAmount = vatInclusive ?
-                vat * vatRate :
-                (amount) * vatRate
-
+        def vatAmount = BigDecimal.ZERO
+        if(vatInclusive){
+            vatAmount = (amount / (vatRate + 1)) * vatRate
+        }else{
+            if(vatRate){
+                vatAmount = amount * vatRate
+            }
+        }
         return vatAmount.setScale(2, RoundingMode.HALF_EVEN)
     }
 
     static calculateEwt(Boolean vatInclusive, BigDecimal amount, BigDecimal vatRate, BigDecimal ewtRate) {
         def netOfdiscount = amount;
-        def ewt = 0;
-        def vat = netOfdiscount / (vatRate + 1)
+        BigDecimal ewt = BigDecimal.ZERO;
         if (vatRate <= 0) {
             ewt = netOfdiscount * ewtRate;
         } else {
-            ewt = vatInclusive ?
-                    vat * ewtRate :
-                    netOfdiscount * ewtRate;
+            if(vatInclusive){
+                ewt = (netOfdiscount / (vatRate + 1)) * ewtRate
+            }else{
+                ewt = netOfdiscount * ewtRate
+            }
         }
-        def ewtRound = ewt.setScale(2, RoundingMode.HALF_EVEN)
-        return ewtRound
+        return ewt.setScale(2, RoundingMode.HALF_EVEN)
     }
 }

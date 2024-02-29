@@ -74,7 +74,7 @@ class AccumulatedLogsCalculator {
         if (!employee)
             employee = employeeRepository.findById(id).get()
         List<AccumulatedLogs> accumulatedLogsList = []
-        Map<String, List<EmployeeAttendance>> attendanceMap = getAttendanceLogs(startDate, endDate, id)
+        Map<String, List<EmployeeAttendance>> attendanceMap = getAttendanceLogs(startDate, endDate.plus(1, ChronoUnit.DAYS), id)
         Map<String, List<EmployeeSchedule>> scheduleMap = getSchedules(startDate, endDate, id)
         Map<String, List<EventCalendar>> holidayMap = eventCalendarService.mapEventsToDates(startDate, endDate)
 
@@ -89,7 +89,21 @@ class AccumulatedLogsCalculator {
                 List<EventCalendar> holidays = holidayMap.get(dateString)
 
                 Instant firstIn = attendanceList?.find({ it.type == 'IN' && !it.isTransfer })?.attendance_time
-                Instant out = attendanceList?.find({ it.type == 'OUT' && !it.isTransfer })?.attendance_time
+                Instant out = attendanceList?.reverse()?.find({ it.type == 'OUT' && !it.isTransfer })?.attendance_time
+
+                if (out && firstIn?.isAfter(out)) out = null
+
+                if (firstIn && !out) {
+                    Instant nextDayOut = attendanceMap.get(date.plus(1, ChronoUnit.DAYS).toString().substring(0, 10))?.sort({ it.attendance_time })?.find({ it.type == 'OUT' && !it.isTransfer })?.attendance_time
+                    if (nextDayOut) {
+                        Instant nextDayIn = attendanceMap.get(date.plus(1, ChronoUnit.DAYS).toString().substring(0, 10))?.
+                                sort({ it.attendance_time })?.
+                                find({ it.type == 'IN' && !it.isTransfer })?.attendance_time
+                        if (!nextDayIn || nextDayIn.isAfter(nextDayOut)) {
+                            out = nextDayOut
+                        }
+                    }
+                }
 
                 EmployeeSchedule regularSchedule = scheduleList.find({ !it.isOvertime })
                 EmployeeSchedule overtimeSchedule = scheduleList.find({ it.isOvertime })
@@ -153,7 +167,14 @@ class AccumulatedLogsCalculator {
                     }
                 } else {
                     BigDecimal regularHours = computeHours(regularSchedule, firstIn, out)
-                    BigDecimal overtimeHours = overtimeSchedule ? computeHours(overtimeSchedule, firstIn, out) : 0
+                    BigDecimal overtimeHours = 0
+                    if (overtimeSchedule) {
+                        if (overtimeSchedule.overtimeType == OvertimeType.FLEXIBLE) {
+                            overtimeSchedule.dateTimeStart = regularSchedule.dateTimeEnd
+                            overtimeSchedule.dateTimeEnd = out
+                        }
+                        overtimeHours = computeHours(overtimeSchedule, firstIn, out)
+                    }
                     if (holidays?.size() > 0) {
                         accumulatedLogs.message = AccumulatedLogsMessage.HOLIDAY
                         calculateHolidayHours(holidays, regularHours, hoursLog, overtimeHours)
@@ -276,7 +297,7 @@ class AccumulatedLogsCalculator {
 
     static BigDecimal getLateHours(Instant scheduleStart, Instant firstIn) {
         BigDecimal lateHours = Duration.between(scheduleStart, firstIn).toMillis() / 3600000.0
-        if (lateHours >= 0) {
+        if (lateHours > 0 && lateHours * 1000 > 900) {
             return lateHours
         } else {
             return 0
@@ -296,7 +317,7 @@ class AccumulatedLogsCalculator {
         Instant consideredIn
         Instant consideredOut
         BigDecimal workedHours
-        Long ALLOWANCE = 60
+        Long ALLOWANCE = 900
         Long scheduleStartLogStartDiff = Duration.between(scheduleStart, logStart).getSeconds()
 
         if (scheduleStartLogStartDiff < ALLOWANCE)

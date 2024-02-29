@@ -26,6 +26,7 @@ const useGetPayrollEmployeeOtherDeduction = ({
         $size: Int!
         $filter: String
         $status: [PayrollEmployeeStatus]
+        $withItems: Boolean
       ) {
         data: getOtherDeductionEmployees(
           payroll: $payroll
@@ -33,6 +34,7 @@ const useGetPayrollEmployeeOtherDeduction = ({
           size: $size
           filter: $filter
           status: $status
+          withItems: $withItems
         ) {
           content {
             id

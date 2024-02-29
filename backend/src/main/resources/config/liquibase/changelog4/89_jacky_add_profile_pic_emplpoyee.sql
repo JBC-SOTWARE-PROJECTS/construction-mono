@@ -1,0 +1,1 @@
+alter table hrm.employees add column profile_picture varchar NULL;

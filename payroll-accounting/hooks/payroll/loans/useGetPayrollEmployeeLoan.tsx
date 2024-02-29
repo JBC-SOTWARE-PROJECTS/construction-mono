@@ -45,6 +45,7 @@ const useGetPayrollEmployeeLoan = ({ variables, onCompleted }: IParams) => {
         $size: Int!
         $filter: String
         $status: [PayrollEmployeeStatus]
+        $withItems: Boolean
       ) {
         data: getPayrollEmployeeLoan(
           payroll: $payroll
@@ -52,6 +53,7 @@ const useGetPayrollEmployeeLoan = ({ variables, onCompleted }: IParams) => {
           size: $size
           filter: $filter
           status: $status
+          withItems: $withItems
         ) {
           content {
             id

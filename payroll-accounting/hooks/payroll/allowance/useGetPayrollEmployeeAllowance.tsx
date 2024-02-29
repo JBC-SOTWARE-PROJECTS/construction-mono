@@ -67,38 +67,33 @@ const useGetPayrollEmployeeAllowance = ({
         if (onCompleted) onCompleted(result?.data);
       },
       fetchPolicy: "network-only",
-      // ...params,
     }
   );
 
-  // const { data: dataList, loading: loadingList } = useQuery(
-  //   gql`
-  //     query ($payroll: UUID!) {
-  //       data: getAdjustmentEmployeesList(payroll: $payroll) {
-  //         id
-  //         employeeName
-  //       }
-  //     }
-  //   `,
-  //   {
-  //     variables: {
-  //       ...variables,
-  //       payroll: router?.query?.id,
-  //     },
-  //     onCompleted: (result) => {
-  //       if (onCompleted) onCompleted(result?.data);
-  //     },
-  //     fetchPolicy: "network-only",
-  //     // ...params,
-  //   }
-  // );
+  const { data: allEmp, loading: loadingAllEmp } = useQuery(
+    gql`
+      query ($payroll: UUID!) {
+        data: getAllPayrollEmployeeAllowance(payroll: $payroll) {
+          id
+          payrollEmployeeId
+          employeeName
+        }
+      }
+    `,
+    {
+      variables: {
+        payroll: router?.query?.id,
+      },
+
+      fetchPolicy: "network-only",
+    }
+  );
   return [
     data?.data?.content,
-    loading,
+    loading || loadingAllEmp,
     refetch,
     data?.data?.totalElements,
-
-    // dataList: dataList?.data,
+    allEmp?.data,
   ];
 };
 

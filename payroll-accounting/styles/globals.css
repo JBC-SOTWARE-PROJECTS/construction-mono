@@ -99,7 +99,7 @@ a {
 }
 
 .ant-table-thead tr td.ant-table-row-expand-icon-cell {
-  background-color: #399b53 !important;
+  background-color: #14213d !important;
 }
 
 .ant-pro-form-login-page-title {
@@ -115,8 +115,8 @@ a {
 } */
 
 th.ant-table-cell {
+  /* background: #14213d !important; */
   background: #14213d !important;
-  /* background: #399b53 !important; */
   color: #fff !important;
 }
 
@@ -344,13 +344,10 @@ th.ant-table-cell {
   align-items: center;
   border-radius: 9999px;
   border-width: 1px;
-  /* border-color: #399b53; */
   border-color: #dc6601;
   width: 48px;
   height: 48px;
-  /* background-color: #399b53; */ /*original color*/
-  /* background-color: #14213d; */ /*blue color*/
-  background-color: #dc6601;
+  background-color: #dc6601; 
   
 }
 
@@ -391,6 +388,10 @@ th.ant-table-cell {
 .custom_calendar_cell:hover {
   background-color: rgb(236, 234, 234) !important;
   color: rgb(39, 39, 39) !important;
+}
+
+.ant-upload{
+  width: 100% !important;
 }
 
 .billing-info-width {

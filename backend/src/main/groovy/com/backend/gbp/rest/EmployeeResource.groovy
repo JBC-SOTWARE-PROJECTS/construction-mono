@@ -2,11 +2,14 @@ package com.backend.gbp.rest
 
 import com.amazonaws.AmazonClientException
 import com.backend.gbp.domain.CompanySettings
+import com.backend.gbp.domain.assets.VehicleUsageDocs
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.hrm.EmployeeAttendance
+import com.backend.gbp.domain.hrm.EmployeeDocs
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.hrm.EmployeeAttendanceService
+import com.backend.gbp.graphqlservices.hrm.EmployeeDocsService
 import com.backend.gbp.graphqlservices.hrm.EmployeeFilterService
 import com.backend.gbp.graphqlservices.hrm.EmployeeService
 import com.backend.gbp.graphqlservices.projects.ProjectService
@@ -27,6 +30,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -58,6 +62,9 @@ class EmployeeResource {
 
     @Autowired
     EmployeeService employeeService
+
+    @Autowired
+    EmployeeDocsService employeeDocsService
 
     @Autowired
     EmployeeRepository employeeRepository
@@ -118,6 +125,45 @@ class EmployeeResource {
         mobileInitializerDto.projects = allProjects;
 
         return mobileInitializerDto;
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(method = RequestMethod.POST, value = ['/employee-profile-picture/upload'])
+    String uploadEmployeeProfilePic(
+            @RequestPart("file") MultipartFile capture,
+            @RequestPart("fields") String fields
+    ) {
+        File file = convertMultipartFileToFile(capture);
+        spaceService.uploadFileToSpace(file,"EMPLOYEE_PROFILE_PICS");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Employee empRecord = objectMapper.readValue(fields, Employee.class);
+
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put("profilePicture", file.getName());
+        Employee employeeDocResult = employeeService.upsertMobileData(empRecord.id,fieldMap );
+
+        return employeeDocResult.profilePicture;
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(method = RequestMethod.POST, value = ['/employee-documents/upload'])
+    String uploadEmployeeDocuments(
+            @RequestPart("file") MultipartFile capture,
+            @RequestPart("fields") String fields
+    ) {
+
+        File file = convertMultipartFileToFile(capture);
+        spaceService.uploadFileToSpace(file,"EMPLOYEE_DOCUMENTS");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> fieldMapString = objectMapper.readValue(fields, Map.class);
+
+        Map<String, Object> fieldMap = new HashMap<>();
+        fieldMap.put("file", file.getName());
+        EmployeeDocs employeeDocResult = employeeDocsService.upsertEmpDocs( null,  UUID.fromString(fieldMapString.get("employee") as String),fieldMap);
+
+        return employeeDocResult.id;
     }
 
 

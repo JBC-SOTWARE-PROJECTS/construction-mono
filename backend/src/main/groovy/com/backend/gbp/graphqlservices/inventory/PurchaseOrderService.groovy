@@ -121,7 +121,7 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
             params.put('supplier', supplier)
         }
 
-		query += ''' ORDER BY po.poNumber DESC'''
+		query += ''' ORDER BY po.preparedDate DESC'''
 
 		Page<PurchaseOrder> result = getPageable(query, countQuery, page, size, params)
 		return result

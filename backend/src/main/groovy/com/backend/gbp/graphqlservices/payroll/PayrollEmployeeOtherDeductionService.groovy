@@ -53,13 +53,15 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "filter") String filter,
-            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
+            @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status,
+            @GraphQLArgument(name = "withItems") Boolean withItems
     ) {
         if (payroll) {
             Page<PayrollEmployeeOtherDeductionDto> pageRes = payrollEmployeeOtherDeductionRepository.getEmployeesPageable(
                     payroll,
                     filter,
                     status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
+                    withItems,
                     PageRequest.of(page, size))
 
             return pageRes
@@ -80,22 +82,38 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
     //=========================== MUTATIONS ============================
 
     @GraphQLMutation(name = "upsertOtherDeductionItem")
-    GraphQLResVal<PayrollOtherDeductionItem> upsertOtherDeductionItem(
+    GraphQLResVal<String> upsertOtherDeductionItem(
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "employee") UUID employee,
+            @GraphQLArgument(name = "employee") List<UUID> employee,
             @GraphQLArgument(name = "amount") BigDecimal amount,
             @GraphQLArgument(name = "description") String description,
             @GraphQLArgument(name = "deductionType") UUID deductionType,
             @GraphQLArgument(name = "subaccountCode") String subaccountCode
-
-
     ) {
-        PayrollOtherDeductionItem item = new PayrollOtherDeductionItem()
+
+        if (employee) {
+            List<PayrollOtherDeductionItem> items = []
+            List<PayrollEmployeeOtherDeduction> employees = payrollEmployeeOtherDeductionRepository.findAllById(employee)
+            employees.each {
+                PayrollOtherDeductionItem item = new PayrollOtherDeductionItem()
+                item = generateItem(id, amount, item, deductionType, subaccountCode, description)
+                item.employeeOtherDeduction = it
+                items.push(item)
+            }
+            payrollOtherDeductionItemRepository.saveAll(items)
+        } else {
+            PayrollOtherDeductionItem item = new PayrollOtherDeductionItem()
+            item = generateItem(id, amount, item, deductionType, subaccountCode, description)
+            payrollOtherDeductionItemRepository.save(item)
+        }
+        return new GraphQLResVal<String>('success', true, "Successfully ${id ? 'updated' : 'created'} deduction item${!id && 's'}!")
+    }
+
+    private generateItem(UUID id, BigDecimal amount, PayrollOtherDeductionItem item, UUID deductionType, String subaccountCode, String description) {
         if (id) {
             item = payrollOtherDeductionItemRepository.findById(id).get()
         }
-        if (employee)
-            item.employeeOtherDeduction = payrollEmployeeOtherDeductionRepository.findById(employee).get()
+
 
         if (amount)
             item.amount = amount
@@ -111,9 +129,7 @@ class PayrollEmployeeOtherDeductionService extends AbstractPayrollEmployeeStatus
 
         item.description = description ? description : item.description
         item.company = SecurityUtils.currentCompany()
-        payrollOtherDeductionItemRepository.save(item)
-
-        return new GraphQLResVal<PayrollOtherDeductionItem>(item, true, "Successfully updated employee otherDeduction status!")
+        item
     }
 
 

@@ -18,6 +18,7 @@ import UpsertVehicleUsageModal from "@/components/inventory/assets/dialogs/upser
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_ACTIVE_PROJECTS } from "@/components/payroll/configurations/UpsertScheduleType";
 import VehicleUsageAttachemntModal from "@/components/inventory/assets/dialogs/vehicleUsageAttachment";
+import CustomButton from "@/components/common/CustomButton";
 
 type Props = {};
 const { Search } = Input;
@@ -106,13 +107,14 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
               onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
               className="w-full"
             />
-            <Button
+            <CustomButton
               type="primary"
               icon={<PlusCircleOutlined />}
               onClick={() => onUpsertRecord()}
+              allowedPermissions={["manage_vehicle_usage"]}
             >
               Create New
-            </Button>
+            </CustomButton>
           </ProFormGroup>
         }
       >
