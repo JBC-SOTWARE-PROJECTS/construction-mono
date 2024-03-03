@@ -1,36 +1,15 @@
-import { EmployeeSchedule, Schedule } from "@/graphql/gql/graphql";
-import useGetEmployeeScheduleDetails from "@/hooks/employee-schedule/useGetEmployeeScheduleDetails";
-import { IState } from "@/routes/payroll/employees";
-import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Empty,
-  Form,
-  List,
-  Modal,
-  Row,
-  Space,
-  Spin,
-  Typography,
-} from "antd";
-import dayjs from "dayjs";
-import { useState } from "react";
-import { IEmployee } from "./ScheduleCell";
-import { PageHeader } from "@ant-design/pro-components";
-import ScheduleCard from "@/components/common/ScheduleCard";
-import CustomButton from "@/components/common/CustomButton";
-import { EditOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
-import useUpsertEmployeeSchedule, {
-  IUpsertEmployeeScheduleParams,
-} from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
 import FormInput from "@/components/common/formInput/formInput";
-import { requiredField, transformDate } from "@/utility/helper";
-import FormTimePicker from "@/components/common/formTimePicker/formTimePicker";
-import { Maybe } from "graphql/jsutils/Maybe";
-import { useQuery } from "@apollo/client";
 import FormSelect from "@/components/common/formSelect/formSelect";
+import FormTimePicker from "@/components/common/formTimePicker/formTimePicker";
+import { EmployeeSchedule } from "@/graphql/gql/graphql";
+import { IUpsertEmployeeScheduleParams } from "@/hooks/employee-schedule/useUpsertEmployeeSchedule";
+import { requiredField, transformDate } from "@/utility/helper";
+import { EditOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
+import { useQuery } from "@apollo/client";
+import { Button, Col, Form, Modal, Row, Space } from "antd";
+import dayjs from "dayjs";
+import { Maybe } from "graphql/jsutils/Maybe";
+import { useState } from "react";
 import { GET_ACTIVE_PROJECTS } from "../../configurations/UpsertScheduleType";
 const colSpan2 = {
   xs: 24,
@@ -77,6 +56,7 @@ function UpsertEmployeeScheduleModal({
       title: values?.title,
       isCustom: true,
       isOvertime,
+      overtimeType: values?.overtimeType,
       project_id: values.project_id,
     };
 
@@ -89,7 +69,8 @@ function UpsertEmployeeScheduleModal({
     });
     setVisible(false);
   };
-
+  const [form] = Form.useForm();
+  const overtimeType = Form.useWatch("overtimeType", form);
   return (
     <>
       <Button
@@ -126,6 +107,7 @@ function UpsertEmployeeScheduleModal({
       >
         <Form
           name="upsertForm"
+          form={form}
           layout="vertical"
           onFinish={onSubmit}
           initialValues={{
@@ -170,6 +152,7 @@ function UpsertEmployeeScheduleModal({
               <FormSelect
                 name="project_id"
                 label="Project"
+                initialValue={null}
                 propsselect={{
                   options: [
                     { value: null, label: "Office Based" },
@@ -185,20 +168,48 @@ function UpsertEmployeeScheduleModal({
                 }}
               />
             </Col>
-            <Col {...colSpan2}>
-              <FormTimePicker
-                name="dateTimeStart"
-                label="Start Time"
-                propstimepicker={{ format: "hh:mm a", use12Hours: true }}
-              />
-            </Col>{" "}
-            <Col {...colSpan2}>
-              <FormTimePicker
-                name="dateTimeEnd"
-                label="End Time"
-                propstimepicker={{ format: "hh:mm a", use12Hours: true }}
-              />
-            </Col>
+            {isOvertime && (
+              <Col span={24}>
+                <FormSelect
+                  label="Overtime Type"
+                  name="overtimeType"
+                  rules={requiredField}
+                  propsselect={{
+                    showSearch: true,
+                    options: [
+                      {
+                        label: "Fixed",
+                        value: "FIXED",
+                      },
+                      {
+                        label: "Flexible",
+                        value: "FLEXIBLE",
+                      },
+                    ],
+                    placeholder: "Overtime Type",
+                  }}
+                />
+              </Col>
+            )}
+            {(!isOvertime || overtimeType === "FIXED") && (
+              <>
+                <Col {...colSpan2}>
+                  <FormTimePicker
+                    name="dateTimeStart"
+                    label="Start Time"
+                    propstimepicker={{ format: "hh:mm a", use12Hours: true }}
+                  />
+                </Col>{" "}
+                <Col {...colSpan2}>
+                  <FormTimePicker
+                    name="dateTimeEnd"
+                    label="End Time"
+                    propstimepicker={{ format: "hh:mm a", use12Hours: true }}
+                  />
+                </Col>
+              </>
+            )}
+
             {!isOvertime && (
               <>
                 <Col {...colSpan2}>

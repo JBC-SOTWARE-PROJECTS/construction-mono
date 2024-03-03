@@ -12,6 +12,7 @@ import {
 } from "@/graphql/gql/graphql";
 import { useRouter } from "next/router";
 import moment from "moment";
+import CustomButton from "@/components/common/CustomButton";
 
 type IProps = {
   dataSource: AssetRepairMaintenance[];
@@ -72,21 +73,23 @@ export default function AssetRepairMaintenanceTable({
         return (
           <Row gutter={5}>
             <Col>
-              <Button
+              <CustomButton
                 icon={<EyeOutlined />}
                 type="primary"
                 onClick={() => {
                   handleView(record);
                 }}
+                allowedPermissions={["manage_repairs_and_maintenance"]}
               />
             </Col>
             <Col>
-              <Button
+              <CustomButton
                 icon={<EditOutlined />}
                 type="primary"
                 onClick={() => {
                   handleOpen(record);
                 }}
+                allowedPermissions={["manage_repairs_and_maintenance"]}
               />
             </Col>
           </Row>

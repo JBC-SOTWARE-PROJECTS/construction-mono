@@ -1,15 +1,33 @@
 import AccessManager from "@/components/accessControl/AccessManager";
 import EmployeeManagementHeader from "@/components/administrative/employees/EmployeeManagementHeader";
 import EmployeeDetails from "@/components/common/EmployeeDetails";
+import ProfilePicture from "@/components/payroll/employee-management/documents/profilePicture";
+import EmployeeDescription from "@/components/payroll/employee-management/employee/employeeDescription";
 import { useGetEmployeeById } from "@/hooks/employee";
 import { IPageProps } from "@/utility/interfaces";
-import { EditOutlined, FieldTimeOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  FieldTimeOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { ProCard } from "@ant-design/pro-components";
-import { Button, Card, Divider, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Divider,
+  Flex,
+  Row,
+  Typography,
+  Upload,
+} from "antd";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+
+const { Meta } = Card;
+import React, { useState } from "react";
 
 const gridStyle: React.CSSProperties = {
   width: "33%",
@@ -46,6 +64,13 @@ const menuItems = [
     description: "Tracks and manages employee leave requests .",
     show: true,
   },
+  {
+    title: "Documents",
+    icon: <FieldTimeOutlined />,
+    link: "/documents",
+    description: "Manage employee documents",
+    show: true,
+  },
   // {
   //   title: "Other Deduction",
   //   icon: <FieldTimeOutlined />,
@@ -73,20 +98,32 @@ const ViewEmployee = ({ account }: IPageProps) => {
             }}
           >
             <EmployeeManagementHeader title="Employee Management">
-              <EmployeeDetails
+              <Row>
+                <Col xs={24} sm={24} md={6} lg={6} xl={6}>
+                  <ProfilePicture record={employee} />
+                </Col>
+                <Col xs={24} sm={24} md={18} lg={18} xl={18}>
+                  <Button
+                    icon={<EditOutlined />}
+                    type="default"
+                    style={{ marginBottom: "30px" }}
+                    onClick={() => {
+                      router.push(
+                        `/payroll/employees/${router?.query?.id}/edit`
+                      );
+                    }}
+                  >
+                    Edit Employee Information
+                  </Button>
+                  <EmployeeDescription record={employee} />
+                </Col>
+              </Row>
+
+              {/* <EmployeeDetails
                 loading={loadingEmployee}
                 fullName={employee?.fullName}
                 position={employee?.position?.description}
-              />
-              <Button
-                icon={<EditOutlined />}
-                type="default"
-                onClick={() => {
-                  router.push(`/payroll/employees/${router?.query?.id}/edit`);
-                }}
-              >
-                Edit Employee Information
-              </Button>
+              /> */}
             </EmployeeManagementHeader>
 
             <Divider />

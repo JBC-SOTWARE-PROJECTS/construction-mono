@@ -56,6 +56,22 @@ class VehicleUsageMonitoring extends AbstractAuditingEntity implements Serializa
 	String endFuelReading
 
 	@GraphQLQuery
+	@Column(name = "rental_rate")
+	BigDecimal rentalRate
+
+	@GraphQLQuery
+	@Column(name = "rent_unit_measure_quantity")
+	BigDecimal rentUnitMeasureQuantity
+
+	@GraphQLQuery
+	@Column(name = "calculated_rental_fee")
+	BigDecimal calculatedRentalFee
+
+	@GraphQLQuery
+	@Column(name = "remarks")
+	String remarks
+
+	@GraphQLQuery
 	@Column(name = "start_datetime")
 	Instant startDatetime
 
@@ -80,6 +96,12 @@ class VehicleUsageMonitoring extends AbstractAuditingEntity implements Serializa
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "asset", referencedColumnName = "id")
 	Assets asset
+
+	@GraphQLQuery
+	@NotFound(action = NotFoundAction.IGNORE)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "rental_basis", referencedColumnName = "id")
+	RentalRates rentalBasis
 
 	@GraphQLQuery
 	@Column(name = "company")

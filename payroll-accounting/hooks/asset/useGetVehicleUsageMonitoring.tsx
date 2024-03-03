@@ -18,6 +18,17 @@ const GET_RECORDS = gql`
           endDatetime
           startFuelReading
           endFuelReading
+          rentalBasis{
+            id
+            amount
+          }
+          rentUnitMeasureQuantity
+          remarks
+          rentalRate
+          company
+          asset{
+            id
+          }
           project{
             id
             description
@@ -37,7 +48,7 @@ const useGetVehicleUsageMonitoring = (props: QueryHookOptions ) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     ...props
   });
-
+console.log("data", data)
   return [data?.list , loading, refetch];
 };
 

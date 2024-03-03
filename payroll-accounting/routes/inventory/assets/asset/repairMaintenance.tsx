@@ -12,6 +12,7 @@ import AssetRepairMaintenanceTable from "@/components/inventory/assets/masterfil
 import useGetAssetRepairMaintenance from "@/hooks/asset/useGetAssetRepairMaintenance";
 import UpsertRepairMaintenanceModal from "@/components/inventory/assets/dialogs/upsertAssetRepairMaintenance";
 import ViewRepairMaintenance from "@/components/inventory/assets/dialogs/viewRepairMaintenance";
+import CustomButton from "@/components/common/CustomButton";
 
 type Props = {};
 const { Search } = Input;
@@ -76,13 +77,14 @@ export default function AssetRepairMaintenanceComponent({}: Props) {
               onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
               className="w-full"
             />
-            <Button
+            <CustomButton
               type="primary"
               icon={<PlusCircleOutlined />}
               onClick={() => onUpsertRecord()}
+              allowedPermissions={["manage_repairs_and_maintenance"]}
             >
               Create New
-            </Button>
+            </CustomButton>
           </ProFormGroup>
         }
       >

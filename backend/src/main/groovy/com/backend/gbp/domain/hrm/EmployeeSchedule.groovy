@@ -3,6 +3,7 @@ package com.backend.gbp.domain.hrm
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.CompanySettings
 import com.backend.gbp.domain.projects.Projects
+import com.backend.gbp.graphqlservices.hrm.OvertimeType
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.*
 import javax.persistence.Table
@@ -46,6 +47,11 @@ class EmployeeSchedule extends AbstractAuditingEntity {
 	@Column(name = "is_overtime")
 	Boolean isOvertime;
 
+	@Enumerated(EnumType.STRING)
+	@GraphQLQuery
+	@Column(name = "overtime_type")
+	OvertimeType overtimeType;
+
 	@GraphQLQuery
 	@Column(name = "deleted")
 	Boolean deleted;
@@ -77,6 +83,7 @@ class EmployeeSchedule extends AbstractAuditingEntity {
 	@GraphQLQuery
 	@Column(name = "is_custom")
 	Boolean isCustom;
+
 
 	@GraphQLQuery
 	@Column(name = "is_leave")

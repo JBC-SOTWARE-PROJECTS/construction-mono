@@ -3,6 +3,8 @@ import React from 'react';
 import { Button, Card, Col, Divider, Row, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { EditOutlined, PrinterOutlined } from '@ant-design/icons';
+import { getUrlPrefix } from '@/utility/graphql-client';
+import { useRouter } from 'next/router';
 
 interface DataType {
   key: React.Key;
@@ -45,6 +47,8 @@ for (let i = 0; i < 100; i++) {
 }
 
 function PayrollRegisterEmp() {
+  const router = useRouter();
+
   const columns: ColumnsType<DataType> = [
     {
       title: 'Account No.',
@@ -159,6 +163,7 @@ function PayrollRegisterEmp() {
     },
     {
       title: 'Net Pay',
+      fixed: 'right',
       width: 150,
       render: (record) => (
         <span style={{ color: 'blue', fontWeight: 'bold' }}>
@@ -189,11 +194,31 @@ function PayrollRegisterEmp() {
     <div>
       <Card>
         <>
-          {tableHeader.map((item: any) => (
-            <div key={item.key} style={{ fontWeight: 'bold' }}>
-              {item.title}
-            </div>
-          ))}
+          <Row gutter={2}>
+            <Col md={20}>
+              {tableHeader.map((item: any) => (
+                <div key={item.key} style={{ fontWeight: 'bold' }}>
+                  {item.title}
+                </div>
+              ))}
+            </Col>
+            <Col md={4}>
+              <Button
+                type='primary'
+                icon={<PrinterOutlined />}
+                size='middle'
+                onClick={() =>
+                  window.open(
+                    getUrlPrefix() +
+                      '/reports/payroll/print/payrollLedgerDownload?id=' +
+                      router?.query?.id
+                  )
+                }
+              >
+                DownLoad CSV
+              </Button>
+            </Col>
+          </Row>
           <Divider />
           <Row>
             <Table
