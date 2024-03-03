@@ -611,3 +611,9 @@ export const PR_STATUS = [
   { label: "FOR APPROVAL", value: "FOR APPROVAL" },
   { label: "APPROVED", value: "APPROVED" },
 ];
+
+export const ISSUANCE_CATEGORY = [
+  { label: "PROJECTS", value: "PROJECTS" },
+  { label: "SPARE PARTS", value: "SPARE_PARTS" },
+  { label: "PERSONAL", value: "PERSONAL" },
+];

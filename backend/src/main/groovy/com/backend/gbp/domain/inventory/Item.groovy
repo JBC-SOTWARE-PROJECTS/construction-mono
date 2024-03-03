@@ -83,6 +83,21 @@ class Item extends AbstractAuditingEntity implements Serializable {
 	ItemSubAccount expenseSubAccount
 
 	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fixed_asset_sub_account", referencedColumnName = "id")
+	ItemSubAccount fixedAssetSubAccount
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "fixed_asset_expense_sub_account", referencedColumnName = "id")
+	ItemSubAccount fixedAssetExpenseSubAccount
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "revenue_sub_account", referencedColumnName = "id")
+	ItemSubAccount revenueSubAccount
+
+	@GraphQLQuery
 	@Column(name = "item_conversion")
 	Integer item_conversion
 
@@ -133,6 +148,10 @@ class Item extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "fix_asset")
 	Boolean fixAsset
+
+	@GraphQLQuery
+	@Column(name = "for_sale")
+	Boolean forSale
 
 	@GraphQLQuery
 	@Column(name = "company")

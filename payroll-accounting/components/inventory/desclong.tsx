@@ -11,11 +11,36 @@ export default function DescLong({ descripton, record }: IProps) {
   return (
     <span>
       {`${descripton} `}
-      {record?.consignment && <Tag color="magenta">Consignment</Tag>}
-      {record?.fixAsset && <Tag color="cyan">Fixed Asset</Tag>}
-      {record?.vatable && <Tag color="volcano">Vatable</Tag>}
-      {record?.isMedicine && <Tag color="gold">Medicine</Tag>}
-      {record?.production && <Tag color="blue">Production Item</Tag>}
+      {record?.consignment && (
+        <Tag color="magenta" bordered={false}>
+          Consignment
+        </Tag>
+      )}
+      {record?.fixAsset && (
+        <Tag color="cyan" bordered={false}>
+          Fixed Asset
+        </Tag>
+      )}
+      {record?.vatable && (
+        <Tag color="volcano" bordered={false}>
+          Vatable
+        </Tag>
+      )}
+      {record?.isMedicine && (
+        <Tag color="gold" bordered={false}>
+          Medicine
+        </Tag>
+      )}
+      {record?.production && (
+        <Tag color="blue" bordered={false}>
+          Production Item
+        </Tag>
+      )}
+      {record?.forSale && (
+        <Tag color="lime" bordered={false}>
+          For Sale
+        </Tag>
+      )}
     </span>
   );
 }

@@ -2186,7 +2186,8 @@ export type DocumentTypes = {
 export enum DomainEnum {
   Bank = 'BANK',
   FixedAssetSubAccount = 'FIXED_ASSET_SUB_ACCOUNT',
-  ItemCategory = 'ITEM_CATEGORY',
+  ItemAssetSubAccount = 'ITEM_ASSET_SUB_ACCOUNT',
+  ItemRevenueSubAccount = 'ITEM_REVENUE_SUB_ACCOUNT',
   NoDomain = 'NO_DOMAIN',
   Projects = 'PROJECTS',
   Supplier = 'SUPPLIER'
@@ -3582,6 +3583,9 @@ export type Item = {
   discountable?: Maybe<Scalars['Boolean']['output']>;
   expenseSubAccount?: Maybe<ItemSubAccount>;
   fixAsset?: Maybe<Scalars['Boolean']['output']>;
+  fixedAssetExpenseSubAccount?: Maybe<ItemSubAccount>;
+  fixedAssetSubAccount?: Maybe<ItemSubAccount>;
+  forSale?: Maybe<Scalars['Boolean']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
   isMedicine?: Maybe<Scalars['Boolean']['output']>;
   itemCode?: Maybe<Scalars['String']['output']>;
@@ -3596,6 +3600,7 @@ export type Item = {
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   markupLock?: Maybe<Scalars['Boolean']['output']>;
   production?: Maybe<Scalars['Boolean']['output']>;
+  revenueSubAccount?: Maybe<ItemSubAccount>;
   sku?: Maybe<Scalars['String']['output']>;
   specification?: Maybe<Scalars['String']['output']>;
   unitMeasurement?: Maybe<Scalars['String']['output']>;
@@ -3665,6 +3670,9 @@ export type ItemInput = {
   discountable?: InputMaybe<Scalars['Boolean']['input']>;
   expenseSubAccount?: InputMaybe<ItemSubAccountInput>;
   fixAsset?: InputMaybe<Scalars['Boolean']['input']>;
+  fixedAssetExpenseSubAccount?: InputMaybe<ItemSubAccountInput>;
+  fixedAssetSubAccount?: InputMaybe<ItemSubAccountInput>;
+  forSale?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   isMedicine?: InputMaybe<Scalars['Boolean']['input']>;
   itemCode?: InputMaybe<Scalars['String']['input']>;
@@ -3677,6 +3685,7 @@ export type ItemInput = {
   item_maximum?: InputMaybe<Scalars['BigDecimal']['input']>;
   markupLock?: InputMaybe<Scalars['Boolean']['input']>;
   production?: InputMaybe<Scalars['Boolean']['input']>;
+  revenueSubAccount?: InputMaybe<ItemSubAccountInput>;
   sku?: InputMaybe<Scalars['String']['input']>;
   specification?: InputMaybe<Scalars['String']['input']>;
   unit_of_purchase?: InputMaybe<UnitMeasurementInput>;
@@ -3702,6 +3711,7 @@ export type ItemSubAccount = {
   id?: Maybe<Scalars['UUID']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
   isFixedAsset?: Maybe<Scalars['Boolean']['output']>;
+  isRevenue?: Maybe<Scalars['Boolean']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   sourceColumn?: Maybe<Scalars['String']['output']>;
@@ -3715,6 +3725,7 @@ export type ItemSubAccountInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isFixedAsset?: InputMaybe<Scalars['Boolean']['input']>;
+  isRevenue?: InputMaybe<Scalars['Boolean']['input']>;
   sourceColumn?: InputMaybe<Scalars['String']['input']>;
   subAccountCode?: InputMaybe<Scalars['String']['input']>;
   subAccountDescription?: InputMaybe<Scalars['String']['input']>;
@@ -10947,6 +10958,7 @@ export type Query = {
   signatureListFilter?: Maybe<Array<Maybe<Signature>>>;
   srrGetReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   srrList?: Maybe<Array<Maybe<ReceivingReport>>>;
+  stiByFiltersNewPage?: Maybe<Page_StockIssue>;
   stiByFiltersPage?: Maybe<Page_StockIssue>;
   stiById?: Maybe<StockIssue>;
   stiItemById?: Maybe<StockIssueItems>;
@@ -14154,6 +14166,19 @@ export type QuerySignatureListFilterArgs = {
 
 
 /** Query root */
+export type QueryStiByFiltersNewPageArgs = {
+  asset?: InputMaybe<Scalars['UUID']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<Scalars['String']['input']>;
+  issueType?: InputMaybe<Scalars['String']['input']>;
+  office?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  project?: InputMaybe<Scalars['UUID']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryStiByFiltersPageArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   office?: InputMaybe<Scalars['UUID']['input']>;
@@ -15201,6 +15226,8 @@ export type StockCard = {
 
 export type StockIssue = {
   __typename?: 'StockIssue';
+  assets?: Maybe<Assets>;
+  category?: Maybe<Scalars['String']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   created?: Maybe<Scalars['Instant']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -15221,6 +15248,8 @@ export type StockIssue = {
 };
 
 export type StockIssueInput = {
+  assets?: InputMaybe<AssetsInput>;
+  category?: InputMaybe<Scalars['String']['input']>;
   company?: InputMaybe<Scalars['UUID']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   isCancel?: InputMaybe<Scalars['Boolean']['input']>;

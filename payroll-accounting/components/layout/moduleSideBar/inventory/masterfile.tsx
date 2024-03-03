@@ -15,6 +15,10 @@ const AccountingAccountsPayableMenu = {
             name: "Production",
           },
           {
+            path: "/inventory/masterfile/items/for-sale",
+            name: "For Sale",
+          },
+          {
             path: "/inventory/masterfile/items/fix-assets",
             name: "Fixed Assets",
           },
@@ -92,7 +96,7 @@ const AccountingAccountsPayableMenu = {
           },
           {
             path: "/inventory/masterfile/other-configurations/subaccount-category",
-            name: "Item Subaccount Category",
+            name: "Item SubAccount",
           },
           {
             path: "/inventory/masterfile/other-configurations/measurements",

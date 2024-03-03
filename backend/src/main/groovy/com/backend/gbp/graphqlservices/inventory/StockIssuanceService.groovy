@@ -68,16 +68,19 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
 
         def company = SecurityUtils.currentCompanyId()
 		String query = '''Select po from StockIssue po where
-						(lower(po.issueNo) like lower(concat('%',:filter,'%')))
-						and po.issueFrom.id = :office'''
+						(lower(po.issueNo) like lower(concat('%',:filter,'%'))) '''
 
 		String countQuery = '''Select count(po) from StockIssue po where
-						(lower(po.issueNo) like lower(concat('%',:filter,'%')))
-						and po.issueFrom.id = :office'''
+						(lower(po.issueNo) like lower(concat('%',:filter,'%'))) '''
 
 		Map<String, Object> params = new HashMap<>()
 		params.put('filter', filter)
-        params.put('office', office)
+
+        if (office) {
+            query += ''' and (po.issueFrom.id = :office)'''
+            countQuery += ''' and (po.issueFrom.id = :office)'''
+            params.put("office", office)
+        }
 
         if (company) {
             query += ''' and (po.company = :company)'''
@@ -91,6 +94,71 @@ class StockIssuanceService extends AbstractDaoService<StockIssue> {
 		Page<StockIssue> result = getPageable(query, countQuery, page, size, params)
 		return result
 	}
+
+    @GraphQLQuery(name = "stiByFiltersNewPage")
+    Page<StockIssue> stiByFiltersNewPage(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "category") String category,
+            @GraphQLArgument(name = "issueType") String issueType,
+            @GraphQLArgument(name = "project") UUID project,
+            @GraphQLArgument(name = "asset") UUID asset,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select po from StockIssue po where
+						(lower(po.issueNo) like lower(concat('%',:filter,'%'))) '''
+
+        String countQuery = '''Select count(po) from StockIssue po where
+						(lower(po.issueNo) like lower(concat('%',:filter,'%'))) '''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+
+        if (office) {
+            query += ''' and (po.issueFrom.id = :office)'''
+            countQuery += ''' and (po.issueFrom.id = :office)'''
+            params.put("office", office)
+        }
+
+        if (issueType) {
+            query += ''' and (po.issueType = :issueType)'''
+            countQuery += ''' and (po.issueType = :issueType)'''
+            params.put("issueType", issueType)
+        }
+
+        if(category){
+            query += ''' and (po.category = :category)''';
+            countQuery += ''' and (po.category = :category)''';
+            params.put('category', category)
+        }
+
+        if (project) {
+            query += ''' and (po.project.id = :project)'''
+            countQuery += ''' and (po.project.id = :project)'''
+            params.put("project", project)
+        }
+
+        if (asset) {
+            query += ''' and (po.assets.id = :asset)'''
+            countQuery += ''' and (po.assets.id = :asset)'''
+            params.put("asset", asset)
+        }
+
+        if (company) {
+            query += ''' and (po.company = :company)'''
+            countQuery += ''' and (po.company = :company)'''
+            params.put("company", company)
+        }
+
+
+        query += ''' ORDER BY po.issueNo DESC'''
+
+        Page<StockIssue> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
 
     // ============== Mutation =======================//
     @Transactional

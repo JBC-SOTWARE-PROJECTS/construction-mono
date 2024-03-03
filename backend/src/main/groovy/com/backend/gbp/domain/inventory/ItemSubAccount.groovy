@@ -52,6 +52,10 @@ class ItemSubAccount extends AbstractAuditingEntity implements Serializable, Sub
 	Boolean isFixedAsset
 
 	@GraphQLQuery
+	@Column(name = "is_revenue")
+	Boolean isRevenue
+
+	@GraphQLQuery
 	@Column(name = "company")
 	UUID company
 

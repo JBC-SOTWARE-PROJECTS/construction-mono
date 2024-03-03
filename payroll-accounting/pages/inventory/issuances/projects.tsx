@@ -2,12 +2,12 @@ import React from "react";
 import asyncComponent from "@/utility/asyncComponent";
 
 const Component = asyncComponent(
-  () => import("@/routes/inventory/deliveries/receiving")
+  () => import("@/routes/inventory/insuances")
 );
 
 const IssuancesProjects = () => {
   // personal, projects, fixed-assets
-  return <Component type="projects" />;
+  return <Component type="projects" issueType="ISSUE" />;
 };
 
 export default IssuancesProjects;

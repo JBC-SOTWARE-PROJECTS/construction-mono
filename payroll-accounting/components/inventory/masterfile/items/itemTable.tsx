@@ -33,7 +33,7 @@ export default function ItemTable({
       title: "SKU/Barcode",
       dataIndex: "sku",
       key: "sku",
-      width: 140,
+      width: 120,
     },
     {
       title: "Description",
@@ -45,7 +45,7 @@ export default function ItemTable({
       title: "Brand",
       dataIndex: "brand",
       key: "brand",
-      width: 140,
+      width: 150,
     },
     {
       title: (

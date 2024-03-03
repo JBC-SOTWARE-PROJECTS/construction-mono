@@ -571,4 +571,11 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/88_michael_add_disable_withholding_tax.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_wilson_issuance_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/90_wilson_fixed_asset_revenue_table_sub_account.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/90_wilson_item_alter_table.sql"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

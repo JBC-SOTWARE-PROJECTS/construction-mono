@@ -3,9 +3,8 @@ import asyncComponent from "@/utility/asyncComponent";
 
 const Component = asyncComponent(() => import("@/routes/inventory/insuances"));
 
-const IssuancesAssets = () => {
-  // projects, personal, fixed-assets
-  return <Component type="personal" issueType="EXPENSE" />;
+const QuantityAdjustments = () => {
+  return <Component type="all" issueType="EXPENSE" />;
 };
 
-export default IssuancesAssets;
+export default QuantityAdjustments;

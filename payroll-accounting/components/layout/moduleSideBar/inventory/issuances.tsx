@@ -4,7 +4,7 @@ const AccountingAccountsPayableMenu = {
     routes: [
       {
         path: "/inventory/issuances/all",
-        name: "Delivery Receiving",
+        name: "Item Issuances",
         routes: [
           {
             path: "/inventory/issuances/all",
@@ -26,7 +26,7 @@ const AccountingAccountsPayableMenu = {
       },
       {
         path: "/inventory/issuances/expense",
-        name: "Expense",
+        name: "Item Expenses",
         routes: [
           {
             path: "/inventory/issuances/expense/all",

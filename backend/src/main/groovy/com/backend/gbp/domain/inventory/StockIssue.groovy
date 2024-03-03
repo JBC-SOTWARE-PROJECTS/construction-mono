@@ -2,6 +2,7 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -52,6 +53,15 @@ class StockIssue extends AbstractAuditingEntity implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id")
 	Projects project
+
+	@GraphQLQuery
+	@Column(name = "category", columnDefinition = "varchar")
+	String category
+
+	@GraphQLQuery
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "asset", referencedColumnName = "id")
+	Assets assets
 	
 	@GraphQLQuery
 	@Column(name = "issue_type")
