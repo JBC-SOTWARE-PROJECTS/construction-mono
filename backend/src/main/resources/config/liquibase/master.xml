@@ -591,4 +591,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/89_jacky_veh_monitoring_other_details.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_asset_veh_emp_rent_permission.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_asset_veh_new_permission.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
