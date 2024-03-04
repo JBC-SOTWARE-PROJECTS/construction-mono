@@ -35,6 +35,7 @@ export const GET_INVENTORY_BY_LOCATION = gql`
           vatable
           fixAsset
           consignment
+          forSale
         }
         descLong
         uou

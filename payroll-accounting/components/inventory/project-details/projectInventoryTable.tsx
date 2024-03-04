@@ -30,7 +30,7 @@ export default function ProjectInventoryMonitoringTable({
       title: "SKU/Barcode",
       dataIndex: "sku",
       key: "sku",
-      width: 140,
+      width: 115,
     },
     {
       title: "Description",
@@ -115,10 +115,10 @@ export default function ProjectInventoryMonitoringTable({
       render: (_, record) => {
         return (
           <Button
-            type="primary"
+            type="dashed"
             size="small"
             onClick={() => handleOpen(record)}
-            icon={<EditFilled />}
+            icon={<FolderOpenOutlined />}
           />
         );
       },
