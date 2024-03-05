@@ -6,6 +6,7 @@ import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.Position
 import com.backend.gbp.domain.hrm.dto.EmployeeLoanConfig
 import com.backend.gbp.domain.hrm.dto.HoursLog
+import com.backend.gbp.domain.hrm.enums.SalaryDisbursementMethod
 import com.backend.gbp.domain.payroll.EmployeeLoan
 import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import com.backend.gbp.domain.types.JaversResolvable
@@ -260,6 +261,9 @@ class Employee extends AbstractAuditingEntity implements JaversResolvable, Seria
 	@Column(name = "is_disabled_withholding_tax", columnDefinition = "bool")
 	Boolean isDisabledWithholdingTax
 
-
+	@GraphQLQuery
+	@Enumerated(EnumType.STRING)
+	@Column(name = "salary_disbursement_method", columnDefinition = "varchar")
+	SalaryDisbursementMethod salaryDisbursementMethod
 
 }
