@@ -13,3 +13,4 @@ export { UseSupplierObject as useSupplierObject } from "./supplierObject";
 export { UseProjectStatusList as useProjectStatusList } from "./projectStatusList";
 export { UseProjectCostCategory as useProjectCostCategory } from "./projectCostCategory";
 export { UseProjectCostUnits as useProjectCostUnits } from "./projectCostUnits";
+export { useAdjustmentTypes as useAdjustmentTypes } from "./adjustmentTypes";

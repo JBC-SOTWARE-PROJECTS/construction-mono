@@ -597,5 +597,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/90_wilson_item_alter_table.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/91_wilson_asset_sub_account_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/92_wilson_asset_sub_account_alter.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

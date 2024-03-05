@@ -14,14 +14,14 @@ import {
 import ProjectInventoryMonitoringTable from "@/components/inventory/project-details/projectInventoryTable";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import { useDialog } from "@/hooks";
-import UpsertCriticalQty from "@/components/inventory/project-details/dialogs/upsertCriticalQty";
+import QuantityAdjustmentModal from "../../../components/inventory/adjustments/quantityAdjustmentModal";
 import { useOffices } from "@/hooks/payables";
 
 const { Search } = Input;
 
 export default function QuantityAdjustmentContent() {
   const { message } = App.useApp();
-  const modal = useDialog(UpsertCriticalQty);
+  const modal = useDialog(QuantityAdjustmentModal);
   const account = useContext(AccountContext);
   const [category, setCategory] = useState<string[]>([]);
   const [groupId, setGroupId] = useState<string | null>(null);
@@ -56,8 +56,8 @@ export default function QuantityAdjustmentContent() {
     }
   );
 
-  const onUpsertRecord = (record?: Inventory) => {
-    modal({ record: record }, (result: any) => {
+  const onShowModalTransaction = (record?: Inventory) => {
+    modal({ record: record, office: officeId }, (result: any) => {
       if (result) {
         message.success(result);
         refetch();
@@ -165,7 +165,7 @@ export default function QuantityAdjustmentContent() {
               totalElements={
                 data?.inventoryListPageableByDep?.totalElements as number
               }
-              handleOpen={(e) => onUpsertRecord(e)}
+              handleOpen={(e) => onShowModalTransaction(e)}
               changePage={(e: number) =>
                 setState((prev) => ({ ...prev, page: e }))
               }

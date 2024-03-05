@@ -108,7 +108,7 @@ const DiverseTradeLayout = (props: IProps) => {
     <div
       id="diversetrade-layout"
       style={{
-        height: "100vh",
+        height: "calc(100vh - 19px)",
         overflow: "auto",
       }}>
       <ProConfigProvider hashed={false} token={theme.token}>

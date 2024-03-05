@@ -26,8 +26,8 @@ export default function ColTitlePopUp({
       )}
       {editable && (
         <Tooltip
-          title={"Editable (double click to edit)"}
-          color="blue"
+          title={"Editable (Click or Double click to edit)"}
+          color="green"
           key={"popoverEditable"}>
           &nbsp;
           <EditFilled style={{ color: popupColor }} />

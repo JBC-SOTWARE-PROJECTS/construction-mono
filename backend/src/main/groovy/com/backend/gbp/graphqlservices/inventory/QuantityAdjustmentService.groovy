@@ -90,6 +90,17 @@ class QuantityAdjustmentService {
 		return upsert
 	}
 
+	@Transactional
+	@GraphQLMutation(name = "upsertAdjustmentRemarks")
+	QuantityAdjustment upsertAdjustmentRemarks(
+			@GraphQLArgument(name = "remarks") String remarks,
+			@GraphQLArgument(name = "id") UUID id
+	) {
+		QuantityAdjustment upsert = quantityAdjustmentRepository.findById(id).get()
+		upsert.remarks = remarks
+		return upsert
+	}
+
 
 	@Transactional
 	@GraphQLMutation(name = "updateQtyAdjStatus")

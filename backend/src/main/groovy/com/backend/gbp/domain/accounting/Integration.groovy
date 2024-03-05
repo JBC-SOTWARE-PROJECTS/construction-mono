@@ -28,7 +28,9 @@ enum IntegrationDomainEnum {
     FIXED_ASSET_ITEM("Fixed Asset Item", "com.backend.gbp.domain.fixed_asset.FixedAssetItems"),
     LOAN_AMORTIZATION("Loan Amortization", "com.backend.gbp.domain.accounting.LoanAmortization"),
     LOAN("Loan", "com.backend.gbp.domain.accounting.Loan"),
-    PROJECT_WORK_ACCOMPLISH("Project Work Accomplish", "com.backend.gbp.domain.accounting.ProjectWorkAccomplish")
+    PROJECT_WORK_ACCOMPLISH("Project Work Accomplish", "com.backend.gbp.domain.accounting.ProjectWorkAccomplish"),
+    //inventory
+    QUANTITY_ADJUSTMENT("Quantity Adjustment", "com.backend.gbp.domain.inventory.QuantityAdjustment")
 
     String displayName
     String path
