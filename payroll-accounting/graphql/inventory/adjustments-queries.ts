@@ -49,8 +49,8 @@ export const UPSERT_QTY_ADJUSTMENT = gql`
 `;
 
 export const UPSERT_REMARKS_ADJUSTMENT = gql`
-  mutation ($remarks: String, $id: UUID) {
-    upsertAdjustmentRemarks(remarks: $remarks, id: $id) {
+  mutation ($remarks: String, $type: UUID, $id: UUID) {
+    upsertAdjustmentRemarks(remarks: $remarks, type: $type, id: $id) {
       id
     }
   }
@@ -60,6 +60,17 @@ export const UPSERT_STATUS_ADJUSTMENT = gql`
   mutation ($status: Boolean, $id: UUID) {
     updateQtyAdjStatus(status: $status, id: $id) {
       id
+    }
+  }
+`;
+
+export const GET_JOURNAL_ENTRIES_QTY_ADJUSTMENT = gql`
+  query ($id: UUID, $status: Boolean) {
+    adjQuantityAccountView(id: $id, status: $status) {
+      code
+      desc
+      debit
+      credit
     }
   }
 `;

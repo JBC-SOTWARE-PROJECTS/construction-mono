@@ -73,8 +73,16 @@ class QuantityAdjustment extends AbstractAuditingEntity implements AutoIntegrate
 	String remarks
 
 	@GraphQLQuery
+	@Column(name = "posted_by")
+	String postedBy
+
+	@GraphQLQuery
 	@Column(name = "company")
 	UUID company
+
+	@GraphQLQuery
+	@Column(name = "posted_ledger")
+	UUID postedLedger
 
 	@GraphQLQuery(name = "unitMeasurement")
 	@Transient

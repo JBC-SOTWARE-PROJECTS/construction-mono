@@ -7,6 +7,8 @@ import _ from "lodash";
 import { requiredField } from "@/utility/helper";
 import { FormTextArea } from "@/components/common";
 import { UPSERT_REMARKS_ADJUSTMENT } from "@/graphql/inventory/adjustments-queries";
+import FormSelect from "@/components/common/formSelect/formSelect";
+import { useAdjustmentTypes } from "@/hooks/inventory";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -17,8 +19,8 @@ export default function UpsertQuantityAdjustmentRemarks(props: IProps) {
   const { message } = App.useApp();
   const { hide, record } = props;
   const [form] = Form.useForm();
-
   // ===================== Queries ==============================
+  const adjTypes = useAdjustmentTypes();
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
     UPSERT_REMARKS_ADJUSTMENT,
     {
@@ -42,6 +44,7 @@ export default function UpsertQuantityAdjustmentRemarks(props: IProps) {
     upsertRecord({
       variables: {
         remarks: data.remarks,
+        type: data.quantityAdjustmentType,
         id: record?.id,
       },
     });
@@ -51,7 +54,7 @@ export default function UpsertQuantityAdjustmentRemarks(props: IProps) {
     <Modal
       title={
         <Typography.Title level={4}>
-          <Space align="center">Remarks/Notes (Particular)</Space>
+          <Space align="center">Quantity Adjustment Transaction</Space>
         </Typography.Title>
       }
       destroyOnClose={true}
@@ -81,8 +84,21 @@ export default function UpsertQuantityAdjustmentRemarks(props: IProps) {
         onFinishFailed={onFinishFailed}
         initialValues={{
           ...record,
+          quantityAdjustmentType: record?.quantityAdjustmentType?.id ?? null,
         }}>
         <Row gutter={[8, 0]}>
+          <Col span={24}>
+            <FormSelect
+              label="Adjustment Type"
+              name="quantityAdjustmentType"
+              rules={requiredField}
+              propsselect={{
+                options: adjTypes,
+                allowClear: true,
+                placeholder: "Select Adjustment Type",
+              }}
+            />
+          </Col>
           <Col span={24}>
             <FormTextArea
               label="Remarks/Notes (Particular)"

@@ -342,7 +342,7 @@ class SubAccountSetupService extends AbstractDaoService<SubAccountSetup> {
     List<DomainOptionDto> subAccountDomainsRecords(
             @GraphQLArgument(name = "domain") DomainEnum domain
     ) {
-        UUID companyID = SecurityUtils.currentCompanyId()
+        //UUID companyID = SecurityUtils.currentCompanyId()
         String query = "from ${domain.path as String} "
         if(domain.flagColumn) {
             query = "from ${domain.path as String} where ${domain.flagColumn as String} = true "

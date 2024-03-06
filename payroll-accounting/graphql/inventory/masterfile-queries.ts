@@ -55,15 +55,15 @@ export const GET_ITEM_RECORDS = gql`
           id
           subAccountDescription
         }
-        fixedAssetSubAccount{
+        fixedAssetSubAccount {
           id
           subAccountDescription
         }
-        fixedAssetExpenseSubAccount{
+        fixedAssetExpenseSubAccount {
           id
           subAccountDescription
         }
-        revenueSubAccount{
+        revenueSubAccount {
           id
           subAccountDescription
         }
@@ -335,6 +335,7 @@ export const GET_RECORDS_QUANTITY_ADJUSTMENT = gql`
       flagValue
       sourceColumn
       is_active
+      reverse
     }
   }
 `;

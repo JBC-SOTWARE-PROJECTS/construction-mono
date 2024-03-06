@@ -157,13 +157,20 @@ export default function QuantityAdjustmentModal(props: IProps) {
     });
   };
   // ====================== post or void ===================
-  const onPostOrVoid = (record: QuantityAdjustment) => {
-    postInventory({ record: record }, (result: string) => {
-      if (result) {
-        message.success(result);
-        refetch();
+  const onPostOrVoidView = (
+    record: QuantityAdjustment,
+    status: boolean,
+    viewOnly: boolean
+  ) => {
+    postInventory(
+      { record: record, status: status, viewOnly: viewOnly },
+      (result: string) => {
+        if (result) {
+          message.success(result);
+          refetch();
+        }
       }
-    });
+    );
   };
   // ================ column tabs descriptions ================================
   const columns: ColumnsType<QuantityAdjustment> = [
@@ -265,9 +272,12 @@ export default function QuantityAdjustmentModal(props: IProps) {
           color = "red";
           text = "Voided";
         }
+        // for viewing please set status to true to view the current entries not the reverse
         if (status) {
           return (
-            <ButtonPosted onClick={() => console.log("")}>{text}</ButtonPosted>
+            <ButtonPosted onClick={() => onPostOrVoidView(record, true, true)}>
+              {text}
+            </ButtonPosted>
           );
         } else {
           return (
@@ -286,15 +296,22 @@ export default function QuantityAdjustmentModal(props: IProps) {
       key: "action",
       align: "center",
       width: 100,
-      render: (text, record) => (
-        <Button
-          type="primary"
-          size="small"
-          onClick={() => onPostOrVoid(record)}
-          icon={record?.isPosted ? <UndoOutlined /> : <FileProtectOutlined />}>
-          {record?.isPosted ? "Void" : "Post"}
-        </Button>
-      ),
+      render: (text, record) => {
+        let posted = record?.isPosted;
+        return (
+          <Button
+            type="primary"
+            danger={posted ? true : false}
+            disabled={record.isCancel ?? false}
+            size="small"
+            onClick={() => onPostOrVoidView(record, !posted, false)}
+            icon={
+              record?.isPosted ? <UndoOutlined /> : <FileProtectOutlined />
+            }>
+            {record?.isPosted ? "Void" : "Post"}
+          </Button>
+        );
+      },
     },
   ];
 
@@ -413,13 +430,15 @@ export default function QuantityAdjustmentModal(props: IProps) {
                 <p style={{ margin: 0 }}>
                   Remarks/Notes (Particular):{" "}
                   {record.remarks ? <Tag>{record.remarks}</Tag> : "--"}
-                  <Button
-                    size="small"
-                    type="link"
-                    icon={<EditOutlined />}
-                    onClick={() => onEditRemarks(record)}>
-                    Edit Remarks
-                  </Button>
+                  {record?.isPosted || record?.isCancel ? null : (
+                    <Button
+                      size="small"
+                      type="link"
+                      icon={<EditOutlined />}
+                      onClick={() => onEditRemarks(record)}>
+                      Edit Remarks
+                    </Button>
+                  )}
                 </p>
               ),
             }}

@@ -601,5 +601,11 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/92_wilson_asset_sub_account_alter.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/93_wilson_qty_adjustment_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/94_wilson_quantity_adjustment_type_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/94_wilson_qty_adjustment_alter.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

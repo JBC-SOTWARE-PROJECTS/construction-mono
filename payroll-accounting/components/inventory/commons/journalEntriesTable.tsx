@@ -57,7 +57,9 @@ export default function JournaEntriesTable({ entries, loading }: IProps) {
           size="small"
           loading={loading}
           pagination={false}
-          summary={() => <JournalEntriesSummary dataSource={entries} />}
+          summary={() => (
+            <JournalEntriesSummary dataSource={entries} autoEntries={true} />
+          )}
         />
       </TableCSS>
     </Space>
