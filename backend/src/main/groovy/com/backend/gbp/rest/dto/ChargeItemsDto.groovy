@@ -11,7 +11,7 @@ class ChargeItemsDto {
     String refNo
     String description
     String transType
-    Integer qty
+    BigDecimal qty
     BigDecimal unitCost
     BigDecimal totalAmount
 }

@@ -6,6 +6,6 @@ class STSReportDto {
 
 class STSReportItemDto {
 	String code, description, uom
-	Integer  issued
+	BigDecimal  issued
 	BigDecimal unitCost, total
 }

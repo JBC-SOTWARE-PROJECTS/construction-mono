@@ -123,7 +123,7 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
     @Transactional
     @GraphQLMutation(name = "updateReorder")
     OfficeItem updateReorder(
-            @GraphQLArgument(name = "qty") Integer qty,
+            @GraphQLArgument(name = "qty") BigDecimal qty,
             @GraphQLArgument(name = "id") UUID id
     ) {
         OfficeItem officeItem = findOne(id)
@@ -178,7 +178,7 @@ class OfficeItemService extends AbstractDaoService<OfficeItem> {
     @Transactional
     @GraphQLMutation(name = "updateReOrderQty")
     OfficeItem updateReOrderQty(
-            @GraphQLArgument(name = "value") Integer value,
+            @GraphQLArgument(name = "value") BigDecimal value,
             @GraphQLArgument(name = "id") UUID id
     ) {
         OfficeItem officeItem = findOne(id)

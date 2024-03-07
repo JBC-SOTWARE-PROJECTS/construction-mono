@@ -12,7 +12,7 @@ class CustomerBillingDto {
     String item_type
     Instant trans_date
     String description
-    Integer qty
+    BigDecimal qty
     BigDecimal price
     BigDecimal amount_charge
     BigDecimal deduction

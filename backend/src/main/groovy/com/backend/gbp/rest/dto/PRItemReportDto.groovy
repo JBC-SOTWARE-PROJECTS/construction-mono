@@ -5,7 +5,7 @@ import groovy.transform.TupleConstructor
 @TupleConstructor
 class PRItemReportDto {
     String description, brand, uop, uou
-    Integer content_ratio, qty_uop, onhand, qty_uou, reorder
+    BigDecimal content_ratio, qty_uop, onhand, qty_uou, reorder
 }
 
 @TupleConstructor

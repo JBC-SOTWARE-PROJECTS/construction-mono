@@ -111,7 +111,7 @@ class SupplierItemService extends AbstractDaoService<SupplierItem> {
         if(id) {
             upsertFromMap(id, fields, { SupplierItem entity, boolean forInsert ->
                 if(!forInsert){
-                    Integer qty = entity.item.item_conversion
+                    BigDecimal qty = entity.item.item_conversion
                     BigDecimal costU = entity.cost.setScale(2, RoundingMode.HALF_EVEN)
                     BigDecimal costP = costU * qty
                     entity.company = company
@@ -123,7 +123,7 @@ class SupplierItemService extends AbstractDaoService<SupplierItem> {
             if(!supItem){
                 upsertFromMap(id, fields, { SupplierItem entity, boolean forInsert ->
                     if(forInsert){
-                        Integer qty = entity.item.item_conversion
+                        BigDecimal qty = entity.item.item_conversion
                         entity.company = company
                         BigDecimal costU = entity.cost.setScale(2, RoundingMode.HALF_EVEN)
                         BigDecimal costP = costU * qty

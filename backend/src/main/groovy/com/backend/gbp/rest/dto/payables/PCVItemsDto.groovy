@@ -11,7 +11,7 @@ class PCVItemsDto {
 	String id
 	Item item
 	Office office
-	Integer qty
+	BigDecimal qty
 	BigDecimal unitCost
 	BigDecimal inventoryCost
 	BigDecimal grossAmount

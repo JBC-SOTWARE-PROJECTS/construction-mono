@@ -607,5 +607,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/94_wilson_qty_adjustment_alter.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/95_wilson_super_bulk_change_data_type_int_to_numeric_qty_important.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/96_beginning_balance.sql"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

@@ -12,8 +12,8 @@ class PurchaseDto {
 	UUID id
 	Item item
 	String unitMeasurement
-	Integer requestedQty
-	Integer onHandQty
+	BigDecimal requestedQty
+	BigDecimal onHandQty
 	String remarks
 	Boolean isNew
 }
@@ -22,7 +22,7 @@ class PurchasePODto {
 	UUID id
 	Item item
 	String unitMeasurement
-	Integer quantity
+	BigDecimal quantity
 	BigDecimal unitCost
 	String prNos
 	String type
@@ -35,7 +35,7 @@ class PurchaseRecDto {
 	Item item
 	String unitMeasurement
 	PurchaseOrderItems refPoItem
-	Integer receiveQty
+	BigDecimal receiveQty
 	BigDecimal receiveUnitCost
 	BigDecimal receiveDiscountCost
 	Instant expirationDate
@@ -67,7 +67,7 @@ class POMonitoringDto {
 	UUID purchaseOrderItem
 	UUID receivingReport
 	UUID receivingReportItem
-	Integer quantity
+	BigDecimal quantity
 	String status
 }
 
@@ -82,7 +82,7 @@ class PostLedgerDto {
 	String date
 	String typeId
 	String itemId
-	Integer qty
+	BigDecimal qty
 	BigDecimal unitcost
 	Boolean isFg
 	Boolean isDiscount
@@ -101,7 +101,7 @@ class PostDto {
 	String type
 	String typeId
 	String itemId
-	Integer qty
+	BigDecimal qty
 	BigDecimal unitcost
 
 }

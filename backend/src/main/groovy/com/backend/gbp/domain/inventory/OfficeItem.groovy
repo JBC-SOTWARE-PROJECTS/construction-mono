@@ -35,7 +35,7 @@ class OfficeItem implements Serializable{
 	
 	@GraphQLQuery
 	@Column(name = "reorder_quantity")
-	Integer reorder_quantity
+	BigDecimal reorder_quantity
 
 	@GraphQLQuery
 	@Column(name = "actual_cost")

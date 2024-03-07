@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { QuantityAdjustment, Query, Inventory } from "@/graphql/gql/graphql";
 import {
+  BackwardOutlined,
   EditOutlined,
   FileAddOutlined,
   FileProtectOutlined,
@@ -49,6 +50,7 @@ import styled from "styled-components";
 import ButtonPosted from "../commons/buttonPosted";
 import UpsertQuantityAdjustmentRemarks from "./upsertRemarks";
 import PostQuantityAdjustmentModal from "../post-dialogs/postsQuantityAdjustment";
+import AccessControl from "@/components/accessControl/AccessControl";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -235,15 +237,23 @@ export default function QuantityAdjustmentModal(props: IProps) {
       render: (text, record) => {
         let defaultValue = Number(text);
         return editable[record.id + "quantity"] ? (
-          <InputNumber
-            autoFocus
-            defaultValue={defaultValue}
-            onBlur={(e) => {
-              let newValue = Number(e?.target?.value);
-              setEditable({ ...editable, [record.id + "quantity"]: false });
-              onChangeQuantity(record, newValue);
-            }}
-          />
+          <AccessControl
+            allowedPermissions={["allow_edit_qty_adjustment"]}
+            renderNoAccess={
+              <Tag bordered={false} color="red">
+                Access Denied
+              </Tag>
+            }>
+            <InputNumber
+              autoFocus
+              defaultValue={defaultValue}
+              onBlur={(e) => {
+                let newValue = Number(e?.target?.value);
+                setEditable({ ...editable, [record.id + "quantity"]: false });
+                onChangeQuantity(record, newValue);
+              }}
+            />
+          </AccessControl>
         ) : (
           <span key={text}>{NumberFormaterNoDecimal(record.quantity)}</span>
         );
@@ -296,20 +306,22 @@ export default function QuantityAdjustmentModal(props: IProps) {
       key: "action",
       align: "center",
       width: 100,
-      render: (text, record) => {
+      render: (_, record) => {
         let posted = record?.isPosted;
         return (
-          <Button
-            type="primary"
-            danger={posted ? true : false}
-            disabled={record.isCancel ?? false}
-            size="small"
-            onClick={() => onPostOrVoidView(record, !posted, false)}
-            icon={
-              record?.isPosted ? <UndoOutlined /> : <FileProtectOutlined />
-            }>
-            {record?.isPosted ? "Void" : "Post"}
-          </Button>
+          <AccessControl allowedPermissions={["allow_edit_qty_adjustment"]}>
+            <Button
+              type="primary"
+              danger={posted ? true : false}
+              disabled={record.isCancel ?? false}
+              size="small"
+              onClick={() => onPostOrVoidView(record, !posted, false)}
+              icon={
+                record?.isPosted ? <UndoOutlined /> : <FileProtectOutlined />
+              }>
+              {record?.isPosted ? "Void" : "Post"}
+            </Button>
+          </AccessControl>
         );
       },
     },
@@ -325,17 +337,14 @@ export default function QuantityAdjustmentModal(props: IProps) {
       title={`Quantity Adjustment`}
       extraTitle={record?.item?.descLong}
       footer={
-        <div className="w-full dev-between">
-          <Space>
-            <Button
-              type="dashed"
-              size="large"
-              onClick={() => console.log()}
-              icon={<FileTextOutlined />}>
-              View Journal Entries
-            </Button>
-          </Space>
-        </div>
+        <Button
+          type="primary"
+          danger
+          size="large"
+          onClick={() => hide(false)}
+          icon={<BackwardOutlined />}>
+          Return
+        </Button>
       }>
       <Form
         form={parentForm}
@@ -401,18 +410,20 @@ export default function QuantityAdjustmentModal(props: IProps) {
               }}
             />
           </Col>
-          <Col span={24}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              form="upsertForm"
-              loading={upsertLoading}
-              disabled={upsertLoading}
-              icon={<SaveOutlined />}
-              block>
-              Save Quantity Adjustment
-            </Button>
-          </Col>
+          <AccessControl allowedPermissions={["allow_edit_qty_adjustment"]}>
+            <Col span={24}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                form="upsertForm"
+                loading={upsertLoading}
+                disabled={upsertLoading}
+                icon={<SaveOutlined />}
+                block>
+                Save Quantity Adjustment
+              </Button>
+            </Col>
+          </AccessControl>
         </Row>
       </Form>
       {/*  */}
@@ -431,13 +442,16 @@ export default function QuantityAdjustmentModal(props: IProps) {
                   Remarks/Notes (Particular):{" "}
                   {record.remarks ? <Tag>{record.remarks}</Tag> : "--"}
                   {record?.isPosted || record?.isCancel ? null : (
-                    <Button
-                      size="small"
-                      type="link"
-                      icon={<EditOutlined />}
-                      onClick={() => onEditRemarks(record)}>
-                      Edit Remarks
-                    </Button>
+                    <AccessControl
+                      allowedPermissions={["allow_edit_qty_adjustment"]}>
+                      <Button
+                        size="small"
+                        type="link"
+                        icon={<EditOutlined />}
+                        onClick={() => onEditRemarks(record)}>
+                        Edit Remarks
+                      </Button>
+                    </AccessControl>
                   )}
                 </p>
               ),

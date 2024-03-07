@@ -47,7 +47,7 @@ class BeginningBalance extends AbstractAuditingEntity {
 
 	@GraphQLQuery
 	@Column(name = "quantity")
-	Integer quantity
+	BigDecimal quantity
 
 	@GraphQLQuery
 	@Column(name = "unit_cost")

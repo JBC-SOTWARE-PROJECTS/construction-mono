@@ -43,7 +43,7 @@ class PurchaseOrderItems extends AbstractAuditingEntity implements Serializable 
 	
 	@GraphQLQuery
 	@Column(name = "quantity", columnDefinition = "numeric")
-	Integer quantity
+	BigDecimal quantity
 
 	@GraphQLQuery
 	@Column(name = "unit_cost", columnDefinition = "numeric")
@@ -55,7 +55,7 @@ class PurchaseOrderItems extends AbstractAuditingEntity implements Serializable 
 	
 	@GraphQLQuery
 	@Column(name = "qty_in_small", columnDefinition = "int")
-	Integer qtyInSmall
+	BigDecimal qtyInSmall
 
 	@GraphQLQuery
 	@Column(name = "type", columnDefinition = "varchar")

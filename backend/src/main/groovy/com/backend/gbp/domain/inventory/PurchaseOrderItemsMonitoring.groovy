@@ -38,7 +38,7 @@ class PurchaseOrderItemsMonitoring extends AbstractAuditingEntity implements Ser
 	
 	@GraphQLQuery
 	@Column(name = "quantity", columnDefinition = "numeric")
-	Integer quantity
+	BigDecimal quantity
 
 	@GraphQLQuery
 	@Column(name = "unit_cost", columnDefinition = "numeric")
@@ -50,7 +50,7 @@ class PurchaseOrderItemsMonitoring extends AbstractAuditingEntity implements Ser
 	
 	@GraphQLQuery
 	@Column(name = "qty_in_small", columnDefinition = "int")
-	Integer qtyInSmall
+	BigDecimal qtyInSmall
 
 	@GraphQLQuery
 	@Column(name = "type", columnDefinition = "varchar")
@@ -62,11 +62,11 @@ class PurchaseOrderItemsMonitoring extends AbstractAuditingEntity implements Ser
 
 	@GraphQLQuery
 	@Column(name = "delivered_qty")
-	Integer deliveredQty
+	BigDecimal deliveredQty
 
 	@GraphQLQuery
 	@Column(name = "delivery_balance")
-	Integer deliveryBalance
+	BigDecimal deliveryBalance
 
 	@Transient
 	String getUnitMeasurement() {

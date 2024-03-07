@@ -99,7 +99,7 @@ class Item extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "item_conversion")
-	Integer item_conversion
+	BigDecimal item_conversion
 
 	@GraphQLQuery
 	@Column(name = "item_maximum")

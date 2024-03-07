@@ -49,7 +49,7 @@ class QuantityAdjustment extends AbstractAuditingEntity implements AutoIntegrate
 	
 	@GraphQLQuery
 	@Column(name = "quantity")
-	Integer quantity
+	BigDecimal quantity
 
 	@GraphQLQuery
 	@Column(name = "unit_cost")

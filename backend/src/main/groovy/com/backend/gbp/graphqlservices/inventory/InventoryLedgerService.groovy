@@ -173,7 +173,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 
 		def items = this.getLegerByDoc(uuids, start, end, filter)
 		def result = new ArrayList<ChargeItemsDto>()
-		def unit_cost = BigDecimal.ZERO;def qty = 0;
+		def unit_cost = BigDecimal.ZERO;def qty = BigDecimal.ZERO;
 		items.each {
 			it->
 
@@ -459,7 +459,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 			UUID itemId,
 			String reference_no,
 			String type,
-			Integer qty,
+			BigDecimal qty,
 			BigDecimal wcost
 	) {
 		def company = SecurityUtils.currentCompanyId()
@@ -565,7 +565,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	InventoryLedger expenseItemFromProjects(
 			@GraphQLArgument(name = "it") Projects it,
 			@GraphQLArgument(name = "item") Item item,
-			@GraphQLArgument(name = "qty") Integer qty,
+			@GraphQLArgument(name = "qty") BigDecimal qty,
 			@GraphQLArgument(name = "cost") BigDecimal cost
 	) {
 		def company = SecurityUtils.currentCompanyId()
@@ -593,7 +593,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	@GraphQLMutation(name = "editExpenseItemFromProjects")
 	InventoryLedger editExpenseItemFromProjects(
 			@GraphQLArgument(name = "id") UUID id,
-			@GraphQLArgument(name = "qty") Integer qty
+			@GraphQLArgument(name = "qty") BigDecimal qty
 	) {
 		if(id){
 			def upsert = findOne(id)

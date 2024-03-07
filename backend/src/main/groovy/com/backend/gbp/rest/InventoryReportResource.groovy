@@ -359,8 +359,8 @@ class InventoryReportResource {
 							content_ratio: it.item.item_conversion,
 							qty_uop: it.requestedQty,
 							qty_uou: it.requestedQty * it.item.item_conversion,
-							onhand: inv?.onHand ? inv?.onHand : 0,
-							reorder: inv?.reOrderQty ? inv?.reOrderQty : 0
+							onhand: inv?.onHand ? inv?.onHand : BigDecimal.ZERO,
+							reorder: inv?.reOrderQty ? inv?.reOrderQty : BigDecimal.ZERO
 					)
 					itemsDto.add(itemDto)
 			}
