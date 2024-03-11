@@ -18,7 +18,7 @@ import {
   Typography,
   message,
 } from "antd";
-import { SaveOutlined } from "@ant-design/icons";
+import { CloudDownloadOutlined, SaveOutlined } from "@ant-design/icons";
 import { requiredField } from "@/utility/helper";
 import { FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
@@ -42,6 +42,8 @@ import useGetRentalRateByAsset from "@/hooks/asset/useGetRentalRateByAsset";
 import { currencyDisplay } from "@/shared/settings";
 import FormTextArea from "@/components/common/formTextArea/formTextArea";
 import AccessControl from "@/components/accessControl/AccessControl";
+import { getUrlPrefix } from "@/utility/graphql-client";
+
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -79,6 +81,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   const [deletedEmps, setDeletedEmps] = useState<string[]>([]);
   const [statePage, setState] = useState(initialState);
   const [viewMode, setViewMode] = useState(viewModeSet ?? true);
+  const [csvLoading, setCsvLoading] = useState(false);
   const [calculatedRental, setCalculatedRental] = useState(0);
   const [form] = Form.useForm();
   const router = useRouter();
@@ -261,14 +264,37 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     };
   });
 
+  const onHandleDownloadCSV = () => {
+    let apiURL =
+      `/reports/inventory/print/trip_ticket/${record?.id}`
+
+      // let apiURL =
+      // '/general-ledger-reports/summary?' +
+      // 'startDate=' +
+      // startDate +
+      // '&endDate=' +
+      // endDate
+
+    window.open(getUrlPrefix() + apiURL, '_blank')
+  }
+
+
   return (
     <Modal
       title={
-        <Typography.Title level={4}>
-          <Space align="center">{`
-          ${viewMode ? "" : `${record?.id ? "Edit" : "Add"} `}
-          Vehicle Usage`}</Space>
-        </Typography.Title>
+        <>
+          <Typography.Title level={4}>
+            <Space align="center">{`
+            ${viewMode ? "" : `${record?.id ? "Edit" : "Add"} `}
+            Vehicle Usage`}</Space>
+          </Typography.Title>
+          <Button size="small" type="primary" icon={<CloudDownloadOutlined />} className="margin-0"
+                    onClick={onHandleDownloadCSV}
+                    loading={csvLoading}
+                >
+                    Download Trip Ticket
+                </Button>
+        </>
       }
       destroyOnClose={true}
       maskClosable={false}
