@@ -113,12 +113,22 @@ export default function VehicleUsageMonitoringTable({
           <Row gutter={5}>
             <Col>
               <CustomButton
+                icon={<EyeOutlined />}
+                type="primary"
+                onClick={() => {
+                  handleView(record);
+                }}
+                allowedPermissions={["manage_vehicle_usage", "view_vehicle_usage"]}
+              />
+            </Col>
+            <Col>
+              <CustomButton
                 icon={<EditOutlined />}
                 type="primary"
                 onClick={() => {
                   handleOpen(record);
                 }}
-                allowedPermissions={["manage_vehicle_usage"]}
+                allowedPermissions={["manage_vehicle_usage", "update_vehicle_usage"]}
               />
             </Col>
             <Col>

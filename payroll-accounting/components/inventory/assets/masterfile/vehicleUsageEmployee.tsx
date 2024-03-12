@@ -211,10 +211,11 @@ type ColumnTypes = Exclude<EditableTableProps["columns"], undefined>;
 type Iprops = {
   selectedEmps: VehicleUsageEmployee[];
   handleSelected: (record : VehicleUsageEmployee[])=>void;
-  handleDeleted: (deleted : string)=>void
+  handleDeleted: (deleted : string)=>void;
+  viewMode: boolean
 };
 
-const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected, handleDeleted }: Iprops) => {
+const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected, handleDeleted, viewMode = true }: Iprops) => {
   const [dataSource, setDataSource] =
     useState<VehicleUsageEmployee[]>(selectedEmps);
 
@@ -258,25 +259,25 @@ const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected, handleDeleted
     {
       title: "Designation",
       dataIndex: "designation",
-      editable: true,
+      editable: viewMode ? false : true,
       width: "15%",
     },
     {
       title: "Time Rendered Start",
       dataIndex: "timeRenderedStart",
-      editable: true,
+      editable: viewMode ? false : true,
       width: "20%",
     },
     {
       title: "Time Rendered End",
       dataIndex: "timeRenderedEnd",
-      editable: true,
+      editable: viewMode ? false : true,
       width: "20%",
     },
     {
       title: "Remarks",
       dataIndex: "remarks",
-      editable: true,
+      editable: viewMode ? false : true,
       width: "15%",
     },
     {
@@ -285,6 +286,7 @@ const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected, handleDeleted
       width: "10%",
       render: (_, record: VehicleUsageEmployee) =>
         dataSource.length >= 1 ? (
+          viewMode ? <></> :
           <Popconfirm
             title="Sure to delete?"
             onConfirm={() => handleDelete(record?.employee?.id, record?.id)}

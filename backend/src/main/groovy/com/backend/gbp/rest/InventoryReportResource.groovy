@@ -1,7 +1,9 @@
 package com.backend.gbp.rest
 
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.assets.VehicleUsageMonitoring
 import com.backend.gbp.graphqlservices.CompanySettingsService
+import com.backend.gbp.graphqlservices.assets.VehicleUsageMonitoringService
 import com.backend.gbp.graphqlservices.inventory.InventoryService
 import com.backend.gbp.graphqlservices.inventory.ItemService
 import com.backend.gbp.graphqlservices.inventory.PurchaseOrderItemService
@@ -46,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController
 
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -62,6 +65,9 @@ class InventoryReportResource {
 
 	@Autowired
 	PurchaseOrderItemService purchaseOrderItemService
+
+	@Autowired
+	VehicleUsageMonitoringService vehicleUsageMonitoringService
 
 	@Autowired
 	PurchaseRequestService purchaseRequestService
@@ -305,6 +311,85 @@ class InventoryReportResource {
         return new ResponseEntity(data, params, HttpStatus.OK)
     }
 
+	@RequestMapping(value = ['/trip_ticket/{id}'], produces = ['application/pdf'])
+	ResponseEntity<byte[]> trip_ticket(@PathVariable('id') UUID id) {
+
+		VehicleUsageMonitoring vhmonitor =  vehicleUsageMonitoringService.findOne(id);
+
+		Employee currentEmp = employeeRepository.findByUsername(SecurityUtils.currentLogin()).first()
+
+		Office office = officeRepository.findById(currentEmp.office.id).get()
+		def com = companySettingsService.comById()
+
+		def res = applicationContext?.getResource("classpath:/reports/inventory/trip_ticket.jasper")
+		def bytearray = new ByteArrayInputStream()
+		def os = new ByteArrayOutputStream()
+		def parameters = [:] as Map<String, Object>
+		def logo = applicationContext?.getResource("classpath:/reports/${com.logoFileName}")
+
+		LocalDateTime endDateTimeLocal = LocalDateTime.ofInstant(vhmonitor.endDatetime, ZoneId.systemDefault());
+		LocalDateTime startDateTimeLocal = LocalDateTime.ofInstant(vhmonitor.startDatetime, ZoneId.systemDefault());
+
+		def dto = new TripTicketDto(
+				endDatetime: endDateTimeLocal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString(),
+				startDatetime: startDateTimeLocal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString(),
+				assetName: (vhmonitor.asset.item.descLong  ?: "")+ " "+(vhmonitor.asset.model ?: "") + "-" +(vhmonitor.asset.assetCode ?: "")  ,
+				projectName: vhmonitor.project?( vhmonitor.project.description ?: "") : "Office Based",
+				route: vhmonitor.route ?: "",
+				purpose: vhmonitor.usagePurpose ?: "",
+				endOdometerReading: vhmonitor.endOdometerReading ?: "",
+				startOdometerReading: vhmonitor.startOdometerReading ?: "",
+				startFuelReading: vhmonitor.startFuelReading ?: "",
+				endFuelReading: vhmonitor.endFuelReading  ?: "",
+				remarks: vhmonitor.remarks  ?: "",
+		)
+		def gson = new Gson()
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson(dto).getBytes("UTF8"))
+		def dataSource = new JsonDataSource(dataSourceByteArray)
+
+		if (logo.exists()) {
+			parameters.put("logo", logo?.getURL())
+		}
+
+
+		String tel = office.telNo ?: "N/A";String phone = office.phoneNo ?: "N/A"
+		String company = com.companyName ?: "";String addr = office.fullAddress ?: ""
+		parameters.put("company_name", company)
+		parameters.put("com_address", addr.trim())
+		parameters.put("phone_no", "Phone No: "+phone)
+		parameters.put("tel_no", "Tel No: "+tel)
+		parameters.put("email", office.emailAdd ?: "N/A")
+
+		//printing
+		try {
+			def jrprint = JasperFillManager.fillReport(res.inputStream, parameters, dataSource)
+
+			def pdfExporter = new JRPdfExporter()
+
+			def outputStreamExporterOutput = new SimpleOutputStreamExporterOutput(os)
+
+			pdfExporter.setExporterInput(new SimpleExporterInput(jrprint))
+			pdfExporter.setExporterOutput(outputStreamExporterOutput)
+			def configuration = new SimplePdfExporterConfiguration()
+			pdfExporter.setConfiguration(configuration)
+			pdfExporter.exportReport()
+
+		} catch (JRException e) {
+			e.printStackTrace()
+		} catch (IOException e) {
+			e.printStackTrace()
+		}
+
+		if (bytearray != null)
+			IOUtils.closeQuietly(bytearray)
+		//end
+
+		def data = os.toByteArray()
+		def params = new LinkedMultiValueMap<String, String>()
+		//params.add("Content-Disposition", "inline;filename=Discharge-Instruction-of-\"" + caseDto?.patient?.fullName + "\".pdf")
+		params.add("Content-Disposition", "inline;filename=trip-ticket-\"" + "00" + "\".pdf")
+		return new ResponseEntity(data, params, HttpStatus.OK)
+	}
     //pr print
     @RequestMapping(value = ['/pr_report/{id}'], produces = ['application/pdf'])
     ResponseEntity<byte[]> prReport(@PathVariable('id') UUID id) {
