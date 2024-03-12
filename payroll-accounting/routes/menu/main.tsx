@@ -84,10 +84,10 @@ export default function MainMenu({ account }: IPageProps) {
       <div className="w-full">
         <MenuCard menus={accountingMenu} />
       </div>
-      <Divider orientation="left">HR & Payroll Module</Divider>
+      {/* <Divider orientation="left">HR & Payroll Module</Divider>
       <div className="w-full">
         <MenuCard menus={payroll} />
-      </div>
+      </div> */}
       <Divider orientation="left">Administrative Module</Divider>
       <div className="w-full">
         <MenuCard menus={administrativeMenu} />
