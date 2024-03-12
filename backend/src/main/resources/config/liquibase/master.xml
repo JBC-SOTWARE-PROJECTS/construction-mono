@@ -594,5 +594,7 @@
     <include file="classpath:config/liquibase/changelog4/89_asset_veh_emp_rent_permission.sql"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/89_asset_veh_new_permission.sql"
-             relativeToChangelogFile="false"/>
+              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/91_michael_alter_employees_add_salary_disbursement.sql"
+              relativeToChangelogFile="false"/>
 </databaseChangeLog>
