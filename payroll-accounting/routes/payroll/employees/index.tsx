@@ -41,7 +41,7 @@ export interface IState {
 
 export default function EmployeesPage({ account }: IPageProps) {
   const router = useRouter();
-  const [data, loading, setFilters] = useGetEmployeesByFilter({
+  const [data, loading, setFilters, refetch] = useGetEmployeesByFilter({
     fetchPolicy: "network-only",
   });
 
@@ -80,9 +80,10 @@ export default function EmployeesPage({ account }: IPageProps) {
             loading={loading}
             totalElements={1 as number}
             handleOpen={(record) => console.log("record => ", record)}
-            changePage={(page : any) =>
+            changePage={(page: any) =>
               setFilters((prev: any) => ({ ...prev, page: page }))
             }
+            refetch={refetch}
           />
         </ProCard>
       }
