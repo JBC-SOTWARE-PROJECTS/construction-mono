@@ -331,8 +331,8 @@ class InventoryReportResource {
 		LocalDateTime startDateTimeLocal = LocalDateTime.ofInstant(vhmonitor.startDatetime, ZoneId.systemDefault());
 
 		def dto = new TripTicketDto(
-				endDatetime: endDateTimeLocal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString(),
-				startDatetime: startDateTimeLocal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toString(),
+				endDatetime: endDateTimeLocal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss a")).toString(),
+				startDatetime: startDateTimeLocal.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss a")).toString(),
 				assetName: (vhmonitor.asset.item.descLong  ?: "")+ " "+(vhmonitor.asset.model ?: "") + "-" +(vhmonitor.asset.assetCode ?: "")  ,
 				projectName: vhmonitor.project?( vhmonitor.project.description ?: "") : "Office Based",
 				route: vhmonitor.route ?: "",

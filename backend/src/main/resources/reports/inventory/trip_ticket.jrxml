@@ -220,7 +220,7 @@
 				</reportElement>
 			</line>
 			<staticText>
-				<reportElement x="280" y="100" width="126" height="12" uuid="0f86baff-6386-4f3f-b3fe-2388707babe8">
+				<reportElement x="270" y="100" width="136" height="12" uuid="0f86baff-6386-4f3f-b3fe-2388707babe8">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box rightPadding="4"/>
@@ -248,7 +248,7 @@
 				<textFieldExpression><![CDATA[$F{endDatetime}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="280" y="112" width="126" height="12" uuid="0b3f9342-da78-4cfa-9fc5-2301c4749678">
+				<reportElement x="270" y="112" width="136" height="12" uuid="0b3f9342-da78-4cfa-9fc5-2301c4749678">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box rightPadding="4"/>
