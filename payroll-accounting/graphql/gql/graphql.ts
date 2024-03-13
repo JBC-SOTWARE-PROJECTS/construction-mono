@@ -1098,6 +1098,8 @@ export type Billing = {
   /** payments */
   payments?: Maybe<Scalars['BigDecimal']['output']>;
   project?: Maybe<Projects>;
+  projectWorkAccomplishId?: Maybe<Scalars['UUID']['output']>;
+  projectWorkAccomplishNo?: Maybe<Scalars['String']['output']>;
   status?: Maybe<Scalars['Boolean']['output']>;
   /** totals */
   totals?: Maybe<Scalars['BigDecimal']['output']>;
@@ -1114,6 +1116,8 @@ export type BillingInput = {
   lockedBy?: InputMaybe<Scalars['String']['input']>;
   otcName?: InputMaybe<Scalars['String']['input']>;
   project?: InputMaybe<ProjectsInput>;
+  projectWorkAccomplishId?: InputMaybe<Scalars['UUID']['input']>;
+  projectWorkAccomplishNo?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
@@ -2998,6 +3002,14 @@ export type GraphQlResVal_ArInvoiceParticulars = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlResVal_Billing = {
+  __typename?: 'GraphQLResVal_Billing';
+  message?: Maybe<Scalars['String']['output']>;
+  response?: Maybe<Billing>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlResVal_Boolean = {
   __typename?: 'GraphQLResVal_Boolean';
   message?: Maybe<Scalars['String']['output']>;
@@ -4296,6 +4308,7 @@ export type Mutation = {
   postPettyCashManual?: Maybe<GraphQlRetVal_Boolean>;
   postReappManual?: Maybe<GraphQlRetVal_Boolean>;
   postReapplication?: Maybe<Reapplication>;
+  postToBilling?: Maybe<GraphQlResVal_Billing>;
   projectWorkAccomplishToggleLock?: Maybe<ProjectWorkAccomplish>;
   pushToBill?: Maybe<Billing>;
   pushToBillProject?: Maybe<Billing>;
@@ -5352,6 +5365,12 @@ export type MutationPostReappManualArgs = {
 export type MutationPostReapplicationArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationPostToBillingArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -9960,6 +9979,8 @@ export type ProjectUpdatesWorkers = {
 export type ProjectWorkAccomplish = {
   __typename?: 'ProjectWorkAccomplish';
   approvedForPayment?: Maybe<Scalars['String']['output']>;
+  billing?: Maybe<Scalars['UUID']['output']>;
+  billingNo?: Maybe<Scalars['String']['output']>;
   checkedBy?: Maybe<Scalars['String']['output']>;
   companyId?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;

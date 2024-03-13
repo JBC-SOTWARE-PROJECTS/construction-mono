@@ -1,10 +1,23 @@
 import { ProjectWorkAccomplishItems } from '@/graphql/gql/graphql'
 import Decimal from 'decimal.js'
 
-export const calculateBalance = (row: ProjectWorkAccomplishItems) => {
-  const prev = new Decimal(row?.qty ?? 0).minus(new Decimal(row?.prevQty ?? 0))
+export const calculateToDate = (row: ProjectWorkAccomplishItems) => {
+  const current = new Decimal(row?.prevQty ?? 0).add(
+    new Decimal(row?.thisPeriodQty ?? 0)
+  )
 
-  const balance = prev.minus(row?.thisPeriodQty ?? 0).toString()
+  const toDate = current.toString()
+
+  row.toDateQty = parseInt(toDate)
+  return row
+}
+
+export const calculateBalance = (row: ProjectWorkAccomplishItems) => {
+  const prev = new Decimal(row?.qty ?? 0).minus(
+    new Decimal(row?.toDateQty ?? 0)
+  )
+
+  const balance = prev.toString()
 
   row.balanceQty = parseInt(balance)
   return row
