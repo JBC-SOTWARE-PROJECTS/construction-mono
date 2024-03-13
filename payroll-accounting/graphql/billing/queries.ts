@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from "@apollo/client"
 
 export const GET_BILLING_RECORDS = gql`
   query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
@@ -32,7 +32,7 @@ export const GET_BILLING_RECORDS = gql`
       number
     }
   }
-`;
+`
 
 export const GET_BILLING_INFO_BY_ID = gql`
   query ($id: UUID) {
@@ -65,10 +65,12 @@ export const GET_BILLING_INFO_BY_ID = gql`
       totals
       deductions
       payments
+      projectWorkAccomplishId
+      projectWorkAccomplishNo
       status
     }
   }
-`;
+`
 
 export const GET_BILLING_ITEMS = gql`
   query ($filter: String, $id: UUID, $type: [String]) {
@@ -88,7 +90,7 @@ export const GET_BILLING_ITEMS = gql`
       status
     }
   }
-`;
+`
 
 export const CANCEL_BILLING_ITEM = gql`
   mutation ($id: UUID, $office: UUID) {
@@ -96,7 +98,7 @@ export const CANCEL_BILLING_ITEM = gql`
       id
     }
   }
-`;
+`
 
 export const GET_OTC_RECORD = gql`
   query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
@@ -121,4 +123,4 @@ export const GET_OTC_RECORD = gql`
       number
     }
   }
-`;
+`
