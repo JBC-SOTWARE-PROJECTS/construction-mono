@@ -1545,6 +1545,10 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
              StringUtils.leftPad(it.toString(),5,"0")
         }
 
+        headerLedger.ledger.each { ledger ->
+            ledger.transactionDateOnly = headerLedger.transactionDateOnly
+        }
+
         if(details)
             details.each {k,v->
                 headerLedger.details[k] = v

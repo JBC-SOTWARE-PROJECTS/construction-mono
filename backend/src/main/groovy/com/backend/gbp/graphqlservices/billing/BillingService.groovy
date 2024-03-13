@@ -10,6 +10,8 @@ import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.projects.ProjectCostService
 import com.backend.gbp.graphqlservices.projects.ProjectService
+import com.backend.gbp.graphqlservices.projects.ProjectWorkAccomplishService
+import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.UserRepository
 import com.backend.gbp.repository.billing.BillingItemRepository
@@ -87,6 +89,9 @@ class BillingService extends AbstractDaoService<Billing> {
 
     @Autowired
     ProjectCostService projectCostService
+
+    @Autowired
+    ProjectWorkAccomplishService projectWorkAccomplishService
 
     @GraphQLQuery(name = "billingById")
     Billing billingById(
@@ -619,6 +624,41 @@ class BillingService extends AbstractDaoService<Billing> {
             return null
         }
 
+    }
+
+
+    @Transactional
+    @GraphQLMutation(name='postToBilling')
+    GraphQLResVal<Billing> postToBilling(
+            @GraphQLArgument(name='id') UUID id
+    )throws Exception {
+        try {
+            def workAccomplishment = projectWorkAccomplishService.findOne(id)
+            if(workAccomplishment){
+                if(!workAccomplishment.billing){
+                    def company = SecurityUtils.currentCompanyId()
+                    Billing bill = new Billing()
+                    bill.dateTrans = Instant.now()
+                    bill.billNo = generatorService.getNextValue(GeneratorType.BILLING_NO) { Long no ->
+                        StringUtils.leftPad(no.toString(), 6, "0")
+                    }
+                    bill.project = projectService.findOne(workAccomplishment.project)
+                    bill.customer = bill.project.customer
+                    bill.locked = false
+                    bill.status = true
+                    bill.projectWorkAccomplishId = workAccomplishment.id
+                    bill.projectWorkAccomplishNo = workAccomplishment.recordNo
+                    bill.companyId = company
+                    def savedBill = save(bill)
+                    workAccomplishment.billing = savedBill.id
+                    workAccomplishment.billingNo = savedBill.billNo
+                    projectWorkAccomplishService.save(workAccomplishment)
+                    return  new GraphQLResVal<Billing>(savedBill,true,"Successfully posted")
+                } else return new GraphQLResVal<Billing>(new Billing(),false,"Already posted.")
+            } else return new GraphQLResVal<Billing>(new Billing(),false,"Record doesn't exist.")
+        }catch (e){
+            return new GraphQLResVal<Billing>(new Billing(),false,e.message)
+        }
     }
 
 }

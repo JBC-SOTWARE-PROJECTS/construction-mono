@@ -74,5 +74,12 @@ class Billing extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "status")
 	Boolean status // active = true //inactive = false
 
+	@GraphQLQuery
+	@Column(name = "project_work_accomplish_id")
+	UUID projectWorkAccomplishId
+
+	@GraphQLQuery
+	@Column(name = "project_work_accomplish_no")
+	String projectWorkAccomplishNo
 
 }
