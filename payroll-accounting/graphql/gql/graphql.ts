@@ -1138,6 +1138,8 @@ export type BillingItem = {
   orNum?: Maybe<Scalars['String']['output']>;
   outputTax?: Maybe<Scalars['BigDecimal']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
+  projectWorkAccomplishmentItemId?: Maybe<Scalars['UUID']['output']>;
+  projectWorkId?: Maybe<Scalars['UUID']['output']>;
   qty?: Maybe<Scalars['BigDecimal']['output']>;
   recalculationDate?: Maybe<Scalars['Instant']['output']>;
   recordNo?: Maybe<Scalars['String']['output']>;
@@ -4196,6 +4198,8 @@ export type Mutation = {
   addReceivablePayment?: Maybe<GraphQlResVal_Payment>;
   /** add remarks in shift */
   addRemarks?: Maybe<Shift>;
+  /** Add Items to bill */
+  addSWAItems: Scalars['Boolean']['output'];
   addService?: Maybe<BillingItem>;
   /** add shift */
   addShift?: Maybe<Shift>;
@@ -4308,7 +4312,7 @@ export type Mutation = {
   postPettyCashManual?: Maybe<GraphQlRetVal_Boolean>;
   postReappManual?: Maybe<GraphQlRetVal_Boolean>;
   postReapplication?: Maybe<Reapplication>;
-  postToBilling?: Maybe<GraphQlResVal_Billing>;
+  postSWAToBilling?: Maybe<GraphQlResVal_Billing>;
   projectWorkAccomplishToggleLock?: Maybe<ProjectWorkAccomplish>;
   pushToBill?: Maybe<Billing>;
   pushToBillProject?: Maybe<Billing>;
@@ -4693,6 +4697,13 @@ export type MutationAddReceivablePaymentArgs = {
 export type MutationAddRemarksArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   remarks?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationAddSwaItemsArgs = {
+  billing?: InputMaybe<Scalars['UUID']['input']>;
+  items?: InputMaybe<Array<InputMaybe<ProjectWorkAccomplishItemsInput>>>;
 };
 
 
@@ -5369,7 +5380,7 @@ export type MutationPostReapplicationArgs = {
 
 
 /** Mutation root */
-export type MutationPostToBillingArgs = {
+export type MutationPostSwaToBillingArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -10039,6 +10050,34 @@ export type ProjectWorkAccomplishItems = {
   toDateAmount?: Maybe<Scalars['BigDecimal']['output']>;
   toDateQty?: Maybe<Scalars['BigDecimal']['output']>;
   unit?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProjectWorkAccomplishItemsInput = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  balanceAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  balanceQty?: InputMaybe<Scalars['BigDecimal']['input']>;
+  companyId?: InputMaybe<Scalars['UUID']['input']>;
+  cost?: InputMaybe<Scalars['BigDecimal']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  itemNo?: InputMaybe<Scalars['String']['input']>;
+  payments?: InputMaybe<Scalars['BigDecimal']['input']>;
+  percentage?: InputMaybe<Scalars['BigDecimal']['input']>;
+  periodEnd?: InputMaybe<Scalars['String']['input']>;
+  periodStart?: InputMaybe<Scalars['String']['input']>;
+  prevAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  prevQty?: InputMaybe<Scalars['BigDecimal']['input']>;
+  project?: InputMaybe<Scalars['UUID']['input']>;
+  projectCost?: InputMaybe<Scalars['UUID']['input']>;
+  projectWorkAccomplishId?: InputMaybe<Scalars['UUID']['input']>;
+  qty?: InputMaybe<Scalars['BigDecimal']['input']>;
+  relativeWeight?: InputMaybe<Scalars['BigDecimal']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  thisPeriodAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  thisPeriodQty?: InputMaybe<Scalars['BigDecimal']['input']>;
+  toDateAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  toDateQty?: InputMaybe<Scalars['BigDecimal']['input']>;
+  unit?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Projects = {

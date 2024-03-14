@@ -25,7 +25,7 @@ const TOGGLE_LOCK = gql`
 
 const TOGGLE_POST_TO_BILLING = gql`
   mutation ($id: UUID) {
-    posting: postToBilling(id: $id) {
+    posting: postSWAToBilling(id: $id) {
       response {
         id
       }
@@ -74,7 +74,8 @@ export default function WorkAccomplishmentsCollapse(
       variables: {
         id,
       },
-      onCompleted: ({ posting }) => {
+      onCompleted: (data) => {
+        const posting = data?.posting
         messageApi.open({
           key: "success",
           type: "success",

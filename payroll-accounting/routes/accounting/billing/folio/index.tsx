@@ -67,28 +67,6 @@ export default function BillingFolioComponent(props: Iprops) {
         <b>Folio Transaction(s)</b>
       </Divider>
       <Folio.Tabs />
-      {/* <Card
-        title="Billing Folio Details"
-        size="small"
-        extra={
-          <>
-            <Button size="small" type="primary" icon={<PrinterOutlined />}>
-              Print Billing Statement
-            </Button>
-          </>
-        }>
-        <BillingHeader
-          record={billingInfo}
-          onRefetchBillingInfo={onRefetchBillingInfo}
-          otc={!_.isEmpty(billingInfo.otcName)}
-        />
-      </Card>
-      <BillingTables
-        record={billingInfo}
-        billingId={id}
-        onRefetchBillingInfo={onRefetchBillingInfo}
-        type={type}
-      /> */}
     </Folio>
   )
 }
