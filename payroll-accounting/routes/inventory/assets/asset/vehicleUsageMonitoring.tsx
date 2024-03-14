@@ -56,7 +56,7 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
     data: projects,
   } = useQuery(GET_ACTIVE_PROJECTS);
 
-  const onUpsertRecord = (record?: any) => {
+  const onUpsertRecord = (record?: any, viewMode?: boolean) => {
 
    var projectOpts = [
       { value: null, label: "Office Based" },
@@ -68,7 +68,7 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
         : []),
     ]
 
-    modalUpsert({ record: record , projectOpts: projectOpts}, (result: any) => {
+    modalUpsert({ record: record , projectOpts: projectOpts, viewModeSet: viewMode}, (result: any) => {
       if (result) {
         refetch();
         if (record?.id) {
@@ -110,7 +110,7 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
             <CustomButton
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={() => onUpsertRecord()}
+              onClick={() => onUpsertRecord(null, false)}
               allowedPermissions={["manage_vehicle_usage"]}
             >
               Create New
@@ -122,8 +122,8 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
           dataSource={data?.content}
           loading={false}
           totalElements={data?.totalElements as number}
-          handleOpen={(record) => onUpsertRecord(record)}
-          handleView={(record) => {}}
+          handleOpen={(record) => onUpsertRecord(record, false)}
+          handleView={(record) => onUpsertRecord(record, true)}
           handleSupplier={(record) => {}}
           handleAttachment={(record) => onVehicleUsageAttach(record)}
           changePage={(page) => {

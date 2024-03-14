@@ -30,7 +30,7 @@ const useGetVehicleUsageEmployee = (props: QueryHookOptions ) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     ...props
   });
-console.log("datadata", data)
+
   return [data?.page , loading, refetch];
 };
 

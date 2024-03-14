@@ -3,12 +3,12 @@ import FormButton from "@/components/common/formButton/formButton";
 import FormCheckBox from "@/components/common/formCheckBox/formCheckBox";
 import FormDatePicker from "@/components/common/formDatePicker/formDatePicker";
 import FormRadioButton from "@/components/common/formRadioButton";
+import { SalaryDisbursementMethod } from "@/graphql/gql/graphql";
 import { UseCompanySelection } from "@/hooks/companySelection";
 import { CIVIL, EMPSTATUS, GENDER, col2, col3, col4 } from "@/utility/constant";
 import { IPageProps } from "@/utility/interfaces";
 import {
   ArrowLeftOutlined,
-  ExclamationCircleOutlined,
   InfoCircleOutlined,
   LockOutlined,
   SaveOutlined,
@@ -28,7 +28,6 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import _ from "lodash";
-import moment from "moment";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 
@@ -85,6 +84,7 @@ const GET_RECORDS = gql`
       isFixedRate
       isDisabledWithholdingTax
       isExcludedFromAttendance
+      salaryDisbursementMethod
       user {
         login
         password
@@ -740,35 +740,85 @@ const EmployeeForm = ({ account }: IPageProps) => {
                   />
                 </Col>
                 <Col {...col4}>
-                  <FormCheckBox
+                  <FormRadioButton
+                    label="Included in SSS"
                     name="isActiveSSS"
-                    valuePropName="checked"
-                    checkBoxLabel="Include in SSS"
                     initialValue={_.get(data, "emp.isActiveSSS")}
-                    propscheckbox={{
-                      defaultChecked: true,
+                    propsradiobutton={{
+                      options: [
+                        {
+                          label: "Yes",
+                          value: true,
+                        },
+                        {
+                          label: "No",
+                          value: false,
+                        },
+                      ],
+                      optionType: "button",
+                      buttonStyle: "solid",
                     }}
                   />
                 </Col>
                 <Col {...col4}>
-                  <FormCheckBox
+                  <FormRadioButton
+                    label="Included in PHIC"
                     name="isActivePHIC"
-                    valuePropName="checked"
-                    checkBoxLabel="include in PHIC"
                     initialValue={_.get(data, "emp.isActivePHIC")}
-                    propscheckbox={{
-                      defaultChecked: true,
+                    propsradiobutton={{
+                      options: [
+                        {
+                          label: "Yes",
+                          value: true,
+                        },
+                        {
+                          label: "No",
+                          value: false,
+                        },
+                      ],
+                      optionType: "button",
+                      buttonStyle: "solid",
                     }}
                   />
                 </Col>
                 <Col {...col4}>
-                  <FormCheckBox
+                  <FormRadioButton
+                    label="Included in HDMF"
                     name="isActiveHDMF"
                     initialValue={_.get(data, "emp.isActiveHDMF")}
-                    valuePropName="checked"
-                    checkBoxLabel="include in HDMF"
-                    propscheckbox={{
-                      defaultChecked: true,
+                    propsradiobutton={{
+                      options: [
+                        {
+                          label: "Yes",
+                          value: true,
+                        },
+                        {
+                          label: "No",
+                          value: false,
+                        },
+                      ],
+                      optionType: "button",
+                      buttonStyle: "solid",
+                    }}
+                  />
+                </Col>
+                <Col {...col4}>
+                  <FormSelect
+                    label={"Salary Disbursement Method"}
+                    initialValue={_.get(data, "emp.salaryDisbursementMethod")}
+                    rules={[
+                      { required: true, message: "This Field is required" },
+                    ]}
+                    name="salaryDisbursementMethod"
+                    propsselect={{
+                      placeholder: "Salary Disbursement Method",
+                      loading: loading,
+                      options: Object.values(SalaryDisbursementMethod).map(
+                        (item) => ({
+                          value: item,
+                          label: item,
+                        })
+                      ),
                     }}
                   />
                 </Col>

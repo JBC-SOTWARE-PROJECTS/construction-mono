@@ -1,6 +1,7 @@
 import { CompanySettings, Employee } from "@/graphql/gql/graphql";
+import useUpdateEmployeeStatus from "@/hooks/employee/useUpdateEmployeeStatus";
 import { EyeOutlined } from "@ant-design/icons";
-import { Button, Col, Pagination, Row, Switch, Table } from "antd";
+import { Button, Col, Pagination, Row, Switch, Table, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { TableRowSelection } from "antd/es/table/interface";
 import { useRouter } from "next/router";
@@ -14,30 +15,40 @@ interface IProps {
   rowSelection?: TableRowSelection<Employee>;
   hideExtraColumns?: boolean;
   additionalColumns?: ColumnsType<Employee>;
+  refetch?: () => void;
 }
 
 export default function EmployeeTable({
   dataSource,
   loading,
   handleOpen,
+  refetch,
   changePage,
   rowSelection,
   hideExtraColumns = false,
   additionalColumns,
 }: IProps) {
   const router = useRouter();
+  const [update, loadingUpdate] = useUpdateEmployeeStatus((e) => {
+    if (e.id) {
+      if (refetch) refetch();
+    }
+  });
 
   const extraColumns: ColumnsType<Employee> = [
     {
       title: "Active",
       dataIndex: "isActive",
       key: "isActive",
-      render: (value) => {
+      render: (value, { id }) => {
         return (
           <Switch
             checked={value}
             checkedChildren="Yes"
             unCheckedChildren="No"
+            onChange={(status) => {
+              update({ id, status });
+            }}
           />
         );
       },
@@ -101,7 +112,7 @@ export default function EmployeeTable({
           dataSource={dataSource}
           // pagination={false}
           onChange={changePage}
-          loading={loading}
+          loading={loading || loadingUpdate}
           rowSelection={rowSelection}
           // footer={() => (
           //   <Pagination

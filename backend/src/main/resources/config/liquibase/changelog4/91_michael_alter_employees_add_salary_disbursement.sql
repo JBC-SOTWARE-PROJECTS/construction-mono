@@ -1,0 +1,1 @@
+alter table hrm.employees add column salary_disbursement_method varchar;
