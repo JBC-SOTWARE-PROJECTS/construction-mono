@@ -5,6 +5,7 @@ import com.backend.gbp.domain.payroll.Payroll
 import com.backend.gbp.domain.payroll.PayrollEmployee
 import com.backend.gbp.domain.payroll.enums.AdjustmentOperation
 import com.backend.gbp.graphqlservices.hrm.SalaryRateMultiplierService
+import com.backend.gbp.graphqlservices.payroll.TimekeepingEmployeeService
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
 import groovy.transform.Canonical
@@ -56,7 +57,7 @@ class PayrollRegEmployeeDto {
     String adjustment;
     String netPay;
     String payFrequencyTotals;
-    String TotalNetPaySemiMonthly;
+    String totalNetPaySemiMonthly;
 }
 
 
@@ -76,8 +77,8 @@ class PayrollLedger {
 
 
     @RequestMapping("/payrollLedgerDownload")
-     Callable<ResponseEntity<byte[]>> payrollLedgerDownload(
-               @RequestParam(name ="id") UUID id
+    Callable<ResponseEntity<byte[]>> payrollLedgerDownload(
+            @RequestParam(name ="id") UUID id
 //              @RequestParam(name = "payPeriod")  Instant payPeriod,
     ) {
 
@@ -101,6 +102,18 @@ class PayrollLedger {
 
                 String startDate = formatterD.format(payrollEmp?.dateStart)
                 String endDate = formatterD.format(payrollEmp?.dateEnd)
+
+                def totalHours = payrollEmployees?.timekeepingEmployee?.totalHours;
+                def getTotalHrs = 0.0;
+                if (totalHours != null) {
+                    totalHours.each { employeeHours ->
+                        if (employeeHours != null && employeeHours.regular != null) {
+                            getTotalHrs += employeeHours.regular
+                        }
+                    }
+                }
+
+                SalaryRateMultiplier multipliers = salaryRateMultiplierService.getSalaryRateMultiplier()
 
 
                 CSVPrinter csvPrinter = new CSVPrinter(buffer, CSVFormat.POSTGRESQL_CSV)
@@ -134,13 +147,18 @@ class PayrollLedger {
                 )
 //
 
-
+                def getTotalPayFreq = "";
                 payrollEmployees.eachWithIndex{ it, idx->
                     def summary = it.employeeAdjustment;
                     def totalNet = it.timekeepingEmployee.totalSalary;
                     def allowance = it?.allowanceEmployee;
                     def otherDeduction = it?.employeeOtherDeduction;
                     def contribution = it?.payrollEmployeeContribution;
+
+                    BigDecimal hourlyRate = TimekeepingEmployeeService.getHourlyRate(it.employee, 12)
+                    def totalRate = (hourlyRate * multipliers?.regular);
+
+                    getTotalPayFreq =  totalRate * (getTotalHrs as Number);
 
                     BigDecimal grossTT = 0.0
                     if(allowance != null && allowance.allowanceItems != null){
@@ -184,16 +202,17 @@ class PayrollLedger {
                     PayrollRegEmployeeDto payrollDto = new PayrollRegEmployeeDto();
                     payrollDto.accountNo = it.employee.employeeNo ?: ""
                     payrollDto.name = it.employee.fullName ?: ""
-                    payrollDto.regularPay = it.timekeepingEmployee.totalSalary.regular ?: ""
-                    payrollDto.underTimePay = it.timekeepingEmployee.totalSalary.underTime ?: ""
-                    payrollDto.overtimePay = it.timekeepingEmployee.totalSalary.overtime ?: ""
-                    payrollDto.holiday = it.timekeepingEmployee.totalSalary.regularHoliday ?: ""
+
+                    payrollDto.regularPay = it.timekeepingEmployee?.totalSalary?.regular ?: ""
+                    payrollDto.underTimePay = it.timekeepingEmployee?.totalSalary?.underTime ?: ""
+                    payrollDto.overtimePay = it.timekeepingEmployee?.totalSalary?.overtime ?: ""
+                    payrollDto.holiday = it.timekeepingEmployee?.totalSalary?.regularHoliday ?: ""
                     payrollDto.allowance = grossTT ?: ""
                     payrollDto.totalGrossPay = totalGrossPay ?: ""
                     payrollDto.withholdingTax = it.withholdingTax ?: ""
-                    payrollDto.sss = it.payrollEmployeeContribution.sssEE ?: ""
-                    payrollDto.hdmf = it.payrollEmployeeContribution.hdmfEE ?: ""
-                    payrollDto.phic = it.payrollEmployeeContribution.phicEE ?: ""
+                    payrollDto.sss = it.payrollEmployeeContribution?.sssEE ?: ""
+                    payrollDto.hdmf = it.payrollEmployeeContribution?.hdmfEE ?: ""
+                    payrollDto.phic = it.payrollEmployeeContribution?.phicEE ?: ""
 //                    payrollDto.insurance = ''
 //                    payrollDto.salaryLoan = ''
                     payrollDto.otherDeductions = otherDeduct ?: ""
@@ -201,6 +220,9 @@ class PayrollLedger {
                     payrollDto.subTotal = subtotal ?: ""
                     payrollDto.adjustment = adjustTotal ?: ""
                     payrollDto.netPay = totalNetPay ?: ""
+
+
+
 
                     csvPrinter.printRecord(
                             payrollDto.accountNo,
@@ -224,24 +246,34 @@ class PayrollLedger {
                             payrollDto.netPay
                     )
                 }
+                def semiMonthly = '';
+                def payFrequencyTotal = '';
+
                 csvPrinter.printRecord("")
-                csvPrinter.printRecord("Pay Frequency Totals")
-                csvPrinter.printRecord("Total Net Pays for Semi-Monthly Frequency")
-//                payrollEmployees.eachWithIndex{ it, idx->
-//
-//                    def paymentsSemiMonthly
-//
-//                    if(it.payroll.type == it.payroll.type.SEMI_MONTHLY){
-//                        paymentsSemiMonthly += it.payroll.
-//                    }
-//
-//                    PayrollRegEmployeeDto payrollDto = new PayrollRegEmployeeDto();
-////                    payrollDto.payFrequencyTotals = it.timekeepingEmployee.accumulatedLogs.
-//
-//                    csvPrinter.printRecord(
-//
-//                    )
-//                }
+                csvPrinter.printRecord("Pay Frequency Totals", getTotalPayFreq)
+                csvPrinter.printRecord("Total Net Pays for Semi-Monthly Frequency", semiMonthly )
+
+                payrollEmployees.eachWithIndex{ it, idx->
+                    def paymentsSemiMonthly = ""
+                    if(it.payroll.type != null){
+                        if(it.payroll.type == it.payroll.type.SEMI_MONTHLY){
+                            paymentsSemiMonthly = "SEMI MONTHLY"
+                        }else if (it.payroll.type == it.payroll.type.WEEKLY){
+                            paymentsSemiMonthly = "WEEKLY"
+                        }
+                    }
+
+
+                    PayrollRegEmployeeDto payrollDto = new PayrollRegEmployeeDto();
+                    payrollDto.payFrequencyTotals = ''
+                    payrollDto.totalNetPaySemiMonthly = paymentsSemiMonthly
+
+
+
+                    payFrequencyTotal = payrollDto.payFrequencyTotals
+                    semiMonthly = payrollDto.totalNetPaySemiMonthly
+
+                }
 //
                 csvPrinter.printRecord("")
                 csvPrinter.printRecord("Date Printed", formattedDate)

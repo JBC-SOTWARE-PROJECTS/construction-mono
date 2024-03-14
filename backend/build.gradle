@@ -11,7 +11,7 @@ group = 'com.backend'
 
 
 
-version = '1.2.26'
+version = '1.2.30'
 sourceCompatibility = '1.8'
 repositories {
 
@@ -143,6 +143,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web' // Add other Spring Boot dependencies as needed
     implementation 'software.amazon.awssdk:s3:2.17.98' // AWS SDK for Java S3
     implementation 'com.amazonaws:aws-java-sdk:1.11.163'
+    implementation 'org.mozilla:rhino:1.7.14'
 
 }
 sourceSets {

@@ -583,4 +583,18 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/90_jacky_employee_documents.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/90_jacky_create_asset_rent_rate.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_add_coverage_range.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_veh_monitoring_rental_details.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_jacky_veh_monitoring_other_details.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_asset_veh_emp_rent_permission.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/89_asset_veh_new_permission.sql"
+              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/91_michael_alter_employees_add_salary_disbursement.sql"
+              relativeToChangelogFile="false"/>
 </databaseChangeLog>

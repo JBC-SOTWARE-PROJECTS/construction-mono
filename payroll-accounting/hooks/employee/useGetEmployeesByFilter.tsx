@@ -52,6 +52,7 @@ const useGetEmployeesByFilter = (props: QueryHookOptions) => {
       if (props.onCompleted) {
         return props.onCompleted(res.list);
       }
+      console.log(filter);
     },
   });
   return [data?.list, loading, setFilters, refetch];
