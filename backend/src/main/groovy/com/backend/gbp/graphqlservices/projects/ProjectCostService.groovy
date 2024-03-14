@@ -180,9 +180,4 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
 
     }
 
-    @GraphQLQuery(name = "billedQty", description = "balance")
-    BigDecimal billedQty(@GraphQLContext ProjectCost projectCost) {
-        return projectWorkAccomplishItemsService.getBilledQty(projectCost.id)
-    }
-
 }
