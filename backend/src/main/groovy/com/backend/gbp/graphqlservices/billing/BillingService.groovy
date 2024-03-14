@@ -10,6 +10,7 @@ import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.projects.ProjectCostService
 import com.backend.gbp.graphqlservices.projects.ProjectService
+import com.backend.gbp.graphqlservices.projects.ProjectWorkAccomplishItemsService
 import com.backend.gbp.graphqlservices.projects.ProjectWorkAccomplishService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.OfficeRepository
@@ -92,6 +93,9 @@ class BillingService extends AbstractDaoService<Billing> {
 
     @Autowired
     ProjectWorkAccomplishService projectWorkAccomplishService
+
+    @Autowired
+    ProjectWorkAccomplishItemsService projectWorkAccomplishItemsService
 
     @GraphQLQuery(name = "billingById")
     Billing billingById(
@@ -628,8 +632,8 @@ class BillingService extends AbstractDaoService<Billing> {
 
 
     @Transactional
-    @GraphQLMutation(name='postToBilling')
-    GraphQLResVal<Billing> postToBilling(
+    @GraphQLMutation(name='postSWAToBilling')
+    GraphQLResVal<Billing> postSWAToBilling(
             @GraphQLArgument(name='id') UUID id
     )throws Exception {
         try {
@@ -653,6 +657,10 @@ class BillingService extends AbstractDaoService<Billing> {
                     workAccomplishment.billing = savedBill.id
                     workAccomplishment.billingNo = savedBill.billNo
                     projectWorkAccomplishService.save(workAccomplishment)
+
+                    def swaItems = projectWorkAccomplishItemsService.getProjectWorkAccomplishItemsByGroupId(workAccomplishment.id)
+                    billingItemService.addSWAItems(swaItems,savedBill.id)
+
                     return  new GraphQLResVal<Billing>(savedBill,true,"Successfully posted")
                 } else return new GraphQLResVal<Billing>(new Billing(),false,"Already posted.")
             } else return new GraphQLResVal<Billing>(new Billing(),false,"Record doesn't exist.")

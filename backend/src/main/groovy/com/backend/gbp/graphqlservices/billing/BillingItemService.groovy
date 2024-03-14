@@ -6,6 +6,7 @@ import com.backend.gbp.domain.billing.DiscountDetails
 import com.backend.gbp.domain.billing.JobItems
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.projects.ProjectCost
+import com.backend.gbp.domain.projects.ProjectWorkAccomplishItems
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.inventory.ItemService
@@ -443,6 +444,47 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         return item
 
     }
+
+
+    @Transactional
+    @GraphQLMutation(name = "addSWAItems", description = "Add Items to bill")
+    void addSWAItems(
+            @GraphQLArgument(name = "items") List<ProjectWorkAccomplishItems> items,
+            @GraphQLArgument(name = "billing") UUID billing
+    ) {
+        def billObject = billingService.billingById(billing)
+
+        items.each {
+            it ->
+                BillingItem billingItem = new BillingItem()
+                def itemObject = objectMapper.convertValue(it, Item.class)
+
+                def recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
+                    StringUtils.leftPad(no.toString(), 6, "0")
+                }
+                /* Insert */
+                if(it.thisPeriodQty > 0) {
+                    billingItem.transDate = Instant.now()
+                    billingItem.billing = billObject
+                    billingItem.recordNo = recordNo
+                    billingItem.description = it.description
+                    billingItem.qty = it.thisPeriodQty
+                    billingItem.debit = it.cost
+                    billingItem.credit = BigDecimal.ZERO
+                    billingItem.subTotal = it.thisPeriodAmount
+                    billingItem.itemType = 'SERVICE'
+                    billingItem.transType = 'PROJECT'
+                    billingItem.outputTax = BigDecimal.ZERO
+                    billingItem.wcost = BigDecimal.ZERO
+                    billingItem.projectWorkAccomplishmentItemId = it.id
+                    billingItem.projectWorkId = it.projectCost
+                    billingItem.status = true
+                    save(billingItem)
+                }
+
+        }
+    }
+
 
     //cancel billing item
     @Transactional

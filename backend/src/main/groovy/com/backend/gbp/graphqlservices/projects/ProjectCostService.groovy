@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.projects
 
+import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.projects.ProjectCost
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.billing.BillingItemService
@@ -12,6 +13,7 @@ import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
+import io.leangen.graphql.annotations.GraphQLContext
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
@@ -50,6 +52,9 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
 
     @Autowired
     ProjectCostRevisionService projectCostRevisionService
+
+    @Autowired
+    ProjectWorkAccomplishItemsService projectWorkAccomplishItemsService
 
 
     @GraphQLQuery(name = "pCostById")
@@ -173,6 +178,11 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
 
         return null
 
+    }
+
+    @GraphQLQuery(name = "billedQty", description = "balance")
+    BigDecimal billedQty(@GraphQLContext ProjectCost projectCost) {
+        return projectWorkAccomplishItemsService.getBilledQty(projectCost.id)
     }
 
 }
