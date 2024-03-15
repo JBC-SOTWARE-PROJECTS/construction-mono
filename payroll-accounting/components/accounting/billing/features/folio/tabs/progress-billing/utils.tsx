@@ -2,11 +2,11 @@ import { BillingItem } from "@/graphql/gql/graphql"
 import { currency } from "@/utility/constant"
 import { DateFormatterWithTime, NumberFormater } from "@/utility/helper"
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons"
-import { Button, Space, Tag, Typography } from "antd"
+import { Button, Popconfirm, Space, Tag, Typography } from "antd"
 
 import type { TableColumnsType } from "antd"
 
-export const getBillingItemColumns = () => {
+export const getBillingItemColumns = (onDelete: (id: string) => void) => {
   const columns: TableColumnsType<BillingItem> = [
     {
       title: "Date/Time",
@@ -142,13 +142,28 @@ export const getBillingItemColumns = () => {
     },
     {
       title: <EditOutlined />,
-      key: "operation",
+      dataIndex: "id",
       align: "center",
       fixed: "right",
       width: 30,
-      render: () => (
+      render: (text, record: BillingItem) => (
         <Space>
-          <Button size="small" type="text" danger icon={<DeleteOutlined />} />
+          {record.status && (
+            <Popconfirm
+              title="Delete billing item"
+              description="Are you sure to delete?"
+              onConfirm={() => onDelete(text)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                size="small"
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+              />
+            </Popconfirm>
+          )}
         </Space>
       ),
     },

@@ -6,11 +6,16 @@ import com.backend.gbp.domain.billing.DiscountDetails
 import com.backend.gbp.domain.billing.JobItems
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.projects.ProjectCost
+import com.backend.gbp.domain.projects.ProjectWorkAccomplish
 import com.backend.gbp.domain.projects.ProjectWorkAccomplishItems
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.inventory.ItemService
+import com.backend.gbp.graphqlservices.projects.ProjectCostService
+import com.backend.gbp.graphqlservices.projects.ProjectWorkAccomplishItemsService
+import com.backend.gbp.graphqlservices.projects.ProjectWorkAccomplishService
 import com.backend.gbp.graphqlservices.services.ServiceManagementService
+import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.billing.DiscountDetailsRepository
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.BillingItemsDto
@@ -74,8 +79,14 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
     ServiceManagementService serviceManagementService
 
     @Autowired
-    JobItemService jobItemService
+    ProjectWorkAccomplishItemsService projectWorkAccomplishItemsService
 
+    @Autowired
+    ProjectWorkAccomplishService projectWorkAccomplishService
+
+
+    @Autowired
+    ProjectCostService projectCostService
 
     @GraphQLQuery(name = "billingItemById")
     BillingItem billingItemById(
@@ -477,7 +488,7 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
                     billingItem.outputTax = BigDecimal.ZERO
                     billingItem.wcost = BigDecimal.ZERO
                     billingItem.projectWorkAccomplishmentItemId = it.id
-                    billingItem.projectWorkId = it.projectCost
+                    billingItem.projectCostId = it.projectCost
                     billingItem.status = true
                     save(billingItem)
                 }
@@ -639,5 +650,58 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
 
     }
 
+    @Transactional
+    @GraphQLMutation(name="addProjectService")
+    GraphQLResVal<Boolean> addProjectService(
+            @GraphQLArgument(name="billingId") UUID billingId,
+            @GraphQLArgument(name="fields") Map<String,Object> fields
+    ){
+        def billing = billingService.findOne(billingId)
+        if(billing){
+            ProjectWorkAccomplish accomplish = projectWorkAccomplishService.findOne(billing.projectWorkAccomplishId)
+            def accomplishItems = new ProjectWorkAccomplishItems()
+            accomplishItems = projectWorkAccomplishItemsService.findOneProjectWorkAccomplishItemsByProjectCost(UUID.fromString(fields['projectCost'] as String))
+            entityObjectMapperService.updateFromMap(accomplishItems, fields)
+            accomplishItems.projectWorkAccomplishId =accomplish.id
+            accomplishItems.periodStart = accomplish.periodStart
+            accomplishItems.periodEnd = accomplish.periodEnd
+            accomplishItems.status = 'ACTIVE'
+            def newSaved = projectWorkAccomplishItemsService.save(accomplishItems)
 
+            def projectCost = projectCostService.findOne(newSaved.projectCost)
+            projectCost.billedQty = (newSaved?.prevQty ?: 0) + (newSaved?.thisPeriodQty ?: 0)
+            projectCostService.save(projectCost)
+
+            List<ProjectWorkAccomplishItems> items = []
+            items << newSaved
+            addSWAItems(items,billing.id)
+            return new GraphQLResVal<Boolean>(true,true,"Successfully saved.")
+        }
+        return new GraphQLResVal<Boolean>(false,false,"Folio doesn't exist.")
+    }
+
+    @Transactional
+    @GraphQLMutation(name="removeBillingItemProjectService")
+    GraphQLResVal<Boolean> removeBillingItemProjectService(
+            @GraphQLArgument(name="id") UUID id
+    ){
+        def item = findOne(id)
+        if(item){
+            item.status = false
+            save(item)
+
+            def accomplishItem = projectWorkAccomplishItemsService.findOne(item.projectWorkAccomplishmentItemId)
+            accomplishItem.thisPeriodQty = 0
+            accomplishItem.toDateQty = accomplishItem.toDateQty - item.qty
+            accomplishItem.toDateAmount = accomplishItem.toDateQty * accomplishItem.cost
+            accomplishItem.balanceQty = accomplishItem.balanceQty > 0 ? accomplishItem.balanceQty - item.qty : item.qty
+            accomplishItem.balanceAmount = accomplishItem.balanceQty * accomplishItem.cost
+            accomplishItem.thisPeriodAmount = 0
+            accomplishItem.percentage = 0
+            projectWorkAccomplishItemsService.save(accomplishItem)
+
+            return new GraphQLResVal<Boolean>(true,true,"Successfully removed.")
+        }
+        return new GraphQLResVal<Boolean>(false,false,"Folio doesn't exist.")
+    }
 }

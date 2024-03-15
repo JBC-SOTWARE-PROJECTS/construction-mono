@@ -87,6 +87,8 @@ export const GET_BILLING_ITEMS = gql`
       transType
       orNum
       lastModifiedBy
+      projectCostId
+      projectWorkAccomplishmentItemId
       status
     }
   }
@@ -121,6 +123,24 @@ export const GET_OTC_RECORD = gql`
       size
       totalElements
       number
+    }
+  }
+`
+
+export const ADD_BILLING_ITEM_PROJECT_SERVICES = gql`
+  mutation ($billingId: UUID, $fields: Map_String_ObjectScalar) {
+    addProjectService(billingId: $billingId, fields: $fields) {
+      message
+      success
+    }
+  }
+`
+
+export const DELETE_BILLING_ITEM_BY_ID = gql`
+  mutation ($id: UUID) {
+    removeBillingItemProjectService(id: $id) {
+      message
+      success
     }
   }
 `

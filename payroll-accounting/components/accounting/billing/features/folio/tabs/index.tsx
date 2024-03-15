@@ -1,15 +1,26 @@
-import { Button, Card, Col, Row, Space, Tabs, Typography } from "antd"
-import FolioProgressBilling from "./progress-billing"
-import { PlusCircleFilled, PlusCircleOutlined } from "@ant-design/icons"
 import { Billing } from "@/graphql/gql/graphql"
+import { Col, Row, Tabs } from "antd"
+import { FolioRefetchType } from ".."
+import FolioProgressBilling from "./progress-billing"
 
-const FolioTabs = (props: Billing) => {
+export interface FolioTabsProps {
+  billing: Billing | null
+  refetch: FolioRefetchType | null
+}
+
+const FolioTabs = (props: FolioTabsProps) => {
   const TabItems = [
     {
       label: "Progress Billing",
       key: "progress-billing",
       children: (
-        <FolioProgressBilling {...{ billing: { ...props }, type: "SERVICE" }} />
+        <FolioProgressBilling
+          {...{
+            billing: { ...props.billing },
+            refetch: props.refetch,
+            type: "SERVICE",
+          }}
+        />
       ),
     },
     {
@@ -17,7 +28,11 @@ const FolioTabs = (props: Billing) => {
       key: "deductions",
       children: (
         <FolioProgressBilling
-          {...{ billing: { ...props }, type: "DEDUCTIONS" }}
+          {...{
+            billing: { ...props.billing },
+            refetch: props.refetch,
+            type: "DEDUCTIONS",
+          }}
         />
       ),
     },
@@ -26,7 +41,11 @@ const FolioTabs = (props: Billing) => {
       key: "payments",
       children: (
         <FolioProgressBilling
-          {...{ billing: { ...props }, type: "PAYMENTS" }}
+          {...{
+            billing: { ...props.billing },
+            refetch: props.refetch,
+            type: "PAYMENTS",
+          }}
         />
       ),
     },
@@ -35,7 +54,13 @@ const FolioTabs = (props: Billing) => {
   return (
     <Row gutter={[8, 8]} style={{ minHeight: 400 }}>
       <Col span={24}>
-        <Tabs defaultActiveKey="1" type="card" size="small" items={TabItems} />
+        <Tabs
+          defaultActiveKey="1"
+          type="card"
+          size="small"
+          items={TabItems}
+          destroyInactiveTabPane
+        />
       </Col>
     </Row>
   )

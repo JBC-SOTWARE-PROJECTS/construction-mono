@@ -1,5 +1,5 @@
-import { ProjectWorkAccomplishItems } from '@/graphql/gql/graphql'
-import Decimal from 'decimal.js'
+import { ProjectWorkAccomplishItems } from "@/graphql/gql/graphql"
+import Decimal from "decimal.js"
 
 export const calculateToDate = (row: ProjectWorkAccomplishItems) => {
   const current = new Decimal(row?.prevQty ?? 0).add(
@@ -8,7 +8,7 @@ export const calculateToDate = (row: ProjectWorkAccomplishItems) => {
 
   const toDate = current.toString()
 
-  row.toDateQty = parseInt(toDate)
+  row.toDateQty = parseFloat(toDate)
   return row
 }
 
@@ -19,7 +19,7 @@ export const calculateBalance = (row: ProjectWorkAccomplishItems) => {
 
   const balance = prev.toString()
 
-  row.balanceQty = parseInt(balance)
+  row.balanceQty = parseFloat(balance)
   return row
 }
 

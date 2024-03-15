@@ -169,13 +169,14 @@ export default function WorkAccomplishmentsCollapse(
                   </Popconfirm>
                 )}
                 <ButtonLock record={works} />
-
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => props.onHandleEdit(works?.id)}
-                />
+                {!works?.billing && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={() => props.onHandleEdit(works?.id)}
+                  />
+                )}
 
                 <Button
                   type="primary"

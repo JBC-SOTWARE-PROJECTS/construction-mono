@@ -1138,8 +1138,8 @@ export type BillingItem = {
   orNum?: Maybe<Scalars['String']['output']>;
   outputTax?: Maybe<Scalars['BigDecimal']['output']>;
   postedLedger?: Maybe<Scalars['UUID']['output']>;
+  projectCostId?: Maybe<Scalars['UUID']['output']>;
   projectWorkAccomplishmentItemId?: Maybe<Scalars['UUID']['output']>;
-  projectWorkId?: Maybe<Scalars['UUID']['output']>;
   qty?: Maybe<Scalars['BigDecimal']['output']>;
   recalculationDate?: Maybe<Scalars['Instant']['output']>;
   recordNo?: Maybe<Scalars['String']['output']>;
@@ -10739,6 +10739,7 @@ export type Query = {
   getAutoIntegrateableFromDomain?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   getBalance?: Maybe<Scalars['BigDecimal']['output']>;
   getBigDecimalFieldsFromDomain?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  getBilledQty?: Maybe<Scalars['BigDecimal']['output']>;
   getBillingItemFilterActive?: Maybe<Array<Maybe<BillingItem>>>;
   getBrands?: Maybe<Array<Maybe<BrandDto>>>;
   /** Get all calendar events */
@@ -12479,6 +12480,12 @@ export type QueryGetBalanceArgs = {
 /** Query root */
 export type QueryGetBigDecimalFieldsFromDomainArgs = {
   domain?: InputMaybe<IntegrationDomainEnum>;
+};
+
+
+/** Query root */
+export type QueryGetBilledQtyArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 

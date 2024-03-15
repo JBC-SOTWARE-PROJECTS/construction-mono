@@ -130,7 +130,7 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 	UUID projectWorkAccomplishmentItemId
 
 	@GraphQLQuery
-	@Column(name = "project_work_id")
-	UUID projectWorkId
+	@Column(name = "project_cost_id")
+	UUID projectCostId
 
 }

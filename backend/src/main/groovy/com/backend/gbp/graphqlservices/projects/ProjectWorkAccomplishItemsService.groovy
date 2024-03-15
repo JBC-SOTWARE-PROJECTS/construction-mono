@@ -47,6 +47,18 @@ class ProjectWorkAccomplishItemsService extends AbstractDaoCompanyService<Projec
                 .singleResult
     }
 
+    @GraphQLQuery(name='findOneProjectWorkAccomplishItemsByProjectCost')
+    ProjectWorkAccomplishItems findOneProjectWorkAccomplishItemsByProjectCost(
+            @GraphQLArgument(name='id') UUID id
+    ){
+        createQuery("""
+            Select p from ProjectWorkAccomplishItems p
+            where p.projectCost = :id
+        """)
+                .setParameter('id',id)
+                .singleResult
+    }
+
     @GraphQLQuery(name = "getBilledQty")
     BigDecimal getBilledQty(
             @GraphQLArgument(name = "id") UUID id
@@ -57,5 +69,7 @@ class ProjectWorkAccomplishItemsService extends AbstractDaoCompanyService<Projec
         params.put('id', id)
         getSum(query, params)
     }
+
+
 
 }

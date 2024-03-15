@@ -20,6 +20,7 @@ import {
 } from "antd"
 import { DescriptionsItemProps } from "antd/lib/descriptions/Item"
 import dayjs from "dayjs"
+import { useRouter } from "next/router"
 import styled from "styled-components"
 
 const LabelProps: Omit<DescriptionsItemProps, "children"> = {
@@ -88,6 +89,10 @@ export const BillingInfo = (props: Billing) => {
 }
 
 export const CustomerInfo = (props?: ArCustomers) => {
+  const onNewTab = () => {
+    window.open(`/accounting/accounts-receivable/clients/${props?.id}`)
+  }
+
   return (
     <Col
       xs={{ flex: "100%" }}
@@ -107,7 +112,12 @@ export const CustomerInfo = (props?: ArCustomers) => {
             column={{ xs: 1, sm: 2, md: 3, lg: 2, xl: 2, xxl: 2 }}
             extra={
               <Space>
-                <Button type="link" size="small" icon={<SelectOutlined />} />
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<SelectOutlined />}
+                  onClick={onNewTab}
+                />
               </Space>
             }
           >
@@ -134,6 +144,10 @@ export const CustomerInfo = (props?: ArCustomers) => {
 }
 
 export const ProjectInfo = (props?: Projects & { swa: string }) => {
+  const onNewTab = () => {
+    window.open(`/inventory/project-details/${props?.id}/bill-quantities`)
+  }
+
   return (
     <Col
       xs={{ flex: "100%" }}
@@ -153,7 +167,12 @@ export const ProjectInfo = (props?: Projects & { swa: string }) => {
             }
             extra={
               <Space>
-                <Button type="link" size="small" icon={<SelectOutlined />} />
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<SelectOutlined />}
+                  onClick={onNewTab}
+                />
               </Space>
             }
           >

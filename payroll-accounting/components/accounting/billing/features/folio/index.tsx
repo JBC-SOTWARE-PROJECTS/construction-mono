@@ -3,14 +3,23 @@ import { Col, ColProps, Row, Spin } from "antd"
 import { ReactNode, createContext, useContext } from "react"
 import FolioHeader from "./header"
 import FolioTabs from "./tabs"
-import { Billing } from "@/graphql/gql/graphql"
+import { Billing, Query } from "@/graphql/gql/graphql"
+import { ApolloQueryResult, OperationVariables } from "@apollo/client"
 
+export type FolioRefetchType = (
+  variables?: Partial<OperationVariables> | undefined
+) => Promise<ApolloQueryResult<Query>>
+
+export interface FolioRefetchProps {
+  onRefetchBilling: FolioRefetchType
+}
 export interface FolioHeaderProps {
   billing: Billing | null
 }
 
 interface FolioContextProps {
   header: FolioHeaderProps
+  refetch: FolioRefetchProps
 }
 
 export const FolioContext = createContext<FolioContextProps | null>(null)
@@ -50,7 +59,14 @@ const Header = () => {
 const Tabs = () => {
   const context = useContext(FolioContext)
   if (!context?.header) return <Spin />
-  return <FolioTabs {...context?.header?.billing} />
+  return (
+    <FolioTabs
+      {...{
+        billing: context?.header?.billing,
+        refetch: context?.refetch?.onRefetchBilling,
+      }}
+    />
+  )
 }
 
 Folio.Header = Header

@@ -36,9 +36,8 @@ export default function BillingFolioComponent(props: Iprops) {
 
   const [state, dispatch] = useReducer(reducer, { billing: null })
 
-  const { loading: onLoadingBilling, refetch } = useQuery<Query>(
-    GET_BILLING_INFO_BY_ID,
-    {
+  const { loading: onLoadingBilling, refetch: onRefetchBilling } =
+    useQuery<Query>(GET_BILLING_INFO_BY_ID, {
       fetchPolicy: "cache-and-network",
       variables: {
         id: id,
@@ -49,19 +48,18 @@ export default function BillingFolioComponent(props: Iprops) {
           dispatch({ type: "set-billing", payload: result })
         }
       },
-    }
-  )
-
-  const onRefetchBillingInfo = () => {
-    refetch({ id: id })
-  }
+    })
 
   const header = {
     billing: state.billing,
   }
 
+  const refetch = {
+    onRefetchBilling,
+  }
+
   return (
-    <Folio {...{ header }}>
+    <Folio {...{ header, refetch }}>
       <Folio.Header />
       <Divider dashed orientation="left">
         <b>Folio Transaction(s)</b>
