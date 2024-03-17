@@ -190,7 +190,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
           asset: record.asset?.id,
           item: record.item?.id,
           vehicleUsage: record?.id,
-          laborCost: record?.laborCost,
+          laborCost: parseInt(record?.laborCost),
           timeRenderedEnd: dayjs(record.timeRenderedEnd).millisecond(0),
           timeRenderedStart: dayjs(record.timeRenderedStart).millisecond(0),
         },

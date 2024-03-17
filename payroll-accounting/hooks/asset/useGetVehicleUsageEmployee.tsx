@@ -10,6 +10,7 @@ query ($filter: String, $page: Int, $size: Int, $usageID: UUID) {
       remarks
       timeRenderedStart
       timeRenderedEnd
+      laborCost
       employee{
         id
         fullName
