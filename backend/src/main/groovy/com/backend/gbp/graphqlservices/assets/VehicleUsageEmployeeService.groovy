@@ -97,6 +97,7 @@ class VehicleUsageEmployeeService extends AbstractDaoService<VehicleUsageEmploye
                     }
 
                     upsert.designation = empItem.designation;
+                    upsert.laborCost = empItem.laborCost;
                     upsert.remarks = empItem.remarks;
                     upsert.timeRenderedEnd = empItem.timeRenderedEnd;
                     upsert.timeRenderedStart = empItem.timeRenderedStart;
