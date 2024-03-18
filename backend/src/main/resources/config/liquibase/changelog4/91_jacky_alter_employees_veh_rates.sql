@@ -1,0 +1,1 @@
+alter table asset.vehicle_usage_employee add column labor_cost varchar;
