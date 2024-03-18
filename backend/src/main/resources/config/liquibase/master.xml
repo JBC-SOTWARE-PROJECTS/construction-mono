@@ -597,4 +597,6 @@
               relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/91_michael_alter_employees_add_salary_disbursement.sql"
               relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/91_jacky_alter_employees_veh_rates.sql"
+              relativeToChangelogFile="false"/>
 </databaseChangeLog>

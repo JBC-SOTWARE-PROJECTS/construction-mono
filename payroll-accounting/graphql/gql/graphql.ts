@@ -15734,6 +15734,7 @@ export type VehicleUsageEmployee = {
   employee?: Maybe<Employee>;
   id?: Maybe<Scalars['UUID']['output']>;
   item?: Maybe<Item>;
+  laborCost?: Maybe<Scalars['BigDecimal']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
