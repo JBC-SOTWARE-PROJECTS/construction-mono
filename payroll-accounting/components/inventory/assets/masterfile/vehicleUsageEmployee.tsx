@@ -281,6 +281,15 @@ const VehicleUsageEmployeeTable = ({ selectedEmps, handleSelected, handleDeleted
       width: "15%",
     },
     {
+      title: "Labor Cost",
+      dataIndex: "laborCost",
+      editable: viewMode ? false : true,
+      width: "15%",
+      render: (_, record: VehicleUsageEmployee) =>(
+        <>{record?.laborCost ?? 0}</>
+        ) ,
+    },
+    {
       title: "Action",
       dataIndex: "operation",
       width: "10%",
