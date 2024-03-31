@@ -159,7 +159,7 @@ class TimekeepingEmployeeService extends AbstractPayrollEmployeeStatusService<Ti
     @GraphQLQuery(name = "getTimekeepingEmployees", description = "Gets the timekeeping employees by payroll id")
     List<TimekeepingEmployeeDto> getTimekeepingEmployees(@GraphQLArgument(name = "id") UUID id) {
         Payroll payroll = payrollRepository.getOne(id)
-        return timekeepingEmployeeRepository.findByTimekeeping(payroll)
+        return timekeepingEmployeeRepository.findByTimekeeping(payroll).sort({it.fullName})
     }
 
     @GraphQLQuery(name = "getTimekeepingEmployeesV2", description = "Gets all the ids of the employees of the timekeeping")

@@ -12,6 +12,7 @@ class VehicleUsageEmployeeDto {
     String remarks
     Instant timeRenderedStart
     Instant timeRenderedEnd
+    BigDecimal laborCost
     UUID item
     UUID asset
     UUID vehicleUsage

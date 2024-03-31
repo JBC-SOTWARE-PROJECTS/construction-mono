@@ -2301,6 +2301,7 @@ export type Employee = {
   pinCode?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Position>;
   profilePicture?: Maybe<Scalars['String']['output']>;
+  salaryDisbursementMethod?: Maybe<SalaryDisbursementMethod>;
   shortName?: Maybe<Scalars['String']['output']>;
   sssNo?: Maybe<Scalars['String']['output']>;
   stateProvince?: Maybe<Scalars['String']['output']>;
@@ -2444,6 +2445,7 @@ export type EmployeeInput = {
   pinCode?: InputMaybe<Scalars['String']['input']>;
   position?: InputMaybe<PositionInput>;
   profilePicture?: InputMaybe<Scalars['String']['input']>;
+  salaryDisbursementMethod?: InputMaybe<SalaryDisbursementMethod>;
   shortName?: InputMaybe<Scalars['String']['input']>;
   sssNo?: InputMaybe<Scalars['String']['input']>;
   stateProvince?: InputMaybe<Scalars['String']['input']>;
@@ -15596,6 +15598,12 @@ export type SssContribution = {
   wispErContribution?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
+export enum SalaryDisbursementMethod {
+  Atm = 'ATM',
+  Cash = 'CASH',
+  Gcash = 'GCASH'
+}
+
 export type SalaryRateMultiplier = {
   __typename?: 'SalaryRateMultiplier';
   company?: Maybe<CompanySettings>;
@@ -16264,6 +16272,7 @@ export type VehicleUsageEmployee = {
   employee?: Maybe<Employee>;
   id?: Maybe<Scalars['UUID']['output']>;
   item?: Maybe<Item>;
+  laborCost?: Maybe<Scalars['BigDecimal']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
