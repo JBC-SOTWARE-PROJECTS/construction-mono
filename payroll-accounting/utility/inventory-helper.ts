@@ -29,6 +29,7 @@ export const formatObjSupplierPurchaseRequest = (
       unitMeasurement: e.unitMeasurement,
       requestedQty: 1,
       onHandQty: e.onHand,
+      unitCost: e.unitCost,
       remarks: null,
       isNew: true,
     };
@@ -50,6 +51,7 @@ export const formatObjInventoryPurchaseRequest = (
       unitMeasurement: e.unitMeasurement,
       requestedQty: 1,
       onHandQty: e.onHand,
+      unitCost: e.lastUnitCost,
       remarks: null,
       isNew: true,
     };
@@ -65,7 +67,7 @@ export const formatObjPrItemsToPoItems = (
     item: records.item,
     unitMeasurement: records?.unitMeasurement,
     quantity: records.requestedQty || 1,
-    unitCost: 0,
+    unitCost: records?.unitCost,
     prNos: records?.purchaseRequest?.prNo ?? null,
     type: null,
     type_text: null,

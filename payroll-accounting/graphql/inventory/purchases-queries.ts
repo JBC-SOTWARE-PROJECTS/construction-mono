@@ -138,6 +138,7 @@ export const GET_RECORDS_PURCHASE_REQ_ITEMS = gql`
       }
       unitMeasurement
       requestedQty
+      unitCost
       onHandQty
       remarks
     }
@@ -193,20 +194,41 @@ export const GET_RECORDS_PO_ITEMS = gql`
 `;
 
 export const GET_PR_ITEMS_BY_PRNOS = gql`
-  query ($prNos: [String], $status: Boolean, $id: UUID) {
-    getPrItemInPO(prNos: $prNos, status: $status, id: $id) {
-      id
-      item {
-        id
-        descLong
-        item_conversion
-      }
-      purchaseRequest {
+  query ($prNos: String, $status: Boolean, $id: UUID) {
+    getPrItemInOnePO(prNos: $prNos, status: $status, id: $id) {
+      parent {
         id
         prNo
+        project {
+          id
+          description
+        }
+        assets {
+          id
+          description
+        }
+        supplier {
+          id
+          supplierFullname
+        }
+        category
+        remarks
       }
-      unitMeasurement
-      requestedQty
+      items {
+        id
+        item {
+          id
+          descLong
+          item_conversion
+        }
+        purchaseRequest {
+          id
+          prNo
+        }
+        unitMeasurement
+        unitCost
+        requestedQty
+      }
     }
   }
 `;

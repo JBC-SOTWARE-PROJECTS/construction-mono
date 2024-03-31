@@ -1,5 +1,9 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import { PurchaseOrder, PurchaseRequestItem } from "@/graphql/gql/graphql";
+import React, { useContext, useMemo, useState } from "react";
+import {
+  PrChildrenDto,
+  PurchaseOrder,
+  PurchaseRequestItem,
+} from "@/graphql/gql/graphql";
 import {
   DeleteFilled,
   SaveOutlined,
@@ -16,14 +20,12 @@ import {
   Input,
   InputNumber,
   Row,
-  Space,
   Table,
   Tag,
   message,
 } from "antd";
 import _ from "lodash";
 import {
-  DateFormatterText,
   NumberFormater,
   NumberFormaterDynamic,
   requiredField,
@@ -39,7 +41,6 @@ import {
 } from "@/components/common";
 import {
   PURCHASE_CATEGORY,
-  PR_TYPE,
   responsiveColumn4,
   responsiveColumn42,
   poType,
@@ -60,18 +61,12 @@ import { ColumnsType } from "antd/lib/table";
 import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import {
   DELETE_RECORD_PO_ITEM,
-  DELETE_RECORD_PURCHASE_REQUEST,
   GET_PR_ITEMS_BY_PRNOS,
   GET_RECORDS_PO_ITEMS,
-  GET_RECORDS_PURCHASE_REQ_ITEMS,
   UPSERT_RECORD_PURCHASE_ORDER,
-  UPSERT_RECORD_PURCHASE_REQUEST,
 } from "@/graphql/inventory/purchases-queries";
 import { Query } from "../../../../../graphql/gql/graphql";
-import {
-  IFormPurchaseOrder,
-  IFormPurchaseRequest,
-} from "@/interface/inventory/inventory-form";
+import { IFormPurchaseOrder } from "@/interface/inventory/inventory-form";
 import { useDialog } from "@/hooks";
 import SupplierItemSelector from "@/components/inventory/supplierItemSelector";
 import {
@@ -91,6 +86,7 @@ interface IProps {
 export default function UpsertPOFormModal(props: IProps) {
   const { hide, record, poCategory } = props;
   const [form] = Form.useForm();
+  const { setFieldValue } = form;
   const account = useContext(AccountContext);
   const [category, setCategory] = useState(record?.category ?? poCategory);
   const [editable, setEditable] = useState<any>({});
@@ -98,9 +94,8 @@ export default function UpsertPOFormModal(props: IProps) {
   const [forRemove, setForRemove] = useState<PurchaseOrderItemsExtended[]>([]);
   const [uploading, setUploading] = useState<boolean>(false);
   const [prItems, setPrItems] = useState<PurchaseRequestItem[]>([]);
-  const [prNo, setPrNo] = useState<string[]>(
-    record?.prNos ? record.prNos.split(",") : []
-  );
+  const [prNo, setPrNo] = useState<string | null>(record?.prNos ?? null);
+
   // ====================== modals =============================
   const supplierItems = useDialog(SupplierItemSelector);
   // ===================== Queries ==============================
@@ -118,7 +113,13 @@ export default function UpsertPOFormModal(props: IProps) {
     },
     onCompleted: (data) => {
       let result = (data?.poItemByParent ?? []) as PurchaseOrderItemsExtended[];
-      setItems(result);
+      if (!_.isEmpty(result)) {
+        setItems(result);
+        let prNos = record?.prNos ?? "";
+        if (!_.isEmpty(prNos)) {
+          getPrItems(prNos, true);
+        }
+      }
     },
   });
 
@@ -214,7 +215,7 @@ export default function UpsertPOFormModal(props: IProps) {
     } as PurchaseOrder;
     payload.supplier = { id: data?.supplier?.value };
     payload.paymentTerms = { id: data?.paymentTerms };
-    payload.prNos = _.toString(data?.prNos);
+    payload.prNos = data?.prNos;
     payload.noPr = _.isEmpty(data?.prNos);
     payload.project = null;
     payload.assets = null;
@@ -332,10 +333,13 @@ export default function UpsertPOFormModal(props: IProps) {
       return null;
     } else {
       if (type === "supplier") {
-        return shapeOptionValue(
-          record?.supplier?.supplierFullname,
-          record?.supplier?.id
-        );
+        if (record?.supplier?.id) {
+          return shapeOptionValue(
+            record?.supplier?.supplierFullname,
+            record?.supplier?.id
+          );
+        }
+        return null;
       }
     }
   };
@@ -417,7 +421,7 @@ export default function UpsertPOFormModal(props: IProps) {
     }
   };
 
-  const getPrItems = (prNo: string[]) => {
+  const getPrItems = (prNo: string, forListingOnly?: boolean) => {
     getPurchaseReqItems({
       variables: {
         prNos: prNo,
@@ -425,10 +429,50 @@ export default function UpsertPOFormModal(props: IProps) {
         id: record?.id,
       },
       onCompleted: (data) => {
-        let list = (data?.getPrItemInPO ?? []) as PurchaseRequestItem[];
-        let result = mapObject(list);
-        setItems(result);
-        setPrItems(list);
+        let obj = data?.getPrItemInOnePO as PrChildrenDto;
+        if (obj?.parent?.id) {
+          let list = obj.items as PurchaseRequestItem[];
+          if (!forListingOnly) {
+            // ==== set supplier ============
+            if (obj?.parent?.supplier) {
+              setFieldValue(
+                "supplier",
+                shapeOptionValue(
+                  obj?.parent?.supplier?.supplierFullname,
+                  obj?.parent?.supplier?.id
+                )
+              );
+            } else {
+              setFieldValue("supplier", null);
+            }
+            // ==== set category ============
+            if (obj?.parent?.category) {
+              setFieldValue("category", obj?.parent?.category);
+              setCategory(obj?.parent?.category ?? "");
+            }
+            // ==== set project ============
+            if (obj?.parent?.project) {
+              setFieldValue("project", obj?.parent?.project?.id);
+            } else {
+              setFieldValue("project", null);
+            }
+            // ==== set assets ============
+            if (obj?.parent?.assets) {
+              setFieldValue("assets", obj?.parent?.assets?.id);
+            } else {
+              setFieldValue("assets", null);
+            }
+            if (obj?.parent?.remarks) {
+              setFieldValue("remarks", obj?.parent?.remarks);
+            } else {
+              setFieldValue("remarks", null);
+            }
+            // ===== set result ==========
+            let result = mapObject(list);
+            setItems(result);
+          }
+          setPrItems(list);
+        }
       },
     });
   };
@@ -557,7 +601,6 @@ export default function UpsertPOFormModal(props: IProps) {
                 "This Purchase Order is already approved/voided. Editing is disabled."
               );
             } else {
-              console.log("double click");
               setEditable((prev: any) => ({
                 ...prev,
                 [e.id + "quantity"]: true,
@@ -685,46 +728,23 @@ export default function UpsertPOFormModal(props: IProps) {
   // ========================== mappings =======================================
   //item manage
   const mapObject = (list: PurchaseRequestItem[]) => {
-    let payload = record?.id ? _.clone(items) : [];
+    let tobeDeleted = _.clone(items);
+    let payload = [] as PurchaseOrderItemsExtended[];
     if (!_.isEmpty(list)) {
       (list || []).map((value) => {
-        let index = _.findIndex(
-          payload,
-          (x) => x?.item?.id === value?.item?.id
-        );
-        if (index < 0) {
-          let obj = formatObjPrItemsToPoItems(value);
-          obj.noPr = false;
-          payload.push(obj);
-        } else {
-          payload[index]["quantity"] = _.sumBy(list, function (obj) {
-            if (value?.item?.id === obj?.item?.id) {
-              return obj.requestedQty;
-            }
-          });
-          payload[index]["prNos"] = _.isEmpty(payload[index]["prNos"])
-            ? value.purchaseRequest?.prNo
-            : `${payload[index]["prNos"]},${value.purchaseRequest?.prNo}`;
-        }
-      });
-      let itemIds = _.map(list, "item.id");
-      if (record?.id) {
-        //removes items to database
-        let tobeRemove = _.filter(payload, function (o) {
-          //remove item where not included in PR items
-          return !_.includes(itemIds, o?.item?.id) && !_.isEmpty(o.prNos);
-        });
-        if (!_.isEmpty(tobeRemove)) {
-          //remove query if naay sulod
-          setForRemove([...forRemove, ...tobeRemove]);
-        }
-      }
-      payload = _.filter(payload, function (o) {
-        //remove item where not included in PR items
-        return _.includes(itemIds, o?.item?.id);
+        let obj = formatObjPrItemsToPoItems(value);
+        obj.noPr = false;
+        payload.push(obj);
       });
     } else {
       payload = [];
+    }
+    if (!_.isEmpty(tobeDeleted)) {
+      // checks if items is already saved
+      let checks = _.filter(tobeDeleted, (obj) => !obj?.isNew);
+      if (!_.isEmpty(checks)) {
+        setForRemove(checks);
+      }
     }
     return payload;
   };
@@ -787,13 +807,14 @@ export default function UpsertPOFormModal(props: IProps) {
           disabled={record?.isApprove ?? false}
           initialValues={{
             ...record,
-            prNos: record?.prNos ? record.prNos.split(",") : [],
+            prNos: record?.prNos ?? null,
             preparedDate: dayjs(record?.preparedDate ?? new Date()),
             etaDate: dayjs(record?.etaDate ?? new Date()),
             supplier: selectInValueInit(record?.id, "supplier"),
             project: record?.project?.id ?? null,
             assets: record?.assets?.id ?? null,
             category: record?.category ?? poCategory,
+            paymentTerms: record?.paymentTerms?.id ?? null,
           }}>
           <Row gutter={[16, 0]}>
             <Col {...responsiveColumn4}>
@@ -908,10 +929,9 @@ export default function UpsertPOFormModal(props: IProps) {
             title={
               <div className="pr-selector">
                 <FormSelect
-                  label="Select Purchase Request(s)"
+                  label="Select Purchase Request"
                   name="prNos"
                   propsselect={{
-                    mode: "multiple",
                     options: prNumberList,
                     onChange: (e) => {
                       setPrNo(e);
@@ -923,7 +943,7 @@ export default function UpsertPOFormModal(props: IProps) {
                 />
               </div>
             }
-            extra={[
+            extra={
               <Button
                 className="btn-order"
                 type="primary"
@@ -934,8 +954,8 @@ export default function UpsertPOFormModal(props: IProps) {
                 }
                 onClick={onOrderItems}>
                 Order Item
-              </Button>,
-            ]}>
+              </Button>
+            }>
             <Table
               rowKey="id"
               expandable={{

@@ -283,10 +283,14 @@ export default function UpsertPRFormModal(props: IProps) {
       return null;
     } else {
       if (type === "supplier") {
-        return shapeOptionValue(
-          record?.supplier?.supplierFullname,
-          record?.supplier?.id
-        );
+        if (record?.supplier?.id) {
+          return shapeOptionValue(
+            record?.supplier?.supplierFullname,
+            record?.supplier?.id
+          );
+        } else {
+          return null;
+        }
       }
     }
   };

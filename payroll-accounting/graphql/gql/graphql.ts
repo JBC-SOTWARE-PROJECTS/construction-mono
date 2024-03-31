@@ -4414,6 +4414,7 @@ export type Mutation = {
   removeApAppList?: Maybe<DisbursementAp>;
   removeApDetails?: Maybe<AccountsPayableDetails>;
   removeApLedger?: Maybe<ApLedger>;
+  removeAttachment?: Maybe<GraphQlRetVal_Boolean>;
   removeCheck?: Maybe<DisbursementCheck>;
   removeCheckList?: Maybe<DisbursementCheck>;
   removeCreditNoteItem?: Maybe<GraphQlResVal_ArCreditNoteItems>;
@@ -5557,6 +5558,12 @@ export type MutationRemoveApDetailsArgs = {
 /** Mutation root */
 export type MutationRemoveApLedgerArgs = {
   ref?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveAttachmentArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -7490,6 +7497,12 @@ export type PoMonitoringDtoInput = {
   receivingReport?: InputMaybe<Scalars['UUID']['input']>;
   receivingReportItem?: InputMaybe<Scalars['UUID']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PrChildrenDto = {
+  __typename?: 'PRChildrenDto';
+  items?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
+  parent?: Maybe<PurchaseRequest>;
 };
 
 export type Page_ArPaymentPosting = {
@@ -10484,6 +10497,7 @@ export type PurchaseRequestItem = {
   refPo?: Maybe<Scalars['UUID']['output']>;
   remarks?: Maybe<Scalars['String']['output']>;
   requestedQty?: Maybe<Scalars['BigDecimal']['output']>;
+  unitCost?: Maybe<Scalars['BigDecimal']['output']>;
   unitMeasurement?: Maybe<Scalars['String']['output']>;
 };
 
@@ -10495,6 +10509,7 @@ export type PurchaseRequestItemInput = {
   refPo?: InputMaybe<Scalars['UUID']['input']>;
   remarks?: InputMaybe<Scalars['String']['input']>;
   requestedQty?: InputMaybe<Scalars['BigDecimal']['input']>;
+  unitCost?: InputMaybe<Scalars['BigDecimal']['input']>;
 };
 
 export type PurchaseRtsDtoInput = {
@@ -11155,6 +11170,7 @@ export type Query = {
   getPayrollOtherDeductionByPayrollId?: Maybe<PayrollOtherDeduction>;
   getPlateNo?: Maybe<Array<Maybe<PlateNumberDto>>>;
   getPrItemByPoId?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
+  getPrItemInOnePO?: Maybe<PrChildrenDto>;
   getPrItemInPO?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getProjectMaterialsByMilestone?: Maybe<Array<Maybe<ProjectUpdatesMaterials>>>;
   getProjectWorkAccomplishItemsByGroupId?: Maybe<Array<Maybe<ProjectWorkAccomplishItems>>>;
@@ -11385,6 +11401,7 @@ export type Query = {
   prByFiltersPage?: Maybe<Page_PurchaseRequest>;
   prByFiltersPageNoDate?: Maybe<Page_PurchaseRequest>;
   prById?: Maybe<PurchaseRequest>;
+  prByPrNo?: Maybe<PurchaseRequest>;
   prItemById?: Maybe<PurchaseRequestItem>;
   prItemByParent?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   prItemNoPo?: Maybe<Array<Maybe<PurchaseRequest>>>;
@@ -13267,6 +13284,14 @@ export type QueryGetPrItemByPoIdArgs = {
 
 
 /** Query root */
+export type QueryGetPrItemInOnePoArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  prNos?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetPrItemInPoArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   prNos?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -14370,6 +14395,12 @@ export type QueryPrByFiltersPageNoDateArgs = {
 /** Query root */
 export type QueryPrByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPrByPrNoArgs = {
+  prNo?: InputMaybe<Scalars['String']['input']>;
 };
 
 

@@ -21,5 +21,5 @@ export interface IFormPurchaseOrder {
   project: string;
   assets: string;
   remarks: string;
-  prNos: string[];
+  prNos: string;
 }

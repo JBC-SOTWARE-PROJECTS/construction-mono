@@ -176,7 +176,7 @@
 		<field name="uom" class="java.lang.String"/>
 		<field name="deals" class="java.lang.String"/>
 		<field name="no" class="java.lang.Integer"/>
-		<field name="request_qty" class="java.lang.Integer"/>
+		<field name="request_qty" class="java.math.BigDecimal"/>
 		<field name="unit_cost" class="java.math.BigDecimal"/>
 		<field name="total" class="java.math.BigDecimal"/>
 		<field name="discount" class="java.math.BigDecimal"/>

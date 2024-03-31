@@ -53,6 +53,20 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
         }
     }
 
+    @GraphQLQuery(name = "prByPrNo")
+    PurchaseRequest prByPrNo(
+            @GraphQLArgument(name = "prNo") String prNo
+    ) {
+        if(prNo){
+            String query = '''SELECT pr from PurchaseRequest pr where pr.prNo = :prNo '''
+            Map<String, Object> params = new HashMap<>()
+            params.put('prNo', prNo)
+            createQuery(query, params).resultList.find()
+        }else{
+            null
+        }
+    }
+
 
     @GraphQLQuery(name = "prByFiltersPage")
 	Page<PurchaseRequest> prByFiltersPage(

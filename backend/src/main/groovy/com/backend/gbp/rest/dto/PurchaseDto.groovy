@@ -13,6 +13,7 @@ class PurchaseDto {
 	Item item
 	String unitMeasurement
 	BigDecimal requestedQty
+	BigDecimal unitCost
 	BigDecimal onHandQty
 	String remarks
 	Boolean isNew
