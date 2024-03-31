@@ -13,7 +13,7 @@ import {
 } from "@/hooks/inventory";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import { useDialog } from "@/hooks";
-import QuantityAdjustmentModal from "../../../components/inventory/adjustments/quantityAdjustmentModal";
+import BeginningBalanceModal from "@/components/inventory/beginning-balance/beginningBalanceModal";
 import { useOffices } from "@/hooks/payables";
 import BeginningBalanceTable from "@/components/inventory/beginning-balance/beginningBalanceTable";
 
@@ -21,7 +21,7 @@ const { Search } = Input;
 
 export default function BeginningBalancesContent() {
   const { message } = App.useApp();
-  const modal = useDialog(QuantityAdjustmentModal);
+  const modal = useDialog(BeginningBalanceModal);
   const account = useContext(AccountContext);
   const [category, setCategory] = useState<string[]>([]);
   const [groupId, setGroupId] = useState<string | null>(null);
@@ -40,6 +40,7 @@ export default function BeginningBalancesContent() {
   const categories = useItemCategory({ groupId: groupId });
   const brands = useItemBrands();
   const offices = useOffices();
+
   const { data, loading, refetch } = useQuery<Query>(
     GET_BEGINNING_BY_LOCATION,
     {
@@ -60,6 +61,8 @@ export default function BeginningBalancesContent() {
     modal({ record: record, office: officeId }, (result: any) => {
       if (result) {
         message.success(result);
+        refetch();
+      } else {
         refetch();
       }
     });

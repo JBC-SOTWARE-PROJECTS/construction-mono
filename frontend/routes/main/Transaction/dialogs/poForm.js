@@ -298,7 +298,6 @@ const POForm = ({ visible, hide, ...props }) => {
       return (
         <InputNumber
           defaultValue={record[el]}
-          // size="small"
           autoFocus
           onBlur={(e) => {
             let newValue = e?.target?.value;
@@ -783,7 +782,6 @@ const POForm = ({ visible, hide, ...props }) => {
               />
             )}
           </Col>
-
           <Col span={24}>
             <FormInput
               description={"Remarks/Notes"}

@@ -4,8 +4,9 @@ import type { MenuProps } from "antd";
 import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 import DescLong from "../desclong";
-import ColTitlePopUp from "../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import { NumberFormater, NumberFormaterNoDecimal } from "@/utility/helper";
+
 
 interface IProps {
   dataSource: BeginningBalanceDto[];
@@ -52,7 +53,7 @@ export default function BeginningBalanceTable({
       render: (_, record) => <span>{record?.item?.brand ?? "--"}</span>,
     },
     {
-      title: <ColTitlePopUp descripton="Unit (UoU)" popup="Unit of Usage" />,
+      title: <ColumnTitle descripton="Unit (UoU)" popup="Unit of Usage" />,
       dataIndex: "uou",
       key: "uou",
       width: 110,

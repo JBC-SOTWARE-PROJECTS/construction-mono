@@ -10,18 +10,19 @@ import { PurchaseOrder, Query } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
 import { GET_RECORDS_PURCHASE_ORDER } from "@/graphql/inventory/purchases-queries";
-import UpsertItemModal from "@/components/inventory/masterfile/items/dialogs/upsertItem";
+import UpsertPOFormModal from "@/components/inventory/purchases/purchase-order/dialogs/upserPOFormModal";
 import PurchaseOrderTable from "@/components/inventory/purchases/purchase-order/purchaseOrderTable";
 import { FormDebounceSelect, FormSelect } from "@/components/common";
-import { useOffices } from "@/hooks/payables";
+import { useOffices, useProjects } from "@/hooks/payables";
 import { PURCHASE_CATEGORY } from "@/utility/constant";
 import { OptionsValue } from "@/utility/interfaces";
 import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
+import { useAssets } from "@/hooks/inventory";
 
 const { Search } = Input;
 
 export default function PurchaseOrderComponent({ type }: { type: string }) {
-  const modal = useDialog(UpsertItemModal);
+  const modal = useDialog(UpsertPOFormModal);
   const [supplier, setSupplier] = useState<OptionsValue>();
   const [category, setCategory] = useState<string | null>(null);
   const [project, setProject] = useState<string | null>(null);
@@ -34,6 +35,9 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
   });
   // ====================== queries =====================================
   const offices = useOffices();
+  const projects = useProjects({ office: null });
+  const assets = useAssets();
+
   const { data, loading, refetch } = useQuery<Query>(
     GET_RECORDS_PURCHASE_ORDER,
     {
@@ -52,7 +56,7 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
   );
 
   const onUpsertRecord = (record?: PurchaseOrder) => {
-    modal({ record: record }, (msg: string) => {
+    modal({ record: record, poCategory: category }, (msg: string) => {
       if (msg) {
         message.success(msg);
         refetch();
@@ -198,7 +202,7 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
                         propsselect={{
                           showSearch: true,
                           value: project,
-                          options: [],
+                          options: projects,
                           allowClear: true,
                           placeholder: "Select Projects",
                           onChange: (newValue) => {
@@ -213,7 +217,7 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
                         propsselect={{
                           showSearch: true,
                           value: asset,
-                          options: [],
+                          options: assets,
                           allowClear: true,
                           placeholder: "Select Asset",
                           onChange: (newValue) => {

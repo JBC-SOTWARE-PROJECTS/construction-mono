@@ -105,7 +105,8 @@ export const responsiveColumn4 = {
   xs: 24,
   sm: 12,
   md: 12,
-  lg: 6,
+  lg: 12,
+  xl: 6,
 };
 
 export const responsiveColumn3Last = {
@@ -133,6 +134,14 @@ export const responsiveColumn6 = {
   sm: 24,
   md: 12,
   lg: 6,
+};
+
+export const responsiveColumn42 = {
+  xs: 24,
+  sm: 24,
+  md: 24,
+  lg: 24,
+  xl: 12,
 };
 // ===============end columns
 // =============== default datasource accounts payable ============
@@ -616,4 +625,17 @@ export const ISSUANCE_CATEGORY = [
   { label: "PROJECTS", value: "PROJECTS" },
   { label: "SPARE PARTS", value: "SPARE_PARTS" },
   { label: "PERSONAL", value: "PERSONAL" },
+];
+
+export const PR_TYPE = [
+  { label: "NORMAL", value: "NORMAL" },
+  { label: "URGENT", value: "URGENT" },
+  { label: "EMERGENCY", value: "EMERGENCY" },
+];
+
+export const poType = [
+  { label: "N/A", value: "none" },
+  { label: "Discount rate", value: "discountRate" },
+  { label: "Discount amount", value: "discountAmount" },
+  { label: "Package", value: "package" },
 ];

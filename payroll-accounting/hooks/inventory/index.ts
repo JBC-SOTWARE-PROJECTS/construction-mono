@@ -13,4 +13,7 @@ export { UseSupplierObject as useSupplierObject } from "./supplierObject";
 export { UseProjectStatusList as useProjectStatusList } from "./projectStatusList";
 export { UseProjectCostCategory as useProjectCostCategory } from "./projectCostCategory";
 export { UseProjectCostUnits as useProjectCostUnits } from "./projectCostUnits";
-export { useAdjustmentTypes as useAdjustmentTypes } from "./adjustmentTypes";
+export { UseAdjustmentTypes as useAdjustmentTypes } from "./adjustmentTypes";
+export { UseAssets as useAssets } from "./assets";
+export { UseInventoryAttachments as useInventoryAttachments } from "./attachments";
+export { UsePrNumbersNoPo as usePrNumbersNoPo } from "./prNumbersNoPo";

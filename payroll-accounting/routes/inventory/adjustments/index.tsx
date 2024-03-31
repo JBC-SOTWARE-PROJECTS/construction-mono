@@ -61,6 +61,8 @@ export default function QuantityAdjustmentContent() {
       if (result) {
         message.success(result);
         refetch();
+      } else {
+        refetch();
       }
     });
   };

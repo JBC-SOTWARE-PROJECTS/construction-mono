@@ -24,9 +24,10 @@ import { NumberFormater, requiredField } from "@/utility/helper";
 import { FormInputNumber, FormSelect } from "@/components/common";
 import { ColumnsType } from "antd/es/table";
 import { useSupplier } from "@/hooks/inventory";
-import ColTitlePopUp from "@/components/inventory/colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import { responsiveColumn2 } from "@/utility/constant";
 import { confirmDelete } from "@/hooks";
+
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -144,7 +145,7 @@ export default function UpsertAssignSupplierItemModal(props: IProps) {
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="Unit Cost (UoU)"
           popup="Unit of Usage"
           editable={true}
@@ -183,7 +184,7 @@ export default function UpsertAssignSupplierItemModal(props: IProps) {
     },
     {
       title: (
-        <ColTitlePopUp descripton="Unit Cost (UoP)" popup="Unit of Purchase" />
+        <ColumnTitle descripton="Unit Cost (UoP)" popup="Unit of Purchase" />
       ),
       dataIndex: "costPurchase",
       key: "costPurchase",

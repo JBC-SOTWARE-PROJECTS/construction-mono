@@ -4,26 +4,32 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, message, Row, Col, Form } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { Input, Button, Row, Col, Form, App } from "antd";
+import {
+  ExclamationCircleOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import { PurchaseRequest, Query } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
-import { useQuery } from "@apollo/client";
-import { GET_RECORDS_PURCHASE_REQUEST } from "@/graphql/inventory/purchases-queries";
-import UpsertItemModal from "@/components/inventory/masterfile/items/dialogs/upsertItem";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  GET_RECORDS_PURCHASE_REQUEST,
+  UPSERT_RECORD_PR_STATUS,
+} from "@/graphql/inventory/purchases-queries";
 import PurchaseRequestTable from "@/components/inventory/purchases/purchase-request/purchaseRequestTable";
 import { FormSelect } from "@/components/common";
-import UpsertAssignItemLocationModal from "@/components/inventory/masterfile/other-configurations/dialogs/upsertAssignItem";
-import UpsertAssignSupplierItemModal from "@/components/inventory/masterfile/other-configurations/dialogs/upsertSupplierItem";
+import UpsertPRFormModal from "@/components/inventory/purchases/purchase-request/dialogs/upserPRFormModal";
 import { useOffices, useProjects } from "@/hooks/payables";
 import { PR_STATUS, PURCHASE_CATEGORY } from "@/utility/constant";
+import { useAssets } from "@/hooks/inventory";
+import _ from "lodash";
 
 const { Search } = Input;
 
 export default function PurchaseRequestComponent({ type }: { type: string }) {
-  const modal = useDialog(UpsertItemModal);
-  const assignItemModal = useDialog(UpsertAssignItemLocationModal);
-  const assignSupplierItemModal = useDialog(UpsertAssignSupplierItemModal);
+  const { modal: parentModal, message } = App.useApp();
+  const { confirm } = parentModal;
+  const modal = useDialog(UpsertPRFormModal);
   const [category, setCategory] = useState<string | null>(null);
   const [project, setProject] = useState<string | null>(null);
   const [asset, setAsset] = useState<string | null>(null);
@@ -37,6 +43,8 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
   // ====================== queries =====================================
   const offices = useOffices();
   const projects = useProjects({ office: null });
+  const assets = useAssets();
+
   const { data, loading, refetch } = useQuery<Query>(
     GET_RECORDS_PURCHASE_REQUEST,
     {
@@ -54,8 +62,21 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
     }
   );
 
+  const [upsertRecord, { loading: upsertLoading }] = useMutation(
+    UPSERT_RECORD_PR_STATUS,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.updatePRStatus?.id)) {
+          message.success("Purchase Request Information Updated");
+          refetch();
+        }
+      },
+    }
+  );
+  // =================== end Queries =============================
   const onUpsertRecord = (record?: PurchaseRequest) => {
-    modal({ record: record }, (msg: string) => {
+    modal({ record: record, prCategory: category }, (msg: string) => {
       if (msg) {
         message.success(msg);
         refetch();
@@ -69,14 +90,32 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
       if (record?.isApprove) {
         message.error("Purchase Request is already approved");
       } else {
+        _approve(record?.id, status, "approve");
       }
     } else {
       //void
       if (!record?.isApprove) {
         message.error("Purchase Request is already not yet approved");
       } else {
+        _approve(record?.id, status, "void");
       }
     }
+  };
+
+  const _approve = (id: string, status: boolean, message: string) => {
+    confirm({
+      title: `Do you want ${message} this Purchase Request?`,
+      icon: <ExclamationCircleOutlined />,
+      content: "Please click ok to proceed.",
+      onOk() {
+        upsertRecord({
+          variables: {
+            status: status,
+            id: id,
+          },
+        });
+      },
+    });
   };
 
   const title = useMemo(() => {
@@ -217,7 +256,7 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
                         propsselect={{
                           showSearch: true,
                           value: asset,
-                          options: [],
+                          options: assets,
                           allowClear: true,
                           placeholder: "Select Asset",
                           onChange: (newValue) => {
@@ -282,7 +321,7 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
         </div>
         <PurchaseRequestTable
           dataSource={data?.prByFiltersPageNoDate?.content as PurchaseRequest[]}
-          loading={loading}
+          loading={loading || upsertLoading}
           totalElements={data?.prByFiltersPageNoDate?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}

@@ -8,6 +8,7 @@ import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
+import java.math.RoundingMode
 
 @Entity
 @Table(schema = "inventory", name = "office_item")
@@ -60,4 +61,27 @@ class OfficeItem implements Serializable{
 	@GraphQLQuery
 	@Column(name = "company")
 	UUID company
+
+	@Transient
+	String getUnitMeasurement() {
+		return "${item.unit_of_purchase?.unitDescription} (${item.item_conversion} ${item.unit_of_usage?.unitDescription})"
+	}
+
+	@Transient
+	String getUou() {
+		return item.unit_of_usage?.unitDescription
+	}
+
+	@GraphQLQuery(name = "markup")
+	@Transient
+	BigDecimal markup
+	BigDecimal getMarkup() {
+		def rate = 0.00
+		if(actualCost && sellingPrice){
+			def lprice = actualCost;
+			def sprice = sellingPrice - actualCost;
+			rate = (sprice / lprice) * 100;
+		}
+		rate.setScale(2, RoundingMode.HALF_EVEN)
+	}
 }

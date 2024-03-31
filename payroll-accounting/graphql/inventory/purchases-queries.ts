@@ -62,16 +62,6 @@ export const GET_RECORDS_PURCHASE_REQUEST = gql`
   }
 `;
 
-export const UPSERT_RECORD_ITEM = gql`
-  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
-    upsertItem(id: $id, fields: $fields) {
-      payload
-      success
-      message
-    }
-  }
-`;
-
 export const GET_RECORDS_PURCHASE_ORDER = gql`
   query (
     $filter: String
@@ -134,6 +124,110 @@ export const GET_RECORDS_PURCHASE_ORDER = gql`
       totalPages
       size
       number
+    }
+  }
+`;
+
+export const GET_RECORDS_PURCHASE_REQ_ITEMS = gql`
+  query ($id: UUID) {
+    prItemByParent(id: $id) {
+      id
+      item {
+        id
+        descLong
+      }
+      unitMeasurement
+      requestedQty
+      onHandQty
+      remarks
+    }
+  }
+`;
+
+export const UPSERT_RECORD_PURCHASE_REQUEST = gql`
+  mutation (
+    $id: UUID
+    $items: [Map_String_ObjectScalar]
+    $fields: Map_String_ObjectScalar
+  ) {
+    upsertPR(id: $id, items: $items, fields: $fields) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_PURCHASE_REQUEST = gql`
+  mutation ($id: UUID) {
+    removePrItem(id: $id) {
+      id
+    }
+  }
+`;
+
+export const UPSERT_RECORD_PR_STATUS = gql`
+  mutation ($status: Boolean, $id: UUID) {
+    updatePRStatus(status: $status, id: $id) {
+      id
+    }
+  }
+`;
+
+// ====================== purchase order =========================
+export const GET_RECORDS_PO_ITEMS = gql`
+  query ($id: UUID) {
+    poItemByParent(id: $id) {
+      id
+      item {
+        id
+        descLong
+        item_conversion
+      }
+      unitMeasurement
+      quantity
+      unitCost
+      prNos
+      type
+      type_text
+    }
+  }
+`;
+
+export const GET_PR_ITEMS_BY_PRNOS = gql`
+  query ($prNos: [String], $status: Boolean, $id: UUID) {
+    getPrItemInPO(prNos: $prNos, status: $status, id: $id) {
+      id
+      item {
+        id
+        descLong
+        item_conversion
+      }
+      purchaseRequest {
+        id
+        prNo
+      }
+      unitMeasurement
+      requestedQty
+    }
+  }
+`;
+
+export const UPSERT_RECORD_PURCHASE_ORDER = gql`
+  mutation (
+    $id: UUID
+    $items: [Map_String_ObjectScalar]
+    $forRemove: [Map_String_ObjectScalar]
+    $fields: Map_String_ObjectScalar
+  ) {
+    upsertPO(id: $id, items: $items, forRemove: $forRemove, fields: $fields) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_PO_ITEM = gql`
+  mutation ($id: UUID) {
+    removePoItem(id: $id) {
+      id
     }
   }
 `;

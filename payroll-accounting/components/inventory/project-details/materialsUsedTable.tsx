@@ -7,7 +7,8 @@ import {
 import { Row, Col, Table, Pagination } from "antd";
 import { ColumnsType } from "antd/es/table";
 import _ from "lodash";
-import ColTitlePopUp from "../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
+
 
 interface IProps {
   dataSource: ProjectUpdatesMaterials[];
@@ -49,7 +50,7 @@ export default function MaterialsUsedTable({
       },
     },
     {
-      title: <ColTitlePopUp descripton="Unit (UoU)" popup="Unit of Usage" />,
+      title: <ColumnTitle descripton="Unit (UoU)" popup="Unit of Usage" />,
       dataIndex: "uou",
       key: "uou",
       width: 150,

@@ -36,11 +36,11 @@ enum LedgerDocType { //transactype
 	QA, // QuantityAdjustments
 	PA, // ProductionAssemblies
 	AM, // AssetManagement
+	BB, // Beginning Balance
 	// END: inventory transactions//
 	CH, // Charges
 	CA, // Cash,
 	XX, // Generated From Generator - Error when pushed through
-	BB, // Beginning Balance
 	PRL, //Payroll
 	EL, //Employee Loan
 	FA

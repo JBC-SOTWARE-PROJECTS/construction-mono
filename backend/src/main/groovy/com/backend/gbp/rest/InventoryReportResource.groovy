@@ -341,6 +341,7 @@ class InventoryReportResource {
 				fullname: purchaseRequest?.userFullname ?: "",
 				project: desc ?: "",
 				projTitle: title ?: "",
+				remarks: purchaseRequest?.remarks ?: "",
 
 		)
 		def gson = new Gson()

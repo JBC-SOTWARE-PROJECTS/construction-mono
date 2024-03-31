@@ -1,11 +1,11 @@
 import { Inventory, Item } from "@/graphql/gql/graphql";
-import { EditFilled, FolderOpenOutlined } from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
+import { FolderOpenOutlined } from "@ant-design/icons";
+import { Row, Col, Table, Pagination, Tag, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 import DescLong from "../desclong";
-import ColTitlePopUp from "../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import { NumberFormaterNoDecimal } from "@/utility/helper";
+
 
 interface IProps {
   dataSource: Inventory[];
@@ -49,7 +49,7 @@ export default function ProjectInventoryMonitoringTable({
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="Unit (UoU)"
           popup="Unit of Usage"
         />

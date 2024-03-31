@@ -1,10 +1,8 @@
 package com.backend.gbp.graphqlservices.inventory
 
-import com.backend.gbp.domain.inventory.InventoryLedger
-import com.backend.gbp.domain.inventory.OfficeItem
+
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.InventoryInfoDto
-import com.backend.gbp.rest.dto.InventoryInfoRawDto
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.backend.gbp.domain.User
 import com.backend.gbp.domain.hrm.Employee
@@ -19,11 +17,8 @@ import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLContext
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
-import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 

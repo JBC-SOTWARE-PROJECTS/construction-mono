@@ -5,7 +5,6 @@ import {
   EditOutlined,
   FileAddOutlined,
   FileProtectOutlined,
-  FileTextOutlined,
   SaveOutlined,
   UndoOutlined,
 } from "@ant-design/icons";
@@ -16,7 +15,6 @@ import {
   Divider,
   Form,
   Row,
-  Space,
   Tag,
   App,
   Table,
@@ -38,31 +36,24 @@ import {
   requiredField,
 } from "@/utility/helper";
 import { ColumnsType } from "antd/es/table";
-import { useConfirmationPasswordHook, useDialog } from "@/hooks";
-import ColTitlePopUp from "../colTitlePopUp";
+import { useDialog } from "@/hooks";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import {
   GET_RECORDS_QUANTITY_ADJUSTMENTS,
   UPSERT_QTY_ADJUSTMENT,
   UPSERT_RECORD_ADJUSTMENT,
 } from "@/graphql/inventory/adjustments-queries";
 import { useAdjustmentTypes } from "@/hooks/inventory";
-import styled from "styled-components";
 import ButtonPosted from "../commons/buttonPosted";
 import UpsertQuantityAdjustmentRemarks from "./upsertRemarks";
 import PostQuantityAdjustmentModal from "../post-dialogs/postsQuantityAdjustment";
 import AccessControl from "@/components/accessControl/AccessControl";
 
+
 interface IProps {
   hide: (hideProps: any) => void;
   record: Inventory;
   office: string;
-}
-
-interface IPayloadValues {
-  discount: number;
-  ewtAmount: number;
-  appliedAmount: number;
-  netAmount: number;
 }
 
 export default function QuantityAdjustmentModal(props: IProps) {
@@ -190,7 +181,7 @@ export default function QuantityAdjustmentModal(props: IProps) {
       width: 140,
     },
     {
-      title: <ColTitlePopUp descripton="Unit (UoU)" popup="Unit of Usage" />,
+      title: <ColumnTitle descripton="Unit (UoU)" popup="Unit of Usage" />,
       dataIndex: "uou",
       key: "uou",
       width: 200,
@@ -212,7 +203,7 @@ export default function QuantityAdjustmentModal(props: IProps) {
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="Qty (UoU)"
           popup="Unit of Usage"
           editable={true}
@@ -261,7 +252,7 @@ export default function QuantityAdjustmentModal(props: IProps) {
     },
     {
       title: (
-        <ColTitlePopUp descripton="Unit Cost (UoU)" popup="Unit of Usage" />
+        <ColumnTitle descripton="Unit Cost (UoU)" popup="Unit of Usage" />
       ),
       dataIndex: "unit_cost",
       key: "unit_cost",

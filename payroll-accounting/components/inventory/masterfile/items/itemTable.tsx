@@ -3,8 +3,9 @@ import { FolderOpenOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
 import { ColumnsType } from "antd/es/table";
-import ColTitlePopUp from "../../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import DescLong from "../../desclong";
+
 
 interface IProps {
   dataSource: Item[];
@@ -49,7 +50,7 @@ export default function ItemTable({
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="Unit of Measurement (UoP/UoU)"
           popup="Unit of Purchase/Unit of Usage"
         />

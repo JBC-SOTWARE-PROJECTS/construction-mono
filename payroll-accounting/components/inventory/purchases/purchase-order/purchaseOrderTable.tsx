@@ -146,6 +146,25 @@ export default function PurchaseOrderTable({
     <Row>
       <Col span={24}>
         <Table
+          expandable={{
+            expandedRowRender: (record) => (
+              <div className="w-full">
+                <p>
+                  Office: <Tag>{record.office?.officeDescription}</Tag>
+                </p>
+                {record?.category === "PROJECTS" && (
+                  <p style={{ paddingTop: 5 }}>
+                    Project: <Tag>{record.project?.description}</Tag>
+                  </p>
+                )}
+                {record?.category === "SPARE_PARTS" && (
+                  <p style={{ paddingTop: 5 }}>
+                    Equipment (Assets): <Tag>{record.assets?.description}</Tag>
+                  </p>
+                )}
+              </div>
+            ),
+          }}
           rowKey="id"
           size="small"
           columns={columns}

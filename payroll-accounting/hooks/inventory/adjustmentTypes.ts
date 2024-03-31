@@ -11,7 +11,7 @@ const GET_RECORDS = gql`
   }
 `;
 
-export function useAdjustmentTypes() {
+export function UseAdjustmentTypes() {
   const { data } = useQuery<Query>(GET_RECORDS);
   const options = data?.filterAdjustmentType as OptionsValue[];
   return options;

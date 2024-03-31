@@ -6,18 +6,7 @@ import {
 } from "@/graphql/gql/graphql";
 import { FileDoneOutlined, SaveOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@apollo/client";
-import {
-  Button,
-  Col,
-  Form,
-  Modal,
-  Row,
-  Space,
-  Typography,
-  App,
-  Table,
-  Divider,
-} from "antd";
+import { Button, Modal, Space, Typography, App, Divider } from "antd";
 import _ from "lodash";
 import {
   UPSERT_STATUS_ADJUSTMENT,

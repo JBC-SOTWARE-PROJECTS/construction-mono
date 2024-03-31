@@ -2,6 +2,7 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -91,6 +92,7 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "remarks", columnDefinition = "varchar")
+	@UpperCase
 	String remarks
 
 	@GraphQLQuery

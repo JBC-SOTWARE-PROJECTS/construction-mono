@@ -10,4 +10,4 @@ const PurchaseOrderPersonal = () => {
   return <Component type="personal" />;
 };
 
-export default PurchasePersonalPersonal;
+export default PurchaseOrderPersonal;

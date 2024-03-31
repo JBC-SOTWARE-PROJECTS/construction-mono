@@ -611,5 +611,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/96_beginning_balance.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/97_beginning_balance_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/98_wilson_inventory_attachments.sql"
+             relativeToChangelogFile="false"/>
+
 
 </databaseChangeLog>
