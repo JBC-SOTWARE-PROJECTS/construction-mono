@@ -173,6 +173,14 @@ export const UPSERT_RECORD_PR_STATUS = gql`
   }
 `;
 
+export const UPSERT_RECORD_PO_STATUS = gql`
+  mutation ($status: Boolean, $id: UUID) {
+    updatePOStatus(status: $status, id: $id) {
+      id
+    }
+  }
+`;
+
 // ====================== purchase order =========================
 export const GET_RECORDS_PO_ITEMS = gql`
   query ($id: UUID) {
@@ -250,6 +258,83 @@ export const DELETE_RECORD_PO_ITEM = gql`
   mutation ($id: UUID) {
     removePoItem(id: $id) {
       id
+    }
+  }
+`;
+
+export const GET_RECORDS_PO_MONITORING = gql`
+  query (
+    $filter: String
+    $poId: UUID
+    $supplier: UUID
+    $page: Int
+    $size: Int
+  ) {
+    poItemMonitoringPage(
+      filter: $filter
+      poId: $poId
+      supplier: $supplier
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        item {
+          id
+          descLong
+          item_conversion
+          vatable
+          unit_of_usage {
+            id
+            unitDescription
+          }
+        }
+        purchaseOrder {
+          id
+          poNumber
+          preparedDate
+          supplier {
+            id
+            supplierFullname
+          }
+        }
+        prNos
+        unitMeasurement
+        quantity
+        unitCost
+        qtyInSmall
+        deliveredQty
+        deliveryBalance
+        status
+      }
+      totalElements
+      totalPages
+      size
+      number
+    }
+  }
+`;
+
+export const GET_RECORDS_PO_DEL_MON = gql`
+  query ($filter: String, $id: UUID) {
+    getPOMonitoringByPoItemFilter(filter: $filter, id: $id) {
+      id
+      receivingReport {
+        rrNo
+        receivedRefNo
+      }
+      receivingReportItem {
+        id
+        item {
+          id
+          unit_of_usage {
+            id
+            unitDescription
+          }
+        }
+      }
+      quantity
+      status
     }
   }
 `;

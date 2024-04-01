@@ -8742,6 +8742,25 @@ export type Page_PurchaseOrder = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_PurchaseOrderItemsMonitoring = {
+  __typename?: 'Page_PurchaseOrderItemsMonitoring';
+  content?: Maybe<Array<Maybe<PurchaseOrderItemsMonitoring>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_PurchaseRequest = {
   __typename?: 'Page_PurchaseRequest';
   content?: Maybe<Array<Maybe<PurchaseRequest>>>;
@@ -10278,6 +10297,7 @@ export type PurchaseDtoInput = {
   onHandQty?: InputMaybe<Scalars['BigDecimal']['input']>;
   remarks?: InputMaybe<Scalars['String']['input']>;
   requestedQty?: InputMaybe<Scalars['BigDecimal']['input']>;
+  unitCost?: InputMaybe<Scalars['BigDecimal']['input']>;
   unitMeasurement?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -10402,6 +10422,7 @@ export type PurchaseOrderItemsMonitoring = {
   qtyInSmall?: Maybe<Scalars['BigDecimal']['output']>;
   quantity?: Maybe<Scalars['BigDecimal']['output']>;
   receivingReport?: Maybe<ReceivingReport>;
+  status?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Scalars['String']['output']>;
   type_text?: Maybe<Scalars['String']['output']>;
   unitCost?: Maybe<Scalars['BigDecimal']['output']>;
@@ -11388,6 +11409,7 @@ export type Query = {
   poItemById?: Maybe<PurchaseOrderItems>;
   poItemByParent?: Maybe<Array<Maybe<PurchaseOrderItems>>>;
   poItemMonitoringByParentFilter?: Maybe<Array<Maybe<PurchaseOrderItemsMonitoring>>>;
+  poItemMonitoringPage?: Maybe<Page_PurchaseOrderItemsMonitoring>;
   poItemNotReceive?: Maybe<Array<Maybe<PurchaseOrderItems>>>;
   poItemNotReceiveMonitoring?: Maybe<Array<Maybe<PurchaseOrderItemsMonitoring>>>;
   poList?: Maybe<Array<Maybe<PurchaseOrder>>>;
@@ -14334,6 +14356,16 @@ export type QueryPoItemByParentArgs = {
 export type QueryPoItemMonitoringByParentFilterArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryPoItemMonitoringPageArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  poId?: InputMaybe<Scalars['UUID']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  supplier?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 

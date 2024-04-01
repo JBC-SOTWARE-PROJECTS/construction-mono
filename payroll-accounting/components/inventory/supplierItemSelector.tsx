@@ -19,7 +19,7 @@ import ColumnTitle from "../common/columnTitle/columnTitle";
 import { GET_RECORDS_ITEMS_SUPPLIER } from "@/graphql/inventory/global-queries";
 import DescLong from "./desclong";
 import styled from "styled-components";
-import { formatObjSupplierPurchaseRequest } from "@/utility/inventory-helper";
+import { formatObjSupplierPurchaseRequest, formatObjSupplierPurchaseOrder } from "@/utility/inventory-helper";
 import { NumberFormaterDynamic } from "@/utility/helper";
 
 interface IProps {
@@ -102,6 +102,11 @@ export default function SupplierItemSelector(props: IProps) {
     if (!_.isEmpty(selectedItems)) {
       if (formModule === "PR") {
         let result = formatObjSupplierPurchaseRequest(selectedItems);
+        if (!_.isEmpty(result)) {
+          hide(result);
+        }
+      }else if(formModule === "PO") {
+        let result = formatObjSupplierPurchaseOrder(selectedItems);
         if (!_.isEmpty(result)) {
           hide(result);
         }

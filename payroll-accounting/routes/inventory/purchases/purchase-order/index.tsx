@@ -4,12 +4,18 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, message, Row, Col, Form } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { Input, Button, Row, Col, Form, App } from "antd";
+import {
+  ExclamationCircleOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
 import { PurchaseOrder, Query } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
-import { useQuery } from "@apollo/client";
-import { GET_RECORDS_PURCHASE_ORDER } from "@/graphql/inventory/purchases-queries";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  GET_RECORDS_PURCHASE_ORDER,
+  UPSERT_RECORD_PO_STATUS,
+} from "@/graphql/inventory/purchases-queries";
 import UpsertPOFormModal from "@/components/inventory/purchases/purchase-order/dialogs/upserPOFormModal";
 import PurchaseOrderTable from "@/components/inventory/purchases/purchase-order/purchaseOrderTable";
 import { FormDebounceSelect, FormSelect } from "@/components/common";
@@ -18,11 +24,14 @@ import { PURCHASE_CATEGORY } from "@/utility/constant";
 import { OptionsValue } from "@/utility/interfaces";
 import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
 import { useAssets } from "@/hooks/inventory";
+import _ from "lodash";
 
 const { Search } = Input;
 
 export default function PurchaseOrderComponent({ type }: { type: string }) {
+  const { modal: parentModal, message } = App.useApp();
   const modal = useDialog(UpsertPOFormModal);
+  const { confirm } = parentModal;
   const [supplier, setSupplier] = useState<OptionsValue>();
   const [category, setCategory] = useState<string | null>(null);
   const [project, setProject] = useState<string | null>(null);
@@ -55,6 +64,19 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
     }
   );
 
+  const [upsertRecord, { loading: upsertLoading }] = useMutation(
+    UPSERT_RECORD_PO_STATUS,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.updatePOStatus?.id)) {
+          message.success("Purchase Order Information Updated");
+          refetch();
+        }
+      },
+    }
+  );
+
   const onUpsertRecord = (record?: PurchaseOrder) => {
     modal({ record: record, poCategory: category }, (msg: string) => {
       if (msg) {
@@ -70,15 +92,34 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
       if (record?.isApprove) {
         message.error("Purchase Request is already approved");
       } else {
+        _approve(record?.id, status, "approve");
       }
     } else {
       //void
       if (!record?.isApprove) {
         message.error("Purchase Request is already not yet approved");
       } else {
+        _approve(record?.id, status, "void");
       }
     }
   };
+
+  const _approve = (id: string, status: boolean, message: string) => {
+    confirm({
+      title: `Do you want ${message} this Purchase Order?`,
+      icon: <ExclamationCircleOutlined />,
+      content: "Please click ok to proceed.",
+      onOk() {
+        upsertRecord({
+          variables: {
+            status: status,
+            id: id,
+          },
+        });
+      },
+    });
+  };
+
   const title = useMemo(() => {
     let title = "All Purchase Order";
     switch (type) {
@@ -280,7 +321,7 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
         </div>
         <PurchaseOrderTable
           dataSource={data?.poByFiltersPageNoDate?.content as PurchaseOrder[]}
-          loading={loading}
+          loading={loading || upsertLoading}
           totalElements={data?.poByFiltersPageNoDate?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}

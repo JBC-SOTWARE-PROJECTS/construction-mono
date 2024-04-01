@@ -17,3 +17,4 @@ export { UseAdjustmentTypes as useAdjustmentTypes } from "./adjustmentTypes";
 export { UseAssets as useAssets } from "./assets";
 export { UseInventoryAttachments as useInventoryAttachments } from "./attachments";
 export { UsePrNumbersNoPo as usePrNumbersNoPo } from "./prNumbersNoPo";
+export { UsePurcaseOrderList as usePurcaseOrderList } from "./poList";

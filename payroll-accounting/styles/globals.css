@@ -527,6 +527,16 @@ th.ant-table-cell {
   background-color: rgba(0, 0, 0, 0.9) !important;
 }
 
+.ant-pro-page-container
+  .ant-pro-page-container-warp-page-header
+  .ant-page-header-heading {
+  padding-block-start: 0px !important;
+}
+
+.ant-page-header-content {
+  padding-block-start: 0px !important;
+}
+
 /* responsive here onwards */
 
 @media screen and (max-width: 767px) {

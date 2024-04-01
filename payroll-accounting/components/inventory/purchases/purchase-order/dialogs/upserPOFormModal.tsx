@@ -95,7 +95,6 @@ export default function UpsertPOFormModal(props: IProps) {
   const [uploading, setUploading] = useState<boolean>(false);
   const [prItems, setPrItems] = useState<PurchaseRequestItem[]>([]);
   const [prNo, setPrNo] = useState<string | null>(record?.prNos ?? null);
-
   // ====================== modals =============================
   const supplierItems = useDialog(SupplierItemSelector);
   // ===================== Queries ==============================
@@ -114,12 +113,12 @@ export default function UpsertPOFormModal(props: IProps) {
     onCompleted: (data) => {
       let result = (data?.poItemByParent ?? []) as PurchaseOrderItemsExtended[];
       if (!_.isEmpty(result)) {
-        setItems(result);
         let prNos = record?.prNos ?? "";
         if (!_.isEmpty(prNos)) {
           getPrItems(prNos, true);
         }
       }
+      setItems(result);
     },
   });
 

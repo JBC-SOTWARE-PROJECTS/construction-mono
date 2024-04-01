@@ -68,7 +68,7 @@ const AccountingAccountsPayableMenu = {
         routes: [
           {
             path: "/inventory/purchases/purchase-order-monitoring/all",
-            name: "All",
+            name: "PO Delivery Monitoring",
           },
         ],
       },

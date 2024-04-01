@@ -59,6 +59,30 @@ export const formatObjInventoryPurchaseRequest = (
   return result;
 };
 
+export const formatObjSupplierPurchaseOrder = (
+  records: SupplierInventory[]
+): PurchaseOrderItemsExtended[] => {
+  let result = [] as PurchaseOrderItemsExtended[];
+  result = (records || []).map((e) => {
+    return {
+      id: e.id,
+      item: {
+        ...e.item,
+        descLong: e.descLong,
+      },
+      unitMeasurement: e.unitMeasurement,
+      requestedQty: 1,
+      unitCost: e.unitCost,
+      prNos: null,
+      type: null,
+      type_text: null,
+      isNew: true,
+      noPr: true,
+    };
+  }) as PurchaseOrderItemsExtended[];
+  return result;
+};
+
 export const formatObjPrItemsToPoItems = (
   records: PurchaseRequestItem
 ): PurchaseOrderItemsExtended => {
@@ -72,7 +96,7 @@ export const formatObjPrItemsToPoItems = (
     type: null,
     type_text: null,
     isNew: true,
-    noPr: true,
+    noPr: false,
   };
   return result;
 };
