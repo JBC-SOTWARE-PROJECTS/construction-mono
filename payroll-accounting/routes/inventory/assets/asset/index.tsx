@@ -14,6 +14,7 @@ import AssetRepairMaintenance from "./repairMaintenance";
 import AssetRepairMaintenanceComponent from "./repairMaintenance";
 import VehicleUsageMonitoringComponent from "./vehicleUsageMonitoring";
 import AssetConfigurations from "./assetConfigurations";
+import VehAccumulatedReports from "./vehAccumulatedReports";
 
 type Props = {};
 const items: TabsProps["items"] = [
@@ -34,6 +35,11 @@ const items: TabsProps["items"] = [
   },
   {
     key: "4",
+    label: "Accumulated Reports",
+    children: <VehAccumulatedReports/>,
+  },
+  {
+    key: "5",
     label: "Configurations",
     children: <AssetConfigurations/>,
   }
