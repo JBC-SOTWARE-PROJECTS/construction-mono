@@ -960,6 +960,15 @@ export type AssetUpcomingPreventiveMaintenanceKms = {
   startBasis?: Maybe<Scalars['String']['output']>;
 };
 
+export type AssetVehicleUsageAccumulation = {
+  __typename?: 'AssetVehicleUsageAccumulation';
+  accumulatedFuel?: Maybe<Scalars['BigDecimal']['output']>;
+  accumulatedOdo?: Maybe<Scalars['BigDecimal']['output']>;
+  asset?: Maybe<Assets>;
+  dateOfUsage?: Maybe<Scalars['Instant']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+};
+
 export type Assets = {
   __typename?: 'Assets';
   assetCode?: Maybe<Scalars['String']['output']>;
@@ -7736,6 +7745,25 @@ export type Page_AssetUpcomingPreventiveMaintenanceKms = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_AssetVehicleUsageAccumulation = {
+  __typename?: 'Page_AssetVehicleUsageAccumulation';
+  content?: Maybe<Array<Maybe<AssetVehicleUsageAccumulation>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_Assets = {
   __typename?: 'Page_Assets';
   content?: Maybe<Array<Maybe<Assets>>>;
@@ -10398,6 +10426,7 @@ export type QuantityAdjustmentTypeInput = {
 /** Query root */
 export type Query = {
   __typename?: 'Query';
+  AssetVehicleUsageAccumulationPageable?: Maybe<Page_AssetVehicleUsageAccumulation>;
   /** List of item expense */
   ItemExpense?: Maybe<Array<Maybe<StockIssueItems>>>;
   /** Get User by login */
@@ -11161,6 +11190,15 @@ export type Query = {
   wtxList?: Maybe<Array<Maybe<Wtx2307>>>;
   wtxListByRef?: Maybe<Array<Maybe<Wtx2307>>>;
   wtxListPage?: Maybe<Page_Wtx2307>;
+};
+
+
+/** Query root */
+export type QueryAssetVehicleUsageAccumulationPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
