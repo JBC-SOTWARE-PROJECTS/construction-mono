@@ -100,6 +100,10 @@ export const GET_RECORDS_RETURNS = gql`
           id
           supplierFullname
         }
+        transType {
+          id
+          description
+        }
         received_by
         returnBy
         returnUser
@@ -119,6 +123,68 @@ export const UPSERT_RECORD_ITEM = gql`
       payload
       success
       message
+    }
+  }
+`;
+
+export const GET_RECORDS_RETURN_ITEMS = gql`
+  query ($id: UUID) {
+    rtsItemByParent(id: $id) {
+      id
+      item {
+        id
+        descLong
+        item_conversion
+        vatable
+        unit_of_usage {
+          id
+          unitDescription
+        }
+      }
+      uou
+      returnQty
+      returnUnitCost
+      return_remarks
+      isPosted
+    }
+  }
+`;
+
+export const GET_JOURNAL_RETURN_SUPPLIER = gql`
+  query ($id: UUID, $status: Boolean) {
+    returnSupplierAccountView(id: $id, status: $status) {
+      code
+      desc
+      debit
+      credit
+    }
+  }
+`;
+
+export const UPSERT_RECORD_RETURN_ITEMS = gql`
+  mutation (
+    $fields: Map_String_ObjectScalar
+    $items: [Map_String_ObjectScalar]
+    $id: UUID
+  ) {
+    upsertRTS(fields: $fields, items: $items, id: $id) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_RETURN_ITEM = gql`
+  mutation ($id: UUID) {
+    removeRtsItem(id: $id) {
+      id
+    }
+  }
+`;
+
+export const POST_VOID_RETURN_SUPPLIER = gql`
+  mutation ($id: UUID, $items: [Map_String_ObjectScalar], $status: Boolean) {
+    postReturnInventory(id: $id, items: $items, status: $status) {
+      id
     }
   }
 `;

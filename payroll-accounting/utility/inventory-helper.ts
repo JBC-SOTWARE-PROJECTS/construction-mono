@@ -1,10 +1,15 @@
 import {
   Inventory,
+  Item,
+  Office,
   PurchaseOrderItems,
   PurchaseRequestItem,
+  ReturnSupplier,
+  ReturnSupplierItem,
   SupplierInventory,
 } from "@/graphql/gql/graphql";
 import { decimalRound2 } from "./helper";
+import dayjs, { Dayjs } from "dayjs";
 
 export interface PurchaseRequestItemExtended extends PurchaseRequestItem {
   isNew?: boolean;
@@ -13,6 +18,29 @@ export interface PurchaseRequestItemExtended extends PurchaseRequestItem {
 export interface PurchaseOrderItemsExtended extends PurchaseOrderItems {
   isNew?: boolean;
   noPr?: boolean;
+}
+
+export interface ReturnItemsExtended extends ReturnSupplierItem {
+  isNew?: boolean;
+}
+
+interface PostDto {
+  id: string;
+  ledgerNo: string;
+  source: Office;
+  destination: Office;
+  date: string | Dayjs;
+  type: string;
+  typeId: string;
+  itemId: string;
+  qty: number;
+  unitcost: number;
+}
+
+export interface InventoryPostList extends PostDto {
+  item: Item;
+  unit: string;
+  status: boolean;
 }
 
 export const formatObjSupplierPurchaseRequest = (
@@ -83,6 +111,25 @@ export const formatObjSupplierPurchaseOrder = (
   return result;
 };
 
+export const formatObjSupplierReturnSupplier = (
+  records: SupplierInventory[]
+): ReturnItemsExtended[] => {
+  let result = [] as ReturnItemsExtended[];
+  result = (records || []).map((e) => {
+    return {
+      id: e?.id,
+      item: e?.item,
+      uou: e?.item?.unit_of_usage?.unitDescription,
+      returnQty: 1,
+      returnUnitCost: e?.unitCost ?? 0,
+      return_remarks: null,
+      isPosted: false,
+      isNew: true,
+    };
+  }) as ReturnItemsExtended[];
+  return result;
+};
+
 export const formatObjPrItemsToPoItems = (
   records: PurchaseRequestItem
 ): PurchaseOrderItemsExtended => {
@@ -99,4 +146,29 @@ export const formatObjPrItemsToPoItems = (
     noPr: false,
   };
   return result;
+};
+
+//  ===================== post inventory =============================
+export const formatPostReturnSupplier = (
+  element: ReturnSupplierItem,
+  parent: ReturnSupplier,
+  index: number
+) => {
+  let ledgerDate = dayjs(parent.returnDate).add(index, "seconds");
+  let obj = {
+    id: element.id,
+    source: parent.office as Office,
+    destination: parent.office as Office,
+    date: ledgerDate,
+    type: "RTS",
+    item: element.item as Item,
+    unit: element.item?.unit_of_usage?.unitDescription as string,
+    qty: element?.returnQty as number,
+    unitcost: element.returnUnitCost as number,
+    status: element?.isPosted as boolean,
+    ledgerNo: parent?.rtsNo as string,
+    typeId: "56461ef7-5162-46ac-8fbb-0ab2bdcc2746",
+    itemId: element?.item?.id as string,
+  } as InventoryPostList;
+  return obj;
 };

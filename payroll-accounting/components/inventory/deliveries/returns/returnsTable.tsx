@@ -5,8 +5,6 @@ import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { DateFormatter } from "@/utility/helper";
 import { getUrlPrefix } from "@/utility/graphql-client";
-import { useContext } from "react";
-import { AccountContext } from "@/components/accessControl/AccountContext";
 
 interface IProps {
   dataSource: ReturnSupplier[];
@@ -25,8 +23,6 @@ export default function ReturnSupplierTable({
   handleUpdateStatus,
   changePage,
 }: IProps) {
-  // ===================== menus ========================
-  const account = useContext(AccountContext);
   // ===================== columns ========================
   const columns: ColumnsType<ReturnSupplier> = [
     {
@@ -46,9 +42,12 @@ export default function ReturnSupplierTable({
     },
     {
       title: "Ref #",
-      dataIndex: "refSrr",
-      key: "refSrr",
-      width: 140,
+      dataIndex: "receivedRefNo",
+      key: "receivedRefNo",
+      width: 200,
+      render: (text) => {
+        return <span>{text ?? ""}</span>;
+      },
     },
     {
       title: "Supplier",

@@ -23,3 +23,14 @@ export interface IFormPurchaseOrder {
   remarks: string;
   prNos: string;
 }
+
+export interface IFromReturnSupplier {
+  returnDate: Dayjs;
+  office: string;
+  supplier: OptionsValue;
+  receivedRefNo: string;
+  receivedRefDate: Dayjs;
+  received_by: string;
+  returnBy: string;
+  transType: string;
+}

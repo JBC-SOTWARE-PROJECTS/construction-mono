@@ -18,3 +18,4 @@ export { UseAssets as useAssets } from "./assets";
 export { UseInventoryAttachments as useInventoryAttachments } from "./attachments";
 export { UsePrNumbersNoPo as usePrNumbersNoPo } from "./prNumbersNoPo";
 export { UsePurcaseOrderList as usePurcaseOrderList } from "./poList";
+export { UseTransactionTypes as useTransactionTypes } from "./transactionTypes";

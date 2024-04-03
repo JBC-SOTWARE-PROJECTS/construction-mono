@@ -10,17 +10,19 @@ import { ReturnSupplier, Query } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
 import { GET_RECORDS_RETURNS } from "@/graphql/inventory/deliveries-queries";
-import UpsertItemModal from "@/components/inventory/masterfile/items/dialogs/upsertItem";
+import UpsertReturnFormModal from "@/components/inventory/deliveries/returns/dialogs/upsertReturnFormModal";
 import ReturnSupplierTable from "@/components/inventory/deliveries/returns/returnsTable";
 import { FormDebounceSelect, FormSelect } from "@/components/common";
 import { useOffices } from "@/hooks/payables";
 import { OptionsValue } from "@/utility/interfaces";
 import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
+import PostReturnSupplierModal from "@/components/inventory/post-dialogs/postReturnSupplier";
 
 const { Search } = Input;
 
 export default function ReturnsComponent() {
-  const modal = useDialog(UpsertItemModal);
+  const modal = useDialog(UpsertReturnFormModal);
+  const postInventory = useDialog(PostReturnSupplierModal);
   const [supplier, setSupplier] = useState<OptionsValue>();
   const [office, setOffice] = useState<string | null>(null);
   const [state, setState] = useState({
@@ -49,18 +51,36 @@ export default function ReturnsComponent() {
     });
   };
 
+  const onPostOrVoidView = (
+    record: ReturnSupplier,
+    status: boolean,
+    viewOnly: boolean
+  ) => {
+    postInventory(
+      { record: record, status: status, viewOnly: viewOnly },
+      (result: string) => {
+        if (result) {
+          message.success(result);
+          refetch();
+        }
+      }
+    );
+  };
+
   const handleUpdateStatus = (record: ReturnSupplier, status: boolean) => {
     if (status) {
       //if clicked approved
       if (record?.isPosted) {
         message.error("Return Transaction is already posted");
       } else {
+        onPostOrVoidView(record, status, false);
       }
     } else {
       //void
       if (!record?.isPosted) {
         message.error("Return Transaction is already not yet posted");
       } else {
+        onPostOrVoidView(record, status, false);
       }
     }
   };
