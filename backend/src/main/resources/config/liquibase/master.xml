@@ -603,4 +603,6 @@
               relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/80_jacky_vehicle_usage_accumulated_report_id.sql"
               relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/80_jacky_vehicle_usage_accumulated_report_decimal.sql"
+              relativeToChangelogFile="false"/>
 </databaseChangeLog>
