@@ -69,6 +69,16 @@ class PurchaseOrderItemsMonitoring extends AbstractAuditingEntity implements Ser
 	BigDecimal deliveryBalance
 
 	@Transient
+	String getStatus() {
+		if(deliveredQty == BigDecimal.ZERO) {
+			return "For Delivery"
+		}else if(deliveryBalance == BigDecimal.ZERO) {
+			return "Delivered"
+		}
+		return "Partial Delivered"
+	}
+
+	@Transient
 	String getUnitMeasurement() {
 		return "${item.unit_of_purchase?.unitDescription} (${item.item_conversion} ${item.unit_of_usage?.unitDescription})"
 	}

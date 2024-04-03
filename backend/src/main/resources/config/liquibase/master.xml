@@ -625,6 +625,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/99_wilson_inventory_pr_items.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/100_wilson_inventory_return_supplier.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/101_wilson_project_cost.sql"
+             relativeToChangelogFile="false"/>
 
 
 </databaseChangeLog>

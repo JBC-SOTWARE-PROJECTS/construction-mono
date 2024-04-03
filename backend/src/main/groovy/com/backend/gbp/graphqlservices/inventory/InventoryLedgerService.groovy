@@ -309,6 +309,43 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	}
 
 	@Transactional
+	@GraphQLMutation(name = "postInventoryLedgerReturnNew")
+	InventoryLedger postInventoryLedgerReturnNew(
+			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items
+	) {
+		def company = SecurityUtils.currentCompanyId()
+		def upsert = new InventoryLedger()
+		def postItems = items as ArrayList<PostDto>
+		postItems.each {
+			it ->
+				//insert
+				upsert = new InventoryLedger()
+				def source = objectMapper.convertValue(it.source, Office.class)
+				def dest = objectMapper.convertValue(it.destination, Office.class)
+
+				upsert.sourceOffice = source
+				upsert.destinationOffice = dest
+				upsert.documentTypes = documentTypeRepository.findById(UUID.fromString(it.typeId)).get()
+				upsert.item = itemService.itemById(UUID.fromString(it.itemId))
+				upsert.referenceNo = it.ledgerNo
+				upsert.ledgerDate = Instant.parse(it.date)
+				upsert.ledgerQtyIn = 0
+				upsert.ledgerQtyOut = it.qty
+				upsert.ledgerPhysical = 0
+				upsert.ledgerUnitCost = it.unitcost
+				upsert.isInclude = true
+				upsert.company = company
+				save(upsert)
+
+				//update returns Item
+				returnSupplierItemsService.updateRtsItemStatus(UUID.fromString(it.id), true)
+
+
+		}
+		return upsert
+	}
+
+	@Transactional
 	@GraphQLMutation(name = "postInventoryLedgerIssuance")
 	InventoryLedger postInventoryLedgerIssuance(
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,

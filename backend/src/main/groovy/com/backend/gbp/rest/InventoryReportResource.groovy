@@ -983,7 +983,7 @@ class InventoryReportResource {
 		def dto = new ReturnSuppReportDto(
 				date: dateFormat.format(Instant.now()),
 				rts: returnSupplierDetails?.rtsNo,
-				refNo: "${returnSupplierDetails?.refSrr}${returnSupplierDetails?.receivedRefNo ? "/${returnSupplierDetails?.receivedRefNo}" : ""}",
+				refNo: returnSupplierDetails?.receivedRefNo ?: "",
 				supplierCode: returnSupplierDetails?.supplier?.supplierCode,
 				supplierName: returnSupplierDetails?.supplier?.supplierFullname,
 				returnBy: emp?.fullName,

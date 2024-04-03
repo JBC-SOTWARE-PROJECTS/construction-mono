@@ -31,7 +31,9 @@ enum IntegrationDomainEnum {
     PROJECT_WORK_ACCOMPLISH("Project Work Accomplish", "com.backend.gbp.domain.accounting.ProjectWorkAccomplish"),
     //inventory
     QUANTITY_ADJUSTMENT("Quantity Adjustment", "com.backend.gbp.domain.inventory.QuantityAdjustment"),
-    BEGINNING_BALANCE("Beginning Balance", "com.backend.gbp.domain.inventory.BeginningBalance")
+    BEGINNING_BALANCE("Beginning Balance", "com.backend.gbp.domain.inventory.BeginningBalance"),
+    RECEIVING_REPORT("Receiving Report", "com.backend.gbp.domain.inventory.ReceivingReport"),
+    RETURN_SUPPLIER("Return Supplier", "com.backend.gbp.domain.inventory.ReturnSupplier")
 
     String displayName
     String path
