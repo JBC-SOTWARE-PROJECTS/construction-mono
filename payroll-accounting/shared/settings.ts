@@ -10,12 +10,12 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   frontEndUrl = "http://localhost:6060";
 } else {
   if (typeof window) {
-    apiUrlPrefix = "https://api-demo.megaptk.com";
-    //frontEndUrl = "https://inventory.megaptk.com"; //PROD
-    frontEndUrl = "https://inventory-demo.syncprosolutions.com"; // DEMO
+    apiUrlPrefix = "https://api-prod.megaptk.com";
+    frontEndUrl = "https://inventory.megaptk.com"; //PROD
+    //frontEndUrl = "https://inventory-demo.syncprosolutions.com"; // DEMO
   } else {
-    apiUrlPrefix = "https://api-demo.megaptk.com";
-    //frontEndUrl = "https://inventory.megaptk.com"; //PROD
-   frontEndUrl = "https://inventory-demo.syncprosolutions.com"; //DEMO
+    apiUrlPrefix = "https://api-prod.megaptk.com";
+    frontEndUrl = "https://inventory.megaptk.com"; //PROD
+   //frontEndUrl = "https://inventory-demo.syncprosolutions.com"; //DEMO
   }
 }
