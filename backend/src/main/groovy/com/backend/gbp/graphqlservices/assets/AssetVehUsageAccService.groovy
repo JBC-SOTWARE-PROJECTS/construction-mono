@@ -53,7 +53,7 @@ class AssetVehUsageAccService extends AbstractDaoService<AssetVehicleUsageAccumu
         params.put('startDate', startDate)
         params.put('endDate', endDate)
 
-        query += ''' ORDER BY p.asset.description DESC'''
+        query += ''' ORDER BY p.dateOfUsage DESC'''
 
         Page<AssetVehicleUsageAccumulation> result = getPageable(query, countQuery, page, size, params)
         return result
