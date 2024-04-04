@@ -34,3 +34,14 @@ export interface IFromReturnSupplier {
   returnBy: string;
   transType: string;
 }
+
+export interface IFormItemIssuance {
+  issueDate: Dayjs;
+  issueTo: string;
+  issueType: string;
+  received_by: string;
+  category: string;
+  project: string;
+  assets: string;
+  remarks: string;
+}

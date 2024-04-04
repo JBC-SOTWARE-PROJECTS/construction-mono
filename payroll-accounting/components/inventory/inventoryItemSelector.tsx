@@ -19,7 +19,10 @@ import ColumnTitle from "../common/columnTitle/columnTitle";
 import { GET_RECORDS_ITEMS_INVENTORY } from "@/graphql/inventory/global-queries";
 import DescLong from "./desclong";
 import styled from "styled-components";
-import { formatObjInventoryPurchaseRequest } from "@/utility/inventory-helper";
+import {
+  formatObjInventoryPurchaseRequest,
+  formatObjInventoryStockIssuance,
+} from "@/utility/inventory-helper";
 import { NumberFormaterDynamic } from "@/utility/helper";
 
 interface IProps {
@@ -102,6 +105,11 @@ export default function InventoryItemSelector(props: IProps) {
     if (!_.isEmpty(selectedItems)) {
       if (formModule === "PR") {
         let result = formatObjInventoryPurchaseRequest(selectedItems);
+        if (!_.isEmpty(result)) {
+          hide(result);
+        }
+      } else if (formModule === "STI") {
+        let result = formatObjInventoryStockIssuance(selectedItems);
         if (!_.isEmpty(result)) {
           hide(result);
         }

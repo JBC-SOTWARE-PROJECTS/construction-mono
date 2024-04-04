@@ -3,7 +3,7 @@ const AccountingAccountsPayableMenu = {
     path: "/inventory/issuances",
     routes: [
       {
-        path: "/inventory/issuances/all",
+        path: "/inventory/issuances",
         name: "Item Issuances",
         routes: [
           {

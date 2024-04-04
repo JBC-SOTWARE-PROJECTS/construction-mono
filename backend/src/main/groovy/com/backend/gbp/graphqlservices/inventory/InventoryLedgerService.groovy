@@ -399,6 +399,56 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	}
 
 	@Transactional
+	@GraphQLMutation(name = "postInventoryLedgerIssuanceNew")
+	InventoryLedger postInventoryLedgerIssuanceNew(
+			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+			@GraphQLArgument(name = "parentId") UUID parentId
+	) {
+		def company = SecurityUtils.currentCompanyId()
+		def upsert = new InventoryLedger()
+		def postItems = items as ArrayList<PostDto>
+		def parent = stockIssuanceService.stiById(parentId)
+		postItems.each {
+			it ->
+				//insert
+				upsert = new InventoryLedger()
+				def source = objectMapper.convertValue(it.source, Office.class)
+				def dest = objectMapper.convertValue(it.destination, Office.class)
+				def item = itemService.itemById(UUID.fromString(it.itemId))
+				def doctype = documentTypeRepository.findById(UUID.fromString(it.typeId)).get()
+				upsert.sourceOffice = source
+				upsert.destinationOffice = dest
+				upsert.documentTypes = doctype
+				upsert.item = item
+				upsert.referenceNo = it.ledgerNo
+				upsert.ledgerDate = Instant.parse(it.date)
+				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("STI") ? it.qty : 0
+				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("STO") || it.type.equalsIgnoreCase("EX") ? it.qty : 0
+				upsert.ledgerPhysical = 0
+				upsert.ledgerUnitCost = it.unitcost
+				upsert.isInclude = true
+				upsert.company = company
+				def afterSave = save(upsert)
+
+				//update issuance Item
+				stockIssueItemsService.updateStiItemStatus(UUID.fromString(it.id), true)
+
+				//insert direct to materials expense in project
+				if(doctype.documentCode.equalsIgnoreCase("EX")){
+					if(parent.project){
+						projectMaterialService.directExpenseMaterials(item,
+								parent.project,
+								it.qty,
+								it.unitcost,
+								afterSave.id)
+					}
+				}
+
+		}
+		return upsert
+	}
+
+	@Transactional
 	@GraphQLMutation(name = "postInventoryLedgerMaterial")
 	InventoryLedger postInventoryLedgerMaterial(
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,

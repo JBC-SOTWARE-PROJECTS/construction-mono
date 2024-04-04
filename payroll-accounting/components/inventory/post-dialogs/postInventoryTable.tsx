@@ -9,9 +9,14 @@ import styled from "styled-components";
 interface IProps {
   dataSource: InventoryPostList[];
   loading: boolean;
+  rowKey?: string;
 }
 
-export default function PostInventoryTable({ dataSource, loading }: IProps) {
+export default function PostInventoryTable({
+  dataSource,
+  loading,
+  rowKey,
+}: IProps) {
   // ===================== menus ========================
 
   // ===================== columns ========================
@@ -31,8 +36,14 @@ export default function PostInventoryTable({ dataSource, loading }: IProps) {
       key: "type",
       width: 50,
       render: (type) => {
+        let color = "green";
+        if (type === "STO") {
+          color = "orange";
+        } else if (type === "EX") {
+          color = "red";
+        }
         return (
-          <Tag color="green" bordered={false}>
+          <Tag color={color} bordered={false}>
             {type}
           </Tag>
         );
@@ -111,7 +122,7 @@ export default function PostInventoryTable({ dataSource, loading }: IProps) {
       <Row>
         <Col span={24}>
           <Table
-            rowKey="id"
+            rowKey={rowKey ?? "id"}
             expandable={{
               expandedRowRender: (record) => (
                 <div className="w-full">

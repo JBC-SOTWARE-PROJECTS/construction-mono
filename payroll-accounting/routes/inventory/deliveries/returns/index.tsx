@@ -78,7 +78,11 @@ export default function ReturnsComponent() {
     } else {
       //void
       if (!record?.isPosted) {
-        message.error("Return Transaction is already not yet posted");
+        if (record.isVoid) {
+          message.error("Return Transaction is already voided");
+        } else {
+          message.error("Return Transaction is not yet posted");
+        }
       } else {
         onPostOrVoidView(record, status, false);
       }

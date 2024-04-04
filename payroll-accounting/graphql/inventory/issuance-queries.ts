@@ -51,6 +51,11 @@ export const GET_ISSUANCE_RECORDS = gql`
           id
           description
         }
+        transType {
+          id
+          description
+        }
+        remarks
         isCancel
         isPosted
       }
@@ -68,6 +73,68 @@ export const UPSERT_RECORD_ITEM = gql`
       payload
       success
       message
+    }
+  }
+`;
+
+export const GET_RECORDS_ISSUANCE_ITEMS = gql`
+  query ($id: UUID) {
+    stiItemByParent(id: $id) {
+      id
+      item {
+        id
+        descLong
+        item_conversion
+        vatable
+        unit_of_usage {
+          id
+          unitDescription
+        }
+      }
+      uou
+      issueQty
+      unitCost
+      isPosted
+      remarks
+    }
+  }
+`;
+
+export const UPSERT_RECORD_ISSUANCE = gql`
+  mutation (
+    $fields: Map_String_ObjectScalar
+    $items: [Map_String_ObjectScalar]
+    $id: UUID
+  ) {
+    upsertSTI(fields: $fields, items: $items, id: $id) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_ISSUE_ITEM = gql`
+  mutation ($id: UUID) {
+    removeStiItem(id: $id) {
+      id
+    }
+  }
+`;
+
+export const GET_JOURNAL_ITEM_ISSUANCE = gql`
+  query ($id: UUID, $status: Boolean) {
+    issuanceExpenseAccountView(id: $id, status: $status) {
+      code
+      desc
+      debit
+      credit
+    }
+  }
+`;
+
+export const POST_VOID_ITEM_ISSUANCE = gql`
+  mutation ($id: UUID, $items: [Map_String_ObjectScalar], $status: Boolean) {
+    postInventoryIssuanceExpense(id: $id, items: $items, status: $status) {
+      id
     }
   }
 `;

@@ -97,7 +97,11 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
     } else {
       //void
       if (!record?.isApprove) {
-        message.error("Purchase Request is already not yet approved");
+        if (record.isVoided) {
+          message.error("Purchase Request is already voided");
+        } else {
+          message.error("Purchase Request is not yet approved");
+        }
       } else {
         _approve(record?.id, status, "void");
       }

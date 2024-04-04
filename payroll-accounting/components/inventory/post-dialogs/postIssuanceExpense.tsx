@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import {
   JournalEntryViewDto,
   Query,
-  ReturnSupplier,
-  ReturnSupplierItem,
+  StockIssue,
+  StockIssueItems,
 } from "@/graphql/gql/graphql";
 import {
   FileDoneOutlined,
@@ -13,54 +13,79 @@ import {
 import { useMutation, useQuery } from "@apollo/client";
 import { Button, Modal, Space, Typography, App, Divider, Collapse } from "antd";
 import _ from "lodash";
-import {
-  UPSERT_STATUS_ADJUSTMENT,
-  GET_JOURNAL_ENTRIES_QTY_ADJUSTMENT,
-} from "@/graphql/inventory/adjustments-queries";
 import { useConfirmationPasswordHook } from "@/hooks";
 import JournaEntriesTable from "../commons/journalEntriesTable";
 import { decimalRound2 } from "@/utility/helper";
 import PostInventoryTable from "./postInventoryTable";
 import {
   GET_JOURNAL_RETURN_SUPPLIER,
-  GET_RECORDS_RETURN_ITEMS,
   POST_VOID_RETURN_SUPPLIER,
 } from "@/graphql/inventory/deliveries-queries";
 import {
-  formatPostReturnSupplier,
+  formatPostStockIssuance,
   InventoryPostList,
 } from "@/utility/inventory-helper";
+import {
+  GET_JOURNAL_ITEM_ISSUANCE,
+  GET_RECORDS_ISSUANCE_ITEMS,
+  POST_VOID_ITEM_ISSUANCE,
+} from "@/graphql/inventory/issuance-queries";
 
 interface IProps {
   hide: (hideProps: any) => void;
-  record: ReturnSupplier;
+  record: StockIssue;
   status: boolean;
   viewOnly: boolean;
+  title: string;
+  showJournal: boolean;
 }
 
-export default function PostReturnSupplierModal(props: IProps) {
+export default function PostIssuanceExpenseModal(props: IProps) {
   const { message } = App.useApp();
-  const { hide, record, status, viewOnly } = props;
+  const { hide, record, status, viewOnly, showJournal, title } = props;
   const [showPasswordConfirmation] = useConfirmationPasswordHook();
   const [items, setItems] = useState<InventoryPostList[]>([]);
   // ===================== Queries ==============================
-  const { loading: loadingItems } = useQuery<Query>(GET_RECORDS_RETURN_ITEMS, {
-    variables: {
-      id: record?.id,
-    },
-    onCompleted: (data) => {
-      let result = (data?.rtsItemByParent ?? []) as ReturnSupplierItem[];
-      if (!_.isEmpty(result)) {
-        let payload = (result || []).map((e, i) => {
-          let obj = formatPostReturnSupplier(e, record, i);
-          return obj;
-        });
-        setItems(payload);
-      }
-    },
-  });
+  const { loading: loadingItems } = useQuery<Query>(
+    GET_RECORDS_ISSUANCE_ITEMS,
+    {
+      variables: {
+        id: record?.id,
+      },
+      onCompleted: (data) => {
+        let result = (data?.stiItemByParent ?? []) as StockIssueItems[];
+        if (!_.isEmpty(result)) {
+          let payload = [] as InventoryPostList[];
+          (result || []).forEach((e, i) => {
+            let sti = {} as InventoryPostList;
+            let ex = {} as InventoryPostList;
+            let sto = {} as InventoryPostList;
+            if (record?.issueType === "EXPENSE") {
+              if (record?.issueFrom?.id === record?.issueTo?.id) {
+                ex = formatPostStockIssuance("EX", e, record, i);
+                payload.push(ex);
+              } else {
+                ex = formatPostStockIssuance("EX", e, record, i);
+                sti = formatPostStockIssuance("STI", e, record, i);
+                sto = formatPostStockIssuance("STO", e, record, i);
+                payload.push(sto);
+                payload.push(sti);
+                payload.push(ex);
+              }
+            } else {
+              sto = formatPostStockIssuance("STO", e, record, i);
+              sti = formatPostStockIssuance("STI", e, record, i);
+              payload.push(sto);
+              payload.push(sti);
+            }
+          });
+          setItems(payload);
+        }
+      },
+    }
+  );
 
-  const { data, loading } = useQuery<Query>(GET_JOURNAL_RETURN_SUPPLIER, {
+  const { data, loading } = useQuery<Query>(GET_JOURNAL_ITEM_ISSUANCE, {
     variables: {
       id: record?.id,
       status: status,
@@ -69,12 +94,16 @@ export default function PostReturnSupplierModal(props: IProps) {
   });
 
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
-    POST_VOID_RETURN_SUPPLIER,
+    POST_VOID_ITEM_ISSUANCE,
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        if (!_.isEmpty(data?.postReturnInventory?.id)) {
-          hide("Return Supplier Updated");
+        if (!_.isEmpty(data?.postInventoryIssuanceExpense?.id)) {
+          let message = "Item Issuance Updated";
+          if (record?.issueType === "EXPENSE") {
+            message = "Item Expense Updated";
+          }
+          hide(message);
         } else {
           message.error("Something went wrong. Please contact administrator");
         }
@@ -103,8 +132,8 @@ export default function PostReturnSupplierModal(props: IProps) {
     return sum !== 0;
   }, [data?.adjQuantityAccountView]);
 
-  const disabledStatus = useMemo(() => {
-    if (record?.isVoid) {
+  const disabledForm = useMemo(() => {
+    if (record?.isCancel) {
       return true;
     } else {
       return false;
@@ -116,7 +145,7 @@ export default function PostReturnSupplierModal(props: IProps) {
       title={
         <Typography.Title level={4}>
           <Space align="center">
-            <FileDoneOutlined /> Return Supplier Journal Entry Details
+            <FileDoneOutlined /> {title}
           </Space>
         </Typography.Title>
       }
@@ -135,7 +164,7 @@ export default function PostReturnSupplierModal(props: IProps) {
               danger={status ? false : true}
               loading={upsertLoading}
               onClick={onSubmit}
-              disabled={upsertLoading || disabledButton || disabledStatus}
+              disabled={upsertLoading || disabledButton || disabledForm}
               icon={<SaveOutlined />}>
               {status ? "Post to Inventory" : "Void to Inventory"}
             </Button>
@@ -146,6 +175,7 @@ export default function PostReturnSupplierModal(props: IProps) {
       }>
       <Collapse
         size="small"
+        defaultActiveKey={showJournal ? "" : "inventory"}
         expandIcon={() => {
           return <ShoppingCartOutlined />;
         }}
@@ -154,16 +184,24 @@ export default function PostReturnSupplierModal(props: IProps) {
             key: "inventory",
             label: "View Inventory Items",
             children: (
-              <PostInventoryTable dataSource={items} loading={loadingItems} />
+              <PostInventoryTable
+                dataSource={items}
+                loading={loadingItems}
+                rowKey="key"
+              />
             ),
           },
         ]}
       />
-      <Divider plain>Accounting Journal Entries</Divider>
-      <JournaEntriesTable
-        entries={data?.returnSupplierAccountView as JournalEntryViewDto[]}
-        loading={loading}
-      />
+      {showJournal && (
+        <React.Fragment>
+          <Divider plain>Accounting Journal Entries</Divider>
+          <JournaEntriesTable
+            entries={data?.issuanceExpenseAccountView as JournalEntryViewDto[]}
+            loading={loading}
+          />
+        </React.Fragment>
+      )}
     </Modal>
   );
 }

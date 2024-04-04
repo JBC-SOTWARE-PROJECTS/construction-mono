@@ -33,7 +33,8 @@ enum IntegrationDomainEnum {
     QUANTITY_ADJUSTMENT("Quantity Adjustment", "com.backend.gbp.domain.inventory.QuantityAdjustment"),
     BEGINNING_BALANCE("Beginning Balance", "com.backend.gbp.domain.inventory.BeginningBalance"),
     RECEIVING_REPORT("Receiving Report", "com.backend.gbp.domain.inventory.ReceivingReport"),
-    RETURN_SUPPLIER("Return Supplier", "com.backend.gbp.domain.inventory.ReturnSupplier")
+    RETURN_SUPPLIER("Return Supplier", "com.backend.gbp.domain.inventory.ReturnSupplier"),
+    ISSUE_EXPENSE("Item Issuance/Expense", "com.backend.gbp.domain.inventory.StockIssue")
 
     String displayName
     String path

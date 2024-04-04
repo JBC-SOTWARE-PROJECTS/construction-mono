@@ -6,6 +6,8 @@ import {
   PurchaseRequestItem,
   ReturnSupplier,
   ReturnSupplierItem,
+  StockIssue,
+  StockIssueItems,
   SupplierInventory,
 } from "@/graphql/gql/graphql";
 import { decimalRound2 } from "./helper";
@@ -21,6 +23,9 @@ export interface PurchaseOrderItemsExtended extends PurchaseOrderItems {
 }
 
 export interface ReturnItemsExtended extends ReturnSupplierItem {
+  isNew?: boolean;
+}
+export interface StockIssueItemsExtended extends StockIssueItems {
   isNew?: boolean;
 }
 
@@ -148,6 +153,25 @@ export const formatObjPrItemsToPoItems = (
   return result;
 };
 
+export const formatObjInventoryStockIssuance = (
+  records: Inventory[]
+): StockIssueItemsExtended[] => {
+  let result = [] as StockIssueItemsExtended[];
+  result = (records || []).map((e) => {
+    return {
+      id: e?.id,
+      item: e?.item,
+      uou: e?.item?.unit_of_usage?.unitDescription,
+      issueQty: 1,
+      unitCost: e.last_wcost ?? 0,
+      remarks: null,
+      isPosted: false,
+      isNew: true,
+    };
+  }) as StockIssueItemsExtended[];
+  return result;
+};
+
 //  ===================== post inventory =============================
 export const formatPostReturnSupplier = (
   element: ReturnSupplierItem,
@@ -169,6 +193,54 @@ export const formatPostReturnSupplier = (
     ledgerNo: parent?.rtsNo as string,
     typeId: "56461ef7-5162-46ac-8fbb-0ab2bdcc2746",
     itemId: element?.item?.id as string,
+  } as InventoryPostList;
+  return obj;
+};
+
+export const formatPostStockIssuance = (
+  type: string,
+  element: StockIssueItems,
+  parent: StockIssue,
+  index: number
+) => {
+  let ledgerDate = dayjs(parent.issueDate).add(
+    type === "STO" ? index : type === "STI" ? index + 1 : index + 2,
+    "seconds"
+  );
+  let sto = "d12f0de2-cb65-42ab-bcdb-881ebce57045";
+  let sti = "7250e64a-de1b-4015-80fb-e15f9f6762ab";
+  let ex = "0f3c2b76-445a-4f78-a256-21656bd62872";
+  let uniqId =
+    type === "STO"
+      ? element.id
+      : type === "STI"
+      ? element.id + "STI"
+      : element.id + "EX";
+  let obj = {
+    id: element.id,
+    key: uniqId,
+    source:
+      type === "STO"
+        ? parent.issueFrom
+        : type === "STI"
+        ? parent.issueTo
+        : parent.issueTo,
+    destination:
+      type === "STO"
+        ? parent.issueTo
+        : type === "STI"
+        ? parent.issueFrom
+        : parent.issueTo,
+    date: ledgerDate,
+    type: type,
+    item: element.item,
+    unit: element.item?.unit_of_usage?.unitDescription,
+    qty: element?.issueQty,
+    unitcost: element.unitCost,
+    status: element?.isPosted,
+    ledgerNo: parent?.issueNo,
+    typeId: type === "STO" ? sto : type === "STI" ? sti : ex,
+    itemId: element?.item?.id,
   } as InventoryPostList;
   return obj;
 };

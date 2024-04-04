@@ -9,25 +9,22 @@ import { PlusCircleOutlined } from "@ant-design/icons";
 import { Query, StockIssue } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { useQuery } from "@apollo/client";
-import UpsertItemModal from "@/components/inventory/masterfile/items/dialogs/upsertItem";
+import UpsertIssuanceFormModal from "@/components/inventory/issuance/dialogs/upserIssuanceFormModal";
 import { FormSelect } from "@/components/common";
 import { useOffices } from "@/hooks/payables";
 import { ISSUANCE_CATEGORY } from "@/utility/constant";
-import { OptionsValue } from "@/utility/interfaces";
 import { GET_ISSUANCE_RECORDS } from "@/graphql/inventory/issuance-queries";
 import IssuanceTable from "@/components/inventory/issuance/issuanceTable";
+import PostIssuanceExpenseModal from "@/components/inventory/post-dialogs/postIssuanceExpense";
 
 const { Search } = Input;
 
-export default function IssuanceComponent({
-  type,
-  issueType,
-}: {
+interface IProps {
   type: string;
   issueType: string;
-}) {
-  const modal = useDialog(UpsertItemModal);
-  const [supplier, setSupplier] = useState<OptionsValue>();
+}
+
+export default function IssuanceComponent({ type, issueType }: IProps) {
   const [category, setCategory] = useState<string | null>(null);
   const [project, setProject] = useState<string | null>(null);
   const [asset, setAsset] = useState<string | null>(null);
@@ -37,6 +34,9 @@ export default function IssuanceComponent({
     page: 0,
     size: 10,
   });
+  // ====================== modals ==================================
+  const modal = useDialog(UpsertIssuanceFormModal);
+  const postInventory = useDialog(PostIssuanceExpenseModal);
   // ====================== queries =====================================
   const offices = useOffices();
   const { data, loading, refetch } = useQuery<Query>(GET_ISSUANCE_RECORDS, {
@@ -54,34 +54,72 @@ export default function IssuanceComponent({
   });
 
   const onUpsertRecord = (record?: StockIssue) => {
-    modal({ record: record }, (msg: string) => {
-      if (msg) {
-        message.success(msg);
-        refetch();
+    modal(
+      { record: record, issueCategory: category, issueType: issueType },
+      (msg: string) => {
+        if (msg) {
+          message.success(msg);
+          refetch();
+        }
       }
-    });
+    );
+  };
+
+  const onPostOrVoidView = (
+    record: StockIssue,
+    status: boolean,
+    viewOnly: boolean
+  ) => {
+    let title = "Item Issuance Post to Inventory";
+    let showJournal = false;
+    if (record.issueType === "EXPENSE") {
+      title = "Item Expense Journal Entry Details";
+      showJournal = true;
+    }
+    postInventory(
+      {
+        record: record,
+        status: status,
+        viewOnly: viewOnly,
+        title: title,
+        showJournal: showJournal,
+      },
+      (result: string) => {
+        if (result) {
+          message.success(result);
+          refetch();
+        }
+      }
+    );
   };
 
   const handleUpdateStatus = (record: StockIssue, status: boolean) => {
+    let errMsg = "Item Issuance";
+    if (record.issueType === "EXPENSE") {
+      errMsg = "Item Expense";
+    }
     if (status) {
       //if clicked approved
       if (record?.isPosted) {
-        message.error("Delivery Receiving is already posted");
+        message.error(`${errMsg} is already posted`);
       } else {
+        onPostOrVoidView(record, status, false);
       }
     } else {
       //void
       if (!record?.isPosted) {
-        message.error("Delivery Receiving is already not yet posted");
+        if (record.isCancel) {
+          message.error(`${errMsg} is already voided`);
+        } else {
+          message.error(`${errMsg} is not yet posted`);
+        }
       } else {
+        onPostOrVoidView(record, status, false);
       }
     }
   };
   const title = useMemo(() => {
     let title = "All Item Issuances";
-    if (issueType === "EXPENSE") {
-      title = "All Item Expense";
-    }
     switch (type) {
       case "projects":
         title = "Projects Item Issuances";
@@ -104,9 +142,24 @@ export default function IssuanceComponent({
         }
         setCategory("PERSONAL");
         break;
+      default:
+        title = "All Item Issuances";
+        if (issueType === "EXPENSE") {
+          title = "All Item Expense";
+          setCategory(null);
+        }
+        break;
     }
     return title;
   }, [type, issueType]);
+
+  const parentTitle = useMemo(() => {
+    if (issueType === "EXPENSE") {
+      return "Expenses";
+    } else {
+      return "Issuances";
+    }
+  }, [issueType]);
 
   const typeFilters = useMemo(() => {
     let result = false;
@@ -129,7 +182,7 @@ export default function IssuanceComponent({
 
   return (
     <PageContainer
-      title="Item Issuances"
+      title={`Item ${parentTitle}`}
       content="Efficient Inventory Utilization: Mastering Item Issuances and Expense Tracking.">
       <ProCard
         title={`${title} List`}
