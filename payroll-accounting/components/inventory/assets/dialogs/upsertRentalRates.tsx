@@ -37,12 +37,13 @@ interface IProps {
   assetId?: string;
 }
 
-const rentTypeList = ["KILOMETER", "HOUR", "BATCH"];
+const rentTypeList = ["KILOMETER", "HOUR", "BATCH", "DESCRIPTION"];
 const rentUnitList = ["KILOMETER", "HOUR", "CUBIC_METER"];
 
 export default function UpsertRentalRatesModal(props: IProps) {
   const { hide, record, assetId } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
+  const [selectedRentType, setSelectedRentType] = useState(null)
 
   const [upsert, { loading: upsertLoading }] = useMutation(
     UPSERT_RENTAL_RATES_RECORD,
@@ -75,6 +76,10 @@ export default function UpsertRentalRatesModal(props: IProps) {
   const onFinishFailed = () => {
     message.error("Something went wrong. Please contact administrator.");
   };
+
+  const RentTypeChange = (data: any)=>{
+      setSelectedRentType(data);
+  }
 
   var rentTypeOpts = rentTypeList.map((item: string) => {
     return {
@@ -135,6 +140,7 @@ export default function UpsertRentalRatesModal(props: IProps) {
               label="Rent Type"
               rules={requiredField}
               propsselect={{
+                onChange: (data)=> RentTypeChange(data),
                 options: rentTypeOpts,
                 allowClear: true,
                 placeholder: "Select rent type",
@@ -152,6 +158,7 @@ export default function UpsertRentalRatesModal(props: IProps) {
               }}
             />
           </Col>
+          {selectedRentType != "DESCRIPTION" &&
           <Col span={12}>
             <FormInput
               name="measurement"
@@ -161,7 +168,7 @@ export default function UpsertRentalRatesModal(props: IProps) {
                 placeholder: "1, 4, 10 etc.",
               }}
             />
-          </Col>
+          </Col>}
           {/* <Col span={12}>
             <FormInput
               name="coverageStart"
@@ -182,7 +189,7 @@ export default function UpsertRentalRatesModal(props: IProps) {
               }}
             />
           </Col> */}
-          <Col span={12}>
+         {selectedRentType != "DESCRIPTION" && <Col span={12}>
             <FormSelect
               name="unit"
               label="Unit"
@@ -193,7 +200,7 @@ export default function UpsertRentalRatesModal(props: IProps) {
                 placeholder: "Select unit type",
               }}
             />
-          </Col>
+          </Col>}
           <Col span={12}>
             <FormInput
               name="amount"
