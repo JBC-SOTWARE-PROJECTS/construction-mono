@@ -259,9 +259,10 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   var rentUnitOpts = dataRentalRates?.content.map((item: RentalRates) => {
     return {
       value: item?.id,
-      label: `${currencyDisplay} ${parseFloat(item.amount).toFixed(2)} per ${
+      label: `${currencyDisplay} ${parseFloat(item.amount).toFixed(2)} per ${item.rentType == "DESCRIPTION" ? item.description : (`${
         item.measurement ?? 0
-      } ${item.unit ?? ""}`,
+      } ${item.unit ?? ""}`)}
+       `,
     };
   });
 
