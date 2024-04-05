@@ -27,23 +27,6 @@ export const getProjectServicesCol = () => {
       },
     },
     {
-      title: "Date of Transaction",
-      dataIndex: "dateTransact",
-      key: "dateTransact",
-      width: 200,
-      render: (text, record) => {
-        if (record.status) {
-          return <span>{DateFormatterWithTime(text)}</span>
-        } else {
-          return (
-            <Typography.Text delete type="danger">
-              {DateFormatterWithTime(text)}
-            </Typography.Text>
-          )
-        }
-      },
-    },
-    {
       title: "Description",
       dataIndex: "description",
       key: "description",
