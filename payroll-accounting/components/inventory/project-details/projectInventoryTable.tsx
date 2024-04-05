@@ -1,11 +1,11 @@
 import { Inventory, Item } from "@/graphql/gql/graphql";
-import { EditFilled, FolderOpenOutlined } from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
+import { FolderOpenOutlined } from "@ant-design/icons";
+import { Row, Col, Table, Pagination, Tag, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 import DescLong from "../desclong";
-import ColTitlePopUp from "../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import { NumberFormaterNoDecimal } from "@/utility/helper";
+
 
 interface IProps {
   dataSource: Inventory[];
@@ -30,7 +30,7 @@ export default function ProjectInventoryMonitoringTable({
       title: "SKU/Barcode",
       dataIndex: "sku",
       key: "sku",
-      width: 140,
+      width: 115,
     },
     {
       title: "Description",
@@ -44,19 +44,19 @@ export default function ProjectInventoryMonitoringTable({
       title: "Brand",
       dataIndex: "brand",
       key: "brand",
-      width: 140,
+      width: 190,
       render: (text) => <span>{text ?? "--"}</span>,
     },
     {
       title: (
-        <ColTitlePopUp
-          descripton="Unit of Measurement (UoU)"
+        <ColumnTitle
+          descripton="Unit (UoU)"
           popup="Unit of Usage"
         />
       ),
       dataIndex: "uou",
       key: "uou",
-      width: 210,
+      width: 110,
     },
     {
       title: "Category",
@@ -94,6 +94,9 @@ export default function ProjectInventoryMonitoringTable({
       width: 90,
       render: (status) => {
         let color = status === "Healthy" ? "green" : "orange";
+        if (status === "Over Stock") {
+          color = "lime";
+        }
         if (status === "No Stock") {
           color = "red";
         }
@@ -115,10 +118,10 @@ export default function ProjectInventoryMonitoringTable({
       render: (_, record) => {
         return (
           <Button
-            type="primary"
+            type="dashed"
             size="small"
             onClick={() => handleOpen(record)}
-            icon={<EditFilled />}
+            icon={<FolderOpenOutlined />}
           />
         );
       },

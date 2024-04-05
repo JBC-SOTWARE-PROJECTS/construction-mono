@@ -37,7 +37,7 @@ class PODeliveryMonitoring extends AbstractAuditingEntity implements Serializabl
 	
 	@GraphQLQuery
 	@Column(name = "delivered_qty", columnDefinition = "numeric")
-	Integer quantity
+	BigDecimal quantity
 	
 	@GraphQLQuery
 	@Column(name = "delivery_status", columnDefinition = "varchar")

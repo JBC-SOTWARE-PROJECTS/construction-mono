@@ -3,9 +3,10 @@ import { SupplierItem } from "@/graphql/gql/graphql";
 import { DeleteFilled } from "@ant-design/icons";
 import { Row, Col, Table, Pagination, Button, InputNumber } from "antd";
 import { ColumnsType } from "antd/es/table";
-import ColTitlePopUp from "../../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import { NumberFormater } from "@/utility/helper";
 import { confirmDelete } from "@/hooks";
+
 
 interface IProps {
   dataSource: SupplierItem[];
@@ -49,7 +50,7 @@ export default function SupplierItemTable({
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="Unit of Measurement (UoP/UoU)"
           popup="Unit of Purchase/Unit of Usage"
         />
@@ -60,7 +61,7 @@ export default function SupplierItemTable({
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="Unit Cost (UoU)"
           popup="Unit of Usage"
           editable={true}
@@ -99,7 +100,7 @@ export default function SupplierItemTable({
     },
     {
       title: (
-        <ColTitlePopUp descripton="Unit Cost (UoP)" popup="Unit of Purchase" />
+        <ColumnTitle descripton="Unit Cost (UoP)" popup="Unit of Purchase" />
       ),
       dataIndex: "costPurchase",
       key: "costPurchase",

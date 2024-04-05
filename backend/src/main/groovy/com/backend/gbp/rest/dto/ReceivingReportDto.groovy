@@ -25,7 +25,7 @@ class ReceivingReportDto {
 @TupleConstructor
 class ReceivingReportItemDto {
     String item_code
-    Integer uou_qty
+    BigDecimal uou_qty
     String uou_unit
     BigDecimal uop_qty
     String uop_unit

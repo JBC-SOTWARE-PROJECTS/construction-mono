@@ -29,7 +29,7 @@ class Inventory implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "reorder_quantity")
-	Integer reOrderQty
+	BigDecimal reOrderQty
 
 	@GraphQLQuery
 	@Column(name = "actual_cost")
@@ -45,7 +45,7 @@ class Inventory implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "onhand")
-	Integer onHand
+	BigDecimal onHand
 
 	@GraphQLQuery
 	@Column(name = "last_unit_cost")
@@ -145,6 +145,9 @@ class Inventory implements Serializable {
 		def res = "Critical"
 		if(reOrderQty < onHand){
 			res = "Healthy"
+			if(onHand > item.item_maximum){
+				res = "Over Stock"
+			}
 		} else if(onHand <= 0){
 			res = "No Stock"
 		}

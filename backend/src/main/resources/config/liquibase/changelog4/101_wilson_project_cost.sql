@@ -1,0 +1,1 @@
+ALTER TABLE projects.project_costs ADD COLUMN total_cost numeric default 0;

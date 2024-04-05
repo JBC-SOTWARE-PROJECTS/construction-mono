@@ -20,7 +20,7 @@ import {
   REMOVE_PROGRESS_IMAGE,
 } from "@/graphql/inventory/project-queries";
 import type { UploadProps } from "antd";
-import { apiUrlPrefix } from "@/shared/settings";
+import { apiUrlPrefix, s3UrlPrefix } from "@/shared/settings";
 import { accessControl } from "@/utility/helper";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import index from "../../../../pages/index";
@@ -171,7 +171,7 @@ export default function ProjectProgressImagesLists({
                         style={{ objectPosition: "center", objectFit: "cover" }}
                         width={200}
                         height={200}
-                        src={`https://megatam.sgp1.cdn.digitaloceanspaces.com/${image?.imageUrl}`}
+                        src={`${s3UrlPrefix}${image?.imageUrl}`}
                       />
                     </div>
                   )

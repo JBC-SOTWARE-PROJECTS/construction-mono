@@ -58,15 +58,15 @@ class InventoryLedger extends AbstractAuditingEntity implements Serializable {
 	
 	@GraphQLQuery
 	@Column(name = "ledger_qty_in")
-	Integer ledgerQtyIn
+	BigDecimal ledgerQtyIn
 	
 	@GraphQLQuery
 	@Column(name = "ledger_qty_out")
-	Integer ledgerQtyOut
+	BigDecimal ledgerQtyOut
 	
 	@GraphQLQuery
 	@Column(name = "ledger_physical")
-	Integer ledgerPhysical
+	BigDecimal ledgerPhysical
 	
 	@GraphQLQuery
 	@Column(name = "ledger_unit_cost")

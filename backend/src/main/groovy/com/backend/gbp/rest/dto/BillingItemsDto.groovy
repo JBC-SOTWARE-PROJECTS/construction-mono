@@ -10,7 +10,7 @@ class BillingItemsDto {
     UUID service
     String serviceCategory
     String description
-    Integer qty
+    BigDecimal qty
     BigDecimal amount
     BigDecimal subTotal
     BigDecimal wcost

@@ -33,7 +33,7 @@ class MaterialProductionItem extends AbstractAuditingEntity implements Serializa
 	
 	@GraphQLQuery
 	@Column(name = "qty")
-	Integer qty
+	BigDecimal qty
 	
 	@GraphQLQuery
 	@Column(name = "unit_cost")

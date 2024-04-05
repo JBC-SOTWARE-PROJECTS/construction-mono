@@ -3,6 +3,7 @@ export let systemTagline: string = "Business Solutions Systems";
 export let apiUrlPrefix: string = "";
 export let frontEndUrl: string = "";
 export let currencyDisplay: string = "₱";
+export let s3UrlPrefix: string = "https://megatam.sgp1.cdn.digitaloceanspaces.com/"
 
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {

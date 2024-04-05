@@ -43,11 +43,15 @@ class PurchaseRequestItem extends AbstractAuditingEntity implements Serializable
 	
 	@GraphQLQuery
 	@Column(name = "requested_qty", columnDefinition = "int")
-	Integer requestedQty
+	BigDecimal requestedQty
 	
 	@GraphQLQuery
-	@Column(name = "on_hand_qty", columnDefinition = "int")
-	Integer onHandQty
+	@Column(name = "on_hand_qty", columnDefinition = "numeric")
+	BigDecimal onHandQty
+
+	@GraphQLQuery
+	@Column(name = "unit_cost", columnDefinition = "numeric")
+	BigDecimal unitCost
 	
 	@GraphQLQuery
 	@Column(name = "remarks", columnDefinition = "varchar")

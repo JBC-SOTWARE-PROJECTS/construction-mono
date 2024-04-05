@@ -127,6 +127,67 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
 		return result
 	}
 
+    @GraphQLQuery(name = "poByFiltersPageNoDate")
+    Page<PurchaseOrder> poByFiltersPageNoDate(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "category") String category,
+            @GraphQLArgument(name = "project") UUID project,
+            @GraphQLArgument(name = "asset") UUID asset,
+            @GraphQLArgument(name = "supplier") UUID supplier,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select po from PurchaseOrder po where
+						(lower(po.prNos) like lower(concat('%',:filter,'%')) or
+						lower(po.poNumber) like lower(concat('%',:filter,'%'))) '''
+
+        String countQuery = '''Select count(po) from PurchaseOrder po where
+						(lower(po.prNos) like lower(concat('%',:filter,'%')) or
+						lower(po.poNumber) like lower(concat('%',:filter,'%'))) '''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+
+        if(office){
+            query += ''' and (po.office.id = :office)''';
+            countQuery += ''' and (pr.office.id = :office)''';
+            params.put('office', office)
+        }
+        if(supplier){
+            query += ''' and (po.supplier.id = :supplier)'''
+            countQuery += ''' and (po.supplier.id = :supplier)'''
+            params.put('supplier', supplier)
+        }
+        if(category){
+            query += ''' and (po.category = :category)''';
+            countQuery += ''' and (po.category = :category)''';
+            params.put('category', category)
+        }
+        if(project){
+            query += ''' and (po.project.id = :project)''';
+            countQuery += ''' and (po.project.id = :project)''';
+            params.put('project', project)
+        }
+        if(asset){
+            query += ''' and (po.assets.id = :asset)''';
+            countQuery += ''' and (po.assets.id = :asset)''';
+            params.put('asset', asset)
+        }
+        if (company) {
+            query += ''' and (po.company = :company)'''
+            countQuery += ''' and (po.company = :company)'''
+            params.put("company", company)
+        }
+
+        query += ''' ORDER BY po.preparedDate DESC'''
+
+        Page<PurchaseOrder> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
     // ============== Mutation =======================//
     @Transactional
     @GraphQLMutation(name = "upsertPO")

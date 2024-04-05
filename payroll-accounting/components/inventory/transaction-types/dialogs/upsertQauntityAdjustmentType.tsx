@@ -142,6 +142,16 @@ export default function UpsertQuantityAdjustmentTypeModal(props: IProps) {
               }}
             />
           </Col>
+          <Col span={24}>
+            <FormCheckBox
+              name="reverse"
+              valuePropName="checked"
+              checkBoxLabel="Reverse Entry Normal Side"
+              propscheckbox={{
+                defaultChecked: false,
+              }}
+            />
+          </Col>
         </Row>
       </Form>
     </Modal>

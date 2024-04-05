@@ -39,7 +39,7 @@ class SupplierInventory implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "onhand")
-	Integer onHand
+	BigDecimal onHand
 
 	@GraphQLQuery
 	@Column(name = "unit_cost")

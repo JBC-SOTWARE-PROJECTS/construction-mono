@@ -173,7 +173,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 
 		def items = this.getLegerByDoc(uuids, start, end, filter)
 		def result = new ArrayList<ChargeItemsDto>()
-		def unit_cost = BigDecimal.ZERO;def qty = 0;
+		def unit_cost = BigDecimal.ZERO;def qty = BigDecimal.ZERO;
 		items.each {
 			it->
 
@@ -309,6 +309,43 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	}
 
 	@Transactional
+	@GraphQLMutation(name = "postInventoryLedgerReturnNew")
+	InventoryLedger postInventoryLedgerReturnNew(
+			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items
+	) {
+		def company = SecurityUtils.currentCompanyId()
+		def upsert = new InventoryLedger()
+		def postItems = items as ArrayList<PostDto>
+		postItems.each {
+			it ->
+				//insert
+				upsert = new InventoryLedger()
+				def source = objectMapper.convertValue(it.source, Office.class)
+				def dest = objectMapper.convertValue(it.destination, Office.class)
+
+				upsert.sourceOffice = source
+				upsert.destinationOffice = dest
+				upsert.documentTypes = documentTypeRepository.findById(UUID.fromString(it.typeId)).get()
+				upsert.item = itemService.itemById(UUID.fromString(it.itemId))
+				upsert.referenceNo = it.ledgerNo
+				upsert.ledgerDate = Instant.parse(it.date)
+				upsert.ledgerQtyIn = 0
+				upsert.ledgerQtyOut = it.qty
+				upsert.ledgerPhysical = 0
+				upsert.ledgerUnitCost = it.unitcost
+				upsert.isInclude = true
+				upsert.company = company
+				save(upsert)
+
+				//update returns Item
+				returnSupplierItemsService.updateRtsItemStatus(UUID.fromString(it.id), true)
+
+
+		}
+		return upsert
+	}
+
+	@Transactional
 	@GraphQLMutation(name = "postInventoryLedgerIssuance")
 	InventoryLedger postInventoryLedgerIssuance(
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
@@ -358,6 +395,56 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 		//update parent
 		stockIssuanceService.updateSTIStatus(true, parentId)
 
+		return upsert
+	}
+
+	@Transactional
+	@GraphQLMutation(name = "postInventoryLedgerIssuanceNew")
+	InventoryLedger postInventoryLedgerIssuanceNew(
+			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+			@GraphQLArgument(name = "parentId") UUID parentId
+	) {
+		def company = SecurityUtils.currentCompanyId()
+		def upsert = new InventoryLedger()
+		def postItems = items as ArrayList<PostDto>
+		def parent = stockIssuanceService.stiById(parentId)
+		postItems.each {
+			it ->
+				//insert
+				upsert = new InventoryLedger()
+				def source = objectMapper.convertValue(it.source, Office.class)
+				def dest = objectMapper.convertValue(it.destination, Office.class)
+				def item = itemService.itemById(UUID.fromString(it.itemId))
+				def doctype = documentTypeRepository.findById(UUID.fromString(it.typeId)).get()
+				upsert.sourceOffice = source
+				upsert.destinationOffice = dest
+				upsert.documentTypes = doctype
+				upsert.item = item
+				upsert.referenceNo = it.ledgerNo
+				upsert.ledgerDate = Instant.parse(it.date)
+				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("STI") ? it.qty : 0
+				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("STO") || it.type.equalsIgnoreCase("EX") ? it.qty : 0
+				upsert.ledgerPhysical = 0
+				upsert.ledgerUnitCost = it.unitcost
+				upsert.isInclude = true
+				upsert.company = company
+				def afterSave = save(upsert)
+
+				//update issuance Item
+				stockIssueItemsService.updateStiItemStatus(UUID.fromString(it.id), true)
+
+				//insert direct to materials expense in project
+				if(doctype.documentCode.equalsIgnoreCase("EX")){
+					if(parent.project){
+						projectMaterialService.directExpenseMaterials(item,
+								parent.project,
+								it.qty,
+								it.unitcost,
+								afterSave.id)
+					}
+				}
+
+		}
 		return upsert
 	}
 
@@ -459,7 +546,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 			UUID itemId,
 			String reference_no,
 			String type,
-			Integer qty,
+			BigDecimal qty,
 			BigDecimal wcost
 	) {
 		def company = SecurityUtils.currentCompanyId()
@@ -565,7 +652,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	InventoryLedger expenseItemFromProjects(
 			@GraphQLArgument(name = "it") Projects it,
 			@GraphQLArgument(name = "item") Item item,
-			@GraphQLArgument(name = "qty") Integer qty,
+			@GraphQLArgument(name = "qty") BigDecimal qty,
 			@GraphQLArgument(name = "cost") BigDecimal cost
 	) {
 		def company = SecurityUtils.currentCompanyId()
@@ -593,7 +680,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	@GraphQLMutation(name = "editExpenseItemFromProjects")
 	InventoryLedger editExpenseItemFromProjects(
 			@GraphQLArgument(name = "id") UUID id,
-			@GraphQLArgument(name = "qty") Integer qty
+			@GraphQLArgument(name = "qty") BigDecimal qty
 	) {
 		if(id){
 			def upsert = findOne(id)

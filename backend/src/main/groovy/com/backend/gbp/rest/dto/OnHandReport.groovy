@@ -13,7 +13,7 @@ class OnHandReport {
     UUID department
     String department_name
     String expiration_date
-    Integer onhand
+    BigDecimal onhand
     BigDecimal last_unit_cost
     BigDecimal last_wcost
 }

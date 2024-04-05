@@ -16,7 +16,7 @@ class InventoryLedgerDto {
 	String itemId
 	String itemDesc
 	String unit
-	Integer qty
+	BigDecimal qty
 	BigDecimal unitCost
 	BigDecimal discountCost
 	Boolean isFg
@@ -42,11 +42,11 @@ class StockCard {
 	String desc_long
 	String reference_no
 	String ledger_date
-	Integer ledger_qtyin
-	Integer ledger_qty_out
-	Integer adjustment
+	BigDecimal ledger_qtyin
+	BigDecimal ledger_qty_out
+	BigDecimal adjustment
 	BigDecimal unitcost
-	Integer runningqty
+	BigDecimal runningqty
 	BigDecimal wcost
 	BigDecimal runningbalance
 }
@@ -58,12 +58,12 @@ class StockCardPrint {
 	String document_desc
 	String reference_no
 	String ledger_date
-	Integer ledger_qtyin
-	Integer ledger_qty_out
-	Integer adjustment
+	BigDecimal ledger_qtyin
+	BigDecimal ledger_qty_out
+	BigDecimal adjustment
 	BigDecimal unitcost
 	BigDecimal totalCost
-	Integer runningqty
+	BigDecimal runningqty
 	BigDecimal wcost
 	BigDecimal runningbalance
 }

@@ -3,28 +3,34 @@ import { Tooltip } from "antd";
 import { QuestionCircleFilled, EditFilled } from "@ant-design/icons";
 
 interface IProps {
-  descripton?: string;
+  descripton: string;
   popup?: string;
   editable?: boolean;
+  popupColor?: string;
 }
 
-export default function ColumnTitle({ descripton, popup, editable }: IProps) {
+export default function ColumnTitle({
+  descripton,
+  popup,
+  editable,
+  popupColor = "#fff",
+}: IProps) {
   return (
     <span>
       {descripton}
       {popup && (
-        <Tooltip title={popup} color="cyan" key={"popover"}>
+        <Tooltip title={popup} color="green" key={"popover"}>
           &nbsp;
-          <QuestionCircleFilled style={{ color: "#fff" }} />
+          <QuestionCircleFilled style={{ color: popupColor }} />
         </Tooltip>
       )}
       {editable && (
         <Tooltip
-          title={"Editable (double click to edit)"}
-          color="cyan"
+          title={"Editable (click or double to edit)"}
+          color="green"
           key={"popoverEditable"}>
           &nbsp;
-          <EditFilled style={{ color: "#fff" }} />
+          <EditFilled style={{ color: popupColor }} />
         </Tooltip>
       )}
     </span>

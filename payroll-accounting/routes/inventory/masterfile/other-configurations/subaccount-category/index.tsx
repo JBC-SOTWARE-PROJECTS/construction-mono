@@ -90,6 +90,24 @@ export default function ItemSubAccountComponent() {
             onUpsertRecord={(e) => onUpsertRecord(e)}
           />
         </ProCard.TabPane>
+        <ProCard.TabPane
+          key="FIXED_ASSET_EXPENSE"
+          tab="Fixed Asset Expense Subaccount Category">
+          <ItemSubAccountTabComponent
+            loading={loading}
+            data={data?.itemSubAccountList as ItemSubAccount[]}
+            onFilter={(e) => onFilter(e)}
+            onUpsertRecord={(e) => onUpsertRecord(e)}
+          />
+        </ProCard.TabPane>
+        <ProCard.TabPane key="REVENUE" tab="Revenue Subaccount Category">
+          <ItemSubAccountTabComponent
+            loading={loading}
+            data={data?.itemSubAccountList as ItemSubAccount[]}
+            onFilter={(e) => onFilter(e)}
+            onUpsertRecord={(e) => onUpsertRecord(e)}
+          />
+        </ProCard.TabPane>
       </ProCard>
     </PageContainer>
   );

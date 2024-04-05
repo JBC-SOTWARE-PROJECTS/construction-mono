@@ -40,7 +40,7 @@ class ReturnSupplierItem extends AbstractAuditingEntity implements Serializable 
 	
 	@GraphQLQuery
 	@Column(name = "return_qty", columnDefinition = 'int')
-	Integer returnQty
+	BigDecimal returnQty
 	
 	@GraphQLQuery
 	@Column(name = "return_unit_cost", columnDefinition = 'numeric')

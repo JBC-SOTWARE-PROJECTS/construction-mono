@@ -179,7 +179,7 @@
 		<field name="stockCode" class="java.lang.String"/>
 		<field name="itemDesc" class="java.lang.String"/>
 		<field name="uom" class="java.lang.String"/>
-		<field name="quantityReturn" class="java.lang.Integer"/>
+		<field name="quantityReturn" class="java.math.BigDecimal"/>
 		<field name="reasonForReturn" class="java.lang.String"/>
 	</subDataset>
 	<parameter name="items" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>

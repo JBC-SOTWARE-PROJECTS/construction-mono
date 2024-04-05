@@ -45,12 +45,12 @@ class PurchaseOrderItemService extends AbstractDaoService<PurchaseOrderItems> {
 
     //========context ==============//
     @GraphQLQuery(name = "deliveredQty")
-    Integer deliveredQty(@GraphQLContext PurchaseOrderItems poItem) {
+    BigDecimal deliveredQty(@GraphQLContext PurchaseOrderItems poItem) {
         return purchaseOrderItemMonitoringService.monById(poItem.id).deliveredQty
     }
 
     @GraphQLQuery(name = "deliveryBalance")
-    Integer deliveryBalance(@GraphQLContext PurchaseOrderItems poItem) {
+    BigDecimal deliveryBalance(@GraphQLContext PurchaseOrderItems poItem) {
         return purchaseOrderItemMonitoringService.monById(poItem.id).deliveryBalance
     }
 

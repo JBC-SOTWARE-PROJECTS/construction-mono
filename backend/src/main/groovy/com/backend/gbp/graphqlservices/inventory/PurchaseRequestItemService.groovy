@@ -4,6 +4,7 @@ import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.inventory.PurchaseRequest
 import com.backend.gbp.domain.inventory.PurchaseRequestItem
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.rest.dto.PRChildrenDto
 import com.backend.gbp.rest.dto.PurchaseDto
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -31,6 +32,9 @@ class PurchaseRequestItemService extends AbstractDaoService<PurchaseRequestItem>
 
     @Autowired
     GeneratorService generatorService
+
+    @Autowired
+    PurchaseRequestService purchaseRequestService
 
 
     @GraphQLQuery(name = "prItemById")
@@ -88,6 +92,34 @@ class PurchaseRequestItemService extends AbstractDaoService<PurchaseRequestItem>
 
     }
 
+    @GraphQLQuery(name = "getPrItemInOnePO")
+    PRChildrenDto getPrItemInOnePO(
+            @GraphQLArgument(name = "prNos") String prNos,
+            @GraphQLArgument(name = "status") Boolean status,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        if(prNos){
+
+            String query = '''Select e from PurchaseRequestItem e where e.purchaseRequest.prNo = :prNos'''
+            Map<String, Object> params = new HashMap<>()
+            params.put('prNos', prNos)
+
+            if(status){
+                query += ''' and e.refPo = :id '''
+                params.put("id", id)
+            }else{
+                query += ''' and e.refPo is null '''
+            }
+            def children = createQuery(query, params).resultList.sort { it.item.descLong }
+            def parent = purchaseRequestService.prByPrNo(prNos)
+
+            return new PRChildrenDto(parent: parent, items: children)
+        }else{
+            return new PRChildrenDto(parent: new PurchaseRequest(), items: [])
+        }
+
+    }
+
     // ============== Mutation =======================//
     @Transactional
     @GraphQLMutation(name = "upsertPRItem")
@@ -104,6 +136,7 @@ class PurchaseRequestItemService extends AbstractDaoService<PurchaseRequestItem>
         upsert.item = item
         upsert.requestedQty = dto.requestedQty
         upsert.onHandQty = dto.onHandQty
+        upsert.unitCost = dto.unitCost
         upsert.remarks = dto.remarks
         save(upsert)
     }
