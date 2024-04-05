@@ -142,6 +142,68 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 		return result
 	}
 
+    @GraphQLQuery(name = "recByFiltersPageNoDate")
+    Page<ReceivingReport> recByFiltersPageNoDate(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "category") String category,
+            @GraphQLArgument(name = "project") UUID project,
+            @GraphQLArgument(name = "asset") UUID asset,
+            @GraphQLArgument(name = "supplier") UUID supplier,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select r from ReceivingReport r where
+						(lower(r.rrNo) like lower(concat('%',:filter,'%')) or
+						lower(r.receivedRefNo) like lower(concat('%',:filter,'%'))) '''
+
+        String countQuery = '''Select count(r) from ReceivingReport r where
+						(lower(r.rrNo) like lower(concat('%',:filter,'%')) or
+						lower(r.receivedRefNo) like lower(concat('%',:filter,'%'))) '''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+
+        if(office){
+            query += ''' and (r.receivedOffice.id = :office)''';
+            countQuery += ''' and (r.receivedOffice.id = :office)''';
+            params.put('office', office)
+        }
+        if (company) {
+            query += ''' and (r.company = :company)'''
+            countQuery += ''' and (r.company = :company)'''
+            params.put("company", company)
+        }
+        if(category){
+            query += ''' and (r.category = :category)''';
+            countQuery += ''' and (r.category = :category)''';
+            params.put('category', category)
+        }
+        if(project){
+            query += ''' and (r.project.id = :project)''';
+            countQuery += ''' and (r.project.id = :project)''';
+            params.put('project', project)
+        }
+        if(asset){
+            query += ''' and (r.assets.id = :asset)''';
+            countQuery += ''' and (r.assets.id = :asset)''';
+            params.put('asset', asset)
+        }
+        if(supplier){
+            query += ''' and (r.supplier.id = :supplier)'''
+            countQuery += ''' and (r.supplier.id = :supplier)'''
+            params.put('supplier', supplier)
+        }
+
+
+        query += ''' ORDER BY r.rrNo DESC'''
+
+        Page<ReceivingReport> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
     @GraphQLQuery(name = "srrList")
     List<ReceivingReport> srrList() {
         def company = SecurityUtils.currentCompanyId()

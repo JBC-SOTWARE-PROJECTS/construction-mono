@@ -1,5 +1,5 @@
-import { Query } from '@/graphql/gql/graphql'
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { Query } from "@/graphql/gql/graphql";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Card,
@@ -9,22 +9,22 @@ import {
   Space,
   Table,
   Tooltip,
-} from 'antd'
-import { ColumnsType } from 'antd/es/table'
-import { Maybe } from 'graphql/jsutils/Maybe'
-import JournalAccounts, { DELETE_INTEGRATION } from './JournalAccounts'
-import { useDialog } from '@/hooks'
-import CreateIntegration from './integrations/createInteration'
+} from "antd";
+import { ColumnsType } from "antd/es/table";
+import { Maybe } from "graphql/jsutils/Maybe";
+import JournalAccounts, { DELETE_INTEGRATION } from "./JournalAccounts";
+import { useDialog } from "@/hooks";
+import CreateIntegration from "./integrations/createInteration";
 import {
   DeleteFilled,
   DragOutlined,
   EditOutlined,
   PlusCircleOutlined,
-} from '@ant-design/icons'
-import AddAccount from './forms/AddAccount'
-import EditAccount from './forms/EditAccount'
-import IntegrationTransfer from './forms/IntegrationTransfer'
-import IntegrationJournalAccounts from './IntegrationJournalAccounts'
+} from "@ant-design/icons";
+import AddAccount from "./forms/AddAccount";
+import EditAccount from "./forms/EditAccount";
+import IntegrationTransfer from "./forms/IntegrationTransfer";
+import IntegrationJournalAccounts from "./IntegrationJournalAccounts";
 
 export const INTEGRATION_PER_GROUP = gql`
   query ($id: UUID, $filter: String, $size: Int, $page: Int) {
@@ -47,61 +47,61 @@ export const INTEGRATION_PER_GROUP = gql`
       totalElements
     }
   }
-`
+`;
 
 interface IntegrationProps {
-  id: string
-  description: Maybe<string> | undefined
-  domain: string
+  id: string;
+  description: Maybe<string> | undefined;
+  domain: string;
 }
 
 const IntegrationItems = (props: IntegrationProps) => {
-  const onCreateDialog = useDialog(CreateIntegration)
-  const onAddAccount = useDialog(AddAccount)
-  const onEditAccount = useDialog(EditAccount)
-  const onTransferIntegration = useDialog(IntegrationTransfer)
-  const onShowJournalAccounts = useDialog(IntegrationJournalAccounts)
+  const onCreateDialog = useDialog(CreateIntegration);
+  const onAddAccount = useDialog(AddAccount);
+  const onEditAccount = useDialog(EditAccount);
+  const onTransferIntegration = useDialog(IntegrationTransfer);
+  const onShowJournalAccounts = useDialog(IntegrationJournalAccounts);
 
   const { data, loading, refetch } = useQuery(INTEGRATION_PER_GROUP, {
     variables: {
       id: props.id,
-      filter: '',
+      filter: "",
       size: 10,
       page: 0,
     },
     notifyOnNetworkStatusChange: true,
-  })
+  });
   const [onDeleteIntegration, { loading: onLoadingDelete }] =
-    useMutation(DELETE_INTEGRATION)
+    useMutation(DELETE_INTEGRATION);
 
   const onHandleClickCreateEdit = (record?: any) => {
     onCreateDialog({ integrationGroup: props.id, record: { ...record } }, () =>
       refetch()
-    )
-  }
+    );
+  };
 
   const handleTransferIntegration = (itemid: string) =>
     onTransferIntegration({ itemid }, (e: boolean) => {
       if (e) {
-        refetch()
+        refetch();
       }
-    })
+    });
 
   const onHandleShowJournalAccounts = (id: string, domain: string) => {
-    onShowJournalAccounts({ id, domain }, () => {})
-  }
+    onShowJournalAccounts({ id, domain }, () => {});
+  };
 
   const onHandleDeleteIntegration = (integrationId: string) => {
     onDeleteIntegration({
       variables: { integrationId },
       onCompleted: () => refetch(),
-    })
-  }
+    });
+  };
 
   return (
-    <Space direction='vertical' style={{ width: '100%' }}>
+    <Space direction="vertical" style={{ width: "100%" }}>
       <Space>
-        <Button onClick={() => onHandleClickCreateEdit()} type='primary'>
+        <Button onClick={() => onHandleClickCreateEdit()} type="primary">
           Add Integration
         </Button>
       </Space>
@@ -113,32 +113,31 @@ const IntegrationItems = (props: IntegrationProps) => {
                 title={<a>{dg.description}</a>}
                 extra={[
                   <Space.Compact
-                    key={'card-extra'}
+                    key={"card-extra"}
                     block
                     style={{
                       marginBottom: 10,
-                      display: 'flex',
-                      justifyContent: 'end',
-                    }}
-                  >
-                    <Tooltip title='Edit Integration'>
+                      display: "flex",
+                      justifyContent: "end",
+                    }}>
+                    <Tooltip title="Edit Integration">
                       <Button
                         onClick={() => onHandleClickCreateEdit(dg)}
                         icon={<EditOutlined />}
-                        type='primary'
+                        type="primary"
                       />
                     </Tooltip>
-                    <Tooltip title='Transfer'>
+                    <Tooltip title="Transfer">
                       <Button
                         onClick={() => handleTransferIntegration(dg.id)}
                         icon={<DragOutlined />}
-                        type='primary'
+                        type="primary"
                       />
                     </Tooltip>
-                    <Tooltip title='Delete'>
+                    <Tooltip title="Delete">
                       <Button
                         icon={<DeleteFilled />}
-                        type='primary'
+                        type="primary"
                         onClick={() => onHandleDeleteIntegration(dg.id)}
                         loading={onLoadingDelete}
                       />
@@ -146,28 +145,29 @@ const IntegrationItems = (props: IntegrationProps) => {
                   </Space.Compact>,
                 ]}
                 style={{
-                  border: '1px solid #399B53',
+                  border: "1px solid #399B53",
                 }}
-                headStyle={{ border: 'none' }}
-                bodyStyle={{ paddingBottom: 10 }}
+                styles={{
+                  header: { border: "none" },
+                  body: { paddingBottom: 10 },
+                }}
+                //headStyle={}
+                //bodyStyle={{ paddingBottom: 10 }}
               >
-                <Descriptions column={2} size='small'>
+                <Descriptions column={2} size="small">
                   <Descriptions.Item
-                    label='Order Priority'
-                    labelStyle={{ color: '#399B53' }}
-                  >
+                    label="Order Priority"
+                    labelStyle={{ color: "#399B53" }}>
                     {dg.orderPriority}
                   </Descriptions.Item>
                   <Descriptions.Item
-                    label='Flag Value'
-                    labelStyle={{ color: '#399B53' }}
-                  >
+                    label="Flag Value"
+                    labelStyle={{ color: "#399B53" }}>
                     {dg.flagValue}
                   </Descriptions.Item>
                   <Descriptions.Item
-                    label='Domain'
-                    labelStyle={{ color: '#399B53' }}
-                  >
+                    label="Domain"
+                    labelStyle={{ color: "#399B53" }}>
                     {dg.domain}
                   </Descriptions.Item>
                 </Descriptions>
@@ -175,22 +175,21 @@ const IntegrationItems = (props: IntegrationProps) => {
                   <Col span={24}>
                     <Button
                       block
-                      type='primary'
+                      type="primary"
                       onClick={() =>
                         onHandleShowJournalAccounts(dg.id, dg.domain)
-                      }
-                    >
+                      }>
                       View Journal Accounts
                     </Button>
                   </Col>
                 </Row>
               </Card>
             </Col>
-          )
+          );
         })}
       </Row>
     </Space>
-  )
-}
+  );
+};
 
-export default IntegrationItems
+export default IntegrationItems;

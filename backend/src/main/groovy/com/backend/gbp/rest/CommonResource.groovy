@@ -1,8 +1,10 @@
 package com.backend.gbp.rest
 
+import com.backend.gbp.domain.inventory.Attachments
 import com.backend.gbp.domain.projects.ProjectProgressImages
 import com.backend.gbp.graphqlservices.address.AddressServices
 import com.backend.gbp.graphqlservices.projects.ProjectProgressService
+import com.backend.gbp.repository.inventory.AttachmentRepository
 import com.backend.gbp.repository.projects.ProjectsProgressImagesRepository
 import com.backend.gbp.services.DigitalOceanSpaceService
 import com.backend.gbp.services.NotificationService
@@ -66,10 +68,10 @@ class CommonResource {
     ProjectProgressService projectProgressService;
 
     @Autowired
-    SimpMessagingTemplate simpMessagingTemplate
+    ProjectsProgressImagesRepository progressImagesRepository
 
     @Autowired
-    ProjectsProgressImagesRepository progressImagesRepository
+    AttachmentRepository attachmentRepository
 
     @Autowired
     private Environment env;
@@ -199,6 +201,47 @@ class CommonResource {
                     /*** ready for DO S3***/
                     spaceService.uploadFileToSpace(convFile, "PROJECT_IMAGES/${parent.project.id}")
                     progressImagesRepository.save(uploadedResult)
+                    spaceService.deleteToFile(convFile)
+                } catch (Exception e) {
+                    e.printStackTrace()
+                    throw e
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace()
+            throw e
+        }
+
+        return new ResponseEntity<>(
+                "Success Uploading Files",
+                HttpStatus.OK)
+    }
+
+    @Transactional
+    @RequestMapping(method = RequestMethod.POST, value = "/attachment/inventory")
+    ResponseEntity<String> uploadAttachmentInventory(@RequestParam String id, MultipartRequest request) {
+        UUID referenceId = UUID.fromString(id)
+        def attachments = request.getFiles("file")
+
+        try {
+            attachments.forEach { file ->
+                MultipartFile f = file
+                //convert here
+                File convFile = spaceService.convertToFile(f)
+                //end convert here
+                String saveType = env.getProperty("do.env.type");
+
+                Attachments attach = new Attachments()
+                attach.folderName = "${saveType}/INVENTORY_ATTACHMENTS/${referenceId}/"
+                attach.dateTransact = Instant.now()
+                attach.fileName = f.originalFilename
+                attach.mimetype = f.contentType
+                attach.referenceId = referenceId
+                try {
+                    /*** ready for DO S3***/
+                    spaceService.uploadFileToSpace(convFile, "INVENTORY_ATTACHMENTS/${referenceId}")
+                    attachmentRepository.save(attach)
                     spaceService.deleteToFile(convFile)
                 } catch (Exception e) {
                     e.printStackTrace()

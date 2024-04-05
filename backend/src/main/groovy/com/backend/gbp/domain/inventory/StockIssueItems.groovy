@@ -39,7 +39,7 @@ class StockIssueItems extends AbstractAuditingEntity implements Serializable {
 	
 	@GraphQLQuery
 	@Column(name = "issue_qty")
-	Integer issueQty
+	BigDecimal issueQty
 	
 	@GraphQLQuery
 	@Column(name = "unit_cost")

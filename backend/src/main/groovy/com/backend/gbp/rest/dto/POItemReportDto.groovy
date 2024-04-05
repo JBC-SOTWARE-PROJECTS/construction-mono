@@ -2,8 +2,8 @@ package com.backend.gbp.rest.dto
 
 class POItemReportDto {
     String description, uom, deals
-    Integer no, request_qty
-    BigDecimal unit_cost, total, discount
+    Integer no
+    BigDecimal unit_cost, total, discount, request_qty
 }
 
 class POReportDto {

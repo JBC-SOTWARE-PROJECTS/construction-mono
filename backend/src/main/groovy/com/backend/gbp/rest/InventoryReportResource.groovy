@@ -208,7 +208,7 @@ class InventoryReportResource {
 
                     def itemDto = new POItemReportDto(
                             description: it.item.descLong,
-                            uom: it.item.unit_of_purchase.unitDescription + '(' + it.item.item_conversion + ')',
+                            uom: it.item.unit_of_purchase.unitDescription,
                             deals: deals,
                             discount: discount as BigDecimal,
                             no: counter,
@@ -426,6 +426,7 @@ class InventoryReportResource {
 				fullname: purchaseRequest?.userFullname ?: "",
 				project: desc ?: "",
 				projTitle: title ?: "",
+				remarks: purchaseRequest?.remarks ?: "",
 
 		)
 		def gson = new Gson()
@@ -444,8 +445,8 @@ class InventoryReportResource {
 							content_ratio: it.item.item_conversion,
 							qty_uop: it.requestedQty,
 							qty_uou: it.requestedQty * it.item.item_conversion,
-							onhand: inv?.onHand ? inv?.onHand : 0,
-							reorder: inv?.reOrderQty ? inv?.reOrderQty : 0
+							onhand: inv?.onHand ? inv?.onHand : BigDecimal.ZERO,
+							reorder: inv?.reOrderQty ? inv?.reOrderQty : BigDecimal.ZERO
 					)
 					itemsDto.add(itemDto)
 			}
@@ -982,7 +983,7 @@ class InventoryReportResource {
 		def dto = new ReturnSuppReportDto(
 				date: dateFormat.format(Instant.now()),
 				rts: returnSupplierDetails?.rtsNo,
-				refNo: "${returnSupplierDetails?.refSrr}${returnSupplierDetails?.receivedRefNo ? "/${returnSupplierDetails?.receivedRefNo}" : ""}",
+				refNo: returnSupplierDetails?.receivedRefNo ?: "",
 				supplierCode: returnSupplierDetails?.supplier?.supplierCode,
 				supplierName: returnSupplierDetails?.supplier?.supplierFullname,
 				returnBy: emp?.fullName,

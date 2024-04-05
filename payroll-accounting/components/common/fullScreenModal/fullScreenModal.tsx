@@ -19,7 +19,7 @@ const FullScreenModal = ({
   children,
   ...props
 }: ExtendedModalProps) => {
-  let bodyStyle = props.bodyStyle;
+  let bodyStyle = props.styles?.body;
   let style = props.style;
   let width = props.width;
 
@@ -48,7 +48,9 @@ const FullScreenModal = ({
       destroyOnClose={true}
       maskClosable={false}
       open={true}
-      bodyStyle={bodyStyle}
+      styles={{
+        body: bodyStyle,
+      }}
       width={width}
       style={style}
       onCancel={() => hide(false)}

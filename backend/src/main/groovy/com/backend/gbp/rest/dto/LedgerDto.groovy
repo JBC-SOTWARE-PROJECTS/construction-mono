@@ -11,9 +11,9 @@ class LedgerDto {
 	UUID item
 	String referenceNo
 	Instant ledgerDate
-	Integer ledgerQtyIn
-	Integer ledgerQtyOut
-	Integer ledgerPhysical
+	BigDecimal ledgerQtyIn
+	BigDecimal ledgerQtyOut
+	BigDecimal ledgerPhysical
 	BigDecimal ledgerUnitCost
 	Boolean isInclude
 }
@@ -26,8 +26,8 @@ class RawLedgerDto {
 	String typeId
 	String type
 	String ledgerNo
-	Integer qty
-	Integer physical
+	BigDecimal qty
+	BigDecimal physical
 	BigDecimal unitcost
 	String date
 }

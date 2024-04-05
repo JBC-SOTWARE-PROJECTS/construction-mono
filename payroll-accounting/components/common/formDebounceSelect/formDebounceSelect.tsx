@@ -14,11 +14,12 @@ interface DebounceSelectProps<ValueType = any>
 }
 
 interface ExtendedSelectProps extends FormItemProps {
+  defaultSearchLabel?: string;
   propsselect: DebounceSelectProps;
 }
 
 function FormDebounceSelect(
-  { propsselect, ...props }: ExtendedSelectProps,
+  { propsselect, defaultSearchLabel, ...props }: ExtendedSelectProps,
   ref: any
 ) {
   const { fetchOptions, debounceTimeout = 500, ...others } = propsselect;
@@ -61,9 +62,10 @@ function FormDebounceSelect(
         showSearch
         loading={loading}
         onSearch={debounceFetcher}
+        onClear={() => getFirstData("")}
         onDropdownVisibleChange={(open) => {
           if (open && _.isEmpty(options)) {
-            getFirstData("");
+            getFirstData(defaultSearchLabel ?? "");
           }
         }}
         notFoundContent={

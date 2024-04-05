@@ -7,7 +7,7 @@ import com.backend.gbp.domain.inventory.Item
 class PurchaseRtsDto {
 	UUID id
 	Item item
-	Integer returnQty
+	BigDecimal returnQty
 	BigDecimal returnUnitCost
 	String return_remarks
 	Boolean isPosted
@@ -17,7 +17,7 @@ class PurchaseRtsDto {
 class PurchaseIssuanceDto {
 	UUID id
 	Item item
-	Integer issueQty
+	BigDecimal issueQty
 	BigDecimal unitCost
 	String remarks
 	Boolean isPosted
@@ -27,7 +27,7 @@ class PurchaseIssuanceDto {
 class PurchaseMPDto {
 	UUID id
 	Item item
-	Integer qty
+	BigDecimal qty
 	BigDecimal unitCost
 	String type
 	Boolean isPosted

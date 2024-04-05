@@ -9,9 +9,6 @@ const theme: ThemeConfig = {
     Input: {
       fontSize: 14,
     },
-    Segmented: {
-       itemSelectedColor: "white",
-    },
     Button: {
       colorPrimary: "#399B53",
     },
