@@ -4,8 +4,10 @@ import {
   Col,
   ColProps,
   Descriptions,
+  Popconfirm,
   Row,
   Typography,
+  message,
 } from "antd"
 import styled from "styled-components"
 import { BillingInfo, CustomerInfo } from "./info"
@@ -17,6 +19,10 @@ import {
   PrinterOutlined,
 } from "@ant-design/icons"
 import { Billing } from "@/graphql/gql/graphql"
+import { useMutation } from "@apollo/client"
+import { LOCK_BILLING } from "@/graphql/billing/queries"
+import { MessageInstance } from "antd/es/message/interface"
+import { lowerCase } from "lodash"
 
 // Summary Amount Col
 const firstColSummaryProps: ColProps = {
@@ -114,21 +120,60 @@ export const FolioSummary = (props: Billing) => {
   )
 }
 
-export const FolioActions = () => {
+interface FolioActionsProps {
+  id?: string
+  locked: boolean
+  messageApi: MessageInstance
+}
+
+export const FolioActions = (props: FolioActionsProps) => {
+  const [onToggleLock, { loading }] = useMutation(LOCK_BILLING)
+
+  const lockLabel = props.locked ? "Unlock" : "Lock"
+
+  const confirmLock = () => {
+    props.messageApi.open({
+      type: "loading",
+      content: "Action in progress..",
+      duration: 0,
+    })
+    const type = props.locked ? "UNLOCKED" : "LOCK"
+    onToggleLock({
+      variables: {
+        id: props?.id,
+        type,
+      },
+      onCompleted: () => {
+        props.messageApi.destroy()
+      },
+    })
+  }
+
   return (
     <Col {...colActionProps}>
       <CardFlex>
         <Card size="small">
           <Row gutter={[8, 8]}>
             <Col {...colActionButtonProps}>
-              <Button
-                type="primary"
-                block
-                icon={<LockOutlined />}
-                style={{ background: "#047857" }}
+              <Popconfirm
+                title={`${lockLabel} the folio`}
+                description={`Are you sure to ${lowerCase(
+                  lockLabel
+                )} this folio?`}
+                onConfirm={confirmLock}
+                okText="Yes"
+                cancelText="No"
               >
-                Lock
-              </Button>
+                <Button
+                  type="primary"
+                  block
+                  icon={<LockOutlined />}
+                  style={{ background: "#047857" }}
+                  loading={loading}
+                >
+                  {lockLabel}
+                </Button>
+              </Popconfirm>
             </Col>
             <Col {...colActionButtonProps}>
               <Button

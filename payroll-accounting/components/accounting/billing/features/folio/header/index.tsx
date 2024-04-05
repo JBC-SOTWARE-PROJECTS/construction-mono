@@ -40,7 +40,13 @@ export default function FolioHeader(props: FolioHeaderProps) {
       <Col {...secondInfoProps}>
         <Row gutter={[8, 8]} style={{ height: "100%" }}>
           <FolioSummary {...props?.billing} />
-          <FolioActions />
+          <FolioActions
+            {...{
+              id: props?.billing?.id,
+              locked: !!props?.billing?.locked,
+              messageApi: props.messageApi,
+            }}
+          />
         </Row>
       </Col>
     </Row>

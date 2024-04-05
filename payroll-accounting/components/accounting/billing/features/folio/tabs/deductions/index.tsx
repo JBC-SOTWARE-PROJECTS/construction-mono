@@ -23,6 +23,8 @@ import styled from "styled-components"
 import { getBillingItemColumns } from "./utils"
 import { TableNoBorderRadCSS } from "@/components/common/utils/table-utils"
 import { FolioTabsProps } from ".."
+import { AddProjectDeductions } from "@/components/accounting/billing/dialog/add-projrect-deductions"
+import { DeductionItems } from "@/components/accounting/billing/dialog/deduction-items"
 import { useEffect } from "react"
 
 interface DataType {
@@ -34,14 +36,13 @@ interface DataType {
 
 type FolioBillingItemType = "SERVICE" | "DEDUCTIONS" | "PAYMENTS"
 
-interface FolioProgressBillingProps extends FolioTabsProps {
+interface FolioDeductionsProps extends FolioTabsProps {
   type: FolioBillingItemType
 }
 
-export default function FolioProgressBilling(
-  props?: FolioProgressBillingProps
-) {
-  const projectServicesDialog = useDialog(AddProjectServices)
+export default function FolioDeductions(props?: FolioDeductionsProps) {
+  const projectDeductionsDialog = useDialog(AddProjectDeductions)
+  const deductionDetailsDialog = useDialog(DeductionItems)
 
   const { data, loading, refetch } = useQuery(GET_BILLING_ITEMS, {
     fetchPolicy: "cache-and-network",
@@ -56,14 +57,14 @@ export default function FolioProgressBilling(
     DELETE_BILLING_ITEM_BY_ID
   )
 
-  const onInsertService = () => {
+  const onInsertDeductions = () => {
     const billingItems = (data?.billingItemByParentType ?? [])
       .filter((item: BillingItem) => {
         return !!item?.projectCostId && item.status
       })
       .map((item: BillingItem) => item.projectCostId)
       .filter(Boolean)
-    projectServicesDialog(
+    projectDeductionsDialog(
       {
         id: props?.billing?.project?.id,
         billingId: props?.billing?.id,
@@ -90,6 +91,15 @@ export default function FolioProgressBilling(
     })
   }
 
+  const onShowDetails = (id: string) => {
+    deductionDetailsDialog({ id }, () => {})
+  }
+
+  useEffect(() => {
+    refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props?.billing?.locked])
+
   return (
     <TableNoBorderRadCSS>
       <PageFilterContainer
@@ -104,14 +114,13 @@ export default function FolioProgressBilling(
         }
         rightSpace={
           <Space>
-            {!props?.billing?.locked && (
+            {props?.billing?.locked && (
               <Button
                 type="primary"
                 icon={<PlusCircleFilled />}
-                style={{ marginRight: "16px" }}
-                onClick={onInsertService}
+                onClick={onInsertDeductions}
               >
-                Project Services
+                Add Deductions
               </Button>
             )}
           </Space>
@@ -120,7 +129,7 @@ export default function FolioProgressBilling(
       <Table
         rowKey={"id"}
         size="small"
-        columns={getBillingItemColumns(onDeleteBillingItem)}
+        columns={getBillingItemColumns(onDeleteBillingItem, onShowDetails)}
         loading={loading}
         dataSource={data?.billingItemByParentType ?? []}
         scroll={{ x: 1500, y: 300 }}

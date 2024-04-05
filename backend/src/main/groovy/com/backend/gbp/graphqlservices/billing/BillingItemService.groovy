@@ -20,8 +20,10 @@ import com.backend.gbp.repository.billing.DiscountDetailsRepository
 import com.backend.gbp.rest.InventoryResource
 import com.backend.gbp.rest.dto.BillingItemsDto
 import com.backend.gbp.rest.dto.DiscountDto
+import com.backend.gbp.rest.dto.FolioDeductionDto
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
+import com.backend.gbp.utils.BillingUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -84,6 +86,8 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
     @Autowired
     ProjectWorkAccomplishService projectWorkAccomplishService
 
+    @Autowired
+    BillingUtils billingUtils
 
     @Autowired
     ProjectCostService projectCostService
@@ -123,12 +127,18 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
     List<BillingItem> billingItemByParentType(
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "id") UUID id,
-            @GraphQLArgument(name = "type") List<String> type
+            @GraphQLArgument(name = "type") List<String> type,
+            @GraphQLArgument(name = "active") Boolean active = false
     ) {
         String query = '''select q from BillingItem q where 
                         (lower(q.description) like lower(concat('%',:filter,'%')) OR 
                         lower(q.recordNo) like lower(concat('%',:filter,'%'))) 
-					  AND q.billing.id = :id AND q.itemType IN (:type)'''
+					    AND q.billing.id = :id AND q.itemType IN (:type) '''
+
+        if(active)
+            query += """ AND q.status is true  """
+
+
         Map<String, Object> params = new HashMap<>()
         params.put('filter', filter)
         params.put('id', id)
@@ -686,7 +696,7 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
             @GraphQLArgument(name="id") UUID id
     ){
         def item = findOne(id)
-        if(item){
+        if(item.itemType != 'DEDUCTIONS' && item.itemType != 'PAYMENTS'){
             item.status = false
             save(item)
 
@@ -702,6 +712,147 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
 
             return new GraphQLResVal<Boolean>(true,true,"Successfully removed.")
         }
+        else {
+            if(item.transType == 'TAX' || item.transType == 'VAT' || item.transType == 'RECOUPMENT' || item.transType == 'RETENTION') {
+                item.status = false
+                save(item)
+                return new GraphQLResVal<Boolean>(true,true,"Successfully removed.")
+            }
+        }
         return new GraphQLResVal<Boolean>(false,false,"Folio doesn't exist.")
     }
+
+    @Transactional
+    @GraphQLMutation(name = "addDeductions")
+    Boolean addDeductions(
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "items") List<Map<String, Object>> items,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def it = objectMapper.convertValue(fields, FolioDeductionDto.class)
+        BigDecimal percentage = 0;
+
+        //
+        List<String> types = ['ITEM', 'SERVICE', 'MISC']
+        Billing billing = billingService.findOne(id)
+        def discountItems = this.getItemDiscountable(id, types)
+
+        // Return empty records when not lock
+        if(!billing.locked)
+            return new BillingItem()
+
+        BigDecimal baseAmount = 0.00
+        BigDecimal deduction = 0.00
+        BigDecimal totalAmount = this.getAmounts(id, types)
+        //calculate
+        if(it.deduction == 'RECOUPMENT' || it.deduction == 'RETENTION'){
+            baseAmount = it?.baseAmount ?: 0.00
+            if (it.dedType == "PERCENTAGE")
+                percentage = it.percentage / 100
+            else
+                percentage = it.deductionAmount / baseAmount
+
+            deduction = baseAmount * percentage
+        }
+        else {
+            if (it.deduction == 'TAX' || it.deduction == 'VAT') {
+                baseAmount = totalAmount
+                if (it.dedType == "PERCENTAGE") {
+                    percentage = it.percentage / 100
+                    deduction = (baseAmount/1.12) * percentage
+                }
+                else {
+                    BigDecimal divideBaseAmount = baseAmount / 1.12
+                    percentage = it.deductionAmount / divideBaseAmount
+                    deduction = it.deductionAmount
+                }
+
+            }else {
+                baseAmount = this.getBalance(id)
+                if (it.dedType == "PERCENTAGE")
+                    percentage = it.percentage / 100
+                else
+                    percentage = it.deductionAmount / baseAmount
+
+                deduction = baseAmount * percentage
+            }
+
+        }
+
+        deduction = billingUtils.bankersRounding(deduction)
+        //insert billing item as deductions
+        BillingItem item = new BillingItem();
+        def recordNo = generatorService.getNextValue(GeneratorType.REC_NO) { Long no ->
+            StringUtils.leftPad(no.toString(), 6, "0")
+        }
+        item.transDate = Instant.now()
+        item.billing = billing
+        item.recordNo = recordNo
+        item.description = "${it.deduction} ${it?.remarks ? "(${it?.remarks})": ''}"
+        item.qty = 1
+        item.debit = BigDecimal.ZERO
+        item.credit = deduction
+        item.subTotal = BigDecimal.ZERO - (deduction)
+        item.itemType = "DEDUCTIONS"
+        item.transType = it.deduction
+        item.status = true
+        def afterSave = save(item)
+
+        //insert discounts details
+        if(items.size() > 0) {
+            BigDecimal totals = 0.00
+            items.each {
+                dis ->
+                    totals = totals + new BigDecimal((dis['subTotal'] ?: 0.00).toString())
+            }
+
+            items.each {
+                dedItems ->
+                def discDetails = objectMapper.convertValue(dedItems, BillingItem.class)
+                BigDecimal itemProportion = discDetails.subTotal / totals
+                BigDecimal itemDeduction = deduction * itemProportion
+                def disc = new DiscountDetails();
+                disc.billing = billingService.findOne(id)
+                disc.billingItem = afterSave
+                disc.refBillItem = discDetails
+                disc.amount = billingUtils.bankersRounding(itemDeduction)
+                discountDetailsRepository.save(disc)
+            }
+        }
+        else {
+            BigDecimal totals = 0.00
+            discountItems.each {
+                dis ->
+                    totals = totals + dis.subTotal
+            }
+
+
+            discountItems.each {
+                dis ->
+                    def disc = new DiscountDetails();
+                    disc.billing = billingService.findOne(id)
+                    disc.billingItem = afterSave
+                    disc.refBillItem = dis
+                    BigDecimal itemProportion = dis.subTotal / totals
+                    BigDecimal itemDeduction = deduction * itemProportion
+                    BigDecimal bankersRounding = billingUtils.bankersRounding(itemDeduction)
+                    disc.amount = bankersRounding
+                    discountDetailsRepository.save(disc)
+            }
+        }
+        return true
+    }
+
+
+    @GraphQLQuery(name = "deductionItemsById")
+    List<DiscountDetails> deductionItemsById(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        if(id){
+            return discountDetailsRepository.getItemDiscountsByBillingItem(id)
+        }else{
+            return []
+        }
+    }
+
 }

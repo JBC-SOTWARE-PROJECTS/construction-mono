@@ -2,6 +2,8 @@ import { Billing } from "@/graphql/gql/graphql"
 import { Col, Row, Tabs } from "antd"
 import { FolioRefetchType } from ".."
 import FolioProgressBilling from "./progress-billing"
+import FolioDeductions from "./deductions"
+import { MessageInstance } from "antd/es/message/interface"
 
 export interface FolioTabsProps {
   billing: Billing | null
@@ -27,7 +29,7 @@ const FolioTabs = (props: FolioTabsProps) => {
       label: `Deduction(s)`,
       key: "deductions",
       children: (
-        <FolioProgressBilling
+        <FolioDeductions
           {...{
             billing: { ...props.billing },
             refetch: props.refetch,

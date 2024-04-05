@@ -73,8 +73,13 @@ export const GET_BILLING_INFO_BY_ID = gql`
 `
 
 export const GET_BILLING_ITEMS = gql`
-  query ($filter: String, $id: UUID, $type: [String]) {
-    billingItemByParentType(filter: $filter, id: $id, type: $type) {
+  query ($filter: String, $id: UUID, $type: [String], $active: Boolean) {
+    billingItemByParentType(
+      filter: $filter
+      id: $id
+      type: $type
+      active: $active
+    ) {
       id
       transDate
       recordNo
@@ -141,6 +146,39 @@ export const DELETE_BILLING_ITEM_BY_ID = gql`
     removeBillingItemProjectService(id: $id) {
       message
       success
+    }
+  }
+`
+
+export const LOCK_BILLING = gql`
+  mutation ($id: UUID, $type: String) {
+    lockBilling(id: $id, type: $type) {
+      id
+      locked
+    }
+  }
+`
+
+export const ADD_DEDUCTIONS = gql`
+  mutation (
+    $fields: Map_String_ObjectScalar
+    $id: UUID
+    $items: [Map_String_ObjectScalar]
+  ) {
+    addDeductions(fields: $fields, id: $id, items: $items)
+  }
+`
+
+export const DEDUCTION_DETAILS = gql`
+  query ($id: UUID) {
+    deductionItemsById(id: $id) {
+      id
+      refBillItem {
+        id
+        recordNo
+        description
+      }
+      amount
     }
   }
 `

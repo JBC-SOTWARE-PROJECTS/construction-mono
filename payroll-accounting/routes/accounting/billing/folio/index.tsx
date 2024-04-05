@@ -2,7 +2,7 @@ import Folio from "@/components/accounting/billing/features/folio"
 import { GET_BILLING_INFO_BY_ID } from "@/graphql/billing/queries"
 import { Billing, Query } from "@/graphql/gql/graphql"
 import { useQuery } from "@apollo/client"
-import { Divider, type ColProps, Typography } from "antd"
+import { Divider, type ColProps, Typography, message } from "antd"
 import { useReducer } from "react"
 import styled from "styled-components"
 
@@ -35,6 +35,7 @@ export default function BillingFolioComponent(props: Iprops) {
   const { id, type } = props
 
   const [state, dispatch] = useReducer(reducer, { billing: null })
+  const [messageApi, contextHolder] = message.useMessage()
 
   const { loading: onLoadingBilling, refetch: onRefetchBilling } =
     useQuery<Query>(GET_BILLING_INFO_BY_ID, {
@@ -52,6 +53,7 @@ export default function BillingFolioComponent(props: Iprops) {
 
   const header = {
     billing: state.billing,
+    messageApi,
   }
 
   const refetch = {
@@ -59,7 +61,8 @@ export default function BillingFolioComponent(props: Iprops) {
   }
 
   return (
-    <Folio {...{ header, refetch }}>
+    <Folio {...{ header, refetch, messageApi }}>
+      {contextHolder}
       <Folio.Header />
       <Divider dashed orientation="left">
         <b>Folio Transaction(s)</b>

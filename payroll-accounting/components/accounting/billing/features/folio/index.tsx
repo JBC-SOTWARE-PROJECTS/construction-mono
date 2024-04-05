@@ -5,6 +5,7 @@ import FolioHeader from "./header"
 import FolioTabs from "./tabs"
 import { Billing, Query } from "@/graphql/gql/graphql"
 import { ApolloQueryResult, OperationVariables } from "@apollo/client"
+import { MessageInstance } from "antd/es/message/interface"
 
 export type FolioRefetchType = (
   variables?: Partial<OperationVariables> | undefined
@@ -15,11 +16,13 @@ export interface FolioRefetchProps {
 }
 export interface FolioHeaderProps {
   billing: Billing | null
+  messageApi: MessageInstance
 }
 
 interface FolioContextProps {
   header: FolioHeaderProps
   refetch: FolioRefetchProps
+  messageApi: MessageInstance
 }
 
 export const FolioContext = createContext<FolioContextProps | null>(null)
