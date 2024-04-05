@@ -45,6 +45,7 @@ export default function FolioHeader(props: FolioHeaderProps) {
               id: props?.billing?.id,
               locked: !!props?.billing?.locked,
               messageApi: props.messageApi,
+              onRefetchBilling: props.onRefetchBilling,
             }}
           />
         </Row>

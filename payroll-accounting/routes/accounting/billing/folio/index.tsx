@@ -54,6 +54,7 @@ export default function BillingFolioComponent(props: Iprops) {
   const header = {
     billing: state.billing,
     messageApi,
+    onRefetchBilling,
   }
 
   const refetch = {

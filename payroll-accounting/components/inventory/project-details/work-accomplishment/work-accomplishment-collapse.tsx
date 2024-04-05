@@ -131,6 +131,10 @@ export default function WorkAccomplishmentsCollapse(
     )
   }
 
+  const onPushToBilling = (id: string) => {
+    push(`/accounting/billing/folio/${id}`)
+  }
+
   return (
     <Row>
       {contextHolder}
@@ -144,7 +148,7 @@ export default function WorkAccomplishmentsCollapse(
             children: <WorkAccomplishmentsTable projectId={works?.id} />,
             extra: (
               <Space>
-                {works?.status == "LOCKED" && (
+                {works?.status == "LOCKED" && !works?.billing && (
                   <Popconfirm
                     placement="topLeft"
                     title="Confirm Adding to Billing"
@@ -168,7 +172,19 @@ export default function WorkAccomplishmentsCollapse(
                     />
                   </Popconfirm>
                 )}
+
+                {works?.billing && (
+                  <Button
+                    type="primary"
+                    size="small"
+                    icon={<SelectOutlined />}
+                    style={{ background: "#6435c9" }}
+                    onClick={() => onPushToBilling(works?.billing)}
+                  />
+                )}
+
                 <ButtonLock record={works} />
+
                 {!works?.billing && (
                   <Button
                     type="primary"

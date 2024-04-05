@@ -23,6 +23,7 @@ import { useMutation } from "@apollo/client"
 import { LOCK_BILLING } from "@/graphql/billing/queries"
 import { MessageInstance } from "antd/es/message/interface"
 import { lowerCase } from "lodash"
+import { FolioRefetchType } from ".."
 
 // Summary Amount Col
 const firstColSummaryProps: ColProps = {
@@ -124,6 +125,7 @@ interface FolioActionsProps {
   id?: string
   locked: boolean
   messageApi: MessageInstance
+  onRefetchBilling: FolioRefetchType
 }
 
 export const FolioActions = (props: FolioActionsProps) => {
@@ -144,6 +146,7 @@ export const FolioActions = (props: FolioActionsProps) => {
         type,
       },
       onCompleted: () => {
+        props.onRefetchBilling()
         props.messageApi.destroy()
       },
     })

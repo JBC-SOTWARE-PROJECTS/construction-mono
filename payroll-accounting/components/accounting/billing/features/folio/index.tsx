@@ -17,6 +17,7 @@ export interface FolioRefetchProps {
 export interface FolioHeaderProps {
   billing: Billing | null
   messageApi: MessageInstance
+  onRefetchBilling: FolioRefetchType
 }
 
 interface FolioContextProps {
