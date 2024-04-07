@@ -643,4 +643,12 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/103_wilson_stock_issue.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/104_wilson_receiving_report_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/105_wilson_receiving_item_report_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/106_wilson_payables_details.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/107_wilson_disbursement_exp.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

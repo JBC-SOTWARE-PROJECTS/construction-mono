@@ -23,6 +23,7 @@ import {
   useProjects,
 } from "@/hooks/payables";
 import { Supplier } from "@/graphql/gql/graphql";
+import { useAssets } from "@/hooks/inventory";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -43,6 +44,7 @@ export default function APDetailsModal(props: IProps) {
   });
   const offices = useOffices();
   const projects = useProjects({ office: selectedOffice });
+  const assets = useAssets();
   //================== functions ====================
 
   const onSubmit = (data: IFormAPTransactionDetails) => {
@@ -69,6 +71,12 @@ export default function APDetailsModal(props: IProps) {
       payload.project = {
         id: data?.project?.value,
         description: data?.project?.label,
+      };
+    }
+    if (payload.assets) {
+      payload.assets = {
+        id: data?.assets?.value,
+        description: data?.assets?.label,
       };
     }
     payload.taxDesc = data?.taxDesc?.label;
@@ -241,6 +249,11 @@ export default function APDetailsModal(props: IProps) {
           record?.project?.description,
           record?.project?.id
         );
+      } else if (type === "assets") {
+        return shapeOptionValue(
+          record?.assets?.description,
+          record?.assets?.id
+        );
       } else if (type === "taxDesc") {
         return shapeOptionValue(record?.taxDesc, record?.ewtRate);
       }
@@ -284,6 +297,7 @@ export default function APDetailsModal(props: IProps) {
           transType: selectInValueInit(record?.transType?.id, "transType"),
           office: selectInValueInit(record?.office?.id, "office"),
           project: selectInValueInit(record?.project?.id, "project"),
+          assets: selectInValueInit(record?.assets?.id, "assets"),
           amount: record?.amount ?? 0,
           discRate: record?.discRate ?? 0,
           discAmount: record?.discAmount ?? 0,
@@ -315,6 +329,7 @@ export default function APDetailsModal(props: IProps) {
               label="Office"
               name="office"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: offices,
@@ -331,10 +346,24 @@ export default function APDetailsModal(props: IProps) {
               label="Project"
               name="project"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: projects,
                 placeholder: "Select Project",
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormSelect
+              label="Asset"
+              name="assets"
+              propsselect={{
+                allowClear: true,
+                showSearch: true,
+                labelInValue: true,
+                options: assets,
+                placeholder: "Select Assets",
               }}
             />
           </Col>

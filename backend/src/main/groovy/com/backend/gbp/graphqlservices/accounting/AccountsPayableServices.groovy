@@ -14,6 +14,7 @@ import com.backend.gbp.rest.dto.payables.ApAgingDetailedDto
 import com.backend.gbp.rest.dto.payables.ApAgingSummaryDto
 import com.backend.gbp.rest.dto.payables.ApLedgerDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
+import com.backend.gbp.rest.dto.payables.AssetDto
 import com.backend.gbp.rest.dto.payables.OfficeDto
 import com.backend.gbp.rest.dto.payables.ProjectDto
 import com.backend.gbp.rest.dto.payables.TransTypeDto
@@ -338,13 +339,17 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                 def apDto = objectMapper.convertValue(it, AccountPayableDetialsDto.class)
                 def office = null
                 def project = null
+                def assets = null
                 if (it.office) {
                     office = objectMapper.convertValue(it.office, OfficeDto.class)
                 }
                 if (it.project) {
                     project = objectMapper.convertValue(it.project, ProjectDto.class)
                 }
-                accountsPayableDetialServices.upsertPayablesDetails(apDto, ap, trans?.id, office?.id, project?.id)
+                if (it.assets) {
+                    assets = objectMapper.convertValue(it.assets, AssetDto.class)
+                }
+                accountsPayableDetialServices.upsertPayablesDetails(apDto, ap, trans?.id, office?.id, project?.id, assets?.id)
         }
 
         return ap

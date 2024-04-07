@@ -4,6 +4,7 @@ import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.AccountsPayable
 import com.backend.gbp.domain.accounting.Bank
 import com.backend.gbp.domain.accounting.ExpenseTransaction
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import groovy.transform.TupleConstructor
 
@@ -41,6 +42,7 @@ class DisbursementExpDto{
 	ExpenseTransaction transType
 	Office office
 	Projects project
+	Assets assets
 	BigDecimal amount
 	String remarks
 	Boolean	isNew

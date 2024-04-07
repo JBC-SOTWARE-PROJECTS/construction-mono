@@ -132,7 +132,7 @@ const SidebarContent = ({ account }) => {
               </SubMenu> */}
 
               {/* SHOP */}
-              <Menu.Item key="main/shop">
+              {/* <Menu.Item key="main/shop">
                 <Link href="/main/shop">
                   <a>
                     <i className="icon icon-shopping-cart" />
@@ -141,9 +141,9 @@ const SidebarContent = ({ account }) => {
                     </span>
                   </a>
                 </Link>
-              </Menu.Item>
+              </Menu.Item> */}
               {/* Transaction */}
-              <SubMenu
+              {/* <SubMenu
                 key="transaction"
                 popupClassName={getNavStyleSubMenuClass(navStyle)}
                 title={
@@ -225,7 +225,7 @@ const SidebarContent = ({ account }) => {
                     </span>
                   </Link>
                 </Menu.Item>
-              </SubMenu>
+              </SubMenu> */}
 
               {/* Reports */}
               <SubMenu

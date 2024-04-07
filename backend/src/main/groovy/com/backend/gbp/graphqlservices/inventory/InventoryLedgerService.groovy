@@ -269,6 +269,59 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 	}
 
 	@Transactional
+	@GraphQLMutation(name = "postInventoryLedgerRecNew")
+	InventoryLedger postInventoryLedgerRecNew(
+			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+			@GraphQLArgument(name = "parentId") UUID parentId
+	) {
+		def company = SecurityUtils.currentCompanyId()
+		def upsert = new InventoryLedger()
+		def postItems = items as ArrayList<PostLedgerDto>
+		postItems.each {
+			it ->
+				upsert = new InventoryLedger()
+				def source = objectMapper.convertValue(it.source, Office.class)
+				def dest = objectMapper.convertValue(it.destination, Office.class)
+
+				upsert.sourceOffice = source
+				upsert.destinationOffice = dest
+				upsert.documentTypes = documentTypeRepository.findById(UUID.fromString(it.typeId)).get()
+				upsert.item = itemService.itemById(UUID.fromString(it.itemId))
+				upsert.referenceNo = it.ledgerNo
+				upsert.ledgerDate = Instant.parse(it.date)
+				upsert.ledgerQtyIn = it.qty
+				upsert.ledgerQtyOut = 0
+				upsert.ledgerPhysical = 0
+				upsert.ledgerUnitCost = it.unitcost
+				upsert.isInclude = true
+				upsert.company = company
+				save(upsert)
+
+				//update receiving Item
+				receivingReportItemService.updateRecItemStatus(UUID.fromString(it.id), true)
+
+				//insert sa PO Monitoring
+				if (it.poItem != null) {
+					def mon = new POMonitoringDto(
+							purchaseOrderItem: UUID.fromString(it.poItem),
+							receivingReport: parentId,
+							receivingReportItem: UUID.fromString(it.id),
+							quantity: it.qty,
+							status: it.isPartial ? "PARTIAL DELIVERED" : "DELIVERED",
+					)
+					poDeliveryMonitoringService.upsertPOMonitoring(mon, null)
+
+					//link po item into receiving id
+					def parentRec = receivingReportService.recById(parentId)
+					purchaseOrderItemService.linkPOItemRec(UUID.fromString(it.poItem), parentRec)
+
+				}
+
+		}
+		return upsert
+	}
+
+	@Transactional
 	@GraphQLMutation(name = "postInventoryLedgerReturn")
 	InventoryLedger postInventoryLedgerReturn(
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,

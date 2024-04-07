@@ -178,9 +178,9 @@
 		<field name="unitOfUsage" class="java.lang.String"/>
 		<field name="itemCategory" class="java.lang.String"/>
 		<field name="expiryDate" class="java.lang.String"/>
-		<field name="onHand" class="java.lang.Integer"/>
-		<field name="physicalCount" class="java.lang.Integer"/>
-		<field name="variance" class="java.lang.Integer"/>
+		<field name="onHand" class="java.math.BigDecimal"/>
+		<field name="physicalCount" class="java.math.BigDecimal"/>
+		<field name="variance" class="java.math.BigDecimal"/>
 		<field name="unitCost" class="java.math.BigDecimal"/>
 		<field name="totalCost" class="java.math.BigDecimal"/>
 		<variable name="sumTotalCost" class="java.math.BigDecimal" calculation="Sum">

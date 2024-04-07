@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import {
   JournalEntryViewDto,
   Query,
-  ReturnSupplier,
-  ReturnSupplierItem,
+  ReceivingReport,
+  ReceivingReportItem,
 } from "@/graphql/gql/graphql";
 import {
   FileDoneOutlined,
@@ -16,39 +16,42 @@ import _ from "lodash";
 import { useConfirmationPasswordHook } from "@/hooks";
 import JournaEntriesTable from "../commons/journalEntriesTable";
 import { decimalRound2 } from "@/utility/helper";
-import PostInventoryTable from "./postInventoryTable";
+import PostInventoryReceivingTable from "./postInventoryReceivingTable";
 import {
-  GET_JOURNAL_RETURN_SUPPLIER,
-  GET_RECORDS_RETURN_ITEMS,
-  POST_VOID_RETURN_SUPPLIER,
+  CHECKING_PO,
+  GET_JOURNAL_RECEIVING_REPORT,
+  GET_RECEIVING_ITEMS,
+  POST_VOID_RECEIVING_REPORT,
 } from "@/graphql/inventory/deliveries-queries";
 import {
-  formatPostReturnSupplier,
-  InventoryPostList,
+  formatPostReceivingReport,
+  InventoryPostReceivingtList,
 } from "@/utility/inventory-helper";
 
 interface IProps {
   hide: (hideProps: any) => void;
-  record: ReturnSupplier;
+  record: ReceivingReport;
   status: boolean;
   viewOnly: boolean;
 }
 
-export default function PostReturnSupplierModal(props: IProps) {
+export default function PostReceivingReportModal(props: IProps) {
   const { message } = App.useApp();
   const { hide, record, status, viewOnly } = props;
   const [showPasswordConfirmation] = useConfirmationPasswordHook();
-  const [items, setItems] = useState<InventoryPostList[]>([]);
+  const [items, setItems] = useState<InventoryPostReceivingtList[]>([]);
   // ===================== Queries ==============================
-  const { loading: loadingItems } = useQuery<Query>(GET_RECORDS_RETURN_ITEMS, {
+  const { loading: loadingItems } = useQuery<Query>(GET_RECEIVING_ITEMS, {
     variables: {
       id: record?.id,
     },
     onCompleted: (data) => {
-      let result = (data?.rtsItemByParent ?? []) as ReturnSupplierItem[];
+      let result = (data?.recItemByParent ?? []) as ReceivingReportItem[];
+
       if (!_.isEmpty(result)) {
-        let payload = (result || []).map((e, i) => {
-          let obj = formatPostReturnSupplier(e, record, i);
+        let payload = result.map((e, i) => {
+          let obj = formatPostReceivingReport(e, record, i);
+          console.log("obj", obj);
           return obj;
         });
         setItems(payload);
@@ -56,7 +59,7 @@ export default function PostReturnSupplierModal(props: IProps) {
     },
   });
 
-  const { data, loading } = useQuery<Query>(GET_JOURNAL_RETURN_SUPPLIER, {
+  const { data, loading } = useQuery<Query>(GET_JOURNAL_RECEIVING_REPORT, {
     variables: {
       id: record?.id,
       status: status,
@@ -64,13 +67,33 @@ export default function PostReturnSupplierModal(props: IProps) {
     fetchPolicy: "cache-and-network",
   });
 
-  const [upsertRecord, { loading: upsertLoading }] = useMutation(
-    POST_VOID_RETURN_SUPPLIER,
+  const [checkingPO, { loading: checkingPOLoading }] = useMutation(
+    CHECKING_PO,
     {
       ignoreResults: false,
       onCompleted: (data) => {
-        if (!_.isEmpty(data?.postReturnInventory?.id)) {
-          hide("Return Supplier Updated");
+        if (!_.isEmpty(data?.setToCompleted?.id)) {
+          hide("Delivery Receiving Posted");
+        }
+      },
+    }
+  );
+
+  const [upsertRecord, { loading: upsertLoading }] = useMutation(
+    POST_VOID_RECEIVING_REPORT,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.receivingPostInventory?.id)) {
+          if (record?.purchaseOrder?.id) {
+            checkingPO({
+              variables: {
+                id: record?.purchaseOrder?.id,
+              },
+            });
+          } else {
+            hide("Delivery Receiving Updated");
+          }
         } else {
           message.error("Something went wrong. Please contact administrator");
         }
@@ -107,12 +130,14 @@ export default function PostReturnSupplierModal(props: IProps) {
     }
   }, [record]);
 
+  console.log("items", items);
+
   return (
     <Modal
       title={
         <Typography.Title level={4}>
           <Space align="center">
-            <FileDoneOutlined /> Return Supplier Journal Entry Details
+            <FileDoneOutlined /> Delivery Receiving Journal Entry Details
           </Space>
         </Typography.Title>
       }
@@ -129,9 +154,14 @@ export default function PostReturnSupplierModal(props: IProps) {
               type="primary"
               size="large"
               danger={status ? false : true}
-              loading={upsertLoading}
+              loading={upsertLoading || checkingPOLoading}
               onClick={onSubmit}
-              disabled={upsertLoading || disabledButton || disabledStatus}
+              disabled={
+                upsertLoading ||
+                disabledButton ||
+                disabledStatus ||
+                checkingPOLoading
+              }
               icon={<SaveOutlined />}>
               {status ? "Post to Inventory" : "Void to Inventory"}
             </Button>
@@ -150,14 +180,17 @@ export default function PostReturnSupplierModal(props: IProps) {
             key: "inventory",
             label: "View Inventory Items",
             children: (
-              <PostInventoryTable dataSource={items} loading={loadingItems} />
+              <PostInventoryReceivingTable
+                dataSource={items}
+                loading={loadingItems}
+              />
             ),
           },
         ]}
       />
       <Divider plain>Accounting Journal Entries</Divider>
       <JournaEntriesTable
-        entries={data?.returnSupplierAccountView as JournalEntryViewDto[]}
+        entries={data?.receivingAccountView as JournalEntryViewDto[]}
         loading={loading}
       />
     </Modal>

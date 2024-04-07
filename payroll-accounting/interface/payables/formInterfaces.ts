@@ -17,6 +17,7 @@ export interface IFormAPTransactionDetails {
   transType?: any;
   office?: any;
   project?: any;
+  assets?: any;
   amount: number;
   discRate: number;
   discAmount: number;
@@ -66,6 +67,7 @@ export interface IFormDisbursementExpense {
   transType: OptionsValue;
   office: OptionsValue;
   project: OptionsValue;
+  assets: OptionsValue;
   amount: number;
   remarks: string;
 }

@@ -154,6 +154,10 @@ export const GET_AP_ITEMS = gql`
         id
         description
       }
+      assets {
+        id
+        description
+      }
       amount
       discRate
       discAmount
@@ -171,30 +175,38 @@ export const GET_AP_ITEMS = gql`
 
 export const GET_REC_ITEMS_RECORDS = gql`
   query ($id: UUID) {
-    receivingReportItemLists(id: $id) {
+    recItemByParent(id: $id) {
       id
+      receivingReport {
+        id
+        rrNo
+      }
       item {
         id
         descLong
+        item_conversion
+        vatable
         unit_of_usage {
           id
           unitDescription
         }
       }
-      receivingReport {
-        id
-        rrNo
-        receiveDate
-      }
+      uou
       receiveQty
       receiveUnitCost
+      recInventoryCost
+      discountRate
       receiveDiscountCost
+      isFg
+      isDiscount
+      isPartial
+      isCompleted
+      isTax
+      expirationDate
       totalAmount
       inputTax
       netAmount
-      isFg
-      isCompleted
-      isPartial
+      isPosted
     }
   }
 `;

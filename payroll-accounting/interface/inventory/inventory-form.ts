@@ -45,3 +45,26 @@ export interface IFormItemIssuance {
   assets: string;
   remarks: string;
 }
+
+export interface IFormReceivingReport {
+  receiveDate: Dayjs;
+  receivedRefDate: Dayjs;
+  receivedRefNo: string;
+  purchaseOrder: string;
+  supplier: OptionsValue;
+  receivedOffice: string;
+  paymentTerms: string;
+  account: string;
+  category: string;
+  project: string;
+  assets: string;
+  receivedRemarks: string;
+  grossAmount: number;
+  inputTax: number;
+  totalDiscount: number;
+  netAmount: number;
+  netDiscount: number;
+  amount: number;
+  vatRate: number;
+  vatInclusive: boolean;
+}
