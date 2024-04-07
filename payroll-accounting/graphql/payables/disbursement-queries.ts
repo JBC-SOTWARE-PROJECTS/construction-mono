@@ -162,6 +162,10 @@ export const GET_DISBURSEMENT_EXPENSE = gql`
         id
         description
       }
+      assets {
+        id
+        description
+      }
       amount
       remarks
     }
