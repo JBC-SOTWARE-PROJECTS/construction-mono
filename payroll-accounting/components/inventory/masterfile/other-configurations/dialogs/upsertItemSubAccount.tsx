@@ -46,10 +46,20 @@ export default function UpsertItemSubAccountModal(props: IProps) {
   const onSubmit = (values: any) => {
     let payload = _.clone(values);
     payload.accountType = record?.accountType;
-    if (record?.accountType === "FIXED_ASSET") {
+
+    if (
+      record?.accountType === "FIXED_ASSET" ||
+      record?.accountType === "FIXED_ASSET_EXPENSE"
+    ) {
       payload.isFixedAsset = true;
     } else {
       payload.isFixedAsset = false;
+    }
+
+    if (record?.accountType === "REVENUE") {
+      payload.isRevenue = true;
+    } else {
+      payload.isRevenue = false;
     }
 
     upsert({

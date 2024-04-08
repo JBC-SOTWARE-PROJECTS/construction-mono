@@ -150,6 +150,9 @@ th.ant-table-cell {
 .notification-badge sup.ant-badge-count-sm {
   transform: translate(70%, -70%) !important;
 }
+.notification-badge {
+  height: fit-content !important;
+}
 
 /* select header className */
 .select-header {
@@ -523,6 +526,16 @@ th.ant-table-cell {
 
 .ant-image-preview-mask {
   background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.ant-pro-page-container
+  .ant-pro-page-container-warp-page-header
+  .ant-page-header-heading {
+  padding-block-start: 0px !important;
+}
+
+.ant-page-header-content {
+  padding-block-start: 0px !important;
 }
 
 /* responsive here onwards */

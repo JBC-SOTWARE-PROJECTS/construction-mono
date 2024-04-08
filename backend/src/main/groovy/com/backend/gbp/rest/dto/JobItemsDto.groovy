@@ -12,7 +12,7 @@ class JobItemsDto {
     String service
     String serviceCategory
     String descriptions
-    Integer qty
+    BigDecimal qty
     BigDecimal cost
     BigDecimal subTotal
     BigDecimal outputTax

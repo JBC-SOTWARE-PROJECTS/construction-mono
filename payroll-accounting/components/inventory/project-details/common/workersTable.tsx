@@ -6,7 +6,7 @@ import { Row, Col, Table, Button, Typography, Space, App, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import _ from "lodash";
 import { useContext } from "react";
-import ColTitlePopUp from "../../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import { NumberFormaterNoDecimal } from "@/utility/helper";
 import { confirmDelete, useDialog } from "@/hooks";
 import { useRouter } from "next/router";
@@ -17,6 +17,7 @@ import {
   REMOVE_RECORD_PROJECT_WORKERS,
 } from "@/graphql/inventory/project-queries";
 import { DateFormatterWithTime } from "../../../../utility/helper";
+
 
 interface IProps {
   projectUpdateId: string;
@@ -95,7 +96,7 @@ export default function ProjectAccomplishmentWorkersTable({
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="AM"
           popup="Total numbers of workers in morning shift"
         />
@@ -110,7 +111,7 @@ export default function ProjectAccomplishmentWorkersTable({
     },
     {
       title: (
-        <ColTitlePopUp
+        <ColumnTitle
           descripton="PM"
           popup="Total numbers of workers in afternoon shift"
         />

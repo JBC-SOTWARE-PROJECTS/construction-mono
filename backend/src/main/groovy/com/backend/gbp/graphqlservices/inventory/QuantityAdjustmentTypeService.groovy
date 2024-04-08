@@ -55,6 +55,7 @@ class QuantityAdjustmentTypeService extends AbstractDaoService<QuantityAdjustmen
 			upsert.is_active = forInsert.is_active
 			upsert.flagValue = forInsert.flagValue
 			upsert.sourceColumn = forInsert.sourceColumn
+			upsert.reverse = forInsert.reverse
 			upsert.company = company
 			save(upsert)
 

@@ -73,7 +73,7 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     BigDecimal getTotals(
             @GraphQLArgument(name = "id") UUID id
     ){
-        String query = '''Select coalesce(sum(j.cost * j.qty), 0) from ProjectCost j where 
+        String query = '''Select coalesce(sum(j.totalCost), 0) from ProjectCost j where 
         j.project.id = :id and j.status = true'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)

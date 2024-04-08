@@ -1,0 +1,1 @@
+ALTER TABLE inventory.stock_issue ADD column IF NOT EXISTS asset uuid default null, ADD column IF NOT EXISTS category varchar default null;

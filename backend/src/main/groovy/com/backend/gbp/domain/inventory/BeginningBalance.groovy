@@ -2,6 +2,8 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
+import com.backend.gbp.domain.types.AutoIntegrateable
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
@@ -17,7 +19,7 @@ import java.time.Instant
 @Table(schema = "inventory", name = "beginning_balance")
 @SQLDelete(sql = "UPDATE inventory.beginning_balance SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class BeginningBalance extends AbstractAuditingEntity {
+class BeginningBalance extends AbstractAuditingEntity implements AutoIntegrateable {
 
 	@GraphQLQuery
 	@Id
@@ -47,7 +49,7 @@ class BeginningBalance extends AbstractAuditingEntity {
 
 	@GraphQLQuery
 	@Column(name = "quantity")
-	Integer quantity
+	BigDecimal quantity
 
 	@GraphQLQuery
 	@Column(name = "unit_cost")
@@ -62,8 +64,16 @@ class BeginningBalance extends AbstractAuditingEntity {
 	Boolean isCancel
 
 	@GraphQLQuery
+	@Column(name = "posted_by")
+	String postedBy
+
+	@GraphQLQuery
 	@Column(name = "company")
 	UUID company
+
+	@GraphQLQuery
+	@Column(name = "posted_ledger")
+	UUID postedLedger
 
 	@GraphQLQuery(name = "unitMeasurement")
 	@Transient
@@ -76,4 +86,34 @@ class BeginningBalance extends AbstractAuditingEntity {
 	String getUou() {
 		return "${item.unit_of_usage?.unitDescription}"
 	}
+
+	//accounting integrate
+	@Override
+	String getDomain() {
+		return IntegrationDomainEnum.BEGINNING_BALANCE.name()
+	}
+
+	@Transient
+	String flagValue
+
+	@Override
+	Map<String, String> getDetails() {
+		return [:]
+	}
+
+	// cost for adjustment
+	@Transient
+	BigDecimal inventoryCost = BigDecimal.ZERO
+
+	@Transient
+	BigDecimal inventoryCostNegative = BigDecimal.ZERO
+
+	@Transient
+	BigDecimal beginningCost = BigDecimal.ZERO
+
+	@Transient
+	BigDecimal beginningCostNegative = BigDecimal.ZERO
+
+	@Transient
+	ItemSubAccount inventorySubAccount
 }

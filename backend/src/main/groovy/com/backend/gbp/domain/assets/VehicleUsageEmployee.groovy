@@ -47,6 +47,10 @@ class VehicleUsageEmployee extends AbstractAuditingEntity implements Serializabl
 	Instant timeRenderedEnd
 
 	@GraphQLQuery
+	@Column(name = "labor_cost")
+	BigDecimal laborCost
+
+	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "employee", referencedColumnName = "id")

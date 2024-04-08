@@ -5,7 +5,7 @@ import groovy.transform.TupleConstructor
 @TupleConstructor
 class ReturnSuppItemReportDto {
 	String stockCode, itemDesc, uom, reasonForReturn, srrNo
-	Integer quantityReturn
+	BigDecimal quantityReturn
 }
 
 @TupleConstructor

@@ -95,8 +95,7 @@ const ViewEmployee = ({ account }: IPageProps) => {
           <ProCard
             headStyle={{
               flexWrap: "wrap",
-            }}
-          >
+            }}>
             <EmployeeManagementHeader title="Employee Management">
               <Row>
                 <Col xs={24} sm={24} md={6} lg={6} xl={6}>
@@ -111,8 +110,7 @@ const ViewEmployee = ({ account }: IPageProps) => {
                       router.push(
                         `/payroll/employees/${router?.query?.id}/edit`
                       );
-                    }}
-                  >
+                    }}>
                     Edit Employee Information
                   </Button>
                   <EmployeeDescription record={employee} />
@@ -127,7 +125,7 @@ const ViewEmployee = ({ account }: IPageProps) => {
             </EmployeeManagementHeader>
 
             <Divider />
-            <Card bodyStyle={{ padding: 0 }}>
+            <Card styles={{ body: { padding: 0 } }}>
               {menuItems.map(
                 (item, index) =>
                   item.show === true && (
@@ -136,14 +134,12 @@ const ViewEmployee = ({ account }: IPageProps) => {
                       passHref
                       legacyBehavior
                       key={index}
-                      style={{ display: "inline" }}
-                    >
+                      style={{ display: "inline" }}>
                       <a style={{ textDecoration: "none" }}>
                         <Card.Grid
                           style={gridStyle}
                           key={index}
-                          onClick={() => {}}
-                        >
+                          onClick={() => {}}>
                           <Typography.Title level={4}>
                             {item.title}
                           </Typography.Title>

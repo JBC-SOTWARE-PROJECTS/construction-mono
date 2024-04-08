@@ -166,7 +166,15 @@ export default function BillQuantitesContent() {
             </Row>
           </Form>
         </div>
-        <div className="w-full mb-5 dev-right">
+        <div className="w-full mb-5 dev-between">
+          <Statistic
+            title="Total Project Cost"
+            value={Number(_.sumBy(data?.pCostByList, "totalCost"))}
+            formatter={(e) => {
+              let value = Number(e);
+              return `${NumberFormater(value)}`;
+            }}
+          />
           <Statistic
             title="Total Relative Weight (%)"
             value={Number(_.sumBy(data?.pCostByList, "relativeWeight"))}

@@ -3,6 +3,7 @@ export let systemTagline: string = "Business Solutions Systems";
 export let apiUrlPrefix: string = "";
 export let frontEndUrl: string = "";
 export let currencyDisplay: string = "₱";
+export let s3UrlPrefix: string = "https://megatam.sgp1.cdn.digitaloceanspaces.com/"
 
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
@@ -11,11 +12,11 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 } else {
   if (typeof window) {
     apiUrlPrefix = "https://api-demo.megaptk.com";
-   // frontEndUrl = "https://inventory.megaptk.com"; //PROD
+    //frontEndUrl = "https://inventory.megaptk.com"; //PROD
     frontEndUrl = "https://inventory-demo.syncprosolutions.com"; // DEMO
   } else {
     apiUrlPrefix = "https://api-demo.megaptk.com";
-   // frontEndUrl = "https://inventory.megaptk.com"; //PROD
-    frontEndUrl = "https://inventory-demo.syncprosolutions.com"; //DEMO
+    //frontEndUrl = "https://inventory.megaptk.com"; //PROD
+   frontEndUrl = "https://inventory-demo.syncprosolutions.com"; //DEMO
   }
 }

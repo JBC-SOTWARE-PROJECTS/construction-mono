@@ -44,6 +44,20 @@ export default function QuantityAdjustmentTypeTable({
       },
     },
     {
+      title: "Reverse Normal Side",
+      dataIndex: "reverse",
+      key: "reverse",
+      align: "center",
+      width: 150,
+      render: (text) => {
+        let color = "red";
+        if (text) {
+          color = "green";
+        }
+        return <Tag color={color}>{text ? "Yes" : "No"}</Tag>;
+      },
+    },
+    {
       title: "Status",
       dataIndex: "is_active",
       key: "is_active",
@@ -58,6 +72,7 @@ export default function QuantityAdjustmentTypeTable({
         return <Tag color={color}>{text ? "Active" : "Inactive"}</Tag>;
       },
     },
+
     {
       title: "#",
       key: "action",
