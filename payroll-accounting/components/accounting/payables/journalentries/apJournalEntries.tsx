@@ -67,7 +67,7 @@ export default function APJournalEntries(props: IProps) {
   const showAccountSelector = useDialog(ChartOfAccountsComponentSelector);
   // ===================== Queries ==============================
   const templates = UseAccountsTemplate({
-    type: type ?? "",
+    type: type ?? null,
     category: "AP",
   });
   // ===========================================

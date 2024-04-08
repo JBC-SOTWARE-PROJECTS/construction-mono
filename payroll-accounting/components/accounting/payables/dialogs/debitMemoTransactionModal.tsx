@@ -16,7 +16,13 @@ import { FormTextArea } from "@/components/common";
 import _ from "lodash";
 import { randomId, requiredField, shapeOptionValue } from "@/utility/helper";
 import { decimalRound2 } from "@/utility/helper";
-import { ExpenseTransaction, Office, Projects } from "@/graphql/gql/graphql";
+import {
+  Assets,
+  ExpenseTransaction,
+  Office,
+  Projects,
+} from "@/graphql/gql/graphql";
+import { useAssets } from "@/hooks/inventory";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -37,6 +43,7 @@ export default function DebitMemoTransactionModal(props: IProps) {
   const banks = useExpenseTransaction({ type: type });
   const offices = useOffices();
   const projects = useProjects({ office: selectedOffice });
+  const assets = useAssets();
   //================== functions ====================
   const onSubmit = (data: IFormDebitMemoDetails) => {
     const payload = {
@@ -63,6 +70,13 @@ export default function DebitMemoTransactionModal(props: IProps) {
         id: data?.project?.value,
         description: data?.project?.label,
       } as Projects;
+    }
+    payload.assets = null;
+    if (data.assets) {
+      payload.assets = {
+        id: data?.assets?.value,
+        description: data?.assets?.label,
+      } as Assets;
     }
     payload.transType = {
       id: data?.transType?.value,
@@ -99,6 +113,11 @@ export default function DebitMemoTransactionModal(props: IProps) {
           record?.project?.description,
           record?.project?.id
         );
+      } else if (type === "assets") {
+        return shapeOptionValue(
+          record?.assets?.description,
+          record?.assets?.id
+        );
       }
     }
   };
@@ -108,7 +127,8 @@ export default function DebitMemoTransactionModal(props: IProps) {
       title={
         <Typography.Title level={4}>
           <Space align="center">
-            <TransactionOutlined /> Debit Memo Transaction
+            <TransactionOutlined /> Debit
+            {type === "DEBITMEMO" ? "Memo" : "Advice"} Transaction
           </Space>
         </Typography.Title>
       }
@@ -139,6 +159,7 @@ export default function DebitMemoTransactionModal(props: IProps) {
           transType: selectInValueInit(record?.transType?.id, "transType"),
           office: selectInValueInit(record?.office?.id, "office"),
           project: selectInValueInit(record?.project?.id, "project"),
+          assets: selectInValueInit(record?.assets?.id, "assets"),
           type: record?.type ?? calculationType,
           percent: record?.percent ?? 0,
           amount: record?.amount ?? 0,
@@ -163,6 +184,7 @@ export default function DebitMemoTransactionModal(props: IProps) {
               label="Office"
               name="office"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: offices,
@@ -179,10 +201,24 @@ export default function DebitMemoTransactionModal(props: IProps) {
               label="Project"
               name="project"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: projects,
                 placeholder: "Select Project",
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormSelect
+              label="Asset"
+              name="assets"
+              propsselect={{
+                allowClear: true,
+                showSearch: true,
+                labelInValue: true,
+                options: assets,
+                placeholder: "Select Assets",
               }}
             />
           </Col>

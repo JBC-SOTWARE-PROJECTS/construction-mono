@@ -88,6 +88,7 @@ export interface IFormDebitMemoDetails {
   transType: OptionsValue;
   office: OptionsValue;
   project: OptionsValue;
+  assets: OptionsValue;
   type: string;
   percent: number;
   amount: number;
@@ -114,6 +115,7 @@ export interface IFormPettyCashOthers {
   transType: OptionsValue;
   office: OptionsValue;
   project: OptionsValue;
+  assets: OptionsValue;
   amount: number;
   remarks: string;
 }

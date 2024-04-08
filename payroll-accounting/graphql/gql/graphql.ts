@@ -44,6 +44,16 @@ export type Scalars = {
   UUID: { input: any; output: any; }
 };
 
+export type ApBeginningBalanceDto = {
+  __typename?: 'APBeginningBalanceDto';
+  apNo?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  supplierFullname?: Maybe<Scalars['String']['output']>;
+  supplierId?: Maybe<Scalars['UUID']['output']>;
+  supplierType?: Maybe<Scalars['String']['output']>;
+  total?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
 export type ArInvoiceDto = {
   __typename?: 'ARInvoiceDto';
   amount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -1467,6 +1477,7 @@ export type DateWithScheduleInput = {
 export type DebitMemo = {
   __typename?: 'DebitMemo';
   appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  assets?: Maybe<Assets>;
   bank?: Maybe<Bank>;
   cashOnBank?: Maybe<Scalars['BigDecimal']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
@@ -1614,6 +1625,7 @@ export type DebitMemo = {
 export type DebitMemoDetails = {
   __typename?: 'DebitMemoDetails';
   amount?: Maybe<Scalars['BigDecimal']['output']>;
+  assets?: Maybe<Assets>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   debitMemo?: Maybe<DebitMemo>;
@@ -1630,6 +1642,7 @@ export type DebitMemoDetails = {
 
 export type DebitMemoInput = {
   appliedAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  assets?: InputMaybe<AssetsInput>;
   bank?: InputMaybe<BankInput>;
   cashOnBank?: InputMaybe<Scalars['BigDecimal']['input']>;
   company?: InputMaybe<Scalars['UUID']['input']>;
@@ -2178,6 +2191,7 @@ export type DisbursementWtx = {
   appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
+  debitMemo?: Maybe<DebitMemo>;
   disbursement?: Maybe<Disbursement>;
   ewtAmount?: Maybe<Scalars['BigDecimal']['output']>;
   ewtDesc?: Maybe<Scalars['String']['output']>;
@@ -2221,6 +2235,7 @@ export type DiscountDetails = {
 
 export type DmDetailsDtoInput = {
   amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  assets?: InputMaybe<AssetsInput>;
   id?: InputMaybe<Scalars['String']['input']>;
   isNew?: InputMaybe<Scalars['Boolean']['input']>;
   office?: InputMaybe<OfficeInput>;
@@ -4468,7 +4483,9 @@ export type Mutation = {
   removeServiceItem?: Maybe<ServiceItems>;
   removeStiItem?: Maybe<StockIssueItems>;
   removeWtx?: Maybe<DisbursementWtx>;
+  removeWtxDebitMemo?: Maybe<DisbursementWtx>;
   removeWtxList?: Maybe<DisbursementWtx>;
+  removeWtxListDebitMemo?: Maybe<DisbursementWtx>;
   removedMaterial?: Maybe<ProjectUpdatesMaterials>;
   removedMaterialDirectExpense?: Maybe<ProjectUpdatesMaterials>;
   resetPassword?: Maybe<User>;
@@ -4690,6 +4707,7 @@ export type Mutation = {
   upsertVehicleUsageMonitoring?: Maybe<VehicleUsageMonitoring>;
   upsertWithholdingTaxMatrix?: Maybe<GraphQlRetVal_WithholdingTaxMatrix>;
   upsertWtx?: Maybe<DisbursementWtx>;
+  upsertWtxDebitMemo?: Maybe<DisbursementWtx>;
   voidLedgerById?: Maybe<InventoryLedger>;
   voidLedgerByRef?: Maybe<InventoryLedger>;
   voidLedgerByRefExpense?: Maybe<InventoryLedger>;
@@ -5809,7 +5827,19 @@ export type MutationRemoveWtxArgs = {
 
 
 /** Mutation root */
+export type MutationRemoveWtxDebitMemoArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationRemoveWtxListArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveWtxListDebitMemoArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
@@ -6536,6 +6566,7 @@ export type MutationUpsertDebitMemoArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+  wtx?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
 };
 
 
@@ -7346,6 +7377,13 @@ export type MutationUpsertWtxArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertWtxDebitMemoArgs = {
+  it?: InputMaybe<DisbursementWtxDtoInput>;
+  parent?: InputMaybe<DebitMemoInput>;
+};
+
+
+/** Mutation root */
 export type MutationVoidLedgerByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -7540,6 +7578,7 @@ export type PcvItemsDtoInput = {
 
 export type PcvOthersDtoInput = {
   amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  assets?: InputMaybe<AssetsInput>;
   id?: InputMaybe<Scalars['String']['input']>;
   isNew?: InputMaybe<Scalars['Boolean']['input']>;
   office?: InputMaybe<OfficeInput>;
@@ -10074,6 +10113,7 @@ export type PettyCashName = {
 export type PettyCashOther = {
   __typename?: 'PettyCashOther';
   amount?: Maybe<Scalars['BigDecimal']['output']>;
+  assets?: Maybe<Assets>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
   id?: Maybe<Scalars['UUID']['output']>;
@@ -10972,6 +11012,7 @@ export type Query = {
   apApplicationById?: Maybe<DisbursementAp>;
   /** Find Ap that has beginning */
   apBeginning?: Maybe<Scalars['Boolean']['output']>;
+  apBeginningBalance?: Maybe<Array<Maybe<ApBeginningBalanceDto>>>;
   apByDis?: Maybe<Array<Maybe<DisbursementAp>>>;
   apById?: Maybe<AccountsPayable>;
   apDebitMemo?: Maybe<Array<Maybe<DisbursementAp>>>;
@@ -11086,6 +11127,8 @@ export type Query = {
   disExpByParent?: Maybe<Array<Maybe<DisbursementExpense>>>;
   /** Find Ap reference Type */
   disReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
+  /** Find DisbursementWtx by Parent */
+  disWtxByDebitMemo?: Maybe<Array<Maybe<DisbursementWtx>>>;
   disWtxById?: Maybe<DisbursementWtx>;
   /** Find DisbursementWtx by Parent */
   disWtxByParent?: Maybe<Array<Maybe<DisbursementWtx>>>;
@@ -11859,6 +11902,14 @@ export type QueryApBeginningArgs = {
 
 
 /** Query root */
+export type QueryApBeginningBalanceArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['Boolean']['input']>;
+  types?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
 export type QueryApByDisArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -12378,6 +12429,12 @@ export type QueryDisExpByIdArgs = {
 
 /** Query root */
 export type QueryDisExpByParentArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisWtxByDebitMemoArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 

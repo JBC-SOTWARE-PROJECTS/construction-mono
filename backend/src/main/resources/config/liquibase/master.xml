@@ -651,4 +651,10 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/107_wilson_disbursement_exp.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/108_wilson_petty_cash_others.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/109_wilson_debit_memo_details_alter.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/109_wilson_debit_memo_wtx_alter.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

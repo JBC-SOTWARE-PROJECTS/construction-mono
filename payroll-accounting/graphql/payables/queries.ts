@@ -293,3 +293,24 @@ export const GET_AP_ADVANCE_SUPPLIER = gql`
     apBeginning(supplier: $supplier, id: $id)
   }
 `;
+
+export const REMOVE_DEBIT_MEMO_WTX = gql`
+  mutation ($id: UUID) {
+    removeWtxDebitMemo(id: $id) {
+      id
+    }
+  }
+`;
+
+export const GET_AP_BEGINNING_BALANCE = gql`
+  query ($filter: String, $types: UUID, $status: Boolean) {
+    apBeginningBalance(filter: $filter, types: $types, status: $status) {
+      id
+      apNo
+      supplierId
+      supplierFullname
+      supplierType
+      total
+    }
+  }
+`
