@@ -1,36 +1,15 @@
 import { AddProjectServices } from "@/components/accounting/billing/dialog/add-projrect-services"
 import PageFilterContainer from "@/components/common/custom-components/page-filter-container"
-import {
-  DELETE_BILLING_ITEM_BY_ID,
-  GET_BILLING_ITEMS,
-} from "@/graphql/billing/queries"
-import { Billing, BillingItem } from "@/graphql/gql/graphql"
+import { GET_BILLING_ITEMS } from "@/graphql/billing/queries"
+import { BillingItem } from "@/graphql/gql/graphql"
 import { useDialog } from "@/hooks"
-import { currency } from "@/utility/constant"
-import { DateFormatterWithTime, NumberFormater } from "@/utility/helper"
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PlusCircleFilled,
-  SearchOutlined,
-  UserOutlined,
-} from "@ant-design/icons"
-import { useMutation, useQuery } from "@apollo/client"
-import { Alert, Button, Input, Space, Table, Tag, Typography } from "antd"
+import { PlusCircleFilled, SearchOutlined } from "@ant-design/icons"
+import { useQuery } from "@apollo/client"
+import { Button, Input, Space, Table } from "antd"
 
-import type { TableColumnsType } from "antd"
-import styled from "styled-components"
-import { getBillingItemColumns } from "./utils"
 import { TableNoBorderRadCSS } from "@/components/common/utils/table-utils"
 import { FolioTabsProps } from ".."
-import { useEffect } from "react"
-
-interface DataType {
-  key: React.Key
-  name: string
-  age: number
-  address: string
-}
+import { getBillingItemColumns } from "./utils"
 
 type FolioBillingItemType = "SERVICE" | "DEDUCTIONS" | "PAYMENTS"
 
@@ -52,10 +31,6 @@ export default function FolioProgressBilling(
     },
   })
 
-  const [onDeleteItem, { loading: onDeleteItemLoading }] = useMutation(
-    DELETE_BILLING_ITEM_BY_ID
-  )
-
   const onInsertService = () => {
     const billingItems = (data?.billingItemByParentType ?? [])
       .filter((item: BillingItem) => {
@@ -74,20 +49,6 @@ export default function FolioProgressBilling(
         refetch()
       }
     )
-  }
-
-  const onDeleteBillingItem = (id: string) => {
-    onDeleteItem({
-      variables: {
-        id,
-      },
-      onCompleted: ({ removeBillingItemProjectService }) => {
-        if (removeBillingItemProjectService?.success) {
-          refetch()
-          if (props?.refetch) props?.refetch()
-        }
-      },
-    })
   }
 
   return (
@@ -120,7 +81,7 @@ export default function FolioProgressBilling(
       <Table
         rowKey={"id"}
         size="small"
-        columns={getBillingItemColumns(onDeleteBillingItem)}
+        columns={getBillingItemColumns(props?.refetch, refetch)}
         loading={loading}
         dataSource={data?.billingItemByParentType ?? []}
         scroll={{ x: 1500, y: 300 }}

@@ -72,14 +72,3 @@ export default function BillingFolioComponent(props: Iprops) {
     </Folio>
   )
 }
-
-const CardFlex = styled.div`
-  height: 100%;
-  .ant-card {
-    height: 100%;
-  }
-`
-
-const InfoContainer = styled.div`
-  height: 100%;
-`

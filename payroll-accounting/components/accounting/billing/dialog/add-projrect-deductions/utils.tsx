@@ -20,7 +20,7 @@ export const getProjectDeductionCol = (
     },
     {
       title: "Amount",
-      dataIndex: "subTotal",
+      dataIndex: "remainingBalance",
       align: "right",
       render: (text) => numeral(text).format("0,0.00"),
     },

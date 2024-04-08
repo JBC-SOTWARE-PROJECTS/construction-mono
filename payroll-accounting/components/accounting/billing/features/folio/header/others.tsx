@@ -178,7 +178,7 @@ export const FolioActions = (props: FolioActionsProps) => {
                 </Button>
               </Popconfirm>
             </Col>
-            <Col {...colActionButtonProps}>
+            {/* <Col {...colActionButtonProps}>
               <Button
                 type="primary"
                 block
@@ -197,7 +197,7 @@ export const FolioActions = (props: FolioActionsProps) => {
               >
                 Print
               </Button>
-            </Col>
+            </Col> */}
           </Row>
         </Card>
       </CardFlex>

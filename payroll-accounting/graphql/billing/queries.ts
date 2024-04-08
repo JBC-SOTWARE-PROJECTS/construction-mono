@@ -72,6 +72,34 @@ export const GET_BILLING_INFO_BY_ID = gql`
   }
 `
 
+export const GET_BILLING_ITEMS_PAGE = gql`
+  query ($id: UUID, $page: Int, $size: Int) {
+    billingItemPage(id: $id, page: $page, size: $size) {
+      content {
+        id
+        transDate
+        recordNo
+        description
+        qty
+        debit
+        credit
+        subTotal
+        itemType
+        transType
+        orNum
+        lastModifiedBy
+        projectCostId
+        projectWorkAccomplishmentItemId
+        remainingBalance
+        status
+      }
+      size
+      totalElements
+      number
+    }
+  }
+`
+
 export const GET_BILLING_ITEMS = gql`
   query ($filter: String, $id: UUID, $type: [String], $active: Boolean) {
     billingItemByParentType(

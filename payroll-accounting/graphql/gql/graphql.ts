@@ -1144,6 +1144,7 @@ export type BillingItem = {
   recalculationDate?: Maybe<Scalars['Instant']['output']>;
   recordNo?: Maybe<Scalars['String']['output']>;
   refId?: Maybe<Scalars['UUID']['output']>;
+  remainingBalance?: Maybe<Scalars['BigDecimal']['output']>;
   service?: Maybe<ServiceManagement>;
   status?: Maybe<Scalars['Boolean']['output']>;
   subTotal?: Maybe<Scalars['BigDecimal']['output']>;
@@ -4184,6 +4185,7 @@ export type Mutation = {
   addArInvoiceParticulars?: Maybe<GraphQlResVal_ArInvoiceParticulars>;
   addCreditNoteClaimsItem?: Maybe<GraphQlResVal_ArCreditNoteItems>;
   addCustomJV?: Maybe<GraphQlRetVal_Boolean>;
+  addDeductions?: Maybe<Scalars['Boolean']['output']>;
   addDiscounts?: Maybe<BillingItem>;
   addInvoiceClaimsItem?: Maybe<GraphQlResVal_ArInvoiceItems>;
   addInvoiceItem?: Maybe<GraphQlResVal_ArInvoiceItems>;
@@ -4195,6 +4197,7 @@ export type Mutation = {
   addOTC?: Maybe<Billing>;
   /** add Payment */
   addPayment?: Maybe<Payment>;
+  addProjectService?: Maybe<GraphQlResVal_Boolean>;
   addReceivablePayment?: Maybe<GraphQlResVal_Payment>;
   /** add remarks in shift */
   addRemarks?: Maybe<Shift>;
@@ -4331,6 +4334,7 @@ export type Mutation = {
   removeApAppList?: Maybe<DisbursementAp>;
   removeApDetails?: Maybe<AccountsPayableDetails>;
   removeApLedger?: Maybe<ApLedger>;
+  removeBillingItemProjectService?: Maybe<GraphQlResVal_Boolean>;
   removeCheck?: Maybe<DisbursementCheck>;
   removeCheckList?: Maybe<DisbursementCheck>;
   removeCreditNoteItem?: Maybe<GraphQlResVal_ArCreditNoteItems>;
@@ -4615,6 +4619,14 @@ export type MutationAddCustomJvArgs = {
 
 
 /** Mutation root */
+export type MutationAddDeductionsArgs = {
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
+};
+
+
+/** Mutation root */
 export type MutationAddDiscountsArgs = {
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -4678,6 +4690,13 @@ export type MutationAddPaymentArgs = {
   payment_details?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
   shift?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationAddProjectServiceArgs = {
+  billingId?: InputMaybe<Scalars['UUID']['input']>;
+  fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
 };
 
 
@@ -5484,6 +5503,12 @@ export type MutationRemoveApDetailsArgs = {
 /** Mutation root */
 export type MutationRemoveApLedgerArgs = {
   ref?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveBillingItemProjectServiceArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -7807,6 +7832,25 @@ export type Page_Bank = {
 export type Page_Billing = {
   __typename?: 'Page_Billing';
   content?: Maybe<Array<Maybe<Billing>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type Page_BillingItem = {
+  __typename?: 'Page_BillingItem';
+  content?: Maybe<Array<Maybe<BillingItem>>>;
   first: Scalars['Boolean']['output'];
   hasContent: Scalars['Boolean']['output'];
   hasNext: Scalars['Boolean']['output'];
@@ -10559,6 +10603,7 @@ export type Query = {
   billingItemById?: Maybe<BillingItem>;
   billingItemByParent?: Maybe<Array<Maybe<BillingItem>>>;
   billingItemByParentType?: Maybe<Array<Maybe<BillingItem>>>;
+  billingItemPage?: Maybe<Page_BillingItem>;
   billingOTCByFiltersPage?: Maybe<Page_Billing>;
   cashFlowReport?: Maybe<Array<Maybe<CashFlowDto>>>;
   chargeInvoiceAll?: Maybe<Array<Maybe<ChargeInvoice>>>;
@@ -10592,6 +10637,7 @@ export type Query = {
   debitMemoById?: Maybe<DebitMemo>;
   /** List of DM Pageable */
   debitMemoFilter?: Maybe<Page_DebitMemo>;
+  deductionItemsById?: Maybe<Array<Maybe<DiscountDetails>>>;
   /** Find Ap posted */
   detailsByAp?: Maybe<Array<Maybe<AccountsPayableDetails>>>;
   disAccountView?: Maybe<Array<Maybe<JournalEntryViewDto>>>;
@@ -10694,6 +10740,7 @@ export type Query = {
   findOneInvoiceItems?: Maybe<ArInvoiceItems>;
   findOneProjectWorkAccomplish?: Maybe<ProjectWorkAccomplish>;
   findOneProjectWorkAccomplishItems?: Maybe<ProjectWorkAccomplishItems>;
+  findOneProjectWorkAccomplishItemsByProjectCost?: Maybe<ProjectWorkAccomplishItems>;
   findOneReportLayoutById?: Maybe<ReportsLayout>;
   /** find signature by id */
   findOneSignature?: Maybe<Signature>;
@@ -11654,9 +11701,18 @@ export type QueryBillingItemByParentArgs = {
 
 /** Query root */
 export type QueryBillingItemByParentTypeArgs = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+/** Query root */
+export type QueryBillingItemPageArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -11798,6 +11854,12 @@ export type QueryDebitMemoFilterArgs = {
   status?: InputMaybe<Scalars['Boolean']['input']>;
   supplier?: InputMaybe<Scalars['UUID']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryDeductionItemsByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -12252,6 +12314,12 @@ export type QueryFindOneProjectWorkAccomplishArgs = {
 
 /** Query root */
 export type QueryFindOneProjectWorkAccomplishItemsArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryFindOneProjectWorkAccomplishItemsByProjectCostArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 

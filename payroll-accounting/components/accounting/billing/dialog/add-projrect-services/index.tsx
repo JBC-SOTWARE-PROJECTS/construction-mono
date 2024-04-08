@@ -146,6 +146,8 @@ export function AddProjectServices(props: AddProjectServicesProps) {
       title={<b>New Services</b>}
       okText="Add"
       onOk={onAddItem}
+      okButtonProps={{ loading }}
+      cancelButtonProps={{ loading }}
     >
       <Row gutter={[8, 8]}>
         <Col flex="100%">

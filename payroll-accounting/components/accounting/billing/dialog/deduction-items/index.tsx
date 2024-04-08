@@ -7,7 +7,7 @@ import { Button, Col, Input, Modal, Row, Space, Table, Typography } from "antd"
 import { DEDUCTION_DETAILS, GET_BILLING_ITEMS } from "@/graphql/billing/queries"
 import type { TableProps } from "antd"
 import { ColumnsType } from "antd/es/table"
-import { BillingItem } from "@/graphql/gql/graphql"
+import { BillingItem, DiscountDetails } from "@/graphql/gql/graphql"
 import { currency } from "@/utility/constant"
 import { NumberFormater } from "@/utility/helper"
 import numeral from "numeral"
@@ -28,7 +28,7 @@ export function DeductionItems(props: DeductionItemsProps) {
     fetchPolicy: "cache-and-network",
   })
 
-  const columns: ColumnsType<BillingItem> = [
+  const columns: ColumnsType<DiscountDetails> = [
     {
       title: "Record No.",
       width: 100,
@@ -66,6 +66,27 @@ export function DeductionItems(props: DeductionItemsProps) {
               columns={columns}
               dataSource={data?.deductionItemsById ?? []}
               scroll={{ x: 1500 }}
+              summary={(pageData) => {
+                let sum = 0
+
+                pageData.forEach(({ amount }) => {
+                  sum += amount
+                })
+
+                return (
+                  <Table.Summary fixed>
+                    <Table.Summary.Row>
+                      <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+                      <Table.Summary.Cell index={1} />
+                      <Table.Summary.Cell index={2} align="right">
+                        <Typography.Text type="danger">
+                          {numeral(sum).format("0,0.00")}
+                        </Typography.Text>
+                      </Table.Summary.Cell>
+                    </Table.Summary.Row>
+                  </Table.Summary>
+                )
+              }}
             />
           </TableNoBorderRadCSS>
         </Col>

@@ -29,8 +29,8 @@ export const getProjectServicesCol = () => {
       dataIndex: "description",
     },
     {
-      title: "Amount",
-      dataIndex: "subTotal",
+      title: "Balance",
+      dataIndex: "remainingBalance",
       align: "right",
       width: 150,
       fixed: "right",

@@ -95,39 +95,28 @@ export default function WorkAccomplishmentsCollapse(
   }
 
   const ButtonLock = ({ record }: { record: ProjectWorkAccomplish }) => {
-    if (record.status == "OPEN") {
-      return (
-        <Popconfirm
-          placement="topLeft"
-          title="Toggle Lock"
-          description="Proceed with toggling the lock?"
-          onConfirm={() => confirm(record?.id)}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button
-            type="primary"
-            size="small"
-            icon={<UnlockOutlined />}
-            style={{
-              background: "#4096ff",
-            }}
-          />
-        </Popconfirm>
-      )
-    }
-
     return (
-      <Button
-        type="primary"
-        size="small"
-        icon={
-          record?.status == "LOCKED" ? <LockOutlined /> : <UnlockOutlined />
-        }
-        style={{
-          background: record?.status == "LOCKED" ? "red" : "#4096ff",
-        }}
-      />
+      <Popconfirm
+        placement="topLeft"
+        title={`Toggle ${record.status == "OPEN" ? "Lock" : "Unlock"} `}
+        description={`Proceed with toggling the ${
+          record.status == "OPEN" ? "Lock" : "Unlock"
+        }?`}
+        onConfirm={() => confirm(record?.id)}
+        okText="Yes"
+        cancelText="No"
+      >
+        <Button
+          type="primary"
+          size="small"
+          icon={
+            record?.status == "LOCKED" ? <LockOutlined /> : <UnlockOutlined />
+          }
+          style={{
+            background: record?.status == "LOCKED" ? "red" : "#4096ff",
+          }}
+        />
+      </Popconfirm>
     )
   }
 
@@ -182,10 +171,9 @@ export default function WorkAccomplishmentsCollapse(
                     onClick={() => onPushToBilling(works?.billing)}
                   />
                 )}
+                {!works?.billing && <ButtonLock record={works} />}
 
-                <ButtonLock record={works} />
-
-                {!works?.billing && (
+                {works.status == "OPEN" && !works?.billing && (
                   <Button
                     type="primary"
                     size="small"

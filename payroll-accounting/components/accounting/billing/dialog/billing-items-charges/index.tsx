@@ -1,10 +1,13 @@
 import { TableNoBorderRadCSS } from "@/components/common/utils/table-utils"
 import { useQuery } from "@apollo/client"
-import { Col, Modal, Row, Table } from "antd"
+import { Col, Modal, Pagination, Row, Table } from "antd"
 import { useState } from "react"
 import { getProjectServicesCol } from "./utils"
 
-import { GET_BILLING_ITEMS } from "@/graphql/billing/queries"
+import {
+  GET_BILLING_ITEMS,
+  GET_BILLING_ITEMS_PAGE,
+} from "@/graphql/billing/queries"
 import { BillingItem } from "@/graphql/gql/graphql"
 import type { TableProps } from "antd"
 
@@ -16,12 +19,11 @@ interface BillingItemsChargesProps {
   billingItems: string[]
 }
 export function BillingItemsCharges(props: BillingItemsChargesProps) {
-  const { data, loading, refetch } = useQuery(GET_BILLING_ITEMS, {
+  const { data, loading, refetch } = useQuery(GET_BILLING_ITEMS_PAGE, {
     variables: {
-      filter: "",
       id: props?.id,
-      type: "SERVICE",
-      active: true,
+      page: 0,
+      size: 10,
     },
     notifyOnNetworkStatusChange: true,
     fetchPolicy: "cache-and-network",
@@ -44,7 +46,9 @@ export function BillingItemsCharges(props: BillingItemsChargesProps) {
     selectedRowKeys,
     onChange: onSelectChange,
     getCheckboxProps: (record: BillingItem) => ({
-      disabled: (props?.billingItems ?? []).includes(record.id), // Column configuration not to be checked
+      disabled:
+        (props?.billingItems ?? []).includes(record.id) ||
+        record.remainingBalance <= 0, // Column configuration not to be checked
     }),
   }
 
@@ -64,35 +68,26 @@ export function BillingItemsCharges(props: BillingItemsChargesProps) {
       <Row gutter={[8, 8]}>
         <Col flex="100%">
           <TableNoBorderRadCSS>
-            {/* <PageFilterContainer
-              leftSpace={
-                <Space>
-                  <Input
-                    variant="filled"
-                    placeholder="Search ..."
-                    suffix={<SearchOutlined />}
-                  />
-                </Space>
-              }
-              rightSpace={
-                <Space>
-                  <Button
-                    type="primary"
-                    icon={<PlusCircleFilled />}
-                    style={{ marginRight: "16px" }}
-                  >
-                    Add Bill of Quantities
-                  </Button>
-                </Space>
-              }
-            /> */}
             <Table
+              loading={loading}
               rowSelection={rowSelection}
               rowKey="id"
               size="small"
               columns={getProjectServicesCol()}
-              dataSource={data?.billingItemByParentType ?? []}
+              dataSource={data?.billingItemPage?.content ?? []}
               scroll={{ x: 1500 }}
+              footer={() => (
+                <Pagination
+                  current={data?.billingItemPage?.number + 1}
+                  showSizeChanger={false}
+                  pageSize={10}
+                  responsive={true}
+                  total={data?.billingItemPage?.totalElements}
+                  onChange={(e) => {
+                    refetch({ page: e - 1 })
+                  }}
+                />
+              )}
             />
           </TableNoBorderRadCSS>
         </Col>

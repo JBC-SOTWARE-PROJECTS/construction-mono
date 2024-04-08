@@ -32,6 +32,7 @@ import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -111,6 +112,42 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
         createQuery(query, params).resultList.sort { it.description }
+    }
+
+
+    @GraphQLQuery(name="billingItemPage")
+    Page<BillingItem> billingItemPage(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ){
+        List<String> types = ['ITEM', 'SERVICE', 'MISC']
+        Map<String,Object> params = [:]
+        params['id'] = id
+        params['types'] = types
+
+        Page<BillingItem> items = getPageable(
+                """ Select e from  BillingItem e where e.billing.id = :id and e.itemType in(:types) and e.status is true""",
+                """ Select count(e) from  BillingItem e where e.billing.id = :id and e.itemType in(:types) and e.status is true """,
+                page,
+                size,
+                params
+        )
+
+        if(items.content.size() > 0) {
+            items.content.each {
+                def remainingBal = it.subTotal
+                def deductions = discountDetailsRepository.getItemDiscountsByRefBillingItem(it.id)
+                if (deductions.size() > 0) {
+                    deductions.each {
+                        disc ->
+                            remainingBal -= disc.amount
+                    }
+                }
+                it.remainingBalance = remainingBal
+            }
+        }
+        return items
     }
 
     @GraphQLQuery(name = "billingByRef")
@@ -702,12 +739,17 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
 
             def accomplishItem = projectWorkAccomplishItemsService.findOne(item.projectWorkAccomplishmentItemId)
             accomplishItem.thisPeriodQty = 0
-            accomplishItem.toDateQty = accomplishItem.toDateQty - item.qty
-            accomplishItem.toDateAmount = accomplishItem.toDateQty * accomplishItem.cost
-            accomplishItem.balanceQty = accomplishItem.balanceQty > 0 ? accomplishItem.balanceQty - item.qty : item.qty
+            accomplishItem.toDateQty = accomplishItem?.toDateQty ?: 0.00 - item.qty
+            accomplishItem.toDateAmount = accomplishItem?.toDateQty ?: 0.00 * accomplishItem?.cost ?: 0.00
+            accomplishItem.balanceQty = accomplishItem.balanceQty > 0 ? (accomplishItem?.balanceQty ?: 0.00) - item.qty : item.qty
             accomplishItem.balanceAmount = accomplishItem.balanceQty * accomplishItem.cost
             accomplishItem.thisPeriodAmount = 0
             accomplishItem.percentage = 0
+
+            def projCost = projectCostService.findOne(accomplishItem.projectCost)
+            projCost.billedQty = (projCost?.billedQty ?: 0.00) - item.qty
+            projectCostService.save(projCost)
+
             projectWorkAccomplishItemsService.save(accomplishItem)
 
             return new GraphQLResVal<Boolean>(true,true,"Successfully removed.")

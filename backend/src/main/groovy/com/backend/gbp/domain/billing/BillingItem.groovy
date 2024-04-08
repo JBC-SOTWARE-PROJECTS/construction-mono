@@ -133,4 +133,7 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "project_cost_id")
 	UUID projectCostId
 
+	@Transient
+	BigDecimal remainingBalance
+
 }

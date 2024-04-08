@@ -1,12 +1,50 @@
+import { DELETE_BILLING_ITEM_BY_ID } from "@/graphql/billing/queries"
 import { BillingItem } from "@/graphql/gql/graphql"
 import { currency } from "@/utility/constant"
 import { DateFormatterWithTime, NumberFormater } from "@/utility/helper"
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons"
+import { useMutation } from "@apollo/client"
 import { Button, Popconfirm, Space, Tag, Typography } from "antd"
 
 import type { TableColumnsType } from "antd"
 
-export const getBillingItemColumns = (onDelete: (id: string) => void) => {
+const PBDeleteBtn = (props: { id: string; refetch: any; itemRefetch: any }) => {
+  const [onDeleteItem, { loading }] = useMutation(DELETE_BILLING_ITEM_BY_ID)
+
+  const onDeleteBillingItem = (id: string) => {
+    onDeleteItem({
+      variables: {
+        id,
+      },
+      onCompleted: ({ removeBillingItemProjectService }) => {
+        if (removeBillingItemProjectService?.success) {
+          props.refetch()
+          props.itemRefetch()
+        }
+      },
+    })
+  }
+
+  return (
+    <Popconfirm
+      title="Delete billing item"
+      description="Are you sure to delete?"
+      onConfirm={() => onDeleteBillingItem(props.id)}
+      okText="Yes"
+      cancelText="No"
+    >
+      <Button
+        loading={loading}
+        size="small"
+        type="text"
+        danger
+        icon={<DeleteOutlined />}
+      />
+    </Popconfirm>
+  )
+}
+
+export const getBillingItemColumns = (refetch: any, itemRefetch: any) => {
   const columns: TableColumnsType<BillingItem> = [
     {
       title: "Date/Time",
@@ -146,26 +184,8 @@ export const getBillingItemColumns = (onDelete: (id: string) => void) => {
       align: "center",
       fixed: "right",
       width: 30,
-      render: (text, record: BillingItem) => (
-        <Space>
-          {record.status && (
-            <Popconfirm
-              title="Delete billing item"
-              description="Are you sure to delete?"
-              onConfirm={() => onDelete(text)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button
-                size="small"
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-              />
-            </Popconfirm>
-          )}
-        </Space>
-      ),
+      render: (id, record: BillingItem) =>
+        record.status && <PBDeleteBtn {...{ id, refetch, itemRefetch }} />,
     },
   ]
 

@@ -11,4 +11,6 @@ interface DiscountDetailsRepository extends JpaRepository<DiscountDetails, UUID>
 	@Query(value = '''select q from DiscountDetails q where q.billingItem.id = :id''')
 	List<DiscountDetails> getItemDiscountsByBillingItem(@Param('id') UUID id)
 
+	@Query(value = '''select q from DiscountDetails q where q.refBillItem.id = :id''')
+	List<DiscountDetails> getItemDiscountsByRefBillingItem(@Param('id') UUID id)
 }
