@@ -2186,6 +2186,27 @@ export type DisbursementInput = {
   voucherAmount?: InputMaybe<Scalars['BigDecimal']['input']>;
 };
 
+export type DisbursementPettyCash = {
+  __typename?: 'DisbursementPettyCash';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  company?: Maybe<Scalars['UUID']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['Instant']['output']>;
+  debitMemo?: Maybe<DebitMemo>;
+  disbursement?: Maybe<Disbursement>;
+  id?: Maybe<Scalars['UUID']['output']>;
+  lastModifiedBy?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['Instant']['output']>;
+  pettyCashAccounting?: Maybe<PettyCashAccounting>;
+};
+
+export type DisbursementPettyDtoInput = {
+  amount?: InputMaybe<Scalars['BigDecimal']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  isNew?: InputMaybe<Scalars['Boolean']['input']>;
+  pettyCashAccounting?: InputMaybe<PettyCashAccountingInput>;
+};
+
 export type DisbursementWtx = {
   __typename?: 'DisbursementWtx';
   appliedAmount?: Maybe<Scalars['BigDecimal']['output']>;
@@ -4460,6 +4481,8 @@ export type Mutation = {
   removeCreditNoteItem?: Maybe<GraphQlResVal_ArCreditNoteItems>;
   removeDMAPDetails?: Maybe<DisbursementAp>;
   removeDetailsDebitMemo?: Maybe<DebitMemoDetails>;
+  removeDisPettyCash?: Maybe<DisbursementPettyCash>;
+  removeDisPettyCashByList?: Maybe<DisbursementPettyCash>;
   removeDmDetails?: Maybe<DebitMemoDetails>;
   removeExpense?: Maybe<DisbursementExpense>;
   removeExpenseByList?: Maybe<DisbursementExpense>;
@@ -4593,9 +4616,11 @@ export type Mutation = {
   upsertCreditNoteItem?: Maybe<GraphQlResVal_ArCreditNoteItems>;
   upsertCustomer?: Maybe<Customer>;
   upsertDM?: Maybe<DebitMemo>;
+  upsertDMPettyCash?: Maybe<DisbursementPettyCash>;
   upsertDebitMemo?: Maybe<DebitMemo>;
   upsertDisAp?: Maybe<DisbursementAp>;
   upsertDisDM?: Maybe<DisbursementAp>;
+  upsertDisPettyCash?: Maybe<DisbursementPettyCash>;
   upsertDisReap?: Maybe<DisbursementAp>;
   upsertDmDetials?: Maybe<DebitMemoDetails>;
   upsertEmpDocs?: Maybe<EmployeeDocs>;
@@ -5694,6 +5719,18 @@ export type MutationRemoveDetailsDebitMemoArgs = {
 
 
 /** Mutation root */
+export type MutationRemoveDisPettyCashArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationRemoveDisPettyCashByListArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationRemoveDmDetailsArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   parent?: InputMaybe<Scalars['UUID']['input']>;
@@ -6561,6 +6598,13 @@ export type MutationUpsertDmArgs = {
 
 
 /** Mutation root */
+export type MutationUpsertDmPettyCashArgs = {
+  it?: InputMaybe<DisbursementPettyDtoInput>;
+  parent?: InputMaybe<DebitMemoInput>;
+};
+
+
+/** Mutation root */
 export type MutationUpsertDebitMemoArgs = {
   details?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
   fields?: InputMaybe<Scalars['Map_String_ObjectScalar']['input']>;
@@ -6581,6 +6625,13 @@ export type MutationUpsertDisApArgs = {
 export type MutationUpsertDisDmArgs = {
   it?: InputMaybe<DisbursementApDtoInput>;
   parent?: InputMaybe<DebitMemoInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertDisPettyCashArgs = {
+  it?: InputMaybe<DisbursementPettyDtoInput>;
+  parent?: InputMaybe<DisbursementInput>;
 };
 
 
@@ -9821,8 +9872,10 @@ export type PettyCash = {
 export type PettyCashAccounting = {
   __typename?: 'PettyCashAccounting';
   amountIssued?: Maybe<Scalars['BigDecimal']['output']>;
+  amountReplenish?: Maybe<Scalars['BigDecimal']['output']>;
   amountUnused?: Maybe<Scalars['BigDecimal']['output']>;
   amountUsed?: Maybe<Scalars['BigDecimal']['output']>;
+  balance?: Maybe<Scalars['BigDecimal']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
@@ -9952,8 +10005,10 @@ export type PettyCashAccounting = {
 
 export type PettyCashAccountingInput = {
   amountIssued?: InputMaybe<Scalars['BigDecimal']['input']>;
+  amountReplenish?: InputMaybe<Scalars['BigDecimal']['input']>;
   amountUnused?: InputMaybe<Scalars['BigDecimal']['input']>;
   amountUsed?: InputMaybe<Scalars['BigDecimal']['input']>;
+  balance?: InputMaybe<Scalars['BigDecimal']['input']>;
   company?: InputMaybe<Scalars['UUID']['input']>;
   flagValue?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
@@ -11125,6 +11180,9 @@ export type Query = {
   disExpById?: Maybe<DisbursementExpense>;
   /** Find DisbursementExpense by Parent */
   disExpByParent?: Maybe<Array<Maybe<DisbursementExpense>>>;
+  disPettyById?: Maybe<DisbursementPettyCash>;
+  /** Find DisbursementPettyCash by Parent */
+  disPettyByParent?: Maybe<Array<Maybe<DisbursementPettyCash>>>;
   /** Find Ap reference Type */
   disReferenceType?: Maybe<Array<Maybe<ApReferenceDto>>>;
   /** Find DisbursementWtx by Parent */
@@ -12429,6 +12487,18 @@ export type QueryDisExpByIdArgs = {
 
 /** Query root */
 export type QueryDisExpByParentArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisPettyByIdArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryDisPettyByParentArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
 

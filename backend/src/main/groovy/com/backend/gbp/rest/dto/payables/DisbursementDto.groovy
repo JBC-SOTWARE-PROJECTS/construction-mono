@@ -3,7 +3,9 @@ package com.backend.gbp.rest.dto.payables
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.AccountsPayable
 import com.backend.gbp.domain.accounting.Bank
+import com.backend.gbp.domain.accounting.Disbursement
 import com.backend.gbp.domain.accounting.ExpenseTransaction
+import com.backend.gbp.domain.accounting.PettyCashAccounting
 import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import groovy.transform.TupleConstructor
@@ -62,4 +64,11 @@ class DisbursementWtxDto {
 	Boolean isNew
 }
 
+
+class DisbursementPettyDto{
+	String id
+	PettyCashAccounting pettyCashAccounting
+	BigDecimal amount
+	Boolean	isNew
+}
 

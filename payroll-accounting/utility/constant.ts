@@ -442,6 +442,10 @@ export const APCAT_DIS = [
     label: "EXPENSE",
     value: "EXPENSE",
   },
+  {
+    label: "PETTY CASH",
+    value: "PETTY_CASH",
+  },
 ];
 
 export const DIS_TYPE = [

@@ -68,18 +68,23 @@ class PettyCashAccounting extends AbstractAuditingEntity implements Serializable
 
 	@GraphQLQuery
 	@Column(name = "amount_issued", columnDefinition = "numeric")
-	@UpperCase
 	BigDecimal amountIssued
 
 	@GraphQLQuery
 	@Column(name = "amount_used", columnDefinition = "bool")
-	@UpperCase
 	BigDecimal amountUsed
 
 	@GraphQLQuery
 	@Column(name = "amount_unused", columnDefinition = "numeric")
-	@UpperCase
 	BigDecimal amountUnused
+
+	@GraphQLQuery
+	@Column(name = "amount_replenish", columnDefinition = "bool")
+	BigDecimal amountReplenish
+
+	@GraphQLQuery
+	@Column(name = "balance", columnDefinition = "bool")
+	BigDecimal balance
 
 	@GraphQLQuery
 	@Column(name = "vat_inclusive", columnDefinition = "numeric")

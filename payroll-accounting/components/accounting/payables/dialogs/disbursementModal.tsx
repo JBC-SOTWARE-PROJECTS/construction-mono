@@ -14,6 +14,7 @@ import {
 import {
   AuditOutlined,
   CarryOutOutlined,
+  CreditCardOutlined,
   FileSyncOutlined,
   FileTextOutlined,
   FundProjectionScreenOutlined,
@@ -84,6 +85,7 @@ import {
 import DisbrusementExepnseTable from "../disbursement/component/expensesTable";
 import DisbrusementWTXTable from "../disbursement/component/witholdingTaxTable";
 import CKJournalEntries from "../journalentries/ckJournalEntries";
+import PettyCashApplicationTable from "../disbursement/component/pettyCashApplications";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -524,7 +526,7 @@ export default function DisbursementModal(props: IProps) {
         label: (
           <span>
             <AuditOutlined />
-            Accounts Payable Application
+            &nbsp;Accounts Payable Application
           </span>
         ),
         key: "2_application",
@@ -548,7 +550,7 @@ export default function DisbursementModal(props: IProps) {
           label: (
             <span>
               <InsertRowBelowOutlined />
-              Check Details
+              &nbsp;Check Details
             </span>
           ),
           key: "1_checks",
@@ -569,7 +571,7 @@ export default function DisbursementModal(props: IProps) {
         label: (
           <span>
             <TransactionOutlined />
-            Expense Transaction
+            &nbsp;Expense Transaction
           </span>
         ),
         key: "2_expense_transaction",
@@ -588,7 +590,7 @@ export default function DisbursementModal(props: IProps) {
         label: (
           <span>
             <FundProjectionScreenOutlined />
-            Expanded Withholding Tax
+            &nbsp;Expanded Withholding Tax
           </span>
         ),
         key: "3_expanded_tax",
@@ -608,7 +610,48 @@ export default function DisbursementModal(props: IProps) {
           label: (
             <span>
               <InsertRowBelowOutlined />
-              Check Details
+              &nbsp;Check Details
+            </span>
+          ),
+          key: "1_checks",
+          children: (
+            <ChecksTable
+              calculateAmount={(e, a) => calculateAmount(e, a)}
+              status={disabled}
+              parentId={record?.id}
+              dataSource={checks}
+              setChecks={setChecks}
+              isVoided={record?.status === "VOIDED"}
+            />
+          ),
+        });
+      }
+    } else if (state.paymentCategory === "PETTY_CASH") {
+      localTabs.push({
+        label: (
+          <span>
+            <CreditCardOutlined />
+            &nbsp;Petty Cash Application
+          </span>
+        ),
+        key: "2_petty_cash",
+        children: (
+          <PettyCashApplicationTable
+            calculateAmount={(e: number) => calculateAmount(e, "WTX")}
+            status={disabled}
+            parentId={record?.id}
+            dataSource={wtx}
+            setWtx={setWtx}
+            isVoided={record?.status === "VOIDED"}
+          />
+        ),
+      });
+      if (state.type === "CHECK") {
+        localTabs.push({
+          label: (
+            <span>
+              <InsertRowBelowOutlined />
+              &nbsp;Check Details
             </span>
           ),
           key: "1_checks",

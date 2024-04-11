@@ -6,6 +6,7 @@ import {
   DisbursementAp,
   DisbursementCheck,
   DisbursementExpense,
+  DisbursementPettyCash,
   DisbursementWtx,
   PettyCashItem,
   PettyCashOther,
@@ -135,6 +136,10 @@ export interface IDisbursementExpense extends DisbursementExpense {
   isNew?: boolean;
 }
 export interface IDisbursementWTX extends DisbursementWtx {
+  isNew?: boolean;
+}
+
+export interface IDisbursementPCV extends DisbursementPettyCash {
   isNew?: boolean;
 }
 
