@@ -160,7 +160,8 @@ class InventoryReportResource {
 				project: desc,
 				projTitle: title,
 				location: purchaseOrder?.project?.location?.fullAddress ?: "",
-                fullname: emp?.fullName
+                fullname: emp?.fullName,
+				remarks: purchaseOrder?.remarks ?: ''
 
         )
         def gson = new Gson()
@@ -1082,14 +1083,23 @@ class InventoryReportResource {
 		DateTimeFormatter dateFormat =
 				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
 
+		String desc = parent.category.equalsIgnoreCase("PROJECTS") ? parent?.project?.description ?: "" : parent?.assets?.description ?: ""
+		String title = parent.category.equalsIgnoreCase("PROJECTS") ? "Project: " : "Asset Equipment: "
+		if(parent.category.equalsIgnoreCase("PERSONAL")){
+			desc = ""
+			title = ""
+		}
+
 		def dto = new STSReportDto(
 				date: dateFormat.format(parent?.issueDate),
 				stsNo: parent?.issueNo,
 				issuing_location: parent?.issueFrom?.officeDescription,
 				receiving_location: parent?.issueTo?.officeDescription,
-				project: parent?.project?.description ?: "N/A",
+				project: desc,
+				projectTitle: title,
 				issuedBy: issueBy,
 				receivedBy: receivedBy,
+				remarks: parent?.remarks ?: ""
 
 		)
 		def gson = new Gson()

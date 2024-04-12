@@ -14,15 +14,15 @@ export default function ExpenseSummaryFooter(props: IProps) {
   return (
     <Table.Summary fixed>
       <Table.Summary.Row>
-        <Table.Summary.Cell index={0} colSpan={3} className="font-bold">
+        <Table.Summary.Cell index={0} colSpan={5} className="font-bold">
           Grand Totals
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={3} align="right" className="font-bold">
+        <Table.Summary.Cell index={5} align="right" className="font-bold">
           <span>{currency} </span>
           {NumberFormater(_.sumBy(dataSource, "amount"))}
         </Table.Summary.Cell>
         <Table.Summary.Cell
-          index={4}
+          index={6}
           align="center"
           className="font-bold"></Table.Summary.Cell>
       </Table.Summary.Row>

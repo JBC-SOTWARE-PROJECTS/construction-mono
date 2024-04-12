@@ -67,7 +67,7 @@ export default function APJournalEntries(props: IProps) {
   const showAccountSelector = useDialog(ChartOfAccountsComponentSelector);
   // ===================== Queries ==============================
   const templates = UseAccountsTemplate({
-    type: type ?? "",
+    type: type ?? null,
     category: "AP",
   });
   // ===========================================
@@ -276,81 +276,83 @@ export default function APJournalEntries(props: IProps) {
   };
 
   // ================ columns ================================
-  const columns: ColumnsType<JournalEntryViewDto> = [
-    {
-      title: "Account Code",
-      dataIndex: "code",
-      key: "code",
-    },
-    {
-      title: "Account Description",
-      dataIndex: "desc",
-      key: "desc",
-    },
-    {
-      title: <ColumnTitle descripton="Debit" editable={true} />,
-      dataIndex: "debit",
-      key: "debit",
-      width: 130,
-      align: "right",
-      onCell: (record) => {
-        return {
-          onDoubleClick: () => {
-            if (!manual) {
-              message.error("This Transaction is not Editable");
-            } else {
-              setEditable({ [`${record.code}-debit`]: true });
-            }
-          }, // double click row
-        };
+  const columns = useMemo(() => {
+    let cols: ColumnsType<JournalEntryViewDto> = [
+      {
+        title: "Account Code",
+        dataIndex: "code",
+        key: "code",
       },
-      render: (amount, record) => {
-        return editable[`${record.code}-debit`] ? (
-          renderNumberInput(record, "debit")
-        ) : (
-          <span>
-            <small>{currency} </small>
-            {NumberFormater(amount)}
-          </span>
-        );
+      {
+        title: "Account Description",
+        dataIndex: "desc",
+        key: "desc",
       },
-    },
-    {
-      title: <ColumnTitle descripton="Credit" editable={true} />,
-      dataIndex: "credit",
-      key: "credit",
-      align: "right",
-      width: 130,
-      onCell: (record) => {
-        return {
-          onDoubleClick: () => {
-            if (!manual) {
-              message.error("This Transaction is not Editable");
-            } else {
-              setEditable({ [`${record.code}-credit`]: true });
-            }
-          }, // double click row
-        };
+      {
+        title: <ColumnTitle descripton="Debit" editable={true} />,
+        dataIndex: "debit",
+        key: "debit",
+        width: 130,
+        align: "right",
+        onCell: (record) => {
+          return {
+            onDoubleClick: () => {
+              if (!manual) {
+                message.error("This Transaction is not Editable");
+              } else {
+                setEditable({ [`${record.code}-debit`]: true });
+              }
+            }, // double click row
+          };
+        },
+        render: (amount, record) => {
+          return editable[`${record.code}-debit`] ? (
+            renderNumberInput(record, "debit")
+          ) : (
+            <span>
+              <small>{currency} </small>
+              {NumberFormater(amount)}
+            </span>
+          );
+        },
       },
-      render: (amount, record) => {
-        return editable[`${record.code}-credit`] ? (
-          renderNumberInput(record, "credit")
-        ) : (
-          <span>
-            <small>{currency} </small>
-            {NumberFormater(amount)}
-          </span>
-        );
+      {
+        title: <ColumnTitle descripton="Credit" editable={true} />,
+        dataIndex: "credit",
+        key: "credit",
+        align: "right",
+        width: 130,
+        onCell: (record) => {
+          return {
+            onDoubleClick: () => {
+              if (!manual) {
+                message.error("This Transaction is not Editable");
+              } else {
+                setEditable({ [`${record.code}-credit`]: true });
+              }
+            }, // double click row
+          };
+        },
+        render: (amount, record) => {
+          return editable[`${record.code}-credit`] ? (
+            renderNumberInput(record, "credit")
+          ) : (
+            <span>
+              <small>{currency} </small>
+              {NumberFormater(amount)}
+            </span>
+          );
+        },
       },
-    },
-    {
-      title: "#",
-      dataIndex: "action",
-      key: "action",
-      width: 50,
-      align: "center",
-      render: (_, record) => {
-        if (manual) {
+    ];
+    if (manual) {
+      cols.push({
+        title: "#",
+        dataIndex: "action",
+        key: "action",
+        width: 50,
+        align: "center",
+        render: (_, record) => {
           return (
             <Button
               size="small"
@@ -359,10 +361,11 @@ export default function APJournalEntries(props: IProps) {
               onClick={() => onRemove(record?.code as string)}
             />
           );
-        }
-      },
-    },
-  ];
+        },
+      });
+    }
+    return cols;
+  }, [manual]);
 
   const disabledButton = useMemo(() => {
     const debit = _.sumBy(ledger, "debit");
@@ -487,7 +490,12 @@ export default function APJournalEntries(props: IProps) {
             columns={columns}
             pagination={false}
             dataSource={ledger}
-            summary={() => <JournalEntriesSummary dataSource={ledger} />}
+            summary={() => (
+              <JournalEntriesSummary
+                dataSource={ledger}
+                autoEntries={!manual}
+              />
+            )}
           />
         </Col>
       </Row>

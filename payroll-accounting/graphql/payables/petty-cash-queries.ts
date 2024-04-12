@@ -182,6 +182,10 @@ export const GET_PCV_ITEMS = gql`
         id
         description
       }
+      assets {
+        id
+        description
+      }
       amount
       remarks
     }

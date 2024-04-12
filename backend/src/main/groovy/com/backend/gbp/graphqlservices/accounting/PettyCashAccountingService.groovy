@@ -303,7 +303,7 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 				headerLedger.ledger.each {
 					def list = new JournalEntryViewDto(
 							code: it.journalAccount.code,
-							desc: it.journalAccount.description,
+							desc: it.journalAccount.accountName,
 							debit: it.debit,
 							credit: it.credit
 					)
@@ -315,7 +315,7 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 					header.ledger.each {
 						def list = new JournalEntryViewDto(
 								code: it.journalAccount.code,
-								desc: it.journalAccount.description,
+								desc: it.journalAccount.accountName,
 								debit: it.credit,
 								credit: it.debit
 						)
@@ -453,7 +453,7 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 				String date = "${formatDate.format(parent.pcvDate)} ${localTime}"
 				def localDateTime = LocalDateTime.parse(date, dateFormatter).atZone(ZoneId.of("Asia/Manila"))
 				def ledgerDate = localDateTime.toInstant()
-				println("DateLedger ====> " + date)
+
 				LedgerDto ledger = new LedgerDto()
 				ledger.sourceOffice = it.office
 				ledger.destinationOffice = it.office

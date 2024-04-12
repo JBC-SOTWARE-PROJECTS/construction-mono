@@ -3,7 +3,10 @@ import {
   Item,
   Office,
   PurchaseOrderItems,
+  PurchaseOrderItemsMonitoring,
   PurchaseRequestItem,
+  ReceivingReport,
+  ReceivingReportItem,
   ReturnSupplier,
   ReturnSupplierItem,
   StockIssue,
@@ -29,6 +32,10 @@ export interface StockIssueItemsExtended extends StockIssueItems {
   isNew?: boolean;
 }
 
+export interface StockReceivingReportExtended extends ReceivingReportItem {
+  isNew?: boolean;
+}
+
 interface PostDto {
   id: string;
   ledgerNo: string;
@@ -44,6 +51,16 @@ interface PostDto {
 
 export interface InventoryPostList extends PostDto {
   item: Item;
+  unit: string;
+  status: boolean;
+}
+
+export interface InventoryPostReceivingtList extends PostDto {
+  item: Item;
+  poId: string | null;
+  poItem: string | null;
+  isPartial: boolean;
+  isCompleted: boolean;
   unit: string;
   status: boolean;
 }
@@ -135,6 +152,36 @@ export const formatObjSupplierReturnSupplier = (
   return result;
 };
 
+export const formatObjSupplierReceiving = (
+  records: SupplierInventory[]
+): StockReceivingReportExtended[] => {
+  let result = [] as StockReceivingReportExtended[];
+  result = (records || []).map((e) => {
+    return {
+      id: e?.id,
+      item: e?.item,
+      uou: e?.item?.unit_of_usage?.unitDescription,
+      refPoItem: null,
+      receiveQty: 1,
+      receiveUnitCost: e?.unitCost ?? 0,
+      recInventoryCost: e?.unitCost ?? 0,
+      discountRate: 0.0,
+      receiveDiscountCost: 0.0,
+      expirationDate: null,
+      totalAmount: e?.unitCost ?? 0,
+      inputTax: 0,
+      netAmount: e?.unitCost ?? 0,
+      isTax: false,
+      isDiscount: false,
+      isPartial: false,
+      isCompleted: true,
+      isFg: false,
+      isNew: true,
+    };
+  }) as StockReceivingReportExtended[];
+  return result;
+};
+
 export const formatObjPrItemsToPoItems = (
   records: PurchaseRequestItem
 ): PurchaseOrderItemsExtended => {
@@ -170,6 +217,45 @@ export const formatObjInventoryStockIssuance = (
     };
   }) as StockIssueItemsExtended[];
   return result;
+};
+
+export const formatPurchaseOrderReceiving = (
+  e: PurchaseOrderItemsMonitoring
+) => {
+  let unitcost = decimalRound2(e?.unitCost / e.item?.item_conversion);
+  let obj = {
+    id: e?.id,
+    item: e?.item,
+    uou: e?.item?.unit_of_usage?.unitDescription,
+    refPoItem: {
+      id: e?.id,
+      item: e?.item,
+      purchaseOrder: {
+        id: e?.purchaseOrder?.id,
+        poNumber: e?.purchaseOrder?.poNumber,
+      },
+      qtyInSmall: e?.qtyInSmall,
+      deliveredQty: e?.deliveredQty,
+      deliveryBalance: e?.deliveryBalance,
+      unitCost: e?.unitCost,
+    },
+    receiveQty: e?.deliveryBalance,
+    receiveUnitCost: unitcost,
+    recInventoryCost: unitcost,
+    discountRate: 0.0,
+    receiveDiscountCost: 0.0,
+    isFg: false,
+    isDiscount: false,
+    isPartial: false,
+    isCompleted: true,
+    totalAmount: 0,
+    inputTax: 0,
+    netAmount: 0,
+    isTax: e?.item?.vatable ?? false,
+    expirationDate: null,
+    isNew: true,
+  } as StockReceivingReportExtended;
+  return obj;
 };
 
 //  ===================== post inventory =============================
@@ -242,5 +328,43 @@ export const formatPostStockIssuance = (
     typeId: type === "STO" ? sto : type === "STI" ? sti : ex,
     itemId: element?.item?.id,
   } as InventoryPostList;
+  return obj;
+};
+
+export const formatPostReceivingReport = (
+  element: ReceivingReportItem,
+  parent: ReceivingReport,
+  index: number
+) => {
+  let ledgerDate = dayjs(parent.receiveDate).add(index, "seconds");
+  let typeId = "254a07d3-e33a-491c-943e-b3fe6792c5fc";
+  if (parent?.receivedType === "EP") {
+    typeId = "af7dc429-8352-4f09-b58c-26a0a490881c";
+  } else {
+    if (element?.isFg) {
+      typeId = "7b94c82f-081a-4578-82c2-f7343852fcf3";
+    } else {
+      typeId = "254a07d3-e33a-491c-943e-b3fe6792c5fc";
+    }
+  }
+  let obj = {
+    id: element.id,
+    source: parent.receivedOffice as Office,
+    destination: parent.receivedOffice as Office,
+    date: ledgerDate,
+    type: "SRR",
+    item: element.item as Item,
+    unit: element.item?.unit_of_usage?.unitDescription as string,
+    qty: element?.receiveQty as number,
+    unitcost: element.recInventoryCost as number,
+    status: element?.isPosted as boolean,
+    ledgerNo: parent?.rrNo as string,
+    typeId: typeId,
+    itemId: element?.item?.id as string,
+    poId: parent?.purchaseOrder?.id ?? null,
+    poItem: element.refPoItem?.id ?? null,
+    isPartial: element.isPartial,
+    isCompleted: element.isCompleted,
+  } as InventoryPostReceivingtList;
   return obj;
 };

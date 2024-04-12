@@ -90,17 +90,23 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
     if (status) {
       //if clicked approved
       if (record?.isApprove) {
-        message.error("Purchase Request is already approved");
+        message.error("Purchase Order is already approved");
       } else {
         _approve(record?.id, status, "approve");
       }
     } else {
       //void
       if (!record?.isApprove) {
-        if (record.isVoided) {
-          message.error("Purchase Request is already voided");
+        if (!record.isCompleted) {
+          if (record.isVoided) {
+            message.error("Purchase Order is already voided");
+          } else {
+            message.error("Purchase Order is not yet approved");
+          }
         } else {
-          message.error("Purchase Request is not yet approved");
+          message.error(
+            "Cannot void Purchase Order. Transaction is already set to delivered"
+          );
         }
       } else {
         _approve(record?.id, status, "void");

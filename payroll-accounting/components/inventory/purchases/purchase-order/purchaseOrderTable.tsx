@@ -45,10 +45,13 @@ export default function PurchaseOrderTable({
       width: 140,
     },
     {
-      title: "PR Number(s)",
+      title: "PR Number",
       dataIndex: "prNos",
       key: "prNos",
       width: 200,
+      render: (text) => {
+        return <span>{text ?? "--"}</span>;
+      },
     },
     {
       title: "Supplier",
@@ -128,6 +131,7 @@ export default function PurchaseOrderTable({
             key: "3",
           },
         ];
+
         return (
           <Dropdown.Button
             size="small"

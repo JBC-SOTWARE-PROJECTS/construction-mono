@@ -280,14 +280,11 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
     ) {
         if(id){
             def upsert = findOne(id)
-            Boolean checkpoint = false
             def check = purchaseOrderItemMonitoringService.checkBalancesByPO(id).sort{it.deliveryBalance }
-            //loop checking
-            check.each {
-                checkpoint = it.deliveryBalance <= 0
-            }
+            def deliveredList = check.findAll({a -> a.deliveryBalance <= 0 })
+            Boolean isCompleted = check.size() == deliveredList.size()
 
-            if(checkpoint){
+            if(isCompleted){
                 upsert.isCompleted = true
                 upsert.status = "DELIVERED"
                 save(upsert)
@@ -298,4 +295,5 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
         }
 
     }
+
 }

@@ -89,6 +89,7 @@ export default function DocumentUpload(props: IProps) {
             type="primary"
             size="small"
             onClick={() => onClickRemove(id)}
+            disabled={!allowUpload}
             danger
             icon={<DeleteOutlined />}
           />

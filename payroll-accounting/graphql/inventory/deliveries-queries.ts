@@ -67,7 +67,11 @@ export const GET_RECORDS_DELIVERY_RECEIVING = gql`
         vatInclusive
         isPosted
         isVoid
-        account
+        account {
+          id
+          description
+        }
+        refAp
       }
       totalElements
       totalPages
@@ -184,6 +188,171 @@ export const DELETE_RECORD_RETURN_ITEM = gql`
 export const POST_VOID_RETURN_SUPPLIER = gql`
   mutation ($id: UUID, $items: [Map_String_ObjectScalar], $status: Boolean) {
     postReturnInventory(id: $id, items: $items, status: $status) {
+      id
+    }
+  }
+`;
+
+export const GET_JOURNAL_RECEIVING_REPORT = gql`
+  query ($id: UUID, $status: Boolean) {
+    receivingAccountView(id: $id, status: $status) {
+      code
+      desc
+      debit
+      credit
+    }
+  }
+`;
+
+export const POST_VOID_RECEIVING_REPORT = gql`
+  mutation ($id: UUID, $items: [Map_String_ObjectScalar], $status: Boolean) {
+    receivingPostInventory(id: $id, items: $items, status: $status) {
+      id
+    }
+  }
+`;
+
+export const GET_RECEIVING_ITEMS = gql`
+  query ($id: UUID) {
+    recItemByParent(id: $id) {
+      id
+      item {
+        id
+        descLong
+        item_conversion
+        vatable
+        unit_of_usage {
+          id
+          unitDescription
+        }
+      }
+      uou
+      refPoItem {
+        id
+        purchaseOrder {
+          id
+          poNumber
+        }
+        qtyInSmall
+        deliveredQty
+        deliveryBalance
+        unitCost
+      }
+      receiveQty
+      receiveUnitCost
+      recInventoryCost
+      discountRate
+      receiveDiscountCost
+      isFg
+      isDiscount
+      isPartial
+      isCompleted
+      isTax
+      expirationDate
+      totalAmount
+      inputTax
+      netAmount
+      isPosted
+    }
+  }
+`;
+
+export const GET_PO_ITEMS = gql`
+  query ($id: UUID) {
+    getPurchaserOrderChildren(id: $id) {
+      parent {
+        id
+        supplier {
+          id
+          supplierFullname
+        }
+        paymentTerms {
+          id
+          paymentDesc
+        }
+        project {
+          id
+          description
+        }
+        category
+        assets {
+          id
+          description
+        }
+        remarks
+      }
+      items {
+        id
+        item {
+          id
+          descLong
+          item_conversion
+          vatable
+          unit_of_usage {
+            id
+            unitDescription
+          }
+        }
+        purchaseOrder {
+          id
+          poNumber
+        }
+        unitMeasurement
+        quantity
+        unitCost
+        qtyInSmall
+        deliveredQty
+        deliveryBalance
+      }
+    }
+  }
+`;
+
+export const UPSERT_RECORD_DELIVERY_RECEIVING = gql`
+  mutation (
+    $id: UUID
+    $items: [Map_String_ObjectScalar]
+    $forRemove: [Map_String_ObjectScalar]
+    $fields: Map_String_ObjectScalar
+  ) {
+    upsertRecNew(
+      id: $id
+      items: $items
+      forRemove: $forRemove
+      fields: $fields
+    ) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RECORD_REC_ITEM = gql`
+  mutation ($id: UUID) {
+    removeRecItem(id: $id) {
+      id
+    }
+  }
+`;
+
+export const REDO_SRR_TRANSACTION = gql`
+  mutation ($id: UUID) {
+    redoReceiving(id: $id) {
+      id
+    }
+  }
+`;
+
+export const CHECKING_PO = gql`
+  mutation ($id: UUID) {
+    setToCompleted(id: $id) {
+      id
+    }
+  }
+`;
+
+export const DRAFT_APV = gql`
+  mutation ($id: UUID) {
+    upsertPayablesByRec(id: $id) {
       id
     }
   }

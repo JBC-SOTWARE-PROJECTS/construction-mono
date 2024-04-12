@@ -38,6 +38,7 @@ class PurchaseRecDto {
 	PurchaseOrderItems refPoItem
 	BigDecimal receiveQty
 	BigDecimal receiveUnitCost
+	BigDecimal recInventoryCost
 	BigDecimal receiveDiscountCost
 	Instant expirationDate
 	BigDecimal totalAmount
