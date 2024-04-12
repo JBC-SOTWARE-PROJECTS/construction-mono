@@ -90,6 +90,7 @@ interface IProps {
   hide: (hideProps: any) => void;
   record?: ReceivingReport | null | undefined;
   rrCategory: string;
+  disabledPO?: boolean
 }
 
 interface IAmount {
@@ -105,7 +106,7 @@ interface IAmount {
 }
 
 export default function UpsertReceivingModal(props: IProps) {
-  const { hide, record, rrCategory } = props;
+  const { hide, record, rrCategory, disabledPO } = props;
   const [form] = Form.useForm();
   const { setFieldValue } = form;
   const account = useContext(AccountContext);
@@ -1501,6 +1502,7 @@ export default function UpsertReceivingModal(props: IProps) {
                   allowClear: true,
                   showSearch: true,
                   placeholder: "Select PO Number",
+                  disabled: disabledPO,
                   onChange: (e) => {
                     getPOItems(e);
                   },

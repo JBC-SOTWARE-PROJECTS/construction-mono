@@ -51,7 +51,6 @@ import {
   usePrNumbersNoPo,
 } from "@/hooks/inventory";
 import dayjs from "dayjs";
-import Alert from "antd/es/alert/Alert";
 import styled from "styled-components";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
@@ -81,10 +80,11 @@ interface IProps {
   hide: (hideProps: any) => void;
   record?: PurchaseOrder | null | undefined;
   poCategory: string;
+  disabledPR?: boolean;
 }
 
 export default function UpsertPOFormModal(props: IProps) {
-  const { hide, record, poCategory } = props;
+  const { hide, record, poCategory, disabledPR } = props;
   const [form] = Form.useForm();
   const { setFieldValue } = form;
   const account = useContext(AccountContext);
@@ -787,16 +787,6 @@ export default function UpsertPOFormModal(props: IProps) {
         </div>
       }>
       <CustomCSS>
-        <div className="header-container">
-          <Alert
-            type="info"
-            message={
-              <div className="w-full">
-                <p>Prepared By: {preparedBy}</p>
-              </div>
-            }
-          />
-        </div>
         <Form
           form={form}
           name="upsertForm"
@@ -938,6 +928,7 @@ export default function UpsertPOFormModal(props: IProps) {
                       getPrItems(e);
                     },
                     allowClear: true,
+                    disabled: disabledPR,
                     placeholder: "Select Purchase Request",
                   }}
                 />

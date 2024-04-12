@@ -1,13 +1,16 @@
 package com.backend.gbp.graphqlservices.inventory
 
+import com.backend.gbp.domain.User
 import com.backend.gbp.domain.accounting.Integration
 import com.backend.gbp.domain.accounting.IntegrationDomainEnum
 import com.backend.gbp.domain.accounting.IntegrationItem
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.domain.accounting.LedgerDocType
+import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.inventory.ItemSubAccount
+import com.backend.gbp.domain.inventory.PurchaseOrder
 import com.backend.gbp.domain.inventory.PurchaseOrderItems
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.domain.inventory.ReceivingReportItem
@@ -15,6 +18,10 @@ import com.backend.gbp.domain.inventory.ReturnSupplier
 import com.backend.gbp.graphqlservices.accounting.IntegrationServices
 import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.repository.UserRepository
+import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.inventory.ReceivingReportItemRepository
 import com.backend.gbp.rest.dto.PurchaseRecDto
 import com.backend.gbp.rest.dto.ReceivingAmountDto
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
@@ -66,6 +73,9 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
     PurchaseOrderService purchaseOrderService
 
     @Autowired
+    PurchaseOrderItemService purchaseOrderItemService
+
+    @Autowired
     InventoryLedgerService inventoryLedgerService
 
     @Autowired
@@ -79,6 +89,15 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 
     @Autowired
     LedgerServices ledgerServices
+
+    @Autowired
+    EmployeeRepository employeeRepository
+
+    @Autowired
+    UserRepository userRepository
+
+    @Autowired
+    ReceivingReportItemRepository receivingReportItemRepository
 
 
     @GraphQLQuery(name = "recById")
@@ -109,6 +128,17 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 
         return records
     }
+
+    @GraphQLQuery(name = "getDRBYPONumber")
+    List<ReceivingReport> getDRBYPONumber(@GraphQLArgument(name = "poNumber") String poNumber) {
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from ReceivingReport e where e.purchaseOrder.poNumber = :poNumber and e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('poNumber', poNumber)
+        params.put('company', company)
+        createQuery(query, params).resultList.sort { it.rrNo }
+    }
+
 
 
     @GraphQLQuery(name = "recByFiltersPage")
@@ -643,5 +673,156 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
             throw new Exception("Something was Wrong : " + e)
         }
         return upsert
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "receivingReportByPO")
+    GraphQLRetVal<ReceivingReport> receivingReportByPO(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
+        Employee employee = employeeRepository.findOneByUser(user)
+        def purchaseOrder =  purchaseOrderService.poById(id)
+        def purchaseOrderItems =  purchaseOrderItemService.poItemByParent(id)
+        def checkpoint = this.getDRBYPONumber(purchaseOrder.poNumber)
+        if(checkpoint.size()) {
+            ReceivingReport first = checkpoint.find()
+            return new GraphQLRetVal(first, true, "Delivery Receiving Already Created: Displaying Delivery Receiving Details.")
+        }else{
+            ReceivingReport upsert = new ReceivingReport()
+            def code = "SRR"
+
+            if(purchaseOrder.project?.id){
+                code = purchaseOrder.project?.prefixShortName ?: "PJ"
+                upsert.project = purchaseOrder.project
+            }else if(purchaseOrder.assets?.id){
+                code = purchaseOrder.assets?.prefix ?: "SP"
+                upsert.assets = purchaseOrder.assets
+            }
+
+            upsert.rrNo = generatorService.getNextValue(GeneratorType.SRR_NO, {
+                return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+            })
+
+            upsert.receivedType = code
+            upsert.receiveDate = Instant.now()
+            upsert.userId = employee.id
+            upsert.userFullname = employee.fullName
+            upsert.purchaseOrder = purchaseOrder
+            upsert.receivedRefNo = null
+            upsert.category = purchaseOrder.category ?: ""
+            upsert.receivedRefDate = null
+            upsert.referenceType = null
+            if(employee.office?.id) {
+                upsert.receivedOffice = employee.office
+            }else{
+                upsert.receivedOffice = null
+            }
+            if(purchaseOrder.supplier?.id) {
+                upsert.supplier = purchaseOrder.supplier
+            }else{
+                upsert.supplier = null
+            }
+            if(purchaseOrder?.paymentTerms?.id) {
+                upsert.paymentTerms = purchaseOrder?.paymentTerms
+            }else{
+                upsert.paymentTerms = null
+            }
+            upsert.receivedRemarks = purchaseOrder.remarks ?: ""
+
+            upsert.isPosted = false
+            upsert.isVoid = false
+            upsert.account = null
+            upsert.refAp = null
+            upsert.postedLedger = null
+            upsert.postedBy = null
+            upsert.consignment = false
+            upsert.fixAsset = false
+            upsert.company = company
+
+            // calculations
+            Boolean vatInclusive = true
+            BigDecimal vatRate = 12.00
+            BigDecimal decimalVatRate = vatRate / 100.00
+            BigDecimal gross = BigDecimal.ZERO
+            BigDecimal taxAmount = BigDecimal.ZERO
+            BigDecimal net = BigDecimal.ZERO
+
+            List<ReceivingReportItem> rrItems = []
+            if(purchaseOrderItems.size()) {
+                purchaseOrderItems.each {poItem ->
+                    // calculations here
+                    BigDecimal input_tax = BigDecimal.ZERO;
+                    BigDecimal unitCost = (poItem?.unitCost / (poItem?.item?.item_conversion ?: BigDecimal.ONE)).setScale(2, RoundingMode.HALF_EVEN);
+                    BigDecimal totalAmount = poItem.qtyInSmall * unitCost;
+                    BigDecimal net_amount = totalAmount;
+                    BigDecimal inventoryCost = unitCost;
+                    if (vatInclusive) {
+                        if (poItem.item.vatable) {
+                            BigDecimal sumAmount = totalAmount / (decimalVatRate + 1);
+                            input_tax = sumAmount * decimalVatRate;
+                        }
+                        net_amount = totalAmount - input_tax;
+                        inventoryCost = unitCost / (decimalVatRate + 1);
+                    } else {
+                        if (poItem.item.vatable) {
+                            input_tax = totalAmount * decimalVatRate;
+                        }
+                        net_amount = totalAmount + input_tax;
+                        inventoryCost = unitCost * decimalVatRate + unitCost;
+                    }
+
+                    // sum calculations
+                    gross+=totalAmount
+                    taxAmount+=input_tax
+                    net+=net_amount
+                    // set items
+                    rrItems <<  new ReceivingReportItem().tap {
+                        it.receivingReport = null
+                        it.item = poItem.item
+                        it.refPoItem = poItem
+                        it.receiveQty = poItem.qtyInSmall
+                        it.receiveUnitCost = unitCost
+                        it.recInventoryCost = inventoryCost.setScale(2, RoundingMode.HALF_EVEN)
+                        it.receiveDiscountCost = BigDecimal.ZERO
+                        it.expirationDate = null
+                        it.totalAmount = totalAmount.setScale(2, RoundingMode.HALF_EVEN);
+                        it.inputTax = input_tax.setScale(2, RoundingMode.HALF_EVEN);
+                        it.netAmount = net_amount.setScale(2, RoundingMode.HALF_EVEN);
+                        it.isTax = poItem.item.vatable
+                        it.isFg = false
+                        it.isDiscount = false
+                        it.isCompleted = true
+                        it.isPartial = false
+                        it.isPosted = false
+                    }
+                }
+            }
+
+            upsert.fixDiscount = BigDecimal.ZERO
+            upsert.grossAmount = gross.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.totalDiscount = BigDecimal.ZERO
+            upsert.netDiscount = gross.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.amount = vatInclusive ? gross.setScale(2, RoundingMode.HALF_EVEN) : net.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.inputTax = taxAmount.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.netAmount =  net.setScale(2, RoundingMode.HALF_EVEN)
+
+            upsert.vatRate = vatRate
+            upsert.vatInclusive = vatInclusive
+
+            // end calculations
+            def afterSave = save(upsert)
+
+            // insert items
+            if(rrItems.size()) {
+                rrItems.each {
+                    def upsertItem = it
+                    upsertItem.receivingReport = afterSave
+                    receivingReportItemRepository.save(upsertItem)
+                }
+            }
+            return new GraphQLRetVal(afterSave, true, "Delivery receiving successfully created")
+        }
     }
 }
