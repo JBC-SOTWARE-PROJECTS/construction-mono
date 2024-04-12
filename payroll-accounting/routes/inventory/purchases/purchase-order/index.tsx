@@ -109,7 +109,13 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
           );
         }
       } else {
-        _approve(record?.id, status, "void");
+        if (record.isCompleted) {
+          message.error(
+            "Cannot void Purchase Order. Transaction is already set to delivered"
+          );
+        } else {
+          _approve(record?.id, status, "void");
+        }
       }
     }
   };

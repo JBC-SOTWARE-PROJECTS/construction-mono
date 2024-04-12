@@ -101,7 +101,7 @@ export default function ViewJournalEntries(props: IProps) {
             columns={columns}
             pagination={false}
             dataSource={ledger}
-            summary={() => <JournalEntriesSummary dataSource={ledger} />}
+            summary={() => <JournalEntriesSummary dataSource={ledger} autoEntries={true} />}
           />
         </Col>
       </Row>

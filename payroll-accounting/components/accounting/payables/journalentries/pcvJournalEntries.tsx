@@ -190,12 +190,12 @@ export default function PCVJournalEntries(props: IProps) {
   };
 
   const onRemove = (code: string) => {
+    const payload = _.clone(ledger);
     if (code) {
-      const filtered = _.filter(
-        ledger,
-        (obj: JournalEntryViewDto) => obj.code !== code
-      );
-      setLedger(filtered);
+      _.remove(payload, function (n) {
+        return n.code == code;
+      });
+      setLedger(payload);
     }
   };
 
@@ -373,7 +373,7 @@ export default function PCVJournalEntries(props: IProps) {
       });
     }
     return cols;
-  }, [manual]);
+  }, [manual, editable, ledger]);
 
   const disabledButton = useMemo(() => {
     const debit = _.sumBy(ledger, "debit");

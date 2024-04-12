@@ -19,11 +19,13 @@ export default function PCVApplicationFooter(props: IProps) {
         </Table.Summary.Cell>
         <Table.Summary.Cell index={5} align="right" className="font-bold">
           <span>{currency} </span>
-          {NumberFormater(_.sumBy(dataSource, "ewtAmount"))}
+          {NumberFormater(
+            _.sumBy(dataSource, "pettyCashAccounting.amountUsed")
+          )}
         </Table.Summary.Cell>
         <Table.Summary.Cell index={6} align="right" className="font-bold">
           <span>{currency} </span>
-          {NumberFormater(_.sumBy(dataSource, "ewtAmount"))}
+          {NumberFormater(_.sumBy(dataSource, "amount"))}
         </Table.Summary.Cell>
         <Table.Summary.Cell
           index={7}
