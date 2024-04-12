@@ -6,11 +6,12 @@ import {
 } from "@ant-design/pro-components";
 import { Input, Button, message, Row, Col, Form } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
-import { ReceivingReport, Query } from "@/graphql/gql/graphql";
+import { ReceivingReport, Query, PurchaseOrder } from "@/graphql/gql/graphql";
 import { useConfirmationPasswordHook, useDialog } from "@/hooks";
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   DRAFT_APV,
+  GET_PO_RECORD_BY_PO_NO,
   GET_RECORDS_DELIVERY_RECEIVING,
   REDO_SRR_TRANSACTION,
 } from "@/graphql/inventory/deliveries-queries";
@@ -24,6 +25,7 @@ import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
 import UpsertReceivingModal from "@/components/inventory/deliveries/receiving/dialogs/upsertReceivingModal";
 import PostReceivingReportModal from "@/components/inventory/post-dialogs/postReceivingReport";
 import _ from "lodash";
+import UpsertPOFormModal from "@/components/inventory/purchases/purchase-order/dialogs/upserPOFormModal";
 
 const { Search } = Input;
 
@@ -41,6 +43,7 @@ export default function ReceivingComponent({ type }: { type: string }) {
   });
   //  ===================== modals ===================================
   const modal = useDialog(UpsertReceivingModal);
+  const poModal = useDialog(UpsertPOFormModal);
   const postInventory = useDialog(PostReceivingReportModal);
   // ====================== queries =====================================
   const offices = useOffices();
@@ -95,6 +98,28 @@ export default function ReceivingComponent({ type }: { type: string }) {
     });
   };
 
+  const [getPODetails, { loading: poLoading }] = useLazyQuery<Query>(
+    GET_PO_RECORD_BY_PO_NO,
+    {
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.poByPoNo?.id)) {
+          let parent = data?.poByPoNo as PurchaseOrder;
+          let category = parent?.category ?? "";
+          showPOModal(parent, category);
+        }
+      },
+    }
+  );
+
+  const showPOModal = (record: PurchaseOrder, category: string) => {
+    poModal({ record: record, poCategory: category }, (msg: string) => {
+      if (msg) {
+        message.success(msg);
+        refetch();
+      }
+    });
+  };
+
   const onPostOrVoidView = (
     record: ReceivingReport,
     status: boolean,
@@ -135,6 +160,14 @@ export default function ReceivingComponent({ type }: { type: string }) {
     });
   };
 
+  const onViewPOMoal = (poNumber: string) => {
+    getPODetails({
+      variables: {
+        poNumber: poNumber,
+      },
+    });
+  };
+
   const handleUpdateStatus = (record: ReceivingReport, status: boolean) => {
     if (status) {
       //if clicked approved
@@ -156,6 +189,7 @@ export default function ReceivingComponent({ type }: { type: string }) {
       }
     }
   };
+
   const title = useMemo(() => {
     let title = "All Delivery Receiving";
     switch (type) {
@@ -359,7 +393,7 @@ export default function ReceivingComponent({ type }: { type: string }) {
           dataSource={
             data?.recByFiltersPageNoDate?.content as ReceivingReport[]
           }
-          loading={loading || redoLoading || draftLoading}
+          loading={loading || redoLoading || draftLoading || poLoading}
           totalElements={data?.recByFiltersPageNoDate?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}
@@ -367,6 +401,7 @@ export default function ReceivingComponent({ type }: { type: string }) {
           onViewAccount={(record) => onViewPostedAccount(record)}
           onHandleDraftAPV={(record) => onHandleDraftAPV(record)}
           onRedoTransaction={(record) => onRedoTransaction(record)}
+          viewPOModal={(poNumber) => onViewPOMoal(poNumber)}
         />
       </ProCard>
     </PageContainer>

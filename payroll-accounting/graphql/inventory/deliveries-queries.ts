@@ -357,3 +357,106 @@ export const DRAFT_APV = gql`
     }
   }
 `;
+
+export const CREATE_DELIVERY_RECEIVING_BY_PO = gql`
+  mutation ($id: UUID) {
+    receivingReportByPO(id: $id) {
+      success
+      message
+      payload {
+        id
+        receivedType
+        rrNo
+        receiveDate
+        userId
+        userFullname
+        purchaseOrder {
+          id
+          poNumber
+        }
+        receivedRefNo
+        receivedRefDate
+        receivedOffice {
+          id
+          officeDescription
+        }
+        supplier {
+          id
+          supplierFullname
+        }
+        paymentTerms {
+          id
+          paymentDesc
+        }
+        project {
+          id
+          description
+        }
+        category
+        assets {
+          id
+          description
+        }
+        receivedRemarks
+        fixDiscount
+        grossAmount
+        totalDiscount
+        netDiscount
+        amount
+        vatRate
+        inputTax
+        netAmount
+        vatInclusive
+        isPosted
+        isVoid
+        account {
+          id
+          description
+        }
+        refAp
+      }
+    }
+  }
+`;
+
+export const GET_PO_RECORD_BY_PO_NO = gql`
+  query ($poNumber: String) {
+    poByPoNo(poNumber: $poNumber) {
+      id
+      poNumber
+      preparedDate
+      etaDate
+      supplier {
+        id
+        supplierFullname
+      }
+      paymentTerms {
+        id
+        paymentDesc
+      }
+      prNos
+      office {
+        id
+        officeDescription
+      }
+      project {
+        id
+        description
+      }
+      category
+      assets {
+        id
+        description
+      }
+      remarks
+      isApprove
+      status
+      userId
+      preparedBy
+      noPr
+      isCompleted
+      isVoided
+      remarks
+    }
+  }
+`;

@@ -338,3 +338,87 @@ export const GET_RECORDS_PO_DEL_MON = gql`
     }
   }
 `;
+
+export const CREATE_PURCHASE_ORDER_BY_PR = gql`
+  mutation ($id: UUID) {
+    purchaseOrderByPR(id: $id) {
+      success
+      message
+      payload {
+        id
+        poNumber
+        preparedDate
+        etaDate
+        supplier {
+          id
+          supplierFullname
+        }
+        paymentTerms {
+          id
+          paymentDesc
+        }
+        prNos
+        office {
+          id
+          officeDescription
+        }
+        project {
+          id
+          description
+        }
+        category
+        assets {
+          id
+          description
+        }
+        remarks
+        isApprove
+        status
+        userId
+        preparedBy
+        noPr
+        isCompleted
+        isVoided
+        remarks
+      }
+    }
+  }
+`;
+
+export const GET_PR_RECORD_BY_PR_NO = gql`
+  query ($prNo: String) {
+    prByPrNo(prNo: $prNo) {
+      id
+      prNo
+      prDateRequested
+      prDateNeeded
+      project {
+        id
+        description
+      }
+      assets {
+        id
+        description
+      }
+      supplier {
+        id
+        supplierFullname
+      }
+      requestingOffice {
+        id
+        officeDescription
+      }
+      requestedOffice {
+        id
+        officeDescription
+      }
+      category
+      prType
+      isApprove
+      status
+      userId
+      userFullname
+      remarks
+    }
+  }
+`;

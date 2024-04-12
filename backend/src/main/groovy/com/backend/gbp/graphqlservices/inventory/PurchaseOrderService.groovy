@@ -1,11 +1,16 @@
 package com.backend.gbp.graphqlservices.inventory
 
+import com.backend.gbp.domain.User
+import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.inventory.PurchaseOrder
 import com.backend.gbp.domain.inventory.PurchaseOrderItems
 import com.backend.gbp.domain.inventory.PurchaseRequest
 import com.backend.gbp.domain.inventory.PurchaseRequestItem
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.repository.UserRepository
+import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.rest.dto.PurchaseDto
 import com.backend.gbp.rest.dto.PurchasePODto
 import com.backend.gbp.security.SecurityUtils
@@ -49,6 +54,15 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
     @Autowired
     PurchaseOrderItemMonitoringService purchaseOrderItemMonitoringService
 
+    @Autowired
+    PurchaseRequestService purchaseRequestService
+
+    @Autowired
+    EmployeeRepository employeeRepository
+
+    @Autowired
+    UserRepository userRepository
+
 
     @GraphQLQuery(name = "poById")
     PurchaseOrder poById(
@@ -69,6 +83,30 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
         params.put('status', false)
         params.put('company', company)
         createQuery(query, params).resultList.sort { it.poNumber }
+    }
+
+    @GraphQLQuery(name = "getPoBYPrNO")
+    List<PurchaseOrder> getPoBYPrNO(@GraphQLArgument(name = "prNo") String prNo) {
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from PurchaseOrder e where e.prNos = :prNo and e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('prNo', prNo)
+        params.put('company', company)
+        createQuery(query, params).resultList.sort { it.poNumber }
+    }
+
+    @GraphQLQuery(name = "poByPoNo")
+    PurchaseOrder poByPoNo(
+            @GraphQLArgument(name = "poNumber") String poNumber
+    ) {
+        if(poNumber){
+            String query = '''SELECT po from PurchaseOrder po where po.poNumber = :poNumber'''
+            Map<String, Object> params = new HashMap<>()
+            params.put('poNumber', poNumber)
+            createQuery(query, params).resultList.find()
+        }else{
+            null
+        }
     }
 
     @GraphQLQuery(name = "poList")
@@ -294,6 +332,74 @@ class PurchaseOrderService extends AbstractDaoService<PurchaseOrder> {
             return null
         }
 
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "purchaseOrderByPR")
+    GraphQLRetVal<PurchaseOrder> purchaseOrderByPR(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
+        Employee employee = employeeRepository.findOneByUser(user)
+        def purchaseRequest =  purchaseRequestService.prById(id)
+        def purchaseRequestItems =  purchaseRequestItemService.prItemByParent(id)
+        def checkpoint = this.getPoBYPrNO(purchaseRequest.prNo)
+        if(checkpoint.size()) {
+            PurchaseOrder first = checkpoint.find()
+            return new GraphQLRetVal(first, true, "Purchase Order Already Created: Displaying Purchase Order Details.")
+        }else{
+            PurchaseOrder upsert = new PurchaseOrder()
+            def code = "PO"
+
+            if(purchaseRequest.project?.id){
+                code = purchaseRequest.project?.prefixShortName ?: "PJ"
+                upsert.project =  purchaseRequest.project
+
+            }else if(purchaseRequest.assets?.id){
+                code = purchaseRequest.assets?.prefix ?: "SP"
+                upsert.assets = purchaseRequest.assets
+            }
+
+            upsert.poNumber = generatorService.getNextValue(GeneratorType.PO_NO, {
+                return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+            })
+            upsert.preparedDate = Instant.now()
+            upsert.etaDate = Instant.now()
+            if(purchaseRequest.supplier?.id) {
+                upsert.supplier = purchaseRequest.supplier
+            }else{
+                upsert.supplier = null
+            }
+
+            upsert.paymentTerms = null
+            upsert.category = purchaseRequest.category
+            upsert.prNos = purchaseRequest.prNo
+            if(employee.office?.id) {
+                upsert.office = employee.office
+            }else{
+                upsert.office = null
+            }
+
+            upsert.remarks = purchaseRequest.remarks ?: null
+            upsert.isApprove = false
+            upsert.isVoided = false
+            upsert.status = "FOR APPROVAL"
+            upsert.userId = employee.id
+            upsert.preparedBy = employee.fullName
+            upsert.noPr = false
+            upsert.isCompleted = false
+            upsert.company = company
+            def afterSave = save(upsert)
+
+            // insert items
+            if(purchaseRequestItems.size()) {
+                purchaseRequestItems.each {
+                    purchaseOrderItemService.upsertPOItemByPRItem(it, afterSave)
+                }
+            }
+            return new GraphQLRetVal(afterSave, true, "Purchase order successfully created")
+        }
     }
 
 }

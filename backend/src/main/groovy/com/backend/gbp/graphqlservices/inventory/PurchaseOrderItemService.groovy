@@ -109,6 +109,24 @@ class PurchaseOrderItemService extends AbstractDaoService<PurchaseOrderItems> {
     }
 
     @Transactional
+    @GraphQLMutation(name = "upsertPOItemByPRItem")
+    PurchaseOrderItems upsertPOItemByPRItem(
+            @GraphQLArgument(name = "item") PurchaseRequestItem item,
+            @GraphQLArgument(name = "parent") PurchaseOrder parent
+    ) {
+        def upsert = new PurchaseOrderItems()
+        upsert.purchaseOrder = parent
+        upsert.item = item.item
+        upsert.quantity = item.requestedQty
+        upsert.unitCost = item.unitCost
+        upsert.prNos = item?.purchaseRequest?.prNo ?: ""
+        upsert.qtyInSmall =  item.requestedQty * (item?.item?.item_conversion ?: BigDecimal.ZERO)
+        upsert.type = null
+        upsert.type_text = null
+        save(upsert)
+    }
+
+    @Transactional
     @GraphQLMutation(name = "removePoItem")
     PurchaseOrderItems removePoItem(
             @GraphQLArgument(name = "id") UUID id

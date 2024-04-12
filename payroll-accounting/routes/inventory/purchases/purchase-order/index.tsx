@@ -9,14 +9,22 @@ import {
   ExclamationCircleOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { PurchaseOrder, Query } from "@/graphql/gql/graphql";
-import { useDialog } from "@/hooks";
-import { useMutation, useQuery } from "@apollo/client";
 import {
+  Mutation,
+  PurchaseOrder,
+  PurchaseRequest,
+  Query,
+  ReceivingReport,
+} from "@/graphql/gql/graphql";
+import { useConfirmationPasswordHook, useDialog } from "@/hooks";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import {
+  GET_PR_RECORD_BY_PR_NO,
   GET_RECORDS_PURCHASE_ORDER,
   UPSERT_RECORD_PO_STATUS,
 } from "@/graphql/inventory/purchases-queries";
 import UpsertPOFormModal from "@/components/inventory/purchases/purchase-order/dialogs/upserPOFormModal";
+import UpsertPRFormModal from "@/components/inventory/purchases/purchase-request/dialogs/upserPRFormModal";
 import PurchaseOrderTable from "@/components/inventory/purchases/purchase-order/purchaseOrderTable";
 import { FormDebounceSelect, FormSelect } from "@/components/common";
 import { useOffices, useProjects } from "@/hooks/payables";
@@ -25,12 +33,17 @@ import { OptionsValue } from "@/utility/interfaces";
 import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
 import { useAssets } from "@/hooks/inventory";
 import _ from "lodash";
+import { CREATE_DELIVERY_RECEIVING_BY_PO } from "@/graphql/inventory/deliveries-queries";
+import UpsertReceivingModal from "@/components/inventory/deliveries/receiving/dialogs/upsertReceivingModal";
 
 const { Search } = Input;
 
 export default function PurchaseOrderComponent({ type }: { type: string }) {
   const { modal: parentModal, message } = App.useApp();
   const modal = useDialog(UpsertPOFormModal);
+  const prModal = useDialog(UpsertPRFormModal);
+  const drModal = useDialog(UpsertReceivingModal);
+  const [showPasswordConfirmation] = useConfirmationPasswordHook();
   const { confirm } = parentModal;
   const [supplier, setSupplier] = useState<OptionsValue>();
   const [category, setCategory] = useState<string | null>(null);
@@ -64,6 +77,19 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
     }
   );
 
+  const [getPRDetails, { loading: prLoading }] = useLazyQuery<Query>(
+    GET_PR_RECORD_BY_PR_NO,
+    {
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.prByPrNo?.id)) {
+          let parent = data?.prByPrNo as PurchaseRequest;
+          let category = parent?.category ?? "";
+          showPRModal(parent, category);
+        }
+      },
+    }
+  );
+
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
     UPSERT_RECORD_PO_STATUS,
     {
@@ -77,6 +103,33 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
     }
   );
 
+  const [createDeliveryReceiving, { loading: createLoading }] =
+    useMutation<Mutation>(CREATE_DELIVERY_RECEIVING_BY_PO, {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (data?.receivingReportByPO?.success) {
+          message.success(data?.receivingReportByPO?.message);
+          let payload = data?.receivingReportByPO?.payload as ReceivingReport;
+          if (payload.id) {
+            let category = payload.category ?? "";
+            //show modal here
+            showDeliveryFormModal(payload, category);
+          }
+        } else {
+          message.error(data?.purchaseOrderByPR?.message);
+        }
+      },
+    });
+
+  const showPRModal = (record: PurchaseRequest, category: string) => {
+    prModal({ record: record, prCategory: category }, (msg: string) => {
+      if (msg) {
+        message.success(msg);
+        refetch();
+      }
+    });
+  };
+
   const onUpsertRecord = (record?: PurchaseOrder) => {
     modal({ record: record, poCategory: category }, (msg: string) => {
       if (msg) {
@@ -84,6 +137,18 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
         refetch();
       }
     });
+  };
+
+  const showDeliveryFormModal = (record: ReceivingReport, category: string) => {
+    drModal(
+      { record: record, rrCategory: category, disabledPO: true },
+      (msg: string) => {
+        if (msg) {
+          message.success(msg);
+          refetch();
+        }
+      }
+    );
   };
 
   const handleUpdateStatus = (record: PurchaseOrder, status: boolean) => {
@@ -118,6 +183,24 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
         }
       }
     }
+  };
+
+  const handleCreateDR = (record: PurchaseOrder) => {
+    showPasswordConfirmation(() => {
+      createDeliveryReceiving({
+        variables: {
+          id: record.id,
+        },
+      });
+    });
+  };
+
+  const onViewPRMoal = (prNo: string) => {
+    getPRDetails({
+      variables: {
+        prNo: prNo,
+      },
+    });
   };
 
   const _approve = (id: string, status: boolean, message: string) => {
@@ -337,10 +420,12 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
         </div>
         <PurchaseOrderTable
           dataSource={data?.poByFiltersPageNoDate?.content as PurchaseOrder[]}
-          loading={loading || upsertLoading}
+          loading={loading || upsertLoading || prLoading || createLoading}
           totalElements={data?.poByFiltersPageNoDate?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}
+          handleCreateDR={(record) => handleCreateDR(record)}
+          viewPRModal={(prNo) => onViewPRMoal(prNo)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
         />
       </ProCard>
