@@ -118,8 +118,8 @@ export default function GeneralLedgerRoute() {
         ),
     },
     {
-      title: "Description",
-      dataIndex: "description",
+      title: "Entity Name",
+      dataIndex: "entity",
       width: 200,
       fixed: "left",
       onCell: (record: any, index) => ({
@@ -130,6 +130,12 @@ export default function GeneralLedgerRoute() {
             ? 0
             : 1,
       }),
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      width: 200,
+      render: (text: any) => (text !== "TOTAL" ? text : ""),
     },
     {
       title: "Reference",

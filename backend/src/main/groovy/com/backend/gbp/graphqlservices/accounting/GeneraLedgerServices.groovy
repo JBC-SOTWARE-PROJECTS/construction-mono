@@ -80,7 +80,12 @@ class GeneralLedgerDetailsParentDto{
 @Canonical
 class GeneralLedgerDetailsChildDto{
     String transaction_date
+    String entity
     String description
+    String transactionNo
+    String transactionType
+    String referenceNo
+    String referenceType
     BigDecimal debit
     BigDecimal credit
     BigDecimal running_balance
@@ -557,7 +562,12 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                     l.id,
                     TRIM(BOTH ' ' FROM l.journal_account ->> 'code') as "code",
                     TRIM(BOTH ' ' FROM l.journal_account ->> 'accountName') AS account,
+                    hl.entity_name AS entity,
                     hl.particulars AS description,
+                    hl.transaction_num AS "transactionNo",
+                    hl.transaction_type AS "transactionType",
+                    hl.reference_num AS "referenceNo",
+                    hl.reference_type AS "referenceType",
                     hl.docnum AS "reference",
                     CAST(hl.transaction_date_only AS VARCHAR) AS transaction_date,
                     l.debit,
@@ -591,7 +601,12 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                     CAST(json_agg(
                         jsonb_build_object(
                             'id', CAST(id AS TEXT),
+                            'entity', entity,
                             'description', description,
+                            'transactionNo', "transactionNo",
+                            'transactionType', "transactionType",
+                            'referenceNo', "referenceNo",
+                            'referenceType', "referenceType",
                             'reference',reference,
                             'transaction_date', transaction_date,
                             'debit', debit,
@@ -603,7 +618,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                         jsonb_build_object(
                             'id', CAST(uuid_generate_v4() AS TEXT),
                             'description', 'TOTAL',
-                            'transaction_date', CONCAT('TOTAL ACCOUNTS ',account),
+                            'transaction_date', CONCAT('TOTAL ',account),
                             'debit',sum(debit),
                             'credit',sum(credit),
                             'running_balance', sum(debit) - sum(credit)

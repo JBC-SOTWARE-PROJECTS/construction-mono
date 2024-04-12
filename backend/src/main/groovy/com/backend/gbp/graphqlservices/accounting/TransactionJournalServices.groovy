@@ -5,6 +5,7 @@ import com.backend.gbp.domain.accounting.HeaderLedgerGroup
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.repository.accounting.LedgerRepository
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.backend.gbp.services.GeneratorType
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+import javax.transaction.Transactional
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -39,6 +41,10 @@ class TransactionJournalServices  {
     @Autowired
     HeaderGroupServices headerGroupServices
 
+    @Autowired
+    LedgerRepository ledgerRepository
+
+    @Transactional
     @GraphQLMutation
     GraphQLRetVal<Boolean> editJournalEntry(
             @GraphQLArgument(name = "headerGroupId") UUID headerGroupId,
@@ -59,8 +65,6 @@ class TransactionJournalServices  {
                 StringUtils.leftPad(it.toString(),5,"0")
             }
             header.fiscal = fiscalServices.findFiscalForTransactionDate(header.transactionDate)
-
-
         }
 
         if(!headerGroupId){
@@ -141,8 +145,8 @@ class TransactionJournalServices  {
 
         removed.each {
             if(!it.header.approvedBy) {
-                ledgerServices.deleteById(it.id)
                 header.ledger.remove(it)
+                ledgerRepository.deleteLedger(it.id)
             }
         }
 

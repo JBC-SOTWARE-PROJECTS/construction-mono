@@ -264,13 +264,13 @@ export default function GeneralLedgerRoute() {
               <Button onClick={() => onHandleUpdate()} type="primary">
                 Update
               </Button>
-              {/* <Button
+              <Button
                 onClick={() => onHandleDownloadCSV()}
-                type='dashed'
+                type="dashed"
                 danger
               >
                 Download CSV
-              </Button> */}
+              </Button>
             </Space>
           )}
           loading={loading}

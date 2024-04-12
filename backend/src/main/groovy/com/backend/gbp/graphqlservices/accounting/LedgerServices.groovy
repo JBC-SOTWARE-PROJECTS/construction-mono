@@ -1558,7 +1558,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
 
 
         validateEntries(headerLedger)
-        headerLedger.company = SecurityUtils.currentCompany()
+        headerLedger.companyId = SecurityUtils.currentCompanyId()
 
         if(!headerLedger.headerLedgerGroup){
             HeaderLedgerGroup headerLedgerGroup = new HeaderLedgerGroup()

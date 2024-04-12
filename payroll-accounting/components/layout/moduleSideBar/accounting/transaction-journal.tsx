@@ -28,6 +28,10 @@ const AccountingSetupMenu = {
             path: "/accounting/transaction-journal/purchases",
             name: "Purchase Payable",
           },
+          {
+            path: "/accounting/transaction-journal/receipts",
+            name: "Receipts",
+          },
         ],
       },
     ],
