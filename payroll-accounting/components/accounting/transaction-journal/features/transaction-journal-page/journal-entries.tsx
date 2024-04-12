@@ -11,22 +11,26 @@ import {
   Statistic,
   Table,
   message,
-} from 'antd'
-import numeral from 'numeral'
-import type { ColumnsType } from 'antd/es/table'
+} from "antd"
+import numeral from "numeral"
+import type { ColumnsType } from "antd/es/table"
 import {
   HeaderLedger,
   HeaderLedgerGroupItemsDto,
   Ledger,
   LedgerTotalDebitCredit,
-} from '@/graphql/gql/graphql'
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import dayjs from 'dayjs'
-import { useMemo, useState } from 'react'
-import { ProCard } from '@ant-design/pro-components'
-import LedgerList from './ledgerList'
-import moment from 'moment'
-import ConfirmationPasswordHook from '@/hooks/promptPassword'
+} from "@/graphql/gql/graphql"
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client"
+import dayjs from "dayjs"
+import { useMemo, useState } from "react"
+import { ProCard } from "@ant-design/pro-components"
+import LedgerList from "./ledger-list"
+import moment from "moment"
+import ConfirmationPasswordHook from "@/hooks/promptPassword"
+import PageFilterContainer from "@/components/common/custom-components/page-filter-container"
+import ManualJournalEntriesModal from "../../dialogs/manual-journal-entries"
+import { useDialog } from "@/hooks"
+import { EditOutlined, SelectOutlined } from "@ant-design/icons"
 
 const GET_RECORDS = gql`
   query (
@@ -85,6 +89,8 @@ interface SelectedI {
 export default function JournalEntries(props: JournalEntriesI) {
   const [selected, setSelected] = useState<SelectedI[]>([])
   const [showPasswordConfirmation] = ConfirmationPasswordHook()
+  const manualEntriesDialog = useDialog(ManualJournalEntriesModal)
+
   const [messageApi, contextHolder] = message.useMessage()
 
   const {
@@ -99,7 +105,7 @@ export default function JournalEntries(props: JournalEntriesI) {
 
   const { data, loading, refetch } = useQuery(GET_RECORDS, {
     variables: {
-      filter: '',
+      filter: "",
       groupId,
       startDate,
       endDate,
@@ -145,20 +151,20 @@ export default function JournalEntries(props: JournalEntriesI) {
       setSelected([])
     },
     getCheckboxProps: (record: HeaderLedgerGroupItemsDto) => ({
-      disabled: record?.approvedBy !== '', // Column configuration not to be checked
+      disabled: record?.approvedBy !== "", // Column configuration not to be checked
     }),
   }
 
   const onHandlePost = () => {
     if (selected.length === 0) {
-      message.warning('Please select Entry to approve')
+      message.warning("Please select Entry to approve")
       return
     }
 
     showPasswordConfirmation(() => {
       messageApi.open({
-        type: 'loading',
-        content: 'Action in progress..',
+        type: "loading",
+        content: "Action in progress..",
         duration: 0,
       })
       approveLedger({
@@ -172,30 +178,64 @@ export default function JournalEntries(props: JournalEntriesI) {
     })
   }
 
+  const onCreateEditManualEntries = (
+    id?: string,
+    transactionDateOnly?: string | null
+  ) => {
+    manualEntriesDialog(
+      {
+        id,
+        transactionDateOnly,
+        custom: true,
+        journalType: props?.journalType ?? "ALL",
+        headerGroupId: groupId,
+      },
+      () => {
+        refetch()
+      }
+    )
+  }
+
   const columns: ColumnsType<HeaderLedgerGroupItemsDto> = [
-    { title: 'Journal Type', dataIndex: 'journalType' },
+    { title: "Journal Type", dataIndex: "journalType" },
     {
-      title: 'Date',
-      dataIndex: 'transactionDateOnly',
-      render: (text) => dayjs(text).format('YYYY-MM-DD'),
+      title: "Date",
+      dataIndex: "transactionDateOnly",
+      render: (text) => dayjs(text).format("YYYY-MM-DD"),
     },
-    { title: 'Doc Type', dataIndex: 'docType' },
-    { title: 'Doc No', dataIndex: 'docNo' },
-    { title: 'Particular', dataIndex: 'particulars' },
-    { title: 'Created By', dataIndex: 'createdBy' },
+    { title: "Doc Type", dataIndex: "docType" },
+    { title: "Doc No", dataIndex: "docNo" },
+    { title: "Particular", dataIndex: "particulars" },
+    { title: "Created By", dataIndex: "createdBy" },
     {
-      title: 'Total Debit',
-      dataIndex: 'debit',
-      align: 'right',
-      render: (text) => numeral(text).format('0,0.00'),
+      title: "Total Debit",
+      dataIndex: "debit",
+      align: "right",
+      render: (text) => numeral(text).format("0,0.00"),
     },
     {
-      title: 'Total Credit',
-      dataIndex: 'credit',
-      align: 'right',
-      render: (text) => numeral(text).format('0,0.00'),
+      title: "Total Credit",
+      dataIndex: "credit",
+      align: "right",
+      render: (text) => numeral(text).format("0,0.00"),
     },
-    { title: 'Posted By', dataIndex: 'approvedBy' },
+    { title: "Posted By", dataIndex: "approvedBy" },
+    {
+      title: <SelectOutlined />,
+      dataIndex: "id",
+      align: "center",
+      render: (text: string, record: HeaderLedgerGroupItemsDto) =>
+        !record?.approvedBy && (
+          <Button
+            size="small"
+            icon={<EditOutlined />}
+            type="text"
+            onClick={() =>
+              onCreateEditManualEntries(text, record?.transactionDateOnly)
+            }
+          />
+        ),
+    },
   ]
 
   const journalTotal = useMemo(() => {
@@ -213,64 +253,79 @@ export default function JournalEntries(props: JournalEntriesI) {
 
   return (
     <Modal
-      title='Ledger Overview'
+      title="Ledger Overview"
       open
       onCancel={props.hide}
-      width='100%'
-      style={{ maxWidth: '1600px' }}
+      width="100%"
+      style={{ maxWidth: "1600px" }}
       footer={<Button onClick={() => hide()}>Close</Button>}
     >
       <ProCard
         title={
           <Statistic
-            title='Entity Name'
+            title="Entity Name"
             value={entityName}
-            valueStyle={{ fontWeight: 'normal' }}
+            valueStyle={{ fontWeight: "normal" }}
           />
         }
         bordered={false}
         extra={[
           <Space key={1}>
             <Statistic
-              title='Total Selected Debit'
-              valueStyle={{ color: '#3f8600' }}
-              value={numeral(totalDebit).format('0,0.00')}
+              title="Total Selected Debit"
+              valueStyle={{ color: "#3f8600" }}
+              value={numeral(totalDebit).format("0,0.00")}
             />
             <Statistic
-              title='Total Selected Credit'
-              valueStyle={{ color: '#cf1322' }}
-              value={numeral(totalCredit).format('0,0.00')}
+              title="Total Selected Credit"
+              valueStyle={{ color: "#cf1322" }}
+              value={numeral(totalCredit).format("0,0.00")}
               precision={2}
             />
           </Space>,
         ]}
       >
         <Divider dashed />
+        {contextHolder}
         <Row gutter={[16, 16]} style={{ marginBottom: 8 }}>
           <Col span={24}>
-            {contextHolder}
-            <Button
-              type='primary'
-              onClick={() => onHandlePost()}
-              loading={resultLoading}
-            >
-              Post
-            </Button>
-            <span style={{ marginLeft: 8 }}>
-              {selected.length > 0
-                ? `Selected ${selected.length} entrie(s)`
-                : ''}
-            </span>
+            <PageFilterContainer
+              leftSpace={
+                <Space>
+                  <Button
+                    type="primary"
+                    onClick={() => onHandlePost()}
+                    loading={resultLoading}
+                  >
+                    Post
+                  </Button>
+                  <span style={{ marginLeft: 8 }}>
+                    {selected.length > 0
+                      ? `Selected ${selected.length} entrie(s)`
+                      : ""}
+                  </span>
+                </Space>
+              }
+              rightSpace={
+                <Button
+                  type="primary"
+                  onClick={() => onCreateEditManualEntries()}
+                  loading={resultLoading}
+                >
+                  New Manual Entries
+                </Button>
+              }
+            />
           </Col>
           <Col span={24}>
             <Input.Search onSearch={(e) => refetch({ filter: e })} />
           </Col>
         </Row>
         <Table
-          rowKey='id'
+          rowKey="id"
           loading={loading}
           rowSelection={{
-            type: 'checkbox',
+            type: "checkbox",
             ...rowSelection,
           }}
           expandable={{
@@ -280,7 +335,7 @@ export default function JournalEntries(props: JournalEntriesI) {
           }}
           columns={columns as any}
           dataSource={data?.transactionJournal ?? []}
-          size='small'
+          size="small"
         />
       </ProCard>
     </Modal>

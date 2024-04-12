@@ -6,6 +6,7 @@ import com.backend.gbp.domain.accounting.HeaderLedgerGroup
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.domain.accounting.LedgerDocType
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.security.SecurityUtils
@@ -93,6 +94,7 @@ class TransactionJournalDto{
 @Canonical
 class HeaderLedgerGroupDto{
     String id
+    String docNo
     String referenceNo
     String entityName
     String journalType
@@ -139,7 +141,7 @@ class LedgerEntry{
 @GraphQLApi
 @Slf4j
 @Transactional(rollbackOn = Exception.class)
-class LedgerServices extends AbstractDaoService<HeaderLedger> {
+class LedgerServices extends AbstractDaoCompanyService<HeaderLedger> {
 
     @Autowired
     FiscalServices fiscalServices
@@ -979,8 +981,8 @@ from HeaderLedger hl where
                 select 
                 cast(hlg.id as text) as "id",
                 hlg.record_no as "referenceNo",
+                hlg.doc_no as "docNo",
                 hlg.entity_name as "entityName",
-                hl.journal_type as "journalType",
                 cast(COUNT(CASE WHEN (hl.approved_by is null or hl.approved_by = '') THEN 1 ELSE NULL END) as varchar) AS "notApproved",
                 cast(COUNT(CASE WHEN (hl.approved_by is not null or hl.approved_by != '') THEN 1 ELSE NULL END) as varchar) AS "approved"
                 from accounting.header_ledger hl 
@@ -991,7 +993,7 @@ from HeaderLedger hl where
                 hl.transaction_date_only <= :endDate
                 and (case when :journalType = 'ALL' then true else hl.journal_type  = :journalType end)
                 and (hlg.entity_name like concat('%',:filter,'%') or hlg.record_no like concat('%',:filter,'%'))
-                GROUP by hlg.record_no, hlg.entity_name, journal_type,hlg.id
+                GROUP by hlg.record_no, hlg.entity_name,hlg.id,hlg.doc_no
         """
 
         if(!showAll)
@@ -1044,7 +1046,6 @@ from HeaderLedger hl where
                 select 
                     hlg.record_no as "referenceNo",
                     hlg.entity_name as "entityName",
-                    hl.journal_type as "journalType",
                     cast(COUNT(CASE WHEN (hl.approved_by is null or hl.approved_by = '') THEN 1 ELSE NULL END) as varchar) AS "notApproved",
                     cast(COUNT(CASE WHEN (hl.approved_by is not null or hl.approved_by != '') THEN 1 ELSE NULL END) as varchar) AS "approved"
                     from accounting.header_ledger hl 
@@ -1055,7 +1056,7 @@ from HeaderLedger hl where
                     hl.transaction_date_only <= :endDate
                     and (case when :journalType = 'ALL' then true else hl.journal_type  = :journalType end)
                     and (hlg.entity_name like concat('%',:filter,'%') or hlg.record_no like concat('%',:filter,'%'))
-                    GROUP by hlg.record_no, hlg.entity_name, journal_type
+                    GROUP by hlg.record_no, hlg.entity_name,hlg.id
         """
 
         if(!showAll)
@@ -1351,7 +1352,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
                 else
                     ledger.debit = entry.value.abs()
             }
-
+            ledger.companyId = SecurityUtils.currentCompanyId()
             ledger.header = header
             header.ledger.add(ledger)
         }
@@ -1370,6 +1371,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
             Ledger ledger = new Ledger()
             ledger.journalAccount = entry.journal
             ledger.transactionDateOnly = transactionDatetime.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+            ledger.companyId = SecurityUtils.currentCompanyId()
             ledger.debit = entry.debit
             ledger.credit = entry.credit
             ledger.header = header
@@ -1564,6 +1566,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
                 StringUtils.leftPad(it.toString(),5,"0")
             }
 
+            headerLedgerGroup.docNo = headerLedger.invoiceSoaReference
             headerLedgerGroup.entity_name = headerLedger.entityName
             headerLedgerGroup.particulars = headerLedger.particulars
             headerLedgerGroup.company = SecurityUtils.currentCompany()

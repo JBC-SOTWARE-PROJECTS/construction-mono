@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.accounting.Fiscal
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import groovy.json.JsonSlurper
 import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -466,6 +467,8 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             @GraphQLArgument(name="startDate") String startDate,
             @GraphQLArgument(name="endDate") String endDate
     ){
+        def companyId = SecurityUtils.currentCompanyId()
+
         String query = """ select 
             CAST(uuid_generate_v4() AS TEXT) AS "id",
             TRIM(BOTH ' ' FROM l.journal_account -> 'motherAccount'->>'accountName')  as "accountName",
@@ -479,6 +482,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             and 
             l.transaction_date_only <= cast(:endDate as date)
             and l.approved_datetime  is not null
+            and l.company_id = :companyId
         """
 
         if(accounts) {
@@ -493,6 +497,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
         """)
                 .setParameter('startDate',startDate)
                 .setParameter('endDate',endDate)
+                .setParameter('companyId',companyId)
                 .unwrap(NativeQuery.class)
                 .setResultTransformer(Transformers.aliasToBean(GeneralLedgerListDto.class))
                 .getResultList();
@@ -505,6 +510,8 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             @GraphQLArgument(name="startDate") String startDate,
             @GraphQLArgument(name="endDate") String endDate
     ){
+        def companyId = SecurityUtils.currentCompanyId()
+
         List<GeneralLedgerListDto> ledger = entityManager.createNativeQuery("""
             select 
             CAST(uuid_generate_v4() AS TEXT) AS "id",
@@ -520,6 +527,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             and 
             l.transaction_date_only <= cast(:endDate as date)
             and l.approved_datetime  is not null
+            and l.company_id = :companyId
             and TRIM(BOTH ' ' FROM l.journal_account -> 'motherAccount'->>'code') = :account
             group by l.journal_account ->> 'code',TRIM(BOTH ' ' FROM l.journal_account ->> 'accountName'), l.journal_account -> 'motherAccount'->>'accountName'
             order by TRIM(BOTH ' ' FROM l.journal_account ->> 'accountName') asc 
@@ -527,6 +535,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                 .setParameter('startDate',startDate)
                 .setParameter('endDate',endDate)
                 .setParameter('account',account)
+                .setParameter('companyId',companyId)
                 .unwrap(NativeQuery.class)
                 .setResultTransformer(Transformers.aliasToBean(GeneralLedgerListDto.class))
                 .getResultList();
@@ -540,6 +549,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             @GraphQLArgument(name="startDate") String startDate,
             @GraphQLArgument(name="endDate") String endDate
     ){
+        def companyId = SecurityUtils.currentCompanyId()
 
         List<GeneralLedgerDetailsListDto> ledger = entityManager.createNativeQuery("""
             WITH RunningBalances AS (
@@ -568,6 +578,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                     AND
                     l.transaction_date_only <= CAST(:endDate AS DATE))
                     AND TRIM(BOTH ' ' FROM l.journal_account ->> 'code') = :account
+                    AND l.company_id = :companyId
                     AND 
                     (lower(hl.particulars) like lower(concat('%',:filter,'%')) 
                     or lower(hl.docnum) like lower(concat('%',:filter,'%')))
@@ -608,6 +619,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                 .setParameter('endDate',endDate)
                 .setParameter('account',account)
                 .setParameter('filter',filter)
+                .setParameter('companyId',companyId)
                 .unwrap(NativeQuery.class)
                 .setResultTransformer(Transformers.aliasToBean(GeneralLedgerDetailsParentDto.class))
                 .getResultList()
