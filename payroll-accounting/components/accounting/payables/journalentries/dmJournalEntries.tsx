@@ -383,7 +383,7 @@ export default function RPJournalEntries(props: IProps) {
       });
     }
     return cols;
-  }, [manual]);
+  }, [manual, editable, ledger]);
 
   const disabledButton = useMemo(() => {
     const debit = _.sumBy(ledger, "debit");

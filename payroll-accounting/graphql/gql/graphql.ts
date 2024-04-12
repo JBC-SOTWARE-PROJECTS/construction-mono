@@ -11637,6 +11637,8 @@ export type Query = {
   positionList?: Maybe<Array<Maybe<Position>>>;
   /** Search Positions */
   positionPage?: Maybe<Page_Position>;
+  /** Find Posted Petty Cash */
+  postedPettyCash?: Maybe<Array<Maybe<PettyCashAccounting>>>;
   prByFiltersPage?: Maybe<Page_PurchaseRequest>;
   prByFiltersPageNoDate?: Maybe<Page_PurchaseRequest>;
   prById?: Maybe<PurchaseRequest>;

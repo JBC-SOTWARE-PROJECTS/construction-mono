@@ -20,7 +20,6 @@ export default function JournalEntriesSummary(props: IProps) {
     const debit = decimalRound2(_.sumBy(dataSource, "debit"));
     const credit = decimalRound2(_.sumBy(dataSource, "credit"));
     const sum = decimalRound2(debit - credit);
-    console.log("sum", sum);
     return sum !== 0;
   }, [dataSource]);
 
@@ -49,7 +48,7 @@ export default function JournalEntriesSummary(props: IProps) {
       </Table.Summary.Row>
       {warning && (
         <Table.Summary.Row>
-          <Table.Summary.Cell index={0} colSpan={!autoEntries ? 4 : 5}>
+          <Table.Summary.Cell index={0} colSpan={autoEntries ? 4 : 5}>
             <Alert
               showIcon
               type="warning"
