@@ -34,6 +34,8 @@ export const GET_PETTY_CASH_RECORDS = gql`
         amountIssued
         amountUsed
         amountUnused
+        amountReplenish
+        balance
         vatInclusive
         vatRate
         status
@@ -204,6 +206,36 @@ export const REMOVE_PETTYCASH_ITEM = gql`
   mutation ($id: UUID) {
     removePettyCashItemById(id: $id) {
       id
+    }
+  }
+`;
+
+export const GET_POSTED_PETTY_CASH = gql`
+  query($filter: String) {
+    postedPettyCash(filter: $filter) {
+      id
+      transType {
+        id
+        description
+      }
+      referenceType
+      referenceNo
+      payeeName
+      pcvNo
+      pcvDate
+      pcvCategory
+      amountIssued
+      amountUsed
+      amountUnused
+      amountReplenish
+      balance
+      vatInclusive
+      vatRate
+      status
+      posted
+      postedLedger
+      remarks
+      posted_by
     }
   }
 `;

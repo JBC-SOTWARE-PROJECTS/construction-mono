@@ -10,6 +10,7 @@ import {
   ICheckDetails,
   IDisbursementApplication,
   IDisbursementExpense,
+  IDisbursementPCV,
 } from "@/interface/payables/formInterfaces";
 import {
   AuditOutlined,
@@ -123,6 +124,7 @@ export default function DisbursementModal(props: IProps) {
   );
   const [expense, setExpense] = useState<IDisbursementExpense[]>([]);
   const [wtx, setWtx] = useState<DisbursementWtx[]>([]);
+  const [pcv, setPCV] = useState<IDisbursementPCV[]>([]);
 
   const [saveCloseLoading, setSaveCloseLoading] = useState(false);
   // ======================= Modal ===============================
@@ -640,8 +642,8 @@ export default function DisbursementModal(props: IProps) {
             calculateAmount={(e: number) => calculateAmount(e, "WTX")}
             status={disabled}
             parentId={record?.id}
-            dataSource={wtx}
-            setWtx={setWtx}
+            dataSource={pcv}
+            setPCV={setPCV}
             isVoided={record?.status === "VOIDED"}
           />
         ),
@@ -669,7 +671,7 @@ export default function DisbursementModal(props: IProps) {
       }
     }
     return _.sortBy(localTabs, ["key"]);
-  }, [state, checks, application, expense, wtx, disabled]);
+  }, [state, checks, application, expense, wtx, disabled, pcv]);
 
   // ============================= UI =======================================
 

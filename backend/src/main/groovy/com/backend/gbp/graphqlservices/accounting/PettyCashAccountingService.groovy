@@ -128,6 +128,12 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 
 	}
 
+	@GraphQLQuery(name = "postedPettyCash", description = "Find Posted Petty Cash")
+	List<PettyCashAccounting> postedPettyCash(	@GraphQLArgument(name = "filter") String filter) {
+		createQuery("""Select pcv from PettyCashAccounting pcv where pcv.posted = :posted and pcv.balance > 0
+			and (lower(pcv.payeeName) like lower(concat('%',:filter,'%')) or lower(pcv.referenceNo) like lower(concat('%',:filter,'%')) )
+			""", ["posted": true, "filter": filter]).resultList
+	}
 
 	@GraphQLQuery(name = "pettyCashPage")
 	Page<PettyCashAccounting> pettyCashPage(
