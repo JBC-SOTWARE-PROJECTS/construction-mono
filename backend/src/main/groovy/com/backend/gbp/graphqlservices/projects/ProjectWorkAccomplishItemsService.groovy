@@ -46,4 +46,30 @@ class ProjectWorkAccomplishItemsService extends AbstractDaoCompanyService<Projec
                 .setParameter('id',id)
                 .singleResult
     }
+
+    @GraphQLQuery(name='findOneProjectWorkAccomplishItemsByProjectCost')
+    ProjectWorkAccomplishItems findOneProjectWorkAccomplishItemsByProjectCost(
+            @GraphQLArgument(name='id') UUID id
+    ){
+        createQuery("""
+            Select p from ProjectWorkAccomplishItems p
+            where p.projectCost = :id
+        """)
+                .setParameter('id',id)
+                .singleResult
+    }
+
+    @GraphQLQuery(name = "getBilledQty")
+    BigDecimal getBilledQty(
+            @GraphQLArgument(name = "id") UUID id
+    ){
+        String query = '''Select coalesce(sum(p.thisPeriodQty), 0) from ProjectWorkAccomplishItems p where 
+        p.projectCost = :id AND p.status = 'ACTIVE' '''
+        Map<String, Object> params = new HashMap<>()
+        params.put('id', id)
+        getSum(query, params)
+    }
+
+
+
 }

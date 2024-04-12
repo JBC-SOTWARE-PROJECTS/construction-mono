@@ -18,6 +18,7 @@ import {
   calculateAmountAccomplish,
   calculateBalance,
   calculatePercentage,
+  calculateToDate,
 } from '../../common/work-accomplishments-helpers'
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null)
@@ -239,7 +240,6 @@ export default function UpsertWorkAccomplishmentsTable(
           dataIndex: 'toDateQty',
           align: 'right',
           width: 50,
-          editable: true,
           render: (text: number) => (text > 0 ? text : '-') ?? '-',
         },
         {
@@ -303,6 +303,7 @@ export default function UpsertWorkAccomplishmentsTable(
     const index = newData.findIndex((item) => row.id === item.id)
     const item = newData[index]
 
+    row = calculateToDate(row)
     row = calculateBalance(row)
     row = calculateAmountAccomplish(row)
     row = calculatePercentage(row)

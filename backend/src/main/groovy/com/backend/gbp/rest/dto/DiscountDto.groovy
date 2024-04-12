@@ -12,3 +12,13 @@ class DiscountDto {
 }
 
 
+@TupleConstructor
+class FolioDeductionDto {
+    String deduction
+    String dedType
+    String remarks
+    BigDecimal baseAmount
+    BigDecimal percentage
+    BigDecimal deductionAmount
+}
+

@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from "@apollo/client"
 
 export const GET_PROJECTS_RECORDS = gql`
   query (
@@ -114,6 +114,30 @@ export const GET_PROJECT_COST = gql`
   }
 `
 
+export const GET_PROJECT_OPT = gql`
+  query ($filter: String, $id: UUID) {
+    pCostByList(filter: $filter, id: $id) {
+      value: id
+      label: description
+    }
+  }
+`
+
+export const GET_PROJECT_WORK_BY_ID = gql`
+  query ($id: UUID) {
+    pCostById(id: $id) {
+      id
+      itemNo
+      description
+      unit
+      relativeWeight
+      qty
+      cost
+      billedQty
+    }
+  }
+`
+
 export const GET_PROJECT_COST_REV = gql`
   query ($id: UUID) {
     pCostRevByList(id: $id) {
@@ -213,7 +237,7 @@ export const GET_RECORD_PROJECT_UPDATES_MATERIALS = gql`
       lastModifiedDate
     }
   }
-`;
+`
 
 export const UPSERT_RECORD_PROJECT_ACCOMPLISHMENT_MATERIALS = gql`
   mutation ($fields: Map_String_ObjectScalar, $id: UUID) {
@@ -247,7 +271,7 @@ export const REMOVE_MATERIAL = gql`
       id
     }
   }
-`;
+`
 
 export const GET_RECORD_PROJECT_UPDATES_WORKERS = gql`
   query ($id: UUID) {
@@ -332,7 +356,7 @@ export const GET_PROGRESS_IMAGES = gql`
       imageUrl
     }
   }
-`;
+`
 
 export const REMOVE_PROGRESS_IMAGE = gql`
   mutation ($id: UUID) {
@@ -342,7 +366,7 @@ export const REMOVE_PROGRESS_IMAGE = gql`
       message
     }
   }
-`;
+`
 
 export const GET_MATERIAL_USED_BY_PROJECT = gql`
   query ($id: UUID, $filter: String, $page: Int, $size: Int) {
@@ -368,4 +392,4 @@ export const GET_MATERIAL_USED_BY_PROJECT = gql`
       number
     }
   }
-`;
+`

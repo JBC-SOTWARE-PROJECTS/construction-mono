@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DisbursementPettyCash, Mutation, Query } from "@/graphql/gql/graphql";
+import { DisbursementPettyCash, DisbursementWtx, Mutation, Query } from "@/graphql/gql/graphql";
 import { confirmDelete, useDialog } from "@/hooks";
 import { currency } from "@/utility/constant";
 import { DateFormatter, NumberFormater, decimalRound2 } from "@/utility/helper";
@@ -25,7 +25,7 @@ import PettyCashListSelectorModal from "../../dialogs/pcvListModal";
 
 interface IProps {
   parentId?: string;
-  dataSource?: IDisbursementPCV[];
+  dataSource?: IDisbursementPCV[] | any;
   status?: boolean;
   isVoided?: boolean;
   calculateAmount: (e: number) => void;
