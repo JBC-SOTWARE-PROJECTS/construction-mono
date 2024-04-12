@@ -51,6 +51,10 @@ class ReceivingReportItem extends AbstractAuditingEntity implements Serializable
 	@GraphQLQuery
 	@Column(name = "rec_unit_cost", columnDefinition = 'numeric')
 	BigDecimal receiveUnitCost
+
+	@GraphQLQuery
+	@Column(name = "rec_inv_cost", columnDefinition = 'numeric')
+	BigDecimal recInventoryCost
 	
 	@GraphQLQuery
 	@Column(name = "rec_disc_cost", columnDefinition = 'numeric')

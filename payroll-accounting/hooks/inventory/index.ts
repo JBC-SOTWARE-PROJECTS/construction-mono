@@ -20,3 +20,4 @@ export { UsePrNumbersNoPo as usePrNumbersNoPo } from "./prNumbersNoPo";
 export { UsePurcaseOrderList as usePurcaseOrderList } from "./poList";
 export { UseTransactionTypes as useTransactionTypes } from "./transactionTypes";
 export { UseEmployeeByLocation as useEmployeeByLocation } from "./useEmployeeByLocation";
+export { UsePONotYetCompleted as usePONotYetCompleted } from "./poNotYetCompleted";

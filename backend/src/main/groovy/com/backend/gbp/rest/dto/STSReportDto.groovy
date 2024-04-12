@@ -1,7 +1,7 @@
 package com.backend.gbp.rest.dto
 
 class STSReportDto {
-	String date, stsNo, issuing_location, receiving_location, project, issuedBy, receivedBy
+	String date, stsNo, issuing_location, receiving_location, project, issuedBy, receivedBy, projectTitle, remarks
 }
 
 class STSReportItemDto {

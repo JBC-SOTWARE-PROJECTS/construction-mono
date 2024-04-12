@@ -7,6 +7,7 @@ import { DateFormatter, accessControl } from "@/utility/helper";
 import { getUrlPrefix } from "@/utility/graphql-client";
 import { useContext } from "react";
 import { AccountContext } from "@/components/accessControl/AccountContext";
+import ButtonPosted from "../../commons/buttonPosted";
 
 interface IProps {
   dataSource: ReceivingReport[];
@@ -15,6 +16,9 @@ interface IProps {
   handleOpen: (record: ReceivingReport) => void;
   handleUpdateStatus: (record: ReceivingReport, status: boolean) => void;
   changePage: (page: number) => void;
+  onViewAccount: (record: ReceivingReport) => void;
+  onHandleDraftAPV: (record: ReceivingReport) => void;
+  onRedoTransaction: (record: ReceivingReport) => void;
 }
 
 export default function DeliveryReceivingTable({
@@ -24,6 +28,9 @@ export default function DeliveryReceivingTable({
   handleOpen,
   handleUpdateStatus,
   changePage,
+  onViewAccount,
+  onHandleDraftAPV,
+  onRedoTransaction,
 }: IProps) {
   // ===================== menus ========================
   const account = useContext(AccountContext);
@@ -59,7 +66,12 @@ export default function DeliveryReceivingTable({
       key: "supplier.supplierFullname",
       render: (_, record) => (
         <span>
-          {record?.supplier ? record?.supplier?.supplierFullname : "--"}
+          {record?.supplier ? record?.supplier?.supplierFullname : "--"}{" "}
+          {record?.refAp && (
+            <Tag color="cyan" bordered={false}>
+              Drafted to APV
+            </Tag>
+          )}
         </span>
       ),
     },
@@ -97,7 +109,20 @@ export default function DeliveryReceivingTable({
           color = "red";
           text = "VOIDED";
         }
-        return <Tag color={color}>{text}</Tag>;
+        // for viewing please set status to true to view the current entries not the reverse
+        if (status) {
+          return (
+            <ButtonPosted onClick={() => onViewAccount(record)}>
+              {text}
+            </ButtonPosted>
+          );
+        } else {
+          return (
+            <Tag bordered={false} color={color} key={color}>
+              {text}
+            </Tag>
+          );
+        }
       },
     },
     {
@@ -107,7 +132,7 @@ export default function DeliveryReceivingTable({
       align: "center",
       fixed: "right",
       render: (_, record) => {
-        const items: MenuProps["items"] = [
+        let items: MenuProps["items"] = [
           {
             label: "Post",
             onClick: () => handleUpdateStatus(record, true),
@@ -118,17 +143,31 @@ export default function DeliveryReceivingTable({
             onClick: () => handleUpdateStatus(record, false),
             key: "2",
           },
-          {
-            label: "Print",
-            onClick: () =>
-              window.open(
-                `${getUrlPrefix()}/reports/inventory/print/receiving_report/${
-                  record.id
-                }`
-              ),
-            key: "3",
-          },
         ];
+        if (record.isPosted) {
+          items.push({
+            label: "Draft to APV",
+            onClick: () => onHandleDraftAPV(record),
+            key: "4",
+          });
+        }
+        if (record.isVoid) {
+          items.push({
+            label: "Redo",
+            onClick: () => onRedoTransaction(record),
+            key: "5",
+          });
+        }
+        items.push({
+          label: "Print",
+          onClick: () =>
+            window.open(
+              `${getUrlPrefix()}/reports/inventory/print/receiving_report/${
+                record.id
+              }`
+            ),
+          key: "6",
+        });
         return (
           <Dropdown.Button
             size="small"
@@ -148,6 +187,28 @@ export default function DeliveryReceivingTable({
       <Col span={24}>
         <Table
           rowKey="id"
+          expandable={{
+            expandedRowRender: (record) => (
+              <div className="w-full">
+                <p>
+                  Office: <Tag>{record.receivedOffice?.officeDescription}</Tag>
+                </p>
+                <p>
+                  Received By: <Tag>{record.userFullname}</Tag>
+                </p>
+                {record?.category === "PROJECTS" && (
+                  <p style={{ paddingTop: 5 }}>
+                    Project: <Tag>{record.project?.description}</Tag>
+                  </p>
+                )}
+                {record?.category === "SPARE_PARTS" && (
+                  <p style={{ paddingTop: 5 }}>
+                    Equipment (Assets): <Tag>{record.assets?.description}</Tag>
+                  </p>
+                )}
+              </div>
+            ),
+          }}
           size="small"
           columns={columns}
           dataSource={dataSource}

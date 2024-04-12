@@ -921,6 +921,50 @@ class AccountsPayableReportResource {
 		return new ResponseEntity(data, params, HttpStatus.OK)
 
 	}
+
+	@RequestMapping(method = RequestMethod.GET, value = ["/apBeginningBalance/csv"])
+	ResponseEntity<AnyDocument.Any> apBeginningBalance(
+			@RequestParam String filter,
+			@RequestParam String supplierTypes,
+			@RequestParam Boolean posted
+	) {
+		UUID types = null;
+		if(!supplierTypes.equalsIgnoreCase('null') && !supplierTypes.equalsIgnoreCase('undefined')){
+			types = UUID.fromString(supplierTypes)
+		}
+
+		List<APBeginningBalanceDto> list = accountsPayableServices.apBeginningBalance(filter, types, posted)
+
+		StringBuffer buffer = new StringBuffer()
+
+		CSVPrinter csvPrinter = new CSVPrinter(buffer, CSVFormat.POSTGRESQL_CSV.withHeader(
+				"AP NO",
+				"SUPPLIER NAME",
+				"SUPPLIER TYPE",
+				"TOTAL"))
+
+		try {
+			list.each {
+				item ->
+					csvPrinter.printRecord(
+							item?.apNo,
+							item.supplierFullname,
+							item?.supplierType,
+							item.total
+					)
+			}
+
+			LinkedMultiValueMap<String, String> extHeaders = new LinkedMultiValueMap<>()
+			extHeaders.add("Content-Disposition",
+					"attachment;filename=AgingReportDetailed_${filter}.csv".toString())
+
+			return new ResponseEntity(buffer.toString().getBytes(), extHeaders, HttpStatus.OK)
+		}
+		catch (e) {
+			throw e
+		}
+
+	}
 //
 //	@RequestMapping(value = ['/agingSummary'], produces = ['application/pdf'])
 //	ResponseEntity<byte[]> printAgingSummary(

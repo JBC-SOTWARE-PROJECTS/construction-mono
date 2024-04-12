@@ -200,7 +200,6 @@ export default function PayableModal(props: IProps) {
     payload.netOfVat = state.netOfVat;
     payload.ewtAmount = state.ewtAmount;
     payload.netAmount = state.netAmount;
-
     showPasswordConfirmation(() => {
       if (action === "save_close") {
         setSaveCloseLoading(true);
@@ -400,6 +399,9 @@ export default function PayableModal(props: IProps) {
           },
           project: {
             $set: item?.project,
+          },
+          assets: {
+            $set: item?.assets,
           },
           taxDesc: {
             $set: item?.taxDesc,

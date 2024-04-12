@@ -23,6 +23,7 @@ import {
   formatObjSupplierPurchaseRequest,
   formatObjSupplierPurchaseOrder,
   formatObjSupplierReturnSupplier,
+  formatObjSupplierReceiving,
 } from "@/utility/inventory-helper";
 import { NumberFormaterDynamic } from "@/utility/helper";
 
@@ -116,6 +117,11 @@ export default function SupplierItemSelector(props: IProps) {
         }
       } else if (formModule === "RTS") {
         let result = formatObjSupplierReturnSupplier(selectedItems);
+        if (!_.isEmpty(result)) {
+          hide(result);
+        }
+      } else if (formModule === "SRR") {
+        let result = formatObjSupplierReceiving(selectedItems);
         if (!_.isEmpty(result)) {
           hide(result);
         }

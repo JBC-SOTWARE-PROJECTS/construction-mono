@@ -91,6 +91,14 @@ export const decimalRound2 = (amount?: number) => {
   return 0;
 };
 
+export const decimalRound4 = (amount?: number) => {
+  if (amount) {
+    return roundHalfEven(amount, 4);
+  }
+  return 0;
+};
+
+
 export const NumberInString = (amount: number) => {
   const toWords = new ToWords({
     localeCode: "en-US",
@@ -239,4 +247,9 @@ export const typeLabel = (value: string): string => {
     result = "Package";
   }
   return result;
+};
+
+export const parserInputNumber = {
+  formatter: (value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+  parser: (value: any) => value!.replace(/\$\s?|(,*)/g, ""),
 };

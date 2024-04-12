@@ -19,25 +19,23 @@ export default function APDetailsTransactionSummaryFooter(props: IProps) {
         </Table.Summary.Cell>
         <Table.Summary.Cell
           index={1}
-          className="font-bold"
-        ></Table.Summary.Cell>
+          className="font-bold"></Table.Summary.Cell>
         <Table.Summary.Cell
           index={2}
-          className="font-bold"
-        ></Table.Summary.Cell>
-        <Table.Summary.Cell index={3} align="right" className="font-bold">
+          className="font-bold"></Table.Summary.Cell>
+        <Table.Summary.Cell
+          index={3}
+          className="font-bold"></Table.Summary.Cell>
+        <Table.Summary.Cell index={4} align="right" className="font-bold">
           <span>{currency} </span>
           {NumberFormater(_.sumBy(dataSource, "amount"))}
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={4} align="center" className="font-bold">
+        <Table.Summary.Cell index={5} align="center" className="font-bold">
           --
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={5} align="right" className="font-bold">
+        <Table.Summary.Cell index={6} align="right" className="font-bold">
           <span>{currency} </span>
           {NumberFormater(_.sumBy(dataSource, "discAmount"))}
-        </Table.Summary.Cell>
-        <Table.Summary.Cell index={6} align="center" className="font-bold">
-          --
         </Table.Summary.Cell>
         <Table.Summary.Cell index={7} align="center" className="font-bold">
           --
@@ -48,26 +46,28 @@ export default function APDetailsTransactionSummaryFooter(props: IProps) {
         <Table.Summary.Cell index={9} align="center" className="font-bold">
           --
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={10} align="right" className="font-bold">
+        <Table.Summary.Cell index={10} align="center" className="font-bold">
+          --
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={11} align="right" className="font-bold">
           <span>{currency} </span>
           {NumberFormater(_.sumBy(dataSource, "vatAmount"))}
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={11} align="center" className="font-bold">
+        <Table.Summary.Cell index={12} align="center" className="font-bold">
           --
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={12} align="right" className="font-bold">
+        <Table.Summary.Cell index={13} align="right" className="font-bold">
           <span>{currency} </span>
           {NumberFormater(_.sumBy(dataSource, "ewtAmount"))}
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={13} align="right" className="font-bold">
+        <Table.Summary.Cell index={14} align="right" className="font-bold">
           <span>{currency} </span>
           {NumberFormater(_.sumBy(dataSource, "netAmount"))}
         </Table.Summary.Cell>
         <Table.Summary.Cell
-          index={14}
+          index={15}
           align="right"
-          className="font-bold"
-        ></Table.Summary.Cell>
+          className="font-bold"></Table.Summary.Cell>
       </Table.Summary.Row>
     </Table.Summary>
   );

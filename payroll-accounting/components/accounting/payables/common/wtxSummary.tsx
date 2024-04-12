@@ -19,7 +19,7 @@ export default function WTXSummaryFooter(props: IProps) {
         </Table.Summary.Cell>
         <Table.Summary.Cell index={2} align="right" className="font-bold">
           <span>{currency} </span>
-          {NumberFormater(_.sumBy(dataSource, "amount"))}
+          {NumberFormater(_.sumBy(dataSource, "ewtAmount"))}
         </Table.Summary.Cell>
         <Table.Summary.Cell
           index={3}

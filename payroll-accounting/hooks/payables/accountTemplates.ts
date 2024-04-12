@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Query } from "@/graphql/gql/graphql";
 import { OptionsValue } from "@/utility/interfaces";
+import _ from "lodash";
 
 const GET_ACCOUNT_TEMPLATE = gql`
   query ($type: UUID, $cat: String) {
@@ -12,7 +13,7 @@ const GET_ACCOUNT_TEMPLATE = gql`
 `;
 
 interface Iprops {
-  type: string;
+  type: string | null;
   category: string;
 }
 
@@ -20,7 +21,7 @@ export function UseAccountsTemplate(props: Iprops) {
   const { type, category } = props;
   const { data } = useQuery<Query>(GET_ACCOUNT_TEMPLATE, {
     variables: {
-      type: type,
+      type: !_.isEmpty(type) ? type : null,
       cat: category,
     },
   });

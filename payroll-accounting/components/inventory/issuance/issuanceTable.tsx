@@ -7,6 +7,7 @@ import { DateFormatter, accessControl } from "@/utility/helper";
 import { getUrlPrefix } from "@/utility/graphql-client";
 import { useContext } from "react";
 import { AccountContext } from "@/components/accessControl/AccountContext";
+import ButtonPosted from "../commons/buttonPosted";
 
 interface IProps {
   dataSource: StockIssue[];
@@ -15,6 +16,7 @@ interface IProps {
   handleOpen: (record: StockIssue) => void;
   handleUpdateStatus: (record: StockIssue, status: boolean) => void;
   changePage: (page: number) => void;
+  onViewAccount: (record: StockIssue) => void;
 }
 
 export default function IssuanceTable({
@@ -24,6 +26,7 @@ export default function IssuanceTable({
   handleOpen,
   handleUpdateStatus,
   changePage,
+  onViewAccount,
 }: IProps) {
   // ===================== menus ========================
   const account = useContext(AccountContext);
@@ -82,7 +85,20 @@ export default function IssuanceTable({
           color = "red";
           text = "VOIDED";
         }
-        return <Tag color={color}>{text}</Tag>;
+        // for viewing please set status to true to view the current entries not the reverse
+        if (status) {
+          return (
+            <ButtonPosted onClick={() => onViewAccount(record)}>
+              {text}
+            </ButtonPosted>
+          );
+        } else {
+          return (
+            <Tag bordered={false} color={color} key={color}>
+              {text}
+            </Tag>
+          );
+        }
       },
     },
     {
@@ -92,7 +108,7 @@ export default function IssuanceTable({
       align: "center",
       fixed: "right",
       render: (_, record) => {
-        const items: MenuProps["items"] = [
+        let items: MenuProps["items"] = [
           {
             label: "Post",
             onClick: () => handleUpdateStatus(record, true),
@@ -103,17 +119,20 @@ export default function IssuanceTable({
             onClick: () => handleUpdateStatus(record, false),
             key: "2",
           },
-          {
+        ];
+        if (record?.issueType === "ISSUE") {
+          items.push({
             label: "Print",
-            onClick: () =>
+            onClick: () => {
               window.open(
                 `${getUrlPrefix()}/reports/inventory/print/issue_report/${
                   record.id
                 }`
-              ),
+              );
+            },
             key: "3",
-          },
-        ];
+          });
+        }
         return (
           <Dropdown.Button
             size="small"
@@ -133,6 +152,25 @@ export default function IssuanceTable({
       <Col span={24}>
         <Table
           rowKey="id"
+          expandable={{
+            expandedRowRender: (record) => (
+              <div className="w-full">
+                <p>
+                  Office: <Tag>{record.issueTo?.officeDescription}</Tag>
+                </p>
+                {record?.category === "PROJECTS" && (
+                  <p style={{ paddingTop: 5 }}>
+                    Project: <Tag>{record.project?.description}</Tag>
+                  </p>
+                )}
+                {record?.category === "SPARE_PARTS" && (
+                  <p style={{ paddingTop: 5 }}>
+                    Equipment (Assets): <Tag>{record.assets?.description}</Tag>
+                  </p>
+                )}
+              </div>
+            ),
+          }}
           size="small"
           columns={columns}
           dataSource={dataSource}

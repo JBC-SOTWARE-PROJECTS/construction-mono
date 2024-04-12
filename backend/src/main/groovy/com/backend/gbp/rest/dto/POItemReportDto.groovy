@@ -7,5 +7,5 @@ class POItemReportDto {
 }
 
 class POReportDto {
-    String date, poNum, prNum, supplier, office, terms, fullname, project, location, projTitle
+    String date, poNum, prNum, supplier, office, terms, fullname, project, location, projTitle, remarks
 }
