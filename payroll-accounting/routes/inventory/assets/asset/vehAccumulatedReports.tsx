@@ -3,9 +3,10 @@ import AssetVehAccumulatedTable from "@/components/inventory/assets/masterfile/a
 import useGetVehicleUsageAccumulatedReport from "@/hooks/asset/useGetVehicleUsageAccumulatedReport";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { DatePicker, Input, Select, Table } from "antd";
+import { Button, DatePicker, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
 import { start } from "repl";
+import { CloudDownloadOutlined } from "@ant-design/icons";
 
 type Props = {};
 
@@ -19,6 +20,7 @@ function VehAccumulatedReports({}: Props) {
   const [state, setState] = useState(initialState);
   const [dates, setDates] = useState([dayjs().startOf("month"), dayjs().endOf("month")]);
   const router = useRouter();
+  const [csvLoading, setCsvLoading] = useState(false);
 
   const currentDate = dayjs();
 
@@ -38,6 +40,8 @@ const differenceInDays = currentDate.diff(firstDayOfMonth, 'days');
     fetchPolicy: "network-only",
   });
 
+  
+
   const handleDateChange = (dates: any) => {
     try {
       setDates([dayjs(dates[0]).startOf("day"), dayjs(dates[1]).endOf("day")]);
@@ -48,6 +52,8 @@ const differenceInDays = currentDate.diff(firstDayOfMonth, 'days');
 
   return (
     <>
+    
+
       <DatePicker.RangePicker
         defaultPickerValue={[dayjs().startOf("month"), dayjs().endOf("month")]}
         onChange={(dates: any) => {
