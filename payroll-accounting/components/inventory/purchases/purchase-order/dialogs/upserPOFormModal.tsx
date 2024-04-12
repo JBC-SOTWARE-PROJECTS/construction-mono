@@ -477,10 +477,10 @@ export default function UpsertPOFormModal(props: IProps) {
   };
 
   // ================== disabled columns and buttons =================
-  const _delStatus = useMemo(() => {
+  const disableForm = useMemo(() => {
     let status = false;
     if (!_.isEmpty(record?.id)) {
-      if (record?.isApprove || record?.isVoided) {
+      if (record?.isApprove || record?.isVoided || record?.isCompleted) {
         status = true;
       }
     }
@@ -526,7 +526,7 @@ export default function UpsertPOFormModal(props: IProps) {
       onCell: (e) => {
         return {
           onClick: () => {
-            if (record?.isApprove || record?.isVoided) {
+            if (disableForm) {
               message.error(
                 "This Purchase Order is already approved/voided. Editing is disabled."
               );
@@ -558,7 +558,7 @@ export default function UpsertPOFormModal(props: IProps) {
       onCell: (e) => {
         return {
           onClick: () => {
-            if (record?.isApprove || record?.isVoided) {
+            if (disableForm) {
               message.error(
                 "This Purchase Order is already approved/voided. Editing is disabled."
               );
@@ -595,7 +595,7 @@ export default function UpsertPOFormModal(props: IProps) {
       onCell: (e) => {
         return {
           onClick: () => {
-            if (record?.isApprove || record?.isVoided) {
+            if (disableForm) {
               message.error(
                 "This Purchase Order is already approved/voided. Editing is disabled."
               );
@@ -632,7 +632,7 @@ export default function UpsertPOFormModal(props: IProps) {
       onCell: (e) => {
         return {
           onClick: () => {
-            if (record?.isApprove || record?.isVoided) {
+            if (disableForm) {
               message.error(
                 "This Purchase Order is already approved/voided. Editing is disabled."
               );
@@ -667,7 +667,7 @@ export default function UpsertPOFormModal(props: IProps) {
           onClick={() => {
             _delete(obj);
           }}
-          disabled={_delStatus}
+          disabled={disableForm}
           icon={<DeleteFilled />}
         />
       ),
@@ -781,7 +781,7 @@ export default function UpsertPOFormModal(props: IProps) {
             form="upsertForm"
             loading={upsertLoading}
             icon={<SaveOutlined />}
-            disabled={record?.isApprove || _.isEmpty(items) || upsertLoading}>
+            disabled={disableForm || _.isEmpty(items) || upsertLoading}>
             {`Save ${record?.id ? "Changes" : ""} & Close`}
           </Button>
         </div>
@@ -803,7 +803,7 @@ export default function UpsertPOFormModal(props: IProps) {
           layout="vertical"
           onFinish={onSubmit}
           onFinishFailed={onFinishFailed}
-          disabled={record?.isApprove ?? false}
+          disabled={disableForm}
           initialValues={{
             ...record,
             prNos: record?.prNos ?? null,
@@ -908,7 +908,7 @@ export default function UpsertPOFormModal(props: IProps) {
             </Col>
             <Col {...responsiveColumn42}>
               <DocumentUpload
-                allowUpload={!_.isEmpty(record?.id) && !record?.isApprove}
+                allowUpload={!_.isEmpty(record?.id) && !disableForm}
                 uploadProps={uploadProps}
                 loading={loadingAttachments}
                 uploading={uploading}
@@ -931,6 +931,7 @@ export default function UpsertPOFormModal(props: IProps) {
                   label="Select Purchase Request"
                   name="prNos"
                   propsselect={{
+                    showSearch: true,
                     options: prNumberList,
                     onChange: (e) => {
                       setPrNo(e);
@@ -947,10 +948,7 @@ export default function UpsertPOFormModal(props: IProps) {
                 className="btn-order"
                 type="primary"
                 icon={<ShoppingCartOutlined />}
-                disabled={
-                  ((record?.isApprove || record?.isVoided) ?? false) ||
-                  !_.isEmpty(prNo)
-                }
+                disabled={disableForm || !_.isEmpty(prNo)}
                 onClick={onOrderItems}>
                 Order Item
               </Button>

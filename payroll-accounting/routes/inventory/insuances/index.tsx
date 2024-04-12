@@ -118,6 +118,11 @@ export default function IssuanceComponent({ type, issueType }: IProps) {
       }
     }
   };
+
+  const onViewPostedAccount = (record: StockIssue) => {
+    onPostOrVoidView(record, true, true);
+  };
+
   const title = useMemo(() => {
     let title = "All Item Issuances";
     switch (type) {
@@ -308,6 +313,7 @@ export default function IssuanceComponent({ type, issueType }: IProps) {
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
+          onViewAccount={(record) => onViewPostedAccount(record)}
         />
       </ProCard>
     </PageContainer>

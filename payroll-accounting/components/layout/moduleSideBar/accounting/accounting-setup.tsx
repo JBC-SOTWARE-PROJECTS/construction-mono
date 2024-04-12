@@ -29,6 +29,10 @@ const AccountingSetupMenu = {
             name: 'Integrations',
           },
           {
+            path: '/accounting/accounting-setup/templates',
+            name: 'Accounts Templates',
+          },
+          {
             path: '/accounting/accounting-setup/bank-accounts',
             name: 'Bank Accounts',
           },

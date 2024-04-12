@@ -13,10 +13,6 @@ import {
 import { useMutation, useQuery } from "@apollo/client";
 import { Button, Modal, Space, Typography, App, Divider, Collapse } from "antd";
 import _ from "lodash";
-import {
-  UPSERT_STATUS_ADJUSTMENT,
-  GET_JOURNAL_ENTRIES_QTY_ADJUSTMENT,
-} from "@/graphql/inventory/adjustments-queries";
 import { useConfirmationPasswordHook } from "@/hooks";
 import JournaEntriesTable from "../commons/journalEntriesTable";
 import { decimalRound2 } from "@/utility/helper";

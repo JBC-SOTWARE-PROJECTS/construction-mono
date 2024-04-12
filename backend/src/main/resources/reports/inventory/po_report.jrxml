@@ -227,6 +227,7 @@
 	<field name="project" class="java.lang.String"/>
 	<field name="location" class="java.lang.String"/>
 	<field name="projTitle" class="java.lang.String"/>
+	<field name="remarks" class="java.lang.String"/>
 	<title>
 		<band height="186" splitType="Stretch">
 			<staticText>
@@ -651,7 +652,7 @@
 				</jr:table>
 			</componentElement>
 		</band>
-		<band height="127">
+		<band height="161">
 			<staticText>
 				<reportElement x="0" y="4" width="118" height="12" uuid="e4869ceb-267a-4db0-893c-7b5b24bfdf26">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -673,7 +674,7 @@
 				<textFieldExpression><![CDATA[$F{terms}]]></textFieldExpression>
 			</textField>
 			<componentElement>
-				<reportElement x="0" y="30" width="250" height="66" uuid="822fb73a-b6f8-493e-94a7-1d8bd9f80ac1"/>
+				<reportElement x="0" y="84" width="250" height="66" uuid="822fb73a-b6f8-493e-94a7-1d8bd9f80ac1"/>
 				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 					<datasetRun subDataset="ListData1" uuid="f58f0a11-f646-4bce-beeb-a2a990743611">
 						<dataSourceExpression><![CDATA[$P{sign_column1}]]></dataSourceExpression>
@@ -716,7 +717,7 @@
 				</jr:list>
 			</componentElement>
 			<componentElement>
-				<reportElement x="310" y="30" width="259" height="66" uuid="a9ddcd60-45ba-4a93-926e-8e6f05065d72"/>
+				<reportElement x="310" y="84" width="259" height="66" uuid="a9ddcd60-45ba-4a93-926e-8e6f05065d72"/>
 				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 					<datasetRun subDataset="ListData2" uuid="b2632983-66a6-4a9d-861a-69d6ff46761a">
 						<dataSourceExpression><![CDATA[$P{sign_column2}]]></dataSourceExpression>
@@ -758,6 +759,16 @@
 					</jr:listContents>
 				</jr:list>
 			</componentElement>
+			<textField>
+				<reportElement style="Column header" x="0" y="20" width="569" height="50" forecolor="#000000" uuid="f09bcd0e-afe8-493a-98ab-1846186074a9"/>
+				<box padding="5">
+					<pen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Remarks : "+ $F{remarks}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>

@@ -4,6 +4,7 @@ import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.DebitMemo
 import com.backend.gbp.domain.accounting.DebitMemoDetails
 import com.backend.gbp.domain.accounting.ExpenseTransaction
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.repository.OfficeRepository
@@ -66,6 +67,9 @@ class DebitMemoDetailsServices extends AbstractDaoService<DebitMemoDetails> {
 		}
 		upsert.transType = type
 		upsert.debitMemo = parent
+		upsert.office = null
+		upsert.project = null
+		upsert.assets = null
 		if (it.office) {
 			def office = objectMapper.convertValue(it.office, Office.class)
 			upsert.office = office
@@ -73,6 +77,10 @@ class DebitMemoDetailsServices extends AbstractDaoService<DebitMemoDetails> {
 		if (it.project) {
 			def project = objectMapper.convertValue(it.project, Projects.class)
 			upsert.project = project
+		}
+		if (it.assets) {
+			def assets = objectMapper.convertValue(it.assets, Assets.class)
+			upsert.assets = assets
 		}
 		upsert.type = it.type
 		upsert.percent = it.percent

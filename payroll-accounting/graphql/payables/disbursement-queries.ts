@@ -162,6 +162,10 @@ export const GET_DISBURSEMENT_EXPENSE = gql`
         id
         description
       }
+      assets {
+        id
+        description
+      }
       amount
       remarks
     }
@@ -193,9 +197,36 @@ export const GET_DISBURSEMENT_WTX = gql`
   }
 `;
 
+export const GET_DISBURSEMENT_PCV = gql`
+  query ($id: UUID) {
+    disPettyByParent(id: $id) {
+      id
+      pettyCashAccounting {
+        id
+        pcvNo
+        pcvDate
+        pcvCategory
+        referenceNo
+        referenceType
+        amountIssued
+        amountUsed
+      }
+      amount
+    }
+  }
+`;
+
 export const REMOVE_DISBURSEMENT_WTX = gql`
   mutation ($id: UUID) {
     removeWtx(id: $id) {
+      id
+    }
+  }
+`;
+
+export const REMOVE_DISBURSEMENT_PCV = gql`
+  mutation ($id: UUID) {
+    removeDisPettyCash(id: $id) {
       id
     }
   }

@@ -72,6 +72,9 @@ export default function PettyOthersTable(props: IProps) {
               project: {
                 $set: result?.project,
               },
+              assets: {
+                $set: result?.assets,
+              },
               amount: {
                 $set: decimalRound2(result?.amount),
               },
@@ -134,14 +137,25 @@ export default function PettyOthersTable(props: IProps) {
       dataIndex: "office.officeDescription",
       key: "office.officeDescription",
       width: 300,
-      render: (_, record) => <span>{record?.office?.officeDescription}</span>,
+      render: (_, record) => (
+        <span>{record?.office?.officeDescription ?? "--"}</span>
+      ),
     },
     {
       title: "Project",
       dataIndex: "project.description",
       key: "project.description",
       width: 300,
-      render: (_, record) => <span>{record?.project?.description}</span>,
+      render: (_, record) => (
+        <span>{record?.project?.description ?? "--"}</span>
+      ),
+    },
+    {
+      title: "Asset",
+      dataIndex: "assets.description",
+      key: "assets.description",
+      width: 300,
+      render: (_, record) => <span>{record?.assets?.description ?? "--"}</span>,
     },
     {
       title: "Remarks",

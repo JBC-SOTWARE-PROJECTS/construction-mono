@@ -16,7 +16,13 @@ import { FormTextArea } from "@/components/common";
 import _ from "lodash";
 import { randomId, requiredField, shapeOptionValue } from "@/utility/helper";
 import { decimalRound2 } from "@/utility/helper";
-import { ExpenseTransaction, Office, Projects } from "@/graphql/gql/graphql";
+import {
+  Assets,
+  ExpenseTransaction,
+  Office,
+  Projects,
+} from "@/graphql/gql/graphql";
+import { useAssets } from "@/hooks/inventory";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -32,6 +38,7 @@ export default function DisbursementExpenseModal(props: IProps) {
   const banks = useExpenseTransaction({ type: "DISBURSE" });
   const offices = useOffices();
   const projects = useProjects({ office: selectedOffice });
+  const assets = useAssets();
   //================== functions ====================
   const onSubmit = (data: IFormDisbursementExpense) => {
     const payload = {
@@ -57,6 +64,13 @@ export default function DisbursementExpenseModal(props: IProps) {
         description: data?.project?.label,
       } as Projects;
     }
+    payload.assets = null;
+    if (data.assets) {
+      payload.assets = {
+        id: data?.assets?.value,
+        description: data?.assets?.label,
+      } as Assets;
+    }
     payload.transType = {
       id: data?.transType?.value,
       description: data?.transType?.label,
@@ -75,12 +89,22 @@ export default function DisbursementExpenseModal(props: IProps) {
           record?.office?.officeDescription,
           record?.office?.id
         );
+      } else if (type === "assets") {
+        return shapeOptionValue(
+          record?.assets?.description,
+          record?.assets?.id
+        );
       } else if (type === "transType") {
         return shapeOptionValue(
           record?.transType?.description,
           record?.transType?.id
         );
-      }
+      }else if (type === "project") {
+        return shapeOptionValue(
+          record?.project?.description,
+          record?.project?.id
+        );
+      } 
     }
   };
 
@@ -118,7 +142,9 @@ export default function DisbursementExpenseModal(props: IProps) {
         onFinish={onSubmit}
         initialValues={{
           transType: selectInValueInit(record?.transType?.id, "transType"),
-          department: selectInValueInit(record?.office?.id, "office"),
+          office: selectInValueInit(record?.office?.id, "office"),
+          assets: selectInValueInit(record?.assets?.id, "assets"),
+          project: selectInValueInit(record?.project?.id, "project"),
           amount: record?.amount ?? 0,
           remarks: record?.remarks,
         }}>
@@ -141,6 +167,7 @@ export default function DisbursementExpenseModal(props: IProps) {
               label="Office"
               name="office"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: offices,
@@ -157,10 +184,24 @@ export default function DisbursementExpenseModal(props: IProps) {
               label="Project"
               name="project"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: projects,
                 placeholder: "Select Project",
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormSelect
+              label="Asset"
+              name="assets"
+              propsselect={{
+                allowClear: true,
+                showSearch: true,
+                labelInValue: true,
+                options: assets,
+                placeholder: "Select Assets",
               }}
             />
           </Col>

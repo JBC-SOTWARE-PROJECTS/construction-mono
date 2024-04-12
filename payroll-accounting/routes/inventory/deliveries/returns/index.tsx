@@ -67,6 +67,10 @@ export default function ReturnsComponent() {
     );
   };
 
+  const onViewPostedAccount = (record: ReturnSupplier) => {
+    onPostOrVoidView(record, true, true);
+  };
+
   const handleUpdateStatus = (record: ReturnSupplier, status: boolean) => {
     if (status) {
       //if clicked approved
@@ -162,6 +166,7 @@ export default function ReturnsComponent() {
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
+          onViewAccount={(record) => onViewPostedAccount(record)}
         />
       </ProCard>
     </PageContainer>

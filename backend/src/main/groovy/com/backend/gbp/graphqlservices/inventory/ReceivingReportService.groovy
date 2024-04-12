@@ -1,12 +1,23 @@
 package com.backend.gbp.graphqlservices.inventory
 
+import com.backend.gbp.domain.accounting.Integration
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
+import com.backend.gbp.domain.accounting.IntegrationItem
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.Ledger
+import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.inventory.Item
+import com.backend.gbp.domain.inventory.ItemSubAccount
 import com.backend.gbp.domain.inventory.PurchaseOrderItems
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.domain.inventory.ReceivingReportItem
+import com.backend.gbp.domain.inventory.ReturnSupplier
+import com.backend.gbp.graphqlservices.accounting.IntegrationServices
+import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.PurchaseRecDto
 import com.backend.gbp.rest.dto.ReceivingAmountDto
+import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
@@ -17,6 +28,7 @@ import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -24,8 +36,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Component
 @GraphQLApi
@@ -59,6 +73,12 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
+    @Autowired
+    IntegrationServices integrationServices
+
+    @Autowired
+    LedgerServices ledgerServices
 
 
     @GraphQLQuery(name = "recById")
@@ -136,7 +156,7 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
         }
 
 
-        query += ''' ORDER BY r.rrNo DESC'''
+        query += ''' ORDER BY r.receiveDate DESC'''
 
 		Page<ReceivingReport> result = getPageable(query, countQuery, page, size, params)
 		return result
@@ -198,7 +218,7 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
         }
 
 
-        query += ''' ORDER BY r.rrNo DESC'''
+        query += ''' ORDER BY r.receiveDate DESC'''
 
         Page<ReceivingReport> result = getPageable(query, countQuery, page, size, params)
         return result
@@ -279,6 +299,55 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
     }
 
     @Transactional
+    @GraphQLMutation(name = "upsertRecNew")
+    ReceivingReport upsertRecNew(
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+            @GraphQLArgument(name = "forRemove") ArrayList<Map<String, Object>> forRemove,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        def rr = upsertFromMap(id, fields, { ReceivingReport entity , boolean forInsert ->
+            if(forInsert){
+                def code = "SRR"
+
+                entity.isPosted = false
+                entity.isVoid = false
+
+                if(entity.project?.id){
+                    code = entity.project?.prefixShortName ?: "PJ"
+                }else if(entity.assets?.id){
+                    code = entity.assets?.prefix ?: "SP"
+                }
+
+                entity.rrNo = generatorService.getNextValue(GeneratorType.SRR_NO, {
+                    return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+                })
+                entity.receivedType = code
+                entity.company = company
+            }
+        })
+        //remove first
+        def removeItems = forRemove as ArrayList<ReceivingReportItem>
+        if(removeItems.size()){
+            removeItems.each {
+                def deleted = objectMapper.convertValue(it, ReceivingReportItem.class)
+                receivingReportItemService.removeRecItemNoQuery(deleted)
+            }
+        }
+        //items to be inserted
+        def recItems = items as ArrayList<PurchaseRecDto>
+        recItems.each {
+            def item = objectMapper.convertValue(it.item, Item.class)
+            def poItem = objectMapper.convertValue(it.refPoItem, PurchaseOrderItems.class)
+            def con = objectMapper.convertValue(it, PurchaseRecDto.class)
+            receivingReportItemService.upsertRecItem(con, item, poItem, rr)
+        }
+
+        return rr
+    }
+
+    @Transactional
     @GraphQLMutation(name = "updateRECStatus")
     ReceivingReport updateRECStatus(
             @GraphQLArgument(name = "status") Boolean status,
@@ -305,6 +374,228 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
         }
 
         save(upsert)
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "redoReceiving")
+    ReceivingReport redoReceiving(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def upsert = findOne(id)
+        upsert.isPosted = false
+        upsert.isVoid = false
+        save(upsert)
+    }
+
+    @GraphQLQuery(name = "receivingAccountView")
+    List<JournalEntryViewDto> receivingAccountView(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "status") Boolean status
+    ) {
+        def result = new ArrayList<JournalEntryViewDto>()
+        def parent =  findOne(id)
+        def childrenList =  receivingReportItemService.recItemByParent(id)
+
+        def flagValue = parent.account.flagValue
+
+        if (parent.postedLedger) {
+            def header = ledgerServices.findOne(parent.postedLedger)
+            Set<Ledger> ledger = new HashSet<Ledger>(header.ledger);
+            ledger.each {
+                if(!status) {
+                    //reverse entry if status is false for void
+                    def list = new JournalEntryViewDto(
+                            code: it.journalAccount.code,
+                            desc: it.journalAccount.accountName,
+                            debit: it.credit,
+                            credit: it.debit
+                    )
+                    result.add(list)
+                }else{
+                    def list = new JournalEntryViewDto(
+                            code: it.journalAccount.code,
+                            desc: it.journalAccount.accountName,
+                            debit: it.debit,
+                            credit: it.credit
+                    )
+                    result.add(list)
+                }
+            }
+        } else {
+            if (flagValue) {
+                Integration match = integrationServices.getIntegrationByDomainAndTagValue(IntegrationDomainEnum.RECEIVING_REPORT, flagValue)
+                def headerLedger = integrationServices.generateAutoEntries(parent) {
+                    it, mul ->
+                        //NOTE: always round cost to Bankers Note HALF EVEN
+                        it.flagValue = flagValue
+                        BigDecimal payableAmount = BigDecimal.ZERO
+                        //initialize
+                        Map<String, List<ReceivingReport>> finalAcc  = [:]
+                        match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
+                            if(!finalAcc.containsKey(entry.sourceColumn)){
+                                finalAcc[entry.sourceColumn] = []
+                            }
+                        }
+                        //loop items
+                        Map<ItemSubAccount, BigDecimal> listItems  = [:]
+                        childrenList.each { a ->
+                            if(!listItems.containsKey(a.item.assetSubAccount)) {
+                                listItems[a.item.assetSubAccount] = 0.0
+                            }
+                            listItems[a.item.assetSubAccount] =  listItems[a.item.assetSubAccount] + a.netAmount
+                        }
+                        // loop to final Accounts
+                        listItems.each {k, v ->
+                            if(v > 0){
+                                finalAcc[k.sourceColumn] << new ReceivingReport().tap {
+                                    it.itemSubAccount = k
+                                    it[k.sourceColumn] = status ? v.setScale(2, RoundingMode.HALF_EVEN) : v.setScale(2, RoundingMode.HALF_EVEN) * -1
+                                }
+                            }
+                        }
+                        // ====================== loop multiples ========================
+                        finalAcc.each { key, items ->
+                            mul << items
+                        }
+                        // ====================== not multiple here =====================
+                        it.payableAmount = status ? parent.amount : parent.amount * -1
+
+                }
+
+                Set<Ledger> ledger = new HashSet<Ledger>(headerLedger.ledger);
+                ledger.each {
+                    def list = new JournalEntryViewDto(
+                            code: it.journalAccount.code,
+                            desc: it.journalAccount.accountName,
+                            debit: it.debit,
+                            credit: it.credit
+                    )
+                    result.add(list)
+                }
+            }
+
+        }
+        return result.sort { it.credit }
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "receivingPostInventory")
+    ReceivingReport receivingPostInventory(
+            @GraphQLArgument(name = "status") Boolean status,
+            @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def upsert = findOne(id)
+
+        if(status){
+            //ledger post
+            inventoryLedgerService.postInventoryLedgerRecNew(items, upsert.id)
+            //accounting post
+            return postToLedgerAccounting(upsert)
+
+        }else{
+            upsert.isPosted = status
+            upsert.isVoid = !status
+            upsert.postedLedger = null
+            upsert.postedBy = null
+
+            if(upsert.postedLedger){
+                def header = ledgerServices.findOne(upsert.postedLedger)
+                ledgerServices.reverseEntriesCustom(header, upsert.receiveDate)
+            }
+            //ledger void
+            inventoryLedgerService.voidLedgerByRef(upsert.rrNo)
+            //rec items
+            def recItems = receivingReportItemService.recItemByParent(id)
+            recItems.each {
+                receivingReportItemService.updateRecItemStatus(it.id, status)
+            }
+            //po monitoring delete
+            def poMon = poDeliveryMonitoringService.getPOMonitoringByRec(id)
+            poMon.each {
+                poDeliveryMonitoringService.delPOMonitoring(it.id)
+            }
+        }
+
+        save(upsert)
+    }
+
+    //accounting entries save
+    ReceivingReport postToLedgerAccounting(ReceivingReport receivingReport) {
+        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
+        def parent =  receivingReport
+        def childrenList =  receivingReportItemService.recItemByParent(parent.id)
+        def flagValue = parent.account.flagValue
+
+        if (flagValue) {
+            Integration match = integrationServices.getIntegrationByDomainAndTagValue(IntegrationDomainEnum.RECEIVING_REPORT, flagValue)
+            def headerLedger = integrationServices.generateAutoEntries(parent) {
+                it, mul ->
+                    //NOTE: always round cost to Bankers Note HALF EVEN
+                    it.flagValue = flagValue
+                    //initialize
+                    Map<String, List<ReceivingReport>> finalAcc  = [:]
+                    match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
+                        if(!finalAcc.containsKey(entry.sourceColumn)){
+                            finalAcc[entry.sourceColumn] = []
+                        }
+                    }
+                    //loop items
+                    Map<ItemSubAccount, BigDecimal> listItems  = [:]
+                    childrenList.each { a ->
+                        if(!listItems.containsKey(a.item.assetSubAccount)) {
+                            listItems[a.item.assetSubAccount] = 0.0
+                        }
+                        listItems[a.item.assetSubAccount] =  listItems[a.item.assetSubAccount] + a.netAmount
+                    }
+                    // loop to final Accounts
+                    listItems.each {k, v ->
+                        if(v > 0){
+                            finalAcc[k.sourceColumn] << new ReceivingReport().tap {
+                                it.itemSubAccount = k
+                                it[k.sourceColumn] = v.setScale(2, RoundingMode.HALF_EVEN)
+                            }
+                        }
+                    }
+                    // ====================== loop multiples ========================
+                    finalAcc.each { key, items ->
+                        mul << items
+                    }
+                    // ====================== not multiple here =====================
+                    it.payableAmount = parent.amount
+            }
+            Map<String, String> details = [:]
+
+            parent.details.each { k, v ->
+                details[k] = v
+            }
+
+            details["TRANSACTION_ID"] = parent.id.toString()
+            details["LOCATION_ID"] = parent.receivedOffice.id.toString()
+            details["LOCATION_DESCRIPTION"] = parent.receivedOffice.officeDescription
+
+            headerLedger.transactionNo = parent.rrNo
+            headerLedger.transactionType = parent.account.description
+            headerLedger.referenceType = parent.account.description
+            headerLedger.referenceNo =  parent.receivedRefNo
+
+            def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+                    "${parent.receiveDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${parent.rrNo}",
+                    "${parent.receivedOffice.officeDescription}-${parent.account.description}",
+                    "${parent.receivedOffice.officeDescription}-${parent.account.description}",
+                    LedgerDocType.RR,
+                    JournalType.PURCHASES_PAYABLES,
+                    parent.receiveDate,
+                    details)
+
+            parent.postedLedger = pHeader.id
+            parent.isPosted = true
+            parent.isVoid = false
+            parent.postedBy = SecurityUtils.currentLogin()
+
+            return save(parent)
+        }
+        return parent
     }
 
     @Transactional

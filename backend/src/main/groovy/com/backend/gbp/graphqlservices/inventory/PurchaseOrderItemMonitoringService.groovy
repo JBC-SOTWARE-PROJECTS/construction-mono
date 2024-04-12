@@ -6,6 +6,7 @@ import com.backend.gbp.domain.inventory.PurchaseOrderItems
 import com.backend.gbp.domain.inventory.PurchaseOrderItemsMonitoring
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.rest.dto.POChildrenDto
 import com.backend.gbp.rest.dto.PurchasePODto
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -35,6 +36,9 @@ class PurchaseOrderItemMonitoringService extends AbstractDaoService<PurchaseOrde
     @Autowired
     GeneratorService generatorService
 
+    @Autowired
+    PurchaseOrderService purchaseOrderService
+
     @GraphQLQuery(name = "monById")
     PurchaseOrderItemsMonitoring monById(
             @GraphQLArgument(name = "id") UUID id
@@ -54,6 +58,13 @@ class PurchaseOrderItemMonitoringService extends AbstractDaoService<PurchaseOrde
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
         createQuery(query, params).resultList.sort { it.item.descLong }
+    }
+
+    @GraphQLQuery(name = "getPurchaserOrderChildren")
+    POChildrenDto getPurchaserOrderChildren(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        return new POChildrenDto(parent: purchaseOrderService.poById(id), items: this.poItemNotReceiveMonitoring(id))
     }
 
     @GraphQLQuery(name = "checkBalancesByPO")

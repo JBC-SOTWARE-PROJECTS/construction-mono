@@ -324,12 +324,12 @@ export const createObjRecPo = (e) => {
     isDiscount: false,
     isPartial: false,
     isCompleted: true,
-    isNew: true,
-    isTax: e?.item.vatable,
-    expirationDate: null,
     totalAmount: 0,
     inputTax: 0,
     netAmount: 0,
+    isTax: e?.item.vatable,
+    expirationDate: null,
+    isNew: true,
   };
   return obj;
 };

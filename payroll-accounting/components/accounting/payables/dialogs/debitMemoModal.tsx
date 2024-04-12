@@ -1,5 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { DebitMemo, Mutation, Query, Supplier } from "@/graphql/gql/graphql";
+import {
+  DebitMemo,
+  DisbursementWtx,
+  Mutation,
+  Query,
+  Supplier,
+} from "@/graphql/gql/graphql";
 import {
   IDisbursementApplication,
   IDebitMemoDetails,
@@ -8,6 +14,7 @@ import {
   AuditOutlined,
   CarryOutOutlined,
   FileTextOutlined,
+  FundProjectionScreenOutlined,
   IssuesCloseOutlined,
   RedoOutlined,
   SaveOutlined,
@@ -64,6 +71,7 @@ import DMJournalEntries from "../journalentries/dmJournalEntries";
 import DebitMemoSummaryFooter from "../common/debitMemoSummary";
 import APDebitMemoApplicationsTable from "../disbursement/component/apDebitMemoApplication";
 import DebitMemoTransactionTable from "../disbursement/component/debitMemoTransactionTable";
+import DebitMemotWTXTable from "../disbursement/component/witholdingTaxDebitMemoTable";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -95,6 +103,7 @@ export default function DebitMemoModal(props: IProps) {
     []
   );
   const [expense, setExpense] = useState<IDebitMemoDetails[]>([]);
+  const [wtx, setWtx] = useState<DisbursementWtx[]>([]);
   const [saveCloseLoading, setSaveCloseLoading] = useState(false);
   const [category, setCategory] = useState<string>(
     record?.debitCategory ?? "PAYABLE"
@@ -118,6 +127,7 @@ export default function DebitMemoModal(props: IProps) {
     onCompleted: (data) => {
       let ap = data?.apDebitMemo as IDisbursementApplication[];
       let dm = data?.dmDetials as IDebitMemoDetails[];
+      let wtxList = data?.disWtxByDebitMemo as DisbursementWtx[];
       if (record?.id) {
         if (type === "DEBIT_MEMO") {
           // =================== application =================
@@ -149,6 +159,10 @@ export default function DebitMemoModal(props: IProps) {
             setExpense(_.isEmpty(dm) ? [] : dm);
             let sumAmount: number = _.sumBy(dm, "amount");
             calculateAmount(sumAmount);
+            //================= wtx ====================
+            setWtx(_.isEmpty(wtxList) ? [] : wtxList);
+            let wtx: number = _.sumBy(wtxList, "ewtAmount");
+            calculateWTX(sumAmount, wtx);
           }
         }
       }
@@ -207,6 +221,7 @@ export default function DebitMemoModal(props: IProps) {
           fields: payload,
           items: application,
           details: expense,
+          wtx: wtx,
         },
         onCompleted: (data) => {
           const result = data.upsertDebitMemo as DebitMemo;
@@ -308,16 +323,29 @@ export default function DebitMemoModal(props: IProps) {
   };
 
   const calculateAmount = (value: number) => {
-    if (category === "EXPENSE") {
+    if (category === "PAYABLE") {
       setState((prev: any) => ({
         ...prev,
-        appliedAmount: decimalRound2(value),
         memoAmount: decimalRound2(value),
       }));
-    } else if (category === "PAYABLE") {
+    }
+  };
+
+  const calculateWTX = (amount: number, wtx: number) => {
+    if (amount) {
       setState((prev: any) => ({
         ...prev,
-        memoAmount: decimalRound2(value),
+        ewtAmount: wtx,
+        memoAmount: decimalRound2(amount) - decimalRound2(wtx),
+        appliedAmount: decimalRound2(amount),
+      }));
+    } else {
+      let sumAmount: number = _.sumBy(expense, "amount");
+      setState((prev: any) => ({
+        ...prev,
+        ewtAmount: wtx,
+        memoAmount: decimalRound2(sumAmount) - decimalRound2(wtx),
+        appliedAmount: decimalRound2(sumAmount),
       }));
     }
   };
@@ -353,7 +381,8 @@ export default function DebitMemoModal(props: IProps) {
     } else if (e === "PAYABLE") {
       let sumAmount: number = 0;
       setExpense([]);
-      calculateAmount(sumAmount);
+      setWtx([]);
+      calculateWTX(0, 0);
     }
   };
 
@@ -535,6 +564,29 @@ export default function DebitMemoModal(props: IProps) {
           />
         ),
       });
+      if (type === "DEBIT_ADVICE") {
+        localTabs.push({
+          label: (
+            <span>
+              <FundProjectionScreenOutlined />
+              Expanded Withholding Tax
+            </span>
+          ),
+          key: "3_expanded_tax",
+          children: (
+            <DebitMemotWTXTable
+              calculateAmount={(e: number) => calculateWTX(0, e)}
+              status={disabled}
+              parentId={record?.id}
+              dataSource={wtx}
+              setWtx={setWtx}
+              isVoided={record?.status === "VOIDED"}
+              loading={loading}
+              onRefetchData={onRefetchData}
+            />
+          ),
+        });
+      }
     }
 
     return _.sortBy(localTabs, ["key"]);
@@ -652,7 +704,7 @@ export default function DebitMemoModal(props: IProps) {
               }}
             />
             <FormSelect
-              label="Debit Memo Category"
+              label={`Debit ${type === "DEBIT_MEMO" ? "Memo" : "Advice"} Category`}
               name="debitCategory"
               rules={requiredField}
               propsselect={{

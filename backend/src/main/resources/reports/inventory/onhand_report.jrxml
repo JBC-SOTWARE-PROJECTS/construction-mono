@@ -177,7 +177,7 @@
 		<field name="unit_of_purchase" class="java.lang.String"/>
 		<field name="unit_of_usage" class="java.lang.String"/>
 		<field name="category_description" class="java.lang.String"/>
-		<field name="onhand" class="java.lang.Integer"/>
+		<field name="onhand" class="java.math.BigDecimal"/>
 		<field name="last_unit_cost" class="java.math.BigDecimal"/>
 		<field name="last_wcost" class="java.math.BigDecimal"/>
 		<field name="expiration_date" class="java.lang.String"/>
