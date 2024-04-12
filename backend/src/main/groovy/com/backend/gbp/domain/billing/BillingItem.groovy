@@ -125,5 +125,15 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "posted_ledger")
 	UUID postedLedger
 
+	@GraphQLQuery
+	@Column(name = "project_work_accomplishment_item_id")
+	UUID projectWorkAccomplishmentItemId
+
+	@GraphQLQuery
+	@Column(name = "project_cost_id")
+	UUID projectCostId
+
+	@Transient
+	BigDecimal remainingBalance
 
 }
