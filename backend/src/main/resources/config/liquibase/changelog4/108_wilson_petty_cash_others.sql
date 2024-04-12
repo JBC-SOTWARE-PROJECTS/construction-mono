@@ -1,0 +1,2 @@
+ALTER TABLE accounting.petty_cash_others ADD COLUMN assets uuid default null;
+ALTER TABLE accounting.petty_cash_others ADD CONSTRAINT petty_cash_others_assets_fkey FOREIGN KEY (assets) REFERENCES asset.assets(id);

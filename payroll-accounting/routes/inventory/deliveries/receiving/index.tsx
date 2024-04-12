@@ -7,9 +7,13 @@ import {
 import { Input, Button, message, Row, Col, Form } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { ReceivingReport, Query } from "@/graphql/gql/graphql";
-import { useDialog } from "@/hooks";
-import { useQuery } from "@apollo/client";
-import { GET_RECORDS_DELIVERY_RECEIVING } from "@/graphql/inventory/deliveries-queries";
+import { useConfirmationPasswordHook, useDialog } from "@/hooks";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  DRAFT_APV,
+  GET_RECORDS_DELIVERY_RECEIVING,
+  REDO_SRR_TRANSACTION,
+} from "@/graphql/inventory/deliveries-queries";
 import UpsertItemModal from "@/components/inventory/masterfile/items/dialogs/upsertItem";
 import DeliveryReceivingTable from "@/components/inventory/deliveries/receiving/receivingTable";
 import { FormDebounceSelect, FormSelect } from "@/components/common";
@@ -17,11 +21,14 @@ import { useOffices } from "@/hooks/payables";
 import { PURCHASE_CATEGORY } from "@/utility/constant";
 import { OptionsValue } from "@/utility/interfaces";
 import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
+import UpsertReceivingModal from "@/components/inventory/deliveries/receiving/dialogs/upsertReceivingModal";
+import PostReceivingReportModal from "@/components/inventory/post-dialogs/postReceivingReport";
+import _ from "lodash";
 
 const { Search } = Input;
 
 export default function ReceivingComponent({ type }: { type: string }) {
-  const modal = useDialog(UpsertItemModal);
+  const [showPasswordConfirmation] = useConfirmationPasswordHook();
   const [supplier, setSupplier] = useState<OptionsValue>();
   const [category, setCategory] = useState<string | null>(null);
   const [project, setProject] = useState<string | null>(null);
@@ -32,6 +39,9 @@ export default function ReceivingComponent({ type }: { type: string }) {
     page: 0,
     size: 10,
   });
+  //  ===================== modals ===================================
+  const modal = useDialog(UpsertReceivingModal);
+  const postInventory = useDialog(PostReceivingReportModal);
   // ====================== queries =====================================
   const offices = useOffices();
   const { data, loading, refetch } = useQuery<Query>(
@@ -51,12 +61,77 @@ export default function ReceivingComponent({ type }: { type: string }) {
     }
   );
 
+  const [redo, { loading: redoLoading }] = useMutation(REDO_SRR_TRANSACTION, {
+    ignoreResults: false,
+    onCompleted: (data) => {
+      if (!_.isEmpty(data?.redoReceiving?.id)) {
+        message.success("Delivery Receiving can now be reprocessed");
+        refetch();
+      }
+    },
+  });
+
+  const [draftAccountsPayable, { loading: draftLoading }] = useMutation(
+    DRAFT_APV,
+    {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (!_.isEmpty(data?.upsertPayablesByRec?.id)) {
+          message.success(
+            "Delivery Receipt drafted to Accounts Payable Voucher (APV)"
+          );
+          refetch();
+        }
+      },
+    }
+  );
+
   const onUpsertRecord = (record?: ReceivingReport) => {
-    modal({ record: record }, (msg: string) => {
+    modal({ record: record, rrCategory: category }, (msg: string) => {
       if (msg) {
         message.success(msg);
         refetch();
       }
+    });
+  };
+
+  const onPostOrVoidView = (
+    record: ReceivingReport,
+    status: boolean,
+    viewOnly: boolean
+  ) => {
+    postInventory(
+      { record: record, status: status, viewOnly: viewOnly },
+      (result: string) => {
+        if (result) {
+          message.success(result);
+          refetch();
+        }
+      }
+    );
+  };
+
+  const onViewPostedAccount = (record: ReceivingReport) => {
+    onPostOrVoidView(record, true, true);
+  };
+
+  const onHandleDraftAPV = (record: ReceivingReport) => {
+    showPasswordConfirmation(() => {
+      draftAccountsPayable({
+        variables: {
+          id: record.id,
+        },
+      });
+    });
+  };
+
+  const onRedoTransaction = (record: ReceivingReport) => {
+    showPasswordConfirmation(() => {
+      redo({
+        variables: {
+          id: record.id,
+        },
+      });
     });
   };
 
@@ -66,12 +141,18 @@ export default function ReceivingComponent({ type }: { type: string }) {
       if (record?.isPosted) {
         message.error("Delivery Receiving is already posted");
       } else {
+        onPostOrVoidView(record, status, false);
       }
     } else {
       //void
       if (!record?.isPosted) {
-        message.error("Delivery Receiving is already not yet posted");
+        if (record.isVoid) {
+          message.error("Delivery Receiving is already voided");
+        } else {
+          message.error("Delivery Receiving is not yet posted");
+        }
       } else {
+        onPostOrVoidView(record, status, false);
       }
     }
   };
@@ -278,11 +359,14 @@ export default function ReceivingComponent({ type }: { type: string }) {
           dataSource={
             data?.recByFiltersPageNoDate?.content as ReceivingReport[]
           }
-          loading={loading}
+          loading={loading || redoLoading || draftLoading}
           totalElements={data?.recByFiltersPageNoDate?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
+          onViewAccount={(record) => onViewPostedAccount(record)}
+          onHandleDraftAPV={(record) => onHandleDraftAPV(record)}
+          onRedoTransaction={(record) => onRedoTransaction(record)}
         />
       </ProCard>
     </PageContainer>

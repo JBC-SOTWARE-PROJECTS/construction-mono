@@ -18,10 +18,6 @@ import JournaEntriesTable from "../commons/journalEntriesTable";
 import { decimalRound2 } from "@/utility/helper";
 import PostInventoryTable from "./postInventoryTable";
 import {
-  GET_JOURNAL_RETURN_SUPPLIER,
-  POST_VOID_RETURN_SUPPLIER,
-} from "@/graphql/inventory/deliveries-queries";
-import {
   formatPostStockIssuance,
   InventoryPostList,
 } from "@/utility/inventory-helper";

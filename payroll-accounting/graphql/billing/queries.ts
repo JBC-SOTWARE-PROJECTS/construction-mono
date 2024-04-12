@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from "@apollo/client"
 
 export const GET_BILLING_RECORDS = gql`
   query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
@@ -32,7 +32,7 @@ export const GET_BILLING_RECORDS = gql`
       number
     }
   }
-`;
+`
 
 export const GET_BILLING_INFO_BY_ID = gql`
   query ($id: UUID) {
@@ -65,14 +65,49 @@ export const GET_BILLING_INFO_BY_ID = gql`
       totals
       deductions
       payments
+      projectWorkAccomplishId
+      projectWorkAccomplishNo
       status
     }
   }
-`;
+`
+
+export const GET_BILLING_ITEMS_PAGE = gql`
+  query ($id: UUID, $page: Int, $size: Int) {
+    billingItemPage(id: $id, page: $page, size: $size) {
+      content {
+        id
+        transDate
+        recordNo
+        description
+        qty
+        debit
+        credit
+        subTotal
+        itemType
+        transType
+        orNum
+        lastModifiedBy
+        projectCostId
+        projectWorkAccomplishmentItemId
+        remainingBalance
+        status
+      }
+      size
+      totalElements
+      number
+    }
+  }
+`
 
 export const GET_BILLING_ITEMS = gql`
-  query ($filter: String, $id: UUID, $type: [String]) {
-    billingItemByParentType(filter: $filter, id: $id, type: $type) {
+  query ($filter: String, $id: UUID, $type: [String], $active: Boolean) {
+    billingItemByParentType(
+      filter: $filter
+      id: $id
+      type: $type
+      active: $active
+    ) {
       id
       transDate
       recordNo
@@ -85,10 +120,12 @@ export const GET_BILLING_ITEMS = gql`
       transType
       orNum
       lastModifiedBy
+      projectCostId
+      projectWorkAccomplishmentItemId
       status
     }
   }
-`;
+`
 
 export const CANCEL_BILLING_ITEM = gql`
   mutation ($id: UUID, $office: UUID) {
@@ -96,7 +133,7 @@ export const CANCEL_BILLING_ITEM = gql`
       id
     }
   }
-`;
+`
 
 export const GET_OTC_RECORD = gql`
   query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
@@ -121,4 +158,55 @@ export const GET_OTC_RECORD = gql`
       number
     }
   }
-`;
+`
+
+export const ADD_BILLING_ITEM_PROJECT_SERVICES = gql`
+  mutation ($billingId: UUID, $fields: Map_String_ObjectScalar) {
+    addProjectService(billingId: $billingId, fields: $fields) {
+      message
+      success
+    }
+  }
+`
+
+export const DELETE_BILLING_ITEM_BY_ID = gql`
+  mutation ($id: UUID) {
+    removeBillingItemProjectService(id: $id) {
+      message
+      success
+    }
+  }
+`
+
+export const LOCK_BILLING = gql`
+  mutation ($id: UUID, $type: String) {
+    lockBilling(id: $id, type: $type) {
+      id
+      locked
+    }
+  }
+`
+
+export const ADD_DEDUCTIONS = gql`
+  mutation (
+    $fields: Map_String_ObjectScalar
+    $id: UUID
+    $items: [Map_String_ObjectScalar]
+  ) {
+    addDeductions(fields: $fields, id: $id, items: $items)
+  }
+`
+
+export const DEDUCTION_DETAILS = gql`
+  query ($id: UUID) {
+    deductionItemsById(id: $id) {
+      id
+      refBillItem {
+        id
+        recordNo
+        description
+      }
+      amount
+    }
+  }
+`

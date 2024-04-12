@@ -16,7 +16,8 @@ import { FormTextArea } from "@/components/common";
 import _ from "lodash";
 import { randomId, requiredField, shapeOptionValue } from "@/utility/helper";
 import { decimalRound2 } from "@/utility/helper";
-import { ExpenseTransaction, Office, Projects } from "@/graphql/gql/graphql";
+import { Assets, ExpenseTransaction, Office, Projects } from "@/graphql/gql/graphql";
+import { useAssets } from "@/hooks/inventory";
 
 interface IProps {
   hide: (hideProps: any) => void;
@@ -32,6 +33,7 @@ export default function PettyCashOtherModal(props: IProps) {
   const types = useExpenseTransaction({ type: "PETTYCASH" });
   const offices = useOffices();
   const projects = useProjects({ office: selectedOffice });
+  const assets = useAssets();
   //================== functions ====================
   const onSubmit = (data: IFormPettyCashOthers) => {
     const payload = {
@@ -61,6 +63,14 @@ export default function PettyCashOtherModal(props: IProps) {
       id: data?.transType?.value,
       description: data?.transType?.label,
     } as ExpenseTransaction;
+    
+    payload.assets = null;
+    if (data.assets) {
+      payload.assets = {
+        id: data?.assets?.value,
+        description: data?.assets?.label,
+      } as Assets;
+    }
     payload.amount = decimalRound2(data?.amount);
     payload.isNew = true;
     hide(payload);
@@ -84,6 +94,11 @@ export default function PettyCashOtherModal(props: IProps) {
         return shapeOptionValue(
           record?.transType?.description,
           record?.transType?.id
+        );
+      }else if (type === "assets") {
+        return shapeOptionValue(
+          record?.assets?.description,
+          record?.assets?.id
         );
       }
     }
@@ -123,8 +138,9 @@ export default function PettyCashOtherModal(props: IProps) {
         onFinish={onSubmit}
         initialValues={{
           transType: selectInValueInit(record?.transType?.id, "transType"),
-          department: selectInValueInit(record?.office?.id, "office"),
+          office: selectInValueInit(record?.office?.id, "office"),
           project: selectInValueInit(record?.project?.id, "project"),
+          assets: selectInValueInit(record?.assets?.id, "assets"),
           amount: record?.amount ?? 0,
           remarks: record?.remarks,
         }}>
@@ -147,6 +163,7 @@ export default function PettyCashOtherModal(props: IProps) {
               label="Offices"
               name="office"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: offices,
@@ -163,10 +180,24 @@ export default function PettyCashOtherModal(props: IProps) {
               label="Project"
               name="project"
               propsselect={{
+                allowClear: true,
                 showSearch: true,
                 labelInValue: true,
                 options: projects,
                 placeholder: "Select Project",
+              }}
+            />
+          </Col>
+          <Col span={24}>
+            <FormSelect
+              label="Asset"
+              name="assets"
+              propsselect={{
+                allowClear: true,
+                showSearch: true,
+                labelInValue: true,
+                options: assets,
+                placeholder: "Select Assets",
               }}
             />
           </Col>

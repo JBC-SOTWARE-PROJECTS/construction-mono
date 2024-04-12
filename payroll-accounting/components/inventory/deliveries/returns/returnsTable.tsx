@@ -5,6 +5,7 @@ import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { DateFormatter } from "@/utility/helper";
 import { getUrlPrefix } from "@/utility/graphql-client";
+import ButtonPosted from "../../commons/buttonPosted";
 
 interface IProps {
   dataSource: ReturnSupplier[];
@@ -13,6 +14,7 @@ interface IProps {
   handleOpen: (record: ReturnSupplier) => void;
   handleUpdateStatus: (record: ReturnSupplier, status: boolean) => void;
   changePage: (page: number) => void;
+  onViewAccount: (record: ReturnSupplier) => void;
 }
 
 export default function ReturnSupplierTable({
@@ -22,6 +24,7 @@ export default function ReturnSupplierTable({
   handleOpen,
   handleUpdateStatus,
   changePage,
+  onViewAccount,
 }: IProps) {
   // ===================== columns ========================
   const columns: ColumnsType<ReturnSupplier> = [
@@ -74,7 +77,20 @@ export default function ReturnSupplierTable({
           color = "red";
           text = "VOIDED";
         }
-        return <Tag color={color}>{text}</Tag>;
+        // for viewing please set status to true to view the current entries not the reverse
+        if (status) {
+          return (
+            <ButtonPosted onClick={() => onViewAccount(record)}>
+              {text}
+            </ButtonPosted>
+          );
+        } else {
+          return (
+            <Tag bordered={false} color={color} key={color}>
+              {text}
+            </Tag>
+          );
+        }
       },
     },
     {

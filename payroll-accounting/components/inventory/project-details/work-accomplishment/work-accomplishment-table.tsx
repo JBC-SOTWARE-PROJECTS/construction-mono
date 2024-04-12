@@ -1,9 +1,9 @@
-import { ProjectWorkAccomplishItems, Query } from '@/graphql/gql/graphql'
-import { gql, useQuery } from '@apollo/client'
-import { Table, Typography } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
-import Decimal from 'decimal.js'
-import numeral from 'numeral'
+import { ProjectWorkAccomplishItems, Query } from "@/graphql/gql/graphql"
+import { gql, useQuery } from "@apollo/client"
+import { Table, Typography } from "antd"
+import type { ColumnsType } from "antd/es/table"
+import Decimal from "decimal.js"
+import numeral from "numeral"
 
 const GET_PROJECT_WORK_ACCOMPLISH_ITEMS = gql`
   query ($id: UUID) {
@@ -43,155 +43,155 @@ export default function WorkAccomplishmentsTable(
 ) {
   const { data, loading } = useQuery(GET_PROJECT_WORK_ACCOMPLISH_ITEMS, {
     variables: {
-      filter: '',
+      filter: "",
       id: props?.projectId,
     },
     skip: !props?.projectId,
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: "cache-and-network",
   })
 
   const columns: ColumnsType<ProjectWorkAccomplishItems> = [
     {
-      title: 'Item No',
-      dataIndex: 'itemNo',
-      align: 'center',
+      title: "Item No",
+      dataIndex: "itemNo",
+      align: "center",
       width: 40,
-      fixed: 'left',
+      fixed: "left",
     },
     {
-      title: 'Item Description',
-      dataIndex: 'description',
+      title: "Item Description",
+      dataIndex: "description",
       width: 100,
-      fixed: 'left',
+      fixed: "left",
     },
     {
-      title: 'Unit',
-      dataIndex: 'unit',
-      align: 'center',
+      title: "Unit",
+      dataIndex: "unit",
+      align: "center",
       width: 30,
     },
     {
-      title: 'ORIGINAL CONTRACT',
+      title: "ORIGINAL CONTRACT",
       children: [
         {
-          title: 'Quantity',
-          dataIndex: 'qty',
-          align: 'right',
+          title: "Quantity",
+          dataIndex: "qty",
+          align: "right",
           width: 50,
         },
         {
-          title: 'Unit Cost',
-          dataIndex: 'cost',
-          align: 'right',
+          title: "Unit Cost",
+          dataIndex: "cost",
+          align: "right",
           width: 50,
-          render: (text: string) => numeral(text).format('0,0.00'),
+          render: (text: string) => numeral(text).format("0,0.00"),
         },
         {
-          title: 'Amount',
-          dataIndex: 'amount',
-          align: 'right',
+          title: "Amount",
+          dataIndex: "amount",
+          align: "right",
           width: 50,
           render: (_: string, record: ProjectWorkAccomplishItems) => {
             const result = new Decimal(record?.qty ?? 0).times(
               new Decimal(record?.cost)
             )
 
-            return numeral(result.toString()).format('0,0.00')
+            return numeral(result.toString()).format("0,0.00")
           },
         },
       ],
     },
     {
-      title: 'RELATIVE WEIGHT',
-      dataIndex: 'relativeWeight',
-      align: 'center',
+      title: "RELATIVE WEIGHT",
+      dataIndex: "relativeWeight",
+      align: "center",
       width: 40,
-      render: (text: string) => (text ? `${text}%` : '0%'),
+      render: (text: string) => (text ? `${text}%` : "0%"),
     },
     {
-      title: 'QUANTITY ACCOMPLISHMENT',
+      title: "QUANTITY ACCOMPLISHMENT",
       children: [
         {
-          title: 'Previous',
-          dataIndex: 'prevQty',
-          align: 'right',
+          title: "Previous",
+          dataIndex: "prevQty",
+          align: "right",
           width: 50,
-          render: (text: number) => (text > 0 ? text : '-') ?? '-',
+          render: (text: number) => (text > 0 ? text : "-") ?? "-",
         },
         {
-          title: 'This Period',
-          dataIndex: 'thisPeriodQty',
-          align: 'right',
+          title: "This Period",
+          dataIndex: "thisPeriodQty",
+          align: "right",
           width: 50,
-          render: (text: number) => (text > 0 ? text : '-') ?? '-',
+          render: (text: number) => (text > 0 ? text : "-") ?? "-",
         },
         {
-          title: 'To Date',
-          dataIndex: 'toDateQty',
-          align: 'right',
+          title: "To Date",
+          dataIndex: "toDateQty",
+          align: "right",
           width: 50,
-          render: (text: number) => (text > 0 ? text : '-') ?? '-',
+          render: (text: number) => (text > 0 ? text : "-") ?? "-",
         },
         {
-          title: 'Balance',
-          dataIndex: 'balanceQty',
-          align: 'right',
+          title: "Balance",
+          dataIndex: "balanceQty",
+          align: "right",
           width: 50,
-          render: (text: number) => (text > 0 ? text : '-') ?? '-',
+          render: (text: number) => (text > 0 ? text : "-") ?? "-",
         },
       ],
     },
     {
-      title: 'AMOUNT ACCOMPLISHMENT',
+      title: "AMOUNT ACCOMPLISHMENT",
       children: [
         {
-          title: 'Previous',
-          dataIndex: 'prevAmount',
-          align: 'right',
+          title: "Previous",
+          dataIndex: "prevAmount",
+          align: "right",
           width: 50,
           render: (text: string) =>
-            text ? numeral(text).format('0,0.00') : '-',
+            text ? numeral(text).format("0,0.00") : "-",
         },
         {
-          title: 'This Period',
-          dataIndex: 'thisPeriodAmount',
-          align: 'right',
+          title: "This Period",
+          dataIndex: "thisPeriodAmount",
+          align: "right",
           width: 50,
           render: (text: string) =>
-            text ? numeral(text).format('0,0.00') : '-',
+            text ? numeral(text).format("0,0.00") : "-",
         },
         {
-          title: 'To Date',
-          dataIndex: 'toDateAmount',
-          align: 'right',
+          title: "To Date",
+          dataIndex: "toDateAmount",
+          align: "right",
           width: 50,
           render: (text: string) =>
-            text ? numeral(text).format('0,0.00') : '-',
+            text ? numeral(text).format("0,0.00") : "-",
         },
         {
-          title: 'Balance',
-          dataIndex: 'balanceAmount',
-          align: 'right',
+          title: "Balance",
+          dataIndex: "balanceAmount",
+          align: "right",
           width: 50,
           render: (text: string) =>
-            text ? numeral(text).format('0,0.00') : '-',
+            text ? numeral(text).format("0,0.00") : "-",
         },
       ],
     },
     {
-      title: 'PERCENTAGE',
-      dataIndex: 'percentage',
-      align: 'center',
+      title: "PERCENTAGE",
+      dataIndex: "percentage",
+      align: "center",
       width: 50,
       render: (text: string) =>
-        text ? `${numeral(text).format('0.00')}%` : '-',
+        text ? `${numeral(text).format("0.00")}%` : "-",
     },
   ]
 
   const TableSummaryCell = ({ text, index, align }: TableSummaryCellI) => {
     return (
-      <Table.Summary.Cell index={index} align={align ?? 'right'}>
-        <Typography.Text type='success'>{text}</Typography.Text>
+      <Table.Summary.Cell index={index} align={align ?? "right"}>
+        <Typography.Text type="success">{text}</Typography.Text>
       </Table.Summary.Cell>
     )
   }
@@ -201,8 +201,8 @@ export default function WorkAccomplishmentsTable(
       columns={columns}
       dataSource={data?.items ?? []}
       bordered
-      size='small'
-      scroll={{ x: 'calc(1600px + 50%)' }}
+      size="small"
+      scroll={{ x: "calc(1600px + 50%)" }}
       summary={(pageData) => {
         let totalAmount = 0
         let totalRelativeWeight = 0
@@ -269,40 +269,40 @@ export default function WorkAccomplishmentsTable(
         return (
           <>
             <Table.Summary.Row>
-              <Table.Summary.Cell index={0} colSpan={2} align={'center'}>
+              <Table.Summary.Cell index={0} colSpan={2} align={"center"}>
                 Total
               </Table.Summary.Cell>
               <Table.Summary.Cell index={2} colSpan={3} />
               <TableSummaryCell
-                text={numeral(totalAmount).format('0,0.00')}
+                text={numeral(totalAmount).format("0,0.00")}
                 index={5}
               />
               <TableSummaryCell
-                text={`${numeral(totalRelativeWeight).format('0,0.00')}%`}
+                text={`${numeral(totalRelativeWeight).format("0,0.00")}%`}
                 index={6}
-                align={'center'}
+                align={"center"}
               />
               <Table.Summary.Cell index={7} colSpan={4} />
               <TableSummaryCell
-                text={numeral(totalPrevAmount).format('0,0.00')}
+                text={numeral(totalPrevAmount).format("0,0.00")}
                 index={8}
               />
               <TableSummaryCell
-                text={numeral(totalToDateAmount).format('0,0.00')}
+                text={numeral(totalThisPeriodAmount).format("0,0.00")}
                 index={9}
               />
               <TableSummaryCell
-                text={numeral(totalThisPeriodAmount).format('0,0.00')}
+                text={numeral(totalToDateAmount).format("0,0.00")}
                 index={10}
               />
               <TableSummaryCell
-                text={numeral(totalBalanceAmount).format('0,0.00')}
+                text={numeral(totalBalanceAmount).format("0,0.00")}
                 index={11}
               />
               <TableSummaryCell
-                text={`${numeral(totalPercentage).format('0,0.00')}%`}
+                text={`${numeral(totalPercentage).format("0,0.00")}%`}
                 index={12}
-                align={'center'}
+                align={"center"}
               />
             </Table.Summary.Row>
           </>

@@ -177,7 +177,7 @@
 		<field name="code" class="java.lang.String"/>
 		<field name="unitCost" class="java.math.BigDecimal"/>
 		<field name="total" class="java.math.BigDecimal"/>
-		<field name="issued" class="java.lang.Integer"/>
+		<field name="issued" class="java.math.BigDecimal"/>
 	</subDataset>
 	<subDataset name="ListData1" uuid="aad579b7-272e-46dd-ad3c-076b483ea740">
 		<queryString>
@@ -212,8 +212,10 @@
 	<field name="project" class="java.lang.String"/>
 	<field name="issuedBy" class="java.lang.String"/>
 	<field name="receivedBy" class="java.lang.String"/>
+	<field name="remarks" class="java.lang.String"/>
+	<field name="projectTitle" class="java.lang.String"/>
 	<title>
-		<band height="173" splitType="Stretch">
+		<band height="176" splitType="Stretch">
 			<line>
 				<reportElement x="0" y="68" width="569" height="1" uuid="806ce5df-1219-4876-ae0c-ca7405b1f246">
 					<property name="local_mesure_unitheight" value="pixel"/>
@@ -302,18 +304,8 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{receiving_location}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="0" y="159" width="100" height="12" uuid="a34318c2-a334-4c91-baac-e5751b8519af">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box rightPadding="4"/>
-				<textElement textAlignment="Left">
-					<font fontName="DejaVu Sans" size="10" isItalic="false"/>
-				</textElement>
-				<text><![CDATA[Project Name : ]]></text>
-			</staticText>
 			<textField>
-				<reportElement x="100" y="159" width="461" height="12" uuid="ebd7ebac-00ec-46ef-9ed2-2994d94f3113"/>
+				<reportElement x="120" y="159" width="441" height="12" uuid="ebd7ebac-00ec-46ef-9ed2-2994d94f3113"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Solid"/>
 				</box>
@@ -330,7 +322,7 @@
 				<textElement textAlignment="Center">
 					<font fontName="DejaVu Sans" size="16" isBold="true"/>
 				</textElement>
-				<text><![CDATA[STOCK TRANSFER ISSUANCE]]></text>
+				<text><![CDATA[STOCK ISSUANCE]]></text>
 			</staticText>
 			<image hAlign="Center">
 				<reportElement x="0" y="2" width="65" height="60" uuid="5b40a0f6-041e-4f18-a200-eb8f7454ff4b"/>
@@ -386,12 +378,22 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{com_address}]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="0" y="159" width="120" height="12" uuid="e84bc8c5-78b9-488b-8e19-2f31aab4bbbf"/>
+				<box>
+					<pen lineWidth="0.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" isItalic="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{projectTitle}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<detail>
 		<band height="40">
 			<componentElement>
-				<reportElement x="0" y="1" width="569" height="39" uuid="6520cfa6-c5dd-4e23-8de6-06ec0b7c40dd">
+				<reportElement x="2" y="1" width="569" height="39" uuid="6520cfa6-c5dd-4e23-8de6-06ec0b7c40dd">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 4_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 4_CH"/>
@@ -540,9 +542,9 @@
 				</jr:table>
 			</componentElement>
 		</band>
-		<band height="53">
+		<band height="140">
 			<staticText>
-				<reportElement x="2" y="36" width="88" height="12" uuid="59985195-da0f-46d9-951f-561df2ffc83f">
+				<reportElement x="8" y="123" width="88" height="12" uuid="59985195-da0f-46d9-951f-561df2ffc83f">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box rightPadding="4"/>
@@ -552,7 +554,7 @@
 				<text><![CDATA[Date Prepared:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2" y="6" width="180" height="12" uuid="c2d8e42a-ddf0-4eb9-9f5d-f5aeade38158">
+				<reportElement x="8" y="93" width="180" height="12" uuid="c2d8e42a-ddf0-4eb9-9f5d-f5aeade38158">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box rightPadding="4"/>
@@ -562,7 +564,7 @@
 				<text><![CDATA[Prepared and issued by : ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="342" y="6" width="104" height="12" uuid="939e547c-5507-4934-8faa-09b973bc6604">
+				<reportElement x="348" y="93" width="104" height="12" uuid="939e547c-5507-4934-8faa-09b973bc6604">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box rightPadding="4"/>
@@ -572,7 +574,7 @@
 				<text><![CDATA[Received by :]]></text>
 			</staticText>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="2" y="21" width="259" height="12" uuid="f546ccbf-6649-4abb-bb0a-8f758df0feb1">
+				<reportElement x="8" y="108" width="259" height="12" uuid="f546ccbf-6649-4abb-bb0a-8f758df0feb1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -581,7 +583,7 @@
 				<textFieldExpression><![CDATA[$F{issuedBy}]]></textFieldExpression>
 			</textField>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="90" y="36" width="92" height="12" uuid="a7b17fc2-1920-4a73-b923-dd20275ae7f3">
+				<reportElement x="96" y="123" width="92" height="12" uuid="a7b17fc2-1920-4a73-b923-dd20275ae7f3">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -590,7 +592,7 @@
 				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="342" y="21" width="218" height="12" uuid="d21ebf09-1d43-42c9-9a6b-70bed252cbea">
+				<reportElement x="348" y="108" width="218" height="12" uuid="d21ebf09-1d43-42c9-9a6b-70bed252cbea">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
@@ -599,7 +601,7 @@
 				<textFieldExpression><![CDATA[$F{receivedBy}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="342" y="36" width="88" height="12" uuid="aea59dd8-9099-4743-83ce-2f52b094de24">
+				<reportElement x="348" y="123" width="88" height="12" uuid="aea59dd8-9099-4743-83ce-2f52b094de24">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box rightPadding="4"/>
@@ -609,13 +611,23 @@
 				<text><![CDATA[Date Received:]]></text>
 			</staticText>
 			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="430" y="36" width="92" height="12" uuid="b32bcf28-4779-408d-aad4-2836a8f7c59b">
+				<reportElement x="436" y="123" width="92" height="12" uuid="b32bcf28-4779-408d-aad4-2836a8f7c59b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement>
 					<font fontName="DejaVu Sans" size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Column header" x="2" y="6" width="566" height="73" forecolor="#000000" uuid="03754dd8-1a97-476f-b780-eea2c7a10965"/>
+				<box padding="5">
+					<pen lineWidth="1.0" lineStyle="Dashed" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans" size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Remarks : "+ $F{remarks}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

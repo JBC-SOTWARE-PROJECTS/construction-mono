@@ -8,12 +8,14 @@ import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.SupplierService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.inventory.ReceivingRepository
+import com.backend.gbp.rest.ap.APBeginningBalanceDto
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
 import com.backend.gbp.rest.dto.payables.AccountPayableDetialsDto
 import com.backend.gbp.rest.dto.payables.ApAgingDetailedDto
 import com.backend.gbp.rest.dto.payables.ApAgingSummaryDto
 import com.backend.gbp.rest.dto.payables.ApLedgerDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
+import com.backend.gbp.rest.dto.payables.AssetDto
 import com.backend.gbp.rest.dto.payables.OfficeDto
 import com.backend.gbp.rest.dto.payables.ProjectDto
 import com.backend.gbp.rest.dto.payables.TransTypeDto
@@ -338,13 +340,17 @@ class AccountsPayableServices extends AbstractDaoService<AccountsPayable> {
                 def apDto = objectMapper.convertValue(it, AccountPayableDetialsDto.class)
                 def office = null
                 def project = null
+                def assets = null
                 if (it.office) {
                     office = objectMapper.convertValue(it.office, OfficeDto.class)
                 }
                 if (it.project) {
                     project = objectMapper.convertValue(it.project, ProjectDto.class)
                 }
-                accountsPayableDetialServices.upsertPayablesDetails(apDto, ap, trans?.id, office?.id, project?.id)
+                if (it.assets) {
+                    assets = objectMapper.convertValue(it.assets, AssetDto.class)
+                }
+                accountsPayableDetialServices.upsertPayablesDetails(apDto, ap, trans?.id, office?.id, project?.id, assets?.id)
         }
 
         return ap
@@ -1075,5 +1081,68 @@ sum(older) as older,sum(total) as total from accounting.aging_report('${filter}'
         }
         return ewt.setScale(2, RoundingMode.HALF_EVEN)
     }
+    // beginning balance list
+    @GraphQLQuery(name = "apBeginningBalance")
+    List<APBeginningBalanceDto> apBeginningBalance(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "types") UUID types,
+            @GraphQLArgument(name = "status") Boolean status
+    ) {
+        List<APBeginningBalanceDto> records = []
+
+        String query = '''
+            select 
+                p.id,
+                p.ap_no,
+                p.supplier,
+                s.supplier_fullname,
+                st.supplier_type_description as supplier_type,
+                p.net_amount as total
+            from accounting.payables p 
+                left join inventory.supplier s on s.id = p.supplier
+                left join inventory.supplier_types st on st.id  = s.supplier_types
+            where p.beginning_balance = true
+        '''
+
+        Map<String, Object> params = new HashMap<>()
+
+        if (filter) {
+            query += ''' and s.supplier_fullname ilike concat('%',:filter,'%') '''
+            params.put("filter", filter)
+        }
+
+        if (types) {
+            query += ''' and s.supplier_types = :types'''
+            params.put("types", types)
+        }
+
+        if(status) {
+            query += ''' and p.status = :status'''
+            params.put("status", "POSTED")
+        }
+
+        if(status != null && status == false){
+            query += ''' and p.status = :status'''
+            params.put("status", "DRAFT")
+        }
+
+        query += ''' order by s.supplier_fullname ASC '''
+
+        def recordsRaw= namedParameterJdbcTemplate.queryForList(query, params)
+
+        recordsRaw.each {
+            records << new APBeginningBalanceDto(
+                    id: UUID.fromString(it.get("id","") as String),
+                    apNo: StringUtils.upperCase( it.get("ap_no","") as String),
+                    supplierId: UUID.fromString(it.get("supplier","") as String),
+                    supplierFullname: StringUtils.upperCase( it.get("supplier_fullname","") as String),
+                    supplierType: StringUtils.upperCase( it.get("supplier_type","") as String),
+                    total: it.get("total",0) as BigDecimal
+            )
+        }
+
+        return records
+    }
+
 
 }

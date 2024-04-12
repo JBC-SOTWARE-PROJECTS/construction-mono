@@ -73,7 +73,7 @@ export default function PettyCashModal(props: IProps) {
   const [purchases, setPurchases] = useState<PettyCashItemDto[]>([]);
   const [others, setOthers] = useState<PettyCashOthersDto[]>([]);
   const [category, setCategory] = useState<string>(
-    record?.pcvCategory ?? "PURCHASE"
+    record?.pcvCategory ?? "OTHERS"
   );
   const [config, setConfig] = useState<ConfigVat>({
     vatRate: record?.vatRate ?? vatRate,

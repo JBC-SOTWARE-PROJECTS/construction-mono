@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.DebitMemo
 import com.backend.gbp.domain.accounting.Disbursement
 import com.backend.gbp.domain.accounting.DisbursementWtx
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
@@ -44,6 +45,11 @@ class DisbursementWtxServices extends AbstractDaoService<DisbursementWtx> {
 		createQuery("Select ds from DisbursementWtx ds where ds.disbursement.id = :id", ["id": id]).resultList
 	}
 
+	@GraphQLQuery(name = "disWtxByDebitMemo", description = "Find DisbursementWtx by Parent")
+	List<DisbursementWtx> disWtxByDebitMemo(@GraphQLArgument(name = "id") UUID id) {
+		createQuery("Select ds from DisbursementWtx ds where ds.debitMemo.id = :id", ["id": id]).resultList
+	}
+
 	//mutations
 	@Transactional(rollbackFor = Exception.class)
 	@GraphQLMutation(name = "upsertWtx")
@@ -70,6 +76,30 @@ class DisbursementWtxServices extends AbstractDaoService<DisbursementWtx> {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
+	@GraphQLMutation(name = "upsertWtxDebitMemo")
+	DisbursementWtx upsertWtxDebitMemo(
+			@GraphQLArgument(name="it")	DisbursementWtxDto it,
+			@GraphQLArgument(name="parent") DebitMemo parent
+	) {
+		DisbursementWtx upsert = new DisbursementWtx()
+		if(!it.isNew){
+			upsert = findOne(UUID.fromString(it.id))
+		}
+		upsert.debitMemo = parent
+		upsert.appliedAmount = it.appliedAmount
+		upsert.vatRate = it.vatRate
+		upsert.vatInclusive = it.vatInclusive
+		upsert.vatAmount = it.vatAmount
+		upsert.ewtDesc = it.ewtDesc
+		upsert.ewtRate = it.ewtRate
+		upsert.ewtAmount = it.ewtAmount
+		upsert.grossAmount = it.grossAmount
+		upsert.netAmount = it.netAmount
+
+		save(upsert)
+	}
+
+	@Transactional(rollbackFor = Exception.class)
 	@GraphQLMutation(name = "removeWtx")
 	DisbursementWtx removeWtx(
 			@GraphQLArgument(name = "id") UUID id
@@ -82,11 +112,38 @@ class DisbursementWtxServices extends AbstractDaoService<DisbursementWtx> {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
+	@GraphQLMutation(name = "removeWtxDebitMemo")
+	DisbursementWtx removeWtxDebitMemo(
+			@GraphQLArgument(name = "id") UUID id
+	) {
+		def wtx = findOne(id)
+		delete(wtx)
+		return wtx
+	}
+
+	@Transactional(rollbackFor = Exception.class)
 	@GraphQLMutation(name = "removeWtxList")
 	DisbursementWtx removeWtxList(
 			@GraphQLArgument(name = "id") UUID id
 	) {
 		def wtx = this.disWtxByParent(id)
+		//update parent
+		def result = new DisbursementWtx()
+		wtx.each {
+			def obj = it
+			result = it
+			delete(obj)
+		}
+
+		return result
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@GraphQLMutation(name = "removeWtxListDebitMemo")
+	DisbursementWtx removeWtxListDebitMemo(
+			@GraphQLArgument(name = "id") UUID id
+	) {
+		def wtx = this.disWtxByDebitMemo(id)
 		//update parent
 		def result = new DisbursementWtx()
 		wtx.each {

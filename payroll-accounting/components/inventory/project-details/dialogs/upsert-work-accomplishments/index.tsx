@@ -19,6 +19,7 @@ import {
   calculateAmountAccomplish,
   calculateBalance,
   calculatePercentage,
+  calculateToDate,
 } from '../../common/work-accomplishments-helpers'
 import dayjs from 'dayjs'
 import { useConfirmationPasswordHook } from '@/hooks'
@@ -154,6 +155,7 @@ export default function NewWorkAccomplishment(props: NewWorkAccomplishmentI) {
           prevQty: costs?.billedQty,
           id: uuidv4(),
         } as ProjectWorkAccomplishItems
+        row = calculateToDate(row)
         row = calculateBalance(row)
         row = calculateAmountAccomplish(row)
         row = calculatePercentage(row)
