@@ -22,4 +22,5 @@ class HeaderGroupServices extends AbstractDaoService<HeaderLedgerGroup> {
         super(HeaderLedgerGroup.class)
     }
 
+
 }

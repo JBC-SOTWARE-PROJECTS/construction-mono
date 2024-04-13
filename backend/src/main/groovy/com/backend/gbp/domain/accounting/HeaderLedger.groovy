@@ -193,9 +193,8 @@ class HeaderLedger extends AbstractAuditingEntity implements Serializable {
 	String invoiceSoaReference
 
 	@GraphQLQuery
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "company_id", referencedColumnName = "id")
-	CompanySettings company
+	@Column(name = "company_id", columnDefinition = "varchar")
+	UUID companyId
 
 }
 

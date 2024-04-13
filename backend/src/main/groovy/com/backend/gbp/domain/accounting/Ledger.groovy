@@ -20,6 +20,7 @@ import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
 
 import javax.persistence.*
+import java.time.Instant
 import java.time.LocalDate
 
 @Entity
@@ -65,10 +66,19 @@ class Ledger extends AbstractAuditingEntity implements Serializable {
 	BigDecimal totalAppliedOr
 
 	@GraphQLQuery
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "company_id", referencedColumnName = "id")
-	CompanySettings company
+	@Column(name = "company_id")
+	UUID companyId
 
+	@GraphQLQuery
+	@Column(name = "approved_by", columnDefinition = "varchar")
+	String approvedBy
+
+	@GraphQLQuery
+	@Column(name = "approved_datetime", columnDefinition = "timestamp")
+	Instant approvedDatetime
+
+	@Transient
+	Boolean added
 
 }
 
