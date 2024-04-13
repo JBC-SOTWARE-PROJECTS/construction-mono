@@ -4,21 +4,28 @@ import {
   ProCard,
   ProFormGroup,
 } from "@ant-design/pro-components";
-import { Input, Button, Row, Col, Form, App } from "antd";
+import { Input, Button, Row, Col, Form, App, message } from "antd";
 import {
   ExclamationCircleOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { PurchaseRequest, Query } from "@/graphql/gql/graphql";
-import { useDialog } from "@/hooks";
+import {
+  Mutation,
+  PurchaseOrder,
+  PurchaseRequest,
+  Query,
+} from "@/graphql/gql/graphql";
+import { useConfirmationPasswordHook, useDialog } from "@/hooks";
 import { useMutation, useQuery } from "@apollo/client";
 import {
+  CREATE_PURCHASE_ORDER_BY_PR,
   GET_RECORDS_PURCHASE_REQUEST,
   UPSERT_RECORD_PR_STATUS,
 } from "@/graphql/inventory/purchases-queries";
 import PurchaseRequestTable from "@/components/inventory/purchases/purchase-request/purchaseRequestTable";
 import { FormSelect } from "@/components/common";
 import UpsertPRFormModal from "@/components/inventory/purchases/purchase-request/dialogs/upserPRFormModal";
+import UpsertPOFormModal from "@/components/inventory/purchases/purchase-order/dialogs/upserPOFormModal";
 import { useOffices, useProjects } from "@/hooks/payables";
 import { PR_STATUS, PURCHASE_CATEGORY } from "@/utility/constant";
 import { useAssets } from "@/hooks/inventory";
@@ -29,7 +36,9 @@ const { Search } = Input;
 export default function PurchaseRequestComponent({ type }: { type: string }) {
   const { modal: parentModal, message } = App.useApp();
   const { confirm } = parentModal;
+  const [showPasswordConfirmation] = useConfirmationPasswordHook();
   const modal = useDialog(UpsertPRFormModal);
+  const poModal = useDialog(UpsertPOFormModal);
   const [category, setCategory] = useState<string | null>(null);
   const [project, setProject] = useState<string | null>(null);
   const [asset, setAsset] = useState<string | null>(null);
@@ -70,10 +79,32 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
         if (!_.isEmpty(data?.updatePRStatus?.id)) {
           message.success("Purchase Request Information Updated");
           refetch();
+        } else {
+          message.error(
+            "Cannot void purchase request. Purchase order already created."
+          );
         }
       },
     }
   );
+
+  const [createPurchaseOrder, { loading: createLoading }] =
+    useMutation<Mutation>(CREATE_PURCHASE_ORDER_BY_PR, {
+      ignoreResults: false,
+      onCompleted: (data) => {
+        if (data?.purchaseOrderByPR?.success) {
+          message.success(data?.purchaseOrderByPR?.message);
+          let payload = data?.purchaseOrderByPR?.payload as PurchaseOrder;
+          if (payload.id) {
+            let category = payload.category ?? "";
+            //show modal here
+            showPurchaseOrderFormModal(payload, category);
+          }
+        } else {
+          message.error(data?.purchaseOrderByPR?.message);
+        }
+      },
+    });
   // =================== end Queries =============================
   const onUpsertRecord = (record?: PurchaseRequest) => {
     modal({ record: record, prCategory: category }, (msg: string) => {
@@ -82,6 +113,21 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
         refetch();
       }
     });
+  };
+
+  const showPurchaseOrderFormModal = (
+    record: PurchaseOrder,
+    category: string
+  ) => {
+    poModal(
+      { record: record, poCategory: category, disabledPR: true },
+      (msg: string) => {
+        if (msg) {
+          message.success(msg);
+          refetch();
+        }
+      }
+    );
   };
 
   const handleUpdateStatus = (record: PurchaseRequest, status: boolean) => {
@@ -100,6 +146,16 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
         _approve(record?.id, status, "void");
       }
     }
+  };
+
+  const handleCreatePurchaseOrder = (record: PurchaseRequest) => {
+    showPasswordConfirmation(() => {
+      createPurchaseOrder({
+        variables: {
+          id: record.id,
+        },
+      });
+    });
   };
 
   const _approve = (id: string, status: boolean, message: string) => {
@@ -321,10 +377,11 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
         </div>
         <PurchaseRequestTable
           dataSource={data?.prByFiltersPageNoDate?.content as PurchaseRequest[]}
-          loading={loading || upsertLoading}
+          loading={loading || upsertLoading || createLoading}
           totalElements={data?.prByFiltersPageNoDate?.totalElements as number}
           handleOpen={(record) => onUpsertRecord(record)}
           handleUpdateStatus={(record, e) => handleUpdateStatus(record, e)}
+          handleCreatePO={(record) => handleCreatePurchaseOrder(record)}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
         />
       </ProCard>

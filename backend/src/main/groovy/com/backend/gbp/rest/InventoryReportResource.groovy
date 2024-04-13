@@ -352,6 +352,7 @@ class InventoryReportResource {
 								"Total KM",
 								"Diesel",
 								"Route",
+						        "Rental Rate",
 								"Remarks",
 								"Charge To (Project Site)"
 
@@ -368,6 +369,7 @@ class InventoryReportResource {
 							it.endOdometerReading.toBigDecimal() - it.startOdometerReading.toBigDecimal(),
 							it.endFuelReading.toBigDecimal() - it.startFuelReading.toBigDecimal(),
 							it.route,
+							it.rentalRate,
 							it.remarks,
 							it.project ? it.project.description  : "Main Office"
 					)

@@ -3,11 +3,13 @@ import { FolderOpenOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
 import { ColumnsType } from "antd/es/table";
-import DescLong from "../../desclong";
 import { DateFormatter, accessControl } from "@/utility/helper";
 import { getUrlPrefix } from "@/utility/graphql-client";
 import { useContext } from "react";
 import { AccountContext } from "@/components/accessControl/AccountContext";
+import _ from "lodash";
+import { responsiveColumn2 } from "@/utility/constant";
+import styled from "styled-components";
 
 interface IProps {
   dataSource: PurchaseRequest[];
@@ -15,6 +17,7 @@ interface IProps {
   totalElements: number;
   handleOpen: (record: PurchaseRequest) => void;
   handleUpdateStatus: (record: PurchaseRequest, status: boolean) => void;
+  handleCreatePO: (record: PurchaseRequest) => void;
   changePage: (page: number) => void;
 }
 
@@ -24,6 +27,7 @@ export default function PurchaseRequestTable({
   totalElements = 1,
   handleOpen,
   handleUpdateStatus,
+  handleCreatePO,
   changePage,
 }: IProps) {
   // ===================== menus ========================
@@ -120,20 +124,8 @@ export default function PurchaseRequestTable({
       width: 70,
       align: "center",
       fixed: "right",
-      render: (_, record) => {
-        const items: MenuProps["items"] = [
-          {
-            label: "Approve",
-            onClick: () => handleUpdateStatus(record, true),
-            disabled: accessControl(account?.user?.access, "pr_approver"),
-            key: "1",
-          },
-          {
-            label: "Void",
-            onClick: () => handleUpdateStatus(record, false),
-            disabled: accessControl(account?.user?.access, "pr_approver"),
-            key: "2",
-          },
+      render: (__, record) => {
+        let menus: MenuProps["items"] = [
           {
             label: "Print",
             onClick: () =>
@@ -142,9 +134,35 @@ export default function PurchaseRequestTable({
                   record.id
                 }`
               ),
-            key: "3",
+            key: "4",
           },
         ];
+
+        if (record.isApprove) {
+          menus.push(
+            {
+              label: "Create/View Purchase Order",
+              onClick: () => handleCreatePO(record),
+              key: "2",
+            },
+            {
+              label: "Void",
+              onClick: () => handleUpdateStatus(record, false),
+              disabled: accessControl(account?.user?.access, "pr_approver"),
+              key: "3",
+            }
+          );
+        } else {
+          menus.push({
+            label: "Approve",
+            onClick: () => handleUpdateStatus(record, true),
+            disabled: accessControl(account?.user?.access, "pr_approver"),
+            key: "1",
+          });
+        }
+
+        const items = _.sortBy(menus, ["key"]);
+
         return (
           <Dropdown.Button
             size="small"
@@ -160,53 +178,71 @@ export default function PurchaseRequestTable({
   ];
 
   return (
-    <Row>
-      <Col span={24}>
-        <Table
-          expandable={{
-            expandedRowRender: (record) => (
-              <div className="w-full">
-                <p>
-                  Requesting Office:{" "}
-                  <Tag>{record.requestingOffice?.officeDescription}</Tag>
-                </p>
-                <p style={{ paddingTop: 5 }}>
-                  Request To:{" "}
-                  <Tag>{record.requestedOffice?.officeDescription}</Tag>
-                </p>
-                {record?.category === "PROJECTS" && (
-                  <p style={{ paddingTop: 5 }}>
-                    Project: <Tag>{record.project?.description}</Tag>
-                  </p>
-                )}
-                {record?.category === "SPARE_PARTS" && (
-                  <p style={{ paddingTop: 5 }}>
-                    Equipment (Assets): <Tag>{record.assets?.description}</Tag>
-                  </p>
-                )}
-              </div>
-            ),
-          }}
-          rowKey="id"
-          size="small"
-          columns={columns}
-          dataSource={dataSource}
-          pagination={false}
-          loading={loading}
-          footer={() => (
-            <Pagination
-              showSizeChanger={false}
-              pageSize={10}
-              responsive={true}
-              total={totalElements}
-              onChange={(e) => {
-                changePage(e - 1);
-              }}
-            />
-          )}
-          scroll={{ x: 1400 }}
-        />
-      </Col>
-    </Row>
+    <DivCSS>
+      <Row>
+        <Col span={24}>
+          <Table
+            expandable={{
+              expandedRowRender: (record) => (
+                <Row>
+                  <Col {...responsiveColumn2}>
+                    <p>
+                      Requesting Office:{" "}
+                      <Tag>{record.requestingOffice?.officeDescription}</Tag>
+                    </p>
+                    <p style={{ paddingTop: 5 }}>
+                      Request To:{" "}
+                      <Tag>{record.requestedOffice?.officeDescription}</Tag>
+                    </p>
+                  </Col>
+                  <Col {...responsiveColumn2}>
+                    <p style={{ paddingTop: 5 }}>
+                      Request By: <Tag>{record?.userFullname ?? "--"}</Tag>
+                    </p>
+                    {record?.category === "PROJECTS" && (
+                      <p style={{ paddingTop: 5 }}>
+                        Project: <Tag>{record.project?.description}</Tag>
+                      </p>
+                    )}
+                    {record?.category === "SPARE_PARTS" && (
+                      <p style={{ paddingTop: 5 }}>
+                        Equipment (Assets):{" "}
+                        <Tag>{record.assets?.description}</Tag>
+                      </p>
+                    )}
+                  </Col>
+                </Row>
+              ),
+            }}
+            rowKey="id"
+            size="small"
+            columns={columns}
+            dataSource={dataSource}
+            pagination={false}
+            loading={loading}
+            footer={() => (
+              <Pagination
+                showSizeChanger={false}
+                pageSize={10}
+                responsive={true}
+                total={totalElements}
+                onChange={(e) => {
+                  changePage(e - 1);
+                }}
+              />
+            )}
+            scroll={{ x: 1400 }}
+          />
+        </Col>
+      </Row>
+    </DivCSS>
   );
 }
+
+const DivCSS = styled.div`
+  width: 100%;
+
+  .ant-table-wrapper .ant-table-expanded-row-fixed {
+    padding: 4px 16px !important;
+  }
+`;

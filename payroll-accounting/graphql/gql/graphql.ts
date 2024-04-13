@@ -3395,6 +3395,22 @@ export type GraphQlRetVal_ParentAccount = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GraphQlRetVal_PurchaseOrder = {
+  __typename?: 'GraphQLRetVal_PurchaseOrder';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<PurchaseOrder>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type GraphQlRetVal_ReceivingReport = {
+  __typename?: 'GraphQLRetVal_ReceivingReport';
+  message?: Maybe<Scalars['String']['output']>;
+  payload?: Maybe<ReceivingReport>;
+  returnId?: Maybe<Scalars['UUID']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type GraphQlRetVal_SssContribution = {
   __typename?: 'GraphQLRetVal_SSSContribution';
   message?: Maybe<Scalars['String']['output']>;
@@ -4476,6 +4492,7 @@ export type Mutation = {
   postReturnInventory?: Maybe<ReturnSupplier>;
   postSWAToBilling?: Maybe<GraphQlResVal_Billing>;
   projectWorkAccomplishToggleLock?: Maybe<ProjectWorkAccomplish>;
+  purchaseOrderByPR?: Maybe<GraphQlRetVal_PurchaseOrder>;
   pushToBill?: Maybe<Billing>;
   pushToBillProject?: Maybe<Billing>;
   /** insert adj */
@@ -4488,6 +4505,7 @@ export type Mutation = {
   /** A mutation to recalculate payroll module employee . */
   recalculatePayrollModuleEmployee?: Maybe<GraphQlResVal_String>;
   receivingPostInventory?: Maybe<ReceivingReport>;
+  receivingReportByPO?: Maybe<GraphQlRetVal_ReceivingReport>;
   redoReceiving?: Maybe<ReceivingReport>;
   remove2307?: Maybe<Wtx2307>;
   removeAccountTemplateItem?: Maybe<ApAccountsTemplateItems>;
@@ -4693,6 +4711,7 @@ export type Mutation = {
   upsertPHICContribution?: Maybe<GraphQlRetVal_PhicContribution>;
   upsertPO?: Maybe<PurchaseOrder>;
   upsertPOItem?: Maybe<PurchaseOrderItems>;
+  upsertPOItemByPRItem?: Maybe<PurchaseOrderItems>;
   upsertPOMonitoring?: Maybe<PoDeliveryMonitoring>;
   upsertPR?: Maybe<PurchaseRequest>;
   upsertPRItem?: Maybe<PurchaseRequestItem>;
@@ -5620,6 +5639,12 @@ export type MutationProjectWorkAccomplishToggleLockArgs = {
 
 
 /** Mutation root */
+export type MutationPurchaseOrderByPrArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Mutation root */
 export type MutationPushToBillArgs = {
   jobId?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -5683,6 +5708,12 @@ export type MutationReceivingPostInventoryArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   items?: InputMaybe<Array<InputMaybe<Scalars['Map_String_ObjectScalar']['input']>>>;
   status?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+/** Mutation root */
+export type MutationReceivingReportByPoArgs = {
+  id?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -7061,6 +7092,13 @@ export type MutationUpsertPoItemArgs = {
   dto?: InputMaybe<PurchasePoDtoInput>;
   item?: InputMaybe<ItemInput>;
   pr?: InputMaybe<PurchaseOrderInput>;
+};
+
+
+/** Mutation root */
+export type MutationUpsertPoItemByPrItemArgs = {
+  item?: InputMaybe<PurchaseRequestItemInput>;
+  parent?: InputMaybe<PurchaseOrderInput>;
 };
 
 
@@ -11442,6 +11480,7 @@ export type Query = {
   getContributionByPayrollId?: Maybe<GraphQlResVal_PayrollContribution>;
   /** Get contribution by ID, this query is pagable */
   getContributionEmployeesByPayrollId?: Maybe<GraphQlResVal_Page_PayrollEmployeeContributionDto>;
+  getDRBYPONumber?: Maybe<Array<Maybe<ReceivingReport>>>;
   getDocTypeById?: Maybe<DocumentTypes>;
   getEmployeeAllowance?: Maybe<Array<Maybe<EmployeeAllowance>>>;
   getEmployeeAllowanceItemsInIds?: Maybe<Array<Maybe<Employee>>>;
@@ -11513,6 +11552,7 @@ export type Query = {
   /** Get otherDeduction by ID */
   getPayrollOtherDeductionByPayrollId?: Maybe<PayrollOtherDeduction>;
   getPlateNo?: Maybe<Array<Maybe<PlateNumberDto>>>;
+  getPoBYPrNO?: Maybe<Array<Maybe<PurchaseOrder>>>;
   getPrItemByPoId?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
   getPrItemInOnePO?: Maybe<PrChildrenDto>;
   getPrItemInPO?: Maybe<Array<Maybe<PurchaseRequestItem>>>;
@@ -11729,6 +11769,7 @@ export type Query = {
   poByFiltersPage?: Maybe<Page_PurchaseOrder>;
   poByFiltersPageNoDate?: Maybe<Page_PurchaseOrder>;
   poById?: Maybe<PurchaseOrder>;
+  poByPoNo?: Maybe<PurchaseOrder>;
   poItemById?: Maybe<PurchaseOrderItems>;
   poItemByParent?: Maybe<Array<Maybe<PurchaseOrderItems>>>;
   poItemMonitoringByParentFilter?: Maybe<Array<Maybe<PurchaseOrderItemsMonitoring>>>;
@@ -11745,6 +11786,8 @@ export type Query = {
   positionList?: Maybe<Array<Maybe<Position>>>;
   /** Search Positions */
   positionPage?: Maybe<Page_Position>;
+  /** Find Posted Petty Cash */
+  postedPettyCash?: Maybe<Array<Maybe<PettyCashAccounting>>>;
   prByFiltersPage?: Maybe<Page_PurchaseRequest>;
   prByFiltersPageNoDate?: Maybe<Page_PurchaseRequest>;
   prById?: Maybe<PurchaseRequest>;
@@ -13319,6 +13362,12 @@ export type QueryGetContributionEmployeesByPayrollIdArgs = {
 
 
 /** Query root */
+export type QueryGetDrbypoNumberArgs = {
+  poNumber?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
 export type QueryGetDocTypeByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -13687,6 +13736,12 @@ export type QueryGetPayrollOtherDeductionByPayrollIdArgs = {
 /** Query root */
 export type QueryGetPlateNoArgs = {
   status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryGetPoByPrNoArgs = {
+  prNo?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -14743,6 +14798,12 @@ export type QueryPoByIdArgs = {
 
 
 /** Query root */
+export type QueryPoByPoNoArgs = {
+  poNumber?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
 export type QueryPoItemByIdArgs = {
   id?: InputMaybe<Scalars['UUID']['input']>;
 };
@@ -14801,6 +14862,12 @@ export type QueryPositionPageArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryPostedPettyCashArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
 };
 
 

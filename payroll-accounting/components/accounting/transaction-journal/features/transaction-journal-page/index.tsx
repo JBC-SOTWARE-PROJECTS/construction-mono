@@ -1,13 +1,13 @@
-import { FormDateRange } from '@/components/common'
-import FormSwitch from '@/components/common/formSwitch/formSwitch'
-import JournalEntries from '@/components/accounting/transaction-journal/journalEntries'
-import { HeaderLedgerGroupDto } from '@/graphql/gql/graphql'
-import { useDialog } from '@/hooks'
-import ConfirmationPasswordHook from '@/hooks/promptPassword'
-import { dateFormat } from '@/utility/constant'
-import { PageContainer } from '@ant-design/pro-components'
-import { gql, useLazyQuery, useMutation } from '@apollo/client'
+import JournalEntries from "@/components/accounting/transaction-journal/features/transaction-journal-page/journal-entries"
+import { FormDateRange } from "@/components/common"
+import FormSwitch from "@/components/common/formSwitch/formSwitch"
+import { HeaderLedgerGroupDto } from "@/graphql/gql/graphql"
+import { useDialog } from "@/hooks"
+import ConfirmationPasswordHook from "@/hooks/promptPassword"
+import { dateFormat } from "@/utility/constant"
+import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import {
+  App,
   Button,
   Divider,
   Dropdown,
@@ -19,12 +19,13 @@ import {
   Space,
   Spin,
   Table,
-  App,
-} from 'antd'
-import type { ColumnsType } from 'antd/es/table'
-import dayjs from 'dayjs'
-import _ from 'lodash'
-import numeral from 'numeral'
+} from "antd"
+import dayjs from "dayjs"
+import _ from "lodash"
+import numeral from "numeral"
+import ManualJournalEntriesModal from "../../dialogs/manual-journal-entries"
+import { getTransactionJournalPageCol } from "./utils"
+import PageFilterContainer from "@/components/common/custom-components/page-filter-container"
 
 const GET_RECORDS = gql`
   query (
@@ -46,6 +47,7 @@ const GET_RECORDS = gql`
       size: $size
     ) {
       id
+      docNo
       referenceNo
       entityName
       journalType
@@ -98,14 +100,16 @@ interface HeaderLedgerGroupDtoI extends HeaderLedgerGroupDto {
   id: string
 }
 
-export default function TransactionJournal(props: TransactionJournalI) {
-  const { message } = App.useApp()
+export default function TransactionJournalPage(props: TransactionJournalI) {
   const { journalType, roles } = props
   const [form] = Form.useForm()
+  const { message } = App.useApp()
+
   const [showPasswordConfirmation] = ConfirmationPasswordHook()
+  const manualEntriesDialog = useDialog(ManualJournalEntriesModal)
 
   const isAuditorAdmin = _.some(roles, (item) =>
-    _.includes(['ROLE_ACCOUNTING_ADMIN', 'ROLE_ADMIN'], item)
+    _.includes(["ROLE_ACCOUNTING_ADMIN", "ROLE_ADMIN"], item)
   )
 
   const journalEntriesDialog = useDialog(JournalEntries)
@@ -125,7 +129,7 @@ export default function TransactionJournal(props: TransactionJournalI) {
           message.success(
             `${`Updated records ${numeral(
               returnedResult?.data?.payload || 0
-            ).format('0,0')}`}`
+            ).format("0,0")}`}`
           )
           refetch()
         } else {
@@ -140,8 +144,8 @@ export default function TransactionJournal(props: TransactionJournalI) {
       postByFilterMutation({
         variables: {
           journalType,
-          startDate: dayjs(journalDate[0]).startOf('day'),
-          endDate: dayjs(journalDate[1]).endOf('day'),
+          startDate: dayjs(journalDate[0]).startOf("day"),
+          endDate: dayjs(journalDate[1]).endOf("day"),
         },
       })
     })
@@ -152,9 +156,9 @@ export default function TransactionJournal(props: TransactionJournalI) {
     onLoadJournal({
       variables: {
         showAll,
-        filter: filterText ?? '',
-        startDate: dayjs(journalDate[0]).startOf('day'),
-        endDate: dayjs(journalDate[1]).endOf('day'),
+        filter: filterText ?? "",
+        startDate: dayjs(journalDate[0]).startOf("day"),
+        endDate: dayjs(journalDate[1]).endOf("day"),
         journalType,
         page: 0,
         size: 50,
@@ -163,9 +167,9 @@ export default function TransactionJournal(props: TransactionJournalI) {
       onLoadJournalTotal({
         variables: {
           showAll,
-          filter: filterText ?? '',
-          startDate: dayjs(journalDate[0]).startOf('day'),
-          endDate: dayjs(journalDate[1]).endOf('day'),
+          filter: filterText ?? "",
+          startDate: dayjs(journalDate[0]).startOf("day"),
+          endDate: dayjs(journalDate[1]).endOf("day"),
           journalType,
         },
       })
@@ -176,8 +180,8 @@ export default function TransactionJournal(props: TransactionJournalI) {
     const { journalDate } = form.getFieldsValue()
     onLoadJournal({
       variables: {
-        startDate: dayjs(journalDate[0]).startOf('day'),
-        endDate: dayjs(journalDate[1]).endOf('day'),
+        startDate: dayjs(journalDate[0]).startOf("day"),
+        endDate: dayjs(journalDate[1]).endOf("day"),
         journalType,
         page: page - 1,
         size: 50,
@@ -191,11 +195,20 @@ export default function TransactionJournal(props: TransactionJournalI) {
       {
         groupId: record.id,
         entityName: record?.entityName,
-        startDate: dayjs(journalDate[0]).startOf('day'),
-        endDate: dayjs(journalDate[1]).endOf('day'),
+        startDate: dayjs(journalDate[0]).startOf("day"),
+        endDate: dayjs(journalDate[1]).endOf("day"),
         journalType,
         isAuditorAdmin,
       },
+      () => {
+        onLoadJournalEntries()
+      }
+    )
+  }
+
+  const onCreateManualEntries = () => {
+    manualEntriesDialog(
+      { custom: true, journalType: props.journalType },
       () => {
         onLoadJournalEntries()
       }
@@ -230,47 +243,12 @@ export default function TransactionJournal(props: TransactionJournalI) {
   //   )
   // }
 
-  const columns: ColumnsType<HeaderLedgerGroupDtoI> = [
+  const items: MenuProps["items"] = [
     {
-      title: 'Reference No',
-      dataIndex: 'referenceNo',
-      key: 'referenceNo',
-      width: 200,
-      fixed: 'left',
-      render: (text, record: HeaderLedgerGroupDtoI) => (
-        <a onClick={() => onHandleShowLedger(record)}>{text}</a>
-      ),
-    },
-    {
-      title: 'Entity Name',
-      dataIndex: 'entityName',
-      key: 'entityName',
-    },
-    // {
-    //   title: 'OTHER DETAIL',
-    //   dataIndex: 'otherDetail',
-    //   key: 'otherDetail',
-    // },
-    {
-      title: 'POSTED',
-      dataIndex: 'approved',
-      key: 'approved',
-      width: 120,
-    },
-    {
-      title: 'FOR POSTING',
-      dataIndex: 'notApproved',
-      key: 'notApproved',
-      width: 150,
-    },
-  ]
-
-  const items: MenuProps['items'] = [
-    {
-      key: '1',
+      key: "1",
       label: (
         <a
-          target='_blank'
+          target="_blank"
           // onClick={() => onHandleDownloadPosted()}
         >
           Generate CSV File (Posted Only)
@@ -286,56 +264,68 @@ export default function TransactionJournal(props: TransactionJournalI) {
         form={form}
         initialValues={{
           journalDate: [
-            dayjs().startOf('month').startOf('day'),
-            dayjs().endOf('month').endOf('day'),
+            dayjs().startOf("month").startOf("day"),
+            dayjs().endOf("month").endOf("day"),
           ],
           showAll: false,
         }}
+        style={{ marginBottom: 10 }}
       >
-        <Space direction='vertical' style={{ width: '100%', marginBottom: 5 }}>
-          <Space align='baseline'>
+        <Space direction="vertical" style={{ width: "100%", marginBottom: 5 }}>
+          <Space align="baseline">
             <FormDateRange
-              label='Journal Date'
-              name='journalDate'
+              label="Journal Date"
+              name="journalDate"
               showpresstslist={true}
               propsrangepicker={{
                 format: dateFormat,
               }}
             />
-            <Button onClick={() => onLoadJournalEntries()} type='primary'>
+            <Button onClick={() => onLoadJournalEntries()} type="primary">
               Browse Journal
             </Button>
-            <Popconfirm
-              title='Confirm Posting Entries'
-              description='Are you sure you want to post all entries within the selected date range?'
-              onConfirm={onHandlePostByDateRange}
-              okText='Yes'
-              cancelText='No'
-            >
-              <Button type='primary' loading={postByFilterMutationLoading}>
-                Post Entries
-              </Button>
-            </Popconfirm>
           </Space>
-          <Space align='baseline'>
-            <FormSwitch
-              valuePropName='checked'
-              name='showAll'
-              label='Show Posted Entries'
-              switchprops={{
-                defaultChecked: true,
-                onChange: (e) => {
-                  onLoadJournalEntries()
-                },
-              }}
-            />
-            <Dropdown.Button
+          <PageFilterContainer
+            leftSpace={
+              <Space align="baseline">
+                <FormSwitch
+                  valuePropName="checked"
+                  name="showAll"
+                  label="Show Posted Entries"
+                  switchprops={{
+                    defaultChecked: true,
+                    onChange: (e) => {
+                      onLoadJournalEntries()
+                    },
+                  }}
+                />
+                {/* <Dropdown.Button
               menu={{ items }}
               //  onClick={onHandleDownloadAll}
             >
               Generate CSV File
-            </Dropdown.Button>
-          </Space>
+            </Dropdown.Button> */}
+              </Space>
+            }
+            rightSpace={
+              <Space>
+                <Popconfirm
+                  title="Confirm Posting Entries"
+                  description="Are you sure you want to post all entries within the selected date range?"
+                  onConfirm={onHandlePostByDateRange}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button type="primary" loading={postByFilterMutationLoading}>
+                    Post Entries
+                  </Button>
+                </Popconfirm>
+                <Button onClick={() => onCreateManualEntries()} type="primary">
+                  New Manual Entries
+                </Button>
+              </Space>
+            }
+          />
         </Space>
       </Form>
 
@@ -343,11 +333,11 @@ export default function TransactionJournal(props: TransactionJournalI) {
         rowKey={(record) => `${record?.referenceNo}-${record?.entityName}`}
         title={() => (
           <Input.Search
-            placeholder='Search... '
+            placeholder="Search... "
             onSearch={(e) => onLoadJournalEntries(e)}
           />
         )}
-        columns={columns}
+        columns={getTransactionJournalPageCol(onHandleShowLedger)}
         loading={loading}
         dataSource={data?.transactionJournalGroupQuery ?? ([] as any)}
         pagination={false}
@@ -365,7 +355,7 @@ export default function TransactionJournal(props: TransactionJournalI) {
           )
         }
         scroll={{ y: 400 }}
-        size='small'
+        size="small"
       />
     </>
   )

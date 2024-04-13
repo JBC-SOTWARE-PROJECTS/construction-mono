@@ -58,7 +58,7 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
             @GraphQLArgument(name = "prNo") String prNo
     ) {
         if(prNo){
-            String query = '''SELECT pr from PurchaseRequest pr where pr.prNo = :prNo '''
+            String query = '''SELECT pr from PurchaseRequest pr where pr.prNo = :prNo'''
             Map<String, Object> params = new HashMap<>()
             params.put('prNo', prNo)
             createQuery(query, params).resultList.find()
@@ -199,7 +199,7 @@ class PurchaseRequestService extends AbstractDaoService<PurchaseRequest> {
         def pr = upsertFromMap(id, fields, { PurchaseRequest entity , boolean forInsert ->
             if(forInsert){
                 def code = "PR"
-                entity.prDateRequested = Instant.now()
+                //entity.prDateRequested = Instant.now()
                 entity.status = "FOR APPROVAL"
                 entity.company = company
                 if(entity.project?.id){

@@ -22,7 +22,6 @@ import {
 } from "antd";
 import _ from "lodash";
 import {
-  DateFormatterText,
   NumberFormaterDynamic,
   requiredField,
   shapeOptionValue,
@@ -39,10 +38,10 @@ import {
   PR_TYPE,
   responsiveColumn4,
   responsiveColumn42,
+  responsiveColumn2,
 } from "@/utility/constant";
 import { useAssets, useInventoryAttachments } from "@/hooks/inventory";
 import dayjs from "dayjs";
-import Alert from "antd/es/alert/Alert";
 import styled from "styled-components";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import { GET_SUPPLIER_OPTIONS } from "@/graphql/payables/queries";
@@ -260,19 +259,11 @@ export default function UpsertPRFormModal(props: IProps) {
   };
 
   // ====================== useMemo =======================
-  const requestBy = useMemo(() => {
-    if (record?.id) {
-      return record.userFullname;
-    } else {
-      return account.fullName;
-    }
-  }, [record]);
-
   const transDate = useMemo(() => {
     if (record?.id) {
-      return DateFormatterText(record?.prDateRequested);
+      return dayjs(record?.prDateRequested);
     } else {
-      return dayjs().format("MMMM DD, YYYY");
+      return dayjs();
     }
   }, [record]);
 
@@ -425,17 +416,6 @@ export default function UpsertPRFormModal(props: IProps) {
         </div>
       }>
       <CustomCSS>
-        <div className="header-container">
-          <Alert
-            type="info"
-            message={
-              <div className="w-full">
-                <p>Transaction Date: {transDate}</p>
-                <p>Requested By: {requestBy}</p>
-              </div>
-            }
-          />
-        </div>
         <Form
           form={form}
           name="upsertForm"
@@ -445,6 +425,7 @@ export default function UpsertPRFormModal(props: IProps) {
           disabled={record?.isApprove ?? false}
           initialValues={{
             ...record,
+            prDateRequested: transDate,
             prDateNeeded: dayjs(record?.prDateNeeded ?? new Date()),
             requestedOffice: record?.requestedOffice?.id ?? null,
             supplier: selectInValueInit(record?.id, "supplier"),
@@ -454,14 +435,29 @@ export default function UpsertPRFormModal(props: IProps) {
           }}>
           <Row gutter={[16, 0]}>
             <Col {...responsiveColumn4}>
-              <FormDatePicker
-                label="PR Date Needed"
-                name="prDateNeeded"
-                rules={requiredField}
-                propsdatepicker={{
-                  allowClear: false,
-                }}
-              />
+              <Row gutter={[8, 0]}>
+                <Col {...responsiveColumn2}>
+                  <FormDatePicker
+                    label="PR Transaction Date"
+                    name="prDateRequested"
+                    rules={requiredField}
+                    propsdatepicker={{
+                      allowClear: false,
+                    }}
+                  />
+                </Col>
+                <Col {...responsiveColumn2}>
+                  <FormDatePicker
+                    label="PR Date Needed"
+                    name="prDateNeeded"
+                    rules={requiredField}
+                    propsdatepicker={{
+                      allowClear: false,
+                    }}
+                  />
+                </Col>
+              </Row>
+
               <FormSelect
                 name="requestedOffice"
                 label="Request To"

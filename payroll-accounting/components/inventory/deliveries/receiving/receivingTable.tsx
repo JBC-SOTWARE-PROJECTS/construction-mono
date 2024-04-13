@@ -1,13 +1,15 @@
 import { ReceivingReport } from "@/graphql/gql/graphql";
 import { FolderOpenOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Row, Col, Table, Pagination, Tag, Dropdown } from "antd";
+import { Row, Col, Table, Pagination, Tag, Dropdown, Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { DateFormatter, accessControl } from "@/utility/helper";
 import { getUrlPrefix } from "@/utility/graphql-client";
 import { useContext } from "react";
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import ButtonPosted from "../../commons/buttonPosted";
+import styled from "styled-components";
+import { responsiveColumn2 } from "@/utility/constant";
 
 interface IProps {
   dataSource: ReceivingReport[];
@@ -19,6 +21,7 @@ interface IProps {
   onViewAccount: (record: ReceivingReport) => void;
   onHandleDraftAPV: (record: ReceivingReport) => void;
   onRedoTransaction: (record: ReceivingReport) => void;
+  viewPOModal: (poNumber: string) => void;
 }
 
 export default function DeliveryReceivingTable({
@@ -31,6 +34,7 @@ export default function DeliveryReceivingTable({
   onViewAccount,
   onHandleDraftAPV,
   onRedoTransaction,
+  viewPOModal,
 }: IProps) {
   // ===================== menus ========================
   const account = useContext(AccountContext);
@@ -55,10 +59,19 @@ export default function DeliveryReceivingTable({
       title: "PO No.",
       dataIndex: "purchaseOrder",
       key: "purchaseOrder",
-      width: 140,
-      render: (text, record) => (
-        <span key={text}>{record?.purchaseOrder?.poNumber}</span>
-      ),
+      width: 145,
+      render: (__, record) => {
+        if (record?.purchaseOrder?.poNumber) {
+          let text = record?.purchaseOrder?.poNumber;
+          return (
+            <Button size="small" type="link" onClick={() => viewPOModal(text)}>
+              {text}
+            </Button>
+          );
+        } else {
+          return "--";
+        }
+      },
     },
     {
       title: "Supplier",
@@ -183,51 +196,67 @@ export default function DeliveryReceivingTable({
   ];
 
   return (
-    <Row>
-      <Col span={24}>
-        <Table
-          rowKey="id"
-          expandable={{
-            expandedRowRender: (record) => (
-              <div className="w-full">
-                <p>
-                  Office: <Tag>{record.receivedOffice?.officeDescription}</Tag>
-                </p>
-                <p>
-                  Received By: <Tag>{record.userFullname}</Tag>
-                </p>
-                {record?.category === "PROJECTS" && (
-                  <p style={{ paddingTop: 5 }}>
-                    Project: <Tag>{record.project?.description}</Tag>
-                  </p>
-                )}
-                {record?.category === "SPARE_PARTS" && (
-                  <p style={{ paddingTop: 5 }}>
-                    Equipment (Assets): <Tag>{record.assets?.description}</Tag>
-                  </p>
-                )}
-              </div>
-            ),
-          }}
-          size="small"
-          columns={columns}
-          dataSource={dataSource}
-          pagination={false}
-          loading={loading}
-          footer={() => (
-            <Pagination
-              showSizeChanger={false}
-              pageSize={10}
-              responsive={true}
-              total={totalElements}
-              onChange={(e) => {
-                changePage(e - 1);
-              }}
-            />
-          )}
-          scroll={{ x: 1400 }}
-        />
-      </Col>
-    </Row>
+    <DivCSS>
+      <Row>
+        <Col span={24}>
+          <Table
+            rowKey="id"
+            expandable={{
+              expandedRowRender: (record) => (
+                <Row>
+                  <Col {...responsiveColumn2}>
+                    <p>
+                      Office:{" "}
+                      <Tag>{record.receivedOffice?.officeDescription}</Tag>
+                    </p>
+                    <p>
+                      Received By: <Tag>{record.userFullname}</Tag>
+                    </p>
+                  </Col>
+                  <Col {...responsiveColumn2}>
+                    {record?.category === "PROJECTS" && (
+                      <p style={{ paddingTop: 5 }}>
+                        Project: <Tag>{record.project?.description}</Tag>
+                      </p>
+                    )}
+                    {record?.category === "SPARE_PARTS" && (
+                      <p style={{ paddingTop: 5 }}>
+                        Equipment (Assets):{" "}
+                        <Tag>{record.assets?.description}</Tag>
+                      </p>
+                    )}
+                  </Col>
+                </Row>
+              ),
+            }}
+            size="small"
+            columns={columns}
+            dataSource={dataSource}
+            pagination={false}
+            loading={loading}
+            footer={() => (
+              <Pagination
+                showSizeChanger={false}
+                pageSize={10}
+                responsive={true}
+                total={totalElements}
+                onChange={(e) => {
+                  changePage(e - 1);
+                }}
+              />
+            )}
+            scroll={{ x: 1400 }}
+          />
+        </Col>
+      </Row>
+    </DivCSS>
   );
 }
+
+const DivCSS = styled.div`
+  width: 100%;
+
+  .ant-table-wrapper .ant-table-expanded-row-fixed {
+    padding: 4px 16px !important;
+  }
+`;
