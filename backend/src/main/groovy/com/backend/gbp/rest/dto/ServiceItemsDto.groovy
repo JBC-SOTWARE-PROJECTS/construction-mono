@@ -7,7 +7,7 @@ import groovy.transform.TupleConstructor
 class ServiceItemsDto {
     String id
     Item item
-    Integer qty
+    BigDecimal qty
     BigDecimal wcost
     Boolean isNew
 }

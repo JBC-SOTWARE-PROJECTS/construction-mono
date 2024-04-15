@@ -10,7 +10,7 @@ class SrrItemDto {
     String supplier
     String item
     BigDecimal unitCost
-    Integer qty
+    BigDecimal qty
     BigDecimal totalAmount
 }
 

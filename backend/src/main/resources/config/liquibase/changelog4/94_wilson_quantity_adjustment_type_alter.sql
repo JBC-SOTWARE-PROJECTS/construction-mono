@@ -1,0 +1,1 @@
+ALTER TABLE inventory.quantity_adjustment_type ADD COLUMN reverse bool default false;

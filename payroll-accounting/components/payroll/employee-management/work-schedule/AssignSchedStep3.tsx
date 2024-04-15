@@ -37,8 +37,7 @@ function AssignSchedStep3({
           flexWrap: "wrap",
         }}
         headerBordered
-        extra={<ProFormGroup></ProFormGroup>}
-      >
+        extra={<ProFormGroup></ProFormGroup>}>
         <Row gutter={16}>
           <Col span={12}>
             <ScheduleCard
@@ -50,9 +49,11 @@ function AssignSchedStep3({
           <Col span={12}>
             <Card
               title="Selected Dates"
-              bodyStyle={{ padding: 5 }}
-              bordered={false}
-            >
+              // bodyStyle={}
+              styles={{
+                body: { padding: 5 },
+              }}
+              bordered={false}>
               <Table
                 size="small"
                 columns={columns}
@@ -64,9 +65,11 @@ function AssignSchedStep3({
           <Col span={24} style={{ marginTop: 30 }}>
             <Card
               title="Selected Employees"
-              bodyStyle={{ padding: 5 }}
-              bordered={false}
-            >
+              // bodyStyle={}
+              styles={{
+                body: { padding: 5 },
+              }}
+              bordered={false}>
               <EmployeeTable
                 dataSource={selectedEmployees as Employee[]}
                 hideExtraColumns

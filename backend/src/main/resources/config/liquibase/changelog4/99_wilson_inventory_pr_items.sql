@@ -1,0 +1,1 @@
+ALTER TABLE inventory.purchase_request_items ADD COLUMN IF NOT EXISTS unit_cost numeric default 0;

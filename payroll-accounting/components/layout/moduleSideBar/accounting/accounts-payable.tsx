@@ -75,6 +75,10 @@ const AccountingAccountsPayableMenu = {
         name: "Reports",
         routes: [
           {
+            path: "/accounting/accounts-payable/reports/beginning-balance",
+            name: "Beginning Balance",
+          },
+          {
             path: "/accounting/accounts-payable/reports/subsidiary-ledger",
             name: "Subsidiary Ledger",
           },

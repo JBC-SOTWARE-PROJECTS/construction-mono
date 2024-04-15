@@ -46,7 +46,10 @@ class ParentAccountServices extends AbstractDaoService<ParentAccount> {
 
 	@GraphQLQuery(name = "parentAccountsPerCategory", description = "List of parents account")
 	List<AccountTypeDto> parentAccountsPerCategory() {
-		List<ParentAccount> parentAccounts = createQuery("Select p from ParentAccount p order by p.accountCode")
+		def company = SecurityUtils.currentCompanyId()
+		Map<String, Object> params = new HashMap<>()
+		params.put('company', company)
+		List<ParentAccount> parentAccounts = createQuery("Select p from ParentAccount p where p.company.id = :company order by p.accountCode", params)
 				.resultList.findAll { BooleanUtils.isNotTrue(it.deprecated)}
 		return   AccountCategory.values().collect { category ->
 			[

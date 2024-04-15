@@ -3,6 +3,7 @@ package com.backend.gbp.domain.accounting
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
@@ -47,6 +48,10 @@ class DisbursementExpense extends AbstractAuditingEntity implements Serializable
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	Projects project
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "assets", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	Assets assets
 
 	@GraphQLQuery
 	@Column(name = "amount", columnDefinition = "numeric")

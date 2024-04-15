@@ -81,10 +81,14 @@ class ProjectCost extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "billed_qty")
 	BigDecimal billedQty
 
-	@Transient
-	BigDecimal getTotalCost() {
-		def e =  qty * cost
-		return e.setScale(2, RoundingMode.HALF_EVEN)
-	}
+	@GraphQLQuery
+	@Column(name = "total_cost")
+	BigDecimal totalCost
+
+//	@Transient
+//	BigDecimal getTotalCost() {
+//		def e =  qty * cost
+//		return e.setScale(2, RoundingMode.HALF_EVEN)
+//	}
 
 }

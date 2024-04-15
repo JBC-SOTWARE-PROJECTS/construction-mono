@@ -103,6 +103,7 @@ class ReceivingReportItemService extends AbstractDaoService<ReceivingReportItem>
         upsert.refPoItem = refPoItem
         upsert.receiveQty = dto.receiveQty
         upsert.receiveUnitCost = dto.receiveUnitCost
+        upsert.recInventoryCost = dto.recInventoryCost
         upsert.receiveDiscountCost = dto.receiveDiscountCost
         if(dto.expirationDate){
             upsert.expirationDate = dto.expirationDate.plus(Duration.ofDays(1))

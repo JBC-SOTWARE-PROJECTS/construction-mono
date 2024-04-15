@@ -968,6 +968,8 @@ class DisbursementServices extends AbstractDaoService<Disbursement> {
 		}else if(type.equalsIgnoreCase("WTX")){
 			up.ewtAmount = up.ewtAmount - value
 			up.voucherAmount = up.voucherAmount - value
+		}else if(type.equalsIgnoreCase("PCV")){
+			up.appliedAmount = up.appliedAmount - value
 		}
 		save(up)
 	}

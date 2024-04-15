@@ -115,14 +115,12 @@ const ViewPayroll = ({ account }: IPageProps) => {
           allowedPermissions={["view_payroll"]}
           renderNoAccess={
             <Result title="You are not authorized to view this page" />
-          }
-        >
+          }>
           <div className="gx-main-content-wrapper-full-width">
             <ProCard
               headStyle={{
                 flexWrap: "wrap",
-              }}
-            >
+              }}>
               <PageHeader
                 title={
                   <>
@@ -146,8 +144,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
                           )
                         }
                         icon={<EditOutlined />}
-                        allowedPermissions={["edit_payroll"]}
-                      >
+                        allowedPermissions={["edit_payroll"]}>
                         Edit Payroll
                       </CustomButton>
                     )}
@@ -160,7 +157,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
               </Typography.Title>
               {payroll?.description}
               <Divider />
-              <Card bodyStyle={{ padding: 0 }} loading={loadingPayroll}>
+              <Card styles={{ body: { padding: 0 } }} loading={loadingPayroll}>
                 {menuItems.map(
                   (item, index) =>
                     item.show === true && (
@@ -169,8 +166,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
                         passHref
                         legacyBehavior
                         key={index}
-                        style={{ display: "inline" }}
-                      >
+                        style={{ display: "inline" }}>
                         <a style={{ textDecoration: "none" }}>
                           <Card.Grid
                             style={{
@@ -181,8 +177,7 @@ const ViewPayroll = ({ account }: IPageProps) => {
                                   : "#faeece",
                             }}
                             key={index}
-                            onClick={() => {}}
-                          >
+                            onClick={() => {}}>
                             <Typography.Title level={4}>
                               {item.title}
                             </Typography.Title>

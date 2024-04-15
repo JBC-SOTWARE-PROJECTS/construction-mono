@@ -6,6 +6,7 @@ import {
   DisbursementAp,
   DisbursementCheck,
   DisbursementExpense,
+  DisbursementPettyCash,
   DisbursementWtx,
   PettyCashItem,
   PettyCashOther,
@@ -17,6 +18,7 @@ export interface IFormAPTransactionDetails {
   transType?: any;
   office?: any;
   project?: any;
+  assets?: any;
   amount: number;
   discRate: number;
   discAmount: number;
@@ -66,6 +68,7 @@ export interface IFormDisbursementExpense {
   transType: OptionsValue;
   office: OptionsValue;
   project: OptionsValue;
+  assets: OptionsValue;
   amount: number;
   remarks: string;
 }
@@ -86,6 +89,7 @@ export interface IFormDebitMemoDetails {
   transType: OptionsValue;
   office: OptionsValue;
   project: OptionsValue;
+  assets: OptionsValue;
   type: string;
   percent: number;
   amount: number;
@@ -112,6 +116,7 @@ export interface IFormPettyCashOthers {
   transType: OptionsValue;
   office: OptionsValue;
   project: OptionsValue;
+  assets: OptionsValue;
   amount: number;
   remarks: string;
 }
@@ -131,6 +136,10 @@ export interface IDisbursementExpense extends DisbursementExpense {
   isNew?: boolean;
 }
 export interface IDisbursementWTX extends DisbursementWtx {
+  isNew?: boolean;
+}
+
+export interface IDisbursementPCV extends DisbursementPettyCash {
   isNew?: boolean;
 }
 

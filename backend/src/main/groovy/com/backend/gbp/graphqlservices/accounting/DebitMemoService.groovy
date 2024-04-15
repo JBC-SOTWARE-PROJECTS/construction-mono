@@ -10,6 +10,7 @@ import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.rest.dto.payables.DisbursementApDto
+import com.backend.gbp.rest.dto.payables.DisbursementWtxDto
 import com.backend.gbp.rest.dto.payables.DmDetailsDto
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
@@ -69,6 +70,9 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 
 	@Autowired
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
+	@Autowired
+	DisbursementWtxServices disbursementWtxServices
 
 
     DebitMemoService() {
@@ -202,6 +206,7 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 			@GraphQLArgument(name = "fields") Map<String, Object> fields,
 			@GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
 			@GraphQLArgument(name = "details") ArrayList<Map<String, Object>> details,
+			@GraphQLArgument(name = "wtx") ArrayList<Map<String, Object>> wtx,
 			@GraphQLArgument(name = "id") UUID id
 	) {
 		def company = SecurityUtils.currentCompanyId()
@@ -233,6 +238,7 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 				//remove expenses
 				if(id){
 					debitMemoDetailsServices.removeDetailsDebitMemo(id)
+					disbursementWtxServices.removeWtxListDebitMemo(id)
 				}
 			}else{
 				def trans = details as ArrayList<DmDetailsDto>
@@ -256,6 +262,12 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 			trans.each {
 				def dto = objectMapper.convertValue(it, DmDetailsDto.class)
 				debitMemoDetailsServices.upsertDmDetials(dto, dm)
+			}
+
+			def disWtx = wtx as ArrayList<DisbursementWtxDto>
+			disWtx.each {
+				def dto = objectMapper.convertValue(it, DisbursementWtxDto.class)
+				disbursementWtxServices.upsertWtxDebitMemo(dto, dm)
 			}
 		}
 
@@ -310,46 +322,87 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 
 			def dmDetails = disbursementApServices.apDebitMemo(dm.id)
 			def trans = debitMemoDetailsServices.dmDetials(dm.id)
+			def wtx = disbursementWtxServices.disWtxByDebitMemo(dm.id)
 
-			//ewt rate start here
-			dmDetails.each {
-				switch (it.ewtRate) {
-					case 1:
-						ewt1+=it.ewtAmount
-						break;
-					case 2:
-						ewt2+=it.ewtAmount
-						break;
-					case 3:
-						ewt3+=it.ewtAmount
-						break;
-					case 4:
-						ewt4+=it.ewtAmount
-						break;
-					case 5:
-						ewt5+=it.ewtAmount
-						break;
-					case 7:
-						ewt7+=it.ewtAmount
-						break;
-					case 10:
-						ewt10+=it.ewtAmount
-						break;
-					case 15:
-						ewt15+=it.ewtAmount
-						break;
-					case 18:
-						ewt18+=it.ewtAmount
-						break;
-					case 30:
-						ewt30+=it.ewtAmount
-						break;
+			if(dm.debitType.equalsIgnoreCase("DEBIT_MEMO")) {
+				//ewt rate start here
+				dmDetails.each {
+					switch (it.ewtRate) {
+						case 1:
+							ewt1 += it.ewtAmount
+							break;
+						case 2:
+							ewt2 += it.ewtAmount
+							break;
+						case 3:
+							ewt3 += it.ewtAmount
+							break;
+						case 4:
+							ewt4 += it.ewtAmount
+							break;
+						case 5:
+							ewt5 += it.ewtAmount
+							break;
+						case 7:
+							ewt7 += it.ewtAmount
+							break;
+						case 10:
+							ewt10 += it.ewtAmount
+							break;
+						case 15:
+							ewt15 += it.ewtAmount
+							break;
+						case 18:
+							ewt18 += it.ewtAmount
+							break;
+						case 30:
+							ewt30 += it.ewtAmount
+							break;
+					}
+				}
+			}else {
+				//ewt rate start here
+				wtx.each {
+					switch (it.ewtRate) {
+						case 1:
+							ewt1 += it.ewtAmount
+							break;
+						case 2:
+							ewt2 += it.ewtAmount
+							break;
+						case 3:
+							ewt3 += it.ewtAmount
+							break;
+						case 4:
+							ewt4 += it.ewtAmount
+							break;
+						case 5:
+							ewt5 += it.ewtAmount
+							break;
+						case 7:
+							ewt7 += it.ewtAmount
+							break;
+						case 10:
+							ewt10 += it.ewtAmount
+							break;
+						case 15:
+							ewt15 += it.ewtAmount
+							break;
+						case 18:
+							ewt18 += it.ewtAmount
+							break;
+						case 30:
+							ewt30 += it.ewtAmount
+							break;
+					}
 				}
 			}
 
 			if(dm.transType?.flagValue){
 				def headerLedger = integrationServices.generateAutoEntries(dm) {it, mul ->
 					it.flagValue = dm.transType?.flagValue
+
+					List<DebitMemo> exp  = []
 
 					if(dm.debitType.equalsIgnoreCase("DEBIT_MEMO")){
 						it.supplierAmount = status ? dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 : dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN)//default credit side
@@ -363,6 +416,9 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 							if (a.project?.id) {
 								it.project = a.project
 							}
+							if (a.assets?.id) {
+								it.assets = a.assets
+							}
 							if (a.transType.isReverse) {
 								it[a.transType.source] += status ? a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1 : a.amount.setScale(2, RoundingMode.HALF_EVEN)
 								//credit default
@@ -372,8 +428,33 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 							}
 						}
 					}else{
-						it.supplierAmount = status ? dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 : dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) //default credit side
 						it.bank = dm.bank
+						if(dm.debitCategory.equalsIgnoreCase("PAYABLE")){
+							it.supplierAmount = status ? dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 : dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) //default credit side
+						}else{
+							trans.each { a ->
+								//=== for multiple  ===//
+
+								//=== for normal ===//
+								if (a.office?.id) {
+									it.office = a.office
+								}
+								if (a.project?.id) {
+									it.project = a.project
+								}
+								if (a.assets?.id) {
+									it.assets = a.assets
+								}
+								if (a.transType.isReverse) {
+									it[a.transType.source] += status ? a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1 : a.amount.setScale(2, RoundingMode.HALF_EVEN)
+									//credit default
+								} else {
+									it[a.transType.source] += status ? a.amount.setScale(2, RoundingMode.HALF_EVEN) : a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1
+									//credit default
+								}
+							}
+						}
+
 					}
 
 					it.cashOnBank = status ? dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN)* -1 : dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN) //default debit side
@@ -464,7 +545,7 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 			//end remover ap ledger
 		}else{
 			postToLedgerAccounting(dm)
-
+			String ledgerType = dm.debitType.equalsIgnoreCase("DEBIT_MEMO") ? "DM" : "DA"
 			if(dm.debitCategory.equalsIgnoreCase("PAYABLE")) {
 				//add to ap ledger
 				Map<String, Object> ledger = new HashMap<>()
@@ -482,19 +563,39 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 			}
 
 			//post to ewt if naa
-			def ap = disbursementApServices.apDebitMemo(id)
-			ap.each {
-				if(it.ewtAmount > BigDecimal.ZERO){
-					Map<String, Object> ewt = new HashMap<>()
-					ewt.put('refId',it.payable.id)
-					ewt.put('refNo',it.payable.apNo)
-					ewt.put('wtxDate',dm.debitDate)
-					ewt.put('type','AP') //AP, AROTHERS
-					ewt.put('gross',it.appliedAmount) //net of discount
-					ewt.put('vatAmount',it.vatAmount) // 0
-					ewt.put('netVat',(it.appliedAmount - it.vatAmount)) // same by gross
-					ewt.put('ewtAmount',it.ewtAmount) //ewt amounnt
-					wtx2307Service.upsert2307(ewt, null, dm.supplier.id)
+			if(dm.debitCategory.equalsIgnoreCase("PAYABLE")) {
+				def ap = disbursementApServices.apDebitMemo(id)
+				ap.each {
+					if (it.ewtAmount > BigDecimal.ZERO) {
+						Map<String, Object> ewt = new HashMap<>()
+						ewt.put('refId', it.payable.id)
+						ewt.put('refNo', it.payable.apNo)
+						ewt.put('wtxDate', dm.debitDate)
+						ewt.put('type', 'AP') //AP, AROTHERS
+						ewt.put('gross', it.appliedAmount) //net of discount
+						ewt.put('vatAmount', it.vatAmount) // 0
+						ewt.put('netVat', (it.appliedAmount - it.vatAmount)) // same by gross
+						ewt.put('ewtAmount', it.ewtAmount) //ewt amounnt
+						wtx2307Service.upsert2307(ewt, null, dm.supplier.id)
+					}
+				}
+			}else if(dm.debitCategory.equalsIgnoreCase("EXPENSE")) {
+				def ap = disbursementWtxServices.disWtxByDebitMemo(id)
+				ap.each {
+					def netVat = (it.appliedAmount - it.vatAmount)
+					if(it.ewtAmount > BigDecimal.ZERO){
+						Map<String, Object> ewt = new HashMap<>()
+						ewt.put('refId',dm.id)
+						ewt.put('sourceDoc',dm.debitNo)
+						ewt.put('refNo',dm.debitNo)
+						ewt.put('wtxDate',dm.debitDate)
+						ewt.put('type',ledgerType) //AP, AROTHERS , DA, DM
+						ewt.put('gross',it.appliedAmount) //net of discount
+						ewt.put('vatAmount',it.vatAmount) // 0
+						ewt.put('netVat',netVat.setScale(2, RoundingMode.HALF_EVEN)) // same by gross
+						ewt.put('ewtAmount',it.ewtAmount) //ewt amount
+						wtx2307Service.upsert2307(ewt, null, dm.supplier.id)
+					}
 				}
 			}
 			//end
@@ -529,39 +630,79 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 
 		def dmDetails = disbursementApServices.apDebitMemo(dm.id)
 		def trans = debitMemoDetailsServices.dmDetials(dm.id)
-		//ewt rate start here
-		dmDetails.each {
-			switch (it.ewtRate) {
-				case 1:
-					ewt1+=it.ewtAmount
-					break;
-				case 2:
-					ewt2+=it.ewtAmount
-					break;
-				case 3:
-					ewt3+=it.ewtAmount
-					break;
-				case 4:
-					ewt4+=it.ewtAmount
-					break;
-				case 5:
-					ewt5+=it.ewtAmount
-					break;
-				case 7:
-					ewt7+=it.ewtAmount
-					break;
-				case 10:
-					ewt10+=it.ewtAmount
-					break;
-				case 15:
-					ewt15+=it.ewtAmount
-					break;
-				case 18:
-					ewt18+=it.ewtAmount
-					break;
-				case 30:
-					ewt30+=it.ewtAmount
-					break;
+		def wtx = disbursementWtxServices.disWtxByDebitMemo(dm.id)
+
+		if(dm.debitType.equalsIgnoreCase("DEBIT_MEMO")) {
+			//ewt rate start here
+			dmDetails.each {
+				switch (it.ewtRate) {
+					case 1:
+						ewt1 += it.ewtAmount
+						break;
+					case 2:
+						ewt2 += it.ewtAmount
+						break;
+					case 3:
+						ewt3 += it.ewtAmount
+						break;
+					case 4:
+						ewt4 += it.ewtAmount
+						break;
+					case 5:
+						ewt5 += it.ewtAmount
+						break;
+					case 7:
+						ewt7 += it.ewtAmount
+						break;
+					case 10:
+						ewt10 += it.ewtAmount
+						break;
+					case 15:
+						ewt15 += it.ewtAmount
+						break;
+					case 18:
+						ewt18 += it.ewtAmount
+						break;
+					case 30:
+						ewt30 += it.ewtAmount
+						break;
+				}
+			}
+		}else {
+			//ewt rate start here
+			wtx.each {
+				switch (it.ewtRate) {
+					case 1:
+						ewt1 += it.ewtAmount
+						break;
+					case 2:
+						ewt2 += it.ewtAmount
+						break;
+					case 3:
+						ewt3 += it.ewtAmount
+						break;
+					case 4:
+						ewt4 += it.ewtAmount
+						break;
+					case 5:
+						ewt5 += it.ewtAmount
+						break;
+					case 7:
+						ewt7 += it.ewtAmount
+						break;
+					case 10:
+						ewt10 += it.ewtAmount
+						break;
+					case 15:
+						ewt15 += it.ewtAmount
+						break;
+					case 18:
+						ewt18 += it.ewtAmount
+						break;
+					case 30:
+						ewt30 += it.ewtAmount
+						break;
+				}
 			}
 		}
 
@@ -589,8 +730,32 @@ class DebitMemoService extends AbstractDaoService<DebitMemo> {
 					}
 				}
 			}else{
-				it.supplierAmount = dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 //default credit side
 				it.bank = dm.bank
+				if(dm.debitCategory.equalsIgnoreCase("PAYABLE")){
+					it.supplierAmount = dm.appliedAmount.setScale(2, RoundingMode.HALF_EVEN) * -1 //default credit side
+				}else{
+					trans.each { a ->
+						//=== for multiple  ===//
+
+						//=== for normal ===//
+						if (a.office?.id) {
+							it.office = a.office
+						}
+						if (a.project?.id) {
+							it.project = a.project
+						}
+						if (a.assets?.id) {
+							it.assets = a.assets
+						}
+						if (a.transType.isReverse) {
+							it[a.transType.source] += a.amount.setScale(2, RoundingMode.HALF_EVEN) * -1
+							//credit default
+						} else {
+							it[a.transType.source] += a.amount.setScale(2, RoundingMode.HALF_EVEN)
+							//credit default
+						}
+					}
+				}
 			}
 
 			it.cashOnBank = dm.memoAmount.setScale(2, RoundingMode.HALF_EVEN)* -1 //default debit side

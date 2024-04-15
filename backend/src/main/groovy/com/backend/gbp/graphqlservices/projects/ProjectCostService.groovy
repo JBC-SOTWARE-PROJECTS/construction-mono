@@ -1,5 +1,6 @@
 package com.backend.gbp.graphqlservices.projects
 
+import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.projects.ProjectCost
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.billing.BillingItemService
@@ -12,10 +13,12 @@ import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
+import io.leangen.graphql.annotations.GraphQLContext
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -51,6 +54,9 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     @Autowired
     ProjectCostRevisionService projectCostRevisionService
 
+    @Autowired
+    ProjectWorkAccomplishItemsService projectWorkAccomplishItemsService
+
 
     @GraphQLQuery(name = "pCostById")
     ProjectCost pCostById(
@@ -67,7 +73,7 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
     BigDecimal getTotals(
             @GraphQLArgument(name = "id") UUID id
     ){
-        String query = '''Select coalesce(sum(j.cost * j.qty), 0) from ProjectCost j where 
+        String query = '''Select coalesce(sum(j.totalCost), 0) from ProjectCost j where 
         j.project.id = :id and j.status = true'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
@@ -174,5 +180,6 @@ class ProjectCostService extends AbstractDaoService<ProjectCost> {
         return null
 
     }
+
 
 }

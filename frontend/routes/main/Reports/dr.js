@@ -57,7 +57,10 @@ const SRR_REPORT_LIST = gql`
       vatInclusive
       isPosted
       isVoid
-      account
+      account {
+        id
+        description
+      }
     }
   }
 `;

@@ -43,11 +43,13 @@ import { currencyDisplay } from "@/shared/settings";
 import FormTextArea from "@/components/common/formTextArea/formTextArea";
 import AccessControl from "@/components/accessControl/AccessControl";
 import { getUrlPrefix } from "@/utility/graphql-client";
+import useGetVehicleUsageLatest from "@/hooks/asset/useGetVehicleUsageLatest";
 
 
 interface IProps {
   hide: (hideProps: any) => void;
   record?: VehicleUsageMonitoring | null | undefined;
+  latestUsage?: VehicleUsageMonitoring | null;
   projectOpts: any;
   viewModeSet : boolean
 }
@@ -72,7 +74,7 @@ const initialState: IPMState = {
 };
 
 export default function UpsertVehicleUsageModal(props: IProps) {
-  const { hide, record, projectOpts, viewModeSet } = props;
+  const { hide, record, projectOpts, viewModeSet, latestUsage } = props;
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [initRecord, setinitRecord] = useState<VehicleUsageMonitoring | null>(
     null
@@ -91,6 +93,8 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   const [asset, loadingAsset] = useGetAssetById(router?.query?.id);
   const assetType = asset as Assets;
   const [employeeList, loading, setFilters] = useGetEmployeesBasic();
+  
+  
   const [dataEmployee, loadingEMPS, refetch] = useGetVehicleUsageEmployee({
     variables: {
       ...statePage,
@@ -98,6 +102,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     },
     fetchPolicy: "network-only",
   });
+
 
   const [dataRentalRates, loadingRentalRate, refetchRentalRates] =
     useGetRentalRateByAsset({
@@ -126,9 +131,12 @@ export default function UpsertVehicleUsageModal(props: IProps) {
         (initRec?.rentalRate ?? 0) * (initRec?.rentUnitMeasureQuantity ?? 0)
       );
     } else {
-      setinitRecord(defRec);
+
+      var initRec: any = {...defRec, startOdometerReading: latestUsage?.endOdometerReading};
+      
+      setinitRecord(initRec);
     }
-  }, [record]);
+  }, [record ]);
 
   useEffect(() => {
     if (dataEmployee) {
@@ -280,7 +288,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
     window.open(getUrlPrefix() + apiURL, '_blank')
   }
 
-
+console.log("initRecord", initRecord)
   return (
     <Modal
       title={
@@ -290,12 +298,16 @@ export default function UpsertVehicleUsageModal(props: IProps) {
             ${viewMode ? "" : `${record?.id ? "Edit" : "Add"} `}
             Vehicle Usage`}</Space>
           </Typography.Title>
-          <Button size="small" type="primary" icon={<CloudDownloadOutlined />} className="margin-0"
+          {
+            record &&
+            <Button size="small" type="primary" icon={<CloudDownloadOutlined />} className="margin-0"
                     onClick={onHandleDownloadCSV}
                     loading={csvLoading}
                 >
                     Download Trip Ticket
                 </Button>
+          }
+          
         </>
       }
       destroyOnClose={true}
@@ -324,7 +336,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       }
     >
       <>
-        {initRecord && (
+        {initRecord &&  (
           <Form
             form={form}
             name="upsertVehicleUsage"

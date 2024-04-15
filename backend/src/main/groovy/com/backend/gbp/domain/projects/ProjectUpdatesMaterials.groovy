@@ -49,15 +49,15 @@ class ProjectUpdatesMaterials extends AbstractAuditingEntity implements Serializ
 
 	@GraphQLQuery
 	@Column(name = "on_hand")
-	Integer onHand
+	BigDecimal onHand
 
 	@GraphQLQuery
 	@Column(name = "qty")
-	Integer qty
+	BigDecimal qty
 
 	@GraphQLQuery
 	@Column(name = "balance")
-	Integer balance
+	BigDecimal balance
 
 	@GraphQLQuery
 	@Column(name = "w_cost")

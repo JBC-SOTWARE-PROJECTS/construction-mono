@@ -1,8 +1,8 @@
-import { FormDateRange, FormInput, FormSelect } from '@/components/common'
+import { FormDateRange, FormInput, FormSelect } from "@/components/common"
 // import { ChartOfAccount } from '@/graphql/gql/graphql'
-import { PlusOutlined } from '@ant-design/icons'
-import { PageContainer } from '@ant-design/pro-components'
-import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { PlusOutlined } from "@ant-design/icons"
+import { PageContainer } from "@ant-design/pro-components"
+import { gql, useLazyQuery, useQuery } from "@apollo/client"
 import {
   Button,
   Checkbox,
@@ -15,15 +15,15 @@ import {
   Space,
   Switch,
   Table,
-} from 'antd'
-import type { TableProps } from 'antd'
-import dayjs from 'dayjs'
-import numeral from 'numeral'
-import type { ColumnsType } from 'antd/es/table'
-import { useEffect, useState } from 'react'
-import Decimal from 'decimal.js'
-import { useRouter } from 'next/router'
-import { getUrlPrefix } from '@/utility/graphql-client'
+} from "antd"
+import type { TableProps } from "antd"
+import dayjs from "dayjs"
+import numeral from "numeral"
+import type { ColumnsType } from "antd/es/table"
+import { useEffect, useState } from "react"
+import Decimal from "decimal.js"
+import { useRouter } from "next/router"
+import { getUrlPrefix } from "@/utility/graphql-client"
 
 interface RecordType {
   code: string
@@ -60,8 +60,8 @@ const COA_GQL = gql`
 `
 
 function reformatNegativeAmounts(amount: number) {
-  if (amount > 0) return numeral(amount).format('0,0.00')
-  else return '(' + numeral(Math.abs(amount)).format('0,0.00') + ')'
+  if (amount > 0) return numeral(amount).format("0,0.00")
+  else return "(" + numeral(Math.abs(amount)).format("0,0.00") + ")"
 }
 
 export default function GeneralLedgerRoute() {
@@ -80,8 +80,9 @@ export default function GeneralLedgerRoute() {
     loading: loadingCoa,
   } = useQuery(COA_GQL, {
     variables: {
-      filter: '',
+      filter: "",
     },
+    notifyOnNetworkStatusChange: true,
     onCompleted: ({ coaListWithFilter }) => {
       if (coaListWithFilter) {
         setSelectedRowKeys([
@@ -93,75 +94,75 @@ export default function GeneralLedgerRoute() {
 
   const onHandleClickAccounts = (account: string) => {
     const { dateRange } = form.getFieldsValue()
-    const startDate = dayjs(dateRange[0]).startOf('day').format('YYYY-MM-DD')
-    const endDate = dayjs(dateRange[1]).endOf('day').format('YYYY-MM-DD')
+    const startDate = dayjs(dateRange[0]).startOf("day").format("YYYY-MM-DD")
+    const endDate = dayjs(dateRange[1]).endOf("day").format("YYYY-MM-DD")
 
     localStorage.setItem(account, JSON.stringify({ startDate, endDate }))
     window.open(
-      '/accounting/reports/essential/general-ledger/ledger-details/' + account,
+      "/accounting/reports/essential/general-ledger/ledger-details/" + account,
       `general-ledger-summary-details-${account}`
     )
   }
 
   const onHandleDownloadCSV = () => {
     const { dateRange } = form.getFieldsValue()
-    const startDate = dayjs(dateRange[0]).startOf('day').format('YYYY-MM-DD')
-    const endDate = dayjs(dateRange[1]).endOf('day').format('YYYY-MM-DD')
+    const startDate = dayjs(dateRange[0]).startOf("day").format("YYYY-MM-DD")
+    const endDate = dayjs(dateRange[1]).endOf("day").format("YYYY-MM-DD")
 
     let apiURL =
-      '/general-ledger-reports/summary-details?' +
-      'startDate=' +
+      "/general-ledger-reports/summary-details?" +
+      "startDate=" +
       startDate +
-      '&endDate=' +
+      "&endDate=" +
       endDate +
-      '&account=' +
+      "&account=" +
       account
-    window.open(getUrlPrefix() + apiURL, '_blank')
+    window.open(getUrlPrefix() + apiURL, "_blank")
   }
 
-  const columns: TableProps<RecordType>['columns'] = [
+  const columns: TableProps<RecordType>["columns"] = [
     {
-      title: 'Code',
-      dataIndex: 'code',
+      title: "Code",
+      dataIndex: "code",
       width: 50,
-      fixed: 'left',
+      fixed: "left",
     },
     {
-      title: 'Account',
-      dataIndex: 'accountName',
+      title: "Account",
+      dataIndex: "accountName",
       width: 200,
-      fixed: 'left',
+      fixed: "left",
       render: (text: string, record: RecordType) => (
         <a onClick={() => onHandleClickAccounts(record.code)}>{text}</a>
       ),
     },
     {
-      title: 'Debit',
-      dataIndex: 'debit',
-      align: 'right',
+      title: "Debit",
+      dataIndex: "debit",
+      align: "right",
       width: 100,
-      render: (text) => (text ? reformatNegativeAmounts(text) : '-'),
+      render: (text) => (text ? reformatNegativeAmounts(text) : "-"),
     },
     {
-      title: 'Credit',
-      dataIndex: 'credit',
-      align: 'right',
+      title: "Credit",
+      dataIndex: "credit",
+      align: "right",
       width: 100,
-      render: (text) => (text ? reformatNegativeAmounts(text) : '-'),
+      render: (text) => (text ? reformatNegativeAmounts(text) : "-"),
     },
     {
-      title: 'Net Movement',
-      dataIndex: 'netAmount',
-      align: 'right',
+      title: "Net Movement",
+      dataIndex: "netAmount",
+      align: "right",
       width: 100,
-      render: (text) => (text ? reformatNegativeAmounts(text) : '-'),
+      render: (text) => (text ? reformatNegativeAmounts(text) : "-"),
     },
   ]
 
   const onHandleUpdate = () => {
     const { dateRange } = form.getFieldsValue()
-    const startDate = dayjs(dateRange[0]).startOf('day').format('YYYY-MM-DD')
-    const endDate = dayjs(dateRange[1]).endOf('day').format('YYYY-MM-DD')
+    const startDate = dayjs(dateRange[0]).startOf("day").format("YYYY-MM-DD")
+    const endDate = dayjs(dateRange[1]).endOf("day").format("YYYY-MM-DD")
 
     const numberOfCOARecords = (coaListData?.coaListWithFilter ?? []).length
     const numberOfSelectedCOA = (selectedRowKeys ?? []).length
@@ -171,13 +172,13 @@ export default function GeneralLedgerRoute() {
   }
   const accountColumns: ColumnsType<any> = [
     {
-      title: 'Select all',
-      dataIndex: 'description',
+      title: "Select all",
+      dataIndex: "description",
     },
   ]
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys)
+    console.log("selectedRowKeys changed: ", newSelectedRowKeys)
     setSelectedRowKeys(newSelectedRowKeys)
   }
 
@@ -190,12 +191,12 @@ export default function GeneralLedgerRoute() {
 
   useEffect(() => {
     const dateRange = JSON.parse(
-      localStorage.getItem(account as string) ?? '{}'
+      localStorage.getItem(account as string) ?? "{}"
     )
 
-    form.setFieldValue('dateRange', [
-      dayjs(dateRange?.startDate).startOf('day'),
-      dayjs(dateRange?.endDate).endOf('day'),
+    form.setFieldValue("dateRange", [
+      dayjs(dateRange?.startDate).startOf("day"),
+      dayjs(dateRange?.endDate).endOf("day"),
     ])
 
     onLoadGL({
@@ -204,28 +205,28 @@ export default function GeneralLedgerRoute() {
         startDate: dateRange?.startDate,
         endDate: dateRange?.endDate,
       },
-      nextFetchPolicy: 'network-only',
+      nextFetchPolicy: "network-only",
     })
   }, [onLoadGL, account, form])
 
   return (
-    <PageContainer content='General Ledger Summary Details'>
-      <Space direction='vertical' style={{ width: '100%' }}>
+    <PageContainer content="General Ledger Summary Details">
+      <Space direction="vertical" style={{ width: "100%" }}>
         <Form
           form={form}
-          layout='vertical'
+          layout="vertical"
           initialValues={{
             dateRange: [
-              dayjs().startOf('month').startOf('day'),
-              dayjs().endOf('month').endOf('day'),
+              dayjs().startOf("month").startOf("day"),
+              dayjs().endOf("month").endOf("day"),
             ],
           }}
         >
-          <Row justify='start' gutter={[16, 16]}>
+          <Row justify="start" gutter={[16, 16]}>
             <Col span={4}>
               <FormDateRange
-                label='Date Range'
-                name='dateRange'
+                label="Date Range"
+                name="dateRange"
                 showpresstslist={true}
                 propsrangepicker={{
                   allowClear: false,
@@ -237,12 +238,12 @@ export default function GeneralLedgerRoute() {
         <Table
           title={() => (
             <Space>
-              <Button onClick={() => onHandleUpdate()} type='primary'>
+              <Button onClick={() => onHandleUpdate()} type="primary">
                 Update
               </Button>
               <Button
                 onClick={() => onHandleDownloadCSV()}
-                type='dashed'
+                type="dashed"
                 danger
               >
                 Download CSV
@@ -252,8 +253,8 @@ export default function GeneralLedgerRoute() {
           loading={loading}
           columns={columns}
           scroll={{ x: 1500, y: 500 }}
-          rowKey='id'
-          size='small'
+          rowKey="id"
+          size="small"
           dataSource={data?.generalLedger ?? []}
           pagination={false}
           summary={(currentData) => {
@@ -274,18 +275,18 @@ export default function GeneralLedgerRoute() {
             )
 
             return (
-              <Table.Summary fixed={'bottom'}>
-                <Table.Summary.Row style={{ paddingRight: '16px' }}>
+              <Table.Summary fixed={"bottom"}>
+                <Table.Summary.Row style={{ paddingRight: "16px" }}>
                   <Table.Summary.Cell index={0} colSpan={2}>
                     <b>TOTAL</b>
                   </Table.Summary.Cell>
-                  <Table.Summary.Cell index={2} align='right'>
+                  <Table.Summary.Cell index={2} align="right">
                     <b>{reformatNegativeAmounts(totals.totalDebit)}</b>
                   </Table.Summary.Cell>
-                  <Table.Summary.Cell index={3} align='right'>
+                  <Table.Summary.Cell index={3} align="right">
                     <b>{reformatNegativeAmounts(totals.totalCredit)}</b>
                   </Table.Summary.Cell>
-                  <Table.Summary.Cell index={4} align='right'>
+                  <Table.Summary.Cell index={4} align="right">
                     <b>{reformatNegativeAmounts(totals.totalNetAmount)}</b>
                   </Table.Summary.Cell>
                 </Table.Summary.Row>

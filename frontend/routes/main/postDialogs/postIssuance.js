@@ -162,7 +162,6 @@ const PostIssuance = ({ visible, hide, ...props }) => {
     if (_.get(data, "items")) {
       let payload = [];
       (data?.items || []).map(async (e, i) => {
-        console.log("index => ", i);
         let sti = {};
         let ex = {};
         let sto = {};

@@ -180,6 +180,9 @@ class ItemService extends AbstractDaoService<Item> {
         }else if (type.equalsIgnoreCase("fix")) {
             query += ''' and (inv.fixAsset = true)'''
             countQuery += ''' and (inv.fixAsset = true)'''
+        }else if (type.equalsIgnoreCase("sale")) {
+            query += ''' and (inv.forSale = true)'''
+            countQuery += ''' and (inv.forSale = true)'''
         }
 
 		query += ''' ORDER BY inv.descLong ASC'''

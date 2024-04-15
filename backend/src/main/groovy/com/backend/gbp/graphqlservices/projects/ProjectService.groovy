@@ -114,20 +114,15 @@ class ProjectService extends AbstractDaoService<Projects> {
     List<Projects> projectByOffice(
             @GraphQLArgument(name = "id") UUID id
     ) {
-        if(id){
-            def company = SecurityUtils.currentCompanyId()
-            String query = '''Select e from Projects e where e.location.id = :id'''
-            Map<String, Object> params = new HashMap<>()
-            params.put('id', id)
-            if (company) {
-                query += ''' and (e.company = :company)'''
-                params.put("company", company)
-            }
-            createQuery(query, params).resultList.sort { it.projectCode }
-        }else{
-            return null
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from Projects e where e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put("company", company)
+        if (id) {
+            query += ''' and (e.location.id = :id)'''
+            params.put("id", id)
         }
-
+        createQuery(query, params).resultList.sort { it.projectCode }
     }
 
     @GraphQLQuery(name = "projectListPageable")

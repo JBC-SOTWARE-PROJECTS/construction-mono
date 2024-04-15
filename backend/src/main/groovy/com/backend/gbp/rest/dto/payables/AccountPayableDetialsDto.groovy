@@ -10,6 +10,7 @@ class AccountPayableDetialsDto {
 	Map<String, Object> transType
 	Map<String, Object> office
 	Map<String, Object> project
+	Map<String, Object> assets
 
 	BigDecimal amount
 	BigDecimal discRate
@@ -39,7 +40,12 @@ class OfficeDto{
 
 class ProjectDto{
 	UUID id
-	String officeDescription
+	String description
+}
+
+class AssetDto{
+	UUID id
+	String description
 }
 
 

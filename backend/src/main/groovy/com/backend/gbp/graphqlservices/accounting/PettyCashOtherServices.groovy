@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.PettyCashAccounting
 import com.backend.gbp.domain.accounting.PettyCashOther
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.domain.accounting.ExpenseTransaction
@@ -61,6 +62,9 @@ class PettyCashOtherServices extends AbstractDaoService<PettyCashOther> {
 		}
 		upsert.transType = type
 		upsert.pettyCash = parent
+		upsert.office = null
+		upsert.project = null
+		upsert.assets = null
 		if(it.office){
 			def office = objectMapper.convertValue(it.office, Office.class)
 			upsert.office = office
@@ -68,6 +72,10 @@ class PettyCashOtherServices extends AbstractDaoService<PettyCashOther> {
 		if(it.project){
 			def project = objectMapper.convertValue(it.project, Projects.class)
 			upsert.project = project
+		}
+		if(it.assets){
+			def assets = objectMapper.convertValue(it.assets, Assets.class)
+			upsert.assets = assets
 		}
 		upsert.amount = it.amount
 		upsert.remarks = it.remarks

@@ -165,7 +165,7 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
         match.integrationItems.findAll { BooleanUtils.isNotTrue(it.multiple) }.each { item ->
             Ledger ledger = new Ledger()
-            ledger.company = SecurityUtils.currentCompany()
+            ledger.companyId = SecurityUtils.currentCompanyId()
             ledger.transactionDateOnly = header.transactionDateOnly
             def coa =   createCoaFromItem(autoIntegrateable,item)
 

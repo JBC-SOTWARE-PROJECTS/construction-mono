@@ -1,11 +1,11 @@
-import { FormDateRange, FormInput, FormSelect } from '@/components/common'
+import { FormDateRange, FormInput, FormSelect } from "@/components/common"
 // import {
 //   ChartOfAccount,
 //   GeneralLedgerDetailsListDto,
 // } from '@/graphql/gql/graphql'
-import { PlusOutlined } from '@ant-design/icons'
-import { PageContainer } from '@ant-design/pro-components'
-import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { PlusOutlined } from "@ant-design/icons"
+import { PageContainer } from "@ant-design/pro-components"
+import { gql, useLazyQuery, useQuery } from "@apollo/client"
 import {
   Button,
   Checkbox,
@@ -17,14 +17,14 @@ import {
   Row,
   Space,
   Table,
-} from 'antd'
-import type { TableProps } from 'antd'
-import dayjs from 'dayjs'
-import numeral from 'numeral'
-import type { ColumnsType } from 'antd/es/table'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import { getUrlPrefix } from '@/utility/graphql-client'
+} from "antd"
+import type { TableProps } from "antd"
+import dayjs from "dayjs"
+import numeral from "numeral"
+import type { ColumnsType } from "antd/es/table"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
+import { getUrlPrefix } from "@/utility/graphql-client"
 
 interface RecordType {
   code: string
@@ -72,8 +72,8 @@ interface DataType {
 }
 
 function reformatNegativeAmounts(amount: number) {
-  if (amount > 0) return numeral(amount).format('0,0.00')
-  else return '(' + numeral(Math.abs(amount)).format('0,0.00') + ')'
+  if (amount > 0) return numeral(amount).format("0,0.00")
+  else return "(" + numeral(Math.abs(amount)).format("0,0.00") + ")"
 }
 
 export default function GeneralLedgerRoute() {
@@ -82,7 +82,9 @@ export default function GeneralLedgerRoute() {
   } = useRouter()
 
   const [form] = Form.useForm()
-  const [onLoadGL, { data, loading, refetch }] = useLazyQuery(GL_GQL)
+  const [onLoadGL, { data, loading, refetch }] = useLazyQuery(GL_GQL, {
+    notifyOnNetworkStatusChange: true,
+  })
 
   const sharedOnCell = (record: any) => {
     if ((record?.children ?? []).length > 0) {
@@ -94,165 +96,171 @@ export default function GeneralLedgerRoute() {
 
   const columns: ColumnsType<DataType> = [
     {
-      title: 'Date',
-      dataIndex: 'transaction_date',
+      title: "Date",
+      dataIndex: "transaction_date",
       width: 80,
-      fixed: 'left',
+      fixed: "left",
       onCell: (record: any, index) => ({
         colSpan:
           (record?.children ?? []).length > 0
             ? 6
-            : record?.description == 'TOTAL'
+            : record?.description == "TOTAL"
             ? 2
             : 1,
       }),
       render: (text: string, record: any) =>
         (record?.children ?? []).length > 0 ? (
           <b>{`${record?.code} - ${text}`}</b>
-        ) : record?.description == 'TOTAL' ? (
+        ) : record?.description == "TOTAL" ? (
           <b>{text}</b>
         ) : (
           text
         ),
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
+      title: "Entity Name",
+      dataIndex: "entity",
       width: 200,
-      fixed: 'left',
+      fixed: "left",
       onCell: (record: any, index) => ({
         colSpan:
           (record?.children ?? []).length > 0
             ? 0
-            : record?.description == 'TOTAL'
+            : record?.description == "TOTAL"
             ? 0
             : 1,
       }),
     },
     {
-      title: 'Reference',
-      dataIndex: 'reference',
+      title: "Description",
+      dataIndex: "description",
+      width: 200,
+      render: (text: any) => (text !== "TOTAL" ? text : ""),
+    },
+    {
+      title: "Reference",
+      dataIndex: "reference",
       width: 150,
       onCell: sharedOnCell,
     },
     {
-      title: 'Debit',
-      dataIndex: 'debit',
-      align: 'right',
+      title: "Debit",
+      dataIndex: "debit",
+      align: "right",
       width: 100,
       onCell: sharedOnCell,
       render: (text, record) =>
-        record?.description == 'TOTAL' ? (
-          <b>{text ? reformatNegativeAmounts(text) : '-'}</b>
+        record?.description == "TOTAL" ? (
+          <b>{text ? reformatNegativeAmounts(text) : "-"}</b>
         ) : text ? (
           reformatNegativeAmounts(text)
         ) : (
-          '-'
+          "-"
         ),
     },
     {
-      title: 'Credit',
-      dataIndex: 'credit',
-      align: 'right',
+      title: "Credit",
+      dataIndex: "credit",
+      align: "right",
       width: 100,
       onCell: sharedOnCell,
       render: (text, record) =>
-        record?.description == 'TOTAL' ? (
-          <b>{text ? reformatNegativeAmounts(text) : '-'}</b>
+        record?.description == "TOTAL" ? (
+          <b>{text ? reformatNegativeAmounts(text) : "-"}</b>
         ) : text ? (
           reformatNegativeAmounts(text)
         ) : (
-          '-'
+          "-"
         ),
     },
     {
-      title: 'Running Balance',
-      dataIndex: 'running_balance',
-      align: 'right',
+      title: "Running Balance",
+      dataIndex: "running_balance",
+      align: "right",
       width: 100,
       onCell: sharedOnCell,
       render: (text, record) =>
-        record?.description == 'TOTAL' ? (
-          <b>{text ? reformatNegativeAmounts(text) : '-'}</b>
+        record?.description == "TOTAL" ? (
+          <b>{text ? reformatNegativeAmounts(text) : "-"}</b>
         ) : text ? (
           reformatNegativeAmounts(text)
         ) : (
-          '-'
+          "-"
         ),
     },
   ]
 
   const onHandleUpdate = (filter?: string) => {
     const { dateRange } = form.getFieldsValue()
-    const startDate = dayjs(dateRange[0]).startOf('day').format('YYYY-MM-DD')
-    const endDate = dayjs(dateRange[1]).endOf('day').format('YYYY-MM-DD')
+    const startDate = dayjs(dateRange[0]).startOf("day").format("YYYY-MM-DD")
+    const endDate = dayjs(dateRange[1]).endOf("day").format("YYYY-MM-DD")
 
     onLoadGL({
       variables: {
-        filter: filter ?? '',
+        filter: filter ?? "",
         account,
         startDate,
         endDate,
       },
-      nextFetchPolicy: 'network-only',
+      nextFetchPolicy: "network-only",
     })
   }
 
   const onHandleDownloadCSV = () => {
     const { dateRange } = form.getFieldsValue()
-    const startDate = dayjs(dateRange[0]).startOf('day').format('YYYY-MM-DD')
-    const endDate = dayjs(dateRange[1]).endOf('day').format('YYYY-MM-DD')
+    const startDate = dayjs(dateRange[0]).startOf("day").format("YYYY-MM-DD")
+    const endDate = dayjs(dateRange[1]).endOf("day").format("YYYY-MM-DD")
 
     let apiURL =
-      '/general-ledger-reports/ledger-details?' +
-      'startDate=' +
+      "/general-ledger-reports/ledger-details?" +
+      "startDate=" +
       startDate +
-      '&endDate=' +
+      "&endDate=" +
       endDate +
-      '&account=' +
+      "&account=" +
       account
-    window.open(getUrlPrefix() + apiURL, '_blank')
+    window.open(getUrlPrefix() + apiURL, "_blank")
   }
 
   useEffect(() => {
     const dateRange = JSON.parse(
-      localStorage.getItem(account as string) ?? '{}'
+      localStorage.getItem(account as string) ?? "{}"
     )
 
-    form.setFieldValue('dateRange', [
-      dayjs(dateRange?.startDate).startOf('day'),
-      dayjs(dateRange?.endDate).endOf('day'),
+    form.setFieldValue("dateRange", [
+      dayjs(dateRange?.startDate).startOf("day"),
+      dayjs(dateRange?.endDate).endOf("day"),
     ])
 
     onLoadGL({
       variables: {
-        filter: '',
+        filter: "",
         account,
         startDate: dateRange?.startDate,
         endDate: dateRange?.endDate,
       },
-      nextFetchPolicy: 'network-only',
+      nextFetchPolicy: "network-only",
     })
   }, [onLoadGL, account, form])
 
   return (
-    <PageContainer content='General Ledger Details'>
-      <Space direction='vertical' style={{ width: '100%' }}>
+    <PageContainer content="General Ledger Details">
+      <Space direction="vertical" style={{ width: "100%" }}>
         <Form
           form={form}
-          layout='vertical'
+          layout="vertical"
           initialValues={{
             dateRange: [
-              dayjs().startOf('month').startOf('day'),
-              dayjs().endOf('month').endOf('day'),
+              dayjs().startOf("month").startOf("day"),
+              dayjs().endOf("month").endOf("day"),
             ],
           }}
         >
-          <Row justify='start' gutter={[16, 16]}>
+          <Row justify="start" gutter={[16, 16]}>
             <Col span={4}>
               <FormDateRange
-                label='Date Range'
-                name='dateRange'
+                label="Date Range"
+                name="dateRange"
                 showpresstslist={true}
                 propsrangepicker={{
                   allowClear: false,
@@ -261,8 +269,8 @@ export default function GeneralLedgerRoute() {
             </Col>
             <Col span={4}>
               <FormInput
-                label='Search'
-                name='filter'
+                label="Search"
+                name="filter"
                 propsinput={{
                   onPressEnter: (e: any) => onHandleUpdate(e.target.value),
                 }}
@@ -274,12 +282,12 @@ export default function GeneralLedgerRoute() {
           // virtual={true}
           title={() => (
             <Space>
-              <Button onClick={() => onHandleUpdate()} type='primary'>
+              <Button onClick={() => onHandleUpdate()} type="primary">
                 Update
               </Button>
               <Button
                 onClick={() => onHandleDownloadCSV()}
-                type='dashed'
+                type="dashed"
                 danger
               >
                 Download CSV
@@ -289,8 +297,8 @@ export default function GeneralLedgerRoute() {
           loading={loading}
           columns={columns}
           scroll={{ x: 1500, y: 500 }}
-          rowKey={'id'}
-          size='small'
+          rowKey={"id"}
+          size="small"
           dataSource={data?.generalLedger ?? []}
           pagination={false}
         />

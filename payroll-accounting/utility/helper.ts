@@ -59,6 +59,15 @@ export const NumberFormaterNoDecimal = (value: any) => {
   return numeral(value).format("0,0");
 };
 
+export const NumberFormaterDynamic = (value: any) => {
+  let inputedValue = Number(value);
+  if (inputedValue % 1 != 0) {
+    return numeral(value).format("0,0.00"); // 10,000.00
+  } else {
+    return numeral(value).format("0,0"); // 10,000
+  }
+};
+
 export const DateFormatter = (value: string) => {
   return dayjs(value).format("YYYY-MM-DD");
 };
@@ -81,6 +90,14 @@ export const decimalRound2 = (amount?: number) => {
   }
   return 0;
 };
+
+export const decimalRound4 = (amount?: number) => {
+  if (amount) {
+    return roundHalfEven(amount, 4);
+  }
+  return 0;
+};
+
 
 export const NumberInString = (amount: number) => {
   const toWords = new ToWords({
@@ -219,3 +236,20 @@ export function accessControl(permissions: string[], access: string) {
     return false;
   }
 }
+
+export const typeLabel = (value: string): string => {
+  let result = "N/A";
+  if (value == "discountRate") {
+    result = "Discount rate";
+  } else if (value == "discountAmount") {
+    result = "Discount amount";
+  } else if (value == "package") {
+    result = "Package";
+  }
+  return result;
+};
+
+export const parserInputNumber = {
+  formatter: (value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+  parser: (value: any) => value!.replace(/\$\s?|(,*)/g, ""),
+};

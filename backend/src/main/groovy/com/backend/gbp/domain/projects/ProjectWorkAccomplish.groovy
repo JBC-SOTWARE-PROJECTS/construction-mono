@@ -98,6 +98,15 @@ class ProjectWorkAccomplish extends AbstractAuditingEntity implements Serializab
 	@Column(name = "company_id")
 	UUID companyId
 
+	@GraphQLQuery
+	@Column(name = "billing_id")
+	UUID billing
+
+	@GraphQLQuery
+	@Column(name = "billing_no")
+	String billingNo
+
+
 	@Override
 	String getDomain() {
 		return IntegrationDomainEnum.PROJECT_WORK_ACCOMPLISH.name()
