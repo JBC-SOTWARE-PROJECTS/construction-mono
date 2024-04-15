@@ -1,0 +1,2 @@
+ALTER TABLE accounting.debit_memo_details ADD COLUMN assets uuid default null;
+ALTER TABLE accounting.debit_memo_details ADD CONSTRAINT debit_memo_details_assets_fkey FOREIGN KEY (assets) REFERENCES asset.assets(id);

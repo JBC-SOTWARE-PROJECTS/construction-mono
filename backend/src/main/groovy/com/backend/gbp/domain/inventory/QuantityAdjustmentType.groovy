@@ -50,6 +50,10 @@ class QuantityAdjustmentType extends AbstractAuditingEntity implements Serializa
 	Boolean is_active
 
 	@GraphQLQuery
+	@Column(name = "reverse", columnDefinition = 'bool')
+	Boolean reverse
+
+	@GraphQLQuery
 	@Column(name = "company")
 	UUID company
 

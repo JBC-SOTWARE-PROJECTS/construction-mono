@@ -4,6 +4,7 @@ import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.Disbursement
 import com.backend.gbp.domain.accounting.DisbursementExpense
 import com.backend.gbp.domain.accounting.ExpenseTransaction
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.rest.dto.payables.DisbursementExpDto
@@ -61,6 +62,9 @@ class DisbursementExpenseServices extends AbstractDaoService<DisbursementExpense
 			upsert = findOne(UUID.fromString(it.id))
 		}
 		upsert.disbursement = parent
+		upsert.office = null
+		upsert.project = null
+		upsert.assets = null
 		if (it.office) {
 			def office = objectMapper.convertValue(it.office, Office.class)
 			upsert.office = office
@@ -68,6 +72,10 @@ class DisbursementExpenseServices extends AbstractDaoService<DisbursementExpense
 		if (it.project) {
 			def project = objectMapper.convertValue(it.project, Projects.class)
 			upsert.project = project
+		}
+		if (it.assets) {
+			def assets = objectMapper.convertValue(it.assets, Assets.class)
+			upsert.assets = assets
 		}
 		upsert.transType = trans
 		upsert.amount = it.amount

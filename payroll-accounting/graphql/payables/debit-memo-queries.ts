@@ -105,10 +105,26 @@ export const GET_DEBIT_MEMO_TRANSACTIONS = gql`
         id
         description
       }
+      assets {
+        id
+        description
+      }
       type
       percent
       amount
       remarks
+    }
+    disWtxByDebitMemo(id: $id) {
+      id
+      appliedAmount
+      vatRate
+      vatInclusive
+      vatAmount
+      ewtDesc
+      ewtRate
+      ewtAmount
+      grossAmount
+      netAmount
     }
   }
 `;
@@ -119,12 +135,14 @@ export const UPSERT_DEBITMEMO_RECORD = gql`
     $fields: Map_String_ObjectScalar
     $items: [Map_String_ObjectScalar]
     $details: [Map_String_ObjectScalar]
+    $wtx: [Map_String_ObjectScalar]
   ) {
     upsertDebitMemo(
       id: $id
       fields: $fields
       items: $items
       details: $details
+      wtx: $wtx
     ) {
       id
     }

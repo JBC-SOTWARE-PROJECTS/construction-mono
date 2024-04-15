@@ -3,6 +3,7 @@ package com.backend.gbp.domain.accounting
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.annotations.UpperCase
+import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.inventory.Supplier
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.domain.types.AutoIntegrateable
@@ -139,6 +140,9 @@ class DebitMemo extends AbstractAuditingEntity implements Serializable, AutoInte
 
 	@Transient
 	Projects project
+
+	@Transient
+	Assets assets
 
 	@Transient
 	BigDecimal cashOnBank = BigDecimal.ZERO

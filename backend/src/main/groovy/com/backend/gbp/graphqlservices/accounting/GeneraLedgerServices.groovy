@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.accounting
 import com.backend.gbp.domain.accounting.Fiscal
 import com.backend.gbp.domain.accounting.Ledger
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.security.SecurityUtils
 import groovy.json.JsonSlurper
 import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -79,7 +80,12 @@ class GeneralLedgerDetailsParentDto{
 @Canonical
 class GeneralLedgerDetailsChildDto{
     String transaction_date
+    String entity
     String description
+    String transactionNo
+    String transactionType
+    String referenceNo
+    String referenceType
     BigDecimal debit
     BigDecimal credit
     BigDecimal running_balance
@@ -466,6 +472,8 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             @GraphQLArgument(name="startDate") String startDate,
             @GraphQLArgument(name="endDate") String endDate
     ){
+        def companyId = SecurityUtils.currentCompanyId()
+
         String query = """ select 
             CAST(uuid_generate_v4() AS TEXT) AS "id",
             TRIM(BOTH ' ' FROM l.journal_account -> 'motherAccount'->>'accountName')  as "accountName",
@@ -479,6 +487,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             and 
             l.transaction_date_only <= cast(:endDate as date)
             and l.approved_datetime  is not null
+            and l.company_id = :companyId
         """
 
         if(accounts) {
@@ -493,6 +502,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
         """)
                 .setParameter('startDate',startDate)
                 .setParameter('endDate',endDate)
+                .setParameter('companyId',companyId)
                 .unwrap(NativeQuery.class)
                 .setResultTransformer(Transformers.aliasToBean(GeneralLedgerListDto.class))
                 .getResultList();
@@ -505,6 +515,8 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             @GraphQLArgument(name="startDate") String startDate,
             @GraphQLArgument(name="endDate") String endDate
     ){
+        def companyId = SecurityUtils.currentCompanyId()
+
         List<GeneralLedgerListDto> ledger = entityManager.createNativeQuery("""
             select 
             CAST(uuid_generate_v4() AS TEXT) AS "id",
@@ -520,6 +532,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             and 
             l.transaction_date_only <= cast(:endDate as date)
             and l.approved_datetime  is not null
+            and l.company_id = :companyId
             and TRIM(BOTH ' ' FROM l.journal_account -> 'motherAccount'->>'code') = :account
             group by l.journal_account ->> 'code',TRIM(BOTH ' ' FROM l.journal_account ->> 'accountName'), l.journal_account -> 'motherAccount'->>'accountName'
             order by TRIM(BOTH ' ' FROM l.journal_account ->> 'accountName') asc 
@@ -527,6 +540,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                 .setParameter('startDate',startDate)
                 .setParameter('endDate',endDate)
                 .setParameter('account',account)
+                .setParameter('companyId',companyId)
                 .unwrap(NativeQuery.class)
                 .setResultTransformer(Transformers.aliasToBean(GeneralLedgerListDto.class))
                 .getResultList();
@@ -540,6 +554,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
             @GraphQLArgument(name="startDate") String startDate,
             @GraphQLArgument(name="endDate") String endDate
     ){
+        def companyId = SecurityUtils.currentCompanyId()
 
         List<GeneralLedgerDetailsListDto> ledger = entityManager.createNativeQuery("""
             WITH RunningBalances AS (
@@ -547,7 +562,12 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                     l.id,
                     TRIM(BOTH ' ' FROM l.journal_account ->> 'code') as "code",
                     TRIM(BOTH ' ' FROM l.journal_account ->> 'accountName') AS account,
+                    hl.entity_name AS entity,
                     hl.particulars AS description,
+                    hl.transaction_num AS "transactionNo",
+                    hl.transaction_type AS "transactionType",
+                    hl.reference_num AS "referenceNo",
+                    hl.reference_type AS "referenceType",
                     hl.docnum AS "reference",
                     CAST(hl.transaction_date_only AS VARCHAR) AS transaction_date,
                     l.debit,
@@ -568,6 +588,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                     AND
                     l.transaction_date_only <= CAST(:endDate AS DATE))
                     AND TRIM(BOTH ' ' FROM l.journal_account ->> 'code') = :account
+                    AND l.company_id = :companyId
                     AND 
                     (lower(hl.particulars) like lower(concat('%',:filter,'%')) 
                     or lower(hl.docnum) like lower(concat('%',:filter,'%')))
@@ -580,7 +601,12 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                     CAST(json_agg(
                         jsonb_build_object(
                             'id', CAST(id AS TEXT),
+                            'entity', entity,
                             'description', description,
+                            'transactionNo', "transactionNo",
+                            'transactionType', "transactionType",
+                            'referenceNo', "referenceNo",
+                            'referenceType', "referenceType",
                             'reference',reference,
                             'transaction_date', transaction_date,
                             'debit', debit,
@@ -592,7 +618,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                         jsonb_build_object(
                             'id', CAST(uuid_generate_v4() AS TEXT),
                             'description', 'TOTAL',
-                            'transaction_date', CONCAT('TOTAL ACCOUNTS ',account),
+                            'transaction_date', CONCAT('TOTAL ',account),
                             'debit',sum(debit),
                             'credit',sum(credit),
                             'running_balance', sum(debit) - sum(credit)
@@ -608,6 +634,7 @@ class GeneralLedgerServices extends AbstractDaoService<Ledger> {
                 .setParameter('endDate',endDate)
                 .setParameter('account',account)
                 .setParameter('filter',filter)
+                .setParameter('companyId',companyId)
                 .unwrap(NativeQuery.class)
                 .setResultTransformer(Transformers.aliasToBean(GeneralLedgerDetailsParentDto.class))
                 .getResultList()

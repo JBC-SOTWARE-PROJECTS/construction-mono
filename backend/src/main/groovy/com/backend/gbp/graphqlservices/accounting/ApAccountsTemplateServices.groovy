@@ -41,8 +41,17 @@ class ApAccountsTemplateServices extends AbstractDaoService<ApAccountsTemplate> 
 	List<ApAccountsTemplate> apAccountsTemplateByType(@GraphQLArgument(name = "type") UUID type,
 											@GraphQLArgument(name = "category") String category) {
 		def company = SecurityUtils.currentCompanyId()
-		createQuery("Select ap from ApAccountsTemplate ap where ap.supplierType.id = :type and ap.category = :category and ap.status = true and ap.company = :company",
-				[type: type, category: category, company: company]).resultList
+		String query = "Select ap from ApAccountsTemplate ap where ap.category = :category and ap.status = true and ap.company = :company"
+
+		Map<String, Object> params = new HashMap<>()
+		params.put('category', category)
+		params.put('company', company)
+
+		if(type) {
+			query+=" and ap.supplierType.id = :type"
+			params.put('type', type)
+		}
+		createQuery(query, params).resultList
 	}
 
 	@GraphQLQuery(name = "apAccountsTemplateOthers", description = "Find Ap Accounts Template Others")

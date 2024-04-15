@@ -45,12 +45,12 @@ class PurchaseOrderItemService extends AbstractDaoService<PurchaseOrderItems> {
 
     //========context ==============//
     @GraphQLQuery(name = "deliveredQty")
-    Integer deliveredQty(@GraphQLContext PurchaseOrderItems poItem) {
+    BigDecimal deliveredQty(@GraphQLContext PurchaseOrderItems poItem) {
         return purchaseOrderItemMonitoringService.monById(poItem.id).deliveredQty
     }
 
     @GraphQLQuery(name = "deliveryBalance")
-    Integer deliveryBalance(@GraphQLContext PurchaseOrderItems poItem) {
+    BigDecimal deliveryBalance(@GraphQLContext PurchaseOrderItems poItem) {
         return purchaseOrderItemMonitoringService.monById(poItem.id).deliveryBalance
     }
 
@@ -105,6 +105,24 @@ class PurchaseOrderItemService extends AbstractDaoService<PurchaseOrderItems> {
         upsert.qtyInSmall =  dto.quantity * item.item_conversion
         upsert.type = dto.type
         upsert.type_text = dto.type_text
+        save(upsert)
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "upsertPOItemByPRItem")
+    PurchaseOrderItems upsertPOItemByPRItem(
+            @GraphQLArgument(name = "item") PurchaseRequestItem item,
+            @GraphQLArgument(name = "parent") PurchaseOrder parent
+    ) {
+        def upsert = new PurchaseOrderItems()
+        upsert.purchaseOrder = parent
+        upsert.item = item.item
+        upsert.quantity = item.requestedQty
+        upsert.unitCost = item.unitCost
+        upsert.prNos = item?.purchaseRequest?.prNo ?: ""
+        upsert.qtyInSmall =  item.requestedQty * (item?.item?.item_conversion ?: BigDecimal.ZERO)
+        upsert.type = null
+        upsert.type_text = null
         save(upsert)
     }
 

@@ -4,7 +4,7 @@ import {
   ProFormGroup,
 } from "@ant-design/pro-components";
 import { Input, Button, message} from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { CloudDownloadOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import { useDialog } from "@/hooks";
 import { useRouter } from "next/router";
 import {AssetRepairMaintenance, VehicleUsageMonitoring,} from "@/graphql/gql/graphql";
@@ -19,6 +19,8 @@ import { useMutation, useQuery } from "@apollo/client";
 import { GET_ACTIVE_PROJECTS } from "@/components/payroll/configurations/UpsertScheduleType";
 import VehicleUsageAttachemntModal from "@/components/inventory/assets/dialogs/vehicleUsageAttachment";
 import CustomButton from "@/components/common/CustomButton";
+import { getUrlPrefix } from "@/utility/graphql-client";
+import useGetVehicleUsageLatest from "@/hooks/asset/useGetVehicleUsageLatest";
 
 type Props = {};
 const { Search } = Input;
@@ -41,6 +43,14 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
   //const modalViewRM = useDialog(ViewRepairMaintenance);
   const router = useRouter();
   const [state, setState] = useState(initialState);
+  const [csvLoading, setCsvLoading] = useState(false);
+
+  const [latestUsage, latestUsageloading, latestUsagesetFilters] = useGetVehicleUsageLatest({
+    variables:{
+      asset: router?.query?.id
+    },
+    fetchPolicy: "network-only",
+  });
 
   const [data, loading, refetch] = useGetVehicleUsageMonitoring({
     variables: {
@@ -68,7 +78,9 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
         : []),
     ]
 
-    modalUpsert({ record: record , projectOpts: projectOpts, viewModeSet: viewMode}, (result: any) => {
+
+
+    modalUpsert({ record: record, latestUsage: latestUsage, projectOpts: projectOpts, viewModeSet: viewMode}, (result: any) => {
       if (result) {
         refetch();
         if (record?.id) {
@@ -85,6 +97,13 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
        
      });
    };
+
+   const onHandleDownloadCSV = () => {
+    let apiURL =
+      `/reports/inventory/print/accumulated_trip_csv/${router?.query?.id}`
+
+    window.open(getUrlPrefix() + apiURL, '_blank')
+  }
 
   // const viewRepairMaintenance = (record?: any) => {
   //   modalViewRM({ record: record });
@@ -115,6 +134,15 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
             >
               Create New
             </CustomButton>
+            <CustomButton
+              type="primary"
+              icon={<CloudDownloadOutlined />}
+              onClick={onHandleDownloadCSV}
+          loading={csvLoading}
+            >
+              Download Trips
+            </CustomButton>
+           
           </ProFormGroup>
         }
       >

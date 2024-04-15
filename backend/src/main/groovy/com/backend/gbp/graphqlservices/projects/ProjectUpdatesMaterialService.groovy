@@ -207,7 +207,7 @@ class ProjectUpdatesMaterialService extends AbstractDaoService<ProjectUpdatesMat
     GraphQLRetVal<Boolean> directExpenseMaterials(
             @GraphQLArgument(name = "item") Item item,
             @GraphQLArgument(name = "project") Projects project,
-            @GraphQLArgument(name = "qty") Integer qty,
+            @GraphQLArgument(name = "qty") BigDecimal qty,
             @GraphQLArgument(name = "cost") BigDecimal cost,
             @GraphQLArgument(name = "refId") UUID refId
     ) {

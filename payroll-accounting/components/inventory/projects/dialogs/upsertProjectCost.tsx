@@ -225,10 +225,10 @@ export default function UpsertProjectCost(props: IProps) {
               name="totalCost"
               rules={requiredField}
               propsinputnumber={{
-                disabled: true,
                 formatter: (value) =>
                   `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 parser: (value) => value!.replace(/\$\s?|(,*)/g, ""),
+                step: 0.01,
                 placeholder: "Total Cost",
               }}
             />

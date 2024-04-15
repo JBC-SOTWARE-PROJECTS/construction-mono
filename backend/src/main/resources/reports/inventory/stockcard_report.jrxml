@@ -168,12 +168,12 @@
 		<field name="document_desc" class="java.lang.String"/>
 		<field name="source_officename" class="java.lang.String"/>
 		<field name="destination_officename" class="java.lang.String"/>
-		<field name="ledger_qtyin" class="java.lang.Integer"/>
-		<field name="ledger_qty_out" class="java.lang.Integer"/>
-		<field name="adjustment" class="java.lang.Integer"/>
+		<field name="ledger_qtyin" class="java.math.BigDecimal"/>
+		<field name="ledger_qty_out" class="java.math.BigDecimal"/>
+		<field name="adjustment" class="java.math.BigDecimal"/>
 		<field name="unitcost" class="java.math.BigDecimal"/>
 		<field name="totalCost" class="java.math.BigDecimal"/>
-		<field name="runningqty" class="java.lang.Integer"/>
+		<field name="runningqty" class="java.math.BigDecimal"/>
 		<field name="wcost" class="java.math.BigDecimal"/>
 		<field name="runningbalance" class="java.math.BigDecimal"/>
 	</subDataset>

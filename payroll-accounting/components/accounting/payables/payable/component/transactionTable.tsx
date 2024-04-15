@@ -3,8 +3,13 @@ import { AccountsPayableDetails, Supplier } from "@/graphql/gql/graphql";
 import { useDialog } from "@/hooks";
 import { currency } from "@/utility/constant";
 import { NumberFormater } from "@/utility/helper";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Space, Table, Tag } from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleFilled,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { App, Button, Space, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import APDetailsModal from "../../dialogs/apDetailsModal";
 import _ from "lodash";
@@ -28,6 +33,8 @@ interface IProps {
 }
 
 export default function APTransactionDetailsTable(props: IProps) {
+  const { modal } = App.useApp();
+  const { confirm } = modal;
   const {
     loading,
     dataSource,
@@ -59,9 +66,14 @@ export default function APTransactionDetailsTable(props: IProps) {
   const onRemove = (e?: AccountsPayableDetails) => {
     let payload = _.clone(e ?? {}) as ExtendedAPTransactionDto;
     if (payload?.id) {
-      // useConfirm("Click Yes if you want to proceed", () => {
-      //   onRemoveDetails(payload?.id, payload.isNew ?? false);
-      // });
+      confirm({
+        title: "Delete Confirmation",
+        icon: <ExclamationCircleFilled />,
+        content: `Are you certain you want to remove this record?.`,
+        onOk: () => {
+          onRemoveDetails(payload?.id, payload.isNew ?? false);
+        },
+      });
     }
   };
 
@@ -83,21 +95,34 @@ export default function APTransactionDetailsTable(props: IProps) {
       dataIndex: "transType.description",
       key: "transType.description",
       width: 150,
-      render: (_, record) => <span>{record?.transType?.description}</span>,
+      render: (_, record) => (
+        <span>{record?.transType?.description ?? "--"}</span>
+      ),
     },
     {
       title: "Office",
       dataIndex: "department.departmentName",
       key: "department.departmentName",
-      width: 200,
-      render: (_, record) => <span>{record?.office?.officeDescription}</span>,
+      width: 300,
+      render: (_, record) => (
+        <span>{record?.office?.officeDescription ?? "--"}</span>
+      ),
     },
     {
       title: "Project",
       dataIndex: "project.description",
       key: "project.description",
-      width: 200,
-      render: (_, record) => <span>{record?.project?.description}</span>,
+      width: 300,
+      render: (_, record) => (
+        <span>{record?.project?.description ?? "--"}</span>
+      ),
+    },
+    {
+      title: "Assets",
+      dataIndex: "assets.description",
+      key: "assets.description",
+      width: 300,
+      render: (_, record) => <span>{record?.assets?.description ?? "--"}</span>,
     },
     {
       title: "Amount",
@@ -270,7 +295,7 @@ export default function APTransactionDetailsTable(props: IProps) {
         columns={columns}
         loading={loading}
         dataSource={dataSource}
-        scroll={{ x: 2600 }}
+        scroll={{ x: 2900 }}
         pagination={{
           pageSize: size,
           onShowSizeChange: (_, size) => {

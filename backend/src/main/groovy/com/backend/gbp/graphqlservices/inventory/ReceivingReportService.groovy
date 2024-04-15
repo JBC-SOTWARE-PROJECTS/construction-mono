@@ -1,12 +1,30 @@
 package com.backend.gbp.graphqlservices.inventory
 
+import com.backend.gbp.domain.User
+import com.backend.gbp.domain.accounting.Integration
+import com.backend.gbp.domain.accounting.IntegrationDomainEnum
+import com.backend.gbp.domain.accounting.IntegrationItem
+import com.backend.gbp.domain.accounting.JournalType
+import com.backend.gbp.domain.accounting.Ledger
+import com.backend.gbp.domain.accounting.LedgerDocType
+import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.inventory.Item
+import com.backend.gbp.domain.inventory.ItemSubAccount
+import com.backend.gbp.domain.inventory.PurchaseOrder
 import com.backend.gbp.domain.inventory.PurchaseOrderItems
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.domain.inventory.ReceivingReportItem
+import com.backend.gbp.domain.inventory.ReturnSupplier
+import com.backend.gbp.graphqlservices.accounting.IntegrationServices
+import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.graphqlservices.types.GraphQLRetVal
+import com.backend.gbp.repository.UserRepository
+import com.backend.gbp.repository.hrm.EmployeeRepository
+import com.backend.gbp.repository.inventory.ReceivingReportItemRepository
 import com.backend.gbp.rest.dto.PurchaseRecDto
 import com.backend.gbp.rest.dto.ReceivingAmountDto
+import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
 import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
@@ -17,6 +35,7 @@ import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
+import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
@@ -24,8 +43,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Component
 @GraphQLApi
@@ -52,6 +73,9 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
     PurchaseOrderService purchaseOrderService
 
     @Autowired
+    PurchaseOrderItemService purchaseOrderItemService
+
+    @Autowired
     InventoryLedgerService inventoryLedgerService
 
     @Autowired
@@ -59,6 +83,21 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
+    @Autowired
+    IntegrationServices integrationServices
+
+    @Autowired
+    LedgerServices ledgerServices
+
+    @Autowired
+    EmployeeRepository employeeRepository
+
+    @Autowired
+    UserRepository userRepository
+
+    @Autowired
+    ReceivingReportItemRepository receivingReportItemRepository
 
 
     @GraphQLQuery(name = "recById")
@@ -89,6 +128,17 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
 
         return records
     }
+
+    @GraphQLQuery(name = "getDRBYPONumber")
+    List<ReceivingReport> getDRBYPONumber(@GraphQLArgument(name = "poNumber") String poNumber) {
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select e from ReceivingReport e where e.purchaseOrder.poNumber = :poNumber and e.company = :company'''
+        Map<String, Object> params = new HashMap<>()
+        params.put('poNumber', poNumber)
+        params.put('company', company)
+        createQuery(query, params).resultList.sort { it.rrNo }
+    }
+
 
 
     @GraphQLQuery(name = "recByFiltersPage")
@@ -136,11 +186,73 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
         }
 
 
-        query += ''' ORDER BY r.rrNo DESC'''
+        query += ''' ORDER BY r.receiveDate DESC'''
 
 		Page<ReceivingReport> result = getPageable(query, countQuery, page, size, params)
 		return result
 	}
+
+    @GraphQLQuery(name = "recByFiltersPageNoDate")
+    Page<ReceivingReport> recByFiltersPageNoDate(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "office") UUID office,
+            @GraphQLArgument(name = "category") String category,
+            @GraphQLArgument(name = "project") UUID project,
+            @GraphQLArgument(name = "asset") UUID asset,
+            @GraphQLArgument(name = "supplier") UUID supplier,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+
+        def company = SecurityUtils.currentCompanyId()
+        String query = '''Select r from ReceivingReport r where
+						(lower(r.rrNo) like lower(concat('%',:filter,'%')) or
+						lower(r.receivedRefNo) like lower(concat('%',:filter,'%'))) '''
+
+        String countQuery = '''Select count(r) from ReceivingReport r where
+						(lower(r.rrNo) like lower(concat('%',:filter,'%')) or
+						lower(r.receivedRefNo) like lower(concat('%',:filter,'%'))) '''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+
+        if(office){
+            query += ''' and (r.receivedOffice.id = :office)''';
+            countQuery += ''' and (r.receivedOffice.id = :office)''';
+            params.put('office', office)
+        }
+        if (company) {
+            query += ''' and (r.company = :company)'''
+            countQuery += ''' and (r.company = :company)'''
+            params.put("company", company)
+        }
+        if(category){
+            query += ''' and (r.category = :category)''';
+            countQuery += ''' and (r.category = :category)''';
+            params.put('category', category)
+        }
+        if(project){
+            query += ''' and (r.project.id = :project)''';
+            countQuery += ''' and (r.project.id = :project)''';
+            params.put('project', project)
+        }
+        if(asset){
+            query += ''' and (r.assets.id = :asset)''';
+            countQuery += ''' and (r.assets.id = :asset)''';
+            params.put('asset', asset)
+        }
+        if(supplier){
+            query += ''' and (r.supplier.id = :supplier)'''
+            countQuery += ''' and (r.supplier.id = :supplier)'''
+            params.put('supplier', supplier)
+        }
+
+
+        query += ''' ORDER BY r.receiveDate DESC'''
+
+        Page<ReceivingReport> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
 
     @GraphQLQuery(name = "srrList")
     List<ReceivingReport> srrList() {
@@ -217,6 +329,55 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
     }
 
     @Transactional
+    @GraphQLMutation(name = "upsertRecNew")
+    ReceivingReport upsertRecNew(
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+            @GraphQLArgument(name = "forRemove") ArrayList<Map<String, Object>> forRemove,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        def rr = upsertFromMap(id, fields, { ReceivingReport entity , boolean forInsert ->
+            if(forInsert){
+                def code = "SRR"
+
+                entity.isPosted = false
+                entity.isVoid = false
+
+                if(entity.project?.id){
+                    code = entity.project?.prefixShortName ?: "PJ"
+                }else if(entity.assets?.id){
+                    code = entity.assets?.prefix ?: "SP"
+                }
+
+                entity.rrNo = generatorService.getNextValue(GeneratorType.SRR_NO, {
+                    return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+                })
+                entity.receivedType = code
+                entity.company = company
+            }
+        })
+        //remove first
+        def removeItems = forRemove as ArrayList<ReceivingReportItem>
+        if(removeItems.size()){
+            removeItems.each {
+                def deleted = objectMapper.convertValue(it, ReceivingReportItem.class)
+                receivingReportItemService.removeRecItemNoQuery(deleted)
+            }
+        }
+        //items to be inserted
+        def recItems = items as ArrayList<PurchaseRecDto>
+        recItems.each {
+            def item = objectMapper.convertValue(it.item, Item.class)
+            def poItem = objectMapper.convertValue(it.refPoItem, PurchaseOrderItems.class)
+            def con = objectMapper.convertValue(it, PurchaseRecDto.class)
+            receivingReportItemService.upsertRecItem(con, item, poItem, rr)
+        }
+
+        return rr
+    }
+
+    @Transactional
     @GraphQLMutation(name = "updateRECStatus")
     ReceivingReport updateRECStatus(
             @GraphQLArgument(name = "status") Boolean status,
@@ -243,6 +404,228 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
         }
 
         save(upsert)
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "redoReceiving")
+    ReceivingReport redoReceiving(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def upsert = findOne(id)
+        upsert.isPosted = false
+        upsert.isVoid = false
+        save(upsert)
+    }
+
+    @GraphQLQuery(name = "receivingAccountView")
+    List<JournalEntryViewDto> receivingAccountView(
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "status") Boolean status
+    ) {
+        def result = new ArrayList<JournalEntryViewDto>()
+        def parent =  findOne(id)
+        def childrenList =  receivingReportItemService.recItemByParent(id)
+
+        def flagValue = parent.account.flagValue
+
+        if (parent.postedLedger) {
+            def header = ledgerServices.findOne(parent.postedLedger)
+            Set<Ledger> ledger = new HashSet<Ledger>(header.ledger);
+            ledger.each {
+                if(!status) {
+                    //reverse entry if status is false for void
+                    def list = new JournalEntryViewDto(
+                            code: it.journalAccount.code,
+                            desc: it.journalAccount.accountName,
+                            debit: it.credit,
+                            credit: it.debit
+                    )
+                    result.add(list)
+                }else{
+                    def list = new JournalEntryViewDto(
+                            code: it.journalAccount.code,
+                            desc: it.journalAccount.accountName,
+                            debit: it.debit,
+                            credit: it.credit
+                    )
+                    result.add(list)
+                }
+            }
+        } else {
+            if (flagValue) {
+                Integration match = integrationServices.getIntegrationByDomainAndTagValue(IntegrationDomainEnum.RECEIVING_REPORT, flagValue)
+                def headerLedger = integrationServices.generateAutoEntries(parent) {
+                    it, mul ->
+                        //NOTE: always round cost to Bankers Note HALF EVEN
+                        it.flagValue = flagValue
+                        BigDecimal payableAmount = BigDecimal.ZERO
+                        //initialize
+                        Map<String, List<ReceivingReport>> finalAcc  = [:]
+                        match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
+                            if(!finalAcc.containsKey(entry.sourceColumn)){
+                                finalAcc[entry.sourceColumn] = []
+                            }
+                        }
+                        //loop items
+                        Map<ItemSubAccount, BigDecimal> listItems  = [:]
+                        childrenList.each { a ->
+                            if(!listItems.containsKey(a.item.assetSubAccount)) {
+                                listItems[a.item.assetSubAccount] = 0.0
+                            }
+                            listItems[a.item.assetSubAccount] =  listItems[a.item.assetSubAccount] + a.netAmount
+                        }
+                        // loop to final Accounts
+                        listItems.each {k, v ->
+                            if(v > 0){
+                                finalAcc[k.sourceColumn] << new ReceivingReport().tap {
+                                    it.itemSubAccount = k
+                                    it[k.sourceColumn] = status ? v.setScale(2, RoundingMode.HALF_EVEN) : v.setScale(2, RoundingMode.HALF_EVEN) * -1
+                                }
+                            }
+                        }
+                        // ====================== loop multiples ========================
+                        finalAcc.each { key, items ->
+                            mul << items
+                        }
+                        // ====================== not multiple here =====================
+                        it.payableAmount = status ? parent.amount : parent.amount * -1
+
+                }
+
+                Set<Ledger> ledger = new HashSet<Ledger>(headerLedger.ledger);
+                ledger.each {
+                    def list = new JournalEntryViewDto(
+                            code: it.journalAccount.code,
+                            desc: it.journalAccount.accountName,
+                            debit: it.debit,
+                            credit: it.credit
+                    )
+                    result.add(list)
+                }
+            }
+
+        }
+        return result.sort { it.credit }
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "receivingPostInventory")
+    ReceivingReport receivingPostInventory(
+            @GraphQLArgument(name = "status") Boolean status,
+            @GraphQLArgument(name = "items") ArrayList<Map<String, Object>> items,
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def upsert = findOne(id)
+
+        if(status){
+            //ledger post
+            inventoryLedgerService.postInventoryLedgerRecNew(items, upsert.id)
+            //accounting post
+            return postToLedgerAccounting(upsert)
+
+        }else{
+            upsert.isPosted = status
+            upsert.isVoid = !status
+            upsert.postedLedger = null
+            upsert.postedBy = null
+
+            if(upsert.postedLedger){
+                def header = ledgerServices.findOne(upsert.postedLedger)
+                ledgerServices.reverseEntriesCustom(header, upsert.receiveDate)
+            }
+            //ledger void
+            inventoryLedgerService.voidLedgerByRef(upsert.rrNo)
+            //rec items
+            def recItems = receivingReportItemService.recItemByParent(id)
+            recItems.each {
+                receivingReportItemService.updateRecItemStatus(it.id, status)
+            }
+            //po monitoring delete
+            def poMon = poDeliveryMonitoringService.getPOMonitoringByRec(id)
+            poMon.each {
+                poDeliveryMonitoringService.delPOMonitoring(it.id)
+            }
+        }
+
+        save(upsert)
+    }
+
+    //accounting entries save
+    ReceivingReport postToLedgerAccounting(ReceivingReport receivingReport) {
+        def yearFormat = DateTimeFormatter.ofPattern("yyyy")
+        def parent =  receivingReport
+        def childrenList =  receivingReportItemService.recItemByParent(parent.id)
+        def flagValue = parent.account.flagValue
+
+        if (flagValue) {
+            Integration match = integrationServices.getIntegrationByDomainAndTagValue(IntegrationDomainEnum.RECEIVING_REPORT, flagValue)
+            def headerLedger = integrationServices.generateAutoEntries(parent) {
+                it, mul ->
+                    //NOTE: always round cost to Bankers Note HALF EVEN
+                    it.flagValue = flagValue
+                    //initialize
+                    Map<String, List<ReceivingReport>> finalAcc  = [:]
+                    match.integrationItems.findAll { BooleanUtils.isTrue(it.multiple) }.eachWithIndex { IntegrationItem entry, int i ->
+                        if(!finalAcc.containsKey(entry.sourceColumn)){
+                            finalAcc[entry.sourceColumn] = []
+                        }
+                    }
+                    //loop items
+                    Map<ItemSubAccount, BigDecimal> listItems  = [:]
+                    childrenList.each { a ->
+                        if(!listItems.containsKey(a.item.assetSubAccount)) {
+                            listItems[a.item.assetSubAccount] = 0.0
+                        }
+                        listItems[a.item.assetSubAccount] =  listItems[a.item.assetSubAccount] + a.netAmount
+                    }
+                    // loop to final Accounts
+                    listItems.each {k, v ->
+                        if(v > 0){
+                            finalAcc[k.sourceColumn] << new ReceivingReport().tap {
+                                it.itemSubAccount = k
+                                it[k.sourceColumn] = v.setScale(2, RoundingMode.HALF_EVEN)
+                            }
+                        }
+                    }
+                    // ====================== loop multiples ========================
+                    finalAcc.each { key, items ->
+                        mul << items
+                    }
+                    // ====================== not multiple here =====================
+                    it.payableAmount = parent.amount
+            }
+            Map<String, String> details = [:]
+
+            parent.details.each { k, v ->
+                details[k] = v
+            }
+
+            details["TRANSACTION_ID"] = parent.id.toString()
+            details["LOCATION_ID"] = parent.receivedOffice.id.toString()
+            details["LOCATION_DESCRIPTION"] = parent.receivedOffice.officeDescription
+
+            headerLedger.transactionNo = parent.rrNo
+            headerLedger.transactionType = parent.account.description
+            headerLedger.referenceType = parent.account.description
+            headerLedger.referenceNo =  parent.receivedRefNo
+
+            def pHeader = ledgerServices.persistHeaderLedger(headerLedger,
+                    "${parent.receiveDate.atZone(ZoneId.systemDefault()).format(yearFormat)}-${parent.rrNo}",
+                    "${parent.receivedOffice.officeDescription}-${parent.account.description}",
+                    "${parent.receivedOffice.officeDescription}-${parent.account.description}",
+                    LedgerDocType.RR,
+                    JournalType.PURCHASES_PAYABLES,
+                    parent.receiveDate,
+                    details)
+
+            parent.postedLedger = pHeader.id
+            parent.isPosted = true
+            parent.isVoid = false
+            parent.postedBy = SecurityUtils.currentLogin()
+
+            return save(parent)
+        }
+        return parent
     }
 
     @Transactional
@@ -290,5 +673,156 @@ class ReceivingReportService extends AbstractDaoService<ReceivingReport> {
             throw new Exception("Something was Wrong : " + e)
         }
         return upsert
+    }
+
+    @Transactional
+    @GraphQLMutation(name = "receivingReportByPO")
+    GraphQLRetVal<ReceivingReport> receivingReportByPO(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        def company = SecurityUtils.currentCompanyId()
+        User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
+        Employee employee = employeeRepository.findOneByUser(user)
+        def purchaseOrder =  purchaseOrderService.poById(id)
+        def purchaseOrderItems =  purchaseOrderItemService.poItemByParent(id)
+        def checkpoint = this.getDRBYPONumber(purchaseOrder.poNumber)
+        if(checkpoint.size()) {
+            ReceivingReport first = checkpoint.find()
+            return new GraphQLRetVal(first, true, "Delivery Receiving Already Created: Displaying Delivery Receiving Details.")
+        }else{
+            ReceivingReport upsert = new ReceivingReport()
+            def code = "SRR"
+
+            if(purchaseOrder.project?.id){
+                code = purchaseOrder.project?.prefixShortName ?: "PJ"
+                upsert.project = purchaseOrder.project
+            }else if(purchaseOrder.assets?.id){
+                code = purchaseOrder.assets?.prefix ?: "SP"
+                upsert.assets = purchaseOrder.assets
+            }
+
+            upsert.rrNo = generatorService.getNextValue(GeneratorType.SRR_NO, {
+                return "${code}-" + StringUtils.leftPad(it.toString(), 6, "0")
+            })
+
+            upsert.receivedType = code
+            upsert.receiveDate = Instant.now()
+            upsert.userId = employee.id
+            upsert.userFullname = employee.fullName
+            upsert.purchaseOrder = purchaseOrder
+            upsert.receivedRefNo = null
+            upsert.category = purchaseOrder.category ?: ""
+            upsert.receivedRefDate = null
+            upsert.referenceType = null
+            if(employee.office?.id) {
+                upsert.receivedOffice = employee.office
+            }else{
+                upsert.receivedOffice = null
+            }
+            if(purchaseOrder.supplier?.id) {
+                upsert.supplier = purchaseOrder.supplier
+            }else{
+                upsert.supplier = null
+            }
+            if(purchaseOrder?.paymentTerms?.id) {
+                upsert.paymentTerms = purchaseOrder?.paymentTerms
+            }else{
+                upsert.paymentTerms = null
+            }
+            upsert.receivedRemarks = purchaseOrder.remarks ?: ""
+
+            upsert.isPosted = false
+            upsert.isVoid = false
+            upsert.account = null
+            upsert.refAp = null
+            upsert.postedLedger = null
+            upsert.postedBy = null
+            upsert.consignment = false
+            upsert.fixAsset = false
+            upsert.company = company
+
+            // calculations
+            Boolean vatInclusive = true
+            BigDecimal vatRate = 12.00
+            BigDecimal decimalVatRate = vatRate / 100.00
+            BigDecimal gross = BigDecimal.ZERO
+            BigDecimal taxAmount = BigDecimal.ZERO
+            BigDecimal net = BigDecimal.ZERO
+
+            List<ReceivingReportItem> rrItems = []
+            if(purchaseOrderItems.size()) {
+                purchaseOrderItems.each {poItem ->
+                    // calculations here
+                    BigDecimal input_tax = BigDecimal.ZERO;
+                    BigDecimal unitCost = (poItem?.unitCost / (poItem?.item?.item_conversion ?: BigDecimal.ONE)).setScale(2, RoundingMode.HALF_EVEN);
+                    BigDecimal totalAmount = poItem.qtyInSmall * unitCost;
+                    BigDecimal net_amount = totalAmount;
+                    BigDecimal inventoryCost = unitCost;
+                    if (vatInclusive) {
+                        if (poItem.item.vatable) {
+                            BigDecimal sumAmount = totalAmount / (decimalVatRate + 1);
+                            input_tax = sumAmount * decimalVatRate;
+                        }
+                        net_amount = totalAmount - input_tax;
+                        inventoryCost = unitCost / (decimalVatRate + 1);
+                    } else {
+                        if (poItem.item.vatable) {
+                            input_tax = totalAmount * decimalVatRate;
+                        }
+                        net_amount = totalAmount + input_tax;
+                        inventoryCost = unitCost * decimalVatRate + unitCost;
+                    }
+
+                    // sum calculations
+                    gross+=totalAmount
+                    taxAmount+=input_tax
+                    net+=net_amount
+                    // set items
+                    rrItems <<  new ReceivingReportItem().tap {
+                        it.receivingReport = null
+                        it.item = poItem.item
+                        it.refPoItem = poItem
+                        it.receiveQty = poItem.qtyInSmall
+                        it.receiveUnitCost = unitCost
+                        it.recInventoryCost = inventoryCost.setScale(2, RoundingMode.HALF_EVEN)
+                        it.receiveDiscountCost = BigDecimal.ZERO
+                        it.expirationDate = null
+                        it.totalAmount = totalAmount.setScale(2, RoundingMode.HALF_EVEN);
+                        it.inputTax = input_tax.setScale(2, RoundingMode.HALF_EVEN);
+                        it.netAmount = net_amount.setScale(2, RoundingMode.HALF_EVEN);
+                        it.isTax = poItem.item.vatable
+                        it.isFg = false
+                        it.isDiscount = false
+                        it.isCompleted = true
+                        it.isPartial = false
+                        it.isPosted = false
+                    }
+                }
+            }
+
+            upsert.fixDiscount = BigDecimal.ZERO
+            upsert.grossAmount = gross.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.totalDiscount = BigDecimal.ZERO
+            upsert.netDiscount = gross.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.amount = vatInclusive ? gross.setScale(2, RoundingMode.HALF_EVEN) : net.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.inputTax = taxAmount.setScale(2, RoundingMode.HALF_EVEN)
+            upsert.netAmount =  net.setScale(2, RoundingMode.HALF_EVEN)
+
+            upsert.vatRate = vatRate
+            upsert.vatInclusive = vatInclusive
+
+            // end calculations
+            def afterSave = save(upsert)
+
+            // insert items
+            if(rrItems.size()) {
+                rrItems.each {
+                    def upsertItem = it
+                    upsertItem.receivingReport = afterSave
+                    receivingReportItemRepository.save(upsertItem)
+                }
+            }
+            return new GraphQLRetVal(afterSave, true, "Delivery receiving successfully created")
+        }
     }
 }

@@ -1,0 +1,1 @@
+ALTER TABLE inventory.item_sub_account ADD COLUMN is_revenue bool default false;

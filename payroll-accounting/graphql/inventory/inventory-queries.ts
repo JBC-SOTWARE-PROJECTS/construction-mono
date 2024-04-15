@@ -35,6 +35,7 @@ export const GET_INVENTORY_BY_LOCATION = gql`
           vatable
           fixAsset
           consignment
+          forSale
         }
         descLong
         uou
@@ -57,9 +58,61 @@ export const GET_INVENTORY_BY_LOCATION = gql`
 `;
 
 export const UPSERT_CRITICAL_LEVEL_INVENTORY = gql`
-  mutation ($value: Int, $id: UUID) {
+  mutation ($value: BigDecimal, $id: UUID) {
     updateReOrderQty(value: $value, id: $id) {
       id
+    }
+  }
+`;
+
+export const GET_BEGINNING_BY_LOCATION = gql`
+  query (
+    $filter: String
+    $office: UUID
+    $groupId: UUID
+    $category: [UUID]
+    $brand: String
+    $page: Int
+    $size: Int
+  ) {
+    beginningBalancePage(
+      filter: $filter
+      office: $office
+      groupId: $groupId
+      category: $category
+      brand: $brand
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        item {
+          id
+          descLong
+          sku
+          itemCode
+          brand
+          itemGroupId
+          categoryDescription
+          itemCategory
+          production
+          isMedicine
+          vatable
+          fixAsset
+          consignment
+          forSale
+        }
+        office {
+          id
+          officeDescription
+        }
+        uou
+        beginningBalance
+        beginningCost
+      }
+      size
+      totalElements
+      number
     }
   }
 `;

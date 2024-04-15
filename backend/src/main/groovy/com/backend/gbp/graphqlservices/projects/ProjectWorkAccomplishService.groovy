@@ -82,6 +82,7 @@ class ProjectWorkAccomplishService extends AbstractDaoCompanyService<ProjectWork
                     items['periodStart'] = workAccomplish.periodStart
                     items['periodEnd'] = workAccomplish.periodEnd
                     items['projectWorkAccomplishId'] = workAccomplish.id
+                    items['status'] = 'ACTIVE'
 
                 UUID itemId = id ? items['id'] ? UUID.fromString(items['id'] as String) : null : null
                 def workAccomplishItems =  accomplishItemsService.upsertFromMap(itemId,items)

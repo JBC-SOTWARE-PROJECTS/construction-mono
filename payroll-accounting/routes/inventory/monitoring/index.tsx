@@ -68,9 +68,11 @@ export default function InventoryProjectMonitoringContent() {
   };
 
   return (
-    <PageContainer className="project-details">
+    <PageContainer
+      title="Inventory Monitoring"
+      content="Inventory Oversight: Simplifying Monitoring for Better Management.">
       <ProCard
-        title="Inventory Monitoring"
+        title="Inventory"
         headStyle={{
           flexWrap: "wrap",
         }}

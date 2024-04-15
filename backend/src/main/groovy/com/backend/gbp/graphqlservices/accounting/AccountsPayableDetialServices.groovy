@@ -5,6 +5,7 @@ import com.backend.gbp.domain.accounting.AccountsPayableDetails
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.repository.OfficeRepository
+import com.backend.gbp.repository.asset.AssetsRepository
 import com.backend.gbp.repository.projects.ProjectsRepository
 import com.backend.gbp.rest.dto.payables.AccountPayableDetialsDto
 import com.backend.gbp.services.GeneratorService
@@ -41,6 +42,9 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
     @Autowired
     ProjectsRepository projectsRepository
 
+    @Autowired
+    AssetsRepository assetsRepository
+
 
     AccountsPayableDetialServices() {
         super(AccountsPayableDetails.class)
@@ -66,7 +70,8 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
             @GraphQLArgument(name = "ap") AccountsPayable ap,
             @GraphQLArgument(name = "trans") UUID trans,
             @GraphQLArgument(name = "office") UUID office,
-            @GraphQLArgument(name = "project") UUID project
+            @GraphQLArgument(name = "project") UUID project,
+            @GraphQLArgument(name = "assets") UUID assets
     ) {
         AccountsPayableDetails upsert = new AccountsPayableDetails()
         if (!it.isNew) {
@@ -76,11 +81,17 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
         if (trans) {
             upsert.transType = apTransactionServices.apTransactionById(trans)
         }
+        upsert.office = null
         if (office) {
             upsert.office = officeRepository.findById(office).get()
         }
+        upsert.project = null
         if (project) {
             upsert.project = projectsRepository.findById(project).get()
+        }
+        upsert.assets = null
+        if (assets) {
+            upsert.assets = assetsRepository.findById(assets).get()
         }
         upsert.amount = it.amount
         upsert.discRate = it.discRate

@@ -16,6 +16,7 @@ import com.backend.gbp.graphqlservices.inventory.ReturnSupplierItemsService
 import com.backend.gbp.graphqlservices.inventory.ReturnSupplierService
 import com.backend.gbp.graphqlservices.inventory.StockIssuanceService
 import com.backend.gbp.graphqlservices.inventory.StockIssueItemsService
+import com.backend.gbp.repository.asset.VehicleUsageRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.google.gson.Gson
 import com.backend.gbp.domain.hrm.Employee
@@ -35,22 +36,30 @@ import net.sf.jasperreports.engine.export.JRPdfExporter
 import net.sf.jasperreports.export.SimpleExporterInput
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput
 import net.sf.jasperreports.export.SimplePdfExporterConfiguration
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.io.IOUtils
 import org.apache.commons.text.WordUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+import java.nio.charset.Charset
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.Callable
 
 @TypeChecked
 @RestController
@@ -90,6 +99,7 @@ class InventoryReportResource {
 	@Autowired
 	InventoryService inventoryService
 
+
 	@Autowired
 	ItemService itemService
 
@@ -119,6 +129,9 @@ class InventoryReportResource {
 
 	@Autowired
 	StockIssueItemsService stockIssueItemsService
+
+	@Autowired
+	VehicleUsageRepository vehicleUsageRepository
 
     @RequestMapping(value = ['/po_report/{id}'], produces = ['application/pdf'])
     ResponseEntity<byte[]> poReport(@PathVariable('id') UUID id) {
@@ -160,7 +173,8 @@ class InventoryReportResource {
 				project: desc,
 				projTitle: title,
 				location: purchaseOrder?.project?.location?.fullAddress ?: "",
-                fullname: emp?.fullName
+                fullname: emp?.fullName,
+				remarks: purchaseOrder?.remarks ?: ''
 
         )
         def gson = new Gson()
@@ -208,7 +222,7 @@ class InventoryReportResource {
 
                     def itemDto = new POItemReportDto(
                             description: it.item.descLong,
-                            uom: it.item.unit_of_purchase.unitDescription + '(' + it.item.item_conversion + ')',
+                            uom: it.item.unit_of_purchase.unitDescription,
                             deals: deals,
                             discount: discount as BigDecimal,
                             no: counter,
@@ -310,6 +324,94 @@ class InventoryReportResource {
         params.add("Content-Disposition", "inline;filename=PO-Report-of-\"" + purchaseOrder?.poNumber + "\".pdf")
         return new ResponseEntity(data, params, HttpStatus.OK)
     }
+
+	@RequestMapping(value = ['/accumulated_trip_csv/{id}'])
+	Callable<ResponseEntity<byte[]>> accumulated_trip_csv(@PathVariable('id') UUID id) {
+
+		return new Callable<ResponseEntity<byte[]>>() {
+			@Override
+			ResponseEntity<byte[]> call() throws Exception {
+
+				List<VehicleUsageMonitoring> vehList = vehicleUsageRepository.findByAsset(id);
+				def com = companySettingsService.comById()
+				
+				StringBuffer buffer = new StringBuffer()
+
+				CSVPrinter csvPrinter = new CSVPrinter(buffer, CSVFormat.POSTGRESQL_CSV)
+				csvPrinter.printRecord("Company Name",com.companyName)
+				csvPrinter.printRecord("Asset Name",  vehList[0].asset.item.descLong + "/" + vehList[0].asset.model)
+				csvPrinter.printRecord("Usage ",getDateFromInstant(vehList[0].startDatetime).toString() + "to" + getDateFromInstant(vehList[vehList.size()-1].endDatetime).toString())
+				csvPrinter.printRecord("")
+				csvPrinter.printRecord(
+						"Date",
+								"Time Start",
+						         "Time Stop",
+								"Total Hour",
+								"Odemeter Start",
+								"Odemeter Stop",
+								"Total KM",
+								"Diesel",
+								"Route",
+						        "Rental Rate",
+								"Remarks",
+								"Charge To (Project Site)"
+
+				);
+
+
+
+				vehList.eachWithIndex{ it, idx->
+					csvPrinter.printRecord(
+							getDateFromInstant(it.startDatetime),
+							getTimeFromInstant(it.startDatetime),
+							getTimeFromInstant(it.endDatetime),
+							GetHours(it.startDatetime, it.endDatetime),
+							it.startOdometerReading,
+							it.endOdometerReading,
+							it.endOdometerReading.toBigDecimal() - it.startOdometerReading.toBigDecimal(),
+							it.endFuelReading.toBigDecimal() - it.startFuelReading.toBigDecimal(),
+							it.route,
+							it.rentalRate,
+							it.remarks,
+							it.project ? it.project.description  : "Main Office"
+					)
+				}
+
+
+				def data = buffer.toString().getBytes(Charset.defaultCharset())
+				def responseHeaders = new HttpHeaders()
+				responseHeaders.setContentType(MediaType.TEXT_PLAIN)
+				responseHeaders.setContentLength(data.length)
+				responseHeaders.add("Content-Disposition", "attachment;filename=asset_vehicle_usage_transactions.csv")
+
+				return new ResponseEntity(data, responseHeaders, HttpStatus.OK)
+
+			}
+		}
+
+	}
+
+	public static double GetHours(Instant startDate, Instant endDate)
+	{
+		// Convert startDate and endDate to DateTimeOffset objects
+		Instant startInstant = (Instant)startDate;
+		Instant endInstant = (Instant)endDate;
+
+		// Calculate the difference in Duration
+		Duration duration = Duration.between(startInstant, endInstant);
+
+		// Convert Duration to hours
+		double hours = duration.toNanos() / (double)Duration.ofHours(1).toNanos();
+
+		return Math.floor(hours * 100) / 100;
+	}
+
+	public static LocalDate getDateFromInstant(Instant instant) {
+		return instant.atZone(ZoneId.systemDefault()).toLocalDate();
+	}
+	public static LocalTime getTimeFromInstant(Instant instant) {
+		return instant.atZone(ZoneId.systemDefault()).toLocalTime();
+	}
 
 	@RequestMapping(value = ['/trip_ticket/{id}'], produces = ['application/pdf'])
 	ResponseEntity<byte[]> trip_ticket(@PathVariable('id') UUID id) {
@@ -426,6 +528,7 @@ class InventoryReportResource {
 				fullname: purchaseRequest?.userFullname ?: "",
 				project: desc ?: "",
 				projTitle: title ?: "",
+				remarks: purchaseRequest?.remarks ?: "",
 
 		)
 		def gson = new Gson()
@@ -444,8 +547,8 @@ class InventoryReportResource {
 							content_ratio: it.item.item_conversion,
 							qty_uop: it.requestedQty,
 							qty_uou: it.requestedQty * it.item.item_conversion,
-							onhand: inv?.onHand ? inv?.onHand : 0,
-							reorder: inv?.reOrderQty ? inv?.reOrderQty : 0
+							onhand: inv?.onHand ? inv?.onHand : BigDecimal.ZERO,
+							reorder: inv?.reOrderQty ? inv?.reOrderQty : BigDecimal.ZERO
 					)
 					itemsDto.add(itemDto)
 			}
@@ -982,7 +1085,7 @@ class InventoryReportResource {
 		def dto = new ReturnSuppReportDto(
 				date: dateFormat.format(Instant.now()),
 				rts: returnSupplierDetails?.rtsNo,
-				refNo: "${returnSupplierDetails?.refSrr}${returnSupplierDetails?.receivedRefNo ? "/${returnSupplierDetails?.receivedRefNo}" : ""}",
+				refNo: returnSupplierDetails?.receivedRefNo ?: "",
 				supplierCode: returnSupplierDetails?.supplier?.supplierCode,
 				supplierName: returnSupplierDetails?.supplier?.supplierFullname,
 				returnBy: emp?.fullName,
@@ -1081,14 +1184,23 @@ class InventoryReportResource {
 		DateTimeFormatter dateFormat =
 				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
 
+		String desc = parent.category.equalsIgnoreCase("PROJECTS") ? parent?.project?.description ?: "" : parent?.assets?.description ?: ""
+		String title = parent.category.equalsIgnoreCase("PROJECTS") ? "Project: " : "Asset Equipment: "
+		if(parent.category.equalsIgnoreCase("PERSONAL")){
+			desc = ""
+			title = ""
+		}
+
 		def dto = new STSReportDto(
 				date: dateFormat.format(parent?.issueDate),
 				stsNo: parent?.issueNo,
 				issuing_location: parent?.issueFrom?.officeDescription,
 				receiving_location: parent?.issueTo?.officeDescription,
-				project: parent?.project?.description ?: "N/A",
+				project: desc,
+				projectTitle: title,
 				issuedBy: issueBy,
 				receivedBy: receivedBy,
+				remarks: parent?.remarks ?: ""
 
 		)
 		def gson = new Gson()

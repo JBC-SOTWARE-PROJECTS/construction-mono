@@ -46,6 +46,10 @@ export default function UpsertItemModal(props: IProps) {
     record?.item_group ? record?.item_group?.id : null
   );
   const { setFieldValue } = form;
+  const [fixedAsset, setFixedAsset] = useState<boolean>(
+    record?.fixAsset ?? false
+  );
+  const [forSale, setForSale] = useState<boolean>(record?.forSale ?? false);
   // ===================== Queries ==============================
   const groups = useItemGroups();
   const categories = useItemCategory({ groupId: groupId });
@@ -54,9 +58,14 @@ export default function UpsertItemModal(props: IProps) {
   const uou = useUnitOfUsage();
   const generics = useItemGenerics();
   const assetSubAccounts = useItemSubAccount({
-    type: ["ASSET", "FIXED_ASSET"],
+    type: ["ASSET"],
   });
   const expenseSubAccounts = useItemSubAccount({ type: ["EXPENSE"] });
+  const fixedAssetSubAccounts = useItemSubAccount({ type: ["FIXED_ASSET"] });
+  const fixedAssetExpenseSubAccounts = useItemSubAccount({
+    type: ["FIXED_ASSET_EXPENSE"],
+  });
+  const revenueSubAccounts = useItemSubAccount({ type: ["REVENUE"] });
 
   const [upsertRecord, { loading: upsertLoading }] = useMutation(
     UPSERT_RECORD_ITEM,
@@ -96,6 +105,7 @@ export default function UpsertItemModal(props: IProps) {
     payload.discountable = data.discountable || false;
     payload.production = data.production || false;
     payload.consignment = data.consignment || false;
+    payload.forSale = data.forSale || false;
     payload.item_group = { id: data.item_group };
     payload.item_category = { id: data.item_category };
     payload.unit_of_purchase = { id: data.unit_of_purchase };
@@ -103,6 +113,11 @@ export default function UpsertItemModal(props: IProps) {
     payload.item_generics = { id: data.item_generics?.value };
     payload.assetSubAccount = { id: data.assetSubAccount };
     payload.expenseSubAccount = { id: data.expenseSubAccount };
+    payload.fixedAssetSubAccount = { id: data.fixedAssetSubAccount };
+    payload.fixedAssetExpenseSubAccount = {
+      id: data.fixedAssetExpenseSubAccount,
+    };
+    payload.revenueSubAccount = { id: data.revenueSubAccount };
     payload.active = data.active || false;
 
     upsertRecord({
@@ -166,6 +181,15 @@ export default function UpsertItemModal(props: IProps) {
           expenseSubAccount: record?.expenseSubAccount
             ? record?.expenseSubAccount?.id
             : null,
+          fixedAssetSubAccount: record?.fixedAssetSubAccount
+            ? record?.fixedAssetSubAccount?.id
+            : null,
+          fixedAssetExpenseSubAccount: record?.fixedAssetExpenseSubAccount
+            ? record?.fixedAssetExpenseSubAccount?.id
+            : null,
+          revenueSubAccount: record?.revenueSubAccount
+            ? record?.revenueSubAccount?.id
+            : null,
           item_conversion: record?.item_conversion ?? 1,
           item_maximum: record?.item_maximum ?? 0,
           active: record?.active ?? false,
@@ -174,6 +198,7 @@ export default function UpsertItemModal(props: IProps) {
           production: record?.production ?? false,
           fixAsset: record?.fixAsset ?? false,
           consignment: record?.consignment ?? false,
+          forSale: record?.forSale ?? false,
         }}>
         <Row gutter={[8, 0]}>
           <Col {...responsiveColumn4}>
@@ -319,31 +344,6 @@ export default function UpsertItemModal(props: IProps) {
               }}
             />
           </Col>
-          <Divider plain>Accounting Integration</Divider>
-          <Col {...responsiveColumn2}>
-            <FormSelect
-              name="assetSubAccount"
-              label="Asset Category Subaccount"
-              rules={requiredField}
-              propsselect={{
-                options: assetSubAccounts,
-                allowClear: true,
-                placeholder: "Select Asset Category",
-              }}
-            />
-          </Col>
-          <Col {...responsiveColumn2}>
-            <FormSelect
-              name="expenseSubAccount"
-              label="Expense Category Subaccount"
-              rules={requiredField}
-              propsselect={{
-                options: expenseSubAccounts,
-                allowClear: true,
-                placeholder: "Select Expense Category",
-              }}
-            />
-          </Col>
           <Divider plain>Other Configuration</Divider>
           <Col {...responsiveColumn4}>
             <FormCheckBox
@@ -392,6 +392,9 @@ export default function UpsertItemModal(props: IProps) {
               checkBoxLabel="Set as Fixed Asset"
               propscheckbox={{
                 defaultChecked: false,
+                onChange: (e) => {
+                  setFixedAsset(e.target.checked);
+                },
               }}
             />
           </Col>
@@ -405,6 +408,92 @@ export default function UpsertItemModal(props: IProps) {
               }}
             />
           </Col>
+          <Col {...responsiveColumn4}>
+            <FormCheckBox
+              name="forSale"
+              valuePropName="checked"
+              checkBoxLabel="Set as For Sale"
+              propscheckbox={{
+                defaultChecked: false,
+                onChange: (e) => {
+                  setForSale(e.target.checked);
+                },
+              }}
+            />
+          </Col>
+          <Divider plain>Accounting Integration</Divider>
+          <Col {...responsiveColumn2}>
+            <FormSelect
+              name="assetSubAccount"
+              label="Asset Category Subaccount"
+              rules={requiredField}
+              propsselect={{
+                options: assetSubAccounts,
+                allowClear: true,
+                showSearch: true,
+                placeholder: "Select Asset Category",
+              }}
+            />
+          </Col>
+          <Col {...responsiveColumn2}>
+            <FormSelect
+              name="expenseSubAccount"
+              label="Expense Category Subaccount"
+              rules={requiredField}
+              propsselect={{
+                options: expenseSubAccounts,
+                allowClear: true,
+                showSearch: true,
+                placeholder: "Select Expense Category",
+              }}
+            />
+          </Col>
+          {fixedAsset && (
+            <>
+              <Col {...responsiveColumn2}>
+                <FormSelect
+                  name="fixedAssetSubAccount"
+                  label="Fixed Asset Category Subaccount"
+                  rules={requiredField}
+                  propsselect={{
+                    options: fixedAssetSubAccounts,
+                    allowClear: true,
+                    showSearch: true,
+                    placeholder: "Select Fixed Asset Category Subaccount",
+                  }}
+                />
+              </Col>
+              <Col {...responsiveColumn2}>
+                <FormSelect
+                  name="fixedAssetExpenseSubAccount"
+                  label="Fixed Asset Expense Category Subaccount"
+                  rules={requiredField}
+                  propsselect={{
+                    options: fixedAssetExpenseSubAccounts,
+                    allowClear: true,
+                    showSearch: true,
+                    placeholder:
+                      "Select Fixed Asset Expense Category Subaccount",
+                  }}
+                />
+              </Col>
+            </>
+          )}
+          {forSale && (
+            <Col {...responsiveColumn2}>
+              <FormSelect
+                name="revenueSubAccount"
+                label="Revenue Category Subaccount"
+                rules={requiredField}
+                propsselect={{
+                  options: revenueSubAccounts,
+                  allowClear: true,
+                  showSearch: true,
+                  placeholder: "Select Revenue Category Subaccount",
+                }}
+              />
+            </Col>
+          )}
         </Row>
       </Form>
     </Modal>

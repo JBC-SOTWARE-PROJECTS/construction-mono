@@ -36,11 +36,11 @@ enum LedgerDocType { //transactype
 	QA, // QuantityAdjustments
 	PA, // ProductionAssemblies
 	AM, // AssetManagement
+	BB, // Beginning Balance
 	// END: inventory transactions//
 	CH, // Charges
 	CA, // Cash,
 	XX, // Generated From Generator - Error when pushed through
-	BB, // Beginning Balance
 	PRL, //Payroll
 	EL, //Employee Loan
 	FA
@@ -193,9 +193,8 @@ class HeaderLedger extends AbstractAuditingEntity implements Serializable {
 	String invoiceSoaReference
 
 	@GraphQLQuery
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "company_id", referencedColumnName = "id")
-	CompanySettings company
+	@Column(name = "company_id", columnDefinition = "varchar")
+	UUID companyId
 
 }
 

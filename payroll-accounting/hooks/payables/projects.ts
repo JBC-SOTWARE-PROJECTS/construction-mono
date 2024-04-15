@@ -13,7 +13,7 @@ const GET_RECORDS = gql`
 `;
 
 interface IProps {
-  office: string;
+  office?: string | null;
 }
 
 export function UseProjects({ office }: IProps) {

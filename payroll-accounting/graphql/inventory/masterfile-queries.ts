@@ -55,6 +55,19 @@ export const GET_ITEM_RECORDS = gql`
           id
           subAccountDescription
         }
+        fixedAssetSubAccount {
+          id
+          subAccountDescription
+        }
+        fixedAssetExpenseSubAccount {
+          id
+          subAccountDescription
+        }
+        revenueSubAccount {
+          id
+          subAccountDescription
+        }
+        forSale
         item_conversion
         item_maximum
         item_demand_qty
@@ -322,6 +335,7 @@ export const GET_RECORDS_QUANTITY_ADJUSTMENT = gql`
       flagValue
       sourceColumn
       is_active
+      reverse
     }
   }
 `;
@@ -366,6 +380,7 @@ export const GET_RECORDS_ITEM_SUB_ACCOUNT = gql`
       sourceColumn
       isActive
       isFixedAsset
+      isRevenue
     }
   }
 `;

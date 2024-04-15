@@ -1,12 +1,12 @@
 import { AccountContext } from "@/components/accessControl/AccountContext";
 import { ProjectUpdatesMaterials, Query } from "@/graphql/gql/graphql";
-import { DateFormatterWithTime, accessControl } from "@/utility/helper";
+import { DateFormatterWithTime } from "@/utility/helper";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Row, Col, Table, App, Button, Space, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import _ from "lodash";
 import { useContext } from "react";
-import ColTitlePopUp from "../../colTitlePopUp";
+import ColumnTitle from "@/components/common/columnTitle/columnTitle";
 import { NumberFormaterNoDecimal } from "@/utility/helper";
 import { confirmDelete, useDialog } from "@/hooks";
 import {
@@ -95,7 +95,7 @@ export default function ProjectAccomplishmentMaterialsTable({
       key: "descLong",
     },
     {
-      title: <ColTitlePopUp descripton="Unit (UoU)" popup="Unit of Usage" />,
+      title: <ColumnTitle descripton="Unit (UoU)" popup="Unit of Usage" />,
       dataIndex: "uou",
       key: "uou",
       width: 150,

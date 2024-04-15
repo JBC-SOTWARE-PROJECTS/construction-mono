@@ -33,6 +33,10 @@ class DisbursementWtx extends AbstractAuditingEntity implements Serializable {
 	@JoinColumn(name = "disbursement", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	Disbursement disbursement
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "debit_memo", referencedColumnName = "id")
+	DebitMemo debitMemo
+
 	@GraphQLQuery
 	@Column(name = "applied_amount", columnDefinition = "numeric")
 	BigDecimal appliedAmount

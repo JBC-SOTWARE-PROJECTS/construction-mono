@@ -1,6 +1,10 @@
 import { Query, ReceivingReportItem } from "@/graphql/gql/graphql";
 import { currency } from "@/utility/constant";
-import { DateFormatter, NumberFormater, NumberFormaterNoDecimal } from "@/utility/helper";
+import {
+  DateFormatter,
+  NumberFormater,
+  NumberFormaterNoDecimal,
+} from "@/utility/helper";
 import { useQuery } from "@apollo/client";
 import { Table, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
@@ -25,7 +29,7 @@ export default function ReceivingItemsTable({ recId }: IProps) {
       title: "Reference #",
       dataIndex: "receivingReport.rrNo",
       key: "receivingReport.rrNo",
-      width: 120,
+      width: 150,
       render: (_, record) => <span>{record?.receivingReport?.rrNo}</span>,
     },
     {
@@ -41,7 +45,7 @@ export default function ReceivingItemsTable({ recId }: IProps) {
       title: "Description",
       dataIndex: "item.descLong",
       key: "item.descLong",
-      width: 600,
+      width: 400,
       render: (_, record) => <span>{record?.item?.descLong}</span>,
     },
     {
@@ -49,6 +53,7 @@ export default function ReceivingItemsTable({ recId }: IProps) {
       dataIndex: "receiveQty",
       key: "receiveQty",
       align: "center",
+      width: 100,
       render: (qty) => <span>{NumberFormaterNoDecimal(qty)}</span>,
     },
     {
@@ -56,6 +61,7 @@ export default function ReceivingItemsTable({ recId }: IProps) {
       dataIndex: "item.unit_of_usage.unitDescription",
       key: "item.unit_of_usage.unitDescription",
       align: "center",
+      width: 120,
       render: (_, record) => (
         <span>{record.item?.unit_of_usage?.unitDescription}</span>
       ),
@@ -171,8 +177,8 @@ export default function ReceivingItemsTable({ recId }: IProps) {
     },
     {
       title: "Status",
-      dataIndex: "netAmount",
-      key: "netAmount",
+      dataIndex: "isCompleted",
+      key: "isCompleted",
       align: "center",
       width: 100,
       fixed: "right",
@@ -189,12 +195,12 @@ export default function ReceivingItemsTable({ recId }: IProps) {
       size="small"
       columns={columns}
       loading={loading}
-      dataSource={[] as ReceivingReportItem[]}
+      dataSource={data?.recItemByParent as ReceivingReportItem[]}
       pagination={{
         showSizeChanger: false,
         pageSize: 5,
       }}
-      scroll={{ x: 2200 }}
+      scroll={{ x: 2000 }}
     />
   );
 }

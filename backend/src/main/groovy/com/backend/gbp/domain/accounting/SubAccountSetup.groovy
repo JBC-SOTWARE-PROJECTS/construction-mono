@@ -17,11 +17,13 @@ import javax.persistence.*
 
 enum DomainEnum {
     NO_DOMAIN("NO DOMAIN", ""),
-    ITEM_CATEGORY("Item Category", "com.backend.gbp.domain.inventory.ItemCategory"),
     SUPPLIER("Supplier", "com.backend.gbp.domain.inventory.Supplier"),
     BANK("Bank", "com.backend.gbp.domain.accounting.Bank"),
     PROJECTS("Projects", "com.backend.gbp.domain.projects.Projects"),
-    FIXED_ASSET_SUB_ACCOUNT("Fixed Asset Sub-account", "com.backend.gbp.domain.inventory.ItemSubAccount",'isFixedAsset')
+    ITEM_ASSET_SUB_ACCOUNT("Item Asset Sub-account", "com.backend.gbp.domain.inventory.ItemSubAccount", 'isAsset'),
+    FIXED_ASSET_SUB_ACCOUNT("Fixed Asset Sub-account", "com.backend.gbp.domain.inventory.ItemSubAccount",'isFixedAsset'),
+    ITEM_REVENUE_SUB_ACCOUNT("Item Revenue Sub-account", "com.backend.gbp.domain.inventory.ItemSubAccount", 'isRevenue'),
+    ITEM_EXPENSE_SUB_ACCOUNT("Item Expense Sub-account", "com.backend.gbp.domain.inventory.ItemSubAccount", 'isExpense')
 
     String displayName
     String path

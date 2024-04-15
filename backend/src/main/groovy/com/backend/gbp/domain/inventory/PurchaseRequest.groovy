@@ -2,12 +2,11 @@ package com.backend.gbp.domain.inventory
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.assets.Assets
 import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
-import org.hibernate.annotations.NotFound
-import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
@@ -53,18 +52,17 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 	Assets assets
 	
 	@GraphQLQuery
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "supplier", referencedColumnName = "id")
 	Supplier supplier
 	
 	@GraphQLQuery
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "requesting_office", referencedColumnName = "id")
 	Office requestingOffice
 
 	@GraphQLQuery
-	@NotFound(action = NotFoundAction.IGNORE)
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "requested_office", referencedColumnName = "id")
 	Office requestedOffice
 
@@ -94,6 +92,7 @@ class PurchaseRequest extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "remarks", columnDefinition = "varchar")
+	@UpperCase
 	String remarks
 
 	@GraphQLQuery

@@ -6,6 +6,7 @@ import com.backend.gbp.domain.inventory.PurchaseOrderItems
 import com.backend.gbp.domain.inventory.PurchaseOrderItemsMonitoring
 import com.backend.gbp.domain.inventory.ReceivingReport
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.rest.dto.POChildrenDto
 import com.backend.gbp.rest.dto.PurchasePODto
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -15,6 +16,7 @@ import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
@@ -33,6 +35,9 @@ class PurchaseOrderItemMonitoringService extends AbstractDaoService<PurchaseOrde
 
     @Autowired
     GeneratorService generatorService
+
+    @Autowired
+    PurchaseOrderService purchaseOrderService
 
     @GraphQLQuery(name = "monById")
     PurchaseOrderItemsMonitoring monById(
@@ -55,6 +60,13 @@ class PurchaseOrderItemMonitoringService extends AbstractDaoService<PurchaseOrde
         createQuery(query, params).resultList.sort { it.item.descLong }
     }
 
+    @GraphQLQuery(name = "getPurchaserOrderChildren")
+    POChildrenDto getPurchaserOrderChildren(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        return new POChildrenDto(parent: purchaseOrderService.poById(id), items: this.poItemNotReceiveMonitoring(id))
+    }
+
     @GraphQLQuery(name = "checkBalancesByPO")
     List<PurchaseOrderItemsMonitoring> checkBalancesByPO(
             @GraphQLArgument(name = "id") UUID id
@@ -75,6 +87,42 @@ class PurchaseOrderItemMonitoringService extends AbstractDaoService<PurchaseOrde
         params.put('id', id)
         params.put('filter', filter)
         createQuery(query, params).resultList.sort { it.item.descLong }
+    }
+
+    @GraphQLQuery(name = "poItemMonitoringPage")
+    Page<PurchaseOrderItemsMonitoring> poItemMonitoringPage(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "poId") UUID poId,
+            @GraphQLArgument(name = "supplier") UUID supplier,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size
+    ) {
+        String query = '''Select poim from PurchaseOrderItemsMonitoring poim where 
+		 	(lower(poim.item.descLong) like lower(concat('%',:filter,'%'))) and poim.purchaseOrder.status != :status'''
+
+        String countQuery = '''Select count(poim) from PurchaseOrderItemsMonitoring poim where 
+		 	(lower(poim.item.descLong) like lower(concat('%',:filter,'%'))) and poim.purchaseOrder.status != :status'''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        params.put('status', 'VOIDED')
+
+        if (poId) {
+            query += ''' and poim.purchaseOrder.id = :id '''
+            countQuery += ''' and poim.purchaseOrder.id = :id '''
+            params.put('id', poId)
+        }
+
+        if(supplier){
+            query += ''' and poim.purchaseOrder.supplier.id = :supplier '''
+            countQuery += ''' and poim.purchaseOrder.supplier.id = :supplier '''
+            params.put('supplier', supplier)
+        }
+
+
+        query += ''' ORDER BY poim.purchaseOrder.preparedDate DESC'''
+
+        getPageable(query, countQuery, page, size, params)
     }
 
 
