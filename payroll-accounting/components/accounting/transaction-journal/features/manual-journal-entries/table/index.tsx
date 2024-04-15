@@ -84,12 +84,13 @@ const MJETable = (props: ManualJournalEntriesContextProps) => {
 
   const handleAdd = () => {
     const existing: any = {}
-    const defaultSelected = dataSource.map((data) => {
-      if (data?.journalAccount?.code)
-        existing[data?.journalAccount?.code] = data
+    const defaultSelected =
+      (dataSource ?? []).map((data) => {
+        if (data?.journalAccount?.code)
+          existing[data?.journalAccount?.code] = data
 
-      return { ...(data?.journalAccount ?? {}) }
-    })
+        return { ...(data?.journalAccount ?? {}) }
+      }) ?? []
 
     showSelectCoa(
       { defaultSelected, includeMother: false },
