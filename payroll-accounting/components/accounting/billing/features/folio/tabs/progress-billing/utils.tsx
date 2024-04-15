@@ -44,7 +44,11 @@ const PBDeleteBtn = (props: { id: string; refetch: any; itemRefetch: any }) => {
   )
 }
 
-export const getBillingItemColumns = (refetch: any, itemRefetch: any) => {
+export const getBillingItemColumns = (
+  refetch: any,
+  itemRefetch: any,
+  isNotLock?: boolean
+) => {
   const columns: TableColumnsType<BillingItem> = [
     {
       title: "Date/Time",
@@ -185,7 +189,8 @@ export const getBillingItemColumns = (refetch: any, itemRefetch: any) => {
       fixed: "right",
       width: 30,
       render: (id, record: BillingItem) =>
-        record.status && <PBDeleteBtn {...{ id, refetch, itemRefetch }} />,
+        record.status &&
+        isNotLock && <PBDeleteBtn {...{ id, refetch, itemRefetch }} />,
     },
   ]
 
