@@ -358,6 +358,8 @@ class InventoryReportResource {
 
 				);
 
+
+
 				vehList.eachWithIndex{ it, idx->
 					csvPrinter.printRecord(
 							getDateFromInstant(it.startDatetime),

@@ -20,6 +20,7 @@ import { GET_ACTIVE_PROJECTS } from "@/components/payroll/configurations/UpsertS
 import VehicleUsageAttachemntModal from "@/components/inventory/assets/dialogs/vehicleUsageAttachment";
 import CustomButton from "@/components/common/CustomButton";
 import { getUrlPrefix } from "@/utility/graphql-client";
+import useGetVehicleUsageLatest from "@/hooks/asset/useGetVehicleUsageLatest";
 
 type Props = {};
 const { Search } = Input;
@@ -44,6 +45,12 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
   const [state, setState] = useState(initialState);
   const [csvLoading, setCsvLoading] = useState(false);
 
+  const [latestUsage, latestUsageloading, latestUsagesetFilters] = useGetVehicleUsageLatest({
+    variables:{
+      asset: router?.query?.id
+    },
+    fetchPolicy: "network-only",
+  });
 
   const [data, loading, refetch] = useGetVehicleUsageMonitoring({
     variables: {
@@ -71,7 +78,9 @@ export default function VehicleUsageMonitoringComponent({}: Props) {
         : []),
     ]
 
-    modalUpsert({ record: record , projectOpts: projectOpts, viewModeSet: viewMode}, (result: any) => {
+
+
+    modalUpsert({ record: record, latestUsage: latestUsage, projectOpts: projectOpts, viewModeSet: viewMode}, (result: any) => {
       if (result) {
         refetch();
         if (record?.id) {

@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param
 interface VehicleUsageRepository extends JpaRepository<VehicleUsageMonitoring, UUID> {
 
     @Query(
-            value = """Select p from VehicleUsageMonitoring p where p.asset.id = :asset"""
+            value = """Select p from VehicleUsageMonitoring p where p.asset.id = :asset ORDER BY p.startDatetime DESC"""
     )
     List<VehicleUsageMonitoring> findByAsset(@Param("asset") UUID asset)
 
