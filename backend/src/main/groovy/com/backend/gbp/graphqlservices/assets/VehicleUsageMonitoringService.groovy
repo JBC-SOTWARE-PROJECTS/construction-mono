@@ -3,12 +3,14 @@ package com.backend.gbp.graphqlservices.assets
 import com.backend.gbp.domain.assets.AssetMaintenanceTypes
 import com.backend.gbp.domain.assets.VehicleUsageMonitoring
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.repository.asset.VehicleUsageRepository
 import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
@@ -21,6 +23,9 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
     VehicleUsageMonitoringService() {
         super(VehicleUsageMonitoring.class)
     }
+
+    @Autowired
+    VehicleUsageRepository vehicleUsageRepository
 
     @GraphQLMutation(name = "upsertVehicleUsageMonitoring")
     @Transactional
@@ -57,6 +62,17 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
         query += ''' ORDER BY p.startDatetime DESC'''
 
         Page<VehicleUsageMonitoring> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
+    @GraphQLQuery(name = "vehicleUsageMonitoringLatest")
+    VehicleUsageMonitoring vehicleUsageMonitoringLatest(
+            @GraphQLArgument(name = "asset") UUID asset
+    ) {
+
+        List<VehicleUsageMonitoring> vehList = vehicleUsageRepository.findByAsset(asset);
+
+        VehicleUsageMonitoring result = vehList[0]
         return result
     }
 }
