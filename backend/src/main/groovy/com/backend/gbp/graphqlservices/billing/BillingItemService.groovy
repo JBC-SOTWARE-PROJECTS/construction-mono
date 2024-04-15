@@ -739,7 +739,10 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
 
             def accomplishItem = projectWorkAccomplishItemsService.findOne(item.projectWorkAccomplishmentItemId)
             accomplishItem.thisPeriodQty = 0
-            accomplishItem.toDateQty = accomplishItem?.toDateQty ?: 0.00 - item.qty
+            def qty = item.qty
+            def toDateQty = accomplishItem?.toDateQty ?: 0.00
+            def remaining = toDateQty - qty
+            accomplishItem.toDateQty = remaining
             accomplishItem.toDateAmount = accomplishItem?.toDateQty ?: 0.00 * accomplishItem?.cost ?: 0.00
             accomplishItem.balanceQty = accomplishItem.balanceQty > 0 ? (accomplishItem?.balanceQty ?: 0.00) - item.qty : item.qty
             accomplishItem.balanceAmount = accomplishItem.balanceQty * accomplishItem.cost

@@ -81,7 +81,11 @@ export default function FolioProgressBilling(
       <Table
         rowKey={"id"}
         size="small"
-        columns={getBillingItemColumns(props?.refetch, refetch)}
+        columns={getBillingItemColumns(
+          props?.refetch,
+          refetch,
+          !props?.billing?.locked
+        )}
         loading={loading}
         dataSource={data?.billingItemByParentType ?? []}
         scroll={{ x: 1500, y: 300 }}
