@@ -106,14 +106,14 @@ class PayrollPerProject {
 
                 if (payroll) {
                     def timekeeping = payroll?.timekeeping;
-                    def allowance = payroll?.allowance?.allowanceEmployees;
-
-                    BigDecimal allowanceItm = 0.0
-                    allowance.each {al ->
-                        al.allowanceItems.each{
-                            allowanceItm += it.amount ?: 0.0
-                        }
-                    }
+//                    def allowance = payroll?.allowance?.allowanceEmployees;
+//
+//                    BigDecimal allowanceItm = 0.0
+//                    allowance.each {al ->
+//                        al.allowanceItems.each{
+//                            allowanceItm += it.amount ?: 0.0
+//                        }
+//                    }
 
                     timekeeping.timekeepingEmployees.each {
                         it.accumulatedLogs?.each { al ->
@@ -129,6 +129,11 @@ class PayrollPerProject {
                             al.projectBreakdown.each {
                                 hl ->
 
+                                    def gross = (hl.regular ?: 0.0) + (hl.overtime ?: 0.0) + (hl.regularHoliday ?: 0.0) +
+                                                (hl.underTime ?: 0.0) + (hl.overtimeDoubleHoliday ?: 0.0) + (hl.overtimeHoliday ?: 0.0) +
+                                                (hl.overtimeHoliday ?: 0.0) + (hl.regularDoubleHoliday ?: 0.0) + (hl.overtimeSpecialHoliday ?: 0.0) +
+                                                (hl.overtimeSpecialHoliday ?: 0.0) + (hl.regularSpecialHoliday ?: 0.0)
+
                                     if (!projGroup[hl.project]) {
                                         PayrollPerProj proj =  new PayrollPerProj()
                                         proj.id = hl.project
@@ -143,15 +148,12 @@ class PayrollPerProject {
                                         }
                                         else {
                                             HrsDto hrs = new HrsDto()
-                                            BigDecimal gross = (hl.regular ?: BigDecimal.ZERO) + (hl.overtime ?: BigDecimal.ZERO) + (hl.regularHoliday ?: BigDecimal.ZERO)
-                                            gross = gross.setScale(2, RoundingMode.HALF_UP)
-                                            BigDecimal totalGrossPay = gross + allowanceItm
 
                                             hrs.empName = employee?.fullName
                                             hrs.hours = hl?.totalRegularHours
-                                            hrs.grossPay = totalGrossPay
+                                            hrs.grossPay = gross
                                             empPrjHours[hl.project][al?.employeeId] = hrs
-                                            prjTotal[hl.project] = prjTotal[hl.project] + totalGrossPay
+                                            prjTotal[hl.project] = prjTotal[hl.project] + gross
                                         }
                                     }else {
                                         Map<UUID,HrsDto> hrsDtoMap = [:]
@@ -182,12 +184,11 @@ class PayrollPerProject {
                             }
 
                             csvPrinter.printRecord("")
-                            csvPrinter.printRecord("")
-                            csvPrinter.printRecord("Total Pay", prjTotal[project])
+                            csvPrinter.printRecord("Total Pay", "", prjTotal[project])
                             AllTotal +=prjTotal[project]
                     }
-
-                    csvPrinter.printRecord("Total Pay for Company", AllTotal)
+                    csvPrinter.printRecord("")
+                    csvPrinter.printRecord("Total Pay for Company","", AllTotal)
                 }
 
                 def data = buffer.toString().getBytes(Charset.defaultCharset())
