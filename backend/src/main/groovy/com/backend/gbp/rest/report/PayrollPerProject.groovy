@@ -116,6 +116,15 @@ class PayrollPerProject {
 //                    }
 
                     timekeeping.timekeepingEmployees.each {
+                        def gross = it.totalSalary
+
+
+//                        BigDecimal totalGross = gross?.regular ?: 0.0 + gross?.overtime  ?: 0.0 + gross?.regularHoliday  ?: 0.0 + gross?.overtimeHoliday  ?: 0.0 + gross?.overtimeDoubleHoliday  ?: 0.0 + gross?.overtimeSpecialHoliday  ?: 0.0 +
+//                                                gross?.regularDoubleHoliday  ?: 0.0 + gross?.regularSpecialHoliday  ?: 0.0;
+
+                        BigDecimal ttGross = gross?.getTotal() ?: 0.0
+
+
                         it.accumulatedLogs?.each { al ->
                             def employee = new Employee()
                             if (employeeMap[al?.employeeId]) {
@@ -126,13 +135,17 @@ class PayrollPerProject {
                                 employeeMap[al?.employeeId] = employee
                             }
 
+
+
                             al.projectBreakdown.each {
                                 hl ->
 
-                                    def gross = (hl.regular ?: 0.0) + (hl.overtime ?: 0.0) + (hl.regularHoliday ?: 0.0) +
-                                                (hl.underTime ?: 0.0) + (hl.overtimeDoubleHoliday ?: 0.0) + (hl.overtimeHoliday ?: 0.0) +
-                                                (hl.overtimeHoliday ?: 0.0) + (hl.regularDoubleHoliday ?: 0.0) + (hl.overtimeSpecialHoliday ?: 0.0) +
-                                                (hl.overtimeSpecialHoliday ?: 0.0) + (hl.regularSpecialHoliday ?: 0.0)
+
+                                    def totalHrs = hl.regular + hl.overtime  + hl.regularHoliday +
+                                                hl.underTime ?:  + hl.overtimeDoubleHoliday  + hl.overtimeHoliday  +
+                                                hl.overtimeHoliday ?:  + hl.regularDoubleHoliday  + hl.overtimeSpecialHoliday +
+                                                hl.overtimeSpecialHoliday ?:  + hl.regularSpecialHoliday
+
 
                                     if (!projGroup[hl.project]) {
                                         PayrollPerProj proj =  new PayrollPerProj()
@@ -144,16 +157,16 @@ class PayrollPerProject {
 
                                     if(empPrjHours[hl.project]){
                                         if(empPrjHours[hl.project][al?.employeeId]){
-                                            empPrjHours[hl.project][al?.employeeId].hours += hl?.totalRegularHours ?: 0
+                                            empPrjHours[hl.project][al?.employeeId].hours += hl?.totalRegularHours;
                                         }
                                         else {
                                             HrsDto hrs = new HrsDto()
 
                                             hrs.empName = employee?.fullName
-                                            hrs.hours = hl?.totalRegularHours
-                                            hrs.grossPay = gross
+                                            hrs.hours =  hl?.totalRegularHours + totalHrs;
+                                            hrs.grossPay = ttGross
                                             empPrjHours[hl.project][al?.employeeId] = hrs
-                                            prjTotal[hl.project] = prjTotal[hl.project] + gross
+                                            prjTotal[hl.project] = prjTotal[hl.project] + ttGross
                                         }
                                     }else {
                                         Map<UUID,HrsDto> hrsDtoMap = [:]
@@ -180,7 +193,7 @@ class PayrollPerProject {
 
                             empPrjHours[project].each {
                                 empId, hrs ->
-                                    csvPrinter.printRecord(hrs.empName, Math.round(hrs.hours as double), hrs.grossPay);
+                                    csvPrinter.printRecord(hrs.empName, hrs.hours, hrs.grossPay);
                             }
 
                             csvPrinter.printRecord("")
