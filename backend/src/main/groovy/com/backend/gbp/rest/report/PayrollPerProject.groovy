@@ -106,21 +106,9 @@ class PayrollPerProject {
 
                 if (payroll) {
                     def timekeeping = payroll?.timekeeping;
-//                    def allowance = payroll?.allowance?.allowanceEmployees;
-//
-//                    BigDecimal allowanceItm = 0.0
-//                    allowance.each {al ->
-//                        al.allowanceItems.each{
-//                            allowanceItm += it.amount ?: 0.0
-//                        }
-//                    }
 
                     timekeeping.timekeepingEmployees.each {
                         def gross = it.totalSalary
-
-
-//                        BigDecimal totalGross = gross?.regular ?: 0.0 + gross?.overtime  ?: 0.0 + gross?.regularHoliday  ?: 0.0 + gross?.overtimeHoliday  ?: 0.0 + gross?.overtimeDoubleHoliday  ?: 0.0 + gross?.overtimeSpecialHoliday  ?: 0.0 +
-//                                                gross?.regularDoubleHoliday  ?: 0.0 + gross?.regularSpecialHoliday  ?: 0.0;
 
                         BigDecimal ttGross = gross?.getTotal() ?: 0.0
 
@@ -136,16 +124,8 @@ class PayrollPerProject {
                             }
 
 
-
                             al.projectBreakdown.each {
                                 hl ->
-
-
-                                    def totalHrs = hl.regular + hl.overtime  + hl.regularHoliday +
-                                                hl.underTime ?:  + hl.overtimeDoubleHoliday  + hl.overtimeHoliday  +
-                                                hl.overtimeHoliday ?:  + hl.regularDoubleHoliday  + hl.overtimeSpecialHoliday +
-                                                hl.overtimeSpecialHoliday ?:  + hl.regularSpecialHoliday
-
 
                                     if (!projGroup[hl.project]) {
                                         PayrollPerProj proj =  new PayrollPerProj()
@@ -157,13 +137,13 @@ class PayrollPerProject {
 
                                     if(empPrjHours[hl.project]){
                                         if(empPrjHours[hl.project][al?.employeeId]){
-                                            empPrjHours[hl.project][al?.employeeId].hours += hl?.totalRegularHours;
+                                            empPrjHours[hl.project][al?.employeeId].hours += hl?.overtime + hl?.regular + hl?.regularHoliday + hl?.regularDoubleHoliday + hl?.regularSpecialHoliday + hl?.overtimeSpecialHoliday + hl?.overtimeDoubleHoliday + hl?.overtimeHoliday
                                         }
                                         else {
                                             HrsDto hrs = new HrsDto()
 
                                             hrs.empName = employee?.fullName
-                                            hrs.hours =  hl?.totalRegularHours + totalHrs;
+                                            hrs.hours = hl?.overtime + hl?.regular + hl?.regularHoliday + hl?.regularDoubleHoliday + hl?.regularSpecialHoliday + hl?.overtimeSpecialHoliday + hl?.overtimeDoubleHoliday + hl?.overtimeHoliday
                                             hrs.grossPay = ttGross
                                             empPrjHours[hl.project][al?.employeeId] = hrs
                                             prjTotal[hl.project] = prjTotal[hl.project] + ttGross
