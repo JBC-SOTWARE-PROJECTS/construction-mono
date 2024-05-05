@@ -43,6 +43,7 @@ export default function FolioProgressBilling(
         id: props?.billing?.project?.id,
         billingId: props?.billing?.id,
         billingItems,
+        projectWorkAccomplishId: props?.billing?.projectWorkAccomplishId,
       },
       () => {
         if (props?.refetch) props?.refetch()

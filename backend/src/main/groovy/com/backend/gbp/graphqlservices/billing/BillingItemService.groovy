@@ -50,7 +50,7 @@ enum SALES_INTEGRATION {
 
 @Component
 @GraphQLApi
-@TypeChecked
+//@TypeChecked
 class BillingItemService extends AbstractDaoService<BillingItem> {
 
     BillingItemService() {
@@ -707,22 +707,25 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         if(billing){
             ProjectWorkAccomplish accomplish = projectWorkAccomplishService.findOne(billing.projectWorkAccomplishId)
             def accomplishItems = new ProjectWorkAccomplishItems()
-            accomplishItems = projectWorkAccomplishItemsService.findOneProjectWorkAccomplishItemsByProjectCost(UUID.fromString(fields['projectCost'] as String))
-            entityObjectMapperService.updateFromMap(accomplishItems, fields)
-            accomplishItems.projectWorkAccomplishId =accomplish.id
-            accomplishItems.periodStart = accomplish.periodStart
-            accomplishItems.periodEnd = accomplish.periodEnd
-            accomplishItems.status = 'ACTIVE'
-            def newSaved = projectWorkAccomplishItemsService.save(accomplishItems)
+            accomplishItems = projectWorkAccomplishItemsService.findOneProjectWorkAccomplishItemsByProjectCost(UUID.fromString(fields['projectCost'] as String),billing.projectWorkAccomplishId)
+            if(accomplishItems) {
+                entityObjectMapperService.updateFromMap(accomplishItems, fields)
+                accomplishItems.projectWorkAccomplishId = accomplish.id
+                accomplishItems.periodStart = accomplish.periodStart
+                accomplishItems.periodEnd = accomplish.periodEnd
+                accomplishItems.status = 'ACTIVE'
+                def newSaved = projectWorkAccomplishItemsService.save(accomplishItems)
 
-            def projectCost = projectCostService.findOne(newSaved.projectCost)
-            projectCost.billedQty = (newSaved?.prevQty ?: 0) + (newSaved?.thisPeriodQty ?: 0)
-            projectCostService.save(projectCost)
+                def projectCost = projectCostService.findOne(newSaved.projectCost)
+                projectCost.billedQty = (newSaved?.prevQty ?: 0) + (newSaved?.thisPeriodQty ?: 0)
+                projectCostService.save(projectCost)
 
-            List<ProjectWorkAccomplishItems> items = []
-            items << newSaved
-            addSWAItems(items,billing.id)
-            return new GraphQLResVal<Boolean>(true,true,"Successfully saved.")
+                List<ProjectWorkAccomplishItems> items = []
+                items << newSaved
+                addSWAItems(items, billing.id)
+                return new GraphQLResVal<Boolean>(true, true, "Successfully saved.")
+            }
+            return new GraphQLResVal<Boolean>(false,false,"Folio doesn't exist.")
         }
         return new GraphQLResVal<Boolean>(false,false,"Folio doesn't exist.")
     }
