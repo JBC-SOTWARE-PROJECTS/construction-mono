@@ -829,6 +829,7 @@ export default function UpsertPOFormModal(props: IProps) {
                 name="paymentTerms"
                 rules={requiredField}
                 propsselect={{
+                  showSearch: true,
                   options: paymentTerms,
                   allowClear: true,
                   placeholder: "Terms of Payment",
@@ -866,6 +867,7 @@ export default function UpsertPOFormModal(props: IProps) {
                   label="Project"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: projects,
                     allowClear: true,
                     placeholder: "Select Project",
@@ -878,6 +880,7 @@ export default function UpsertPOFormModal(props: IProps) {
                   label="Equipments (Assets)"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: assets,
                     allowClear: true,
                     placeholder: "Select Equipments (Assets)",

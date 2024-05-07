@@ -537,6 +537,7 @@ export default function UpsertReturnFormModal(props: IProps) {
                 label="Returning Office"
                 rules={requiredField}
                 propsselect={{
+                  showSearch: true,
                   options: offices,
                   allowClear: true,
                   placeholder: "Request To",
