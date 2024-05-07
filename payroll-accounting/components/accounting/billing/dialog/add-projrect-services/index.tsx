@@ -27,6 +27,7 @@ interface AddProjectServicesProps {
   hide: (params?: any) => void
   id: string
   billingId: string
+  projectWorkAccomplishId: string
   billingItems: string[]
 }
 export function AddProjectServices(props: AddProjectServicesProps) {
@@ -76,6 +77,7 @@ export function AddProjectServices(props: AddProjectServicesProps) {
     onFindOne({
       variables: {
         id,
+        projectWorkAccomplishId: props.projectWorkAccomplishId,
       },
     })
   }
