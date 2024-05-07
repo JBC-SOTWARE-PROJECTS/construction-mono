@@ -12,6 +12,9 @@ import {
 import { gql, useQuery } from "@apollo/client";
 import { Button, Col, Form, Input, Row } from "antd";
 import { useRouter } from "next/router";
+import { Divider, Tabs } from "antd";
+import { TabsProps } from "antd/lib";
+import VehicleUsageProjectExpense from "./assets/vehicle-usage-expense";
 
 const PROJECT_WORK_ACCOMPLISH = gql`
   query ($id: UUID) {
@@ -45,6 +48,18 @@ export default function OperationExpenses() {
 
   const onSearchRecord = (text: string) => {};
 
+  const items: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "Vehicle Usage Expense",
+      children: <VehicleUsageProjectExpense/>,
+    }
+  ];
+
+  const onChange = (key: string) => {
+    console.log(key);
+  };
+
   return (
     <PageContainer
       pageHeaderRender={(e) => <ProjectHeader id={query?.id as string} />}>
@@ -74,7 +89,7 @@ export default function OperationExpenses() {
         {/* <WorkAccomplishmentsCollapse
           {...{ data, loading, onHandleEdit, refetch }}
         /> */}
-        All Assets
+           <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
       </ProCard>
     </PageContainer>
   );

@@ -103,6 +103,7 @@ export default function VehicleUsageAttachemntModal(props: IProps) {
 
   const handleUpload = (info: any) => {
     const { status } = info.file;
+    console.log("file", info)
     
     if (status !== "uploading") {
     }
