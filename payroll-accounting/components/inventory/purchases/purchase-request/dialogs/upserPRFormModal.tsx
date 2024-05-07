@@ -463,6 +463,7 @@ export default function UpsertPRFormModal(props: IProps) {
                 label="Request To"
                 rules={requiredField}
                 propsselect={{
+                  showSearch: true,
                   options: offices,
                   allowClear: true,
                   placeholder: "Request To",
@@ -509,6 +510,7 @@ export default function UpsertPRFormModal(props: IProps) {
                   label="Project"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: projects,
                     allowClear: true,
                     placeholder: "Select Project",
@@ -521,6 +523,7 @@ export default function UpsertPRFormModal(props: IProps) {
                   label="Equipments (Assets)"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: assets,
                     allowClear: true,
                     placeholder: "Select Equipments (Assets)",

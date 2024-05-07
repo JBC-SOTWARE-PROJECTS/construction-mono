@@ -503,6 +503,7 @@ export default function UpsertIssuanceFormModal(props: IProps) {
                 propsselect={{
                   options: offices,
                   allowClear: true,
+                  showSearch: true,
                   placeholder: global.labelOffice,
                   onChange: (e) => {
                     setOfficeId(e);
@@ -550,6 +551,7 @@ export default function UpsertIssuanceFormModal(props: IProps) {
                   label="Project"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: projects,
                     allowClear: true,
                     placeholder: "Select Project",
@@ -562,6 +564,7 @@ export default function UpsertIssuanceFormModal(props: IProps) {
                   label="Equipments (Assets)"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: assets,
                     allowClear: true,
                     placeholder: "Select Equipments (Assets)",

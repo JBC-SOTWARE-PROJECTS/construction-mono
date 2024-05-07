@@ -90,7 +90,7 @@ interface IProps {
   hide: (hideProps: any) => void;
   record?: ReceivingReport | null | undefined;
   rrCategory: string;
-  disabledPO?: boolean
+  disabledPO?: boolean;
 }
 
 interface IAmount {
@@ -1526,6 +1526,7 @@ export default function UpsertReceivingModal(props: IProps) {
                 label="Receiving Office"
                 rules={requiredField}
                 propsselect={{
+                  showSearch: true,
                   options: offices,
                   allowClear: true,
                   placeholder: "Receiving Office",
@@ -1536,6 +1537,7 @@ export default function UpsertReceivingModal(props: IProps) {
                 label="Terms of Payment"
                 rules={requiredField}
                 propsselect={{
+                  showSearch: true,
                   options: paymentTerms,
                   allowClear: true,
                   placeholder: "Terms of Payment",
@@ -1572,6 +1574,7 @@ export default function UpsertReceivingModal(props: IProps) {
                   label="Project"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: projects,
                     allowClear: true,
                     placeholder: "Select Project",
@@ -1584,6 +1587,7 @@ export default function UpsertReceivingModal(props: IProps) {
                   label="Equipments (Assets)"
                   rules={requiredField}
                   propsselect={{
+                    showSearch: true,
                     options: assets,
                     allowClear: true,
                     placeholder: "Select Equipments (Assets)",
