@@ -166,6 +166,7 @@ export default function PettyCashModal(props: IProps) {
     payload.amountIssued = state.amountIssued;
     payload.amountUsed = state.amountUsed;
     payload.amountUnused = state.amountUnused;
+    payload.pcvDate = values.pcvDate;
     // ==================== validations ===============================
     if (state.amountUnused < 0) {
       return message.error("Applied issued is greater than Amount used");
