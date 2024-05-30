@@ -1,12 +1,12 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react"
 import {
   ExclamationCircleOutlined,
   LogoutOutlined,
   SettingFilled,
   AlertOutlined,
-} from "@ant-design/icons";
-import type { ProSettings } from "@ant-design/pro-components";
-import { ProConfigProvider, ProLayout } from "@ant-design/pro-components";
+} from "@ant-design/icons"
+import type { ProSettings } from "@ant-design/pro-components"
+import { ProConfigProvider, ProLayout } from "@ant-design/pro-components"
 import {
   Badge,
   Button,
@@ -16,40 +16,38 @@ import {
   Empty,
   Modal,
   App,
-} from "antd";
-import theme from "@/theme/themeConfig";
-import { IUserEmployee } from "@/utility/interfaces";
-import { useRouter } from "next/router";
-import CircularProgress from "../circularProgress";
-import useLogout from "@/hooks/useLogout";
-import enUS from "antd/locale/en_US";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import timezone from "dayjs/plugin/timezone";
-import "dayjs/locale/en"; // Import the English locale
-import { useSidebarMenuSelection } from "@/hooks/common";
-import { softwareName, systemTagline } from "@/shared/settings";
+} from "antd"
+import theme from "@/theme/themeConfig"
+import { IUserEmployee } from "@/utility/interfaces"
+import { useRouter } from "next/router"
+import CircularProgress from "../circularProgress"
+import useLogout from "@/hooks/useLogout"
+import enUS from "antd/locale/en_US"
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
+import timezone from "dayjs/plugin/timezone"
+import "dayjs/locale/en" // Import the English locale
+import { useSidebarMenuSelection } from "@/hooks/common"
+import { softwareName, systemTagline } from "@/shared/settings"
+import { isCashieringTerminal } from "./moduleSideBar/accounting/cashier"
 interface IProps {
-  account: IUserEmployee;
-  children: ReactNode;
+  account: IUserEmployee
+  children: ReactNode
 }
 
 const DiverseTradeLayout = (props: IProps) => {
-  const { children, account } = props;
-  const router = useRouter();
-  const logOut = useLogout();
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+  const { children, account } = props
+  const router = useRouter()
+  const logOut = useLogout()
+  const [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false)
   // const [mobile, setMobile] = useState(false);
 
-  const routerSplit = router.pathname.split("/");
-  const modulePath = routerSplit[1];
-  const subModulePath = routerSplit[2];
+  const routerSplit = router.pathname.split("/")
+  const modulePath = routerSplit[1]
+  const subModulePath = routerSplit[2]
 
-  const { layout, sidebar } = useSidebarMenuSelection(
-    modulePath,
-    subModulePath
-  );
+  const { layout, sidebar } = useSidebarMenuSelection(modulePath, subModulePath)
   const settings: Partial<ProSettings> | undefined = {
     fixSiderbar: true,
     layout,
@@ -61,25 +59,25 @@ const DiverseTradeLayout = (props: IProps) => {
     siderMenuType: "group",
     footerRender: false,
     suppressSiderWhenMenuEmpty: true,
-  };
+  }
 
-  const [pathname, setPathname] = useState(router.pathname || "/");
+  const [pathname, setPathname] = useState(router.pathname || "/")
 
   useEffect(() => {
     if (router.pathname) {
-      setPathname(router.pathname);
-      setLoading(false);
+      setPathname(router.pathname)
+      setLoading(false)
     }
-  }, [router]);
+  }, [router])
 
   useEffect(() => {
-    dayjs.locale("en"); // Set the locale for dayjs
-    dayjs.extend(timezone);
-    dayjs.extend(relativeTime);
-  }, []);
+    dayjs.locale("en") // Set the locale for dayjs
+    dayjs.extend(timezone)
+    dayjs.extend(relativeTime)
+  }, [])
 
   if (typeof document === "undefined") {
-    return <CircularProgress />;
+    return <CircularProgress />
   }
 
   const confirm = () => {
@@ -89,20 +87,22 @@ const DiverseTradeLayout = (props: IProps) => {
       icon: <ExclamationCircleOutlined />,
       onOk() {
         return new Promise((resolve, reject) => {
-          resolve(logOut());
-        }).catch(() => console.log("Oops errors!"));
+          resolve(logOut())
+        }).catch(() => console.log("Oops errors!"))
       },
       onCancel() {},
-    });
-  };
+    })
+  }
 
   const showDrawer = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
   const onClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
+
+  const isTerminal = isCashieringTerminal(router.asPath)
 
   return (
     <div
@@ -110,7 +110,8 @@ const DiverseTradeLayout = (props: IProps) => {
       style={{
         height: "100vh",
         overflow: "auto",
-      }}>
+      }}
+    >
       <ProConfigProvider hashed={false} token={theme.token}>
         <ConfigProvider
           locale={enUS}
@@ -118,9 +119,13 @@ const DiverseTradeLayout = (props: IProps) => {
           getTargetContainer={() => {
             return (
               document.getElementById("diversetrade-layout") || document.body
-            );
-          }}>
+            )
+          }}
+        >
           <ProLayout
+            menuRender={(props, defaultDom) =>
+              !isTerminal ? defaultDom : null
+            }
             loading={loading}
             //title={""}
             title={softwareName}
@@ -179,10 +184,11 @@ const DiverseTradeLayout = (props: IProps) => {
                           onClick: confirm,
                         },
                       ],
-                    }}>
+                    }}
+                  >
                     {dom}
                   </Dropdown>
-                );
+                )
               },
             }}
             actionsRender={(props) => {
@@ -193,15 +199,16 @@ const DiverseTradeLayout = (props: IProps) => {
                     size="small"
                     type="link"
                     onClick={showDrawer}
-                    className="notification-badge">
+                    className="notification-badge"
+                  >
                     <Badge size="small" count={0}>
                       <AlertOutlined key="AlertOutlined" />
                     </Badge>
                   </Button>,
-                ];
+                ]
               }
               if (typeof window === "undefined") {
-                return [];
+                return []
               } else {
                 return [
                   <SettingFilled key="GithubFilled" />,
@@ -210,12 +217,13 @@ const DiverseTradeLayout = (props: IProps) => {
                     size="small"
                     type="link"
                     onClick={showDrawer}
-                    className="notification-badge">
+                    className="notification-badge"
+                  >
                     <Badge size="small" count={0}>
                       <AlertOutlined key="AlertOutlined" />
                     </Badge>
                   </Button>,
-                ];
+                ]
               }
             }}
             headerTitleRender={(logo, title, _) => {
@@ -224,41 +232,44 @@ const DiverseTradeLayout = (props: IProps) => {
                   {logo}
                   <span className="custom-title">{title}</span>
                 </a>
-              );
-              if (typeof window === "undefined") return defaultDom;
+              )
+              if (typeof window === "undefined") return defaultDom
               if (document.body.clientWidth < 1400) {
-                return defaultDom;
+                return defaultDom
               }
-              if (_.isMobile) return defaultDom;
-              return <>{defaultDom}</>;
+              if (_.isMobile) return defaultDom
+              return <>{defaultDom}</>
             }}
             menuFooterRender={(props) => {
-              if (props?.collapsed) return undefined;
+              if (props?.collapsed) return undefined
               return (
                 <div
                   style={{
                     textAlign: "center",
                     paddingBlockStart: 12,
-                  }}>
+                  }}
+                >
                   <div>
                     © 2024 {softwareName} <sup>+</sup>
                   </div>
                   {/* <div>{systemTagline}</div> */}
                 </div>
-              );
+              )
             }}
             onMenuHeaderClick={() => router.push("/")}
             menuItemRender={(item, dom) => (
               <div
                 onClick={() => {
-                  setLoading(true);
-                  let path = item.path || "/";
-                  router.push(path);
-                }}>
+                  setLoading(true)
+                  let path = item.path || "/"
+                  router.push(path)
+                }}
+              >
                 {dom}
               </div>
             )}
-            {...settings}>
+            {...settings}
+          >
             <App>
               {children}
               <Drawer
@@ -267,7 +278,8 @@ const DiverseTradeLayout = (props: IProps) => {
                 closable={false}
                 onClose={onClose}
                 open={open}
-                key="right">
+                key="right"
+              >
                 <Empty />
               </Drawer>
             </App>
@@ -275,7 +287,7 @@ const DiverseTradeLayout = (props: IProps) => {
         </ConfigProvider>
       </ProConfigProvider>
     </div>
-  );
-};
+  )
+}
 
-export default DiverseTradeLayout;
+export default DiverseTradeLayout

@@ -1,4 +1,25 @@
-import { MenuOutlined } from "@ant-design/icons";
+import { MenuOutlined } from "@ant-design/icons"
+
+export function isCashieringTerminal(currentRoute: string) {
+  const paymentTypes = [
+    "project-payments",
+    "otc-payments",
+    "miscellaneous-payments-or",
+    "miscellaneous-payments-ar",
+  ]
+  const urls = currentRoute.split("/").filter(Boolean)
+  if (urls[0] == "accounting") {
+    if (urls[1] == "cashier") {
+      if (urls[2] == "payments" && urls[3] != undefined) {
+        console.log(urls[3], "urls[3]")
+        console.log(urls[3] == undefined, "urls[3]")
+        if (paymentTypes.includes(urls[3]) && urls[3] != undefined) return true
+        else window.location.replace("/accounting/cashier/payments")
+      }
+    }
+  }
+  return false
+}
 
 const CashierSideBarMenu = {
   route: {
@@ -39,6 +60,6 @@ const CashierSideBarMenu = {
   location: {
     pathname: "/",
   },
-};
+}
 
-export default CashierSideBarMenu;
+export default CashierSideBarMenu

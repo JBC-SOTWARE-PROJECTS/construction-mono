@@ -1,35 +1,37 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
   PageContainer,
   ProCard,
   ProFormGroup,
-} from "@ant-design/pro-components";
-import { Input, Row, Col, Form, Statistic } from "antd";
-import CashierTable from "@/components/accounting/cashier/cashierTable";
-import { Billing, Query } from "@/graphql/gql/graphql";
-import { useQuery } from "@apollo/client";
-import { GET_ACCOUNTS_FOLIO_RECORD } from "@/graphql/cashier/queries";
-import { FormSwitch } from "@/components/common";
-import { col2, currency } from "@/utility/constant";
-import _ from "lodash";
-import { NumberFormater } from "@/utility/helper";
+} from "@ant-design/pro-components"
+import { Input, Row, Col, Form, Statistic } from "antd"
+import CashierTable from "@/components/accounting/cashier/cashierTable"
+import { Billing, Query } from "@/graphql/gql/graphql"
+import { useQuery } from "@apollo/client"
+import { GET_ACCOUNTS_FOLIO_RECORD } from "@/graphql/cashier/queries"
+import { FormSwitch } from "@/components/common"
+import { col2, currency } from "@/utility/constant"
+import _ from "lodash"
+import { NumberFormater } from "@/utility/helper"
+import { useRouter } from "next/router"
 
-const { Search } = Input;
+const { Search } = Input
 
 const formatter = (value: number) => (
   <p className="currency-red">
     {currency + " "}
     {NumberFormater(value)}
   </p>
-);
+)
 
 export default function CashierComponent() {
-  const [active, setActive] = useState(true);
+  const router = useRouter()
+  const [active, setActive] = useState(true)
   const [state, setState] = useState({
     filter: "",
     page: 0,
     size: 10,
-  });
+  })
 
   const { data, loading } = useQuery<Query>(GET_ACCOUNTS_FOLIO_RECORD, {
     variables: {
@@ -39,11 +41,11 @@ export default function CashierComponent() {
       size: state.size,
     },
     fetchPolicy: "cache-and-network",
-  });
+  })
 
   const onChangeBillingStatus = (e: boolean) => {
-    setActive(e);
-  };
+    setActive(e)
+  }
 
   return (
     <PageContainer
@@ -75,8 +77,8 @@ export default function CashierComponent() {
                 title="Total Collectibles Amount"
                 value={Number(data?.totalBalances)}
                 formatter={(e) => {
-                  let value = Number(e);
-                  return formatter(value);
+                  let value = Number(e)
+                  return formatter(value)
                 }}
               />
             </Col>
@@ -104,7 +106,11 @@ export default function CashierComponent() {
                 totalElements={
                   data?.billingAllByFiltersPage?.totalElements as number
                 }
-                handleOpen={(record) => console.log(record)}
+                handleOpen={(record: Billing) =>
+                  router.push(
+                    "/accounting/cashier/payments/project-payments/" + record.id
+                  )
+                }
                 changePage={(page) =>
                   setState((prev) => ({ ...prev, page: page }))
                 }
@@ -114,5 +120,5 @@ export default function CashierComponent() {
         </div>
       </ProCard>
     </PageContainer>
-  );
+  )
 }
