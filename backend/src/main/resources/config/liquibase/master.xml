@@ -665,4 +665,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/112_petty_cash_disbursement.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/113_donss_add_payment_items.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

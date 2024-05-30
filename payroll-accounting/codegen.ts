@@ -1,11 +1,11 @@
-import { CodegenConfig } from "@graphql-codegen/cli";
+import { CodegenConfig } from "@graphql-codegen/cli"
 
 const config: CodegenConfig = {
   schema: [
     {
       "http://localhost:5827/graphql": {
         headers: {
-          Cookie: "SESSION=MmQzYzE3ZmMtOGRjOC00NmQzLTlmNjctZDkyZmYxNTRiN2Y5",
+          Cookie: "SESSION=MTI0YjBkMjYtNjQxMy00ODE1LWE3YmQtODgwZDFkMTI3ODQ2",
         },
       },
     },
@@ -17,6 +17,6 @@ const config: CodegenConfig = {
       preset: "client",
     },
   },
-};
+}
 
-export default config;
+export default config

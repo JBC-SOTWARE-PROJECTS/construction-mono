@@ -3,6 +3,7 @@ package com.backend.gbp.graphqlservices.cashier
 import com.backend.gbp.domain.accounting.CustomerType
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LedgerDocType
+import com.backend.gbp.domain.cashier.PaymentItem
 import com.backend.gbp.domain.cashier.PaymentType
 import com.backend.gbp.domain.cashier.ReceiptType
 import com.backend.gbp.domain.types.AutoIntegrateable
@@ -24,7 +25,6 @@ import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.billing.BillingItem
 import com.backend.gbp.domain.cashier.Payment
 import com.backend.gbp.domain.cashier.PaymentDetial
-import com.backend.gbp.domain.cashier.PaymentItems
 import com.backend.gbp.domain.cashier.PaymentTargetItem
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.billing.Job
@@ -139,7 +139,7 @@ class PaymentService {
 	}
 
 	@GraphQLQuery(name = "paymentItems", description = "List of Payments By shift ID")
-	List<PaymentItems> paymentItems(@GraphQLArgument(name = "id") UUID id, @GraphQLArgument(name = "type") String type) {
+	List<PaymentItem> paymentItems(@GraphQLArgument(name = "id") UUID id, @GraphQLArgument(name = "type") String type) {
 		return paymentItemRepository.getPaymentItemsByPayment(id, type)
 	}
 

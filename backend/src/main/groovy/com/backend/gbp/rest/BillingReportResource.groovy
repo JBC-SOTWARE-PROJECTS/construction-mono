@@ -1,6 +1,7 @@
 package com.backend.gbp.rest
 
 import com.backend.gbp.domain.Office
+import com.backend.gbp.domain.cashier.PaymentType
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.billing.BillingItemService
 import com.backend.gbp.graphqlservices.billing.JobItemService
@@ -431,7 +432,7 @@ class BillingReportResource {
 								break
 
 						}
-						if (ptd.type == "CHECK") {
+						if (ptd.type == PaymentType.CHECK) {
 							items << new DCTRItems(
 									StringUtils.upperCase(pt.description),
 									ptd.amount,
@@ -444,7 +445,7 @@ class BillingReportResource {
 
 							)
 						}
-						if (ptd.type == "GCASH") {
+						if (ptd.type == PaymentType.EWALLET) {
 							items << new DCTRItems(
 									StringUtils.upperCase(pt.description),
 									ptd.amount,

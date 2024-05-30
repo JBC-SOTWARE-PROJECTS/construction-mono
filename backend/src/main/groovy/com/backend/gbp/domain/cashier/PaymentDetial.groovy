@@ -29,8 +29,9 @@ class PaymentDetial extends AbstractAuditingEntity {
     BigDecimal amount
 
     @GraphQLQuery
-    @Column(name = "type")
-    String type
+    @Enumerated(EnumType.STRING)
+    @Column(name = "[type]", columnDefinition = "varchar")
+    PaymentType type
 
     @GraphQLQuery
     @Column(name = "reference")
