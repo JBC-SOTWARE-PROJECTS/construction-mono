@@ -86,11 +86,6 @@ const Details = ({ amountSummary }: Props) => {
         <Col span={12}>
           <SummaryTable>
             <tbody>
-              <TableTR
-                label="Hospital Service"
-                value={amountSummary.HOSPITAL}
-              />
-              <TableTR label="Professional Service" value={amountSummary.PF} />
               <TableTR label="Total Sales" value={amountSummary.TOTAL_SALES} />
               <TableTR
                 label="Less: VAT"

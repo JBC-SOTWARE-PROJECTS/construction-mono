@@ -34,7 +34,7 @@ export default function ActionControl(props: ModalProps) {
           <Button
             size="large"
             block
-            style={{ height: 50, background: "#115e59" }}
+            style={{ height: 50, background: "#399b53" }}
             type="primary"
             onClick={onClickNew}
           >

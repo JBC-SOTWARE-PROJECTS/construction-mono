@@ -53,12 +53,12 @@ const TerminalWindowsPaymentMethodList = React.memo(
               <thead>
                 <tr>
                   <td style={{ width: "50%" }}>
-                    <Typography.Text strong style={{ color: "#115e59" }}>
+                    <Typography.Text strong style={{ color: "#399b53" }}>
                       Type
                     </Typography.Text>
                   </td>
                   <td style={{ textAlign: "right", width: "40%" }}>
-                    <Typography.Text strong style={{ color: "#115e59" }}>
+                    <Typography.Text strong style={{ color: "#399b53" }}>
                       Tendered
                     </Typography.Text>
                   </td>
@@ -77,7 +77,7 @@ const TerminalWindowsPaymentMethodList = React.memo(
               <tfoot>
                 <tr>
                   <td>
-                    <Typography.Text strong style={{ color: "#115e59" }}>
+                    <Typography.Text strong style={{ color: "#399b53" }}>
                       Total Amount Tendered
                     </Typography.Text>
                   </td>
@@ -106,7 +106,7 @@ const TableContainer = styled.div`
   table {
     width: 100%;
     border-collapse: collapse;
-    color: #115e59;
+    color: #399b53;
   }
 
   th {

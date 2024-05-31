@@ -29,7 +29,7 @@ type Props = {
 }
 
 const ItemLabel = (props: { label: string }) => (
-  <Typography.Text style={{ color: "#115e59" }} strong>
+  <Typography.Text style={{ color: "#399b53" }} strong>
     {props.label}
   </Typography.Text>
 )

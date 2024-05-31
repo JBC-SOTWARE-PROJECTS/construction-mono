@@ -439,7 +439,7 @@ class BillingReportResource {
 									(ptd.reference ?: "-") + " [${pt.createdBy}]",
 									"",
 									"",
-									ptd.type,
+									ptd.type.toString(),
 									"Checks and Card",
 									""
 
@@ -452,7 +452,7 @@ class BillingReportResource {
 									(ptd.reference ?: "-") + " [${pt.createdBy}]",
 									"",
 									"",
-									ptd.type,
+									ptd.type.toString(),
 									"GCash Deposits",
 									""
 

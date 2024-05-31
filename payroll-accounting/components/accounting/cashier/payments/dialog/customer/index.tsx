@@ -14,6 +14,7 @@ interface ModalProps {
   defaultPayorType: PayorType
 }
 export default function SearchPayorMC(props: ModalProps) {
+  console.log(props, "propss")
   const [form] = Form.useForm()
   const [payorType, setPayorType] = useState<PayorType>(
     props.defaultPayorType ??

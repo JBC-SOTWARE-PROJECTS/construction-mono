@@ -126,7 +126,7 @@ const SelectedItemList = styled.div`
 `
 
 const SelectedItem = styled.li`
-  background: #115e5924;
+  background: #399b5324;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -382,7 +382,7 @@ const SearchInput = styled.input`
   font-size: 17px;
 
   :focus-visible {
-    border-color: #115e59 !important;
+    border-color: #399b53 !important;
   }
 `
 
@@ -397,12 +397,12 @@ const DropdownContent = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   .selected {
-    background: #115e59 !important;
+    background: #399b53 !important;
     color: #ffff !important;
   }
 
   :hover {
-    background-color: #115e59;
+    background-color: #399b53;
     color: #ffff;
   }
 `
@@ -411,5 +411,5 @@ const ResultItem = styled.div`
   padding: 10px;
   cursor: pointer;
   background-color: #ffff;
-  border-bottom: 1px solid #115e592b;
+  border-bottom: 1px solid #399b532b;
 `

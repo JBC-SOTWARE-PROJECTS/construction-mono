@@ -30,7 +30,7 @@ const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
     let payorType = params.payorType
     let paymentType = params.paymentType
     switch (payorType) {
-      case "FOLIO":
+      case "PROJECTS":
         return (
           <PayorFolioDetails
             {...{
@@ -71,68 +71,6 @@ const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
           />
         )
         break
-      case "DOCTORS":
-        return (
-          <DoctorPayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
-        break
-      case "INVESTOR":
-        return (
-          <InvestorPayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
-        break
-      case "PROMISSORY_NOTE":
-        return (
-          <PromissoryNotePayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
-      case "CORPORATE":
-        return (
-          <CorporatePayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
-      case "HMO":
-        return (
-          <CorporatePayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
       case "OTHER":
         return (
           <MiscPayor

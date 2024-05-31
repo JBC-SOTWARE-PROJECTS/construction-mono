@@ -29,12 +29,12 @@ const TerminalWindowHeader = (props: TerminalWindowsHeaderProps) => {
         <Button
           type="link"
           icon={<MenuOutlined />}
-          style={{ marginRight: 24, color: "#115e59" }}
+          style={{ marginRight: 24, color: "#399b53" }}
         />
         <Logo>
           <b
             style={{
-              color: "#115e59",
+              color: "#399b53",
               fontWeight: "bolder",
               fontSize: "large",
             }}

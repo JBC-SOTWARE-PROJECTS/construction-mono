@@ -87,7 +87,6 @@ const reducer = (
 const TerminalWindows = (props: IUserEmployee) => {
   const folioItemsDialog = useDialog(TerminalWindowFolioItemListDialog)
   const paymentItemsDialog = useDialog(TerminalWindowPaymentItemsDialog)
-  const invoiceItemsDialog = useDialog(InvoiceItemsOutstandingRecords)
   const payorDialog = useDialog(SearchPayorMC)
 
   const { query, push } = useRouter()

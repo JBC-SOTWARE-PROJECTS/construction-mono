@@ -17,7 +17,8 @@ import PaymentMethodCheck from "../../../../dialog/payment-method/check"
 import PaymentMethodBankDeposit from "../../../../dialog/payment-method/bank-deposit"
 import PaymentMethodEWallet from "../../../../dialog/payment-method/e-wallet"
 
-type PaymentTypeKeys = keyof typeof PaymentType
+type PaymentTypeKeys = any
+// type PaymentTypeKeys = keyof typeof PaymentType
 
 const PaymentMethodButtons = (props: {
   type: PaymentTypeKeys

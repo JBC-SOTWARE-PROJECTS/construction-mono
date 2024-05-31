@@ -94,7 +94,7 @@ const TerminalWindowAction = (props: Props) => {
           <Button
             size="large"
             block
-            style={{ height: 50, color: "#115e59", borderColor: "#115e59" }}
+            style={{ height: 50, color: "#399b53", borderColor: "#399b53" }}
           >
             Hold
           </Button>
@@ -103,7 +103,7 @@ const TerminalWindowAction = (props: Props) => {
           <Button
             size="large"
             block
-            style={{ height: 50, background: "#115e59" }}
+            style={{ height: 50, background: "#399b53" }}
             type="primary"
             onClick={() => onClickContinue()}
             loading={loading}

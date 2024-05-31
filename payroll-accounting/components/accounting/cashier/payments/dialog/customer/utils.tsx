@@ -151,7 +151,7 @@ const SearchInput = styled.input`
   font-size: 17px;
 
   :focus-visible {
-    border-color: #115e59 !important;
+    border-color: #399b53 !important;
   }
 `
 
@@ -165,7 +165,7 @@ const DropdownContent = styled.div`
   margin-top: 5px;
 
   .selected {
-    background: #115e59 !important;
+    background: #399b53 !important;
     color: #ffff !important;
   }
 `
@@ -174,7 +174,7 @@ const ResultItem = styled.div`
   padding: 10px;
   cursor: pointer;
   background-color: #ffff;
-  border-bottom: 1px solid #115e592b;
+  border-bottom: 1px solid #399b532b;
 `
 
 const ItemDetails = styled.div`

@@ -29,7 +29,7 @@ import { PayorType } from "../../../data-types/types"
 const { Sider, Content, Footer } = Layout
 
 const buttonStyle: CSSProp = {
-  background: "#115e59",
+  background: "#399b53",
 }
 
 const QuickOptionsBtn = (props: ButtonProps) => {
@@ -45,6 +45,7 @@ const QuickOptionsBtn = (props: ButtonProps) => {
 }
 
 const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
+  console.log(props, "props")
   const { push } = useRouter()
   const [collapse, setCollapse] = useState(false)
   const payorDialog = useDialog(SearchPayorMC)
