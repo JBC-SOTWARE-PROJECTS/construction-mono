@@ -30,6 +30,8 @@ import java.time.Instant
 
 @Entity
 @Table(name = "payables", schema = "accounting")
+@SQLDelete(sql = "UPDATE accounting.payables SET deleted = true WHERE id = ?")
+@Where(clause = "deleted <> true or deleted is  null ")
 class AccountsPayable extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
 
 	@GraphQLQuery
