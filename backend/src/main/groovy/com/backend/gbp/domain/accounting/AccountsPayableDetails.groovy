@@ -8,6 +8,8 @@ import com.backend.gbp.domain.projects.Projects
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 
 import javax.persistence.Column
 import javax.persistence.ConstraintMode
@@ -23,6 +25,8 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "payables_detials", schema = "accounting")
+@SQLDelete(sql = "UPDATE accounting.payables_detials SET deleted = true WHERE id = ?")
+@Where(clause = "deleted <> true or deleted is  null ")
 class AccountsPayableDetails extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
