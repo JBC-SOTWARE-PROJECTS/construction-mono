@@ -8,6 +8,8 @@ import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
 import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -21,6 +23,8 @@ import java.time.Instant
 
 @Entity
 @Table(name = "ap_ledger", schema = "accounting")
+@SQLDelete(sql = "UPDATE accounting.ap_ledger SET deleted = true WHERE id = ?")
+@Where(clause = "deleted <> true or deleted is  null ")
 class ApLedger extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery

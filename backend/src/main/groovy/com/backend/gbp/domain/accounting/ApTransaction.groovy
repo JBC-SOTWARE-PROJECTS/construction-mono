@@ -9,6 +9,8 @@ import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
 import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -22,6 +24,8 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "ap_trans_types", schema = "accounting")
+@SQLDelete(sql = "UPDATE accounting.ap_trans_types SET deleted = true WHERE id = ?")
+@Where(clause = "deleted <> true or deleted is  null ")
 class ApTransaction extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
