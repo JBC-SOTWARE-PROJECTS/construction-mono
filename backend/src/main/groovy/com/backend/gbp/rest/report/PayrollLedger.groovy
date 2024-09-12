@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import java.nio.charset.Charset
+import java.text.DecimalFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -79,7 +80,6 @@ class PayrollLedger {
     @RequestMapping("/payrollLedgerDownload")
     Callable<ResponseEntity<byte[]>> payrollLedgerDownload(
             @RequestParam(name ="id") UUID id
-//              @RequestParam(name = "payPeriod")  Instant payPeriod,
     ) {
 
 
@@ -147,7 +147,8 @@ class PayrollLedger {
                 )
 //
 
-                def getTotalPayFreq = "";
+                def getTotalPayFreq;
+                def totalRate;
                 payrollEmployees.eachWithIndex{ it, idx->
                     def summary = it.employeeAdjustment;
                     def totalNet = it.timekeepingEmployee.totalSalary;
@@ -156,9 +157,17 @@ class PayrollLedger {
                     def contribution = it?.payrollEmployeeContribution;
 
                     BigDecimal hourlyRate = TimekeepingEmployeeService.getHourlyRate(it.employee, 12)
-                    def totalRate = (hourlyRate * multipliers?.regular);
 
-                    getTotalPayFreq =  totalRate * (getTotalHrs as Number);
+
+                    if (hourlyRate != null && multipliers?.regular != null) {
+                        totalRate = (hourlyRate * multipliers?.regular)
+                    }
+
+
+                    if (totalRate != null && getTotalHrs != null) {
+                        getTotalPayFreq = totalRate * (getTotalHrs as Number);
+                    }
+
 
                     BigDecimal grossTT = 0.0
                     if(allowance != null && allowance.allowanceItems != null){
@@ -196,12 +205,10 @@ class PayrollLedger {
                     def subtotal = totalGrossPay + totalDeduction + adjustTotal;
                     def totalNetPay = totalGrossPay - totalDeduction + adjustTotal;
 
-//                    if()
-//                    it.allowanceEmployee?.allowanceItems?.name
 
                     PayrollRegEmployeeDto payrollDto = new PayrollRegEmployeeDto();
-                    payrollDto.accountNo = it.employee.employeeNo ?: ""
-                    payrollDto.name = it.employee.fullName ?: ""
+                    payrollDto.accountNo = it.employee?.employeeNo ?: ""
+                    payrollDto.name = it.employee?.fullName ?: ""
 
                     payrollDto.regularPay = it.timekeepingEmployee?.totalSalary?.regular ?: ""
                     payrollDto.underTimePay = it.timekeepingEmployee?.totalSalary?.underTime ?: ""
@@ -250,8 +257,8 @@ class PayrollLedger {
                 def payFrequencyTotal = '';
 
                 csvPrinter.printRecord("")
-                csvPrinter.printRecord("Pay Frequency Totals", getTotalPayFreq)
-                csvPrinter.printRecord("Total Net Pays for Semi-Monthly Frequency", semiMonthly )
+                csvPrinter.printRecord("Pay Totals", (getTotalPayFreq as BigDecimal).round(2).toString())
+                csvPrinter.printRecord("Total Net Pays", semiMonthly )
 
                 payrollEmployees.eachWithIndex{ it, idx->
                     def paymentsSemiMonthly = ""

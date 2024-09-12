@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Button, Divider, Input, Row, Table } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { ArrowDownOutlined, PrinterOutlined } from '@ant-design/icons';
-import { getUrlPrefix } from '@/utility/graphql-client';
-import { useRouter } from 'next/router';
+import React, { useState } from "react";
+import { Button, Divider, Input, Row, Table, notification } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { ArrowDownOutlined, PrinterOutlined } from "@ant-design/icons";
+import { getUrlPrefix } from "@/utility/graphql-client";
+import { useRouter } from "next/router";
 
 const { Search } = Input;
 
@@ -15,39 +15,47 @@ interface DataType {
 
 interface FormProps {
   data: any;
-  filter: '' | any;
+  filter: "" | any;
   loading: boolean;
-  viewEmp: any;
-  setSelectedEmp: any;
+  onSearch: (value: string) => void;
 }
 
-function PayslipSearchForm({ data, filter, loading, viewEmp }: FormProps) {
-  const [state, setState] = useState<String>(filter);
+function PayslipSearchForm({ data, filter, loading, onSearch }: FormProps) {
+  const [searchValue, setSearchValue] = useState(filter);
   const [selectedRows, setSelectedRows] = useState<React.Key[]>([]);
   const router = useRouter();
-
-  // const handleSearch = (value: any) => {
-  //   setState(value);
-  // };
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRows(newSelectedRowKeys);
   };
+
+  console.log("data", data);
 
   const rowSelection = {
     selectedRowKeys: selectedRows,
     onChange: onSelectChange,
   };
 
-  const onView = (record: any, index: any) => {
-    viewEmp(record);
-  };
-
   const columns: ColumnsType<DataType> = [
     {
-      key: 'employee',
-      title: 'Employee',
-      dataIndex: 'fullName',
+      key: "employee",
+      title: "Employee",
+      dataIndex: "fullName",
+    },
+    {
+      key: "position",
+      title: "Position",
+      dataIndex: "position",
+    },
+    {
+      key: "timekeepingStatus",
+      title: "TimeKeeping Status",
+      dataIndex: "timekeepingStatus",
+    },
+    {
+      key: "contributionStatus",
+      title: "Contribution Status",
+      dataIndex: "contributionStatus",
     },
   ];
 
@@ -55,65 +63,94 @@ function PayslipSearchForm({ data, filter, loading, viewEmp }: FormProps) {
     <div>
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'right',
+          display: "flex",
+          justifyContent: "right",
           gap: 5,
           marginBottom: 10,
         }}
       >
         <Search
           allowClear
-          style={{ width: '100%', marginBottom: 10 }}
-          size='middle'
-          placeholder='Search emplyee here...'
-          className='select-header-list'
-          onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+          style={{ width: "100%", marginBottom: 10 }}
+          size="middle"
+          placeholder="Search employee here..."
+          className="select-header-list"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onSearch={() => onSearch(searchValue)}
         />
 
         <Button
-          type='primary'
+          type="primary"
           icon={<ArrowDownOutlined />}
           onClick={() =>
-            window.open(
-              `${getUrlPrefix()}/reports/payroll/print/payslipPayroll/${selectedRows}`
-            )
+            selectedRows.length
+              ? window.open(
+                  `${getUrlPrefix()}/reports/payroll/print/payslipPayroll/${selectedRows}`
+                )
+              : notification.warning({
+                  message: "No Employee Selected",
+                  description:
+                    "Please select at least one employee to proceed.",
+                })
           }
         >
           DownLoad Payslip
         </Button>
-        <Divider type='vertical' />
+
+        <Divider type="vertical" />
+
         <Button
-          type='primary'
+          type="primary"
           icon={<PrinterOutlined />}
-          size='middle'
+          size="middle"
           onClick={() =>
             window.open(
               getUrlPrefix() +
-                '/reports/payroll/print/payrollLedgerDownload?id=' +
+                "/reports/payroll/print/payrollPerRegister?id=" +
+                router?.query?.id
+            )
+          }
+        >
+          DownLoad Register Per Project
+        </Button>
+
+        <Divider type="vertical" />
+
+        <Button
+          type="primary"
+          icon={<PrinterOutlined />}
+          size="middle"
+          onClick={() =>
+            window.open(
+              getUrlPrefix() +
+                "/reports/payroll/print/payrollLedgerDownload?id=" +
                 router?.query?.id
             )
           }
         >
           DownLoad Payroll Per Register
         </Button>
+
+        <Divider type="vertical" />
       </div>
 
       <Row>
         <div
           style={{
-            width: '100%',
-            height: '100%',
-            overflowX: 'hidden',
-            overflowY: 'auto',
+            width: "100%",
+            height: "100%",
+            overflowX: "hidden",
+            overflowY: "auto",
           }}
         >
           <Table
             loading={loading}
             rowSelection={{
-              type: 'checkbox',
+              type: "checkbox",
               ...rowSelection,
             }}
-            rowKey='id'
+            rowKey="id"
             columns={columns}
             dataSource={data || []}
           />
