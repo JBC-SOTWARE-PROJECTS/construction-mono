@@ -157,6 +157,7 @@ function PayslipForm() {
                 loading={loading}
                 data={data}
                 filter={state.filter}
+                refetchEmployees={refetch}
               />
             </div>
           </Card>
