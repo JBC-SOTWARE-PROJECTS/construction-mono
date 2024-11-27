@@ -50,7 +50,7 @@ class DatabaseConfig implements EnvironmentAware {
 		if (StringUtils.isEmpty(env.getProperty("spring.datasource.url"))) {
 			config.addDataSourceProperty("databaseName", env.getProperty("spring.datasource.databaseName"))
 			config.addDataSourceProperty("serverName", env.getProperty("spring.datasource.serverName"))
-			config.addDataSourceProperty("portNumber", env.getProperty("spring.datasource.port"))
+			//config.addDataSourceProperty("portNumber", env.getProperty("spring.datasource.port"))
 		} else {
 			config.addDataSourceProperty("url", env.getProperty("spring.datasource.url"))
 		}
