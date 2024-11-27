@@ -50,7 +50,11 @@ function useGetPayrollEmployeesPageable({ variables, onCompleted }: IParams) {
       payroll: router?.query?.id,
     },
     onCompleted: (result) => {
+      console.log("result", result);
       if (onCompleted) onCompleted(result?.employees);
+    },
+    onError: (error) => {
+      console.error("Error fetching employees:", error);
     },
   });
   return [
