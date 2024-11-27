@@ -19,16 +19,18 @@ interface FormProps {
   loading: boolean;
   viewEmp: any;
   setSelectedEmp: any;
+  refetchEmployees: (data:any) => void;
 }
 
-function PayslipSearchForm({ data, filter, loading, viewEmp }: FormProps) {
+function PayslipSearchForm({ data, filter, loading, viewEmp, refetchEmployees }: FormProps) {
   const [state, setState] = useState<String>(filter);
   const [selectedRows, setSelectedRows] = useState<React.Key[]>([]);
   const router = useRouter();
 
-  // const handleSearch = (value: any) => {
-  //   setState(value);
-  // };
+  const handleSearch = (value: any) => {
+    setState(value);
+    refetchEmployees(value);
+  };
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRows(newSelectedRowKeys);
@@ -67,7 +69,8 @@ function PayslipSearchForm({ data, filter, loading, viewEmp }: FormProps) {
           size='middle'
           placeholder='Search emplyee here...'
           className='select-header-list'
-          onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
+          onSearch={(e) => handleSearch(e)}
+         // onSearch={(e) => setState((prev) => ({ ...prev, filter: e }))}
         />
 
         <Button
