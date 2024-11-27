@@ -11,6 +11,7 @@ import com.backend.gbp.domain.payroll.enums.PayrollType
 import com.backend.gbp.graphqlservices.payroll.enums.PayrollModule
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.payroll.PayrollEmployeeAdjustmentDto
+import com.backend.gbp.repository.payroll.PayrollEmployeeContributionDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeListDto
 import com.backend.gbp.repository.payroll.PayrollEmployeeRepository
 import com.backend.gbp.repository.payroll.PayrollRepository
@@ -85,23 +86,35 @@ class PayrollEmployeeService {
     }
 
     @GraphQLQuery(name = "getPayrollEmployeesPageable", description = "Gets all the employees by payroll id")
-    Page<PayrollEmployeeListDto> getPayrollEmployeesPageable(
+  Page<PayrollEmployeeListDto> getPayrollEmployeesPageable(
             @GraphQLArgument(name = "payroll") UUID payroll,
             @GraphQLArgument(name = "page") Integer page,
             @GraphQLArgument(name = "size") Integer size,
             @GraphQLArgument(name = "filter") String filter,
             @GraphQLArgument(name = "status") List<PayrollEmployeeStatus> status
     ) {
-        payrollEmployeeRepository.findByPayrollPageable(
+//        if (payroll) {
+//            Page<PayrollEmployeeListDto> employees =
+                    payrollEmployeeRepository.findByPayrollPageable(
                 payroll,
                 filter,
                 status.size() > 0 ? status : PayrollEmployeeStatus.values().toList(),
                 PageRequest.of(page, size))
+
+//            return new GraphQLResVal<Page<PayrollEmployeeListDto>>(
+//                    employees,
+//                    true,
+//                    "Successfully retrieved Payroll Other Deduction Employee List")
+//        } else {
+//            return null
+//        }
+
     }
 
     @GraphQLQuery(name = "getAllPayrollEmployee", description = "get all employee")
     List<PayrollEmployee> getAllPayrollEmployee(@GraphQLArgument(name = "id") UUID id) {
         return payrollEmployeeRepository.findByPayrollId(id)
+
     }
 
     //=================================MUTATIONS=================================\\
