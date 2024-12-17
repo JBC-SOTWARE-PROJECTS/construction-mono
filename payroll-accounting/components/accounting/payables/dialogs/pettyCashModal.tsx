@@ -97,6 +97,7 @@ export default function PettyCashModal(props: IProps) {
     },
     fetchPolicy: "cache-and-network",
     onCompleted: (data) => {
+      console.log("data", data);
       if (category === "PURCHASE") {
         let result = data.purchaseItemsByPetty as PettyCashItemDto[];
         let mapped = (result || []).map((obj) => {
