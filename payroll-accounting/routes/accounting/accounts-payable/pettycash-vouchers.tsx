@@ -19,6 +19,7 @@ import PettyCashTable from "@/components/accounting/payables/pettycash/pettyCash
 import { useDialog } from "@/hooks";
 import { FormSelect } from "@/components/common";
 import { usePettyCashNames } from "@/hooks/payables";
+import { getUrlPrefix } from "@/utility/graphql-client";
 
 const { Search } = Input;
 
@@ -72,6 +73,8 @@ export default function PettyCashComponent() {
       }
     });
   };
+
+ 
 
   return (
     <PageContainer content="Efficiency in Every Cent: Accounts Payable Petty Cash Voucher">
@@ -148,6 +151,9 @@ export default function PettyCashComponent() {
           loading={loading}
           totalElements={data?.pettyCashPage?.totalElements as number}
           handleOpen={(record) => onShowModalPettyCash(record)}
+          handlePrint={(record) => window.open(
+                          `${getUrlPrefix()}/reports/ap/print/petty-cash-voucher/${record.id}`
+                        )}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
         />
       </ProCard>
