@@ -5,6 +5,7 @@ import com.backend.gbp.domain.Office
 import com.backend.gbp.domain.accounting.AccountsPayable
 import com.backend.gbp.domain.accounting.HeaderLedger
 import com.backend.gbp.domain.accounting.Ledger
+import com.backend.gbp.domain.accounting.PettyCashOther
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.graphqlservices.CompanySettingsService
 import com.backend.gbp.graphqlservices.accounting.AccountsPayableDetialServices
@@ -14,12 +15,16 @@ import com.backend.gbp.graphqlservices.accounting.DisbursementApServices
 import com.backend.gbp.graphqlservices.accounting.DisbursementCheckServices
 import com.backend.gbp.graphqlservices.accounting.DisbursementServices
 import com.backend.gbp.graphqlservices.accounting.LedgerServices
+import com.backend.gbp.graphqlservices.accounting.PettyCashAccountingService
+import com.backend.gbp.graphqlservices.accounting.PettyCashItemServices
+import com.backend.gbp.graphqlservices.accounting.PettyCashOtherServices
 import com.backend.gbp.graphqlservices.accounting.ReapplicationService
 import com.backend.gbp.graphqlservices.accounting.Wtx2307ConsolidatedService
 import com.backend.gbp.graphqlservices.accounting.Wtx2307Service
 import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.hrm.EmployeeRepository
 import com.backend.gbp.repository.inventory.SupplierTypeRepository
+import com.backend.gbp.rest.dto.PettyCashItemsPrintDto
 import com.backend.gbp.security.SecurityUtils
 import com.google.gson.Gson
 import groovy.transform.TypeChecked
@@ -69,6 +74,15 @@ class AccountsPayableReportResource {
 
 	@Autowired
 	DisbursementServices disbursementServices
+
+	@Autowired
+	PettyCashAccountingService pettyCashAccountingService
+
+	@Autowired
+	PettyCashItemServices pettyCashItemServices
+
+	@Autowired
+	PettyCashOtherServices pettyCashOtherServices
 
 	@Autowired
 	DisbursementApServices disbursementApServices
@@ -664,6 +678,94 @@ class AccountsPayableReportResource {
 		return new ResponseEntity(data, params, HttpStatus.OK)
 	}
 
+
+	@RequestMapping(value = ['/petty-cash-voucher/{id}'], produces = ['application/pdf'])
+	ResponseEntity<byte[]> printPettyCash(@PathVariable('id') UUID id) {
+
+		def logo = applicationContext?.getResource("classpath:/images/ptk-group-logo.png")
+		def pettyCash = pettyCashAccountingService.pettyCashAccountingById(id)
+		def pettyCashItems = pettyCashItemServices.purchaseItemsByPetty(pettyCash.id)
+		def pettyCashOthers = pettyCashOtherServices.othersByPetty(pettyCash.id)
+		def newOne = ""
+		DateTimeFormatter dateFormat =
+				DateTimeFormatter.ofPattern("MM/dd/yyyy").withZone(ZoneId.systemDefault())
+
+		def res = applicationContext?.getResource("classpath:/reports/billing/petty_cash.jasper")
+		def bytearray = new ByteArrayInputStream()
+		def os = new ByteArrayOutputStream()
+		def parameters = [:] as Map<String, Object>
+
+		parameters.put("logo", logo?.getURL())
+		parameters.put("code", pettyCash.pcvNo)
+		parameters.put("issuedTo", pettyCash.payeeName)
+		parameters.put("office"," ")
+		parameters.put("prepared"," ")
+		parameters.put("received",pettyCash.payeeName)
+		parameters.put("remarks",pettyCash.remarks)
+		parameters.put("date", dateFormat.format(pettyCash.pcvDate))
+
+
+
+		def allItems = new ArrayList<PettyCashItemsPrintDto>()
+		def totalAmnt = 0
+		if(pettyCashOthers){
+			pettyCashOthers.each {po ->
+				allItems.push(new PettyCashItemsPrintDto(
+					description: po.transType.description,
+						amount:  po.amount.toBigDecimal()
+				))
+				totalAmnt += po.amount.toBigDecimal()
+			}
+		}
+
+		if(pettyCashItems){
+			pettyCashItems.each {po ->
+				allItems.push(new PettyCashItemsPrintDto(
+						description: po.descLong,
+						amount:  po.netAmount.toBigDecimal()
+				))
+				totalAmnt += po.netAmount.toBigDecimal()
+			}
+		}
+
+		parameters.put("items", new JRBeanCollectionDataSource(allItems));
+		parameters.put("total", totalAmnt);
+
+		def gson = new Gson()
+		def dataSourceByteArray = new ByteArrayInputStream(gson.toJson({}).getBytes("UTF8"))
+		def dataSource = new JsonDataSource(dataSourceByteArray)
+
+
+		//printing
+		try {
+			def jrprint = JasperFillManager.fillReport(res.inputStream, parameters, dataSource)
+
+			def pdfExporter = new JRPdfExporter()
+
+			def outputStreamExporterOutput = new SimpleOutputStreamExporterOutput(os)
+
+			pdfExporter.setExporterInput(new SimpleExporterInput(jrprint))
+			pdfExporter.setExporterOutput(outputStreamExporterOutput)
+			def configuration = new SimplePdfExporterConfiguration()
+			pdfExporter.setConfiguration(configuration)
+			pdfExporter.exportReport()
+
+		} catch (JRException e) {
+			e.printStackTrace()
+		} catch (IOException e) {
+			e.printStackTrace()
+		}
+
+		if (bytearray != null)
+			IOUtils.closeQuietly(bytearray)
+		//end
+
+		def data = os.toByteArray()
+		def params = new LinkedMultiValueMap<String, String>()
+		//params.add("Content-Disposition", "inline;filename=Discharge-Instruction-of-\"" + caseDto?.patient?.fullName + "\".pdf")
+		params.add("Content-Disposition", "inline;filename=petty-cash-voucher-\"" + "5758587" + "\".pdf")
+		return new ResponseEntity(data, params, HttpStatus.OK)
+	}
 
 	@RequestMapping(value = ['/2307/{id}'], produces = ['application/pdf'])
 	ResponseEntity<byte[]> print2307(@PathVariable('id') UUID id) {
