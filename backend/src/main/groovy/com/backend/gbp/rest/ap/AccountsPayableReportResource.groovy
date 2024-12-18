@@ -698,7 +698,6 @@ class AccountsPayableReportResource {
 		parameters.put("logo", logo?.getURL())
 		parameters.put("code", pettyCash.pcvNo)
 		parameters.put("issuedTo", pettyCash.payeeName)
-		parameters.put("office"," ")
 		parameters.put("prepared"," ")
 		parameters.put("received",pettyCash.payeeName)
 		parameters.put("remarks",pettyCash.remarks)
@@ -712,7 +711,8 @@ class AccountsPayableReportResource {
 			pettyCashOthers.each {po ->
 				allItems.push(new PettyCashItemsPrintDto(
 					description: po.transType.description,
-						amount:  po.amount.toBigDecimal()
+						amount:  po.amount.toBigDecimal(),
+						project: po?.project?.description
 				))
 				totalAmnt += po.amount.toBigDecimal()
 			}
@@ -722,13 +722,15 @@ class AccountsPayableReportResource {
 			pettyCashItems.each {po ->
 				allItems.push(new PettyCashItemsPrintDto(
 						description: po.descLong,
-						amount:  po.netAmount.toBigDecimal()
+						amount:  po.netAmount.toBigDecimal(),
+						project: po?.project?.description
 				))
 				totalAmnt += po.netAmount.toBigDecimal()
 			}
 		}
 
 		parameters.put("items", new JRBeanCollectionDataSource(allItems));
+		parameters.put("office",allItems[0].project)
 		parameters.put("total", totalAmnt);
 
 		def gson = new Gson()
