@@ -12,7 +12,7 @@ group = 'com.backend'
 
 
 
-version = '1.2.50'
+version = '1.2.51'
 sourceCompatibility = '1.8'
 repositories {
 

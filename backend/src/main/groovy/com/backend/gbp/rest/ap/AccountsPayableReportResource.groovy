@@ -712,7 +712,7 @@ class AccountsPayableReportResource {
 				allItems.push(new PettyCashItemsPrintDto(
 					description: po.transType.description,
 						amount:  po.amount.toBigDecimal(),
-						project: po?.project?.description
+						project: po?.project != null ? po?.project?.description :   po?.office?.officeDescription
 				))
 				totalAmnt += po.amount.toBigDecimal()
 			}
@@ -723,7 +723,7 @@ class AccountsPayableReportResource {
 				allItems.push(new PettyCashItemsPrintDto(
 						description: po.descLong,
 						amount:  po.netAmount.toBigDecimal(),
-						project: po?.project?.description
+						project: po?.project != null ? po?.project?.description :   po?.office?.officeDescription
 				))
 				totalAmnt += po.netAmount.toBigDecimal()
 			}
