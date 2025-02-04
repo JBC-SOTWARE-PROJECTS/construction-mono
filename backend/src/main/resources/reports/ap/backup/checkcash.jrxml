@@ -1164,9 +1164,9 @@
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="61">
+		<band height="59">
 			<staticText>
-				<reportElement x="20" y="33" width="80" height="8" uuid="3d5e7ad9-7837-4b3e-a478-e5757455a996">
+				<reportElement x="23" y="0" width="80" height="8" uuid="3d5e7ad9-7837-4b3e-a478-e5757455a996">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1175,7 +1175,7 @@
 				<text><![CDATA[Prepared by :]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="22" y="41" width="90" height="8" uuid="f580604c-8549-4219-bd6e-e30df853b2d1">
+				<reportElement x="23" y="8" width="90" height="8" uuid="f580604c-8549-4219-bd6e-e30df853b2d1">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -1184,19 +1184,116 @@
 				<textFieldExpression><![CDATA[$F{employee}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="23" y="51" width="90" height="8" uuid="55c280a8-3418-4b27-b56e-98dc1e8f62e5">
+				<reportElement x="23" y="16" width="90" height="8" uuid="55c280a8-3418-4b27-b56e-98dc1e8f62e5">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="6" isBold="false" isItalic="true"/>
 				</textElement>
-				<text><![CDATA[AMO/Disbursement Officer]]></text>
+				<text><![CDATA[Cash Disbursement Clerk]]></text>
 			</staticText>
 			<textField pattern="M/d/yy">
-				<reportElement x="113" y="40" width="50" height="8" uuid="6c96cdc6-83c9-419e-87c8-86535054d995">
+				<reportElement x="113" y="8" width="50" height="8" uuid="d58c89ee-5620-4601-b3c4-52946e1d89af">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="172" y="0" width="80" height="8" uuid="f34a61bd-4e6e-463a-994f-85803b59be70">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="6" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Checked by :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="172" y="16" width="90" height="8" uuid="1e662513-e7b9-407f-909f-b140be476448">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="6" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[General Accountant]]></text>
+			</staticText>
+			<textField pattern="M/d/yy">
+				<reportElement x="264" y="8" width="34" height="8" uuid="edaae669-e89a-4740-abd8-bc1a5f50b606">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="312" y="0" width="80" height="8" uuid="36ed29f9-1be4-4820-89ef-8687c53973ac">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="6" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Cleared for Release by :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="312" y="16" width="90" height="8" uuid="15ba55e4-dab8-42f5-9bb6-ccbf86c35bbc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="6" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Budget Officer]]></text>
+			</staticText>
+			<textField pattern="M/d/yy">
+				<reportElement x="372" y="8" width="50" height="8" uuid="1a49c319-8dc0-47dd-8813-55402ebd35d4">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="432" y="16" width="90" height="8" uuid="628615fc-6089-48ac-98ce-08293e5facbd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="6" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Chief Financial Officer]]></text>
+			</staticText>
+			<textField pattern="M/d/yy">
+				<reportElement x="514" y="8" width="50" height="8" uuid="8c02196f-6b03-4d50-999e-7e7c709e4739">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="23" y="31" width="80" height="8" uuid="aa559414-45d2-4527-9ae8-afd4e575c395">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="6" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Approved by :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="23" y="47" width="90" height="8" uuid="0943ad66-dad8-488f-9e6b-ec13a2cf2ed2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="6" isBold="false" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Treasurer]]></text>
+			</staticText>
+			<textField pattern="M/d/yy">
+				<reportElement x="123" y="39" width="50" height="8" uuid="6c96cdc6-83c9-419e-87c8-86535054d995">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font size="6"/>
@@ -1213,9 +1310,8 @@
 				<text><![CDATA[Approved by :]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="174" y="51" width="90" height="8" uuid="691138e5-fe43-474c-9ad5-66c1a4f4bfa6">
+				<reportElement x="174" y="49" width="90" height="8" uuid="691138e5-fe43-474c-9ad5-66c1a4f4bfa6">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="6" isBold="false" isItalic="true"/>
@@ -1246,12 +1342,27 @@
 				</reportElement>
 			</line>
 			<line>
+				<reportElement x="432" y="15" width="82" height="1" uuid="ff57e82f-307e-45a1-83c0-36fe94f93940">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="312" y="15" width="60" height="1" uuid="89ecb8ef-0eba-47a9-a35c-0e9361145b51">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
+				<reportElement x="172" y="15" width="90" height="1" uuid="f3361894-3066-4b92-ad52-cdda246991c9">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<line>
 				<reportElement x="174" y="48" width="78" height="1" uuid="703e42bd-b232-45bf-a4ad-dba599456729">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 			</line>
 			<line>
-				<reportElement x="24" y="49" width="88" height="1" uuid="71a8e017-36c0-431d-989a-9757dad42d1f">
+				<reportElement x="23" y="46" width="90" height="1" uuid="14a19030-c0ee-4be3-b874-d0e1aa560bf9">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 			</line>
