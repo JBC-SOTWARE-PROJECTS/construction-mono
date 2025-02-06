@@ -68,10 +68,11 @@ interface IProps {
   hide: (hideProps: any) => void;
   record?: PurchaseRequest | null | undefined;
   prCategory: string;
+  projectId?: string | null;
 }
 
 export default function UpsertPRFormModal(props: IProps) {
-  const { hide, record, prCategory } = props;
+  const { hide, record, prCategory, projectId } = props;
   const [form] = Form.useForm();
   const account = useContext(AccountContext);
   const [category, setCategory] = useState(record?.category ?? prCategory);
@@ -429,7 +430,7 @@ export default function UpsertPRFormModal(props: IProps) {
             prDateNeeded: dayjs(record?.prDateNeeded ?? new Date()),
             requestedOffice: record?.requestedOffice?.id ?? null,
             supplier: selectInValueInit(record?.id, "supplier"),
-            project: record?.project?.id ?? null,
+            project: record?.project?.id ?? (projectId ?? null),
             assets: record?.assets?.id ?? null,
             category: record?.category ?? prCategory,
           }}>
