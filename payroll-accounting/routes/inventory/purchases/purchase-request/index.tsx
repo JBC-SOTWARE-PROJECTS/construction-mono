@@ -33,16 +33,26 @@ import _ from "lodash";
 
 const { Search } = Input;
 
-export default function PurchaseRequestComponent({ type }: { type: string }) {
+export default function PurchaseRequestComponent({
+  type,
+  officeId,
+  projectId,
+  forProjectDisplay = false,
+}: {
+  type: string;
+  officeId?: string;
+  projectId?: string;
+  forProjectDisplay?: boolean;
+}) {
   const { modal: parentModal, message } = App.useApp();
   const { confirm } = parentModal;
   const [showPasswordConfirmation] = useConfirmationPasswordHook();
   const modal = useDialog(UpsertPRFormModal);
   const poModal = useDialog(UpsertPOFormModal);
   const [category, setCategory] = useState<string | null>(null);
-  const [project, setProject] = useState<string | null>(null);
+  const [project, setProject] = useState<string | null>(projectId ?? null);
   const [asset, setAsset] = useState<string | null>(null);
-  const [office, setOffice] = useState<string | null>(null);
+  const [office, setOffice] = useState<string | null>(officeId ?? null);
   const [state, setState] = useState({
     filter: "",
     status: null,
@@ -107,7 +117,7 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
     });
   // =================== end Queries =============================
   const onUpsertRecord = (record?: PurchaseRequest) => {
-    modal({ record: record, prCategory: category }, (msg: string) => {
+    modal({ record: record, prCategory: category,projectId: projectId??null  }, (msg: string) => {
       if (msg) {
         message.success(msg);
         refetch();
@@ -120,7 +130,7 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
     category: string
   ) => {
     poModal(
-      { record: record, poCategory: category, disabledPR: true },
+      { record: record, poCategory: category, disabledPR: true, projectId: projectId??null },
       (msg: string) => {
         if (msg) {
           message.success(msg);
@@ -227,7 +237,8 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
   return (
     <PageContainer
       title="Purchase Request"
-      content="From Request to Receipt: Enhancing Inventory Control with Purchase Requests and Orders.">
+      content="From Request to Receipt: Enhancing Inventory Control with Purchase Requests and Orders."
+    >
       <ProCard
         title={`${title} List`}
         headStyle={{
@@ -240,11 +251,13 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
             <Button
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={() => onUpsertRecord()}>
+              onClick={() => onUpsertRecord()}
+            >
               Create New
             </Button>
           </ProFormGroup>
-        }>
+        }
+      >
         <div className="w-full mb-5">
           <Form layout="vertical" className="filter-form">
             <Row gutter={[16, 16]}>
@@ -261,50 +274,59 @@ export default function PurchaseRequestComponent({ type }: { type: string }) {
               {typeFilters ? (
                 <>
                   <Col xs={24} md={12} lg={8}>
-                    <FormSelect
-                      label="Filter Office"
-                      propsselect={{
-                        showSearch: true,
-                        value: office,
-                        options: offices,
-                        allowClear: true,
-                        placeholder: "Select Office",
-                        onChange: (newValue) => {
-                          setOffice(newValue);
-                        },
-                      }}
-                    />
+                    {!forProjectDisplay && (
+                      <>
+                        <FormSelect
+                          label="Filter Office"
+                          propsselect={{
+                            showSearch: true,
+                            value: office,
+                            options: offices,
+                            allowClear: true,
+                            placeholder: "Select Office",
+                            onChange: (newValue) => {
+                              setOffice(newValue);
+                            },
+                          }}
+                        />
+                      </>
+                    )}
                   </Col>
                   <Col xs={24} md={12} lg={8}>
-                    {type === "all" && (
-                      <FormSelect
-                        label="Filter Purchase Request Category"
-                        propsselect={{
-                          showSearch: true,
-                          value: category,
-                          options: PURCHASE_CATEGORY,
-                          allowClear: true,
-                          placeholder: "Select Purchase Request Category",
-                          onChange: (newValue) => {
-                            setCategory(newValue);
-                          },
-                        }}
-                      />
-                    )}
-                    {type === "projects" && (
-                      <FormSelect
-                        label="Filter Projects"
-                        propsselect={{
-                          showSearch: true,
-                          value: project,
-                          options: projects,
-                          allowClear: true,
-                          placeholder: "Select Projects",
-                          onChange: (newValue) => {
-                            setProject(newValue);
-                          },
-                        }}
-                      />
+                    {!forProjectDisplay && (
+                      <>
+                        {type === "all" && (
+                          <FormSelect
+                            label="Filter Purchase Request Category"
+                            propsselect={{
+                              showSearch: true,
+                              value: category,
+                              options: PURCHASE_CATEGORY,
+                              allowClear: true,
+                              placeholder: "Select Purchase Request Category",
+                              onChange: (newValue) => {
+                                setCategory(newValue);
+                              },
+                            }}
+                          />
+                        )}
+
+                        {type === "projects" && (
+                          <FormSelect
+                            label="Filter Projects"
+                            propsselect={{
+                              showSearch: true,
+                              value: project,
+                              options: projects,
+                              allowClear: true,
+                              placeholder: "Select Projects",
+                              onChange: (newValue) => {
+                                setProject(newValue);
+                              },
+                            }}
+                          />
+                        )}
+                      </>
                     )}
                     {type === "spare-parts" && (
                       <FormSelect
