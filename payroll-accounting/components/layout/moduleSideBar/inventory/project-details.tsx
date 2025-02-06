@@ -42,6 +42,16 @@ const InventoryProjectMenu = (query: string) => {
               path: `/inventory/project-details/${query}/inventory`,
               name: 'Inventory Monitoring',
             },
+            {
+              key: 'purchase-requests',
+              path: `/inventory/project-details/${query}/purchase-requests`,
+              name: 'Purchase Requests',
+            },
+            {
+              key: 'purchase-orders',
+              path: `/inventory/project-details/${query}/purchase-orders`,
+              name: 'Purchase Orders',
+            }
           ],
         },
       ],
