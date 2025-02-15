@@ -96,7 +96,7 @@ class PayrollLedger {
                 StringBuffer buffer = new StringBuffer()
 
 
-                SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
+//                SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
                 List<PayrollEmployee> payrollEmployees = payrollEmployeeRepository.getPayrollEmpById(id)
                 Payroll payrollEmp = payrollRepository.getPayrollById(id)
 
@@ -151,21 +151,31 @@ class PayrollLedger {
                 payrollEmployees.eachWithIndex{ it, idx->
                     def summary = it.employeeAdjustment;
                     def totalNet = it.timekeepingEmployee.totalSalary;
-                    def allowance = it?.allowanceEmployee;
+                  
                     def otherDeduction = it?.employeeOtherDeduction;
                     def contribution = it?.payrollEmployeeContribution;
 
                     BigDecimal hourlyRate = TimekeepingEmployeeService.getHourlyRate(it.employee, 12)
-                    def totalRate = (hourlyRate * multipliers?.regular);
+                    def totalRate = 0.00;
+
+                    if(hourlyRate){
+                        totalRate = (hourlyRate * multipliers?.regular);
+                    }
+
 
                     getTotalPayFreq =  totalRate * (getTotalHrs as Number);
 
                     BigDecimal grossTT = 0.0
-                    if(allowance != null && allowance.allowanceItems != null){
-                        allowance.allowanceItems.each{
-                            grossTT +=it.amount ?: 0.0
-                        }
+                    if(it?.allowanceEmployee){
+                          def allowance = it?.allowanceEmployee;
+
+                          if(allowance != null && allowance.allowanceItems != null){
+                            allowance.allowanceItems.each{
+                                grossTT +=it.amount ?: 0.0
+                              }
+                          }
                     }
+                    
 
                     BigDecimal otherDeduct = 0.0
                     if(otherDeduction != null && otherDeduction.deductionItems != null){
