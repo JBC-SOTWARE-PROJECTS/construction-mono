@@ -10,6 +10,7 @@ import com.backend.gbp.domain.payroll.Timekeeping
 import com.backend.gbp.domain.payroll.TimekeepingEmployee
 import com.backend.gbp.domain.payroll.enums.PayrollEmployeeStatus
 import com.backend.gbp.domain.payroll.enums.PayrollStatus
+import com.backend.gbp.graphqlservices.accounting.ChartOfAccountGenerate
 import com.backend.gbp.graphqlservices.hrm.SalaryRateMultiplierService
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
 import com.backend.gbp.repository.TimekeepingEmployeeRepository
@@ -197,13 +198,20 @@ class TimekeepingService implements IPayrollModuleBaseOperations<Timekeeping> {
         EmployeeSalaryDto breakdown = breakdownMap.get((it?.project ? it.project : it.company) as String)
         if (!breakdown) {
             breakdown = new EmployeeSalaryDto()
-            String subAccountCode = chartofAccountGenerator.getAllChartOfAccountGenerate(null,
+            List<ChartOfAccountGenerate> generatedCode = chartofAccountGenerator.getAllChartOfAccountGenerate(null,
                     null,
                     it?.project ? it.projectName : 'GENERAL AND ADMIN',
                     null,
                     null,
                     null,
-                    true)[0].code
+                    true)
+
+            String subAccountCode = ''
+
+            if(generatedCode){
+                subAccountCode = generatedCode[0].code
+            }
+
             breakdown.subAccountCode = subAccountCode
         }
 
