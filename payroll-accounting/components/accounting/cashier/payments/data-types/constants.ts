@@ -1,9 +1,9 @@
 export type PaymentTypesLabel = {
-  [key in keyof typeof paymentTypesLabel]: string
-}
+  [key in keyof typeof paymentTypesLabel]: string;
+};
 
 export const paymentTypesLabel = {
-  "folio-payments": "Folio ",
+  "project-payments": "Folio ",
   "otc-payments": "OTC",
   "investor-payments": "Investor ",
   "financial-assistance": "Financial Assistance",
@@ -11,4 +11,4 @@ export const paymentTypesLabel = {
   "promissory-note-payments": "Promissory note ",
   "miscellaneous-payments-or": "Miscellaneous",
   "miscellaneous-payments-ar": "Miscellaneous",
-}
+};

@@ -1,10 +1,10 @@
-import { ArCustomers, Projects } from "@/graphql/gql/graphql"
+import { ArCustomers, Billing, Projects } from "@/graphql/gql/graphql"
 
-export type Payor = Projects | ArCustomers
+export type Payor = Projects | ArCustomers | Billing
 
 export type GenderType = "boy" | "girl"
 
-export type PayorType = "PROJECTS" | "WALK-IN" | "EMPLOYEE" | "OTHER"
+export type PayorType = "FOLIO" | "WALK-IN" | "EMPLOYEE" | "OTHER"
 
 export type RegistryType = "OPD" | "IPD" | "ERD" | "ALL" | "OTC"
 

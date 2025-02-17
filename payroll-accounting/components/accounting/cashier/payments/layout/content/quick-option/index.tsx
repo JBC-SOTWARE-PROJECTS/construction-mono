@@ -4,8 +4,8 @@ import {
   PlusCircleOutlined,
   SwapLeftOutlined,
   SwapRightOutlined,
-} from "@ant-design/icons"
-import type { ButtonProps } from "antd"
+} from "@ant-design/icons";
+import type { ButtonProps } from "antd";
 import {
   Button,
   Col,
@@ -16,21 +16,27 @@ import {
   Space,
   Switch,
   Typography,
-} from "antd"
-import { useState } from "react"
-import { CSSProp } from "styled-components"
-import { PaymentQuickOptions } from "../../../data-types/interfaces"
-import { useConfirmationPasswordHook, useDialog } from "@/hooks"
-import { useMutation } from "@apollo/client"
-import SearchPayorMC from "../../../dialog/customer"
-import { useRouter } from "next/router"
-import { PayorType } from "../../../data-types/types"
+} from "antd";
+import { useState } from "react";
+import { CSSProp } from "styled-components";
+import { PaymentQuickOptions } from "../../../data-types/interfaces";
+import { useConfirmationPasswordHook, useDialog } from "@/hooks";
+import { useMutation, useQuery } from "@apollo/client";
+import SearchPayorMC from "../../../dialog/customer";
+import { useRouter } from "next/router";
+import { PayorType } from "../../../data-types/types";
+import { GET_BILLING_ITEMS, LOCK_BILLING } from "@/graphql/billing/queries";
+import { BillingItem } from "@/graphql/gql/graphql";
+import { AddProjectDeductions } from "@/components/accounting/billing/dialog/add-projrect-deductions";
 
-const { Sider, Content, Footer } = Layout
+const { Sider, Content, Footer } = Layout;
 
 const buttonStyle: CSSProp = {
-  background: "#399b53",
-}
+  height: "40px",
+  borderRadius: "5px",
+  fontSize: "13px",
+  fontWeight: "bold",
+};
 
 const QuickOptionsBtn = (props: ButtonProps) => {
   return (
@@ -41,56 +47,69 @@ const QuickOptionsBtn = (props: ButtonProps) => {
       size="large"
       {...props}
     />
-  )
-}
+  );
+};
 
 const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
-  console.log(props, "props")
-  const { push } = useRouter()
-  const [collapse, setCollapse] = useState(false)
-  const payorDialog = useDialog(SearchPayorMC)
+  const { push } = useRouter();
+  const [collapse, setCollapse] = useState(false);
+  const payorDialog = useDialog(SearchPayorMC);
+  const projectDeductionsDialog = useDialog(AddProjectDeductions);
 
-  const [showPasswordConfirmation] = useConfirmationPasswordHook()
-  // const discountModal = useDialog(AddDiscountModal)
+  const { data, loading, refetch } = useQuery(GET_BILLING_ITEMS, {
+    fetchPolicy: "cache-and-network",
+    variables: {
+      filter: "",
+      id: props?.billing?.id,
+      type: "DEDUCTIONS",
+    },
+  });
 
-  // const [editRecord, { loading: folioSettingsLoading }] = useMutation(
-  //   EDIT_RECORD,
-  //   {
-  //     ignoreResults: false,
-  //     onCompleted: (data) => {
-  //       // refetch()
-  //       location.reload()
-  //     },
-  //   }
-  // )
+  const [onToggleLock, { loading: lockLoading }] = useMutation(LOCK_BILLING);
+
+  const lockLabel = props.billing?.locked ? "Unlock" : "Lock";
+
+  const [showPasswordConfirmation] = useConfirmationPasswordHook();
+
   const toggleLockBilling = () => {
     if (props.billing?.locked) {
-      alert("Please reconcile any subsidized deductions to the AR personnel")
+      alert("Please reconcile any subsidized deductions to the AR personnel");
     }
 
     showPasswordConfirmation(() => {
-      // editRecord({
-      //   variables: {
-      //     id: props.billing?.id,
-      //     fields: {
-      //       locked: !props.billing?.locked,
-      //       lockedBy: !props.billing?.locked ? props.login : "",
-      //     },
-      //   },
-      // })
-    })
-  }
+      onToggleLock({
+        variables: {
+          id: props?.billing?.id,
+          type: "LOCK",
+        },
+        onCompleted: () => {
+          location.reload();
+        },
+      });
+    });
+  };
 
-  const onAddDiscount = () => {
-    // discountModal({ billing: props.billing }, (msg: string) => {
-    //   if (msg) {
-    //     location.reload()
-    //   }
-    // })
-  }
+  const onAddDeduction = () => {
+    const billingItems = (data?.billingItemByParentType ?? [])
+      .filter((item: BillingItem) => {
+        return !!item?.projectCostId && item.status;
+      })
+      .map((item: BillingItem) => item.projectCostId)
+      .filter(Boolean);
+    projectDeductionsDialog(
+      {
+        id: props?.billing?.project?.id,
+        billingId: props?.billing?.id,
+        billingItems,
+      },
+      () => {
+        location.reload();
+      }
+    );
+  };
 
   const onHandleSelectPayor = () => {
-    const payorType = props.payorType
+    const payorType = props.payorType;
     payorDialog(
       {
         paymentType: props.paymentType,
@@ -99,12 +118,14 @@ const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
       (params: { id: string; payorType: PayorType }) => {
         if (params.id) {
           push(
-            `/accounting/cashier/payments/${props.paymentType}/${params.payorType}/${params.id}`
-          )
+            `/accounting/cashier/payments/${
+              props.paymentType
+            }/${params.payorType.toLowerCase()}/${params.id}`
+          );
         }
       }
-    )
-  }
+    );
+  };
 
   // const onAddItems = () => {
   //   const type = props.paymentType
@@ -123,10 +144,12 @@ const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
   //   }
   // }
 
+  const onToggleReceiptType = () => {};
+
   return (
     <Sider
       theme="light"
-      width="180px"
+      width="150px"
       breakpoint="lg"
       collapsedWidth={0}
       collapsed={collapse}
@@ -134,7 +157,7 @@ const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
       style={{ marginTop: 10, marginRight: 10 }}
     >
       <Row gutter={[8, 8]} style={{ padding: 10 }} justify="center">
-        <Col span={19}>
+        <Col span={23}>
           <Space>
             <Segmented
               options={[
@@ -145,6 +168,8 @@ const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
                   icon: <SwapRightOutlined />,
                 },
               ]}
+              value={props.state.receiptType}
+              onChange={onToggleReceiptType}
             />
           </Space>
         </Col>
@@ -154,23 +179,25 @@ const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
         {/* <Col span={24}>
           <QuickOptionsBtn>New Folio</QuickOptionsBtn>
         </Col> */}
-        <Col span={24}>
+        {/* <Col span={24}>
           <QuickOptionsBtn>History</QuickOptionsBtn>
-        </Col>
+        </Col> */}
         <Col span={24}>
           <QuickOptionsBtn onClick={onHandleSelectPayor}>
             Select Payor (F2)
           </QuickOptionsBtn>
         </Col>
-        <Col span={24}>
+        {/* <Col span={24}>
           {props.billing?.locked && (
             <QuickOptionsBtn
-              onClick={() => props.onAddItems(props.paymentType)}
+              onClick={() =>
+                props.onAddItems(props?.paymentType ?? "project-payments")
+              }
             >
               Select Item (F3)
             </QuickOptionsBtn>
           )}
-        </Col>
+        </Col> */}
         <Col span={24}>
           {!props.billing?.locked && props.billing && (
             <QuickOptionsBtn onClick={toggleLockBilling}>
@@ -188,11 +215,8 @@ const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
 
         <Col span={24}>
           {props.billing?.locked && (
-            <QuickOptionsBtn
-              icon={<PlusCircleOutlined />}
-              onClick={onAddDiscount}
-            >
-              Apply Discount
+            <QuickOptionsBtn onClick={onAddDeduction}>
+              Apply Deduction
             </QuickOptionsBtn>
           )}
         </Col>
@@ -201,7 +225,7 @@ const TerminalWindowsQuickOption = (props: PaymentQuickOptions) => {
         </Col> */}
       </Row>
     </Sider>
-  )
-}
+  );
+};
 
-export default TerminalWindowsQuickOption
+export default TerminalWindowsQuickOption;

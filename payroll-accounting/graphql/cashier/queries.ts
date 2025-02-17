@@ -79,6 +79,30 @@ export const UPSERT_RECORD_TERMINAL = gql`
   }
 `;
 
+export const GET_FOLIO_BY_PROJECTS = gql`
+  query ($filter: String, $status: Boolean, $page: Int, $size: Int) {
+    payer: billingByFiltersPageProjects(
+      filter: $filter
+      status: $status
+      page: $page
+      size: $size
+    ) {
+      content {
+        id
+        billNo
+        project {
+          id
+          description
+        }
+        customer {
+          id
+          customerName
+        }
+      }
+    }
+  }
+`;
+
 export const GET_CASHIER_EMPLOYEE = gql`
   query ($role: String, $filter: String) {
     searchEmployeesByRole(role: $role, filter: $filter) {
@@ -107,6 +131,48 @@ export const CLOSE_SHIFT = gql`
 export const UPSERT_RECORD_REMARKS = gql`
   mutation ($id: UUID, $remarks: String) {
     addRemarks(id: $id, remarks: $remarks) {
+      id
+    }
+  }
+`;
+
+export const GET_BATCH_RECEIPTS = gql`
+  query ($filter: String, $page: Int, $size: Int) {
+    getBatchReceipts(filter: $filter, page: $page, size: $size) {
+      content {
+        id
+        batchCode
+        receiptType
+        receiptCurrentNo
+        rangeStart
+        rangeEnd
+        terminal {
+          id
+          terminal_no
+          description
+        }
+        active
+      }
+      totalPages
+      size
+      number
+      totalElements
+    }
+  }
+`;
+
+export const GET_RECEIPT_TYPES = gql`
+  query {
+    receiptTypeOptions {
+      value
+      label
+    }
+  }
+`;
+
+export const CREATE_BATCH_RECEIPTS = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertBatchReceipt(id: $id, fields: $fields) {
       id
     }
   }

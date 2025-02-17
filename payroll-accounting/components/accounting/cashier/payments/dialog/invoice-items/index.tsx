@@ -178,7 +178,6 @@ export default function InvoiceItemsOutstandingRecords(
 
   const onOk = () => {
     const selectedItems: PaymentItem[] = []
-    console.log(transactions, "transactions")
     selectedRowKeys.map((key) => {
       if (transactions) {
         const record = transactions[key as string]

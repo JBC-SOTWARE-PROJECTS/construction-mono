@@ -28,7 +28,6 @@ const TerminalWindowSelectedBillingItem = (props: Props) => {
   }
 
   const onGenerateRows = (selectedItems: any) => {
-    console.log(selectedItems, "selectedItems")
     const selItems = { ...selectedItems }
     const items: BillingItem[] = []
     Object.keys(selItems).forEach((key) => items.push(selItems[key]))

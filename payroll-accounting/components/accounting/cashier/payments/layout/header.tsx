@@ -1,12 +1,14 @@
-import { getRandomBoyGirl } from "@/utility/helper"
-import { MenuOutlined } from "@ant-design/icons"
-import { Avatar, Button, Layout, Tag, Typography } from "antd"
-import styled from "styled-components"
-import { TerminalWindowsHeaderProps } from "../data-types/interfaces"
-import { paymentTypesLabel } from "../data-types/constants"
-import { PaymentType } from "../data-types/types"
+import { getRandomBoyGirl } from "@/utility/helper";
+import { MenuOutlined } from "@ant-design/icons";
+import { Avatar, Button, Layout, Tag, Typography } from "antd";
+import styled from "styled-components";
+import { TerminalWindowsHeaderProps } from "../data-types/interfaces";
+import { paymentTypesLabel } from "../data-types/constants";
+import { PaymentType } from "../data-types/types";
+import { ReceiptType } from "@/graphql/gql/graphql";
+import { ReceiptTypeEnum } from "@/constant/cashier";
 
-const { Header } = Layout
+const { Header } = Layout;
 
 const TerminalWindowHeader = (props: TerminalWindowsHeaderProps) => {
   return (
@@ -40,9 +42,14 @@ const TerminalWindowHeader = (props: TerminalWindowsHeaderProps) => {
             }}
           >
             {paymentTypesLabel[props.paymentType as PaymentType]} Payments{" "}
-            {props?.nextOR ? (
+            {props?.nextReceiptNo ? (
               <Tag style={{ fontSize: "medium" }}>
-                {props.type} - {props.nextOR}
+                {
+                  ReceiptTypeEnum[
+                    props.receiptType as keyof typeof ReceiptTypeEnum
+                  ]
+                }
+                - {props.nextReceiptNo.toString().padStart(6, "0")}
               </Tag>
             ) : (
               <></>
@@ -60,11 +67,11 @@ const TerminalWindowHeader = (props: TerminalWindowsHeaderProps) => {
         <b>{props?.userName ?? ""}</b>
       </div>
     </Header>
-  )
-}
+  );
+};
 
-export default TerminalWindowHeader
+export default TerminalWindowHeader;
 
 const Logo = styled.div`
   font-weight: bold;
-`
+`;

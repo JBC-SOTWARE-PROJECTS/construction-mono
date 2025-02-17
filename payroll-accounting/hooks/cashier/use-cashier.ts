@@ -1,7 +1,6 @@
-import { ArPromissoryNote, CashierData, Employee } from "@/graphql/gql/graphql"
 import { client } from "@/utility/graphql-client"
 import { gql } from "@apollo/client"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const GET_CASHIER_DATA = gql`
   query ($macAddress: String, $type: String) {
@@ -33,9 +32,9 @@ interface UseCashierParams {
 export const useCashier = ({
   variables,
   ...props
-}: QueryHooksParams<UseCashierParams, CashierData>) => {
+}: QueryHooksParams<UseCashierParams, any>) => {
   const [loading, setLoading] = useState(false)
-  const [hooks, setHooks] = useState<CashierData | null>(null)
+  const [hooks, setHooks] = useState<any | null>(null)
 
   const refetch = async () => {
     try {

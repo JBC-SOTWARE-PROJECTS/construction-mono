@@ -1,36 +1,21 @@
 import { Col } from "antd"
-import { useRouter } from "next/router"
 import React from "react"
 import { TerminalWindowsPayor } from "../../../../data-types/interfaces"
 import PayorFolioDetails from "./details/folio"
-import MiscPayor from "./details/others"
-import DoctorPayor from "./details/doctor"
-import EmployeePayor from "./details/employee"
-import OtherPayor from "./details/others"
-import InvestorPayor from "./details/investor"
-import PromissoryNotePayor from "./details/promissory"
-import CorporatePayor from "./details/corporate"
 
-export interface PaymentRoute {
-  "payor-type": string
-  "payment-type": string
-  id: string
-}
+// export interface PaymentRoute {
+//   "payor-type": string
+//   "payment-type": string
+// }
 
 const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
   console.log("Payor window ...")
-  const router = useRouter()
-  const query: PaymentRoute = (router?.query ?? {
-    "payment-type": "",
-    "payor-type": "",
-    id: "",
-  }) as any
 
   const getPayorDetails: React.FC<TerminalWindowsPayor> = (params) => {
     let payorType = params.payorType
     let paymentType = params.paymentType
     switch (payorType) {
-      case "PROJECTS":
+      case "FOLIO":
         return (
           <PayorFolioDetails
             {...{
@@ -39,7 +24,8 @@ const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
               payorType,
               randomGender: props.randomGender,
               dispatch: props.dispatch,
-              ...query,
+              id: params?.id,
+              // ...query,
             }}
           />
         )
@@ -53,49 +39,13 @@ const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
               payorType,
               randomGender: props.randomGender,
               dispatch: props.dispatch,
-              ...query,
+              // ...query,
             }}
           />
         )
         break
-      case "EMPLOYEE":
-        return (
-          <EmployeePayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
-        break
-      case "OTHER":
-        return (
-          <MiscPayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
-        break
+
       default:
-        return (
-          <OtherPayor
-            {...{
-              paymentType,
-              payorType,
-              randomGender: props.randomGender,
-              dispatch: props.dispatch,
-              ...query,
-            }}
-          />
-        )
         return <></>
         break
     }

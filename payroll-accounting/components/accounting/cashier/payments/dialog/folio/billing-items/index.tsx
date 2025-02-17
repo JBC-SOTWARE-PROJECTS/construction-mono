@@ -50,7 +50,6 @@ const reducer = (
 }
 
 export default function TerminalWindowFolioItemListDialog(props: ModalProps) {
-  console.info("props ...", props)
   console.info("Billing Items ...")
   const [state, dispatch] = useReducer(reducer, initialValues)
 

@@ -3,44 +3,40 @@ import { client } from "@/utility/graphql-client"
 import { gql } from "@apollo/client"
 import { useState, useEffect } from "react"
 
-const BILLING_BY_ID = gql`
-  query ($id: UUID!) {
-    billingById(billingId: $id) {
+export const BILLING_BY_ID = gql`
+  query ($id: UUID) {
+    billingById(id: $id) {
       id
-      entryDateTime
-      billingNo
-      balance
-      locked
-      status
-      otcname
-      isCreditLimitReached
-      creditLimit
-      isAllowedProgressPayment
-      patientCase {
+      dateTrans
+      billNo
+      project {
         id
-        caseNo
-        admissionDatetime
-        dischargedDatetime
-        entryDateTime
-        primaryDx
-        accommodationType
-        registryType
-        secondaryDx
-        room {
-          bedNo
-          roomNo
-          roomName
+        projectCode
+        description
+        location {
+          id
+          fullAddress
         }
-        locked
+        status
       }
-      patient {
+      customer {
         id
-        fullName
-        dob
-        age
-        gender
+        customerName
+        customerType
+        address
         contactNo
+        contactEmail
       }
+      otcName
+      locked
+      lockedBy
+      balance
+      totals
+      deductions
+      payments
+      projectWorkAccomplishId
+      projectWorkAccomplishNo
+      status
     }
   }
 `
@@ -61,6 +57,7 @@ export const useBillingById = ({
   const [loading, setLoading] = useState(false)
   const [hooks, setHooks] = useState<Billing | null>(null)
 
+  console.log(variables, "variables")
   const refetch = async () => {
     try {
       setLoading(true)

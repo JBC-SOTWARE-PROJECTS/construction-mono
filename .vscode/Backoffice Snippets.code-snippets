@@ -1,0 +1,73 @@
+{
+  // Place your backoffice-v2 workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+  // description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+  // is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+  // used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+  // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+  // Placeholders with the same ids are connected.
+  // Example:
+  // "Print to console": {
+  // 	"scope": "javascript,typescript",
+  // 	"prefix": "log",
+  // 	"body": [
+  // 		"console.log('$1');",
+  // 		"$2"
+  // 	],
+  // 	"description": "Log output to console"
+  // }
+
+  "mcSnippets": {
+    "prefix": "mc",
+    "body": [
+      "import { Modal } from 'antd'",
+      "",
+      "interface ModalProps {",
+      "\t hide: () => void ",
+      "}",
+      "export default function $1MC(props: ModalProps) {",
+      "\treturn <Modal title='$2' open onCancel={props.hide}></Modal>",
+      "}"
+    ],
+    "description": "Creates a simple Modal component using Ant Design in React with a customizable hide function."
+  },
+  "useHookSnippets": {
+    "prefix": "useHooks",
+    "body": [
+      "import { client } from \"@/utility/graphql-client\"",
+      "import { gql } from \"@apollo/client\"",
+      "import { useState, useEffect } from \"react\"",
+      "",
+      "const useHooks = () => {",
+      "\tconst [hooks, setHooks] = useState([])",
+      "",
+      "\tuseEffect(() => {",
+      "\t\tconst fetchHooks = async () => {",
+      "\t\t\ttry {",
+      "\t\t\t\tconst { data } = await client.query({",
+      "\t\t\t\t\tquery: gql`",
+      "\t\t\t\t\t\t${1:query_here}",
+      "\t\t\t\t\t`,",
+      "\t\t\t\t\tvariables: { ${2:filter}: \"\" },",
+      "\t\t\t\t})",
+      "\t\t\t\tsetHooks(data.${3:hooks})",
+      "\t\t\t} catch (error) {",
+      "\t\t\t\tconsole.error(\"Error fetching ${4:hooks}:\"), error",
+      "\t\t\t}",
+      "\t\t}",
+      "",
+      "\t\tfetchHooks()",
+      "",
+      "\t\t// Cleanup function if necessary",
+      "\t\treturn () => {",
+      "\t\t\t// Any cleanup code here",
+      "\t\t}",
+      "\t}, []) // Empty dependency array to run only once on component mount",
+      "",
+      "\treturn { hooks }",
+      "}",
+      "",
+      "export default useHooks"
+    ],
+    "description": "Creates a custom hook for fetching and managing data with GraphQL in a React component."
+  }
+}

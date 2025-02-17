@@ -26,9 +26,9 @@ export default function PaymentItemsContent({
 }: Props) {
   return (
     <>
-      <PaymentItemSearchInput
+      {/* <PaymentItemSearchInput
         {...{ dispatch, paymentType: props.paymentType, id: props?.id }}
-      />
+      /> */}
       {props.paymentItems.length > 0 ? (
         <PaymentItems {...{ items: props.paymentItems, dispatch }} />
       ) : (

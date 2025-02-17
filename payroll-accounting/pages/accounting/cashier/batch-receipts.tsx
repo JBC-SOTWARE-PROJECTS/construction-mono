@@ -3,11 +3,11 @@ import asyncComponent from "@/utility/asyncComponent";
 import Head from "next/head";
 import AccessManager from "@/components/accessControl/AccessManager";
 
-const CashierAdminComponent = asyncComponent(
-  () => import("@/routes/accounting/cashier/accounts")
+const BatchReceiptsComponent = asyncComponent(
+  () => import("@/routes/accounting/cashier/batch-receipts")
 );
 
-const CashierAdmin = () => {
+const BatchReceipts = () => {
   return (
     <React.Fragment>
       <Head>
@@ -15,11 +15,11 @@ const CashierAdmin = () => {
       </Head>
       <AccessManager roles={["ROLE_CASHIER_ADMIN", "ROLE_CASHIER"]}>
         <div className="w-full">
-          <CashierAdminComponent />
+          <BatchReceiptsComponent />
         </div>
       </AccessManager>
     </React.Fragment>
   );
 };
 
-export default CashierAdmin;
+export default BatchReceipts;

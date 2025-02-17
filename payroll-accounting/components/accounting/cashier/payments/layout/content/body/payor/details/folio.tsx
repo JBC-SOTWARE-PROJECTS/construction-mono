@@ -5,21 +5,17 @@ import {
   Payor,
   PayorType,
 } from "@/components/accounting/cashier/payments/data-types/types"
-import TerminalWindowFolioListDialog from "@/components/accounting/cashier/payments/dialog/folio/folio-list"
-import { Billing, Patient } from "@/graphql/gql/graphql"
-import { useDialog } from "@/hooks"
+import { Billing } from "@/graphql/gql/graphql"
 import { useBillingById } from "@/hooks/cashier/use-billing"
-import { calculateAge } from "@/utility/helper"
 import { HistoryOutlined, LockOutlined } from "@ant-design/icons"
-import { Card, Divider, Skeleton, Space, Tag, Tooltip, Typography } from "antd"
-import { useRouter } from "next/router"
+import { Divider, Skeleton, Space, Tag, Tooltip, Typography } from "antd"
 import numeral from "numeral"
 import React, { Dispatch } from "react"
-import { PaymentRoute } from ".."
 import { PayorLayout } from "./main"
 
-interface Props extends Billing, PaymentRoute {
-  id: string
+interface Props extends Billing {
+  id?: string
+  payorType: PayorType
   paymentType: PaymentType
   randomGender: GenderType
   billing?: Billing | null
@@ -59,11 +55,12 @@ export const PayorFolioIconStatus = React.memo((props: FolioStatusProps) => {
 PayorFolioIconStatus.displayName = "PayorFolioIconStatus"
 
 const PayorFolioDetails = React.memo((props: Props) => {
-  const paymentType = props["payment-type"] as PaymentType
-  const defaultPayorType =
-    paymentType == "otc-payments"
-      ? "WALK-IN"
-      : (props["payor-type"] as PayorType)
+  console.log("Folio payor ...")
+  console.log(props, "props")
+  const paymentType = props.paymentType as PaymentType
+  const defaultPayorType = (
+    paymentType == "otc-payments" ? "WALK-IN" : props.payorType
+  ) as PayorType
 
   const { loading, data: billing } = useBillingById({
     variables: { id: props.id },
@@ -72,7 +69,7 @@ const PayorFolioDetails = React.memo((props: Props) => {
         props.dispatch({ type: "set-billing", payload: billing })
         props.dispatch({
           type: "set-payor",
-          payload: billing?.patient as Patient,
+          payload: billing as Billing,
         })
         props.dispatch({
           type: "set-folio-items",
@@ -93,14 +90,11 @@ const PayorFolioDetails = React.memo((props: Props) => {
 
   const payorName =
     paymentType == "otc-payments"
-      ? billing?.otcname
-      : billing?.patient?.fullName ?? ""
+      ? billing?.otcName
+      : billing?.customer?.customerName ?? ""
 
   function onRouteFolio() {
-    window.open(
-      `/receivables-collections/billing/folios/patient/${billing?.id}`,
-      "_blank"
-    )
+    window.open(`/accounting/billing/folio/${billing?.id}`, "_blank")
   }
   return (
     <PayorLayout
@@ -111,9 +105,7 @@ const PayorFolioDetails = React.memo((props: Props) => {
         <Space wrap size="small">
           <PayorFolioIconStatus
             {...{
-              registryType: billing?.patientCase?.registryType ?? "",
               locked: !!billing?.locked,
-              isAllowedProgressPayment: !!billing?.isAllowedProgressPayment,
               loading,
             }}
           />
@@ -142,13 +134,10 @@ const PayorFolioDetails = React.memo((props: Props) => {
         ) : billing ? (
           <Space split={<Divider type="vertical" />} wrap>
             <Typography.Text strong>
-              Folio #: <a onClick={onRouteFolio}>{billing?.billingNo}</a>
+              Folio #: <a onClick={onRouteFolio}>{billing?.billNo}</a>
             </Typography.Text>
             <Typography.Text strong>
-              Case #: {billing?.patientCase?.caseNo}
-            </Typography.Text>
-            <Typography.Text strong>
-              Age: {calculateAge(billing?.patient?.dob)}
+              Project #: {billing?.project?.contractId}
             </Typography.Text>
           </Space>
         ) : (

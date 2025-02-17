@@ -14,35 +14,22 @@ interface ModalProps {
   defaultPayorType: PayorType
 }
 export default function SearchPayorMC(props: ModalProps) {
-  console.log(props, "propss")
   const [form] = Form.useForm()
   const [payorType, setPayorType] = useState<PayorType>(
     props.defaultPayorType ??
       (PayorOptionsPerType[props.paymentType][0].value as PayorType)
   )
-  const [registryType, setRegistryType] = useState<RegistryType>("ALL")
 
   const { data, loading, refetch } = useSearchPaymentPayor({
     variables: {
       filter: "",
-      payorType,
+      payorType: (payorType ? payorType.toUpperCase() : "FOLIO") as PayorType,
       paymentType: props.paymentType,
     },
   })
 
   const onChangePayorType = (e: PayorType) => {
     setPayorType(e)
-  }
-
-  const onChangeRegistryType = (e: RegistryType) => {
-    setRegistryType(e)
-    refetch({
-      variables: {
-        filter: "",
-        payorType,
-        paymentType: props.paymentType,
-      },
-    })
   }
 
   const debouncedSearch = useDebounce((filter: string) => {
@@ -60,7 +47,6 @@ export default function SearchPayorMC(props: ModalProps) {
     <Modal title="" open onCancel={props.hide} footer={null} width={800}>
       <Form
         form={form}
-        layout="vertical"
         initialValues={{
           payorType:
             props.defaultPayorType ??
@@ -78,7 +64,6 @@ export default function SearchPayorMC(props: ModalProps) {
                 style={{ fontWeight: "bolder", marginBottom: 0 }}
                 propsselect={{
                   options: PayorOptionsPerType[props.paymentType],
-                  size: "large",
                   style: { width: 200 },
                   onChange: onChangePayorType,
                 }}
@@ -91,7 +76,7 @@ export default function SearchPayorMC(props: ModalProps) {
             <SearchPayorInput
               {...{
                 loading,
-                searchItems: data?.list ?? [],
+                searchItems: data?.content ?? [],
                 handleInputChange: debouncedSearch,
                 hide: props.hide,
                 payorType,

@@ -32,9 +32,9 @@ export default function PaymentMethodCard({
   const [otherType, setOtherType] = useState(false)
   const acquisitionBankOpt = useAcquisitionBankOpt({ size: 100 })
 
+  console.log(acquisitionBankOpt, "acquisitionBankOpt")
   const handleExpirationChange = (e: any) => {
     let formattedValue = e?.target?.value ?? 0
-    console.log(formattedValue, "value")
     formattedValue = formattedValue.replace(/\D/g, "")
     // Limit to 6 characters
     formattedValue = formattedValue.slice(0, 4)

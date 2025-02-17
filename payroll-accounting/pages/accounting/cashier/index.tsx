@@ -4,22 +4,22 @@ import Head from "next/head";
 import AccessManager from "@/components/accessControl/AccessManager";
 
 const CashierComponent = asyncComponent(
-  () => import("@/routes/accounting/cashier/accounts")
+  () => import("@/routes/accounting/cashier")
 );
 
-const Cashiering = () => {
+const Cashier = () => {
   return (
     <React.Fragment>
       <Head>
-        <title>Cashier</title>
+        <title>Cashier </title>
       </Head>
-      <AccessManager roles={["ROLE_ADMIN", "ROLE_CASHIER"]}>
+      <AccessManager roles={["ROLE_CASHIER", "ROLE_CASHIER"]}>
         <div className="w-full">
-          <CashierComponent />;
+          <CashierComponent />
         </div>
       </AccessManager>
     </React.Fragment>
   );
 };
 
-export default Cashiering;
+export default Cashier;

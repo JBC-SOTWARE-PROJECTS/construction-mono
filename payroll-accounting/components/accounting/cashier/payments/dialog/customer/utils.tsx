@@ -7,10 +7,11 @@ import { Card, Space, Typography } from "antd"
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { PayorType } from "../../data-types/types"
+import { PaymentPayor } from "@/hooks/cashier/use-payment-payor"
 
 interface SearchPayorInputProps {
   payorType: PayorType
-  searchItems: PayorDetails[]
+  searchItems: PaymentPayor[]
   loading: boolean
   handleInputChange: (param: string) => void
   hide: (params: { id: string; payorType: PayorType }) => void
@@ -32,7 +33,6 @@ export function SearchPayorInput({
   useEffect(() => {
     if (searchItems.length > 0) {
       const handleKeyDown = (event: KeyboardEvent) => {
-        console.log(event, "event")
         if (event.key === "ArrowDown") {
           setSelectedIndex((prevIndex) => (prevIndex + 1) % searchItems.length)
         } else if (event.key === "ArrowUp") {
@@ -61,7 +61,7 @@ export function SearchPayorInput({
     if (inputRef?.current) inputRef.current.focus()
   }, [])
 
-  const handleResultClick = (record: PayorDetails) => {
+  const handleResultClick = (record: PaymentPayor) => {
     props.hide({ id: record.id, payorType: props.payorType })
   }
 
@@ -89,7 +89,7 @@ export function SearchPayorInput({
               onClick={() => handleResultClick(result)}
             >
               <ItemDetails>
-                <h3>{result.payorName}</h3>
+                <h3>{result.name}</h3>
                 <Desc>
                   <Typography.Text ellipsis>
                     {result?.description ?? "N/A"}
@@ -151,7 +151,7 @@ const SearchInput = styled.input`
   font-size: 17px;
 
   :focus-visible {
-    border-color: #399b53 !important;
+    border-color: #059669 !important;
   }
 `
 

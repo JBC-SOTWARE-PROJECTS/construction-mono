@@ -50,11 +50,12 @@ export const PaymentItems = (props: PaymentItemsProps) => {
 
   const onEdit = (record: PaymentItem) => {
     editAmount({ record }, (returned: PaymentItem) => {
-      console.log(returned, "returned")
       if (returned) {
+        console.log(returned, "returned")
         const newItems = [...(props?.items ?? [])]
         const index = newItems.findIndex((item) => item.id == record.id)
         newItems[index] = returned
+        console.log(newItems, "newItems")
         props.dispatch({
           type: "set-payment-items",
           payload: [...newItems],
@@ -80,11 +81,11 @@ export const PaymentItems = (props: PaymentItemsProps) => {
           <SelectedItem key={index}>
             <ItemDetails onClick={() => onEdit(item)}>
               <h3>{item?.itemName ?? ""}</h3>
-              <Desc>
+              {/* <Desc>
                 <Typography.Text ellipsis>
                   {item?.description ?? ""}
                 </Typography.Text>
-              </Desc>
+              </Desc> */}
               <Desc>
                 {item?.qty ?? 0} PCS @
                 {numeral(item?.price ?? 0).format("0,0.00")}
@@ -92,7 +93,7 @@ export const PaymentItems = (props: PaymentItemsProps) => {
             </ItemDetails>
             <ItemAmount onClick={() => onEdit(item)}>
               <p>{numeral(item?.amount ?? 0).format("0,0.00")}</p>
-              <Desc>VAT: {numeral(item?.vat ?? 0).format("0,0.00")}</Desc>
+              {/* <Desc>VAT: {numeral(item?.vat ?? 0).format("0,0.00")}</Desc> */}
             </ItemAmount>
             <Action>
               <Button
@@ -165,7 +166,6 @@ type PaymentItemsEmptyContentProps = {
 export default function PaymentItemsEmptyContent(
   props: PaymentItemsEmptyContentProps
 ) {
-  console.log(props?.billing?.locked, "props?.billing?.locked")
   return (
     <ImageContainer>
       <ImageWrapper>
@@ -177,14 +177,14 @@ export default function PaymentItemsEmptyContent(
               width={250}
               height={250}
             />
-            <Button
+            {/* <Button
               size="large"
               icon={<PlusCircleOutlined />}
               onClick={() => props.onAddItems(props.paymentType)}
               disabled={!props?.billing?.locked}
             >
               <Typography.Text strong>Select Items (F3)</Typography.Text>
-            </Button>
+            </Button> */}
           </Space>
         </CenteredImage>
       </ImageWrapper>
@@ -244,7 +244,6 @@ export function PaymentItemSearchInput(props: PaymentItemSearchInputProps) {
   useEffect(() => {
     if (searchItems.length > 0) {
       const handleKeyDown = (event: KeyboardEvent) => {
-        console.log(event, "event")
         if (event.key === "ArrowDown") {
           setSelectedIndex((prevIndex) => (prevIndex + 1) % searchItems.length)
         } else if (event.key === "ArrowUp") {

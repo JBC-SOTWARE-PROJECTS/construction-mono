@@ -5,6 +5,7 @@ import {
   Col,
   Form,
   FormInstance,
+  Input,
   InputNumber,
   Space,
   Tag,
@@ -14,6 +15,7 @@ import styled from "styled-components"
 import { AmountSummaryI } from "../../../../data-types/interfaces"
 import numeral from "numeral"
 import Decimal from "decimal.js"
+import { bankersRounding } from "@/utility/bank-utils"
 
 type Props = {
   form: FormInstance<{ amountTendered: number }>
@@ -30,9 +32,8 @@ const TerminalWindowAmountTendered = (props: Props) => {
   }
 
   function setTenderedAmount() {
-    alert()
     const amountChange = getAmountChange()
-    props.form.setFieldValue("amountTendered", amountChange)
+    props.form.setFieldValue("amountTendered", bankersRounding(amountChange))
   }
 
   const amountChange = getAmountChange()
@@ -51,22 +52,27 @@ const TerminalWindowAmountTendered = (props: Props) => {
       />
       <Form form={props.form}>
         <InputCSS>
-          <FormInputNumber
-            name="amountTendered"
-            propsinputnumber={{
-              prefix: (
-                <Tag bordered={false} color="red">
-                  {numeral(Math.abs(amountChange)).format("0,0.00")}
-                </Tag>
-              ),
-              size: "large",
-              style: { width: "100%" },
-              formatter: (value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-              // parser: (value) =>
-              //   value?.replace(/\$\s?|(,*)/g, "") as unknown as number,
-            }}
-          />
+          <Space.Compact style={{ width: "100%" }}>
+            <Button
+              size="large"
+              style={{ fontSize: "20px!important" }}
+              onClick={setTenderedAmount}
+            >
+              {numeral(Math.abs(amountChange)).format("0,0.00")}
+            </Button>
+            <FormInputNumber
+              name="amountTendered"
+              style={{ width: "100%" }}
+              propsinputnumber={{
+                size: "large",
+                style: { width: "100%", fontSize: "20px" },
+                formatter: (value) =>
+                  `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                parser: (value) =>
+                  value?.replace(/\$\s?|(,*)/g, "") as unknown as number,
+              }}
+            />
+          </Space.Compact>
         </InputCSS>
       </Form>
     </Col>

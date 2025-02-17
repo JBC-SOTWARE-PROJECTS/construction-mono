@@ -34,8 +34,12 @@ const TableTR = (props: {
         {props.label}
       </SummaryTableTotalTD>
       <SummaryTableTotalTD
-        align="right"
-        style={{ ...style, fontSize: "20px", color: "#399b53" }}
+        style={{
+          ...style,
+          fontSize: "20px",
+          color: "#399b53",
+          textAlign: "right",
+        }}
       >
         <Space size="small" align="center">
           <p>{numeral(bankersRounding(props?.value ?? 0)).format("0,0.00")}</p>
@@ -66,7 +70,7 @@ const Details = ({ amountSummary }: Props) => {
     <div style={{ padding: "5px" }}>
       <Row justify="end" gutter={[8, 8]}>
         <Col span={12}>
-          <SummaryTable>
+          {/* <SummaryTable>
             <tbody>
               <TableTR
                 label="Vatable Sales"
@@ -81,7 +85,7 @@ const Details = ({ amountSummary }: Props) => {
                 summary
               />
             </tbody>
-          </SummaryTable>
+          </SummaryTable> */}
         </Col>
         <Col span={12}>
           <SummaryTable>
@@ -110,9 +114,16 @@ const Details = ({ amountSummary }: Props) => {
                 color="#ff4d4f"
               />
               <TableTR
-                label="Amount Due"
-                value={amountSummary.TOTAL_SALES}
-                summary
+                label="Less: Recoupment"
+                value={amountSummary.RECOUPMENT}
+                italic
+                color="#ff4d4f"
+              />
+              <TableTR
+                label="Less: Retention"
+                value={amountSummary.RETENTION}
+                italic
+                color="#ff4d4f"
               />
             </tbody>
           </SummaryTable>
@@ -132,7 +143,7 @@ const TerminalAmountSummary = React.memo((props: Props) => {
 
   return (
     <SummaryDiv>
-      {/* {showDetails && (
+      {showDetails && (
         <div
           style={{
             position: "absolute",
@@ -146,34 +157,23 @@ const TerminalAmountSummary = React.memo((props: Props) => {
         >
           <Details {...props} />
         </div>
-      )} */}
-      <div
-        style={{
-          // position: "absolute",
-          // bottom: 60,
-          left: 0,
-          backgroundColor: "white",
-          padding: 0,
-          width: "100%",
-          // borderTop: "1px solid #e5e7eb",
-        }}
-      >
-        <Details {...props} />
-      </div>
-      {/* <Row justify="end" gutter={[8, 8]}> */}
-      {/* <Col flex="auto" />
+      )}
+      <Row justify="end" gutter={[8, 8]}>
+        <Col flex="auto" />
         <Col flex="400px">
           <SummaryTable>
-            <TableTR
-              label="Amount Due"
-              value={amountSummary.AMOUNT_DUE}
-              summary
-              amountDue={true}
-              onShow={onShow}
-            />
+            <tbody>
+              <TableTR
+                label="Amount Due"
+                value={amountSummary.AMOUNT_DUE}
+                summary
+                amountDue={true}
+                onShow={onShow}
+              />
+            </tbody>
           </SummaryTable>
-        </Col> */}
-      {/* </Row> */}
+        </Col>
+      </Row>
     </SummaryDiv>
   )
 })
@@ -187,7 +187,7 @@ const SummaryDiv = styled.div`
   position: fixed;
   bottom: 0;
   width: 45%;
-  height: 185px;
+  height: 57px;
   z-index: 1;
   padding: 10px;
   background: white;

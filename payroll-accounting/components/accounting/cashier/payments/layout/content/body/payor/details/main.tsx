@@ -1,25 +1,12 @@
 import {
-  GenderType,
   PaymentType,
   PayorType,
 } from "@/components/accounting/cashier/payments/data-types/types"
-import { useDialog } from "@/hooks"
 import { getRandomBoyGirl } from "@/utility/helper"
-import { EditOutlined, SelectOutlined } from "@ant-design/icons"
-import {
-  Avatar,
-  Badge,
-  Button,
-  Card,
-  Divider,
-  Skeleton,
-  Space,
-  Typography,
-} from "antd"
-import React, { ReactNode } from "react"
-import styled from "styled-components"
-import { PaymentRoute } from ".."
+import { Avatar, Card, Skeleton, Space } from "antd"
 import { useRouter } from "next/router"
+import { ReactNode } from "react"
+import styled from "styled-components"
 
 interface PayorAvatarProps {
   loading: boolean

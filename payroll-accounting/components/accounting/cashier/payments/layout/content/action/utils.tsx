@@ -1,81 +1,57 @@
-import { Billing, BillingItem, PaymentItem } from "@/graphql/gql/graphql"
-import { FolioItemsI, TerminalDetails } from "../../../data-types/interfaces"
-import { NextRouter } from "next/router"
-import { PaymentType } from "../../../data-types/types"
+import { Billing, BillingItem, PaymentItem } from "@/graphql/gql/graphql";
+import { FolioItemsI, TerminalDetails } from "../../../data-types/interfaces";
+import { NextRouter } from "next/router";
+import { PaymentType } from "../../../data-types/types";
 
 interface folioParams {
-  folioItems?: FolioItemsI
-  billing?: Billing | null
-  terminalDetails?: TerminalDetails
+  folioItems?: FolioItemsI;
+  billing?: Billing | null;
+  terminalDetails?: TerminalDetails;
 }
 
 interface folioFields {
-  items: PaymentItem[]
   fields: {
-    receiptType?: string | null
-    batchReceiptId?: string | null
-    shiftId?: string | null
-    billingId?: string | null
-  }
-  taggedIds: []
-  taggedIdsMeds: []
+    receiptType?: string | null;
+    // batchReceiptId?: string | null
+    shiftId?: string | null;
+    billingId?: string | null;
+  };
 }
 
 export const getFolioFields = (params: folioParams): folioFields => {
-  let items: PaymentItem[] = []
-  const folioItem = params.folioItems
-  const billing = params.billing
-  const {
-    type: receiptType,
-    batchReceiptId,
-    shiftId,
-  } = params?.terminalDetails ?? {
-    type: "",
-    batchReceiptId: "",
-    shiftId: "",
-  }
-
-  for (const itemType in folioItem) {
-    const itemTypeList = (folioItem[itemType as keyof FolioItemsI] ??
-      []) as BillingItem[]
-    itemTypeList.map((item: BillingItem) => {
-      const newItem: PaymentItem = {
-        itemName: item.description,
-        referenceItemId: item.id,
-        qty: item.qty,
-        price: item.wcost,
-        amount: item.subTotal,
-        referenceItemType: item.itemType,
-      }
-
-      items.push(newItem)
-    })
-  }
+  const billing = params.billing;
+  const { batchReceiptId, shiftId, receiptType, nextReceiptNo } =
+    params?.terminalDetails ?? {
+      type: "",
+      batchReceiptId: "",
+      shiftId: "",
+    };
 
   const fields = {
+    batchId: batchReceiptId,
+    receiptNo: nextReceiptNo,
     receiptType,
-    batchReceiptId,
     shiftId,
     billingId: billing?.id,
-  }
+  };
 
   return {
-    items,
     fields,
-    taggedIds: [],
-    taggedIdsMeds: [],
-  }
-}
+  };
+};
 
 export const onCompletePayment = (
   response: string,
   paymentType: PaymentType,
   router: NextRouter
 ) => {
+  if (response == "print") {
+    window.location.reload();
+  }
   if (response == "new") {
-    router.push(`/accounting/cashier/payments/${paymentType}`)
+    window.location.reload();
   }
   if (response == "close") {
-    window.close()
+    router.push(`/accounting/cashier`);
   }
-}
+};

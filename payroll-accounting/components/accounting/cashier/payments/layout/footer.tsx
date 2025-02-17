@@ -1,28 +1,25 @@
-import TitleBox from "@/components/common/custom/title-box"
-import { Progress, Layout, Space, Typography } from "antd"
-import React from "react"
-import { green } from "@ant-design/colors"
-import { TerminalWindowsFooterProps } from "../data-types/interfaces"
+import TitleBox from "@/components/common/custom/title-box";
+import { Progress, Layout, Space, Typography } from "antd";
+import React from "react";
+import { green } from "@ant-design/colors";
+import { TerminalWindowsFooterProps } from "../data-types/interfaces";
 
-const { Text } = Typography
-const { Footer } = Layout
+const { Text } = Typography;
+const { Footer } = Layout;
 
 const TerminalWindowFooter = ({ ...props }: TerminalWindowsFooterProps) => {
   const getPercentage = () => {
-    console.log(props, "props")
-    let percentage = 0
-    if (props?.macAddress) percentage += 20
+    let percentage = 0;
+    if (props?.macAddress) percentage += 20;
 
-    if (props?.shiftId) percentage += 20
+    if (props?.shiftId) percentage += 20;
 
-    if (props?.terminalId) percentage += 20
+    if (props?.terminalId) percentage += 20;
 
-    if (props.batchReceiptId) percentage += 20
+    if (props.batchReceiptId) percentage += 20;
 
-    if (props?.nextAR || props?.nextOR) percentage += 20
-
-    return percentage
-  }
+    return percentage;
+  };
 
   return (
     <Footer
@@ -63,7 +60,7 @@ const TerminalWindowFooter = ({ ...props }: TerminalWindowsFooterProps) => {
         }
       />
     </Footer>
-  )
-}
+  );
+};
 
-export default TerminalWindowFooter
+export default TerminalWindowFooter;

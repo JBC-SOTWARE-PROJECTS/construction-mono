@@ -14,7 +14,7 @@ const PaymentMethodTableRow = (
 ) => {
   return (
     <tr>
-      <td>{props.type}</td>
+      <td>{props.tenderedType}</td>
       <td style={{ textAlign: "right" }}>
         {numeral(bankersRounding(props?.amount)).format("0,0.00")}
       </td>
@@ -44,7 +44,7 @@ const TerminalWindowsPaymentMethodList = React.memo(
       props?.dispatch({ type: "set-payment-methods", payload })
     }
 
-    return hasValues ? (
+    return (
       <Row gutter={[8, 8]}>
         <Col span={24}>
           <Divider dashed />
@@ -95,7 +95,7 @@ const TerminalWindowsPaymentMethodList = React.memo(
           </TableContainer>
         </Col>
       </Row>
-    ) : null
+    )
   }
 )
 
