@@ -6,31 +6,23 @@ import org.springframework.stereotype.Component
 class BillingUtils {
 
     static BigDecimal bankersRounding(BigDecimal number) {
-        // Round the number using bankers' rounding
-        BigDecimal integerPart = new BigDecimal(Math.floor(number));
-        BigDecimal decimalPart = new BigDecimal(number - integerPart);
+        if (number != BigDecimal.ZERO) {
+            BigDecimal scaledNumber = number.setScale(2, BigDecimal.ROUND_HALF_EVEN) // First scale to 2 decimal places using Bankers Rounding
 
-        // If the decimal part has more than two decimal places, apply bankers' rounding to it
-        if (Math.abs(decimalPart * 100) > 2) {
-            decimalPart = Math.round(decimalPart * 100) / 100.0;
+            BigDecimal integerPart = scaledNumber.setScale(0, BigDecimal.ROUND_DOWN) // Get the integer part
+            BigDecimal decimalPart = scaledNumber.subtract(integerPart) // Get the decimal part
 
-            // Check if the decimal part needs to be rounded up or down based on bankers' rounding
-            if ((BigDecimal) Math.abs(decimalPart - Math.floor(decimalPart)) == 0.5) {
-                // If the decimal part is exactly halfway between two integers, use bankers' rounding
-                if ((BigDecimal) Math.floor(decimalPart) % 2 == 0) {
-                    // If the integer part of the decimal part is even, round down
-                    decimalPart = Math.floor(decimalPart);
+            // If the decimal part is exactly 0.5, check the integer part for Bankers Rounding
+            if (decimalPart.compareTo(new BigDecimal("0.50")) == 0) {
+                if (integerPart.remainder(BigDecimal.valueOf(2)).compareTo(BigDecimal.ZERO) == 0) {
+                    return integerPart.add(BigDecimal.ZERO) // Round down if integer part is even
                 } else {
-                    // If the integer part of the decimal part is odd, round up
-                    decimalPart = Math.ceil(decimalPart);
+                    return integerPart.add(BigDecimal.ONE) // Round up if integer part is odd
                 }
             }
-        }
 
-        // Combine the integer and decimal parts and return the result
-        String string = integerPart.toString()
-        String string2 = decimalPart.toString()
-        BigDecimal result = new BigDecimal(string) + new BigDecimal(string2);
-        return result
+            return scaledNumber // If not exactly 0.5, return the scaled number
+        }
+        return BigDecimal.ZERO
     }
 }

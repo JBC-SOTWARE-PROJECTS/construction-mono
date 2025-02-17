@@ -667,4 +667,16 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/113_donss_add_payment_items.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/114_donss_alter_payments.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/115_donss_add_billing_payment_details.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/116_donss_alter_billing_items.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/117_donss_add_integration_auto_post.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/118_donss_alter_report_layout.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/119_donss_add_batch_receipt.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

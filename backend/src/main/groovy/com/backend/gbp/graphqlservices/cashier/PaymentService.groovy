@@ -1,18 +1,18 @@
 package com.backend.gbp.graphqlservices.cashier
 
-import com.backend.gbp.domain.accounting.CustomerType
+
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LedgerDocType
 import com.backend.gbp.domain.cashier.PaymentItem
 import com.backend.gbp.domain.cashier.PaymentType
 import com.backend.gbp.domain.cashier.ReceiptType
-import com.backend.gbp.domain.types.AutoIntegrateable
 import com.backend.gbp.graphqlservices.accounting.ARPaymentPostingService
 import com.backend.gbp.graphqlservices.accounting.ArCustomerServices
 import com.backend.gbp.graphqlservices.accounting.Entry
 import com.backend.gbp.graphqlservices.accounting.IntegrationServices
 import com.backend.gbp.graphqlservices.accounting.LedgerServices
 import com.backend.gbp.graphqlservices.accounting.SubAccountSetupService
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.backend.gbp.graphqlservices.billing.BillingItemService
 import com.backend.gbp.graphqlservices.billing.BillingService
 import com.backend.gbp.graphqlservices.billing.JobService
@@ -24,10 +24,9 @@ import com.backend.gbp.domain.User
 import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.billing.BillingItem
 import com.backend.gbp.domain.cashier.Payment
-import com.backend.gbp.domain.cashier.PaymentDetial
+import com.backend.gbp.domain.cashier.PaymentDetails
 import com.backend.gbp.domain.cashier.PaymentTargetItem
 import com.backend.gbp.domain.hrm.Employee
-import com.backend.gbp.domain.billing.Job
 import com.backend.gbp.repository.UserRepository
 import com.backend.gbp.repository.billing.BillingItemRepository
 import com.backend.gbp.repository.cashier.*
@@ -47,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
-import java.time.Duration
 import java.time.Instant
 
 @Canonical
@@ -60,7 +58,11 @@ class PaymentTarget {
 @Component
 @GraphQLApi
 @TypeChecked
-class PaymentService {
+class PaymentService extends AbstractDaoCompanyService<Payment> {
+
+	PaymentService(){
+		super(Payment.class)
+	}
 
 	@Autowired
 	ShiftRepository shiftRepository
@@ -168,7 +170,7 @@ class PaymentService {
 	) {
 
 		def paymentVal = objectMapper.convertValue(payment, Payment)
-		def listPaymentDetials = payment_details as ArrayList<PaymentDetial>
+		def listPaymentDetials = payment_details as ArrayList<PaymentDetails>
 		def billObject = billingService.billingById(billing)
 		Payment pay = new Payment()
 		BillingItem item = new BillingItem()
@@ -209,7 +211,7 @@ class PaymentService {
 			//start loop insert payment details
 			listPaymentDetials.each {
 				it ->
-					PaymentDetial detial = new PaymentDetial()
+					PaymentDetails detial = new PaymentDetails()
 					detial.amount = it.amount
 					detial.type = it.type
 					detial.reference = it.reference
@@ -285,7 +287,7 @@ class PaymentService {
 		def paymentDetials = paymentDetailRepository.getDetailsById(paymentId)
 		paymentDetials.each {
 			it ->
-				PaymentDetial upd = it
+				PaymentDetails upd = it
 				upd.voided = true
 				paymentDetailRepository.save(upd)
 		}
@@ -433,7 +435,7 @@ class PaymentService {
 
 		tendered.each {
 			map ->
-				def payTrackerDetail = new PaymentDetial()
+				def payTrackerDetail = new PaymentDetails()
 				payTrackerDetail.payment = paymentTracker
 				entityObjectMapperService.updateFromMap(payTrackerDetail, map)
 

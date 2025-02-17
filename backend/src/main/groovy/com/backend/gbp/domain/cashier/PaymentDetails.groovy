@@ -14,7 +14,7 @@ import javax.persistence.*
 @Table(schema = "cashier", name = "payments_details")
 @SQLDelete(sql = "UPDATE cashier.payments_details SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class PaymentDetial extends AbstractAuditingEntity {
+class PaymentDetails extends AbstractAuditingEntity {
 
     @GraphQLQuery
     @Id

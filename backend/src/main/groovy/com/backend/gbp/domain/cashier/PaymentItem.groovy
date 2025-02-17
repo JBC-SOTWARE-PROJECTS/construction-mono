@@ -10,6 +10,7 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.Table
+import javax.persistence.Transient
 
 
 @Entity
@@ -65,16 +66,24 @@ class PaymentItem extends AbstractAuditingEntity implements Serializable{
 	BigDecimal discount
 
 	@GraphQLQuery
+	@Column(name = "deductions", columnDefinition = "numeric")
+	BigDecimal deductions
+
+	@GraphQLQuery
 	@Column(name = "withholding_tax", columnDefinition = "numeric")
 	BigDecimal withholdingTax
 
 	@GraphQLQuery
-	@Column(name = "amount", columnDefinition = "numeric")
-	BigDecimal amount
+	@Column(name = "recoupment", columnDefinition = "numeric")
+	BigDecimal recoupment
 
 	@GraphQLQuery
-	@Column(name = "is_pf", columnDefinition = "bool")
-	Boolean isPf
+	@Column(name = "retention", columnDefinition = "numeric")
+	BigDecimal retention
+
+	@GraphQLQuery
+	@Column(name = "amount", columnDefinition = "numeric")
+	BigDecimal amount
 
 	@GraphQLQuery
 	@Column(name = "is_voided", columnDefinition = "bool")
@@ -92,4 +101,10 @@ class PaymentItem extends AbstractAuditingEntity implements Serializable{
 	@Column(name = "payment_tracker_id", columnDefinition = "uuid")
 	UUID paymentTrackerId
 
+	@GraphQLQuery
+	@Column(name = "company_id")
+	UUID companyId
+
+	@Transient
+	BigDecimal tmpSubTotal,tmpPayment
 }

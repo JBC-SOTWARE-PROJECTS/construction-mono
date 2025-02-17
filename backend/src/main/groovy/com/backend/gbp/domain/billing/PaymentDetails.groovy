@@ -9,16 +9,10 @@ import org.hibernate.annotations.Type
 
 import javax.persistence.*
 
-enum DiscountDetailsType {
-	WITHHOLDING_TAX,
-	VAT,
-	RECOUPMENT,
-	RETENTION
-}
 
 @Entity
-@Table(schema = "billing", name = "discount_details")
-class DiscountDetails extends AbstractAuditingEntity {
+@Table(schema = "billing", name = "payment_amount_details")
+class PaymentDetails extends AbstractAuditingEntity {
 
 	@GraphQLQuery
 	@Id
@@ -47,11 +41,6 @@ class DiscountDetails extends AbstractAuditingEntity {
 	BillingItem refBillItem
 
 	@GraphQLQuery
-	@Column(name = "discount_amount")
+	@Column(name = "amount")
 	BigDecimal amount
-
-	@GraphQLQuery
-	@Column(name = "item_type")
-	DiscountDetailsType itemType
-
 }
