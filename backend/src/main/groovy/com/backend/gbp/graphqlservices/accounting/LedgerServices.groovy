@@ -1599,7 +1599,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
         // ========== added by wilson ==============
-        reversal.company = source.company
+        reversal.companyId = source.companyId
         reversal.referenceNo = source.referenceNo
         reversal.referenceType = source.referenceType
         reversal.transactionNo = source.transactionNo
@@ -1623,7 +1623,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
             l.header = reversal
 
             l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
-            l.company = source.company
+            l.companyId = source.companyId
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit
@@ -1654,7 +1654,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
         reversal.parentLedger = source.id
         reversal.beginningBalance = source.beginningBalance
         // ========== added by wilson ==============
-        reversal.company = source.company
+        reversal.companyId = source.companyId
         reversal.referenceNo = source.referenceNo
         reversal.referenceType = source.referenceType
         reversal.transactionNo = source.transactionNo
@@ -1678,7 +1678,7 @@ or  lower(hl.invoiceSoaReference) like lower(concat('%',:filter,'%'))
             l.header = reversal
 
             l.transactionDateOnly = reversal.transactionDate.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
-            l.company = source.company
+            l.companyId = source.companyId
             l.particulars = it.particulars
             l.journalAccount = it.journalAccount
             l.debit = it.credit

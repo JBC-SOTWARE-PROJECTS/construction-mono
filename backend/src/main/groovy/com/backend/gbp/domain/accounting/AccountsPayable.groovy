@@ -12,6 +12,8 @@ import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound
 import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.Type
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.Where
 
 import javax.persistence.Column
 import javax.persistence.ConstraintMode
@@ -30,6 +32,8 @@ import java.time.Instant
 
 @Entity
 @Table(name = "payables", schema = "accounting")
+@SQLDelete(sql = "UPDATE accounting.payables SET deleted = true WHERE id = ?")
+@Where(clause = "deleted <> true or deleted is  null ")
 class AccountsPayable extends AbstractAuditingEntity implements Serializable, AutoIntegrateable {
 
 	@GraphQLQuery

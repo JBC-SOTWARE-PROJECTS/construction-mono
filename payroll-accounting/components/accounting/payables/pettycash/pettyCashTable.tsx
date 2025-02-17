@@ -1,7 +1,7 @@
 import { PettyCash, PettyCashAccounting } from "@/graphql/gql/graphql";
 import { currency } from "@/utility/constant";
 import { DateFormatter, NumberFormater } from "@/utility/helper";
-import { FolderOpenOutlined } from "@ant-design/icons";
+import { FolderOpenOutlined, PrinterOutlined } from "@ant-design/icons";
 import { Row, Col, Table, Pagination, Button, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 
@@ -10,6 +10,7 @@ interface IProps {
   loading: boolean;
   totalElements: number;
   handleOpen: (record: PettyCashAccounting) => void;
+  handlePrint: (record: PettyCashAccounting) => void;
   changePage: (page: number) => void;
 }
 
@@ -18,6 +19,7 @@ export default function PettyCashTable({
   loading,
   totalElements = 1,
   handleOpen,
+  handlePrint,
   changePage,
 }: IProps) {
   const columns: ColumnsType<PettyCashAccounting> = [
@@ -112,16 +114,25 @@ export default function PettyCashTable({
     {
       title: "#",
       key: "action",
-      width: 50,
+      width: 70,
       fixed: "right",
       render: (text, record) => (
-        <Button
+      <>
+          <Button
           key={text}
           type="dashed"
           size="small"
           onClick={() => handleOpen(record)}
           icon={<FolderOpenOutlined />}
         />
+          <Button
+          key={text}
+          type="dashed"
+          size="small"
+          onClick={() => handlePrint(record)}
+          icon={<PrinterOutlined />}
+        />
+      </>
       ),
     },
   ];

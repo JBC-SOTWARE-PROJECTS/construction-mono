@@ -23,7 +23,7 @@ import useGetPayrollEmployeesPageable, {
 
 const initialState: variables = {
   filter: '',
-  size: 25,
+  size: 500,
   page: 0,
   status: [],
 };
@@ -33,6 +33,7 @@ function PayrollPayslip() {
   const [state, setState] = useState(initialState);
   const [selectedEmp, setSelectedEmp] = useState<any[]>([]);
   const [viewEmp, setViewEmp] = useState<any>();
+  console.log('router', router?.query?.id);
 
   const { data, loading, refetch } = useQuery(GET_ALL_PAYROLL_EMPLOYEE, {
     variables: {
@@ -49,8 +50,14 @@ function PayrollPayslip() {
   //   },
   // });
 
-  const [employees, loadingPayrollEmployees, totalElements] =
+  const [employees, loadingPayrollEmployees,refetchEmployees, totalElements, ] =
     useGetPayrollEmployeesPageable({ variables: state });
+
+    const handleFilterChange = (value:any) => {
+      setState({ ...state, filter: value });
+      refetchEmployees();
+    };
+    
 
   return (
     <div>
@@ -80,6 +87,7 @@ function PayrollPayslip() {
             loading={loadingPayrollEmployees}
             data={employees || []}
             filter={state.filter}
+            refetchEmployees={handleFilterChange}
           />
         </ProCard>
       </PageContainer>
