@@ -1,11 +1,10 @@
-import { TableCSS } from "@/components/accountReceivables/common/style"
-import { FormInput } from "@/components/common"
-import { PaymentBillingFolioDto } from "@/graphql/gql/graphql"
-import { SearchOutlined, SelectOutlined } from "@ant-design/icons"
-import { gql, useQuery } from "@apollo/client"
-import { Button, Form, Modal, Table } from "antd"
-import { ColumnProps } from "antd/es/table"
-import { useEffect, useRef } from "react"
+import { FormInput } from "@/components/common";
+import { TableCSS } from "@/components/common/custom/styles";
+import { SearchOutlined, SelectOutlined } from "@ant-design/icons";
+import { gql, useQuery } from "@apollo/client";
+import { Button, Form, Modal, Table } from "antd";
+import { ColumnProps } from "antd/es/table";
+import { useEffect, useRef } from "react";
 
 const FOLIO_LIST = gql`
   query (
@@ -32,13 +31,13 @@ const FOLIO_LIST = gql`
       }
     }
   }
-`
+`;
 
 interface ModalProps {
-  hide: (id?: string) => void
+  hide: (id?: string) => void;
 }
 export default function TerminalWindowFolioListDialog(props: ModalProps) {
-  const inputRef = useRef<HTMLInputElement>(null) // Create a ref for the input element
+  const inputRef = useRef<HTMLInputElement>(null); // Create a ref for the input element
 
   const { data, loading, refetch } = useQuery(FOLIO_LIST, {
     variables: {
@@ -48,17 +47,17 @@ export default function TerminalWindowFolioListDialog(props: ModalProps) {
       registryType: "ALL",
       active: true,
     },
-  })
+  });
 
   const onSearch = (props: { filter: string }) => {
-    refetch({ filter: props?.filter ?? "" })
-  }
+    refetch({ filter: props?.filter ?? "" });
+  };
 
   const onSelect = (id: string) => {
-    props.hide(id)
-  }
+    props.hide(id);
+  };
 
-  const columns: ColumnProps<PaymentBillingFolioDto>[] = [
+  const columns: ColumnProps<any>[] = [
     {
       title: "Folio No",
       dataIndex: "billingNo",
@@ -91,14 +90,14 @@ export default function TerminalWindowFolioListDialog(props: ModalProps) {
         />
       ),
     },
-  ]
+  ];
 
   useEffect(() => {
     // Focus on the input field when the modal is opened
     if (inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current.focus();
     }
-  }, [])
+  }, []);
 
   return (
     <Modal
@@ -131,12 +130,12 @@ export default function TerminalWindowFolioListDialog(props: ModalProps) {
           onRow={(record, rowIndex) => {
             return {
               onClick: (event) => {
-                onSelect(record.id)
+                onSelect(record.id);
               }, // click row
-            }
+            };
           }}
         />
       </TableCSS>
     </Modal>
-  )
+  );
 }

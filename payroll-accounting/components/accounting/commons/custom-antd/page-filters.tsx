@@ -1,27 +1,27 @@
-import PopoverFilter from "@/components/common/page-layout/popover-filter"
-import { Checkbox, Form, Space, Radio, RadioProps, CheckboxProps } from "antd"
-import { FormInstance, RadioGroupProps } from "antd/lib"
-import { CheckboxGroupProps } from "antd/lib/checkbox"
-import { ReactNode } from "react"
+import PopoverFilter from "@/components/common/page-layout/popover-filter";
+import { Checkbox, Form, Space, Radio, RadioProps, CheckboxProps } from "antd";
+import { FormInstance, RadioGroupProps } from "antd/lib";
+import { CheckboxGroupProps } from "antd/lib/checkbox";
+import { ReactNode } from "react";
 
 interface FilterI {
-  label: string
-  value: string
+  label: string;
+  value: string;
 }
 
 interface PageFiltersI {
-  type?: "RADIO" | "CHECKBOX"
-  title: string
-  label: string
-  form: FormInstance<any>
-  formItemName: string
-  formFilterInitial: any
-  dataSource: FilterI[]
-  children?: ReactNode
-  handleFilterClear: (params: any) => void
-  handleFilterApply: (params: any) => void
-  radioProps?: RadioGroupProps
-  checkboxProps?: CheckboxGroupProps
+  type?: "RADIO" | "CHECKBOX";
+  title: string;
+  label: string;
+  form: FormInstance<any>;
+  formItemName: string;
+  formFilterInitial: any;
+  dataSource: FilterI[];
+  children?: ReactNode;
+  handleFilterClear: (params: any) => void;
+  handleFilterApply: (params: any) => void;
+  radioProps?: RadioGroupProps;
+  checkboxProps?: CheckboxGroupProps;
 }
 
 export default function PageFilters(props: PageFiltersI) {
@@ -64,5 +64,5 @@ export default function PageFilters(props: PageFiltersI) {
         </Form.Item>
       </Form>
     </PopoverFilter>
-  )
+  );
 }

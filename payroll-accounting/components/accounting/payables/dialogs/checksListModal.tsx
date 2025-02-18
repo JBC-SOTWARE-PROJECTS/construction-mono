@@ -68,7 +68,7 @@ export default function ChecksListSelectorModal(props: IProps) {
   });
 
   //================== functions ====================
-  const onRangeChange = (dates: null | (Dayjs | null)[]) => {
+  const onRangeChange = (dates: any) => {
     if (dates) {
       setFilterDates((prev) => ({
         ...prev,
@@ -203,11 +203,13 @@ export default function ChecksListSelectorModal(props: IProps) {
             type="primary"
             size="large"
             icon={<SaveOutlined />}
-            onClick={onSubmit}>
+            onClick={onSubmit}
+          >
             Add Selected
           </Button>
         </Space>
-      }>
+      }
+    >
       <Form layout="vertical" className="filter-form">
         <Row gutter={[8, 8]}>
           <Col span={24}>
