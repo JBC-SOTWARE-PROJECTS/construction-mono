@@ -1,12 +1,9 @@
+import { useDialog } from "@/hooks";
+import { gql, useMutation } from "@apollo/client";
 import { Button, Col, Layout, message, Row } from "antd";
+import { useRouter } from "next/router";
 import { useContext } from "react";
 import { TerminalWindowContext } from "../../..";
-import useProcessPayment from "@/hooks/cashier/use-process-payment";
-import { gql, useMutation } from "@apollo/client";
-import { BillingItem, PaymentItem } from "@/graphql/gql/graphql";
-import { FolioItemsI } from "../../../data-types/interfaces";
-import { useRouter } from "next/router";
-import { useDialog } from "@/hooks";
 import ActionControl from "../../../dialog/control";
 import { getFolioFields, onCompletePayment } from "./utils";
 
