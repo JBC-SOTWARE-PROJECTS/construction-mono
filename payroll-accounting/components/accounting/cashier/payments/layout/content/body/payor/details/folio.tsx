@@ -1,33 +1,33 @@
-import { TerminalWindowsAction } from "@/components/accounting/cashier/payments/data-types/interfaces"
+import { TerminalWindowsAction } from "@/components/accounting/cashier/payments/data-types/interfaces";
 import {
   GenderType,
   PaymentType,
   Payor,
   PayorType,
-} from "@/components/accounting/cashier/payments/data-types/types"
-import { Billing } from "@/graphql/gql/graphql"
-import { useBillingById } from "@/hooks/cashier/use-billing"
-import { HistoryOutlined, LockOutlined } from "@ant-design/icons"
-import { Divider, Skeleton, Space, Tag, Tooltip, Typography } from "antd"
-import numeral from "numeral"
-import React, { Dispatch } from "react"
-import { PayorLayout } from "./main"
+} from "@/components/accounting/cashier/payments/data-types/types";
+import { Billing } from "@/graphql/gql/graphql";
+import { useBillingById } from "@/hooks/cashier/use-billing";
+import { HistoryOutlined, LockOutlined } from "@ant-design/icons";
+import { Divider, Skeleton, Space, Tag, Tooltip, Typography } from "antd";
+import numeral from "numeral";
+import React, { Dispatch } from "react";
+import { PayorLayout } from "./main";
 
 interface Props extends Billing {
-  id?: string
-  payorType: PayorType
-  paymentType: PaymentType
-  randomGender: GenderType
-  billing?: Billing | null
-  payor?: Payor | null
-  dispatch: Dispatch<TerminalWindowsAction>
+  id?: string;
+  payorType: PayorType;
+  paymentType: PaymentType;
+  randomGender: GenderType;
+  billing?: Billing | null;
+  payor?: Payor | null;
+  dispatch: Dispatch<TerminalWindowsAction>;
 }
 
 interface FolioStatusProps {
-  loading: boolean
-  registryType?: string
-  locked?: boolean
-  isAllowedProgressPayment?: boolean
+  loading: boolean;
+  registryType?: string;
+  locked?: boolean;
+  isAllowedProgressPayment?: boolean;
 }
 
 export const PayorFolioIconStatus = React.memo((props: FolioStatusProps) => {
@@ -49,52 +49,52 @@ export const PayorFolioIconStatus = React.memo((props: FolioStatusProps) => {
         </Tooltip>
       )}
     </>
-  )
-})
+  );
+});
 
-PayorFolioIconStatus.displayName = "PayorFolioIconStatus"
+PayorFolioIconStatus.displayName = "PayorFolioIconStatus";
 
 const PayorFolioDetails = React.memo((props: Props) => {
-  console.log("Folio payor ...")
-  console.log(props, "props")
-  const paymentType = props.paymentType as PaymentType
+  console.log("Folio payor ...");
+  console.log(props, "props");
+  const paymentType = props.paymentType as PaymentType;
   const defaultPayorType = (
     paymentType == "otc-payments" ? "WALK-IN" : props.payorType
-  ) as PayorType
+  ) as PayorType;
 
   const { loading, data: billing } = useBillingById({
     variables: { id: props.id },
     onComplete: (billing) => {
       if (billing) {
-        props.dispatch({ type: "set-billing", payload: billing })
+        props.dispatch({ type: "set-billing", payload: billing });
         props.dispatch({
           type: "set-payor",
           payload: billing as Billing,
-        })
-        props.dispatch({
-          type: "set-folio-items",
-          payload: {
-            ROOMBOARD: [],
-            MEDICINES: [],
-            SUPPLIES: [],
-            DIAGNOSTICS: [],
-            CATHLAB: [],
-            ORFEE: [],
-            PF: [],
-            OTHERS: [],
-          },
-        })
+        });
+        // props.dispatch({
+        //   type: "set-folio-items",
+        //   payload: {
+        //     ROOMBOARD: [],
+        //     MEDICINES: [],
+        //     SUPPLIES: [],
+        //     DIAGNOSTICS: [],
+        //     CATHLAB: [],
+        //     ORFEE: [],
+        //     PF: [],
+        //     OTHERS: [],
+        //   },
+        // })
       }
     },
-  })
+  });
 
   const payorName =
     paymentType == "otc-payments"
       ? billing?.otcName
-      : billing?.customer?.customerName ?? ""
+      : billing?.customer?.customerName ?? "";
 
   function onRouteFolio() {
-    window.open(`/accounting/billing/folio/${billing?.id}`, "_blank")
+    window.open(`/accounting/billing/folio/${billing?.id}`, "_blank");
   }
   return (
     <PayorLayout
@@ -155,9 +155,9 @@ const PayorFolioDetails = React.memo((props: Props) => {
         ),
       }}
     />
-  )
-})
+  );
+});
 
-PayorFolioDetails.displayName = "PayorFolioDetails"
+PayorFolioDetails.displayName = "PayorFolioDetails";
 
-export default PayorFolioDetails
+export default PayorFolioDetails;
