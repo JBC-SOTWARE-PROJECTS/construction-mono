@@ -29,6 +29,7 @@ import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/en"; // Import the English locale
 import { useSidebarMenuSelection } from "@/hooks/common";
 import { softwareName, systemTagline } from "@/shared/settings";
+import { isCashieringTerminal } from "./moduleSideBar/accounting/cashier";
 interface IProps {
   account: IUserEmployee;
   children: ReactNode;
@@ -104,13 +105,16 @@ const DiverseTradeLayout = (props: IProps) => {
     setOpen(false);
   };
 
+  const isTerminal = isCashieringTerminal(router.asPath);
+
   return (
     <div
       id="diversetrade-layout"
       style={{
         height: "100vh",
         overflow: "auto",
-      }}>
+      }}
+    >
       <ProConfigProvider hashed={false} token={theme.token}>
         <ConfigProvider
           locale={enUS}
@@ -119,8 +123,12 @@ const DiverseTradeLayout = (props: IProps) => {
             return (
               document.getElementById("diversetrade-layout") || document.body
             );
-          }}>
+          }}
+        >
           <ProLayout
+            menuRender={(props, defaultDom) =>
+              !isTerminal ? defaultDom : null
+            }
             loading={loading}
             //title={""}
             title={softwareName}
@@ -179,7 +187,8 @@ const DiverseTradeLayout = (props: IProps) => {
                           onClick: confirm,
                         },
                       ],
-                    }}>
+                    }}
+                  >
                     {dom}
                   </Dropdown>
                 );
@@ -193,7 +202,8 @@ const DiverseTradeLayout = (props: IProps) => {
                     size="small"
                     type="link"
                     onClick={showDrawer}
-                    className="notification-badge">
+                    className="notification-badge"
+                  >
                     <Badge size="small" count={0}>
                       <AlertOutlined key="AlertOutlined" />
                     </Badge>
@@ -210,7 +220,8 @@ const DiverseTradeLayout = (props: IProps) => {
                     size="small"
                     type="link"
                     onClick={showDrawer}
-                    className="notification-badge">
+                    className="notification-badge"
+                  >
                     <Badge size="small" count={0}>
                       <AlertOutlined key="AlertOutlined" />
                     </Badge>
@@ -239,7 +250,8 @@ const DiverseTradeLayout = (props: IProps) => {
                   style={{
                     textAlign: "center",
                     paddingBlockStart: 12,
-                  }}>
+                  }}
+                >
                   <div>
                     © 2024 {softwareName} <sup>+</sup>
                   </div>
@@ -254,11 +266,13 @@ const DiverseTradeLayout = (props: IProps) => {
                   setLoading(true);
                   let path = item.path || "/";
                   router.push(path);
-                }}>
+                }}
+              >
                 {dom}
               </div>
             )}
-            {...settings}>
+            {...settings}
+          >
             <App>
               {children}
               <Drawer
@@ -267,7 +281,8 @@ const DiverseTradeLayout = (props: IProps) => {
                 closable={false}
                 onClose={onClose}
                 open={open}
-                key="right">
+                key="right"
+              >
                 <Empty />
               </Drawer>
             </App>
