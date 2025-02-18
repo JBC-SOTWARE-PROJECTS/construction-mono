@@ -1,19 +1,19 @@
-import { Col } from "antd"
-import React from "react"
-import { TerminalWindowsPayor } from "../../../../data-types/interfaces"
-import PayorFolioDetails from "./details/folio"
+import { Col } from "antd";
+import React from "react";
+import { TerminalWindowsPayor } from "../../../../data-types/interfaces";
+import PayorFolioDetails from "./details/folio";
 
-// export interface PaymentRoute {
-//   "payor-type": string
-//   "payment-type": string
-// }
+export interface PaymentRoute {
+  "payor-type": string;
+  "payment-type": string;
+}
 
 const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
-  console.log("Payor window ...")
+  console.log("Payor window ...");
 
   const getPayorDetails: React.FC<TerminalWindowsPayor> = (params) => {
-    let payorType = params.payorType
-    let paymentType = params.paymentType
+    let payorType = params.payorType;
+    let paymentType = params.paymentType;
     switch (payorType) {
       case "FOLIO":
         return (
@@ -28,8 +28,8 @@ const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
               // ...query,
             }}
           />
-        )
-        break
+        );
+        break;
       case "WALK-IN":
         return (
           <PayorFolioDetails
@@ -42,18 +42,18 @@ const TerminalWindowPayor = React.memo((props: TerminalWindowsPayor) => {
               // ...query,
             }}
           />
-        )
-        break
+        );
+        break;
 
       default:
-        return <></>
-        break
+        return <></>;
+        break;
     }
-  }
+  };
 
-  return <Col span={24}>{getPayorDetails(props)}</Col>
-})
+  return <Col span={24}>{getPayorDetails(props)}</Col>;
+});
 
-TerminalWindowPayor.displayName = "TerminalWindowPayor"
+TerminalWindowPayor.displayName = "TerminalWindowPayor";
 
-export default TerminalWindowPayor
+export default TerminalWindowPayor;

@@ -1,34 +1,37 @@
-import { TerminalWindowsAction } from "@/components/accounting/cashier/payments/data-types/interfaces"
+import { TerminalWindowsAction } from "@/components/accounting/cashier/payments/data-types/interfaces";
 import {
   GenderType,
   PaymentType,
   Payor,
   PayorType,
-} from "@/components/accounting/cashier/payments/data-types/types"
-import { Divider, Skeleton, Space, Typography } from "antd"
-import { Dispatch } from "react"
-import { PaymentRoute } from ".."
-import { PayorLayout } from "./main"
-import { usePromissoryNoteById } from "@/hooks/cashier/use-promissory-note"
-import numeral from "numeral"
-import { useCustomerById } from "@/hooks/cashier/use-customer"
+} from "@/components/accounting/cashier/payments/data-types/types";
+import { useCustomerById } from "@/hooks/cashier/use-customer";
+import { Divider, Skeleton, Space, Typography } from "antd";
+import { Dispatch } from "react";
+import { PayorLayout } from "./main";
+
+export interface PaymentRoute {
+  "payor-type": string;
+  "payment-type": string;
+  id: string;
+}
 
 interface Props extends PaymentRoute {
-  id: string
-  paymentType: PaymentType
-  randomGender: GenderType
-  payor?: Payor | null
-  dispatch: Dispatch<TerminalWindowsAction>
+  id: string;
+  paymentType: PaymentType;
+  randomGender: GenderType;
+  payor?: Payor | null;
+  dispatch: Dispatch<TerminalWindowsAction>;
 }
 
 export default function CorporatePayor(props: Props) {
   const { data, loading } = useCustomerById({
     variables: { id: props.id },
-  })
+  });
 
-  const hasValue = true
-  const record = null
-  const amount = 0.0
+  const hasValue = true;
+  const record = null;
+  const amount = 0.0;
 
   return (
     <PayorLayout
@@ -62,5 +65,5 @@ export default function CorporatePayor(props: Props) {
         ),
       }}
     />
-  )
+  );
 }
