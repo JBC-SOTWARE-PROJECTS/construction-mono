@@ -1,11 +1,11 @@
-import IntegrationItems from '@/components/accounting/accounting-setup/IntegrationItems'
-import CreateIntegrationsGroup from '@/components/accounting/accounting-setup/integrations/createGroup'
-import { useDialog } from '@/hooks'
-import ConfirmationPasswordHook from '@/hooks/promptPassword'
-import asyncComponent from '@/utility/asyncComponent'
-import { PageContainer, ProCard } from '@ant-design/pro-components'
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { Button, Card, Col, Row, Space, Tabs } from 'antd'
+import IntegrationItems from "@/components/accounting/accounting-setup/IntegrationItems"
+import CreateIntegrationsGroup from "@/components/accounting/accounting-setup/integrations/createGroup"
+import { useDialog } from "@/hooks"
+import ConfirmationPasswordHook from "@/hooks/promptPassword"
+import asyncComponent from "@/utility/asyncComponent"
+import { PageContainer, ProCard } from "@ant-design/pro-components"
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client"
+import { Button, Card, Col, Row, Space, Tabs } from "antd"
 
 export const INTEGRATION_GROUP = gql`
   query {
@@ -53,7 +53,7 @@ export default function Integrations() {
 
   const { data, loading, refetch } = useQuery(INTEGRATION_GROUP, {
     variables: {
-      filter: '',
+      filter: "",
       accountCategory: null,
     },
     onCompleted: ({ integrationGroupList }) => {
@@ -61,7 +61,7 @@ export default function Integrations() {
         onLoadItems({
           variables: {
             id: integrationGroupList[0].id,
-            filter: '',
+            filter: "",
             size: 10,
             page: 0,
           },
@@ -88,7 +88,7 @@ export default function Integrations() {
     onLoadItems({
       variables: {
         id: activeKey,
-        filter: '',
+        filter: "",
         size: 10,
         page: 0,
       },
@@ -97,8 +97,8 @@ export default function Integrations() {
     // else refetch({ accountCategory: activeKey, page: 0 })
   }
 
-  const onUpdateTab = (id: any, action: 'add' | 'remove') => {
-    if (action === 'remove') {
+  const onUpdateTab = (id: any, action: "add" | "remove") => {
+    if (action === "remove") {
       showPasswordConfirmation((password) => {
         onDelete({ variables: { id }, onCompleted: () => refetch() })
       })
@@ -107,16 +107,16 @@ export default function Integrations() {
 
   return (
     <PageContainer
-      title='Integrations'
-      content='Overview of Journal Entries Templates.'
+      title="Integrations"
+      content="Overview of Journal Entries Templates."
     >
       <Card
-        style={{ width: '100%' }}
-        title='Integration Group'
+        style={{ width: "100%" }}
+        title="Integration Group"
         extra={[
           <Button
-            key='add-group'
-            type='primary'
+            key="add-group"
+            type="primary"
             onClick={() => onHandleClickCreate()}
           >
             Add Group
@@ -124,11 +124,11 @@ export default function Integrations() {
         ]}
       >
         <Tabs
-          type={'editable-card'}
+          type={"editable-card"}
           hideAdd={true}
           onEdit={onUpdateTab}
-          defaultActiveKey='1'
-          tabPosition={'top'}
+          defaultActiveKey="1"
+          tabPosition={"top"}
           destroyInactiveTabPane={true}
           items={(data?.integrationGroupList || []).map((tab: any) => ({
             label: tab.description,
@@ -141,7 +141,6 @@ export default function Integrations() {
               />
             ),
           }))}
-          addIcon={<Button>asadad</Button>}
         />
       </Card>
       {/* <ProCard

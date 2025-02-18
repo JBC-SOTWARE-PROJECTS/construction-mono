@@ -1,31 +1,38 @@
-import { FormDatePicker, FormDateRange, FormSelect } from '@/components/common'
-import { getUrlPrefix } from '@/utility/graphql-client'
-import { PageContainer } from '@ant-design/pro-components'
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import FinReportGenerator from "@/components/accounting/reports/financial-report-generator"
+import { CommonReducer } from "@/components/common/custom/interfaces-types/react-common"
+import { ReportTypeLabel } from "@/constant/reports/financial-layout"
 import {
-  Button,
-  Card,
-  Col,
-  Divider,
-  Form,
-  Row,
-  Segmented,
-  Space,
-  Spin,
-  Typography,
-} from 'antd'
-import { useForm } from 'antd/es/form/Form'
-import dayjs from 'dayjs'
-import { useRouter } from 'next/router'
-import numeral from 'numeral'
-import { useState } from 'react'
-import styled from 'styled-components'
+  FinancialReportDto,
+  ReportType,
+  ReportsLayout,
+} from "@/graphql/gql/graphql"
+import { getUrlPrefix } from "@/utility/graphql-client"
+import { PageContainer } from "@ant-design/pro-components"
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client"
+import { useForm } from "antd/es/form/Form"
+import dayjs, { Dayjs } from "dayjs"
+import { useRouter } from "next/router"
+import { useReducer, useState } from "react"
+import styled from "styled-components"
+
+export const REPORTS_LAYOUT_MUTATION = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    createReportsLayout(id: $id, fields: $fields) {
+      response {
+        id
+      }
+    }
+  }
+`
 
 const CHECK_REPORT_QUERY = gql`
   query ($reportType: ReportType) {
     reportLayout: checkExistingReportLayout(reportType: $reportType) {
       id
       title
+      reportType
+      reportLayoutLabel
+      isStandard
     }
   }
 `
@@ -49,323 +56,238 @@ const GENERATE_REPORT = gql`
     }
   }
 `
-const mapAmount = (amount: number) => {
-  if (amount < 0) return `(${numeral(Math.abs(amount)).format('0,0.00')})`
-  return numeral(amount).format('0,0.00')
-}
-
-function remapTable(rows: [any], indent: number): any {
-  return rows.map((pl: any, index: number) => {
-    console.log(pl, 'pl')
-    if (pl.isGroup) {
-      const childRow = JSON.parse(pl.rows)
-      const indention = 10 + indent
-
-      if (pl?.isHide) {
-        return (
-          <tr key={pl.id}>
-            <td className='child-col' style={{ textIndent: indention }}>
-              {pl.title}
-            </td>
-            <td className='amount-col'>{mapAmount(pl.amount)}</td>
-          </tr>
-        )
-      }
-
-      return (
-        <>
-          <tr key={pl.id}>
-            <td className='group-col' style={{ textIndent: indention }}>
-              {pl.title}
-            </td>
-            <td className=''></td>
-          </tr>
-          {childRow.length > 0 ? remapTable(childRow, indention + 10) : null}
-        </>
-      )
-    }
-
-    if (pl.isChild) {
-      return (
-        <tr key={pl.id}>
-          <td className='child-col' style={{ textIndent: indent + 10 }}>
-            {pl.title}
-          </td>
-          <td className='amount-col'>{mapAmount(pl.amount)}</td>
-        </tr>
-      )
-    }
-
-    if (pl.isTotal) {
-      return (
-        <tr key={`total-${pl.id}`} style={{ textIndent: indent - 10 }}>
-          <td className='total-col'>{pl.title}</td>
-          <td className='total-amount-col'>{mapAmount(pl.amount)}</td>
-        </tr>
-      )
-    }
-  })
-}
 
 interface ReportGeneratorI {
-  reportType: string
+  reportType: ReportType
+}
+
+export type FinReportGenDateDataType = "month" | "year"
+
+export interface FinReportStateI {
+  open: boolean
+  reportDate: Dayjs[]
+  dateType: FinReportGenDateDataType
+  reportLayout?: ReportsLayout
+  reportData: FinancialReportDto[]
+  reportType: ReportType
+  isLoading: boolean
+  isComplete: boolean
+}
+
+export type FinReportActionProps =
+  | { type: "set-report-date"; payload: Dayjs[] }
+  | { type: "set-date-type"; payload: FinReportGenDateDataType }
+  | { type: "set-report-layout"; payload: ReportsLayout | undefined }
+  | { type: "set-report-data"; payload: FinancialReportDto[] }
+  | { type: "set-open"; payload: boolean }
+  | { type: "set-report-type"; payload: ReportType }
+  | { type: "set-complete"; payload: boolean }
+  | { type: "set-loading"; payload: boolean }
+
+const reduceParam: CommonReducer<FinReportStateI, FinReportActionProps> = (
+  state,
+  action
+) => {
+  switch (action.type) {
+    case "set-report-date":
+      return { ...state, reportDate: action.payload }
+    case "set-date-type":
+      return { ...state, dateType: action.payload }
+    case "set-report-layout":
+      return { ...state, reportLayout: action.payload }
+    case "set-report-data":
+      return { ...state, reportData: action.payload }
+    case "set-open":
+      return { ...state, open: action.payload }
+    case "set-report-type":
+      return { ...state, reportType: action.payload }
+    case "set-loading":
+      return { ...state, isLoading: action.payload }
+    case "set-complete":
+      return { ...state, isComplete: action.payload }
+    default:
+      return state
+  }
 }
 
 export default function ReportGenerator(props: ReportGeneratorI) {
   const { reportType } = props
   const [form] = useForm()
   const { push } = useRouter()
+  const [loadingState, setLoading] = useState(false)
+  const [complete, setComplete] = useState(false)
 
-  const [reportDate, setReportDate] = useState([dayjs(), dayjs()])
-  const [dateType, setDateType] = useState('month')
+  const [state, dispatch] = useReducer(reduceParam, {
+    reportType,
+    open: false,
+    reportDate: [dayjs(), dayjs()],
+    dateType: "month",
+    reportData: [],
+    isLoading: false,
+    isComplete: false,
+  })
 
   const [onGenerate, { data: generateData, loading: generateLoading }] =
     useLazyQuery(GENERATE_REPORT)
 
-  const { data, loading: checkLoading } = useQuery(CHECK_REPORT_QUERY, {
+  const [onCreateCustomLayout, { loading: generateCustomLoading }] =
+    useMutation(REPORTS_LAYOUT_MUTATION)
+
+  const { loading: checkLoading, refetch } = useQuery(CHECK_REPORT_QUERY, {
     variables: {
       reportType,
     },
     onCompleted: ({ reportLayout }) => {
+      const { dateType, reportDate } = state
+      dispatch({ type: "set-report-layout", payload: reportLayout })
+
       onGenerate({
         variables: {
           reportLayoutId: reportLayout?.id,
           durationType: dateType,
           end:
-            dateType == 'month'
-              ? dayjs(reportDate[0]).startOf('M').format('YYYY-MM-DD')
-              : dayjs(reportDate[1]).endOf('M').format('YYYY-MM-DD'),
+            dateType == "month"
+              ? dayjs(reportDate[0]).startOf("M").format("YYYY-MM-DD")
+              : dayjs(reportDate[1]).endOf("M").format("YYYY-MM-DD"),
+        },
+        onCompleted: ({ reportData }) => {
+          dispatch({ type: "set-report-data", payload: reportData })
+          dispatch({ type: "set-loading", payload: false })
+          dispatch({ type: "set-complete", payload: true })
+        },
+        onError: () => {
+          setLoading(false)
+          setComplete(true)
         },
       })
     },
   })
 
-  const { id, title } = data?.reportLayout ?? { id: null }
-
   const editLayout = () => {
-    push(`/accounting/reports/financial-reports/report-generator/layout/${id}`)
+    push(
+      `/financial-accounting/reports/report-generator/layout/${state?.reportLayout?.id}`
+    )
+  }
+
+  const onHandleCreateCustomLayout = () => {
+    onCreateCustomLayout({
+      variables: {
+        id: null,
+        fields: {
+          reportType: reportType,
+          layoutName: `Custom ${ReportTypeLabel[reportType]}`,
+          title: ReportTypeLabel[reportType],
+          isActive: false,
+          isStandard: false,
+        },
+      },
+      onCompleted: ({ createReportsLayout }) => {
+        push(
+          `/financial-accounting/reports/report-generator/layout/${createReportsLayout?.response?.id}`
+        )
+      },
+    })
   }
 
   const downloadCSV = () => {
+    const { dateType, reportDate } = state
     window.open(
-      `${getUrlPrefix()}/accounting/reports/financial-report/reportExtract?reportLayoutId=${id}&durationType=${dateType}&end=${
-        dateType == 'month'
-          ? dayjs(reportDate[0]).startOf('M').format('YYYY-MM-DD')
-          : dayjs(reportDate[1]).endOf('M').format('YYYY-MM-DD')
+      `${getUrlPrefix()}/accounting/reports/financial-report/reportExtract?reportLayoutId=${
+        state?.reportLayout?.id
+      }&durationType=${dateType}&end=${
+        dateType == "month"
+          ? dayjs(reportDate[0]).startOf("M").format("YYYY-MM-DD")
+          : dayjs(reportDate[1]).endOf("M").format("YYYY-MM-DD")
       }`
     )
   }
 
   const onUpdate = () => {
-    onGenerate({
-      variables: {
-        reportLayoutId: id,
-        durationType: dateType,
-        end:
-          dateType == 'month'
-            ? dayjs(reportDate[0]).startOf('M').format('YYYY-MM-DD')
-            : dayjs(reportDate[1]).endOf('M').format('YYYY-MM-DD'),
-      },
-    })
+    dispatch({ type: "set-loading", payload: true })
+    dispatch({ type: "set-complete", payload: false })
+
+    refetch()
   }
 
-  const onChangeDateType = (type: string) => {
-    const value = form.getFieldValue('reportDate')
-    setDateType(type)
-    if (type == 'month') {
-      setReportDate([
-        dayjs(value).startOf('month'),
-        dayjs(value).endOf('month'),
-      ])
-      form.setFieldValue('reportDate', dayjs(value, 'MMM YYYY'))
-    } else {
-      setReportDate([dayjs(value).startOf('year'), dayjs(value).endOf('year')])
-      form.setFieldValue('reportDate', dayjs(value, 'YYYY'))
-    }
+  const functions = {
+    onUpdate,
+    downloadCSV,
+    editLayout,
+    onHandleCreateCustomLayout,
   }
 
-  const onSetDate = (value: any) => {
-    setReportDate([dayjs(value).startOf('month'), dayjs(value).endOf('month')])
+  const loading = {
+    generate: generateLoading,
+    check: checkLoading,
+    customLayout: generateCustomLoading,
   }
 
   return (
-    <PageContainer content='Balance Sheet'>
-      <Form
-        form={form}
-        layout='vertical'
-        initialValues={{
-          dateType: 'month',
-          reportDate: dayjs(dayjs(), 'MMM YYYY'),
-        }}
-      >
-        <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-          <Col className='gutter-row' span={3}>
-            <FormSelect
-              name='dateType'
-              label='Date Type'
-              propsselect={{
-                options: [
-                  { label: 'Monthly', value: 'month' },
-                  { label: 'Yearly', value: 'year' },
-                ],
-                onChange: (e) => onChangeDateType(e),
-              }}
-            />
-          </Col>
-          <Col className='gutter-row' span={6}>
-            <FormDatePicker
-              name='reportDate'
-              label='Report Date'
-              // showpresstslist={true}
-              propsdatepicker={{
-                onChange: (_, dateString: any) => onSetDate(_),
-                picker: dateType as any,
-                format: dateType == 'month' ? 'MMM YYYY' : 'YYYY',
-              }}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Col span={4}>
-            <Space>
-              <Button onClick={() => onUpdate()}>Update</Button>
-              <Button
-                type='dashed'
-                danger
-                onClick={editLayout}
-                loading={checkLoading}
-              >
-                Edit Layout
-              </Button>
-              <Button
-                type='dashed'
-                onClick={downloadCSV}
-                loading={checkLoading}
-                style={{ color: 'teal' }}
-              >
-                Extract CSV
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Form>
-      <Divider />
-      <Spin tip='Loading...' spinning={generateLoading}>
-        <ReportContainer>
-          <Card>
-            <Form form={form} name='form-data'>
-              <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-                <Col span={24}>
-                  <div style={{ background: 'teal' }}>
-                    <Divider />
-                    <Typography.Title
-                      // editable
-                      level={3}
-                      style={{ marginLeft: 10, color: 'white' }}
-                    >
-                      {title}
-                    </Typography.Title>
-                    <table>
-                      <tbody>
-                        <tr>
-                          <td className=''></td>
-                          <td
-                            className='header-amount-col'
-                            style={{ color: 'white', fontWeight: 'bold' }}
-                          >
-                            {dateType == 'month'
-                              ? `${dayjs(reportDate[0]).format('MMM YYYY')}`
-                              : `${dayjs(reportDate[0]).format('YYYY')}`}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={24}>
-                  <table>
-                    <tbody>
-                      {(generateData?.reportData ?? []).map((pl: any) => {
-                        const rows = JSON.parse(pl.rows)
-
-                        if (pl.isGroup) {
-                          return (
-                            <>
-                              <tr key={pl.id}>
-                                <td className='group-col'>{pl.title}</td>
-                                <td className=''></td>
-                              </tr>
-                              {remapTable(rows, 10)}
-                              <tr>
-                                <td className=''></td>
-                                <td className=''></td>
-                              </tr>
-                            </>
-                          )
-                        }
-
-                        if (pl.isFormula) {
-                          return (
-                            <>
-                              <tr>
-                                <td className=''></td>
-                                <td className=''></td>
-                              </tr>
-                              <tr key={pl.id}>
-                                <td className='formula-col'>{pl.title}</td>
-                                <td className='formula-amount-col'>
-                                  {mapAmount(pl.amount)}
-                                </td>
-                              </tr>
-                              <tr>
-                                <td className=''></td>
-                                <td className=''></td>
-                              </tr>
-                            </>
-                          )
-                        }
-                      })}
-                    </tbody>
-                  </table>
-                </Col>
-              </Row>
-            </Form>
-          </Card>
-        </ReportContainer>
-      </Spin>
-    </PageContainer>
+    <PageStyle>
+      <PageContainerStyle>
+        <PageContainer>
+          <FinReportGenerator
+            {...{ form, state, dispatch, functions, loading }}
+          >
+            <FinReportGenerator.Filter />
+            <ReportContainer>
+              <FinReportGenerator.Header />
+              <FinReportGenerator.Table />
+            </ReportContainer>
+            <FinReportGenerator.Formats />
+          </FinReportGenerator>
+        </PageContainer>
+      </PageContainerStyle>
+    </PageStyle>
   )
 }
 
 export const ReportContainer = styled.div`
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 10, 30, 0.2);
+  padding-left: 32px;
+  padding-right: 32px;
+  padding-bottom: 32px;
+
   margin-top: 20px;
 
   table {
     width: 100%;
-    color: teal;
+    font-size: 0.7125rem;
+    border-collapse: collapse;
+  }
+
+  tr.border-bottom > td {
+    border-bottom: 1px solid #ffffff;
+  }
+  tr:last-child > td {
+    border-bottom: none; /* Remove border for the last row */
   }
 
   td {
-    padding: 4px;
+    padding: 2px;
     width: 80%;
-    border-bottom: 1px solid #ffffff;
   }
 
   .child-col {
     width: 80%;
-    background-color: #edfbfb;
+    border-bottom: 1px solid #ccced2;
   }
 
   .group-col {
     width: 80%;
     font-weight: bold;
+    border-bottom: 1px solid #ccced2;
+  }
+
+  .group-amount-col {
+    border-bottom: 1px solid #ccced2;
   }
 
   .amount-col {
     text-align: right;
-    background-color: #edfbfb;
+    border-bottom: 1px solid #ccced2;
   }
 
   .header-amount-col {
@@ -374,27 +296,46 @@ export const ReportContainer = styled.div`
 
   .total-col {
     font-weight: bold;
-    border-top: 1px solid teal !important;
     border-bottom: 4px double teal;
   }
 
   .total-amount-col {
     font-weight: bold;
     text-align: right;
-    border-top: 1px solid teal !important;
     border-bottom: 4px double teal;
   }
 
   .formula-col {
     font-weight: bold;
-    border-top: 4px dashed teal !important;
-    border-bottom: 4px dashed teal;
+    background: teal;
+    color: #fff;
   }
 
   .formula-amount-col {
     font-weight: bold;
     text-align: right;
-    border-top: 4px dashed teal !important;
-    border-bottom: 4px dashed teal;
+    background: teal;
+    color: #fff;
   }
+`
+
+const PageContainerStyle = styled.div`
+  margin: 0 auto;
+  padding-bottom: 50px;
+
+  @media (max-width: 768px) {
+    max-width: 90%;
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    max-width: 80%;
+  }
+
+  @media (min-width: 1025px) {
+    max-width: 60%;
+  }
+`
+
+const PageStyle = styled.div`
+  background: #f5f5f4;
 `

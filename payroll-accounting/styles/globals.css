@@ -642,3 +642,7 @@ th.ant-table-cell {
     width: 100%;
   }
 }
+
+.w-full {
+  width: 100% !important;
+}

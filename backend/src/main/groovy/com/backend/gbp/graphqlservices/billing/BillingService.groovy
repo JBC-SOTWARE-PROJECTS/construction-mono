@@ -4,6 +4,7 @@ import com.backend.gbp.domain.User
 import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.billing.Job
 import com.backend.gbp.domain.billing.JobItems
+import com.backend.gbp.domain.cashier.PaymentItem
 import com.backend.gbp.domain.hrm.Employee
 import com.backend.gbp.domain.projects.Projects
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
@@ -615,7 +616,6 @@ class BillingService extends AbstractDaoService<Billing> {
 
     }
 
-
     @GraphQLQuery(name = "netSales", description = "netSales")
     BigDecimal netSales(
             @GraphQLArgument(name = "start") String start,
@@ -629,7 +629,6 @@ class BillingService extends AbstractDaoService<Billing> {
         }
 
     }
-
 
     @Transactional
     @GraphQLMutation(name='postSWAToBilling')
