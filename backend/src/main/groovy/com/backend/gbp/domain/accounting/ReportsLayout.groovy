@@ -69,4 +69,14 @@ class ReportsLayout extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "company_id")
 	UUID companyId
+
+	@GraphQLQuery
+	@Column(name = "is_standard", columnDefinition = "bool")
+	Boolean isStandard
+
+	@Transient
+	String reportLayoutLabel
+	String getReportLayoutLabel() {
+		return reportType.label
+	}
 }

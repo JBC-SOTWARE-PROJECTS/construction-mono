@@ -51,6 +51,7 @@ class PayrollRegEmployeeDto {
     String phic;
     String insurance;
     String salaryLoan;
+    String late;
     String otherDeductions;
     String totalPayrollDeductions;
     String subTotal;
@@ -133,12 +134,13 @@ class PayrollLedger {
 //                        "Sick Leave",
                         "Allowance",
                         "Total Gross Pay",
+                        "Late",
                         "With holding Tax",
                         "SSS",
                         "HDMF",
                         "PHIC",
 //                        "Insurance",
-//                        "Salary Loan",
+                        "Salary Loan",
                         "Other Deductions",
                         "Total Payroll Deductions",
                         "SubTotal",
@@ -154,6 +156,7 @@ class PayrollLedger {
                   
                     def otherDeduction = it?.employeeOtherDeduction;
                     def contribution = it?.payrollEmployeeContribution;
+                    def loanDeduction = it?.payrollEmployeeLoan
 
                     BigDecimal hourlyRate = TimekeepingEmployeeService.getHourlyRate(it.employee, 12)
                     def totalRate = 0.00;
@@ -184,13 +187,20 @@ class PayrollLedger {
                         }
                     }
 
+                    BigDecimal loanDeduct = 0.0
+                    if(loanDeduction != null && loanDeduction.loanItems != null){
+                        loanDeduction.loanItems.each {
+                            loanDeduct += it.amount
+                        }
+                    }
+
                     def netPay =  (totalNet?.regular ?: 0.0) + (totalNet?.overtime ?: 0.0) + (totalNet?.regularHoliday ?: 0.0);
                     def totalGrossPay = netPay + grossTT;
 
                     def deduction = (totalNet?.late ?: 0.0) + (totalNet?.underTime ?: 0.0) + (it?.withholdingTax ?: 0.0) +
                             (contribution?.sssEE ?: 0.0) + (contribution?.hdmfEE ?: 0.0) + (contribution?.phicEE ?: 0.0)
 
-                    def totalDeduction = deduction + otherDeduct;
+                    def totalDeduction = deduction + otherDeduct + loanDeduct;
 
                     BigDecimal adjustTotal = 0.0
                     if(summary != null && summary.adjustmentItems != null) {
@@ -203,8 +213,10 @@ class PayrollLedger {
                         }
                     }
 
-                    def subtotal = totalGrossPay + totalDeduction + adjustTotal;
-                    def totalNetPay = totalGrossPay - totalDeduction + adjustTotal;
+                  //  def subtotal = totalGrossPay + totalDeduction + adjustTotal;
+                    def subtotal = totalGrossPay - totalDeduction ;
+                    def totalNetPay =subtotal + adjustTotal;
+                  //  def totalNetPay =( totalGrossPay - totalDeduction) + adjustTotal;
 
 //                    if()
 //                    it.allowanceEmployee?.allowanceItems?.name
@@ -220,11 +232,12 @@ class PayrollLedger {
                     payrollDto.allowance = grossTT ?: ""
                     payrollDto.totalGrossPay = totalGrossPay ?: ""
                     payrollDto.withholdingTax = it.withholdingTax ?: ""
+                    payrollDto.late = totalNet?.late ?: ""
                     payrollDto.sss = it.payrollEmployeeContribution?.sssEE ?: ""
                     payrollDto.hdmf = it.payrollEmployeeContribution?.hdmfEE ?: ""
                     payrollDto.phic = it.payrollEmployeeContribution?.phicEE ?: ""
 //                    payrollDto.insurance = ''
-//                    payrollDto.salaryLoan = ''
+                    payrollDto.salaryLoan = loanDeduct?:""
                     payrollDto.otherDeductions = otherDeduct ?: ""
                     payrollDto.totalPayrollDeductions = totalDeduction ?: ""
                     payrollDto.subTotal = subtotal ?: ""
@@ -243,12 +256,13 @@ class PayrollLedger {
                             payrollDto.holiday,
                             payrollDto.allowance,
                             payrollDto.totalGrossPay,
+                            payrollDto.late,
                             payrollDto.withholdingTax,
                             payrollDto.sss,
                             payrollDto.hdmf,
                             payrollDto.phic,
 //                            payrollDto.insurance,
-//                            payrollDto.salaryLoan,
+                            payrollDto.salaryLoan,
                             payrollDto.otherDeductions,
                             payrollDto.totalPayrollDeductions,
                             payrollDto.subTotal,

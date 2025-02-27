@@ -5,12 +5,12 @@ import {
   InputProps,
   InputNumber,
   InputNumberProps,
-} from "antd";
-import React, { forwardRef } from "react";
-import _ from "lodash";
+} from "antd"
+import React, { forwardRef } from "react"
+import _ from "lodash"
 
 interface ExtendedInputProps extends FormItemProps {
-  propsinputnumber: InputNumberProps;
+  propsinputnumber: InputNumberProps
 }
 
 const FormInputNumber = (
@@ -18,10 +18,13 @@ const FormInputNumber = (
   ref: any
 ) => {
   return (
-    <Form.Item {...props} style={{ marginBottom: "6px" }}>
-      <InputNumber {...propsinputnumber} ref={ref} />
+    <Form.Item
+      {...props}
+      style={{ marginBottom: "6px", ...(props?.style ?? {}) }}
+    >
+      <InputNumber {...propsinputnumber} ref={ref} className="w-full" />
     </Form.Item>
-  );
-};
+  )
+}
 
-export default forwardRef(FormInputNumber);
+export default forwardRef(FormInputNumber)

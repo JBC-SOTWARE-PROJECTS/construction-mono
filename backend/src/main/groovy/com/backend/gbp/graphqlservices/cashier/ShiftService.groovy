@@ -1,5 +1,9 @@
 package com.backend.gbp.graphqlservices.cashier
 
+import com.backend.gbp.domain.cashier.BatchReceipt
+import com.backend.gbp.domain.cashier.Payment
+import com.backend.gbp.domain.cashier.ReceiptType
+import com.backend.gbp.graphqlservices.base.AbstractDaoCompanyService
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.backend.gbp.domain.User
 import com.backend.gbp.domain.cashier.Shift
@@ -28,7 +32,11 @@ import java.time.Instant
 @Component
 @GraphQLApi
 @TypeChecked
-class ShiftService {
+class ShiftService extends AbstractDaoCompanyService<Shift> {
+
+	ShiftService(){
+		super(Shift.class)
+	}
 
 	@Autowired
 	ShiftRepository shiftRepository
@@ -37,7 +45,7 @@ class ShiftService {
 	TerminalRepository terminalRepository
 
 	@Autowired
-	ObjectMapper objectMapper
+	BatchService batchService
 
 	@Autowired
 	GeneratorService generatorService
@@ -85,20 +93,63 @@ class ShiftService {
 		}
 	}
 
+	@GraphQLQuery(name = "terminalActiveShift", description = "Active Shift Per temp")
+	Shift getTerminalActiveShift(
+			@GraphQLArgument(name = "terminalId") UUID terminalId
+	) {
+		try {
+			def shift = createQuery("""
+			SELECT s FROM Shift s
+			WHERE s.terminal.id = :terminalId
+			AND s.active = true
+		""")
+					.setParameter("terminalId", terminalId)
+					.singleResult
+
+
+		}catch (ignore){
+			return null
+		}
+
+	}
+
+	@GraphQLQuery(name = "employeeActiveShift", description = "Active Shift Per emp")
+	Shift employeeActiveShift(
+			@GraphQLArgument(name = "receiptType") String receiptType
+	) {
+		try {
+			def companyId = SecurityUtils.currentCompanyId()
+			def username = SecurityUtils.currentLogin()
+			def user = userRepository.findOneByLogin(username)
+			def employeeId = employeeRepository.findOneByUser(user)?.id
+			def terminalId = terminalRepository.getTerminalByEmpByComp(employeeId,companyId)?.id
+			def shift = getTerminalActiveShift(terminalId)
+			if(shift){
+				def batch = batchService.getTerminalBatchReceiptByDocType(terminalId, receiptType)
+				shift.nextDocNo = batch.receiptCurrentNo
+				shift.docType = ReceiptType.valueOf(receiptType)
+				shift.batchId = batch.id
+			}
+			return shift
+		}catch (Exception e){
+			return null
+		}
+	}
+
 	//
 	//MUTATION
 	@Transactional
 	@GraphQLMutation(name = "addShift", description = "add shift")
 	Shift addShift() {
-		def company = SecurityUtils.currentCompanyId()
-		User user = userRepository.findOneByLogin(SecurityUtils.currentLogin())
-		Employee employee = employeeRepository.findOneByUser(user)
-
-		def terminal = terminalRepository.getTerminalByEmp(employee.id)
-		def activeShift = shiftRepository.getActiveShift(company)
+		def companyId = SecurityUtils.currentCompanyId()
+		def username = SecurityUtils.currentLogin()
+		def user = userRepository.findOneByLogin(username)
+		def employee = employeeRepository.findOneByUser(user)
+		def terminal = terminalRepository.getTerminalByEmpByComp(employee?.id,companyId)
+		def activeShift = getTerminalActiveShift(terminal?.id)
 		def result = new Shift()
 		try {
-			if(activeShift.size() >= 1){
+			if(activeShift){
 				throw new Exception("There is currently active shift");
 			}else{
 				if (terminal) {
@@ -110,7 +161,7 @@ class ShiftService {
 					term.active = true
 					term.startShift = Instant.now()
 					term.employee = employee
-					term.company = company
+					term.company = companyId
 					def afterSave = shiftRepository.save(term)
 					result = afterSave
 				} else {

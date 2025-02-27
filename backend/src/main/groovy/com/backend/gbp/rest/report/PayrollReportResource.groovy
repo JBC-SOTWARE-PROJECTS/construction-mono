@@ -130,6 +130,7 @@ class PayrollReportResource {
                 def contribution = employee?.payrollEmployeeContribution;
                 def summary = employee?.employeeAdjustment;
                 def otherDeduction = employee?.employeeOtherDeduction;
+                def loanDeduction = employee?.payrollEmployeeLoan;
 
                 DateTimeFormatter formatterD = DateTimeFormatter.ofPattern("MM-dd-yyyy").withZone(ZoneId.systemDefault())
                 String startDate = formatterD.format(employee?.payroll?.dateStart)
@@ -184,10 +185,17 @@ class PayrollReportResource {
                     }
                 }
 
+                BigDecimal loanDeduct = 0.0
+                if(loanDeduction != null && loanDeduction.loanItems != null){
+                    loanDeduction.loanItems.each {
+                        loanDeduct += it.amount
+                    }
+                }
+
                 def totalNetPay = (totalSalary?.regular ?: 0.0) + (totalSalary?.overtime ?: 0.0) + (totalSalary?.regularHoliday ?: 0.0);
                 def deduction = (totalSalary?.late ?: 0.0) + (totalSalary?.underTime ?: 0.0) + (employee?.withholdingTax ?: 0.0) +
                         (contribution?.sssEE ?: 0.0) + (contribution?.hdmfEE ?: 0.0) + (contribution?.phicEE ?: 0.0);
-                def totalDeductions = deduction + otherDeduct;
+                def totalDeductions = deduction + otherDeduct + loanDeduct;
 
                 def finalTotalPay = totalNetPay + grossTT - totalDeductions + adjustTotal;
 
@@ -240,6 +248,17 @@ class PayrollReportResource {
                     otherDeduction.deductionItems.each {
                         deductionDtoList.push( new DeductionDto(
                                 description: it.name ?: '',
+                                nohours: '',
+                                rate: '',
+                                total: it.amount ?: 0.0
+                        ))
+                    }
+                }
+
+                if(loanDeduction != null && loanDeduction.loanItems != null){
+                    loanDeduction.loanItems.each {
+                        deductionDtoList.push( new DeductionDto(
+                                description: it.category.name() ? convertToTitleCase( it.category.name()) : '',
                                 nohours: '',
                                 rate: '',
                                 total: it.amount ?: 0.0
@@ -413,6 +432,25 @@ class PayrollReportResource {
         return new ResponseEntity(data, params, HttpStatus.OK)
 
 
+    }
+
+    public static String convertToTitleCase(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+
+        String[] words = input.toLowerCase().split("_");
+        StringBuilder titleCase = new StringBuilder();
+
+        for (String word : words) {
+            if (word.length() > 0) {
+                titleCase.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1))
+                        .append(" ");
+            }
+        }
+
+        return titleCase.toString().trim();
     }
 
 }
