@@ -1,15 +1,15 @@
-import { BillingItem } from "@/graphql/gql/graphql"
-import { currency } from "@/utility/constant"
-import { DateFormatterWithTime, NumberFormater } from "@/utility/helper"
+import { BillingItem } from "@/graphql/gql/graphql";
+import { currency } from "@/utility/constant";
+import { DateFormatterWithTime, NumberFormater } from "@/utility/helper";
 import {
   DeleteOutlined,
   EditOutlined,
   UnorderedListOutlined,
   UserOutlined,
-} from "@ant-design/icons"
-import { Button, Popconfirm, Space, Tag, Typography } from "antd"
+} from "@ant-design/icons";
+import { Button, Popconfirm, Space, Tag, Typography } from "antd";
 
-import type { TableColumnsType } from "antd"
+import type { TableColumnsType } from "antd";
 
 export const getBillingItemColumns = (
   onDelete: (id: string) => void,
@@ -34,9 +34,9 @@ export const getBillingItemColumns = (
             <Typography.Text type="danger" delete={!record.status}>
               {recordNo}
             </Typography.Text>
-          )
+          );
         } else {
-          return <span>{recordNo}</span>
+          return <span>{recordNo}</span>;
         }
       },
     },
@@ -45,52 +45,52 @@ export const getBillingItemColumns = (
       dataIndex: "description",
       width: 350,
     },
+    // {
+    //   title: "Quantity",
+    //   dataIndex: "qty",
+    //   align: "right",
+    //   width: 50,
+    //   render: (qty, record) => {
+    //     if (!record.status) {
+    //       return (
+    //         <Typography.Text type="danger" delete={!record.status}>
+    //           {qty}
+    //         </Typography.Text>
+    //       )
+    //     } else {
+    //       return <span>{qty}</span>
+    //     }
+    //   },
+    // },
+    // {
+    //   title: "Price",
+    //   dataIndex: "debit",
+    //   align: "right",
+    //   width: 80,
+    //   render: (price, record) => {
+    //     let cost = price
+    //     if (record.itemType == "DEDUCTIONS" || record.itemType == "PAYMENTS") {
+    //       cost = record.subTotal
+    //     }
+    //     if (!record.status) {
+    //       return (
+    //         <Typography.Text type={"danger"} delete={!record.status}>
+    //           {currency + " "}
+    //           {NumberFormater(cost)}
+    //         </Typography.Text>
+    //       )
+    //     } else {
+    //       return (
+    //         <span>
+    //           {currency + " "}
+    //           {NumberFormater(cost)}
+    //         </span>
+    //       )
+    //     }
+    //   },
+    // },
     {
-      title: "Quantity",
-      dataIndex: "qty",
-      align: "right",
-      width: 50,
-      render: (qty, record) => {
-        if (!record.status) {
-          return (
-            <Typography.Text type="danger" delete={!record.status}>
-              {qty}
-            </Typography.Text>
-          )
-        } else {
-          return <span>{qty}</span>
-        }
-      },
-    },
-    {
-      title: "Price",
-      dataIndex: "debit",
-      align: "right",
-      width: 80,
-      render: (price, record) => {
-        let cost = price
-        if (record.itemType == "DEDUCTIONS" || record.itemType == "PAYMENTS") {
-          cost = record.subTotal
-        }
-        if (!record.status) {
-          return (
-            <Typography.Text type={"danger"} delete={!record.status}>
-              {currency + " "}
-              {NumberFormater(cost)}
-            </Typography.Text>
-          )
-        } else {
-          return (
-            <span>
-              {currency + " "}
-              {NumberFormater(cost)}
-            </span>
-          )
-        }
-      },
-    },
-    {
-      title: "Subtotal",
+      title: "Deduction amount",
       dataIndex: "subTotal",
       align: "right",
       width: 120,
@@ -101,14 +101,14 @@ export const getBillingItemColumns = (
               {currency + " "}
               {NumberFormater(subTotal)}
             </Typography.Text>
-          )
+          );
         } else {
           return (
             <span>
               {currency + " "}
               {NumberFormater(subTotal)}
             </span>
-          )
+          );
         }
       },
     },
@@ -119,10 +119,10 @@ export const getBillingItemColumns = (
       width: 80,
       align: "center",
       render: (txt, record) => {
-        let object = { color: "red", text: "Cancelled" }
-        let tag = null
+        let object = { color: "red", text: "Cancelled" };
+        let tag = null;
         if (record.status) {
-          object = { color: "green", text: "Active" }
+          object = { color: "green", text: "Active" };
         }
 
         tag = (
@@ -144,8 +144,8 @@ export const getBillingItemColumns = (
               {record.lastModifiedBy}
             </Tag>
           </Space>
-        )
-        return tag
+        );
+        return tag;
       },
     },
     {
@@ -181,7 +181,7 @@ export const getBillingItemColumns = (
         </Space>
       ),
     },
-  ]
+  ];
 
-  return columns
-}
+  return columns;
+};

@@ -18,24 +18,24 @@ const AccountingSetupMenu = {
           // },
         ],
       },
-      // {
-      //   path: "/accounting/reports/financial",
-      //   name: "Financial Reports",
-      //   routes: [
-      //     {
-      //       path: "/accounting/reports/financial-reports/profit-and-loss",
-      //       name: "Profit & Loss",
-      //     },
-      //     {
-      //       path: "/accounting/reports/financial-reports/balance-sheet",
-      //       name: "Balance Sheet",
-      //     },
-      //     {
-      //       path: "/accounting/reports/financial-reports/cash-position",
-      //       name: "Cash Flow",
-      //     },
-      //   ],
-      // },
+      {
+        path: "/accounting/reports/financial",
+        name: "Financial Reports",
+        routes: [
+          {
+            path: "/accounting/reports/financial-reports/profit-and-loss",
+            name: "Profit & Loss",
+          },
+          {
+            path: "/accounting/reports/financial-reports/balance-sheet",
+            name: "Balance Sheet",
+          },
+          {
+            path: "/accounting/reports/financial-reports/cash-position",
+            name: "Cash Flow",
+          },
+        ],
+      },
     ],
   },
   location: {
