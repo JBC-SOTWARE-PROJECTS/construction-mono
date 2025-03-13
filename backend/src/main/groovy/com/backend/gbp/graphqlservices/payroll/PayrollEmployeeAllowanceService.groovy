@@ -209,7 +209,7 @@ class PayrollEmployeeAllowanceService extends AbstractPayrollEmployeeStatusServi
                     allowanceItem.amount += it.amount
                     allowanceItem.originalAmount += it.amount
                     count++
-                }
+                } //Divide by 8 multiply by number of rendered hours
             }
             allowanceItem.name = """${it.name} (${count} day(s) x PHP ${it.amount})"""
             allowanceItemList.push(allowanceItem)
