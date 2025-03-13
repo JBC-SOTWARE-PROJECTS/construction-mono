@@ -43,7 +43,7 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.xmlsoap.schemas.soap.encoding.Int
+
 
 import javax.swing.text.DateFormatter
 import java.math.RoundingMode
@@ -192,34 +192,41 @@ class PayrollReportResource {
                     }
                 }
 
-                def totalNetPay = (totalSalary?.regular ?: 0.0) + (totalSalary?.overtime ?: 0.0) + (totalSalary?.regularHoliday ?: 0.0);
-                def deduction = (totalSalary?.late ?: 0.0) + (totalSalary?.underTime ?: 0.0) + (employee?.withholdingTax ?: 0.0) +
-                        (contribution?.sssEE ?: 0.0) + (contribution?.hdmfEE ?: 0.0) + (contribution?.phicEE ?: 0.0);
-                def totalDeductions = deduction + otherDeduct + loanDeduct;
 
-                def finalTotalPay = totalNetPay + grossTT - totalDeductions + adjustTotal;
 
+                def overTimeRate = ((hourlyRate * multiplier?.regularOvertime ?: '') as BigDecimal).round(2)
+                def overTimeNoHours = ((totalHours?.overtime ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                def totalOverTime = overTimeRate * overTimeNoHours
                 grossDtoList.push(new GrossDto(
                         description: "Over Time",
-                        nohours: ((totalHours?.overtime ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP).toString(),
-                        rate: ((hourlyRate * multiplier?.regularOvertime ?: '') as BigDecimal).round(2).toString(),
-                        total: ((totalSalary?.overtime ?: 0.0) as BigDecimal).round(2),
+                        nohours: overTimeNoHours.toString(),
+                        rate: overTimeRate.toString(),
+                        total:totalOverTime.round(2),
                 ))
 
 
+                def regRate = ((hourlyRate * multiplier?.regular ?: '') as BigDecimal).round(2)
+                def regNoHours = ((totalHours?.regular ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                def totalReg = regNoHours * regRate
                 grossDtoList.push(new GrossDto(
                         description: "Regular",
-                        nohours: ((totalHours?.regular ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP).toString(),
-                        rate: ((hourlyRate * multiplier?.regular ?: '') as BigDecimal).round(2).toString(),
-                        total: ((totalSalary?.regular ?: 0.0) as BigDecimal).round(2),
+                        nohours: regNoHours.toString(),
+                        rate: regRate.toString(),
+                        total: totalReg.round(2),
+                     //   total: ((totalSalary?.regular ?: 0.0) as BigDecimal).round(2),
                 ))
 
+
+
+
+                def regHolNoHours = ((totalHours?.regularHoliday ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                def regHolRate = ((hourlyRate *  multiplier?.regularHoliday ?: '') as BigDecimal).round(2)
+                def totalRegHol = regHolNoHours * regHolRate
                 grossDtoList.push(new GrossDto(
                         description: "Regular Holiday",
-                        nohours:  ((totalHours?.regularHoliday ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP).toString(),
-                        rate: ((hourlyRate *  multiplier?.regularHoliday ?: '') as BigDecimal).round(2).toString(),
-                        total: ((totalSalary?.regularHoliday ?: 0.0) as BigDecimal).round(2),
-
+                        nohours: regHolNoHours.toString() ,
+                        rate:regHolRate.toString() ,
+                        total: totalRegHol.round(2),
                 ))
 
 //
@@ -358,6 +365,18 @@ class PayrollReportResource {
                 }
 
 
+                def totalNetPay = totalRegHol + totalReg + totalOverTime;
+                //def totalNetPay = (totalSalary?.regular ?: 0.0) + (totalSalary?.overtime ?: 0.0) + (totalSalary?.regularHoliday ?: 0.0);
+
+                def deduction = (totalSalary?.late ?: 0.0) + (totalSalary?.underTime ?: 0.0) + (employee?.withholdingTax ?: 0.0) +
+                        (contribution?.sssEE ?: 0.0) + (contribution?.hdmfEE ?: 0.0) + (contribution?.phicEE ?: 0.0);
+                def totalDeductions = deduction + otherDeduct + loanDeduct;
+
+
+                def addGross = totalNetPay + grossTT
+                def finalTotalPay =( addGross - (totalDeductions as Number)) + adjustTotal;
+           //     def finalTotalPay = totalNetPay + grossTT - totalDeductions + adjustTotal;
+
                 def data = new PayslipPayrollDto(
                         empId: employee?.employee?.employeeNo ?: "",
                         empname: employee?.employee?.fullName ?: "",
@@ -368,7 +387,7 @@ class PayrollReportResource {
                         payrollCode: employee?.payroll?.code ?: '',
                         payPeriod: "${startDate} to ${endDate}",
 //                            paycheckdate: null,
-                        netpay: finalTotalPay ?: 0.0,
+                        netpay:((finalTotalPay ?: 0.0) as BigDecimal).round(2),
                         dateprinted: formattedDate,
                         logo: logo?.inputStream
 
