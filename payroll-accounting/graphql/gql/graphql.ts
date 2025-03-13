@@ -431,6 +431,7 @@ export type AllowancePackage = {
 
 export enum AllowanceType {
   Daily = 'DAILY',
+  Hourly = 'HOURLY',
   SemiMonthly = 'SEMI_MONTHLY'
 }
 
@@ -17012,6 +17013,7 @@ export type ServiceManagementInput = {
 export type Shift = {
   __typename?: 'Shift';
   active?: Maybe<Scalars['Boolean']['output']>;
+  batchId?: Maybe<Scalars['UUID']['output']>;
   company?: Maybe<Scalars['UUID']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Instant']['output']>;
