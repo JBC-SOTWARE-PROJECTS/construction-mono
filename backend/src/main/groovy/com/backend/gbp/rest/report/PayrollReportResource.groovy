@@ -194,24 +194,24 @@ class PayrollReportResource {
 
 
 
-                def overTimeRate = ((hourlyRate * multiplier?.regularOvertime ?: '') as BigDecimal).round(2)
-                def overTimeNoHours = ((totalHours?.overtime ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                def overTimeRate = ((hourlyRate * multiplier?.regularOvertime ?: 0.00) as BigDecimal).round(2)
+                def overTimeNoHours = ((totalHours?.overtime ?: 0.00) as BigDecimal).setScale(2, RoundingMode.HALF_UP)
                 def totalOverTime = overTimeRate * overTimeNoHours
                 grossDtoList.push(new GrossDto(
                         description: "Over Time",
-                        nohours: overTimeNoHours.toString(),
-                        rate: overTimeRate.toString(),
+                        nohours:  overTimeNoHours.toString(),
+                        rate:  employee.employee.isFixedRate ? "": overTimeRate.toString(),
                         total:totalOverTime.round(2),
                 ))
 
 
-                def regRate = ((hourlyRate * multiplier?.regular ?: '') as BigDecimal).round(2)
-                def regNoHours = ((totalHours?.regular ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP)
-                def totalReg = regNoHours * regRate
+                def regRate = ((hourlyRate * multiplier?.regular ?: 0.00) as BigDecimal).round(2)
+                def regNoHours = ((totalHours?.regular ?: 0.00) as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                def totalReg =  employee.employee.isFixedRate ? (employee.employee.monthlyRate / 2) : ( regNoHours * regRate)
                 grossDtoList.push(new GrossDto(
                         description: "Regular",
                         nohours: regNoHours.toString(),
-                        rate: regRate.toString(),
+                        rate:  employee.employee.isFixedRate ? "FIXED": regRate.toString(),
                         total: totalReg.round(2),
                      //   total: ((totalSalary?.regular ?: 0.0) as BigDecimal).round(2),
                 ))
@@ -219,13 +219,13 @@ class PayrollReportResource {
 
 
 
-                def regHolNoHours = ((totalHours?.regularHoliday ?: "0") as BigDecimal).setScale(2, RoundingMode.HALF_UP)
-                def regHolRate = ((hourlyRate *  multiplier?.regularHoliday ?: '') as BigDecimal).round(2)
+                def regHolNoHours = ((totalHours?.regularHoliday ?: 0.00) as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                def regHolRate = ((hourlyRate *  multiplier?.regularHoliday ?: 0.00) as BigDecimal).round(2)
                 def totalRegHol = regHolNoHours * regHolRate
                 grossDtoList.push(new GrossDto(
                         description: "Regular Holiday",
                         nohours: regHolNoHours.toString() ,
-                        rate:regHolRate.toString() ,
+                        rate:  employee.employee.isFixedRate ? "": regHolRate.toString() ,
                         total: totalRegHol.round(2),
                 ))
 
@@ -365,7 +365,7 @@ class PayrollReportResource {
                 }
 
 
-                def totalNetPay = totalRegHol + totalReg + totalOverTime;
+                def totalNetPay =  employee.employee.isFixedRate ? (employee.employee.monthlyRate / 2) : (totalRegHol + totalReg + totalOverTime);
                 //def totalNetPay = (totalSalary?.regular ?: 0.0) + (totalSalary?.overtime ?: 0.0) + (totalSalary?.regularHoliday ?: 0.0);
 
                 def deduction = (totalSalary?.late ?: 0.0) + (totalSalary?.underTime ?: 0.0) + (employee?.withholdingTax ?: 0.0) +
@@ -374,8 +374,10 @@ class PayrollReportResource {
 
 
                 def addGross = totalNetPay + grossTT
+
                 def finalTotalPay =( addGross - (totalDeductions as Number)) + adjustTotal;
-           //     def finalTotalPay = totalNetPay + grossTT - totalDeductions + adjustTotal;
+
+                //     def finalTotalPay = totalNetPay + grossTT - totalDeductions + adjustTotal;
 
                 def data = new PayslipPayrollDto(
                         empId: employee?.employee?.employeeNo ?: "",
