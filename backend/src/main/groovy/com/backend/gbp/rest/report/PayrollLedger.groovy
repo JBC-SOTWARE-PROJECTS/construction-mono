@@ -211,6 +211,8 @@ class PayrollLedger {
                     def regHolRate = ((hourlyRate *  multiplier?.regularHoliday ?: 0.00) as BigDecimal).round(2)
                     def totalRegHol = regHolNoHours * regHolRate
 
+
+
                     def netPay = it.employee.isFixedRate ? (it.employee.monthlyRate / 2) : ( totalRegHol + totalReg + totalOverTime);
                    // def netPay =  (totalNet?.regular ?: 0.0) + (totalNet?.overtime ?: 0.0) + (totalNet?.regularHoliday ?: 0.0);
 
@@ -245,7 +247,7 @@ class PayrollLedger {
                     payrollDto.accountNo = it.employee.employeeNo ?: ""
                     payrollDto.name = it.employee.fullName ?: ""
 
-                    payrollDto.regularPay = it.employee.isFixedRate ? "FIXED": (totalReg ?: "")
+                    payrollDto.regularPay = it.employee.isFixedRate ? (it.employee.monthlyRate / 2): (totalReg ?: "")
                     payrollDto.underTimePay = it.timekeepingEmployee?.totalSalary?.underTime ?: ""
                     payrollDto.overtimePay = totalOverTime?: ""
                     payrollDto.holiday = totalRegHol ?: ""
