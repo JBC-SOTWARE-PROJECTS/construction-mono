@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+import java.math.RoundingMode
 import java.nio.charset.Charset
 import java.time.Instant
 import java.time.LocalDate
@@ -105,6 +106,7 @@ class PayrollLedger {
                 String endDate = formatterD.format(payrollEmp?.dateEnd)
 
                 def totalHours = payrollEmployees?.timekeepingEmployee?.totalHours;
+
                 def getTotalHrs = 0.0;
                 if (totalHours != null) {
                     totalHours.each { employeeHours ->
@@ -151,6 +153,8 @@ class PayrollLedger {
 
                 def getTotalPayFreq = "";
                 payrollEmployees.eachWithIndex{ it, idx->
+                    SalaryRateMultiplier multiplier = salaryRateMultiplierService.getSalaryRateMultiplier()
+
                     def summary = it.employeeAdjustment;
                     def totalNet = it.timekeepingEmployee.totalSalary;
                   
@@ -194,7 +198,23 @@ class PayrollLedger {
                         }
                     }
 
-                    def netPay =  (totalNet?.regular ?: 0.0) + (totalNet?.overtime ?: 0.0) + (totalNet?.regularHoliday ?: 0.0);
+                    def totalHoursEmp = it.timekeepingEmployee.totalHours
+                    def overTimeRate = ((hourlyRate * multiplier?.regularOvertime ?: 0.00) as BigDecimal).round(2)
+                    def overTimeNoHours = ((totalHoursEmp?.overtime ?: 0.00) as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                    def totalOverTime = overTimeRate * overTimeNoHours
+
+                    def regRate = ((hourlyRate * multiplier?.regular ?: 0.00) as BigDecimal).round(2)
+                    def regNoHours = ((totalHoursEmp?.regular ?: 0.00) as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                    def totalReg = regNoHours * regRate
+
+                    def regHolNoHours = ((totalHoursEmp?.regularHoliday ?: 0.00) as BigDecimal).setScale(2, RoundingMode.HALF_UP)
+                    def regHolRate = ((hourlyRate *  multiplier?.regularHoliday ?: 0.00) as BigDecimal).round(2)
+                    def totalRegHol = regHolNoHours * regHolRate
+
+                    def netPay = it.employee.isFixedRate ? (it.employee.monthlyRate / 2) : ( totalRegHol + totalReg + totalOverTime);
+                   // def netPay =  (totalNet?.regular ?: 0.0) + (totalNet?.overtime ?: 0.0) + (totalNet?.regularHoliday ?: 0.0);
+
+
                     def totalGrossPay = netPay + grossTT;
 
                     def deduction = (totalNet?.late ?: 0.0) + (totalNet?.underTime ?: 0.0) + (it?.withholdingTax ?: 0.0) +
@@ -225,12 +245,12 @@ class PayrollLedger {
                     payrollDto.accountNo = it.employee.employeeNo ?: ""
                     payrollDto.name = it.employee.fullName ?: ""
 
-                    payrollDto.regularPay = it.timekeepingEmployee?.totalSalary?.regular ?: ""
+                    payrollDto.regularPay = it.employee.isFixedRate ? "FIXED": (totalReg ?: "")
                     payrollDto.underTimePay = it.timekeepingEmployee?.totalSalary?.underTime ?: ""
-                    payrollDto.overtimePay = it.timekeepingEmployee?.totalSalary?.overtime ?: ""
-                    payrollDto.holiday = it.timekeepingEmployee?.totalSalary?.regularHoliday ?: ""
+                    payrollDto.overtimePay = totalOverTime?: ""
+                    payrollDto.holiday = totalRegHol ?: ""
                     payrollDto.allowance = grossTT ?: ""
-                    payrollDto.totalGrossPay = totalGrossPay ?: ""
+                    payrollDto.totalGrossPay = ( totalGrossPay ?: "")
                     payrollDto.withholdingTax = it.withholdingTax ?: ""
                     payrollDto.late = totalNet?.late ?: ""
                     payrollDto.sss = it.payrollEmployeeContribution?.sssEE ?: ""
@@ -240,9 +260,9 @@ class PayrollLedger {
                     payrollDto.salaryLoan = loanDeduct?:""
                     payrollDto.otherDeductions = otherDeduct ?: ""
                     payrollDto.totalPayrollDeductions = totalDeduction ?: ""
-                    payrollDto.subTotal = subtotal ?: ""
+                    payrollDto.subTotal =  (subtotal ?: "")
                     payrollDto.adjustment = adjustTotal ?: ""
-                    payrollDto.netPay = totalNetPay ?: ""
+                    payrollDto.netPay =   (totalNetPay ?: "")
 
 
 
