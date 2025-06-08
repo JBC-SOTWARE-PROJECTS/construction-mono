@@ -14,4 +14,9 @@ interface VehicleUsageRepository extends JpaRepository<VehicleUsageMonitoring, U
     )
     List<VehicleUsageMonitoring> findByAsset(@Param("asset") UUID asset)
 
+    @Query(
+            value = """Select p from VehicleUsageMonitoring p where p.project.id = :project ORDER BY p.startDatetime DESC"""
+    )
+    List<VehicleUsageMonitoring> findByProject(@Param("project") UUID project)
+
 }
