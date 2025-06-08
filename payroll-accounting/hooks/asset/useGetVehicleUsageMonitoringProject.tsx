@@ -1,12 +1,12 @@
 import { QueryHookOptions, gql, useQuery } from "@apollo/client";
 
 const GET_RECORDS = gql`
-  query ($filter: String,  $page: Int, $size: Int, $asset: UUID) {
-    list: vehicleUsageMonitoringPageable(
+  query ($filter: String,  $page: Int, $size: Int, $project: UUID) {
+    list: vehicleUsageMonitoringProjectPageable(
         filter: $filter,
         page: $page,
         size: $size,
-        asset: $asset
+        project: $project
       ) {
         content {
           id
@@ -25,6 +25,7 @@ const GET_RECORDS = gql`
           rentUnitMeasureQuantity
           remarks
           rentalRate
+          calculatedRentalFee
           company
           asset{
             id
@@ -44,7 +45,7 @@ const GET_RECORDS = gql`
   }
 `;
 
-const useGetVehicleUsageMonitoring = (props: QueryHookOptions ) => {
+const useGetVehicleUsageMonitoringProject = (props: QueryHookOptions ) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     ...props
   });
@@ -52,4 +53,4 @@ const useGetVehicleUsageMonitoring = (props: QueryHookOptions ) => {
   return [data?.list , loading, refetch];
 };
 
-export default useGetVehicleUsageMonitoring;
+export default useGetVehicleUsageMonitoringProject;
