@@ -57,31 +57,41 @@ export default function VehicleUsageMonitoringProjectTable({
     title: "Date",
     dataIndex: "date",
     key: "date",
-    width: '1%',
+    // width: '1%',
     render: (_, record) => (
       <span>{moment(record?.startDatetime).format("ll") + " " + moment(record?.startDatetime).format('HH:mm:ss')}</span>
+    ),
+  },
+  {
+    title: "Asset",
+    dataIndex: "asset",
+    key: "asset",
+    // ellipsis: true,
+    // width: '1%',
+    render: (_, record) => (
+      <span>{record?.asset?.description}</span>
     ),
   },
   {
     title: "Usage Purpose",
     dataIndex: "usagePurpose",
     key: "usagePurpose",
-    ellipsis: true,
-    width: '1%',
+    // ellipsis: true,
+    // width: '1%',
   },
   {
     title: "Route",
     dataIndex: "route",
     key: "route",
-    ellipsis: true,
-    width: '1%',
+    // ellipsis: true,
+    // width: '1%',
   },
   {
     title: "Rental Fee",
     dataIndex: "calculatedRentalFee",
     key: "calculatedRentalFee",
-    ellipsis: true,
-    width: '1%',
+    // ellipsis: true,
+    // width: '1%',
     render: (_, record) => (
      <span>
       Php {Number(record?.calculatedRentalFee || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -92,8 +102,8 @@ export default function VehicleUsageMonitoringProjectTable({
     title: "Duration",
     dataIndex: "startDatetime",
     key: "startDatetime",
-    ellipsis: true,
-    width: '1%',
+    // ellipsis: true,
+    // width: '1%',
     render: (_, record) => (
       <span>{getHours(record?.startDatetime, record?.endDatetime) + " hr/s"}</span>
     ),
@@ -102,8 +112,8 @@ export default function VehicleUsageMonitoringProjectTable({
     title: "Odemeter Range",
     dataIndex: "startOdometerReading",
     key: "startOdometerReading",
-    ellipsis: true,
-    width: '1%',
+    // ellipsis: true,
+    // width: '1%',
     render: (_, record) => (
       <span>{record?.startOdometerReading + "-" + record?.endOdometerReading}</span>
     ),
@@ -112,8 +122,8 @@ export default function VehicleUsageMonitoringProjectTable({
     title: "Fuel Range",
     dataIndex: "startFuelReading",
     key: "startFuelReading",
-    ellipsis: true,
-    width: '1%',
+    // ellipsis: true,
+    // width: '1%',
     render: (_, record) => (
       <span>{record?.startFuelReading + "-" + record?.endFuelReading}</span>
     ),
