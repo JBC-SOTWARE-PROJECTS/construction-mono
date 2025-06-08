@@ -25,6 +25,7 @@ const GET_RECORDS = gql`
           company
           asset{
             id
+            description
           }
           project{
             id
