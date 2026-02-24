@@ -9075,6 +9075,25 @@ export type Page_Position = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type Page_ProjectExpenseView = {
+  __typename?: 'Page_ProjectExpenseView';
+  content?: Maybe<Array<Maybe<ProjectExpenseView>>>;
+  first: Scalars['Boolean']['output'];
+  hasContent: Scalars['Boolean']['output'];
+  hasNext: Scalars['Boolean']['output'];
+  hasPrevious: Scalars['Boolean']['output'];
+  last: Scalars['Boolean']['output'];
+  nextPageable?: Maybe<Pagination>;
+  number: Scalars['Int']['output'];
+  numberOfElements: Scalars['Int']['output'];
+  pageable?: Maybe<Pagination>;
+  previousPageable?: Maybe<Pagination>;
+  size: Scalars['Int']['output'];
+  sort?: Maybe<Sorting>;
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type Page_ProjectProgress = {
   __typename?: 'Page_ProjectProgress';
   content?: Maybe<Array<Maybe<ProjectProgress>>>;
@@ -10524,6 +10543,17 @@ export type ProjectCostRevisions = {
   unit?: Maybe<Scalars['String']['output']>;
 };
 
+export type ProjectExpenseView = {
+  __typename?: 'ProjectExpenseView';
+  lineCount?: Maybe<Scalars['BigDecimal']['output']>;
+  payableCount?: Maybe<Scalars['BigDecimal']['output']>;
+  project?: Maybe<Projects>;
+  projectDescription?: Maybe<Scalars['String']['output']>;
+  totalNetAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  transTypeDescription?: Maybe<Scalars['String']['output']>;
+  transactionType?: Maybe<TransactionType>;
+};
+
 export type ProjectProgress = {
   __typename?: 'ProjectProgress';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -11944,6 +11974,7 @@ export type Query = {
   projectById?: Maybe<Projects>;
   projectByOffice?: Maybe<Array<Maybe<Projects>>>;
   projectByStatusCount?: Maybe<Array<Maybe<DashboardDto>>>;
+  projectExpenseView?: Maybe<Page_ProjectExpenseView>;
   projectList?: Maybe<Array<Maybe<Projects>>>;
   projectListPageable?: Maybe<Page_Projects>;
   projectLists?: Maybe<Array<Maybe<Projects>>>;
@@ -12105,6 +12136,8 @@ export type Query = {
   vehicleUsageEmployeeListPageable?: Maybe<Page_VehicleUsageEmployee>;
   vehicleUsageMonitoringLatest?: Maybe<VehicleUsageMonitoring>;
   vehicleUsageMonitoringPageable?: Maybe<Page_VehicleUsageMonitoring>;
+  vehicleUsageMonitoringProjectLatest?: Maybe<VehicleUsageMonitoring>;
+  vehicleUsageMonitoringProjectPageable?: Maybe<Page_VehicleUsageMonitoring>;
   version?: Maybe<Scalars['String']['output']>;
   weatherList?: Maybe<Array<Maybe<Weather>>>;
   wtxById?: Maybe<Wtx2307>;
@@ -15187,6 +15220,14 @@ export type QueryProjectByOfficeArgs = {
 
 
 /** Query root */
+export type QueryProjectExpenseViewArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
 export type QueryProjectListArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
 };
@@ -15897,6 +15938,21 @@ export type QueryVehicleUsageMonitoringPageableArgs = {
   asset?: InputMaybe<Scalars['UUID']['input']>;
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/** Query root */
+export type QueryVehicleUsageMonitoringProjectLatestArgs = {
+  project?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryVehicleUsageMonitoringProjectPageableArgs = {
+  filter?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  project?: InputMaybe<Scalars['UUID']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
 
