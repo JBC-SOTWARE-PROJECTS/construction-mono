@@ -8,6 +8,11 @@ const InventoryProjectMenu = (query: string) => {
           name: 'Projects Menu',
           routes: [
             {
+              key: 'project-expense',
+              path: `/inventory/project-details/${query}/project-expense`,
+              name: 'Project Expense',
+            },
+            {
               key: 'bill-quantities',
               path: `/inventory/project-details/${query}/bill-quantities`,
               name: 'Bill of Quantities',
