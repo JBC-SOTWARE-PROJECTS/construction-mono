@@ -38,7 +38,17 @@ import UpsertReceivingModal from "@/components/inventory/deliveries/receiving/di
 
 const { Search } = Input;
 
-export default function PurchaseOrderComponent({ type }: { type: string }) {
+export default function PurchaseOrderComponent({
+  type,
+  officeId,
+  projectId,
+  forProjectDisplay = false,
+}: {
+  type: string;
+  officeId?: string;
+  projectId?: string;
+  forProjectDisplay?: boolean;
+}) {
   const { modal: parentModal, message } = App.useApp();
   const modal = useDialog(UpsertPOFormModal);
   const prModal = useDialog(UpsertPRFormModal);
@@ -47,7 +57,7 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
   const { confirm } = parentModal;
   const [supplier, setSupplier] = useState<OptionsValue>();
   const [category, setCategory] = useState<string | null>(null);
-  const [project, setProject] = useState<string | null>(null);
+  const [project, setProject] = useState<string | null>(projectId ?? null);
   const [asset, setAsset] = useState<string | null>(null);
   const [office, setOffice] = useState<string | null>(null);
   const [state, setState] = useState({
@@ -131,7 +141,7 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
   };
 
   const onUpsertRecord = (record?: PurchaseOrder) => {
-    modal({ record: record, poCategory: category }, (msg: string) => {
+    modal({ record: record, poCategory: category, projectId: projectId??null }, (msg: string) => {
       if (msg) {
         message.success(msg);
         refetch();
@@ -272,7 +282,8 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
   return (
     <PageContainer
       title="Purchase Order"
-      content="From Request to Receipt: Enhancing Inventory Control with Purchase Requests and Orders.">
+      content="From Request to Receipt: Enhancing Inventory Control with Purchase Requests and Orders."
+    >
       <ProCard
         title={`${title} List`}
         headStyle={{
@@ -285,11 +296,13 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
             <Button
               type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={() => onUpsertRecord()}>
+              onClick={() => onUpsertRecord()}
+            >
               Create New
             </Button>
           </ProFormGroup>
-        }>
+        }
+      >
         <div className="w-full mb-5">
           <Form layout="vertical" className="filter-form">
             <Row gutter={[16, 16]}>
@@ -306,65 +319,73 @@ export default function PurchaseOrderComponent({ type }: { type: string }) {
               {typeFilters ? (
                 <>
                   <Col xs={24} md={12} lg={8}>
-                    <FormSelect
-                      label="Filter Office"
-                      propsselect={{
-                        showSearch: true,
-                        value: office,
-                        options: offices,
-                        allowClear: true,
-                        placeholder: "Select Office",
-                        onChange: (newValue) => {
-                          setOffice(newValue);
-                        },
-                      }}
-                    />
+                    {!forProjectDisplay && (
+                      <>
+                        <FormSelect
+                          label="Filter Office"
+                          propsselect={{
+                            showSearch: true,
+                            value: office,
+                            options: offices,
+                            allowClear: true,
+                            placeholder: "Select Office",
+                            onChange: (newValue) => {
+                              setOffice(newValue);
+                            },
+                          }}
+                        />
+                      </>
+                    )}
                   </Col>
                   <Col xs={24} md={12} lg={8}>
-                    {type === "all" && (
-                      <FormSelect
-                        label="Filter Purchase Order Category"
-                        propsselect={{
-                          showSearch: true,
-                          value: category,
-                          options: PURCHASE_CATEGORY,
-                          allowClear: true,
-                          placeholder: "Select Purchase Order Category",
-                          onChange: (newValue) => {
-                            setCategory(newValue);
-                          },
-                        }}
-                      />
-                    )}
-                    {type === "projects" && (
-                      <FormSelect
-                        label="Filter Projects"
-                        propsselect={{
-                          showSearch: true,
-                          value: project,
-                          options: projects,
-                          allowClear: true,
-                          placeholder: "Select Projects",
-                          onChange: (newValue) => {
-                            setProject(newValue);
-                          },
-                        }}
-                      />
-                    )}
-                    {type === "spare-parts" && (
-                      <FormSelect
-                        label="Filter Asset"
-                        propsselect={{
-                          showSearch: true,
-                          value: asset,
-                          options: assets,
-                          allowClear: true,
-                          placeholder: "Select Asset",
-                          onChange: (newValue) => {
-                            setAsset(newValue);
-                          },
-                        }}
-                      />
+                    {!forProjectDisplay && (
+                      <>
+                        {type === "all" && (
+                          <FormSelect
+                            label="Filter Purchase Order Category"
+                            propsselect={{
+                              showSearch: true,
+                              value: category,
+                              options: PURCHASE_CATEGORY,
+                              allowClear: true,
+                              placeholder: "Select Purchase Order Category",
+                              onChange: (newValue) => {
+                                setCategory(newValue);
+                              },
+                            }}
+                          />
+                        )}
+                        {type === "projects" && (
+                          <FormSelect
+                            label="Filter Projects"
+                            propsselect={{
+                              showSearch: true,
+                              value: project,
+                              options: projects,
+                              allowClear: true,
+                              placeholder: "Select Projects",
+                              onChange: (newValue) => {
+                                setProject(newValue);
+                              },
+                            }}
+                          />
+                        )}
+                        {type === "spare-parts" && (
+                          <FormSelect
+                            label="Filter Asset"
+                            propsselect={{
+                              showSearch: true,
+                              value: asset,
+                              options: assets,
+                              allowClear: true,
+                              placeholder: "Select Asset",
+                              onChange: (newValue) => {
+                                setAsset(newValue);
+                              },
+                            }}
+                          />
+                        )}
+                      </>
                     )}
                   </Col>
                   <Col xs={24} md={12} lg={8}>

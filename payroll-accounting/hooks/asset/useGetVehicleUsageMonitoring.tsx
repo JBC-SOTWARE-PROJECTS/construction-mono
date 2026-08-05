@@ -48,7 +48,7 @@ const useGetVehicleUsageMonitoring = (props: QueryHookOptions ) => {
   const { loading, data, refetch } = useQuery(GET_RECORDS, {
     ...props
   });
-console.log("data", data)
+
   return [data?.list , loading, refetch];
 };
 

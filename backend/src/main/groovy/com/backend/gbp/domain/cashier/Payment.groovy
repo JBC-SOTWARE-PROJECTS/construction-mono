@@ -25,15 +25,24 @@ enum PaymentType {
 }
 
 enum ReceiptType {
-	AR,
-	OR
+	SI("Sales Invoice", true),
+	AR("Acknowledgement Receipt", false),
+	OR("Official Receipt", false)
+
+	final String label
+	final boolean isDefault
+
+	ReceiptType(String label, boolean isDefault) {
+		this.label = label
+		this.isDefault = isDefault
+	}
 }
 
 @Entity
 @Table(schema = "cashier", name = "payments")
 @SQLDelete(sql = "UPDATE cashier.payments SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class Payment extends AbstractAuditingEntity implements AutoIntegrateable{
+class Payment extends AbstractAuditingEntity implements Serializable, AutoIntegrateable{
 
 	@GraphQLQuery
 	@Id
@@ -66,6 +75,10 @@ class Payment extends AbstractAuditingEntity implements AutoIntegrateable{
 	@GraphQLQuery
 	@Column(name = "total_e_wallet", columnDefinition = "numeric")
 	BigDecimal totalEWallet
+
+	@GraphQLQuery
+	@Column(name = "change", columnDefinition = "numeric")
+	BigDecimal change
 
 	@GraphQLQuery
 	@Column(name = "ornumber")
@@ -115,7 +128,7 @@ class Payment extends AbstractAuditingEntity implements AutoIntegrateable{
 	String voidBy
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true, mappedBy = "payment")
-	List<PaymentDetial> paymentDetails = []
+	List<PaymentDetails> paymentDetails = []
 
 	@GraphQLQuery
 	@Column(name = "posted_ledger_id")
@@ -126,8 +139,16 @@ class Payment extends AbstractAuditingEntity implements AutoIntegrateable{
 	String payorName
 
 	@GraphQLQuery
+	@Column(name = "transaction_type")
+	String transactionType
+
+	@GraphQLQuery
 	@Column(name = "ar_customer_id", columnDefinition = "uuid")
 	UUID arCustomerId
+
+	@GraphQLQuery
+	@Column(name = "company_id")
+	UUID companyId
 
 	@Transient
 	List<PaymentTarget> paymentTargets = []

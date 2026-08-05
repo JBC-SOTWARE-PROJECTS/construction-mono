@@ -1,5 +1,5 @@
 export const BillingDeductionOpt = [
-  { label: "Tax", value: "TAX" },
+  { label: "WITHHOLDING TAX", value: "WITHHOLDING_TAX" },
   { label: "Vat", value: "VAT" },
   { label: "Recoupment", value: "RECOUPMENT" },
   { label: "Retention", value: "RETENTION" },

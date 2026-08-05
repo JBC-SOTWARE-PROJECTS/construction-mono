@@ -2,7 +2,6 @@ package com.backend.gbp.domain.services
 
 import com.backend.gbp.domain.AbstractAuditingEntity
 import com.backend.gbp.domain.Office
-import com.backend.gbp.domain.cashier.PaymentDetial
 import io.leangen.graphql.annotations.GraphQLQuery
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.NotFound

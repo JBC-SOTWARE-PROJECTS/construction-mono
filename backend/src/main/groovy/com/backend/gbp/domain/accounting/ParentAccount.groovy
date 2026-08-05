@@ -19,7 +19,8 @@ enum AccountCategory {
 	LIABILITY("Liability"),
 	EQUITY("Equity"),
 	REVENUE("Revenue"),
-	EXPENSE("Expense")
+	EXPENSE("Expense"),
+	COST_OF_SALE("Cost of Sale")
 
 	String label
 
@@ -33,19 +34,30 @@ enum AccountType {
 	// Assets (Normal side: Debit)
 	CURRENT_ASSETS("Current Assets", AccountCategory.ASSET, NormalSide.DEBIT),
 	LONG_TERM_ASSETS("Non-Current Assets", AccountCategory.ASSET, NormalSide.DEBIT),
-
+	FIXED_ASSETS("Fixed Assets", AccountCategory.ASSET, NormalSide.DEBIT),
+	BANK("Bank", AccountCategory.ASSET, NormalSide.DEBIT),
+	ASSET("Assets", AccountCategory.ASSET, NormalSide.DEBIT),
 	// Liabilities (Normal side: Credit)
 	CURRENT_LIABILITIES("Current Liabilities", AccountCategory.LIABILITY, NormalSide.CREDIT),
 	LONG_TERM_LIABILITIES("Non-Current Liabilities", AccountCategory.LIABILITY, NormalSide.CREDIT),
+	LIABILITY("Liability", AccountCategory.LIABILITY, NormalSide.CREDIT),
 
 	// Equity (Normal side: Credit)
 	EQUITY("Equity", AccountCategory.EQUITY, NormalSide.CREDIT),
 
 	// Revenue (Normal side: Credit)
 	REVENUE("Revenue", AccountCategory.REVENUE, NormalSide.CREDIT),
+	SALE("Sale", AccountCategory.REVENUE, NormalSide.CREDIT),
+
+	COST_OF_SALE("Cost of Sale", AccountCategory.COST_OF_SALE, NormalSide.DEBIT),
+	OTHER_INCOME("Other Income", AccountCategory.REVENUE, NormalSide.CREDIT),
 
 	// Expenses (Normal side: Debit)
-	EXPENSES("Expenses", AccountCategory.EXPENSE, NormalSide.DEBIT);
+	EXPENSES("Expenses", AccountCategory.EXPENSE, NormalSide.DEBIT),
+	NON_OPERATING_EXPENSE("Non-Operating Expenses", AccountCategory.EXPENSE, NormalSide.DEBIT),
+	FINANCE_EXPENSE("Financial Expenses", AccountCategory.EXPENSE, NormalSide.DEBIT),
+	TAX_EXPENSE("Tax Expenses", AccountCategory.EXPENSE, NormalSide.DEBIT),
+	OPERATING_EXPENSE("Operating Expenses", AccountCategory.EXPENSE, NormalSide.DEBIT);
 
 	String label;
 	AccountCategory category;

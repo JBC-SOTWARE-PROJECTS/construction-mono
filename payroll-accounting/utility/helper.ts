@@ -52,7 +52,10 @@ export const requiredField = [
 ];
 
 export const NumberFormater = (value: any) => {
-  return numeral(value).format("0,0.00"); // 10,000.00
+  const formattedValue = numeral(value).format("0,0.00"); // 10,000.00
+  return value < 0
+    ? `(${numeral(Math.abs(value)).format("0,0.00")})`
+    : formattedValue;
 };
 
 export const NumberFormaterNoDecimal = (value: any) => {
@@ -97,7 +100,6 @@ export const decimalRound4 = (amount?: number) => {
   }
   return 0;
 };
-
 
 export const NumberInString = (amount: number) => {
   const toWords = new ToWords({
@@ -253,3 +255,38 @@ export const parserInputNumber = {
   formatter: (value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ","),
   parser: (value: any) => value!.replace(/\$\s?|(,*)/g, ""),
 };
+
+export const calculateAge = (value: string) => {
+  const dob = dayjs(value);
+  const today = dayjs();
+  const age = today.diff(dob, "year");
+  return `${age} y.o`;
+};
+
+export function getRandomBoyGirl() {
+  const randomNum = Math.random();
+
+  // Choose between "boy" and "girl" based on the random number
+  return randomNum < 0.5 ? "boy" : "girl";
+}
+
+export function isSeniorCitizen(dateOfBirth: string, thresholdAge: number) {
+  const dob = new Date(dateOfBirth);
+  const currentDate = new Date();
+
+  let age = currentDate.getFullYear() - dob.getFullYear();
+
+  // Check if the birthday has occurred this year
+  const hasBirthdayPassed =
+    currentDate.getMonth() > dob.getMonth() ||
+    (currentDate.getMonth() === dob.getMonth() &&
+      currentDate.getDate() >= dob.getDate());
+
+  // If the birthday hasn't occurred yet this year, subtract one year
+  if (!hasBirthdayPassed) {
+    age--;
+  }
+
+  // Check if age exceeds the threshold for senior citizenship
+  return age >= thresholdAge;
+}
