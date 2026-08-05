@@ -1,38 +1,26 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# DiverseTrade Payroll & Accounting Frontend
 
-## Getting Started
+This is the active DiverseTrade browser application. It is a Next.js 13 Pages Router application built with React, TypeScript, Apollo Client, and Ant Design. It provides the user interface for inventory, accounting, HR/payroll, projects, assets, and administration through the backend’s session-authenticated GraphQL and REST APIs.
 
-First, run the development server:
+## Start here
 
 ```bash
-npm run dev
-# or
+cd payroll-accounting
+yarn
 yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The development server runs on `http://localhost:7001`; the local backend API is configured at `http://localhost:5827`. See [Development](docs/DEVELOPMENT.md) for prerequisites, code generation, configuration, and safe verification.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Documentation
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+| Document | Use it for |
+| --- | --- |
+| [Documentation index](docs/README.md) | Navigating the frontend documentation set |
+| [Architecture](docs/ARCHITECTURE.md) | App shell, routing, state, layout, authentication, and API flow |
+| [Development](docs/DEVELOPMENT.md) | Setup, scripts, TypeScript, GraphQL codegen, and delivery checks |
+| [Feature workflows](docs/FEATURE_WORKFLOWS.md) | Inventory, accounting, HR/payroll, projects, assets, and administration UI flows |
+| [Data and integrations](docs/DATA_AND_INTEGRATIONS.md) | Apollo, REST, uploads, reports/downloads, configuration, and error handling |
+| [UI and access conventions](docs/UI_AND_ACCESS_CONVENTIONS.md) | Page/route composition, components/hooks, forms, roles, permissions, and status changes |
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Repository-wide developer/AI-agent instructions are in [../docs/SYSTEM_GUIDE.md](../docs/SYSTEM_GUIDE.md) and [../AGENTS.md](../AGENTS.md). Backend contract and operational documentation is in [../backend/docs/README.md](../backend/docs/README.md).
