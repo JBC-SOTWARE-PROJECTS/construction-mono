@@ -21,6 +21,8 @@ const GET_RECORDS = gql`
         totalNetAmount
         lineCount
         payableCount
+        pettyCashCount
+        sourceType
       }
       size
       totalElements

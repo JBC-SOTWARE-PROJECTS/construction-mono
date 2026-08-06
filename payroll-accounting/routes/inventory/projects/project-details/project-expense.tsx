@@ -164,7 +164,7 @@ export default function ProjectExpenseContent() {
         <div className="w-full mb-5">
           <Alert
             type="info"
-            message="Project Expense are accounting posted payable amounts for the project. This is a read only module and can only be updated by the system when payables are posted."
+            message="Project Expenses include accounting-posted payable amounts and petty cash vouchers assigned to the project. This is a read-only module and is updated when those transactions are posted."
           />
         </div>
         {/* <div className="w-full mb-5">

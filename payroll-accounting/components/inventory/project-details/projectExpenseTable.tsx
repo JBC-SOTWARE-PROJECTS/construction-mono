@@ -53,6 +53,8 @@ interface ProjectExpenseRow {
   totalNetAmount?: number | null;
   lineCount?: number | null;
   payableCount?: number | null;
+  pettyCashCount?: number | null;
+  sourceType?: string | null;
 }
 
 interface ProjectPayableBreakdown {
@@ -118,7 +120,7 @@ export default function ProjectExpenseTable({
   );
 
   const getRowKey = (record: ProjectExpenseRow) =>
-    `${record.project?.id ?? projectId ?? "project"}-${
+    `${record.sourceType ?? "source"}-${record.project?.id ?? projectId ?? "project"}-${
       record.transactionType?.id ?? "transaction-type"
     }`;
 
@@ -257,10 +259,22 @@ export default function ProjectExpenseTable({
       render: (cost) => NumberFormater(cost ?? 0),
     },
     {
-      title: "Payable Count",
-      dataIndex: "payableCount",
-      key: "payableCount",
+      title: "Source",
+      dataIndex: "sourceType",
+      key: "sourceType",
+      width: 130,
+      render: (sourceType) =>
+        sourceType === "PETTY_CASH" ? "Petty Cash Voucher" : "A/P Payable",
+    },
+    {
+      title: "Documents",
+      key: "documentCount",
       width: 120,
+      align: "right",
+      render: (_, record) =>
+        record.sourceType === "PETTY_CASH"
+          ? record.pettyCashCount ?? 0
+          : record.payableCount ?? 0,
     },
   ];
 
