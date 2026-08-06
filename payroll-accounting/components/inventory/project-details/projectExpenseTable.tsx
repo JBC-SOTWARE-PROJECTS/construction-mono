@@ -5,11 +5,10 @@ import { ColumnsType } from "antd/es/table";
 import { Key, useState } from "react";
 
 const GET_PROJECT_PAYABLE_BREAKDOWN = gql`
-  query ($projectId: UUID!, $transactionTypeId: UUID, $pcvCategory: String) {
+  query ($projectId: UUID!, $transactionTypeId: UUID) {
     list: projectPayableBreakdown(
       projectId: $projectId
       transactionTypeId: $transactionTypeId
-      pcvCategory: $pcvCategory
     ) {
       payableId
       apNo
@@ -48,10 +47,11 @@ const GET_PROJECT_PAYABLE_ITEMS = gql`
 `;
 
 const GET_PROJECT_PETTY_CASH_BREAKDOWN = gql`
-  query ($projectId: UUID!, $transactionTypeId: UUID) {
+  query ($projectId: UUID!, $transactionTypeId: UUID, $pcvCategory: String) {
     list: projectPettyCashBreakdown(
       projectId: $projectId
       transactionTypeId: $transactionTypeId
+      pcvCategory: $pcvCategory
     ) {
       pettyCashId
       pcvNo
