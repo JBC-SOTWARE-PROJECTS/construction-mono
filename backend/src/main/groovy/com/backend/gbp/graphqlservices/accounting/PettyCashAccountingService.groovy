@@ -2,10 +2,13 @@ package com.backend.gbp.graphqlservices.accounting
 
 
 import com.backend.gbp.domain.accounting.PettyCashAccounting
+import com.backend.gbp.domain.accounting.PettyCashItem
+import com.backend.gbp.domain.accounting.PettyCashOther
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.repository.accounting.PettyCashItemRepository
+import com.backend.gbp.repository.projects.ProjectsRepository
 import com.backend.gbp.rest.dto.LedgerDto
 import com.backend.gbp.rest.dto.journal.JournalEntryViewDto
 import com.backend.gbp.rest.dto.payables.ApReferenceDto
@@ -26,6 +29,7 @@ import org.springframework.data.domain.Page
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import groovy.transform.Canonical
 import com.backend.gbp.domain.accounting.JournalType
 import com.backend.gbp.domain.accounting.LedgerDocType
 
@@ -35,9 +39,36 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+@Canonical
+class ProjectPettyCashBreakdown {
+	UUID pettyCashId
+	String pcvNo
+	Instant pcvDate
+	String payeeName
+	String pcvCategory
+	String referenceNo
+	BigDecimal projectAmount
+	Long lineCount
+	String status
+}
+
+@Canonical
+class ProjectPettyCashItem {
+	UUID lineId
+	String lineType
+	String description
+	BigDecimal qty
+	BigDecimal grossAmount
+	BigDecimal vatAmount
+	BigDecimal netAmount
+	String remarks
+}
+
 @Service
 @GraphQLApi
 class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting> {
+
+	private static final UUID UNASSIGNED_TRANSACTION_TYPE = UUID.fromString("00000000-0000-0000-0000-000000000000")
 
 	@Autowired
 	GeneratorService generatorService
@@ -65,6 +96,9 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 
 	@Autowired
 	PettyCashItemRepository pettyCashItemRepository
+
+	@Autowired
+	ProjectsRepository projectsRepository
 
 	PettyCashAccountingService() {
 		super(PettyCashAccounting.class)
@@ -133,6 +167,157 @@ class PettyCashAccountingService extends AbstractDaoService<PettyCashAccounting>
 		createQuery("""Select pcv from PettyCashAccounting pcv where pcv.posted = :posted and pcv.balance > 0
 			and (lower(pcv.payeeName) like lower(concat('%',:filter,'%')) or lower(pcv.referenceNo) like lower(concat('%',:filter,'%')) )
 			""", ["posted": true, "filter": filter]).resultList
+	}
+
+	@GraphQLQuery(name = "projectPettyCashBreakdown", description = "Posted petty cash vouchers and their project-assigned amounts")
+	@Transactional(readOnly = true)
+	List<ProjectPettyCashBreakdown> projectPettyCashBreakdown(
+			@GraphQLArgument(name = "projectId") UUID projectId,
+			@GraphQLArgument(name = "transactionTypeId") UUID transactionTypeId,
+			@GraphQLArgument(name = "pcvCategory") String pcvCategory
+	) {
+		if (!isProjectInCurrentCompany(projectId)) {
+			return []
+		}
+
+		UUID companyId = SecurityUtils.currentCompanyId()
+		Map<String, Object> params = [projectId: projectId]
+		String transactionFilter = ""
+		if (transactionTypeId == UNASSIGNED_TRANSACTION_TYPE) {
+			transactionFilter = " and pc.transType is null"
+		} else if (transactionTypeId) {
+			transactionFilter = " and pc.transType.id = :transactionTypeId"
+			params.transactionTypeId = transactionTypeId
+		}
+		if (pcvCategory == "UNSPECIFIED") {
+			transactionFilter += " and pc.pcvCategory is null"
+		} else if (pcvCategory) {
+			transactionFilter += " and pc.pcvCategory = :pcvCategory"
+			params.pcvCategory = pcvCategory
+		}
+
+		String companyFilter = ""
+		if (companyId) {
+			companyFilter = " and pc.company = :companyId"
+			params.companyId = companyId
+		}
+
+		List<PettyCashItem> purchaseItems = queryResultList(pettyCashItemServices, """
+			Select item from PettyCashItem item
+			join item.pettyCash pc
+			where item.project.id = :projectId and pc.posted = true${transactionFilter}${companyFilter}
+		""", params)
+		List<PettyCashOther> otherItems = queryResultList(pettyCashOtherServices, """
+			Select item from PettyCashOther item
+			join item.pettyCash pc
+			where item.project.id = :projectId and pc.posted = true${transactionFilter}${companyFilter}
+		""", params)
+
+		Map<UUID, ProjectPettyCashBreakdown> grouped = [:]
+		purchaseItems.each { item ->
+			addProjectPettyCashAmount(grouped, item.pettyCash, item.netAmount)
+		}
+		otherItems.each { item ->
+			addProjectPettyCashAmount(grouped, item.pettyCash, item.amount)
+		}
+
+		return grouped.values().toList().sort { it.pcvDate }.reverse()
+	}
+
+	@GraphQLQuery(name = "projectPettyCashItems", description = "Posted petty cash lines assigned to a project")
+	@Transactional(readOnly = true)
+	List<ProjectPettyCashItem> projectPettyCashItems(
+			@GraphQLArgument(name = "projectId") UUID projectId,
+			@GraphQLArgument(name = "pettyCashId") UUID pettyCashId
+	) {
+		if (!pettyCashId || !isProjectInCurrentCompany(projectId)) {
+			return []
+		}
+
+		UUID companyId = SecurityUtils.currentCompanyId()
+		Map<String, Object> params = [projectId: projectId, pettyCashId: pettyCashId]
+		String companyFilter = ""
+		if (companyId) {
+			companyFilter = " and pc.company = :companyId"
+			params.companyId = companyId
+		}
+
+		List<PettyCashItem> purchaseItems = queryResultList(pettyCashItemServices, """
+			Select item from PettyCashItem item
+			join item.pettyCash pc
+			where item.project.id = :projectId and pc.id = :pettyCashId and pc.posted = true${companyFilter}
+		""", params)
+		List<PettyCashOther> otherItems = queryResultList(pettyCashOtherServices, """
+			Select item from PettyCashOther item
+			join item.pettyCash pc
+			where item.project.id = :projectId and pc.id = :pettyCashId and pc.posted = true${companyFilter}
+		""", params)
+
+		List<ProjectPettyCashItem> result = []
+		purchaseItems.each { item ->
+			result << new ProjectPettyCashItem(
+					item.id,
+					"PURCHASE",
+					item.item?.descLong,
+					item.qty ? item.qty.toBigDecimal() : BigDecimal.ZERO,
+					item.grossAmount ?: BigDecimal.ZERO,
+					item.vatAmount ?: BigDecimal.ZERO,
+					item.netAmount ?: BigDecimal.ZERO,
+					item.lotNo
+			)
+		}
+		otherItems.each { item ->
+			result << new ProjectPettyCashItem(
+					item.id,
+					"OTHERS",
+					item.transType?.description,
+					null,
+					item.amount ?: BigDecimal.ZERO,
+					BigDecimal.ZERO,
+					item.amount ?: BigDecimal.ZERO,
+					item.remarks
+			)
+		}
+		return result
+	}
+
+	private List queryResultList(AbstractDaoService queryService, String jpql, Map<String, Object> params) {
+		def query = queryService.createQuery(jpql)
+		params.each { key, value ->
+			query.setParameter(key, value)
+		}
+		return query.resultList
+	}
+
+	private void addProjectPettyCashAmount(Map<UUID, ProjectPettyCashBreakdown> grouped,
+			PettyCashAccounting pettyCash, BigDecimal amount) {
+		def breakdown = grouped[pettyCash.id]
+		if (!breakdown) {
+			breakdown = new ProjectPettyCashBreakdown(
+					pettyCash.id,
+					pettyCash.pcvNo,
+					pettyCash.pcvDate,
+					pettyCash.payeeName,
+					pettyCash.pcvCategory,
+					pettyCash.referenceNo,
+					BigDecimal.ZERO,
+					0L,
+					pettyCash.status
+			)
+			grouped[pettyCash.id] = breakdown
+		}
+		breakdown.projectAmount += amount ?: BigDecimal.ZERO
+		breakdown.lineCount++
+	}
+
+	private boolean isProjectInCurrentCompany(UUID projectId) {
+		if (!projectId) {
+			return false
+		}
+
+		def project = projectsRepository.findById(projectId).orElse(null)
+		UUID companyId = SecurityUtils.currentCompanyId()
+		return project && (!companyId || project.company == companyId)
 	}
 
 	@GraphQLQuery(name = "pettyCashPage")
