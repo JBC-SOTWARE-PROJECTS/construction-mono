@@ -27,6 +27,12 @@ class ProjectExpenseViewId implements Serializable {
 	@Column(name = "trans_type", columnDefinition = "uuid")
 	UUID transTypeId
 
+	@Column(name = "source_type")
+	String sourceType
+
+	@Column(name = "source_category")
+	String sourceCategory
+
 	// IMPORTANT: generate equals/hashCode (IDE)
 }
 @Immutable
@@ -44,6 +50,7 @@ class ProjectExpenseView implements Serializable {
 
 	// This is the key fix: referencedColumnName MUST be "id"
 	@GraphQLQuery(name = "transactionType") // optional: exposes field name transactionType in GraphQL
+	@NotFound(action = NotFoundAction.IGNORE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "trans_type", referencedColumnName = "id", insertable = false, updatable = false)
 	ApTransaction transactionType
@@ -68,4 +75,12 @@ class ProjectExpenseView implements Serializable {
 	@GraphQLQuery
 	@Column(name = "payable_count")
 	Long payableCount
+
+	@GraphQLQuery
+	@Column(name = "petty_cash_count")
+	Long pettyCashCount
+
+	@GraphQLQuery
+	@Column(name = "source_type", insertable = false, updatable = false)
+	String sourceType
 }

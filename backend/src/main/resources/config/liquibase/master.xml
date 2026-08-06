@@ -681,4 +681,8 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/120_jacky_project_expense_view.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/121_project_expense_include_posted_petty_cash.sql"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/122_project_expense_petty_cash_category_key.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

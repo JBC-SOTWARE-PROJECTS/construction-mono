@@ -4,17 +4,24 @@ import com.backend.gbp.domain.accounting.ProjectExpenseView
 import com.backend.gbp.domain.assets.AssetUpcomingPreventiveMaintenance
 import com.backend.gbp.domain.assets.AssetUpcomingPreventiveMaintenanceKms
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.repository.projects.ProjectsRepository
+import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.data.domain.Page
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 @GraphQLApi
 @TypeChecked
 class ProjectExpenseService extends AbstractDaoService<ProjectExpenseView> {
+
+    @Autowired
+    ProjectsRepository projectsRepository
+
     ProjectExpenseService() {
         super(ProjectExpenseView.class)
     }
@@ -75,6 +82,11 @@ class ProjectExpenseService extends AbstractDaoService<ProjectExpenseView> {
     ) {
         UUID pid = projectId ? UUID.fromString(projectId) : null
 
+        if (!isProjectInCurrentCompany(pid)) {
+            return getPageable('SELECT p FROM ProjectExpenseView p WHERE 1 = 0',
+                    'SELECT count(p) FROM ProjectExpenseView p WHERE 1 = 0', page, size, [:])
+        }
+
         String query = '''
         SELECT p
         FROM ProjectExpenseView p
@@ -96,6 +108,16 @@ class ProjectExpenseService extends AbstractDaoService<ProjectExpenseView> {
 
         query += ' ORDER BY p.transTypeDescription ASC'
         return getPageable(query, countQuery, page, size, params)
+    }
+
+    private boolean isProjectInCurrentCompany(UUID projectId) {
+        if (!projectId) {
+            return false
+        }
+
+        def project = projectsRepository.findById(projectId).orElse(null)
+        UUID companyId = SecurityUtils.currentCompanyId()
+        return project && (!companyId || project.company == companyId)
     }
 
 
