@@ -30,6 +30,9 @@ class ProjectExpenseViewId implements Serializable {
 	@Column(name = "source_type")
 	String sourceType
 
+	@Column(name = "source_category")
+	String sourceCategory
+
 	// IMPORTANT: generate equals/hashCode (IDE)
 }
 @Immutable

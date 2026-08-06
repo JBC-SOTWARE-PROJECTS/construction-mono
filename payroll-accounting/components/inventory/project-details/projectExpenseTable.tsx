@@ -5,10 +5,11 @@ import { ColumnsType } from "antd/es/table";
 import { Key, useState } from "react";
 
 const GET_PROJECT_PAYABLE_BREAKDOWN = gql`
-  query ($projectId: UUID!, $transactionTypeId: UUID) {
+  query ($projectId: UUID!, $transactionTypeId: UUID, $pcvCategory: String) {
     list: projectPayableBreakdown(
       projectId: $projectId
       transactionTypeId: $transactionTypeId
+      pcvCategory: $pcvCategory
     ) {
       payableId
       apNo
@@ -46,7 +47,45 @@ const GET_PROJECT_PAYABLE_ITEMS = gql`
   }
 `;
 
+const GET_PROJECT_PETTY_CASH_BREAKDOWN = gql`
+  query ($projectId: UUID!, $transactionTypeId: UUID) {
+    list: projectPettyCashBreakdown(
+      projectId: $projectId
+      transactionTypeId: $transactionTypeId
+    ) {
+      pettyCashId
+      pcvNo
+      pcvDate
+      payeeName
+      pcvCategory
+      referenceNo
+      projectAmount
+      lineCount
+      status
+    }
+  }
+`;
+
+const GET_PROJECT_PETTY_CASH_ITEMS = gql`
+  query ($projectId: UUID!, $pettyCashId: UUID!) {
+    list: projectPettyCashItems(projectId: $projectId, pettyCashId: $pettyCashId) {
+      lineId
+      lineType
+      description
+      qty
+      grossAmount
+      vatAmount
+      netAmount
+      remarks
+    }
+  }
+`;
+
 interface ProjectExpenseRow {
+  id?: {
+    transTypeId?: string | null;
+    sourceCategory?: string | null;
+  } | null;
   project?: { id?: string | null } | null;
   transactionType?: { id?: string | null } | null;
   transTypeDescription?: string | null;
@@ -88,6 +127,37 @@ interface ProjectPayableItemsQuery {
   list: ProjectPayableItem[];
 }
 
+interface ProjectPettyCashBreakdown {
+  pettyCashId: string;
+  pcvNo?: string | null;
+  pcvDate?: string | null;
+  payeeName?: string | null;
+  pcvCategory?: string | null;
+  referenceNo?: string | null;
+  projectAmount?: number | null;
+  lineCount?: number | null;
+  status?: string | null;
+}
+
+interface ProjectPettyCashItem {
+  lineId: string;
+  lineType?: string | null;
+  description?: string | null;
+  qty?: number | null;
+  grossAmount?: number | null;
+  vatAmount?: number | null;
+  netAmount?: number | null;
+  remarks?: string | null;
+}
+
+interface ProjectPettyCashBreakdownQuery {
+  list: ProjectPettyCashBreakdown[];
+}
+
+interface ProjectPettyCashItemsQuery {
+  list: ProjectPettyCashItem[];
+}
+
 interface IProps {
   projectId?: string;
   dataSource: ProjectExpenseRow[];
@@ -102,14 +172,27 @@ export default function ProjectExpenseTable({
   const { message } = App.useApp();
   const [expandedRowKeys, setExpandedRowKeys] = useState<Key[]>([]);
   const [expandedPayableKeys, setExpandedPayableKeys] = useState<Key[]>([]);
+  const [expandedPettyCashKeys, setExpandedPettyCashKeys] = useState<Key[]>([]);
   const [breakdownByKey, setBreakdownByKey] = useState<
     Record<string, ProjectPayableBreakdown[]>
   >({});
   const [itemsByPayableKey, setItemsByPayableKey] = useState<
     Record<string, ProjectPayableItem[]>
   >({});
+  const [pettyCashBreakdownByKey, setPettyCashBreakdownByKey] = useState<
+    Record<string, ProjectPettyCashBreakdown[]>
+  >({});
+  const [itemsByPettyCashKey, setItemsByPettyCashKey] = useState<
+    Record<string, ProjectPettyCashItem[]>
+  >({});
   const [loadingKeys, setLoadingKeys] = useState<Record<string, boolean>>({});
   const [loadingItemKeys, setLoadingItemKeys] = useState<
+    Record<string, boolean>
+  >({});
+  const [loadingPettyCashKeys, setLoadingPettyCashKeys] = useState<
+    Record<string, boolean>
+  >({});
+  const [loadingPettyCashItemKeys, setLoadingPettyCashItemKeys] = useState<
     Record<string, boolean>
   >({});
   const [loadBreakdown] = useLazyQuery<ProjectPayableBreakdownQuery>(
@@ -118,11 +201,17 @@ export default function ProjectExpenseTable({
   const [loadPayableItems] = useLazyQuery<ProjectPayableItemsQuery>(
     GET_PROJECT_PAYABLE_ITEMS
   );
+  const [loadPettyCashBreakdown] = useLazyQuery<ProjectPettyCashBreakdownQuery>(
+    GET_PROJECT_PETTY_CASH_BREAKDOWN
+  );
+  const [loadPettyCashItems] = useLazyQuery<ProjectPettyCashItemsQuery>(
+    GET_PROJECT_PETTY_CASH_ITEMS
+  );
 
   const getRowKey = (record: ProjectExpenseRow) =>
     `${record.sourceType ?? "source"}-${record.project?.id ?? projectId ?? "project"}-${
-      record.transactionType?.id ?? "transaction-type"
-    }`;
+      record.id?.transTypeId ?? "transaction-type"
+    }-${record.id?.sourceCategory ?? "category"}`;
 
   const getPayableRowKey = (
     record: ProjectPayableBreakdown,
@@ -132,6 +221,11 @@ export default function ProjectExpenseTable({
     `${breakdownProjectId ?? "project"}-${
       transactionTypeId ?? "transaction-type"
     }-${record.payableId}`;
+
+  const getPettyCashRowKey = (
+    record: ProjectPettyCashBreakdown,
+    breakdownProjectId?: string | null
+  ) => `${breakdownProjectId ?? "project"}-${record.pettyCashId}`;
 
   const payableColumns: ColumnsType<ProjectPayableBreakdown> = [
     {
@@ -243,6 +337,115 @@ export default function ProjectExpenseTable({
     },
   ];
 
+  const pettyCashColumns: ColumnsType<ProjectPettyCashBreakdown> = [
+    {
+      title: "PCV No.",
+      dataIndex: "pcvNo",
+      key: "pcvNo",
+      width: 130,
+    },
+    {
+      title: "PCV Date",
+      dataIndex: "pcvDate",
+      key: "pcvDate",
+      width: 120,
+      render: (date) => (date ? DateFormatter(date) : "--"),
+    },
+    {
+      title: "Payee",
+      dataIndex: "payeeName",
+      key: "payeeName",
+    },
+    {
+      title: "Category",
+      dataIndex: "pcvCategory",
+      key: "pcvCategory",
+      width: 110,
+      render: (category) => <Tag>{category ?? "--"}</Tag>,
+    },
+    {
+      title: "Reference No.",
+      dataIndex: "referenceNo",
+      key: "referenceNo",
+      width: 140,
+    },
+    {
+      title: "Project Amount",
+      dataIndex: "projectAmount",
+      key: "projectAmount",
+      width: 130,
+      align: "right",
+      render: (amount) => NumberFormater(amount ?? 0),
+    },
+    {
+      title: "Lines",
+      dataIndex: "lineCount",
+      key: "lineCount",
+      width: 80,
+      align: "right",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 100,
+      align: "center",
+      render: (status) => <Tag color="green">{status ?? "POSTED"}</Tag>,
+    },
+  ];
+
+  const pettyCashItemColumns: ColumnsType<ProjectPettyCashItem> = [
+    {
+      title: "Line Type",
+      dataIndex: "lineType",
+      key: "lineType",
+      width: 110,
+      render: (lineType) => <Tag>{lineType ?? "--"}</Tag>,
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Quantity",
+      dataIndex: "qty",
+      key: "qty",
+      width: 100,
+      align: "right",
+      render: (qty) => (qty === null || qty === undefined ? "--" : NumberFormater(qty)),
+    },
+    {
+      title: "Gross Amount",
+      dataIndex: "grossAmount",
+      key: "grossAmount",
+      width: 130,
+      align: "right",
+      render: (amount) => NumberFormater(amount ?? 0),
+    },
+    {
+      title: "VAT",
+      dataIndex: "vatAmount",
+      key: "vatAmount",
+      width: 110,
+      align: "right",
+      render: (amount) => NumberFormater(amount ?? 0),
+    },
+    {
+      title: "Net Amount",
+      dataIndex: "netAmount",
+      key: "netAmount",
+      width: 130,
+      align: "right",
+      render: (amount) => NumberFormater(amount ?? 0),
+    },
+    {
+      title: "Remarks / Lot No.",
+      dataIndex: "remarks",
+      key: "remarks",
+    },
+  ];
+
   const columns: ColumnsType<ProjectExpenseRow> = [
     {
       title: "Transaction Type",
@@ -290,12 +493,41 @@ export default function ProjectExpenseTable({
         : keys.filter((key) => key !== rowKey)
     );
 
-    if (
-      !expanded ||
-      breakdownByKey[rowKey] ||
-      !breakdownProjectId ||
-      !record.transactionType?.id
-    ) {
+    if (!expanded || !breakdownProjectId) {
+      return;
+    }
+
+    if (record.sourceType === "PETTY_CASH") {
+      if (pettyCashBreakdownByKey[rowKey]) {
+        return;
+      }
+
+      setLoadingPettyCashKeys((keys) => ({ ...keys, [rowKey]: true }));
+      try {
+        const result = await loadPettyCashBreakdown({
+          variables: {
+            projectId: breakdownProjectId,
+            transactionTypeId: record.id?.transTypeId ?? null,
+            pcvCategory: record.id?.sourceCategory ?? null,
+          },
+        });
+        if (result.error) {
+          throw result.error;
+        }
+        setPettyCashBreakdownByKey((items) => ({
+          ...items,
+          [rowKey]: result.data?.list ?? [],
+        }));
+      } catch (error) {
+        const details = error instanceof Error ? `: ${error.message}` : "";
+        message.error(`Unable to load the petty cash voucher breakdown${details}`);
+      } finally {
+        setLoadingPettyCashKeys((keys) => ({ ...keys, [rowKey]: false }));
+      }
+      return;
+    }
+
+    if (breakdownByKey[rowKey] || !record.transactionType?.id) {
       return;
     }
 
@@ -375,6 +607,59 @@ export default function ProjectExpenseTable({
     }
   };
 
+  const handlePettyCashExpand = async (
+    expanded: boolean,
+    record: ProjectPettyCashBreakdown,
+    breakdownProjectId?: string | null
+  ) => {
+    const pettyCashRowKey = getPettyCashRowKey(record, breakdownProjectId);
+
+    setExpandedPettyCashKeys((keys) =>
+      expanded
+        ? keys.includes(pettyCashRowKey)
+          ? keys
+          : [...keys, pettyCashRowKey]
+        : keys.filter((key) => key !== pettyCashRowKey)
+    );
+
+    if (
+      !expanded ||
+      itemsByPettyCashKey[pettyCashRowKey] ||
+      !breakdownProjectId ||
+      !record.pettyCashId
+    ) {
+      return;
+    }
+
+    setLoadingPettyCashItemKeys((keys) => ({
+      ...keys,
+      [pettyCashRowKey]: true,
+    }));
+    try {
+      const result = await loadPettyCashItems({
+        variables: {
+          projectId: breakdownProjectId,
+          pettyCashId: record.pettyCashId,
+        },
+      });
+      if (result.error) {
+        throw result.error;
+      }
+      setItemsByPettyCashKey((items) => ({
+        ...items,
+        [pettyCashRowKey]: result.data?.list ?? [],
+      }));
+    } catch (error) {
+      const details = error instanceof Error ? `: ${error.message}` : "";
+      message.error(`Unable to load the petty cash voucher items${details}`);
+    } finally {
+      setLoadingPettyCashItemKeys((keys) => ({
+        ...keys,
+        [pettyCashRowKey]: false,
+      }));
+    }
+  };
+
   return (
     <Row>
       <Col span={24}>
@@ -390,16 +675,74 @@ export default function ProjectExpenseTable({
           expandable={{
             expandedRowKeys,
             onExpand: handleExpand,
-            rowExpandable: (record) =>
-              Boolean(
-                (record.project?.id ?? projectId) &&
-                  record.transactionType?.id
-              ) &&
-              Number(record.payableCount ?? 0) > 0,
+            rowExpandable: (record) => {
+              const hasProject = Boolean(record.project?.id ?? projectId);
+              return record.sourceType === "PETTY_CASH"
+                ? hasProject && Number(record.pettyCashCount ?? 0) > 0
+                : hasProject &&
+                    Boolean(record.transactionType?.id) &&
+                    Number(record.payableCount ?? 0) > 0;
+            },
             expandedRowRender: (record) => {
               const rowKey = getRowKey(record);
               const breakdownProjectId = record.project?.id ?? projectId;
               const transactionTypeId = record.transactionType?.id;
+              if (record.sourceType === "PETTY_CASH") {
+                return (
+                  <div className="w-full px-5">
+                    <p style={{ margin: "0 0 8px", fontWeight: "bold" }}>
+                      Petty Cash Voucher Breakdown (expand a PCV row to view its project lines)
+                    </p>
+                    <Table
+                      rowKey={(pettyCash) =>
+                        getPettyCashRowKey(pettyCash, breakdownProjectId)
+                      }
+                      size="small"
+                      columns={pettyCashColumns}
+                      dataSource={pettyCashBreakdownByKey[rowKey] ?? []}
+                      loading={loadingPettyCashKeys[rowKey]}
+                      pagination={false}
+                      expandable={{
+                        expandedRowKeys: expandedPettyCashKeys,
+                        onExpand: (expanded, pettyCash) =>
+                          handlePettyCashExpand(
+                            expanded,
+                            pettyCash,
+                            breakdownProjectId
+                          ),
+                        rowExpandable: (pettyCash) =>
+                          Boolean(breakdownProjectId && pettyCash.pettyCashId),
+                        expandedRowRender: (pettyCash) => {
+                          const pettyCashRowKey = getPettyCashRowKey(
+                            pettyCash,
+                            breakdownProjectId
+                          );
+                          return (
+                            <Table
+                              rowKey="lineId"
+                              size="small"
+                              columns={pettyCashItemColumns}
+                              dataSource={
+                                itemsByPettyCashKey[pettyCashRowKey] ?? []
+                              }
+                              loading={loadingPettyCashItemKeys[pettyCashRowKey]}
+                              pagination={false}
+                              locale={{
+                                emptyText:
+                                  "No posted petty cash lines are assigned to this project.",
+                              }}
+                            />
+                          );
+                        },
+                      }}
+                      locale={{
+                        emptyText:
+                          "No posted petty cash vouchers are assigned to this project.",
+                      }}
+                    />
+                  </div>
+                );
+              }
               return (
                 <div className="w-full px-5">
                   <p style={{ margin: "0 0 8px", fontWeight: "bold" }}>

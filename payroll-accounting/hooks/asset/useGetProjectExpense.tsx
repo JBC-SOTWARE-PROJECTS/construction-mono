@@ -9,6 +9,10 @@ const GET_RECORDS = gql`
       size: $size
     ) {
       content {
+        id {
+          transTypeId
+          sourceCategory
+        }
         project {
           id
         }
