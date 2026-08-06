@@ -9,6 +9,7 @@ import org.hibernate.annotations.NotFoundAction
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.Where
+import org.springframework.transaction.annotation.Transactional
 
 import javax.persistence.*
 import java.time.Instant
@@ -17,7 +18,7 @@ import java.time.Instant
 @Table(schema = "cashier", name = "shifting")
 @SQLDelete(sql = "UPDATE cashier.shifting SET deleted = true WHERE id = ?")
 @Where(clause = "deleted <> true or deleted is  null ")
-class Shift extends AbstractAuditingEntity {
+class Shift extends AbstractAuditingEntity implements  Serializable {
 
 	@GraphQLQuery
 	@Id
@@ -66,4 +67,12 @@ class Shift extends AbstractAuditingEntity {
 	@OrderBy("orNumber")
 	Set<Payment> payments = []
 
+	@Transient
+	Integer nextDocNo
+
+	@Transient
+	ReceiptType docType
+
+	@Transient
+	UUID batchId
 }

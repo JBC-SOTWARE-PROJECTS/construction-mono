@@ -247,6 +247,17 @@ class IntegrationServices extends AbstractDaoService<Integration> {
              }
        }
 
+       def login =  SecurityUtils.currentLogin()
+       if(match.autoPost){
+           header.ledger.each {
+               ld ->
+                   ld.approvedBy = login
+                   ld.approvedDatetime = Instant.now()
+           }
+           header.approvedBy = login
+           header.approvedDatetime = Instant.now()
+       }
+
         return  header
     }
 
@@ -846,6 +857,17 @@ class IntegrationServices extends AbstractDaoService<Integration> {
 
 
             }
+        }
+
+        def login =  SecurityUtils.currentLogin()
+        if(match.autoPost){
+            header.ledger.each {
+                ld ->
+                    ld.approvedBy = login
+                    ld.approvedDatetime = Instant.now()
+            }
+            header.approvedBy = login
+            header.approvedDatetime = Instant.now()
         }
 
         return  header

@@ -5,6 +5,7 @@ import com.backend.gbp.domain.annotations.UpperCase
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.services.ServiceManagement
 import io.leangen.graphql.annotations.GraphQLQuery
+import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.LazyCollection
 import org.hibernate.annotations.LazyCollectionOption
@@ -33,7 +34,7 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 
 	@GraphQLQuery
 	@Column(name = "trans_date")
-	Instant transDate
+	Instant transDate = Instant.now()
 
 	@GraphQLQuery
 	@NotFound(action = NotFoundAction.IGNORE)
@@ -110,8 +111,14 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	@GraphQLQuery
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(mappedBy = "billingItem")
+	@OneToMany(mappedBy = "refBillItem")
 	List<DiscountDetails> discountDetails
+
+	@NotFound(action = NotFoundAction.IGNORE)
+	@GraphQLQuery
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(mappedBy = "refBillItem")
+	List<PaymentDetails> paymentDetails
 
 	@GraphQLQuery
 	@Column(name = "recalculation_date")
@@ -133,7 +140,12 @@ class BillingItem extends AbstractAuditingEntity implements Serializable {
 	@Column(name = "project_cost_id")
 	UUID projectCostId
 
+	@GraphQLQuery
+	@Column(name = "company_id")
+	UUID companyId
+
 	@Transient
 	BigDecimal remainingBalance
+
 
 }

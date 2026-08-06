@@ -75,6 +75,11 @@ class ReportsLayoutItem extends AbstractAuditingEntity implements Serializable {
 	String itemType
 
 	@GraphQLQuery
+	@Enumerated(EnumType.STRING)
+	@Column(name = "account_type", columnDefinition = "varchar")
+	AccountType accountType
+
+	@GraphQLQuery
 	@Column(name = "is_formula", columnDefinition = "varchar")
 	Boolean isFormula
 
@@ -107,4 +112,7 @@ class ReportsLayoutItem extends AbstractAuditingEntity implements Serializable {
 			return title
 		return account.description
 	}
+
+	@Transient
+	Boolean exist
 }

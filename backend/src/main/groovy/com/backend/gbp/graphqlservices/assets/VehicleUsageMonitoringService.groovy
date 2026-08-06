@@ -65,12 +65,48 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
         return result
     }
 
+
+    @GraphQLQuery(name = "vehicleUsageMonitoringProjectPageable")
+    Page<VehicleUsageMonitoring> vehicleUsageMonitoringListProjectPageable(
+            @GraphQLArgument(name = "filter") String filter,
+            @GraphQLArgument(name = "page") Integer page,
+            @GraphQLArgument(name = "size") Integer size,
+            @GraphQLArgument(name = "project") UUID project
+    ) {
+
+        String query = '''Select p from VehicleUsageMonitoring p where p.project.id = :project AND
+						lower(concat(p.usagePurpose,p.route)) like lower(concat('%',:filter,'%'))'''
+
+        String countQuery = '''Select count(p) from VehicleUsageMonitoring p where p.project.id = :project AND
+							lower(concat(p.usagePurpose,p.route)) like lower(concat('%',:filter,'%'))'''
+
+        Map<String, Object> params = new HashMap<>()
+        params.put('filter', filter)
+        params.put('project', project)
+
+        query += ''' ORDER BY p.startDatetime DESC'''
+
+        Page<VehicleUsageMonitoring> result = getPageable(query, countQuery, page, size, params)
+        return result
+    }
+
     @GraphQLQuery(name = "vehicleUsageMonitoringLatest")
     VehicleUsageMonitoring vehicleUsageMonitoringLatest(
             @GraphQLArgument(name = "asset") UUID asset
     ) {
 
         List<VehicleUsageMonitoring> vehList = vehicleUsageRepository.findByAsset(asset);
+
+        VehicleUsageMonitoring result = vehList[0]
+        return result
+    }
+
+    @GraphQLQuery(name = "vehicleUsageMonitoringProjectLatest")
+    VehicleUsageMonitoring vehicleUsageMonitoringProjectLatest(
+            @GraphQLArgument(name = "project") UUID project
+    ) {
+
+        List<VehicleUsageMonitoring> vehList = vehicleUsageRepository.findByAsset(project);
 
         VehicleUsageMonitoring result = vehList[0]
         return result

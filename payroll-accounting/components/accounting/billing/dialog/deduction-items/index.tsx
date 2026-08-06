@@ -1,15 +1,11 @@
-import PageFilterContainer from "@/components/common/custom-components/page-filter-container"
 import { TableNoBorderRadCSS } from "@/components/common/utils/table-utils"
-import { PlusCircleFilled, SearchOutlined } from "@ant-design/icons"
 import { useQuery } from "@apollo/client"
-import { Button, Col, Input, Modal, Row, Space, Table, Typography } from "antd"
+import { Col, Modal, Row, Table, Typography } from "antd"
 
-import { DEDUCTION_DETAILS, GET_BILLING_ITEMS } from "@/graphql/billing/queries"
+import { DEDUCTION_DETAILS } from "@/graphql/billing/queries"
+import { DiscountDetails } from "@/graphql/gql/graphql"
 import type { TableProps } from "antd"
 import { ColumnsType } from "antd/es/table"
-import { BillingItem, DiscountDetails } from "@/graphql/gql/graphql"
-import { currency } from "@/utility/constant"
-import { NumberFormater } from "@/utility/helper"
 import numeral from "numeral"
 
 type TableRowSelection<T> = TableProps<T>["rowSelection"]
@@ -18,6 +14,7 @@ interface DeductionItemsProps {
   hide: (params?: any) => void
   id: string
   billingItems: string[]
+  isPayment: boolean
 }
 export function DeductionItems(props: DeductionItemsProps) {
   const { data, loading, refetch } = useQuery(DEDUCTION_DETAILS, {

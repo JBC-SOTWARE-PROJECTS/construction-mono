@@ -1,12 +1,12 @@
 package com.backend.gbp.graphqlservices.accounting
 
+import com.backend.gbp.domain.accounting.AccountType
 import com.backend.gbp.domain.accounting.ParentAccount
 import com.backend.gbp.domain.accounting.ReportItemConfig
 import com.backend.gbp.domain.accounting.ReportType
 import com.backend.gbp.domain.accounting.ReportsLayout
 import com.backend.gbp.domain.accounting.ReportsLayoutItem
 import com.backend.gbp.graphqlservices.types.GraphQLResVal
-import com.backend.gbp.graphqlservices.types.GraphQLRetVal
 import com.backend.gbp.services.EntityObjectMapperService
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -176,7 +176,7 @@ class ReportsLayoutItemServices extends ArAbstractFormulaHelper<ReportsLayoutIte
                 ParentAccount coa = chartOfAccountServices.findOne(it) ?: null
                 if(coa) {
                     ChartOfAccountGenerate generate = new ChartOfAccountGenerate()
-                    generate.motherAccount =  new CoaComponentContainer(coa.accountCode,coa.id,coa.accountName,ParentAccount.class.name,coa.normalSide.name())
+                    generate.motherAccount =  new CoaComponentContainer(coa.accountCode,coa.id,coa.description,ChartOfAccount.class.name,coa.normalSide.name())
                     ReportsLayoutItem child = new ReportsLayoutItem()
                     child.reportsLayoutId = parent.reportsLayoutId
                     child.reportLayoutItemsParent = parent
@@ -206,7 +206,7 @@ class ReportsLayoutItemServices extends ArAbstractFormulaHelper<ReportsLayoutIte
                 it.code == code
             }
             if(!match){
-                return   new GraphQLRetVal<Boolean>(false,false,"${code}-${description} is not found in Chart of accounts")
+                return   new GraphQLResVal<Boolean>(false,false,"${code}-${description} is not found in Chart of accounts")
             }
             ReportsLayoutItem child = new ReportsLayoutItem()
             child.reportsLayoutId = parent.reportsLayoutId
@@ -216,6 +216,23 @@ class ReportsLayoutItemServices extends ArAbstractFormulaHelper<ReportsLayoutIte
             child.isGroup = false
             save(child)
         }
+        return new GraphQLResVal<Boolean>(true, true, "Delete successfully")
+    }
+
+    @GraphQLMutation(name="onAddSpecialFormula")
+    GraphQLResVal<Boolean> onAddSpecialFormula(
+            @GraphQLArgument(name = "parentId") UUID parentId,
+            @GraphQLArgument(name = "formulaType") String formulaType
+    ){
+        ReportsLayoutItem parent = findOne(parentId)
+        Integer orderStartingPoint = (parent.reportsChild ?: []).size()
+        ReportsLayoutItem child = new ReportsLayoutItem()
+        child.reportsLayoutId = parent.reportsLayoutId
+        child.reportLayoutItemsParent = parent
+        child.account = match
+        child.orderNo = orderStartingPoint++
+        child.isGroup = false
+        save(child)
         return new GraphQLResVal<Boolean>(true, true, "Delete successfully")
     }
 
@@ -260,8 +277,8 @@ class ReportsLayoutItemServices extends ArAbstractFormulaHelper<ReportsLayoutIte
             and r.reportsLayoutId.reportType = :reportType
             and r.account is not null 
         """)
-        .setParameter('reportType',reportType)
-        .resultList.each {
+                .setParameter('reportType',reportType)
+                .resultList.each {
             it -> uuids[it.account.code] = it.account.code
         }
         return uuids
@@ -284,7 +301,7 @@ class ReportsLayoutItemServices extends ArAbstractFormulaHelper<ReportsLayoutIte
 
     @GraphQLQuery(name = "getReportItemsByReportType", description = "List of child")
     List<ReportsLayoutItem> getReportItemsByReportType(
-        @GraphQLArgument(name = "reportType") ReportType reportType
+            @GraphQLArgument(name = "reportType") ReportType reportType
     ) {
 
         createQuery("""
@@ -312,10 +329,10 @@ class ReportsLayoutItemServices extends ArAbstractFormulaHelper<ReportsLayoutIte
             item.reportLayoutItemsParent is null 
             and report.id = :id 
             and report.isActive is true
-            order by item.createdDate asc
+            order by item.orderNo asc
         """)
-            .setParameter("id",id)
-            .resultList
+                .setParameter("id",id)
+                .resultList
     }
 
 
@@ -337,5 +354,54 @@ class ReportsLayoutItemServices extends ArAbstractFormulaHelper<ReportsLayoutIte
                 .setParameter("reportId",reportId)
                 .setParameter("formulas",formulas)
                 .resultList
+    }
+
+    @GraphQLQuery(name = "getAccountByAccountType", description = "List of account by account type")
+    List<ReportsLayoutItem> getAccountByAccountType(
+            @GraphQLArgument(name = "reportId") UUID reportId,
+            @GraphQLArgument(name = "accountTypes") List<String> accountTypes
+    ) {
+        createQuery("""
+            Select item from ReportsLayoutItem item
+            where 
+            item.reportsLayoutId.id = :reportId 
+            and item.accountType in :accountTypes 
+            order by item.code asc
+        """)
+                .setParameter("reportId",reportId)
+                .setParameter("accountTypes",accountTypes.collect{it -> AccountType.valueOf(it)})
+                .resultList
+    }
+
+    @GraphQLQuery(name = "getAccountByGroupAccountType")
+    List<ReportsLayoutItem> getAccountByGroupAccountType(
+            @GraphQLArgument(name = "reportId") UUID reportId,
+            @GraphQLArgument(name = "reportGroupId") UUID reportGroupId
+    ) {
+        createQuery("""
+            Select item from ReportsLayoutItem item
+            where 
+            item.reportsLayoutId.id = :reportId 
+            and item.reportLayoutItemsParent.id = :reportGroupId 
+            order by item.code asc
+        """)
+                .setParameter("reportId",reportId)
+                .setParameter("reportGroupId",reportGroupId)
+                .resultList
+    }
+
+
+    @GraphQLQuery(name="getReportsLayoutItemByTitle")
+    Optional<ReportsLayoutItem> getReportsLayoutItemByTitle(
+            @GraphQLArgument(name = "reportsLayoutId") UUID reportsLayoutId,
+            @GraphQLArgument(name = "title") String title
+    ){
+        createQuery(""" 
+                Select r from ReportsLayoutItem r
+                WHERE r.reportsLayoutId.id = :reportsLayoutId and r.title = :title
+        """)
+                .setParameter("reportsLayoutId",reportsLayoutId)
+                .setParameter("title",title)
+                .resultList.stream().findFirst()
     }
 }

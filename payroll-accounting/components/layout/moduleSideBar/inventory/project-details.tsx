@@ -8,6 +8,11 @@ const InventoryProjectMenu = (query: string) => {
           name: 'Projects Menu',
           routes: [
             {
+              key: 'project-expense',
+              path: `/inventory/project-details/${query}/project-expense`,
+              name: 'Project Expense',
+            },
+            {
               key: 'bill-quantities',
               path: `/inventory/project-details/${query}/bill-quantities`,
               name: 'Bill of Quantities',
@@ -42,6 +47,21 @@ const InventoryProjectMenu = (query: string) => {
               path: `/inventory/project-details/${query}/inventory`,
               name: 'Inventory Monitoring',
             },
+            {
+              key: 'purchase-requests',
+              path: `/inventory/project-details/${query}/purchase-requests`,
+              name: 'Purchase Requests',
+            },
+            {
+              key: 'purchase-orders',
+              path: `/inventory/project-details/${query}/purchase-orders`,
+              name: 'Purchase Orders',
+            },
+            {
+              key: 'rentals',
+              path: `/inventory/project-details/${query}/rentals`,
+              name: 'Rentals',
+            }
           ],
         },
       ],

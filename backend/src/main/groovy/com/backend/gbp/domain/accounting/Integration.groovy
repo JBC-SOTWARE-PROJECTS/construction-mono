@@ -100,4 +100,7 @@ class Integration extends AbstractAuditingEntity implements Serializable {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     CompanySettings company
 
+    @GraphQLQuery
+    @Column(name = "auto_post", columnDefinition = "varchar")
+    Boolean autoPost
 }

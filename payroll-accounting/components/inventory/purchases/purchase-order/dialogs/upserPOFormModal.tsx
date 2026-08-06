@@ -79,12 +79,13 @@ import { apiUrlPrefix } from "@/shared/settings";
 interface IProps {
   hide: (hideProps: any) => void;
   record?: PurchaseOrder | null | undefined;
+  projectId?: string | null;
   poCategory: string;
   disabledPR?: boolean;
 }
 
 export default function UpsertPOFormModal(props: IProps) {
-  const { hide, record, poCategory, disabledPR } = props;
+  const { hide, record, poCategory, disabledPR, projectId } = props;
   const [form] = Form.useForm();
   const { setFieldValue } = form;
   const account = useContext(AccountContext);
@@ -800,7 +801,7 @@ export default function UpsertPOFormModal(props: IProps) {
             preparedDate: dayjs(record?.preparedDate ?? new Date()),
             etaDate: dayjs(record?.etaDate ?? new Date()),
             supplier: selectInValueInit(record?.id, "supplier"),
-            project: record?.project?.id ?? null,
+            project: record?.project?.id ?? (projectId ?? null),
             assets: record?.assets?.id ?? null,
             category: record?.category ?? poCategory,
             paymentTerms: record?.paymentTerms?.id ?? null,

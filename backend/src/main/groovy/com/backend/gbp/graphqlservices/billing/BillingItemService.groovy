@@ -3,11 +3,13 @@ package com.backend.gbp.graphqlservices.billing
 import com.backend.gbp.domain.billing.Billing
 import com.backend.gbp.domain.billing.BillingItem
 import com.backend.gbp.domain.billing.DiscountDetails
+import com.backend.gbp.domain.billing.DiscountDetailsType
 import com.backend.gbp.domain.billing.JobItems
 import com.backend.gbp.domain.inventory.Item
 import com.backend.gbp.domain.projects.ProjectCost
 import com.backend.gbp.domain.projects.ProjectWorkAccomplish
 import com.backend.gbp.domain.projects.ProjectWorkAccomplishItems
+import com.backend.gbp.graphqlservices.accounting.ArAbstractFormulaHelper
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.InventoryLedgerService
 import com.backend.gbp.graphqlservices.inventory.ItemService
@@ -36,6 +38,7 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+import java.math.MathContext
 import java.math.RoundingMode
 import java.time.Duration
 import java.time.Instant
@@ -51,7 +54,7 @@ enum SALES_INTEGRATION {
 @Component
 @GraphQLApi
 //@TypeChecked
-class BillingItemService extends AbstractDaoService<BillingItem> {
+class BillingItemService extends ArAbstractFormulaHelper<BillingItem> {
 
     BillingItemService() {
         super(BillingItem.class)
@@ -111,9 +114,20 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
         String query = '''Select e from BillingItem e where e.billing.id = :id'''
         Map<String, Object> params = new HashMap<>()
         params.put('id', id)
+
         createQuery(query, params).resultList.sort { it.description }
     }
 
+    @GraphQLQuery(name = "billingItemProgressPaymentByParent")
+    List<BillingItem> billingItemProgressPaymentByParent(
+            @GraphQLArgument(name = "id") UUID id
+    ) {
+        String query = '''Select e from BillingItem e where e.billing.id = :id and e.status is true and e.itemType in ('SERVICE','ITEM') '''
+        Map<String, Object> params = new HashMap<>()
+        params.put('id', id)
+
+        createQuery(query, params).resultList.sort { it.description }
+    }
 
     @GraphQLQuery(name="billingItemPage")
     Page<BillingItem> billingItemPage(
@@ -864,28 +878,41 @@ class BillingItemService extends AbstractDaoService<BillingItem> {
                 disc.billingItem = afterSave
                 disc.refBillItem = discDetails
                 disc.amount = billingUtils.bankersRounding(itemDeduction)
+                disc.itemType = DiscountDetailsType.valueOf(it.deduction)
                 discountDetailsRepository.save(disc)
             }
         }
         else {
-            BigDecimal totals = 0.00
+            BigDecimal totals = BigDecimal.ZERO;
             discountItems.each {
-                dis ->
-                    totals = totals + dis.subTotal
+                dis -> totals = totals.add(dis.subTotal);
             }
 
+            BigDecimal totalRoundedDiscount = BigDecimal.ZERO;
+            BigDecimal lastItemDiscount = BigDecimal.ZERO;
 
-            discountItems.each {
-                dis ->
-                    def disc = new DiscountDetails();
-                    disc.billing = billingService.findOne(id)
-                    disc.billingItem = afterSave
-                    disc.refBillItem = dis
-                    BigDecimal itemProportion = dis.subTotal / totals
-                    BigDecimal itemDeduction = deduction * itemProportion
-                    BigDecimal bankersRounding = billingUtils.bankersRounding(itemDeduction)
-                    disc.amount = bankersRounding
-                    discountDetailsRepository.save(disc)
+            for (int i = 0; i < discountItems.size(); i++) {
+                def dis = discountItems[i];
+                def disc = new DiscountDetails();
+                disc.billing = billingService.findOne(id);
+                disc.billingItem = afterSave;
+                disc.refBillItem = dis;
+
+                BigDecimal itemProportion = dis.subTotal.divide(totals, MathContext.DECIMAL128);
+                BigDecimal itemDeduction = billingUtils.bankersRounding(deduction * itemProportion);
+
+                BigDecimal bankersRounding;
+                if (i == discountItems.size() - 1) {
+                    // Adjust the last item discount to ensure total discount matches the desired amount
+                    bankersRounding = deduction.subtract(totalRoundedDiscount);
+                } else {
+                    bankersRounding = billingUtils.bankersRounding(itemDeduction);
+                }
+
+                totalRoundedDiscount = totalRoundedDiscount.add(bankersRounding);
+                disc.amount = billingUtils.bankersRounding(bankersRounding);
+                disc.itemType = DiscountDetailsType.valueOf(it.deduction);
+                discountDetailsRepository.save(disc);
             }
         }
         return true

@@ -1,6 +1,6 @@
-import { FormInput, FormSelect } from '@/components/common'
-import { gql, useMutation, useQuery } from '@apollo/client'
-import { Form, Modal } from 'antd'
+import { FormCheckBox, FormInput, FormSelect } from "@/components/common"
+import { gql, useMutation, useQuery } from "@apollo/client"
+import { Form, Modal } from "antd"
 
 interface IntegrationsI {
   hide: () => void
@@ -51,9 +51,9 @@ export default function CreateIntegration(props: IntegrationsI) {
   return (
     <Modal
       open
-      title='Add New Integration'
+      title="Add/Edit New Integration"
       onCancel={() => props.hide()}
-      okText={record?.id ? 'Save' : 'Create'}
+      okText={record?.id ? "Save" : "Create"}
       onOk={() => form.submit()}
       // okButtonProps={{ loading: updateInsertLoading }}
       // cancelButtonProps={{ loading: updateInsertLoading }}
@@ -61,22 +61,28 @@ export default function CreateIntegration(props: IntegrationsI) {
       <Form
         form={form}
         onFinish={onHandleClickOk}
-        layout='vertical'
+        layout="vertical"
         initialValues={{ ...props?.record }}
       >
-        <FormInput name='description' label='Integration Name' />
+        <FormInput name="description" label="Integration Name" />
         {!props?.record?.id && (
           <FormSelect
-            name='domain'
-            label='Data Records'
+            name="domain"
+            label="Data Records"
             propsselect={{
               allowClear: true,
               options: data?.domainRecords ?? [],
             }}
           />
         )}
-        <FormInput label='Order No.' name='orderPriority' />
-        <FormInput label='Flag Value' name='flagValue' />
+        <FormInput label="Order No." name="orderPriority" />
+        <FormInput label="Flag Value" name="flagValue" />
+        <FormCheckBox
+          checkBoxLabel="Auto Post"
+          name="autoPost"
+          valuePropName="checked"
+          propscheckbox={{}}
+        />
       </Form>
     </Modal>
   )

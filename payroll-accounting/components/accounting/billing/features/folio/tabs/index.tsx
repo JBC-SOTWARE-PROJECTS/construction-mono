@@ -1,13 +1,14 @@
-import { Billing } from "@/graphql/gql/graphql"
-import { Col, Row, Tabs } from "antd"
-import { FolioRefetchType } from ".."
-import FolioProgressBilling from "./progress-billing"
-import FolioDeductions from "./deductions"
-import { MessageInstance } from "antd/es/message/interface"
+import { Billing } from "@/graphql/gql/graphql";
+import { Col, Row, Tabs } from "antd";
+import { FolioRefetchType } from "..";
+import FolioProgressBilling from "./progress-billing";
+import FolioDeductions from "./deductions";
+import { MessageInstance } from "antd/es/message/interface";
+import FolioPayments from "./payments";
 
 export interface FolioTabsProps {
-  billing: Billing | null
-  refetch: FolioRefetchType | null
+  billing: Billing | null;
+  refetch: FolioRefetchType | null;
 }
 
 const FolioTabs = (props: FolioTabsProps) => {
@@ -42,7 +43,7 @@ const FolioTabs = (props: FolioTabsProps) => {
       label: `Payment(s)`,
       key: "payments",
       children: (
-        <FolioProgressBilling
+        <FolioPayments
           {...{
             billing: { ...props.billing },
             refetch: props.refetch,
@@ -51,7 +52,7 @@ const FolioTabs = (props: FolioTabsProps) => {
         />
       ),
     },
-  ]
+  ];
 
   return (
     <Row gutter={[8, 8]} style={{ minHeight: 400 }}>
@@ -65,7 +66,7 @@ const FolioTabs = (props: FolioTabsProps) => {
         />
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default FolioTabs
+export default FolioTabs;
