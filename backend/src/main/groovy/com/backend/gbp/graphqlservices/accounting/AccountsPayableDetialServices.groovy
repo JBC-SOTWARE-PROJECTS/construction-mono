@@ -8,8 +8,10 @@ import com.backend.gbp.repository.OfficeRepository
 import com.backend.gbp.repository.asset.AssetsRepository
 import com.backend.gbp.repository.projects.ProjectsRepository
 import com.backend.gbp.rest.dto.payables.AccountPayableDetialsDto
+import com.backend.gbp.security.SecurityUtils
 import com.backend.gbp.services.GeneratorService
 import com.fasterxml.jackson.databind.ObjectMapper
+import groovy.transform.Canonical
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
@@ -19,6 +21,32 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 import java.math.RoundingMode
+import java.time.Instant
+
+@Canonical
+class ProjectPayableBreakdown {
+    UUID payableId
+    String apNo
+    Instant apvDate
+    String invoiceNo
+    String supplierName
+    String status
+    BigDecimal netAmount
+    Long lineCount
+}
+
+@Canonical
+class ProjectPayableItem {
+    UUID detailId
+    String transactionTypeDescription
+    BigDecimal amount
+    BigDecimal discAmount
+    BigDecimal vatAmount
+    BigDecimal ewtAmount
+    BigDecimal netAmount
+    String refNo
+    String remarksNotes
+}
 
 @Service
 @GraphQLApi
@@ -60,6 +88,103 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
     @GraphQLQuery(name = "detailsByAp", description = "Find Ap posted")
     List<AccountsPayableDetails> detailsByAp(@GraphQLArgument(name = "id") UUID id) {
         createQuery("Select ap from AccountsPayableDetails ap where ap.accountsPayable.id = :id", ["id": id]).resultList
+    }
+
+    @GraphQLQuery(name = "projectPayableBreakdown", description = "Posted payable amounts for a project and transaction type")
+    List<ProjectPayableBreakdown> projectPayableBreakdown(
+            @GraphQLArgument(name = "projectId") UUID projectId,
+            @GraphQLArgument(name = "transactionTypeId") UUID transactionTypeId
+    ) {
+        if (!projectId) {
+            return []
+        }
+
+        String query = '''
+            SELECT new com.backend.gbp.graphqlservices.accounting.ProjectPayableBreakdown(
+                detail.accountsPayable.id,
+                detail.accountsPayable.apNo,
+                detail.accountsPayable.apvDate,
+                detail.accountsPayable.invoiceNo,
+                detail.accountsPayable.supplier.supplierFullname,
+                detail.accountsPayable.status,
+                sum(coalesce(detail.netAmount, 0)),
+                count(detail.id)
+            )
+            FROM AccountsPayableDetails detail
+            WHERE detail.project.id = :projectId
+              AND detail.accountsPayable.posted = true
+        '''
+
+        Map<String, Object> params = [projectId: projectId]
+        UUID companyId = SecurityUtils.currentCompanyId()
+
+        if (transactionTypeId) {
+            query += ' AND detail.transType.id = :transactionTypeId'
+            params.transactionTypeId = transactionTypeId
+        }
+
+        if (companyId) {
+            query += ' AND detail.project.company = :companyId'
+            params.companyId = companyId
+        }
+
+        query += '''
+            GROUP BY detail.accountsPayable.id,
+                     detail.accountsPayable.apNo,
+                     detail.accountsPayable.apvDate,
+                     detail.accountsPayable.invoiceNo,
+                     detail.accountsPayable.supplier.supplierFullname,
+                     detail.accountsPayable.status
+            ORDER BY detail.accountsPayable.apvDate DESC,
+                     detail.accountsPayable.apNo ASC
+        '''
+
+        return createQuery(query, params).resultList
+    }
+
+    @GraphQLQuery(name = "projectPayableItems", description = "Posted payable detail items for a project, transaction type, and payable")
+    List<ProjectPayableItem> projectPayableItems(
+            @GraphQLArgument(name = "projectId") UUID projectId,
+            @GraphQLArgument(name = "payableId") UUID payableId,
+            @GraphQLArgument(name = "transactionTypeId") UUID transactionTypeId
+    ) {
+        if (!projectId || !payableId) {
+            return []
+        }
+
+        String query = '''
+            SELECT new com.backend.gbp.graphqlservices.accounting.ProjectPayableItem(
+                detail.id,
+                detail.transType.description,
+                detail.amount,
+                detail.discAmount,
+                detail.vatAmount,
+                detail.ewtAmount,
+                detail.netAmount,
+                detail.refNo,
+                detail.remarksNotes
+            )
+            FROM AccountsPayableDetails detail
+            WHERE detail.project.id = :projectId
+              AND detail.accountsPayable.id = :payableId
+              AND detail.accountsPayable.posted = true
+        '''
+
+        Map<String, Object> params = [projectId: projectId, payableId: payableId]
+        UUID companyId = SecurityUtils.currentCompanyId()
+
+        if (transactionTypeId) {
+            query += ' AND detail.transType.id = :transactionTypeId'
+            params.transactionTypeId = transactionTypeId
+        }
+
+        if (companyId) {
+            query += ' AND detail.project.company = :companyId'
+            params.companyId = companyId
+        }
+
+        query += ' ORDER BY detail.id ASC'
+        return createQuery(query, params).resultList
     }
 
     //mutations
