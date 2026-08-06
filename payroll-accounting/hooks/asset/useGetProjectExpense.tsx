@@ -9,6 +9,10 @@ const GET_RECORDS = gql`
       size: $size
     ) {
       content {
+        id {
+          transTypeId
+          sourceCategory
+        }
         project {
           id
         }
@@ -21,6 +25,8 @@ const GET_RECORDS = gql`
         totalNetAmount
         lineCount
         payableCount
+        pettyCashCount
+        sourceType
       }
       size
       totalElements
