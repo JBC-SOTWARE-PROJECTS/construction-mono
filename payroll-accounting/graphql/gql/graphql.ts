@@ -10548,8 +10548,10 @@ export type ProjectExpenseView = {
   id?: Maybe<ProjectExpenseViewId>;
   lineCount?: Maybe<Scalars['Long']['output']>;
   payableCount?: Maybe<Scalars['Long']['output']>;
+  pettyCashCount?: Maybe<Scalars['Long']['output']>;
   project?: Maybe<Projects>;
   projectDescription?: Maybe<Scalars['String']['output']>;
+  sourceType?: Maybe<Scalars['String']['output']>;
   totalNetAmount?: Maybe<Scalars['BigDecimal']['output']>;
   transTypeDescription?: Maybe<Scalars['String']['output']>;
   transactionType?: Maybe<ApTransaction>;
@@ -10558,7 +10560,59 @@ export type ProjectExpenseView = {
 export type ProjectExpenseViewId = {
   __typename?: 'ProjectExpenseViewId';
   projectId?: Maybe<Scalars['UUID']['output']>;
+  sourceCategory?: Maybe<Scalars['String']['output']>;
+  sourceType?: Maybe<Scalars['String']['output']>;
   transTypeId?: Maybe<Scalars['UUID']['output']>;
+};
+
+export type ProjectPayableBreakdown = {
+  __typename?: 'ProjectPayableBreakdown';
+  apNo?: Maybe<Scalars['String']['output']>;
+  apvDate?: Maybe<Scalars['Instant']['output']>;
+  invoiceNo?: Maybe<Scalars['String']['output']>;
+  lineCount?: Maybe<Scalars['Long']['output']>;
+  netAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  payableId?: Maybe<Scalars['UUID']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  supplierName?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProjectPayableItem = {
+  __typename?: 'ProjectPayableItem';
+  amount?: Maybe<Scalars['BigDecimal']['output']>;
+  detailId?: Maybe<Scalars['UUID']['output']>;
+  discAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  ewtAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  netAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  refNo?: Maybe<Scalars['String']['output']>;
+  remarksNotes?: Maybe<Scalars['String']['output']>;
+  transactionTypeDescription?: Maybe<Scalars['String']['output']>;
+  vatAmount?: Maybe<Scalars['BigDecimal']['output']>;
+};
+
+export type ProjectPettyCashBreakdown = {
+  __typename?: 'ProjectPettyCashBreakdown';
+  lineCount?: Maybe<Scalars['Long']['output']>;
+  payeeName?: Maybe<Scalars['String']['output']>;
+  pcvCategory?: Maybe<Scalars['String']['output']>;
+  pcvDate?: Maybe<Scalars['Instant']['output']>;
+  pcvNo?: Maybe<Scalars['String']['output']>;
+  pettyCashId?: Maybe<Scalars['UUID']['output']>;
+  projectAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  referenceNo?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProjectPettyCashItem = {
+  __typename?: 'ProjectPettyCashItem';
+  description?: Maybe<Scalars['String']['output']>;
+  grossAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  lineId?: Maybe<Scalars['UUID']['output']>;
+  lineType?: Maybe<Scalars['String']['output']>;
+  netAmount?: Maybe<Scalars['BigDecimal']['output']>;
+  qty?: Maybe<Scalars['BigDecimal']['output']>;
+  remarks?: Maybe<Scalars['String']['output']>;
+  vatAmount?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type ProjectProgress = {
@@ -11985,6 +12039,14 @@ export type Query = {
   projectList?: Maybe<Array<Maybe<Projects>>>;
   projectListPageable?: Maybe<Page_Projects>;
   projectLists?: Maybe<Array<Maybe<Projects>>>;
+  /** Posted payable amounts for a project and transaction type */
+  projectPayableBreakdown?: Maybe<Array<Maybe<ProjectPayableBreakdown>>>;
+  /** Posted payable detail items for a project, transaction type, and payable */
+  projectPayableItems?: Maybe<Array<Maybe<ProjectPayableItem>>>;
+  /** Posted petty cash vouchers and their project-assigned amounts */
+  projectPettyCashBreakdown?: Maybe<Array<Maybe<ProjectPettyCashBreakdown>>>;
+  /** Posted petty cash lines assigned to a project */
+  projectPettyCashItems?: Maybe<Array<Maybe<ProjectPettyCashItem>>>;
   provinceByRegion?: Maybe<Array<Maybe<Province>>>;
   provinceFilter?: Maybe<Array<Maybe<Province>>>;
   provinces?: Maybe<Array<Maybe<Province>>>;
@@ -15249,6 +15311,36 @@ export type QueryProjectListPageableArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/** Query root */
+export type QueryProjectPayableBreakdownArgs = {
+  projectId?: InputMaybe<Scalars['UUID']['input']>;
+  transactionTypeId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryProjectPayableItemsArgs = {
+  payableId?: InputMaybe<Scalars['UUID']['input']>;
+  projectId?: InputMaybe<Scalars['UUID']['input']>;
+  transactionTypeId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryProjectPettyCashBreakdownArgs = {
+  pcvCategory?: InputMaybe<Scalars['String']['input']>;
+  projectId?: InputMaybe<Scalars['UUID']['input']>;
+  transactionTypeId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+/** Query root */
+export type QueryProjectPettyCashItemsArgs = {
+  pettyCashId?: InputMaybe<Scalars['UUID']['input']>;
+  projectId?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
