@@ -91,100 +91,106 @@ class AccountsPayableDetialServices extends AbstractDaoService<AccountsPayableDe
     }
 
     @GraphQLQuery(name = "projectPayableBreakdown", description = "Posted payable amounts for a project and transaction type")
+    @Transactional(readOnly = true)
     List<ProjectPayableBreakdown> projectPayableBreakdown(
             @GraphQLArgument(name = "projectId") UUID projectId,
             @GraphQLArgument(name = "transactionTypeId") UUID transactionTypeId
     ) {
-        if (!projectId) {
+        if (!isProjectInCurrentCompany(projectId)) {
             return []
         }
 
         String query = '''
-            SELECT new com.backend.gbp.graphqlservices.accounting.ProjectPayableBreakdown(
-                detail.accountsPayable.id,
-                detail.accountsPayable.apNo,
-                detail.accountsPayable.apvDate,
-                detail.accountsPayable.invoiceNo,
-                detail.accountsPayable.supplier.supplierFullname,
-                detail.accountsPayable.status,
-                sum(coalesce(detail.netAmount, 0)),
-                count(detail.id)
-            )
+            SELECT detail
             FROM AccountsPayableDetails detail
+            JOIN FETCH detail.accountsPayable payable
+            LEFT JOIN FETCH payable.supplier
             WHERE detail.project.id = :projectId
-              AND detail.accountsPayable.posted = true
+              AND payable.posted = true
         '''
 
         Map<String, Object> params = [projectId: projectId]
-        UUID companyId = SecurityUtils.currentCompanyId()
 
         if (transactionTypeId) {
             query += ' AND detail.transType.id = :transactionTypeId'
             params.transactionTypeId = transactionTypeId
         }
 
-        if (companyId) {
-            query += ' AND detail.project.company = :companyId'
-            params.companyId = companyId
+        query += ' ORDER BY payable.apvDate DESC, payable.apNo ASC'
+
+        List<AccountsPayableDetails> details = createQuery(query, params).resultList
+        return details.groupBy { it.accountsPayable.id }.collect { UUID payableId, List<AccountsPayableDetails> payableDetails ->
+            AccountsPayable payable = payableDetails.first().accountsPayable
+            BigDecimal netAmount = payableDetails.inject(BigDecimal.ZERO) { total, detail ->
+                total + (detail.netAmount ?: BigDecimal.ZERO)
+            }
+
+            new ProjectPayableBreakdown(
+                    payableId,
+                    payable.apNo,
+                    payable.apvDate,
+                    payable.invoiceNo,
+                    payable.supplier?.supplierFullname,
+                    payable.status,
+                    netAmount,
+                    payableDetails.size() as Long
+            )
         }
-
-        query += '''
-            GROUP BY detail.accountsPayable.id,
-                     detail.accountsPayable.apNo,
-                     detail.accountsPayable.apvDate,
-                     detail.accountsPayable.invoiceNo,
-                     detail.accountsPayable.supplier.supplierFullname,
-                     detail.accountsPayable.status
-            ORDER BY detail.accountsPayable.apvDate DESC,
-                     detail.accountsPayable.apNo ASC
-        '''
-
-        return createQuery(query, params).resultList
     }
 
     @GraphQLQuery(name = "projectPayableItems", description = "Posted payable detail items for a project, transaction type, and payable")
+    @Transactional(readOnly = true)
     List<ProjectPayableItem> projectPayableItems(
             @GraphQLArgument(name = "projectId") UUID projectId,
             @GraphQLArgument(name = "payableId") UUID payableId,
             @GraphQLArgument(name = "transactionTypeId") UUID transactionTypeId
     ) {
-        if (!projectId || !payableId) {
+        if (!payableId || !isProjectInCurrentCompany(projectId)) {
             return []
         }
 
         String query = '''
-            SELECT new com.backend.gbp.graphqlservices.accounting.ProjectPayableItem(
-                detail.id,
-                detail.transType.description,
-                detail.amount,
-                detail.discAmount,
-                detail.vatAmount,
-                detail.ewtAmount,
-                detail.netAmount,
-                detail.refNo,
-                detail.remarksNotes
-            )
+            SELECT detail
             FROM AccountsPayableDetails detail
+            JOIN FETCH detail.accountsPayable payable
+            LEFT JOIN FETCH detail.transType
             WHERE detail.project.id = :projectId
-              AND detail.accountsPayable.id = :payableId
-              AND detail.accountsPayable.posted = true
+              AND payable.id = :payableId
+              AND payable.posted = true
         '''
 
         Map<String, Object> params = [projectId: projectId, payableId: payableId]
-        UUID companyId = SecurityUtils.currentCompanyId()
 
         if (transactionTypeId) {
             query += ' AND detail.transType.id = :transactionTypeId'
             params.transactionTypeId = transactionTypeId
         }
 
-        if (companyId) {
-            query += ' AND detail.project.company = :companyId'
-            params.companyId = companyId
+        query += ' ORDER BY detail.id ASC'
+        List<AccountsPayableDetails> details = createQuery(query, params).resultList
+        return details.collect { detail ->
+            new ProjectPayableItem(
+                    detail.id,
+                    detail.transType?.description,
+                    detail.amount,
+                    detail.discAmount,
+                    detail.vatAmount,
+                    detail.ewtAmount,
+                    detail.netAmount,
+                    detail.refNo,
+                    detail.remarksNotes
+            )
+        }
+    }
+
+    private boolean isProjectInCurrentCompany(UUID projectId) {
+        if (!projectId) {
+            return false
         }
 
-        query += ' ORDER BY detail.id ASC'
-        return createQuery(query, params).resultList
+        def project = projectsRepository.findById(projectId).orElse(null)
+        UUID companyId = SecurityUtils.currentCompanyId()
+        return project && (!companyId || project.company == companyId)
     }
 
     //mutations
