@@ -10545,13 +10545,20 @@ export type ProjectCostRevisions = {
 
 export type ProjectExpenseView = {
   __typename?: 'ProjectExpenseView';
-  lineCount?: Maybe<Scalars['BigDecimal']['output']>;
-  payableCount?: Maybe<Scalars['BigDecimal']['output']>;
+  id?: Maybe<ProjectExpenseViewId>;
+  lineCount?: Maybe<Scalars['Long']['output']>;
+  payableCount?: Maybe<Scalars['Long']['output']>;
   project?: Maybe<Projects>;
   projectDescription?: Maybe<Scalars['String']['output']>;
   totalNetAmount?: Maybe<Scalars['BigDecimal']['output']>;
   transTypeDescription?: Maybe<Scalars['String']['output']>;
-  transactionType?: Maybe<TransactionType>;
+  transactionType?: Maybe<ApTransaction>;
+};
+
+export type ProjectExpenseViewId = {
+  __typename?: 'ProjectExpenseViewId';
+  projectId?: Maybe<Scalars['UUID']['output']>;
+  transTypeId?: Maybe<Scalars['UUID']['output']>;
 };
 
 export type ProjectProgress = {
@@ -15223,6 +15230,7 @@ export type QueryProjectByOfficeArgs = {
 export type QueryProjectExpenseViewArgs = {
   filter?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
+  projectId?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
 
