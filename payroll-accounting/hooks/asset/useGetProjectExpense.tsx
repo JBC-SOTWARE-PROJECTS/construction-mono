@@ -9,6 +9,9 @@ const GET_RECORDS = gql`
       size: $size
     ) {
       content {
+        project {
+          id
+        }
         projectDescription
         transactionType {  # if you exposed this as an object
           id

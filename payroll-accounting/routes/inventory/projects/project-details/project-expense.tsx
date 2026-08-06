@@ -61,9 +61,10 @@ export default function ProjectExpenseContent() {
   //   size: 10,
   // };
 
-   const [expenses, loadingExpenses, refetchProject] = useGetProjectExpense({
+  const [expenses, loadingExpenses, refetchProject] = useGetProjectExpense({
     variables: {
-      ...state
+      ...state,
+      projectId: query?.id ?? null,
     },
     fetchPolicy: "network-only",
   });
@@ -199,12 +200,9 @@ export default function ProjectExpenseContent() {
           /> */}
         </div>
         <ProjectExpenseTable
-          dataSource={expenses as ProjectCost[]}
+          projectId={query?.id as string}
+          dataSource={expenses ?? []}
           loading={loadingExpenses }
-          handleOpen={(record) => {}}
-          handleRemove={(record) => {}}
-          openRevisions={(e, d) => openRevisions(e, d)}
-          revesions={state.revesions}
         />
       </ProCard>
     </PageContainer>
