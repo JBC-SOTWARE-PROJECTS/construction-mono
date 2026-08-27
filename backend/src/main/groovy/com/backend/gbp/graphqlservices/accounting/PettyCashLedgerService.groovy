@@ -77,7 +77,7 @@ class PettyCashLedgerService extends AbstractDaoService<PettyCashCashIn> {
 		UUID company = currentCompany()
 		List<PettyCashLedgerEntry> entries = []
 
-		pettyCashCashIns().each { cashIn ->
+		pettyCashCashIns().findAll { it.posted }.each { cashIn ->
 			entries << new PettyCashLedgerEntry(
 				cashIn.id,
 				cashIn.transDate,
@@ -136,6 +136,9 @@ class PettyCashLedgerService extends AbstractDaoService<PettyCashCashIn> {
 	) {
 		UUID company = currentCompany()
 		PettyCashCashIn cashIn = id ? cashInInCurrentCompany(id, company) : new PettyCashCashIn()
+		if (cashIn.posted) {
+			throw new IllegalStateException("Posted Cash In entries can no longer be edited")
+		}
 		Map<String, Object> permittedFields = new HashMap<>(fields ?: [:])
 		permittedFields.remove("id")
 		permittedFields.remove("company")
@@ -143,14 +146,41 @@ class PettyCashLedgerService extends AbstractDaoService<PettyCashCashIn> {
 		permittedFields.remove("createdDate")
 		permittedFields.remove("lastModifiedBy")
 		permittedFields.remove("lastModifiedDate")
+		permittedFields.remove("status")
+		permittedFields.remove("posted")
 		updateFromMap(cashIn, permittedFields)
 		cashIn.company = company
 		cashIn.transDate = cashIn.transDate ?: Instant.now()
 		cashIn.amount = amount(cashIn.amount)
+		cashIn.status = "DRAFT"
+		cashIn.posted = false
 		if (cashIn.amount <= BigDecimal.ZERO) {
 			throw new IllegalArgumentException("Cash In amount must be greater than zero")
 		}
 		return save(cashIn)
+	}
+
+	@GraphQLMutation(name = "postPettyCashCashIn")
+	@Transactional(rollbackFor = Exception.class)
+	PettyCashCashIn postPettyCashCashIn(@GraphQLArgument(name = "id") UUID id) {
+		PettyCashCashIn cashIn = cashInInCurrentCompany(id, currentCompany())
+		if (cashIn.posted) {
+			throw new IllegalStateException("Cash In entry is already posted")
+		}
+		cashIn.status = "POSTED"
+		cashIn.posted = true
+		return save(cashIn)
+	}
+
+	@GraphQLMutation(name = "removePettyCashCashIn")
+	@Transactional(rollbackFor = Exception.class)
+	PettyCashCashIn removePettyCashCashIn(@GraphQLArgument(name = "id") UUID id) {
+		PettyCashCashIn cashIn = cashInInCurrentCompany(id, currentCompany())
+		if (cashIn.posted) {
+			throw new IllegalStateException("Posted Cash In entries can no longer be removed")
+		}
+		delete(cashIn)
+		return cashIn
 	}
 
 	private PettyCashCashIn cashInInCurrentCompany(UUID id, UUID company) {

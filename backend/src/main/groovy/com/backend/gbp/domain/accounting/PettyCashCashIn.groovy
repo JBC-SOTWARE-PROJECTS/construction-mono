@@ -46,4 +46,13 @@ class PettyCashCashIn extends AbstractAuditingEntity implements Serializable {
 	@GraphQLQuery
 	@Column(name = "company", columnDefinition = "uuid")
 	UUID company
+
+	@GraphQLQuery
+	@Column(name = "status", columnDefinition = "varchar")
+	@UpperCase
+	String status
+
+	@GraphQLQuery
+	@Column(name = "posted", columnDefinition = "bool")
+	Boolean posted
 }

@@ -15,6 +15,8 @@ export interface PettyCashCashInRecord {
   referenceNo?: string;
   description?: string;
   amount?: number;
+  status?: string;
+  posted?: boolean;
 }
 
 interface IProps {
@@ -33,7 +35,7 @@ export default function PettyCashCashInModal({ hide, record }: IProps) {
         if (data?.upsertPettyCashCashIn?.id) {
           hide({
             success: true,
-            message: `Cash In successfully ${record?.id ? "updated" : "recorded"}.`,
+            message: `Cash In successfully ${record?.id ? "updated" : "saved as draft"}.`,
           });
         }
       },

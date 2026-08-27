@@ -1,15 +1,20 @@
 import React from "react";
-import { Button, Card, Col, Row, Statistic, Table, Tag, App } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
-import { useQuery } from "@apollo/client";
+import { Button, Card, Col, Popconfirm, Row, Statistic, Table, Tag, App } from "antd";
+import { CarryOutOutlined, DeleteOutlined, EditOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { useMutation, useQuery } from "@apollo/client";
 import { ColumnsType } from "antd/es/table";
-import { GET_PETTY_CASH_LEDGER } from "@/graphql/payables/petty-cash-queries";
 import { currency } from "@/utility/constant";
 import { DateFormatter, NumberFormater } from "@/utility/helper";
-import { useDialog } from "@/hooks";
+import { useConfirmationPasswordHook, useDialog } from "@/hooks";
 import PettyCashCashInModal, {
   PettyCashCashInRecord,
 } from "../dialogs/pettyCashCashInModal";
+import {
+  GET_PETTY_CASH_CASH_INS,
+  GET_PETTY_CASH_LEDGER,
+  POST_PETTY_CASH_CASH_IN,
+  REMOVE_PETTY_CASH_CASH_IN,
+} from "@/graphql/payables/petty-cash-queries";
 
 interface PettyCashLedgerEntry {
   id: string;
@@ -31,9 +36,14 @@ interface PettyCashLedgerData {
   };
 }
 
+interface PettyCashCashInData {
+  pettyCashCashIns?: PettyCashCashInRecord[];
+}
+
 export default function PettyCashLedger() {
   const { message } = App.useApp();
   const cashInModal = useDialog(PettyCashCashInModal);
+  const [showPasswordConfirmation] = useConfirmationPasswordHook();
   const { data, loading, refetch } = useQuery<PettyCashLedgerData>(
     GET_PETTY_CASH_LEDGER,
     {
@@ -43,13 +53,55 @@ export default function PettyCashLedger() {
     }
   );
   const ledger = data?.pettyCashLedger;
+  const { data: cashInData, loading: cashInLoading, refetch: refetchCashIns } =
+    useQuery<PettyCashCashInData>(GET_PETTY_CASH_CASH_INS, {
+      fetchPolicy: "cache-and-network",
+      onError: () => message.error("Unable to load Cash In transactions."),
+    });
+  const [postCashIn, { loading: postingCashIn }] = useMutation(
+    POST_PETTY_CASH_CASH_IN
+  );
+  const [removeCashIn] = useMutation(REMOVE_PETTY_CASH_CASH_IN);
+
+  const refresh = () => {
+    refetch();
+    refetchCashIns();
+  };
 
   const addCashIn = (record?: PettyCashCashInRecord) => {
     cashInModal({ record }, (result: { success?: boolean; message?: string }) => {
       if (result?.success) {
         message.success(result.message);
-        refetch();
+        refresh();
       }
+    });
+  };
+
+  const postDraftCashIn = (record: PettyCashCashInRecord) => {
+    showPasswordConfirmation(() => {
+      postCashIn({
+        variables: { id: record.id },
+        onCompleted: (data) => {
+          if (data?.postPettyCashCashIn?.id) {
+            message.success("Cash In successfully posted.");
+            refresh();
+          }
+        },
+        onError: () => message.error("Unable to post the Cash In entry."),
+      });
+    });
+  };
+
+  const removeDraftCashIn = (record: PettyCashCashInRecord) => {
+    removeCashIn({
+      variables: { id: record.id },
+      onCompleted: (data) => {
+        if (data?.removePettyCashCashIn?.id) {
+          message.success("Cash In draft removed.");
+          refresh();
+        }
+      },
+      onError: () => message.error("Unable to remove the Cash In draft."),
     });
   };
 
@@ -95,6 +147,71 @@ export default function PettyCashLedger() {
     },
   ];
 
+  const cashInColumns: ColumnsType<PettyCashCashInRecord> = [
+    {
+      title: "Date",
+      dataIndex: "transDate",
+      width: 120,
+      render: (date) => DateFormatter(date),
+    },
+    { title: "Reference No.", dataIndex: "referenceNo", width: 160 },
+    { title: "Description", dataIndex: "description" },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      align: "right",
+      width: 140,
+      render: (amount) => NumberFormater(amount),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      width: 100,
+      render: (status, record) => (
+        <Tag color={record.posted ? "green" : "orange"}>
+          {status ?? (record.posted ? "POSTED" : "DRAFT")}
+        </Tag>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 150,
+      render: (_, record) =>
+        record.posted ? null : (
+          <Row gutter={4} wrap={false}>
+            <Col>
+              <Button
+                type="dashed"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => addCashIn(record)}
+              />
+            </Col>
+            <Col>
+              <Button
+                type="primary"
+                size="small"
+                loading={postingCashIn}
+                icon={<CarryOutOutlined />}
+                onClick={() => postDraftCashIn(record)}
+              />
+            </Col>
+            <Col>
+              <Popconfirm
+                title="Remove Cash In draft?"
+                description="This action cannot be undone."
+                okText="Remove"
+                okButtonProps={{ danger: true }}
+                onConfirm={() => removeDraftCashIn(record)}>
+                <Button danger type="dashed" size="small" icon={<DeleteOutlined />} />
+              </Popconfirm>
+            </Col>
+          </Row>
+        ),
+    },
+  ];
+
   return (
     <Card
       className="mt-5"
@@ -115,6 +232,17 @@ export default function PettyCashLedger() {
           <Statistic title="Cash On Hand" prefix={currency} value={ledger?.cashOnHand ?? 0} precision={2} valueStyle={{ color: "#1677ff" }} />
         </Col>
       </Row>
+      <Table
+        className="mb-5"
+        rowKey="id"
+        size="small"
+        title={() => "Cash In Transactions"}
+        loading={cashInLoading}
+        columns={cashInColumns}
+        dataSource={cashInData?.pettyCashCashIns ?? []}
+        pagination={{ pageSize: 5, showSizeChanger: false }}
+        scroll={{ x: 850 }}
+      />
       <Table
         rowKey={(record) => `${record.entryType}-${record.id}`}
         size="small"
