@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 
 import java.math.RoundingMode
 import java.time.Instant
+import java.time.ZoneOffset
 
 import groovy.transform.Canonical
 
@@ -150,7 +151,7 @@ class PettyCashLedgerService extends AbstractDaoService<PettyCashCashIn> {
 		permittedFields.remove("posted")
 		updateFromMap(cashIn, permittedFields)
 		cashIn.company = company
-		cashIn.transDate = cashIn.transDate ?: Instant.now()
+		cashIn.transDate = cashIn.transDate ? dateOnlyInManila(cashIn.transDate) : Instant.now()
 		cashIn.amount = amount(cashIn.amount)
 		cashIn.status = "DRAFT"
 		cashIn.posted = false
@@ -204,5 +205,15 @@ class PettyCashLedgerService extends AbstractDaoService<PettyCashCashIn> {
 
 	private static BigDecimal amount(BigDecimal value) {
 		return (value ?: BigDecimal.ZERO).setScale(2, RoundingMode.HALF_EVEN)
+	}
+
+	/**
+	 * Cash In is a calendar-date transaction. DatePicker serializes a local
+	 * midnight as the previous UTC day in Manila, so normalize it before it is
+	 * persisted to the PostgreSQL date column.
+	 */
+	private static Instant dateOnlyInManila(Instant value) {
+		def localDate = value.atOffset(ZoneOffset.UTC).plusHours(8).toLocalDate()
+		return localDate.atStartOfDay(ZoneOffset.UTC).toInstant()
 	}
 }

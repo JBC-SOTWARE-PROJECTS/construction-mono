@@ -29,8 +29,16 @@ export default function PettyCashCashInModal({ hide, record }: IProps) {
   const [upsert, { loading }] = useMutation(UPSERT_PETTY_CASH_CASH_IN);
 
   const onSubmit = (values: PettyCashCashInRecord) => {
+    const fields = {
+      ...values,
+      // Send a calendar date at UTC midnight so the selected date does not shift
+      // when a browser in Asia/Manila serializes the Dayjs value.
+      transDate: values.transDate
+        ? `${dayjs(values.transDate).format("YYYY-MM-DD")}T00:00:00.000Z`
+        : undefined,
+    };
     upsert({
-      variables: { id: record?.id, fields: values },
+      variables: { id: record?.id, fields },
       onCompleted: (data) => {
         if (data?.upsertPettyCashCashIn?.id) {
           hide({
