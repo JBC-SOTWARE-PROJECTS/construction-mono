@@ -10,6 +10,7 @@ const GET_RECORDS = gql`
           route
           startOdometerReading
           endOdometerReading
+          usedOdometerReading
           startDatetime
           endDatetime
           startFuelReading

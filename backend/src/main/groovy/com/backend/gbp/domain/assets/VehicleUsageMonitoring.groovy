@@ -48,6 +48,10 @@ class VehicleUsageMonitoring extends AbstractAuditingEntity implements Serializa
 	String endOdometerReading
 
 	@GraphQLQuery
+	@Column(name = "used_odometer_reading")
+	String usedOdometerReading
+
+	@GraphQLQuery
 	@Column(name = "start_fuel_reading")
 	String startFuelReading
 

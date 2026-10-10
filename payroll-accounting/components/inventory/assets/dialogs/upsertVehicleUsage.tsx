@@ -61,6 +61,7 @@ const defRec = {
   endDatetime: null,
   startOdometerReading: null,
   endOdometerReading: null,
+  usedOdometerReading: null,
   startFuelReading: null,
   endFuelReading: null,
   projectId: null,
@@ -394,7 +395,7 @@ console.log("initRecord", initRecord)
                   }}
                 />
               </Col>
-              <Col span={6}>
+              <Col span={8}>
                 <FormInput
                   name="startOdometerReading"
                   rules={requiredField}
@@ -404,7 +405,7 @@ console.log("initRecord", initRecord)
                   }}
                 />
               </Col>
-              <Col span={6}>
+              <Col span={8}>
                 <FormInput
                   name="endOdometerReading"
                   rules={requiredField}
@@ -414,7 +415,17 @@ console.log("initRecord", initRecord)
                   }}
                 />
               </Col>
-              <Col span={6}>
+              <Col span={8}>
+                <FormInput
+                  name="usedOdometerReading"
+                  rules={requiredField}
+                  label="Used Odometer Reading"
+                  propsinput={{
+                    placeholder: "",
+                  }}
+                />
+              </Col>
+              <Col span={12}>
                 <FormInput
                   name="startFuelReading"
                   rules={requiredField}
@@ -425,7 +436,7 @@ console.log("initRecord", initRecord)
                   }}
                 />
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <FormInput
                   name="endFuelReading"
                   rules={requiredField}

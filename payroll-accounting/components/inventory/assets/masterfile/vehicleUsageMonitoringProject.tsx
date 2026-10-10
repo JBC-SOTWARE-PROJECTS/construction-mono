@@ -119,6 +119,11 @@ export default function VehicleUsageMonitoringProjectTable({
     ),
   },
   {
+    title: "Used Odometer Reading",
+    dataIndex: "usedOdometerReading",
+    key: "usedOdometerReading",
+  },
+  {
     title: "Fuel Range",
     dataIndex: "startFuelReading",
     key: "startFuelReading",
