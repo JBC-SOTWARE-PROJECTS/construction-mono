@@ -60,6 +60,10 @@ class VehicleUsageMonitoring extends AbstractAuditingEntity implements Serializa
 	String endFuelReading
 
 	@GraphQLQuery
+	@Column(name = "used_fuel_reading")
+	String usedFuelReading
+
+	@GraphQLQuery
 	@Column(name = "rental_rate")
 	BigDecimal rentalRate
 

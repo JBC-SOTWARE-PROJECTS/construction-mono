@@ -64,6 +64,7 @@ const defRec = {
   usedOdometerReading: null,
   startFuelReading: null,
   endFuelReading: null,
+  usedFuelReading: null,
   projectId: null,
   rentalBasisId: null,
 };
@@ -425,7 +426,7 @@ console.log("initRecord", initRecord)
                   }}
                 />
               </Col>
-              <Col span={12}>
+              <Col span={8}>
                 <FormInput
                   name="startFuelReading"
                   rules={requiredField}
@@ -436,11 +437,22 @@ console.log("initRecord", initRecord)
                   }}
                 />
               </Col>
-              <Col span={12}>
+              <Col span={8}>
                 <FormInput
                   name="endFuelReading"
                   rules={requiredField}
                   label="End Fuel Reading (Liters)"
+                  propsinput={{
+                    placeholder: "",
+                    type: "number",
+                  }}
+                />
+              </Col>
+              <Col span={8}>
+                <FormInput
+                  name="usedFuelReading"
+                  rules={requiredField}
+                  label="Used Fuel Reading (Liters)"
                   propsinput={{
                     placeholder: "",
                     type: "number",

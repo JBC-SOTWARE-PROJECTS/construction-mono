@@ -100,6 +100,11 @@ export default function VehicleUsageMonitoringTable({
       ),
     },
     {
+      title: "Used Fuel Reading",
+      dataIndex: "usedFuelReading",
+      key: "usedFuelReading",
+    },
+    {
       title: "Project",
       dataIndex: "project",
       key: "project",

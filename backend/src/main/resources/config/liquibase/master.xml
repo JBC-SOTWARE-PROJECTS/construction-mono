@@ -691,4 +691,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog4/125_jacky_vehicle_usage_used_odometer.sql"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog4/126_jacky_vehicle_usage_used_fuel.sql"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>

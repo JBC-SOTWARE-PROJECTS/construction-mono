@@ -15,6 +15,7 @@ const GET_RECORDS = gql`
           endDatetime
           startFuelReading
           endFuelReading
+          usedFuelReading
           rentalBasis{
             id
             amount

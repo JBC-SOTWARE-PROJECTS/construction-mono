@@ -133,6 +133,11 @@ export default function VehicleUsageMonitoringProjectTable({
       <span>{record?.startFuelReading + "-" + record?.endFuelReading}</span>
     ),
   },
+  {
+    title: "Used Fuel Reading",
+    dataIndex: "usedFuelReading",
+    key: "usedFuelReading",
+  },
     // {
     //   title: "Project",
     //   dataIndex: "project",
