@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param
 
 interface VehicleUsageRepository extends JpaRepository<VehicleUsageMonitoring, UUID> {
 
+    Optional<VehicleUsageMonitoring> findByIdAndCompany(UUID id, UUID company)
+
     @Query(
             value = """Select p from VehicleUsageMonitoring p where p.asset.id = :asset ORDER BY p.startDatetime DESC"""
     )

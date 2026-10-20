@@ -24,7 +24,7 @@ import { FormInput, FormSelect } from "@/components/common";
 import ConfirmationPasswordHook from "@/hooks/promptPassword";
 import {
   UPSERT_USAGE_EMPLOYEE_ITEM,
-  UPSERT_VEHICLE_USAGE_RECORD,
+  UPSERT_VEHICLE_USAGE_WITH_EXPENSES,
 } from "@/graphql/assets/queries";
 import { useMutation } from "@apollo/client";
 import _, { set } from "lodash";
@@ -44,6 +44,7 @@ import FormTextArea from "@/components/common/formTextArea/formTextArea";
 import AccessControl from "@/components/accessControl/AccessControl";
 import { getUrlPrefix } from "@/utility/graphql-client";
 import useGetVehicleUsageLatest from "@/hooks/asset/useGetVehicleUsageLatest";
+import VehicleUsageExpenses from "./vehicleUsageExpenses";
 
 
 interface IProps {
@@ -83,6 +84,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   );
   const [selectedEmps, setSelectedEmps] = useState<VehicleUsageEmployee[]>([]);
   const [deletedEmps, setDeletedEmps] = useState<string[]>([]);
+  const [deletedExpenses, setDeletedExpenses] = useState<string[]>([]);
   const [statePage, setState] = useState(initialState);
   const [viewMode, setViewMode] = useState(viewModeSet ?? true);
   const [csvLoading, setCsvLoading] = useState(false);
@@ -158,15 +160,7 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   }, [dataEmployee]);
 
   const [upsert, { loading: upsertLoading }] = useMutation(
-    UPSERT_VEHICLE_USAGE_RECORD,
-    {
-      ignoreResults: false,
-      onCompleted: (data) => {
-        if (data) {
-          hide(data);
-        }
-      },
-    }
+    UPSERT_VEHICLE_USAGE_WITH_EXPENSES
   );
 
   const [upsertUsageEmployee, { loading: upsertUEmpLoading }] = useMutation(
@@ -182,8 +176,9 @@ export default function UpsertVehicleUsageModal(props: IProps) {
   );
 
   const onSubmit = (values: any) => {
+    const { expenses = [], ...usageValues } = values;
     let payload = {
-      ...values,
+      ...usageValues,
     };
     payload.item = assetType?.item?.id;
     payload.asset = assetType?.id;
@@ -211,21 +206,45 @@ export default function UpsertVehicleUsageModal(props: IProps) {
       return newProp;
     });
 
-    showPasswordConfirmation(() => {
-      upsertUsageEmployee({
-        variables: {
-          employeeList: usageEmps,
-          usageID: record?.id,
-          toDelete: deletedEmps,
-        },
-      });
+    const expensePayload = expenses.map((expense: any) => ({
+      id: expense.id,
+      expenseType: expense.expenseType,
+      particulars:
+        expense.expenseType === "ITEM"
+          ? expense.item?.label
+          : expense.particulars,
+      item: expense.item?.value,
+      quantity: expense.quantity,
+      amount: expense.amount,
+    }));
 
-      upsert({
-        variables: {
-          fields: payload,
-          id: record?.id,
-        },
-      });
+    showPasswordConfirmation(async () => {
+      try {
+        const result = await upsert({
+          variables: {
+            fields: payload,
+            id: record?.id,
+            expenses: expensePayload,
+            expensesToDelete: deletedExpenses,
+          },
+        });
+        const usageID = result.data?.upsertVehicleUsageWithExpenses?.id;
+
+        if (record?.id) {
+          await upsertUsageEmployee({
+            variables: {
+              employeeList: usageEmps,
+              usageID,
+              toDelete: deletedEmps,
+            },
+          });
+        }
+
+        message.success("Vehicle usage saved successfully.");
+        hide(result.data);
+      } catch (error) {
+        message.error("Unable to save vehicle usage. Please try again.");
+      }
     });
   };
 
@@ -326,7 +345,7 @@ console.log("initRecord", initRecord)
               size="large"
               htmlType="submit"
               form="upsertVehicleUsage"
-              loading={upsertLoading}
+              loading={upsertLoading || upsertUEmpLoading}
               icon={<SaveOutlined />}
             >
               {`${record?.id ? "Save Changes" : "Save"} & Close`}
@@ -483,6 +502,18 @@ console.log("initRecord", initRecord)
                 />
               </Col>
             </Row>
+
+            <Divider orientation="left">EXPENSES</Divider>
+            <VehicleUsageExpenses
+              form={form}
+              usageID={record?.id}
+              viewMode={viewMode}
+              onDelete={(id) =>
+                setDeletedExpenses((current) =>
+                  current.includes(id) ? current : [...current, id]
+                )
+              }
+            />
 
             {record ? (
               <>

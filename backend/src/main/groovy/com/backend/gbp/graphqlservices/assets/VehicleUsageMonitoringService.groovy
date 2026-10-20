@@ -27,18 +27,61 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
     @Autowired
     VehicleUsageRepository vehicleUsageRepository
 
+    @Autowired
+    VehicleUsageExpenseService vehicleUsageExpenseService
+
     @GraphQLMutation(name = "upsertVehicleUsageMonitoring")
     @Transactional
     VehicleUsageMonitoring upserVehicleUsageMonitoring(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ){
-        def company = SecurityUtils.currentCompanyId()
-        def project = upsertFromMap(id, fields, { VehicleUsageMonitoring entity, boolean forInsert ->
-            entity.company = company
-        })
+        UUID company = SecurityUtils.currentCompanyId()
+        VehicleUsageMonitoring project
+
+        if (id) {
+            project = vehicleUsageRepository.findByIdAndCompany(id, company)
+                    .orElseThrow { new IllegalArgumentException("Vehicle usage was not found.") }
+            updateFromMap(project, fields)
+            validateCompanyAssociations(project, company)
+            project.company = company
+            project = save(project)
+        } else {
+            project = upsertFromMap(id, fields, { VehicleUsageMonitoring entity, boolean forInsert ->
+                validateCompanyAssociations(entity, company)
+                entity.company = company
+            })
+        }
 
         return project
+    }
+
+    @GraphQLMutation(name = "upsertVehicleUsageWithExpenses")
+    @Transactional
+    VehicleUsageMonitoring upsertVehicleUsageWithExpenses(
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "expenses") List<Map<String, Object>> expenses,
+            @GraphQLArgument(name = "expensesToDelete") List<UUID> expensesToDelete
+    ) {
+        VehicleUsageMonitoring usage = upserVehicleUsageMonitoring(fields, id)
+        vehicleUsageExpenseService.upsertVehicleUsageExpenses(usage.id, expenses, expensesToDelete)
+        usage
+    }
+
+    private static void validateCompanyAssociations(VehicleUsageMonitoring usage, UUID company) {
+        if (usage.asset != null && usage.asset.company != company) {
+            throw new IllegalArgumentException("The selected asset was not found.")
+        }
+        if (usage.item != null && usage.item.company != company) {
+            throw new IllegalArgumentException("The selected item was not found.")
+        }
+        if (usage.project != null && usage.project.company != company) {
+            throw new IllegalArgumentException("The selected project was not found.")
+        }
+        if (usage.rentalBasis != null && usage.rentalBasis.company != company) {
+            throw new IllegalArgumentException("The selected rental basis was not found.")
+        }
     }
 
     @GraphQLQuery(name = "vehicleUsageMonitoringPageable")
