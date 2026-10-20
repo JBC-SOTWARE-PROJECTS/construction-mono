@@ -8,6 +8,7 @@ import com.backend.gbp.graphqlservices.base.AbstractDaoService
 import com.backend.gbp.graphqlservices.inventory.ItemService
 import com.backend.gbp.repository.asset.VehicleUsageExpenseRepository
 import com.backend.gbp.repository.asset.VehicleUsageRepository
+import com.backend.gbp.repository.projects.ProjectsRepository
 import com.backend.gbp.security.SecurityUtils
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
@@ -37,6 +38,9 @@ class VehicleUsageExpenseService extends AbstractDaoService<VehicleUsageExpense>
     @Autowired
     ItemService itemService
 
+    @Autowired
+    ProjectsRepository projectsRepository
+
     @GraphQLQuery(name = "vehicleUsageExpenses")
     List<VehicleUsageExpense> vehicleUsageExpenses(
             @GraphQLArgument(name = "usageID") UUID usageID
@@ -44,6 +48,24 @@ class VehicleUsageExpenseService extends AbstractDaoService<VehicleUsageExpense>
         UUID company = SecurityUtils.currentCompanyId()
         requireVehicleUsage(usageID, company)
         vehicleUsageExpenseRepository.findAllByVehicleUsageIdAndCompanyOrderByCreatedDateAsc(usageID, company)
+    }
+
+    @GraphQLQuery(name = "projectVehicleUsageExpenses")
+    List<VehicleUsageExpense> projectVehicleUsageExpenses(
+            @GraphQLArgument(name = "projectId") UUID projectId,
+            @GraphQLArgument(name = "expenseType") VehicleUsageExpenseType expenseType
+    ) {
+        UUID company = SecurityUtils.currentCompanyId()
+        if (projectId == null || expenseType == null || company == null) {
+            return []
+        }
+
+        def project = projectsRepository.findById(projectId).orElse(null)
+        if (project == null || project.company != company) {
+            return []
+        }
+
+        vehicleUsageExpenseRepository.findProjectExpenses(projectId, expenseType, company)
     }
 
     @GraphQLMutation(name = "upsertVehicleUsageExpenses")

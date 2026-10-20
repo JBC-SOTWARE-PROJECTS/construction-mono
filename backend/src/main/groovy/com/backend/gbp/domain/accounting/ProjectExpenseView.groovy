@@ -81,6 +81,10 @@ class ProjectExpenseView implements Serializable {
 	Long pettyCashCount
 
 	@GraphQLQuery
+	@Column(name = "vehicle_usage_count")
+	Long vehicleUsageCount
+
+	@GraphQLQuery
 	@Column(name = "source_type", insertable = false, updatable = false)
 	String sourceType
 }

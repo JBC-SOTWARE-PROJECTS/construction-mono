@@ -81,6 +81,33 @@ const GET_PROJECT_PETTY_CASH_ITEMS = gql`
   }
 `;
 
+const GET_PROJECT_VEHICLE_USAGE_EXPENSES = gql`
+  query ($projectId: UUID!, $expenseType: VehicleUsageExpenseType!) {
+    list: projectVehicleUsageExpenses(
+      projectId: $projectId
+      expenseType: $expenseType
+    ) {
+      id
+      expenseType
+      particulars
+      quantity
+      amount
+      vehicleUsage {
+        id
+        usagePurpose
+        route
+        startDatetime
+        asset {
+          id
+          assetCode
+          description
+          plateNo
+        }
+      }
+    }
+  }
+`;
+
 interface ProjectExpenseRow {
   id?: {
     transTypeId?: string | null;
@@ -93,6 +120,7 @@ interface ProjectExpenseRow {
   lineCount?: number | null;
   payableCount?: number | null;
   pettyCashCount?: number | null;
+  vehicleUsageCount?: number | null;
   sourceType?: string | null;
 }
 
@@ -158,6 +186,30 @@ interface ProjectPettyCashItemsQuery {
   list: ProjectPettyCashItem[];
 }
 
+interface ProjectVehicleUsageExpense {
+  id: string;
+  expenseType?: string | null;
+  particulars?: string | null;
+  quantity?: number | null;
+  amount?: number | null;
+  vehicleUsage?: {
+    id?: string | null;
+    usagePurpose?: string | null;
+    route?: string | null;
+    startDatetime?: string | null;
+    asset?: {
+      id?: string | null;
+      assetCode?: string | null;
+      description?: string | null;
+      plateNo?: string | null;
+    } | null;
+  } | null;
+}
+
+interface ProjectVehicleUsageExpensesQuery {
+  list: ProjectVehicleUsageExpense[];
+}
+
 interface IProps {
   projectId?: string;
   dataSource: ProjectExpenseRow[];
@@ -185,6 +237,9 @@ export default function ProjectExpenseTable({
   const [itemsByPettyCashKey, setItemsByPettyCashKey] = useState<
     Record<string, ProjectPettyCashItem[]>
   >({});
+  const [vehicleUsageExpensesByKey, setVehicleUsageExpensesByKey] = useState<
+    Record<string, ProjectVehicleUsageExpense[]>
+  >({});
   const [loadingKeys, setLoadingKeys] = useState<Record<string, boolean>>({});
   const [loadingItemKeys, setLoadingItemKeys] = useState<
     Record<string, boolean>
@@ -193,6 +248,9 @@ export default function ProjectExpenseTable({
     Record<string, boolean>
   >({});
   const [loadingPettyCashItemKeys, setLoadingPettyCashItemKeys] = useState<
+    Record<string, boolean>
+  >({});
+  const [loadingVehicleUsageKeys, setLoadingVehicleUsageKeys] = useState<
     Record<string, boolean>
   >({});
   const [loadBreakdown] = useLazyQuery<ProjectPayableBreakdownQuery>(
@@ -207,6 +265,10 @@ export default function ProjectExpenseTable({
   const [loadPettyCashItems] = useLazyQuery<ProjectPettyCashItemsQuery>(
     GET_PROJECT_PETTY_CASH_ITEMS
   );
+  const [loadVehicleUsageExpenses] =
+    useLazyQuery<ProjectVehicleUsageExpensesQuery>(
+      GET_PROJECT_VEHICLE_USAGE_EXPENSES
+    );
 
   const getRowKey = (record: ProjectExpenseRow) =>
     `${record.sourceType ?? "source"}-${record.project?.id ?? projectId ?? "project"}-${
@@ -446,9 +508,75 @@ export default function ProjectExpenseTable({
     },
   ];
 
+  const vehicleUsageExpenseColumns: ColumnsType<ProjectVehicleUsageExpense> = [
+    {
+      title: "Usage Date",
+      key: "usageDate",
+      width: 130,
+      render: (_, record) =>
+        record.vehicleUsage?.startDatetime
+          ? DateFormatter(record.vehicleUsage.startDatetime)
+          : "--",
+    },
+    {
+      title: "Asset",
+      key: "asset",
+      width: 220,
+      render: (_, record) => {
+        const asset = record.vehicleUsage?.asset;
+        return asset
+          ? [asset.assetCode, asset.description, asset.plateNo]
+              .filter(Boolean)
+              .join(" / ")
+          : "--";
+      },
+    },
+    {
+      title: "Usage Purpose",
+      key: "usagePurpose",
+      render: (_, record) => record.vehicleUsage?.usagePurpose ?? "--",
+    },
+    {
+      title: "Route",
+      key: "route",
+      render: (_, record) => record.vehicleUsage?.route ?? "--",
+    },
+    {
+      title: "Type",
+      dataIndex: "expenseType",
+      key: "expenseType",
+      width: 100,
+      render: (expenseType) => <Tag>{expenseType ?? "--"}</Tag>,
+    },
+    {
+      title: "Particulars",
+      dataIndex: "particulars",
+      key: "particulars",
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+      width: 100,
+      align: "right",
+      render: (quantity) =>
+        quantity === null || quantity === undefined
+          ? "--"
+          : NumberFormater(quantity),
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+      width: 130,
+      align: "right",
+      render: (amount) => NumberFormater(amount ?? 0),
+    },
+  ];
+
   const columns: ColumnsType<ProjectExpenseRow> = [
     {
-      title: "Transaction Type",
+      title: "Category / Transaction Type",
       dataIndex: "transTypeDescription",
       key: "transTypeDescription",
       width: 180,
@@ -467,7 +595,11 @@ export default function ProjectExpenseTable({
       key: "sourceType",
       width: 130,
       render: (sourceType) =>
-        sourceType === "PETTY_CASH" ? "Petty Cash Voucher" : "A/P Payable",
+        sourceType === "PETTY_CASH"
+          ? "Petty Cash Voucher"
+          : sourceType === "VEHICLE_USAGE"
+          ? "Vehicle Usage"
+          : "A/P Payable",
     },
     {
       title: "Documents",
@@ -477,6 +609,8 @@ export default function ProjectExpenseTable({
       render: (_, record) =>
         record.sourceType === "PETTY_CASH"
           ? record.pettyCashCount ?? 0
+          : record.sourceType === "VEHICLE_USAGE"
+          ? record.vehicleUsageCount ?? 0
           : record.payableCount ?? 0,
     },
   ];
@@ -523,6 +657,35 @@ export default function ProjectExpenseTable({
         message.error(`Unable to load the petty cash voucher breakdown${details}`);
       } finally {
         setLoadingPettyCashKeys((keys) => ({ ...keys, [rowKey]: false }));
+      }
+      return;
+    }
+
+    if (record.sourceType === "VEHICLE_USAGE") {
+      if (vehicleUsageExpensesByKey[rowKey]) {
+        return;
+      }
+
+      setLoadingVehicleUsageKeys((keys) => ({ ...keys, [rowKey]: true }));
+      try {
+        const result = await loadVehicleUsageExpenses({
+          variables: {
+            projectId: breakdownProjectId,
+            expenseType: record.id?.sourceCategory,
+          },
+        });
+        if (result.error) {
+          throw result.error;
+        }
+        setVehicleUsageExpensesByKey((items) => ({
+          ...items,
+          [rowKey]: result.data?.list ?? [],
+        }));
+      } catch (error) {
+        const details = error instanceof Error ? `: ${error.message}` : "";
+        message.error(`Unable to load the vehicle usage expenses${details}`);
+      } finally {
+        setLoadingVehicleUsageKeys((keys) => ({ ...keys, [rowKey]: false }));
       }
       return;
     }
@@ -677,11 +840,21 @@ export default function ProjectExpenseTable({
             onExpand: handleExpand,
             rowExpandable: (record) => {
               const hasProject = Boolean(record.project?.id ?? projectId);
-              return record.sourceType === "PETTY_CASH"
-                ? hasProject && Number(record.pettyCashCount ?? 0) > 0
-                : hasProject &&
+              if (record.sourceType === "PETTY_CASH") {
+                return hasProject && Number(record.pettyCashCount ?? 0) > 0;
+              }
+              if (record.sourceType === "VEHICLE_USAGE") {
+                return (
+                  hasProject &&
+                  Boolean(record.id?.sourceCategory) &&
+                  Number(record.vehicleUsageCount ?? 0) > 0
+                );
+              }
+              return (
+                hasProject &&
                     Boolean(record.transactionType?.id) &&
-                    Number(record.payableCount ?? 0) > 0;
+                  Number(record.payableCount ?? 0) > 0
+              );
             },
             expandedRowRender: (record) => {
               const rowKey = getRowKey(record);
@@ -738,6 +911,28 @@ export default function ProjectExpenseTable({
                       locale={{
                         emptyText:
                           "No posted petty cash vouchers are assigned to this project.",
+                      }}
+                    />
+                  </div>
+                );
+              }
+              if (record.sourceType === "VEHICLE_USAGE") {
+                return (
+                  <div className="w-full px-5">
+                    <p style={{ margin: "0 0 8px", fontWeight: "bold" }}>
+                      Vehicle Usage Expense Details
+                    </p>
+                    <Table
+                      rowKey="id"
+                      size="small"
+                      columns={vehicleUsageExpenseColumns}
+                      dataSource={vehicleUsageExpensesByKey[rowKey] ?? []}
+                      loading={loadingVehicleUsageKeys[rowKey]}
+                      pagination={false}
+                      scroll={{ x: 1100 }}
+                      locale={{
+                        emptyText:
+                          "No vehicle usage expenses are assigned to this project.",
                       }}
                     />
                   </div>
