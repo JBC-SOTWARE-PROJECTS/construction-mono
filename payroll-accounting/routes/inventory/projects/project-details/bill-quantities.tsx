@@ -68,6 +68,11 @@ export default function BillQuantitesContent() {
           message.error("Something went wrong. Please contact administrator");
         }
       },
+      onError: () => {
+        message.error(
+          "Unable to remove the bill of quantity. Please contact administrator."
+        );
+      },
       refetchQueries: [GET_PROJECT_BY_ID],
     }
   );

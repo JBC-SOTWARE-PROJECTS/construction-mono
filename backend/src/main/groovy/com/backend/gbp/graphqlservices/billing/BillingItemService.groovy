@@ -667,7 +667,9 @@ class BillingItemService extends ArAbstractFormulaHelper<BillingItem> {
             @GraphQLArgument(name = "id") UUID id
     ) {
         def item = this.billingByRef(id)
-        delete(item)
+        if (item) {
+            delete(item)
+        }
         return item
     }
 
