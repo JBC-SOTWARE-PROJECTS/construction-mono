@@ -51,6 +51,64 @@ export const GET_PETTY_CASH_RECORDS = gql`
   }
 `;
 
+export const GET_PETTY_CASH_LEDGER = gql`
+  query {
+    pettyCashLedger {
+      cashInTotal
+      cashOutTotal
+      cashOnHand
+      entries {
+        id
+        transactionDate
+        entryType
+        referenceNo
+        description
+        cashIn
+        cashOut
+        runningBalance
+      }
+    }
+  }
+`;
+
+export const UPSERT_PETTY_CASH_CASH_IN = gql`
+  mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
+    upsertPettyCashCashIn(id: $id, fields: $fields) {
+      id
+    }
+  }
+`;
+
+export const GET_PETTY_CASH_CASH_INS = gql`
+  query {
+    pettyCashCashIns {
+      id
+      transDate
+      referenceNo
+      description
+      amount
+      status
+      posted
+    }
+  }
+`;
+
+export const POST_PETTY_CASH_CASH_IN = gql`
+  mutation ($id: UUID) {
+    postPettyCashCashIn(id: $id) {
+      id
+    }
+  }
+`;
+
+export const REMOVE_PETTY_CASH_CASH_IN = gql`
+  mutation ($id: UUID) {
+    removePettyCashCashIn(id: $id) {
+      id
+    }
+  }
+`;
+
 export const GET_RECORDS_ITEMS = gql`
   query ($filter: String, $page: Int, $size: Int) {
     itemsByFilterOnly(filter: $filter, page: $page, size: $size) {
