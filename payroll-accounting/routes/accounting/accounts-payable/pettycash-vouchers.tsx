@@ -16,6 +16,7 @@ import { dateFormat } from "@/utility/constant";
 import { dateEndToString, dateToString } from "@/utility/helper";
 import PettyCashModal from "@/components/accounting/payables/dialogs/pettyCashModal";
 import PettyCashTable from "@/components/accounting/payables/pettycash/pettyCashTable";
+import PettyCashLedger from "@/components/accounting/payables/pettycash/pettyCashLedger";
 import { useDialog } from "@/hooks";
 import { FormSelect } from "@/components/common";
 import { usePettyCashNames } from "@/hooks/payables";
@@ -156,6 +157,7 @@ export default function PettyCashComponent() {
                         )}
           changePage={(page) => setState((prev) => ({ ...prev, page: page }))}
         />
+        <PettyCashLedger />
       </ProCard>
     </PageContainer>
   );
