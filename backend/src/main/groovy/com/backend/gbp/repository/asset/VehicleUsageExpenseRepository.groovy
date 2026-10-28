@@ -13,6 +13,19 @@ interface VehicleUsageExpenseRepository extends JpaRepository<VehicleUsageExpens
     Optional<VehicleUsageExpense> findByIdAndVehicleUsageIdAndCompany(UUID id, UUID vehicleUsageId, UUID company)
 
     @Query('''
+        SELECT COALESCE(SUM(expense.amount), 0)
+        FROM VehicleUsageExpense expense
+        JOIN expense.vehicleUsage usage
+        WHERE usage.asset.id = :asset
+          AND expense.company = :company
+          AND usage.company = :company
+    ''')
+    BigDecimal sumAmountByAssetAndCompany(
+            @Param("asset") UUID asset,
+            @Param("company") UUID company
+    )
+
+    @Query('''
         SELECT expense
         FROM VehicleUsageExpense expense
         JOIN FETCH expense.vehicleUsage usage

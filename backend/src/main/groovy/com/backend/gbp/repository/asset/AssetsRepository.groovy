@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface AssetsRepository extends JpaRepository<Assets, UUID> {
 
-
+	Optional<Assets> findByIdAndCompany(UUID id, UUID company)
 }
