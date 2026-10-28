@@ -71,24 +71,6 @@ export default function AssetDashboard() {
 
   const cards = [
     {
-      title: "Total Expenses",
-      value: summary?.totalExpenses,
-      icon: <ToolOutlined />,
-      color: "#cf1322",
-    },
-    {
-      title: "Total Labor Cost",
-      value: summary?.totalLaborCost,
-      icon: <TeamOutlined />,
-      color: "#d46b08",
-    },
-    {
-      title: "Total Rental Fees",
-      value: summary?.totalRentalFee,
-      icon: <WalletOutlined />,
-      color: "#1677ff",
-    },
-    {
       title: "Gross Rental Sales",
       value: summary?.grossRentalSales,
       icon: <RiseOutlined />,
@@ -99,6 +81,24 @@ export default function AssetDashboard() {
       value: summary?.netSales,
       icon: <DollarCircleOutlined />,
       color: netSales < 0 ? "#cf1322" : "#08979c",
+    },
+    {
+      title: "Total Rental Fees",
+      value: summary?.totalRentalFee,
+      icon: <WalletOutlined />,
+      color: "#3e424b",
+    },
+    {
+      title: "Usage Expenses",
+      value: summary?.totalExpenses,
+      icon: <ToolOutlined />,
+      color: "#3e424b",
+    },
+    {
+      title: "Labor Cost",
+      value: summary?.totalLaborCost,
+      icon: <TeamOutlined />,
+      color: "#3e424b",
     },
   ];
 
@@ -112,7 +112,7 @@ export default function AssetDashboard() {
       }>
       <Row gutter={[16, 16]}>
         {cards.map((card, index) => (
-          <Col key={card.title} xs={24} sm={12} xl={index < 3 ? 8 : 12}>
+          <Col key={card.title} xs={24} sm={12} xl={index < 2 ? 12 : 8}>
             <Card size="small" bordered style={{ height: "100%" }}>
               <Statistic
                 title={card.title}
@@ -130,17 +130,7 @@ export default function AssetDashboard() {
         ))}
       </Row>
 
-      <Alert
-        className="mt-4"
-        type={netSales < 0 ? "warning" : "info"}
-        showIcon
-        message="Net sales calculation"
-        description={`Php ${currencyFormatter(summary?.grossRentalSales)} gross rental sales − Php ${currencyFormatter(
-          summary?.totalExpenses
-        )} expenses − Php ${currencyFormatter(summary?.totalLaborCost)} labor cost = Php ${currencyFormatter(
-          summary?.netSales
-        )}`}
-      />
+      
     </Card>
   );
 }
