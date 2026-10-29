@@ -6,7 +6,6 @@ import {
   AssetRepairMaintenanceItems,
   RepairMaintenanceItemType,
 } from "@/graphql/gql/graphql";
-import { useRouter } from "next/router";
 import { FormInput } from "@/components/common";
 import _ from "lodash";
 import { DELETE_REPAIR_MAINTENANCE_ITEM_RECORD } from "@/graphql/assets/queries";
@@ -37,13 +36,12 @@ export default function AssetRepairMaintenanceItemTable({
   changePage,
 }: IProps) {
   const { message } = App.useApp();
-  const router = useRouter();
   const [showPasswordConfirmation] = ConfirmationPasswordHook();
   const [refresh, setRefresh] = useState<number | null>(null);
 
   useEffect(() => {
     refreshTable();
-  }, [!isUpdating]);
+  }, [isUpdating]);
 
   function refreshTable() {
     setRefresh(null);
@@ -58,6 +56,9 @@ export default function AssetRepairMaintenanceItemTable({
         if (data) {
           message.success("Successfully removed item");
         }
+      },
+      onError: (error) => {
+        message.error(error.message);
       },
     }
   );
@@ -94,15 +95,21 @@ export default function AssetRepairMaintenanceItemTable({
         }
       }
     );
+    if (!id) {
+      setItemList([...udpatedList]);
+      refreshTable();
+      return;
+    }
+
     showPasswordConfirmation(() => {
       deleteItem({
         variables: {
           id: id,
         },
-      }).finally(() => {
+      }).then(() => {
         setItemList([...udpatedList]);
         refreshTable();
-      });
+      }).catch(() => undefined);
     });
   };
 
@@ -153,13 +160,15 @@ export default function AssetRepairMaintenanceItemTable({
               propsinput={{
                 placeholder: "Quantity",
                 type: "number",
+                min: 1,
+                step: 1,
                 defaultValue: record?.quantity ?? 0,
                 onBlur: (e) => {
                   itemFormChange(
                     record?.itemType == RepairMaintenanceItemType.Material
                       ? record.item?.id
                       : record?.id,
-                    parseInt(e.target.value),
+                    Number.parseInt(e.target.value, 10),
                     "quantity"
                   );
                 },
@@ -190,7 +199,7 @@ export default function AssetRepairMaintenanceItemTable({
                     record?.itemType == RepairMaintenanceItemType.Material
                       ? record.item?.id
                       : record?.id,
-                    parseInt(e.target.value),
+                    Number.parseFloat(e.target.value),
                     "basePrice"
                   );
                 },
@@ -217,6 +226,7 @@ export default function AssetRepairMaintenanceItemTable({
                   <Button
                     icon={<DeleteOutlined />}
                     type="primary"
+                    loading={upsertLoading}
                     onClick={() => {
                       if (
                         confirm("Are you sure you want to remove this item?")
