@@ -12,5 +12,6 @@ class AssetRepairMaintenanceItemDto {
     String description
     UUID assetRepairMaintenance
     UUID item
+    UUID office
 }
 
