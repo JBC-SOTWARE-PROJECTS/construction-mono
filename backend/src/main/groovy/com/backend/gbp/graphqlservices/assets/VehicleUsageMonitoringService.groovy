@@ -2,7 +2,9 @@ package com.backend.gbp.graphqlservices.assets
 
 import com.backend.gbp.domain.assets.AssetMaintenanceTypes
 import com.backend.gbp.domain.assets.VehicleUsageMonitoring
+import com.backend.gbp.domain.assets.enums.RepairMaintenanceStatus
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.repository.asset.AssetRepairMaintenanceItemRepository
 import com.backend.gbp.repository.asset.AssetsRepository
 import com.backend.gbp.repository.asset.VehicleUsageEmployeeRepository
 import com.backend.gbp.repository.asset.VehicleUsageExpenseRepository
@@ -24,6 +26,9 @@ import javax.transaction.Transactional
 class AssetDashboardSummary {
     @GraphQLQuery
     BigDecimal totalExpenses
+
+    @GraphQLQuery
+    BigDecimal totalOperatingExpenses
 
     @GraphQLQuery
     BigDecimal totalLaborCost
@@ -57,6 +62,9 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
 
     @Autowired
     VehicleUsageEmployeeRepository vehicleUsageEmployeeRepository
+
+    @Autowired
+    AssetRepairMaintenanceItemRepository assetRepairMaintenanceItemRepository
 
     @Autowired
     AssetsRepository assetsRepository
@@ -127,8 +135,14 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
         assetsRepository.findByIdAndCompany(asset, company)
                 .orElseThrow { new IllegalArgumentException("Asset was not found.") }
 
-        BigDecimal totalExpenses = vehicleUsageExpenseRepository
+        BigDecimal usageExpenses = vehicleUsageExpenseRepository
                 .sumAmountByAssetAndCompany(asset, company) ?: BigDecimal.ZERO
+        BigDecimal operatingExpenses = assetRepairMaintenanceItemRepository
+                .sumBasePriceByAssetCompanyAndStatus(
+                        asset,
+                        company,
+                        RepairMaintenanceStatus.COMPLETED
+                ) ?: BigDecimal.ZERO
         BigDecimal totalLaborCost = vehicleUsageEmployeeRepository
                 .sumLaborCostByAssetAndCompany(asset, company) ?: BigDecimal.ZERO
         BigDecimal totalRentalFee = vehicleUsageRepository
@@ -136,10 +150,14 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
 
         // The calculated rental fee is the recorded gross sale for each asset usage.
         BigDecimal grossRentalSales = totalRentalFee
-        BigDecimal netSales = grossRentalSales.subtract(totalExpenses).subtract(totalLaborCost)
+        BigDecimal netSales = grossRentalSales
+                .subtract(usageExpenses)
+                .subtract(operatingExpenses)
+                .subtract(totalLaborCost)
 
         new AssetDashboardSummary(
-                totalExpenses,
+                usageExpenses,
+                operatingExpenses,
                 totalLaborCost,
                 totalRentalFee,
                 grossRentalSales,
@@ -149,6 +167,7 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
 
     private static AssetDashboardSummary emptyDashboardSummary() {
         new AssetDashboardSummary(
+                BigDecimal.ZERO,
                 BigDecimal.ZERO,
                 BigDecimal.ZERO,
                 BigDecimal.ZERO,

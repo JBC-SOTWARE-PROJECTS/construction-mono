@@ -78,27 +78,27 @@ export default function VehicleUsageMonitoringTable({
         <span>{getHours(record?.startDatetime, record?.endDatetime) + " hr/s"}</span>
       ),
     },
-    {
-      title: "Odemeter Range",
-      dataIndex: "startOdometerReading",
-      key: "startOdometerReading",
-      render: (_, record) => (
-        <span>{record?.startOdometerReading +"-"+ record?.endOdometerReading}</span>
-      ),
-    },
+    // {
+    //   title: "Odemeter Range",
+    //   dataIndex: "startOdometerReading",
+    //   key: "startOdometerReading",
+    //   render: (_, record) => (
+    //     <span>{record?.startOdometerReading +"-"+ record?.endOdometerReading}</span>
+    //   ),
+    // },
     {
       title: "Used Odometer Reading",
       dataIndex: "usedOdometerReading",
       key: "usedOdometerReading",
     },
-    {
-      title: "Fuel Range",
-      dataIndex: "startFuelReading",
-      key: "startFuelReading",
-      render: (_, record) => (
-        <span>{record?.startFuelReading +"-"+ record?.endFuelReading}</span>
-      ),
-    },
+    // {
+    //   title: "Fuel Range",
+    //   dataIndex: "startFuelReading",
+    //   key: "startFuelReading",
+    //   render: (_, record) => (
+    //     <span>{record?.startFuelReading +"-"+ record?.endFuelReading}</span>
+    //   ),
+    // },
     {
       title: "Used Fuel Reading",
       dataIndex: "usedFuelReading",

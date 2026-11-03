@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 
 interface AssetDashboardSummary {
   totalExpenses: number | string;
+  totalOperatingExpenses: number | string;
   totalLaborCost: number | string;
   totalRentalFee: number | string;
   grossRentalSales: number | string;
@@ -25,6 +26,7 @@ const GET_ASSET_DASHBOARD_SUMMARY = gql`
   query AssetDashboardSummary($asset: UUID) {
     assetDashboardSummary(asset: $asset) {
       totalExpenses
+      totalOperatingExpenses
       totalLaborCost
       totalRentalFee
       grossRentalSales
@@ -95,6 +97,12 @@ export default function AssetDashboard() {
       color: "#3e424b",
     },
     {
+      title: "Operating Expenses",
+      value: summary?.totalOperatingExpenses,
+      icon: <ToolOutlined />,
+      color: "#3e424b",
+    },
+    {
       title: "Labor Cost",
       value: summary?.totalLaborCost,
       icon: <TeamOutlined />,
@@ -107,12 +115,12 @@ export default function AssetDashboard() {
       title="Financial Overview"
       extra={
         <Typography.Text type="secondary">
-          All recorded vehicle usage
+          Vehicle usage and repair/maintenance activity
         </Typography.Text>
       }>
       <Row gutter={[16, 16]}>
         {cards.map((card, index) => (
-          <Col key={card.title} xs={24} sm={12} xl={index < 2 ? 12 : 8}>
+          <Col key={card.title} xs={24} sm={12} xl={index < 2 ? 12 : 6}>
             <Card size="small" bordered style={{ height: "100%" }}>
               <Statistic
                 title={card.title}

@@ -418,7 +418,6 @@ console.log("initRecord", initRecord)
               <Col span={8}>
                 <FormInput
                   name="startOdometerReading"
-                  rules={requiredField}
                   label="Start Odometer Reading"
                   propsinput={{
                     placeholder: "",
@@ -428,7 +427,6 @@ console.log("initRecord", initRecord)
               <Col span={8}>
                 <FormInput
                   name="endOdometerReading"
-                  rules={requiredField}
                   label="End Odometer Reading"
                   propsinput={{
                     placeholder: "",
@@ -448,7 +446,6 @@ console.log("initRecord", initRecord)
               <Col span={8}>
                 <FormInput
                   name="startFuelReading"
-                  rules={requiredField}
                   label="Start Fuel Reading (Liters)"
                   propsinput={{
                     placeholder: "",
@@ -459,7 +456,6 @@ console.log("initRecord", initRecord)
               <Col span={8}>
                 <FormInput
                   name="endFuelReading"
-                  rules={requiredField}
                   label="End Fuel Reading (Liters)"
                   propsinput={{
                     placeholder: "",
