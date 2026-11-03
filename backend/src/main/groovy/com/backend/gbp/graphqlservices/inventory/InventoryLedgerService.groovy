@@ -35,6 +35,7 @@ import io.leangen.graphql.annotations.GraphQLMutation
 import io.leangen.graphql.annotations.GraphQLQuery
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -49,6 +50,9 @@ import java.time.format.DateTimeFormatter
 @GraphQLApi
 @TypeChecked
 class InventoryLedgerService extends AbstractDaoService<InventoryLedger> {
+
+	private static final UUID EXPENSE_DOCUMENT_TYPE_ID = UUID.fromString("0f3c2b76-445a-4f78-a256-21656bd62872")
+	private static final String ASSET_REPAIR_REFERENCE_PREFIX = "ARM-"
 
 	InventoryLedgerService() {
 		super(InventoryLedger.class)
@@ -112,6 +116,9 @@ class InventoryLedgerService extends AbstractDaoService<InventoryLedger> {
 	InventoryResource inventoryResource
 
 	@Autowired
+	NamedParameterJdbcTemplate namedParameterJdbcTemplate
+
+	@Autowired
 	ServiceItemsService serviceItemsService
 
 	@Autowired
@@ -127,6 +134,109 @@ class InventoryLedgerService extends AbstractDaoService<InventoryLedger> {
 		params.put('ref', ref)
 		params.put('company', company)
 		createQuery(query, params).resultList.sort { it.item.descLong }
+	}
+
+	private static String assetRepairMaintenanceReference(UUID repairItemId) {
+		return ASSET_REPAIR_REFERENCE_PREFIX + repairItemId.toString()
+	}
+
+	boolean hasAssetRepairMaintenanceLedger(UUID repairItemId) {
+		return getLedgerByRef(assetRepairMaintenanceReference(repairItemId)).find() != null
+	}
+
+	/**
+	 * Records material consumed by an asset repair. The office-item row is locked
+	 * before reading on-hand so simultaneous requests cannot consume the same stock.
+	 */
+	@Transactional
+	InventoryLedger upsertAssetRepairMaintenanceLedger(
+			UUID repairItemId,
+			UUID officeId,
+			Item item,
+			BigDecimal quantity,
+			BigDecimal unitCost
+	) {
+		UUID company = SecurityUtils.currentCompanyId()
+		String reference = assetRepairMaintenanceReference(repairItemId)
+		InventoryLedger ledger = getLedgerByRef(reference).find()
+
+		if (quantity == null || quantity.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new IllegalArgumentException("Material quantity must be greater than zero.")
+		}
+
+		Office sourceOffice = ledger?.sourceOffice
+		if (sourceOffice == null && officeId != null) {
+			sourceOffice = officeRepository.findById(officeId).orElse(null)
+		}
+		if (sourceOffice == null) {
+			throw new IllegalArgumentException("A source office is required for repair materials.")
+		}
+		if (sourceOffice.company?.id != company) {
+			throw new IllegalArgumentException("The selected source office is not available for this company.")
+		}
+		if (item == null || item.company != company) {
+			throw new IllegalArgumentException("The selected inventory item is not available for this company.")
+		}
+		if (ledger?.item != null && ledger.item.id != item.id) {
+			throw new IllegalArgumentException("The inventory item of an existing repair material cannot be changed.")
+		}
+
+		Map<String, Object> params = new HashMap<>()
+		params.put("office", sourceOffice.id)
+		params.put("item", item.id)
+		params.put("company", company)
+
+		String lockQuery = '''
+			SELECT id
+			FROM inventory.office_item
+			WHERE office = :office
+			  AND item = :item
+			  AND company = :company
+			  AND is_assign = true
+			FOR UPDATE'''
+		List<Map<String, Object>> assignedItems = namedParameterJdbcTemplate.queryForList(lockQuery, params)
+		if (assignedItems.isEmpty()) {
+			throw new IllegalArgumentException("The selected item is not assigned to the source office.")
+		}
+
+		String onHandQuery = '''
+			SELECT COALESCE(SUM(ledger_qty_in - ledger_qty_out), 0)
+			FROM inventory.inventory_ledger
+			WHERE source_office = :office
+			  AND item = :item
+			  AND is_include = true'''
+		BigDecimal onHand = namedParameterJdbcTemplate.queryForObject(onHandQuery, params, BigDecimal.class) ?: BigDecimal.ZERO
+		BigDecimal previouslyIssued = ledger?.ledgerQtyOut ?: BigDecimal.ZERO
+		BigDecimal available = onHand.add(previouslyIssued)
+
+		if (quantity.compareTo(available) > 0) {
+			throw new IllegalArgumentException(
+					"Insufficient inventory for ${item.descLong}. Available quantity: ${available.stripTrailingZeros().toPlainString()}."
+			)
+		}
+
+		if (ledger == null) {
+			ledger = new InventoryLedger()
+			ledger.referenceNo = reference
+			ledger.ledgerDate = Instant.now()
+		}
+		ledger.sourceOffice = sourceOffice
+		ledger.destinationOffice = sourceOffice
+		ledger.documentTypes = documentTypeRepository.findById(EXPENSE_DOCUMENT_TYPE_ID).get()
+		ledger.item = item
+		ledger.ledgerQtyIn = BigDecimal.ZERO
+		ledger.ledgerQtyOut = quantity
+		ledger.ledgerPhysical = BigDecimal.ZERO
+		ledger.ledgerUnitCost = unitCost != null ? unitCost : (inventoryResource.getLastWcost(item.id.toString()) ?: BigDecimal.ZERO)
+		ledger.isInclude = true
+		ledger.company = company
+
+		return save(ledger)
+	}
+
+	@Transactional
+	InventoryLedger voidAssetRepairMaintenanceLedger(UUID repairItemId) {
+		return voidLedgerByRef(assetRepairMaintenanceReference(repairItemId))
 	}
 
 	@GraphQLQuery(name = "stockCard", description = "List of Stock Card")
@@ -173,18 +283,19 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 
 		def items = this.getLegerByDoc(uuids, start, end, filter)
 		def result = new ArrayList<ChargeItemsDto>()
-		def unit_cost = BigDecimal.ZERO;def qty = BigDecimal.ZERO;
+		BigDecimal unit_cost = BigDecimal.ZERO
+		BigDecimal qty = BigDecimal.ZERO
 		items.each {
 			it->
 
 				if(it.documentTypes.documentCode.equalsIgnoreCase('RCS')){
-					unit_cost = it.ledgerUnitCost * -1;
-					qty = it.ledgerQtyIn * -1;
+					unit_cost = it.ledgerUnitCost.negate()
+					qty = it.ledgerQtyIn.negate()
 				}else{
 					unit_cost = it.ledgerUnitCost
-					qty = it.ledgerQtyOut;
+					qty = it.ledgerQtyOut
 				}
-				def total = qty * it.ledgerUnitCost;
+				BigDecimal total = qty.multiply(it.ledgerUnitCost)
 				def res = new ChargeItemsDto(
 						id: it.id,
 						transDate: it.ledgerDate,
@@ -235,8 +346,8 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
 				upsert.ledgerQtyIn = it.qty
-				upsert.ledgerQtyOut = 0
-				upsert.ledgerPhysical = 0
+				upsert.ledgerQtyOut = BigDecimal.ZERO
+				upsert.ledgerPhysical = BigDecimal.ZERO
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
 				upsert.company = company
@@ -290,8 +401,8 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
 				upsert.ledgerQtyIn = it.qty
-				upsert.ledgerQtyOut = 0
-				upsert.ledgerPhysical = 0
+				upsert.ledgerQtyOut = BigDecimal.ZERO
+				upsert.ledgerPhysical = BigDecimal.ZERO
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
 				upsert.company = company
@@ -343,9 +454,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 				upsert.item = itemService.itemById(UUID.fromString(it.itemId))
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
-				upsert.ledgerQtyIn = 0
+				upsert.ledgerQtyIn = BigDecimal.ZERO
 				upsert.ledgerQtyOut = it.qty
-				upsert.ledgerPhysical = 0
+				upsert.ledgerPhysical = BigDecimal.ZERO
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
 				upsert.company = company
@@ -382,9 +493,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 				upsert.item = itemService.itemById(UUID.fromString(it.itemId))
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
-				upsert.ledgerQtyIn = 0
+				upsert.ledgerQtyIn = BigDecimal.ZERO
 				upsert.ledgerQtyOut = it.qty
-				upsert.ledgerPhysical = 0
+				upsert.ledgerPhysical = BigDecimal.ZERO
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
 				upsert.company = company
@@ -422,9 +533,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 				upsert.item = item
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
-				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("STI") ? it.qty : 0
-				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("STO") || it.type.equalsIgnoreCase("EX") ? it.qty : 0
-				upsert.ledgerPhysical = 0
+				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("STI") ? it.qty : BigDecimal.ZERO
+				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("STO") || it.type.equalsIgnoreCase("EX") ? it.qty : BigDecimal.ZERO
+				upsert.ledgerPhysical = BigDecimal.ZERO
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
 				upsert.company = company
@@ -475,9 +586,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 				upsert.item = item
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
-				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("STI") ? it.qty : 0
-				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("STO") || it.type.equalsIgnoreCase("EX") ? it.qty : 0
-				upsert.ledgerPhysical = 0
+				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("STI") ? it.qty : BigDecimal.ZERO
+				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("STO") || it.type.equalsIgnoreCase("EX") ? it.qty : BigDecimal.ZERO
+				upsert.ledgerPhysical = BigDecimal.ZERO
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
 				upsert.company = company
@@ -523,9 +634,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 				upsert.item = itemService.itemById(UUID.fromString(it.itemId))
 				upsert.referenceNo = it.ledgerNo
 				upsert.ledgerDate = Instant.parse(it.date)
-				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("MPO") ? it.qty : 0
-				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("MPS") ? it.qty : 0
-				upsert.ledgerPhysical = 0
+				upsert.ledgerQtyIn = it.type.equalsIgnoreCase("MPO") ? it.qty : BigDecimal.ZERO
+				upsert.ledgerQtyOut = it.type.equalsIgnoreCase("MPS") ? it.qty : BigDecimal.ZERO
+				upsert.ledgerPhysical = BigDecimal.ZERO
 				upsert.ledgerUnitCost = it.unitcost
 				upsert.isInclude = true
 				upsert.company = company
@@ -556,8 +667,8 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 		upsert.referenceNo = it.refNum
 		upsert.ledgerDate = it.dateTrans
 		upsert.ledgerQtyIn = it.quantity
-		upsert.ledgerQtyOut = 0
-		upsert.ledgerPhysical = 0
+		upsert.ledgerQtyOut = BigDecimal.ZERO
+		upsert.ledgerPhysical = BigDecimal.ZERO
 		upsert.ledgerUnitCost = it.unit_cost
 		upsert.isInclude = true
 		upsert.company = company
@@ -583,8 +694,8 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 		upsert.referenceNo = it.refNum
 		upsert.ledgerDate = it.dateTrans
 		upsert.ledgerQtyIn = it.quantity
-		upsert.ledgerQtyOut = 0
-		upsert.ledgerPhysical = 0
+		upsert.ledgerQtyOut = BigDecimal.ZERO
+		upsert.ledgerPhysical = BigDecimal.ZERO
 		upsert.ledgerUnitCost = it.unitCost
 		upsert.isInclude = true
 		upsert.company = company
@@ -620,9 +731,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 		inv.item = itemService.itemById(itemId)
 		inv.referenceNo = reference_no
 		inv.ledgerDate = Instant.now()
-		inv.ledgerQtyIn = type.equalsIgnoreCase('rcs') || type.equalsIgnoreCase('return') ? qty : 0
-		inv.ledgerQtyOut = type.equalsIgnoreCase('cs') ? qty : 0
-		inv.ledgerPhysical = 0
+		inv.ledgerQtyIn = type.equalsIgnoreCase('rcs') || type.equalsIgnoreCase('return') ? qty : BigDecimal.ZERO
+		inv.ledgerQtyOut = type.equalsIgnoreCase('cs') ? qty : BigDecimal.ZERO
+		inv.ledgerPhysical = BigDecimal.ZERO
 		inv.ledgerUnitCost = wcost
 		inv.isInclude = true
 		inv.company = company
@@ -643,7 +754,7 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 		def serviceItems = serviceItemsService.serviceItemByParentId(service)
 
 		serviceItems.each {
-			def quantity = serviceQty * it.qty
+			BigDecimal quantity = it.qty.multiply(BigDecimal.valueOf(serviceQty.longValue()))
 
 			inv = new InventoryLedger()
 			inv.sourceOffice = officeRepository.findById(office).get()
@@ -652,9 +763,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 			inv.item = it.item
 			inv.referenceNo = reference_no
 			inv.ledgerDate = Instant.now()
-			inv.ledgerQtyIn = 0
+			inv.ledgerQtyIn = BigDecimal.ZERO
 			inv.ledgerQtyOut = quantity
-			inv.ledgerPhysical = 0
+			inv.ledgerPhysical = BigDecimal.ZERO
 			inv.ledgerUnitCost = it.wcost
 			inv.isInclude = true
 			inv.company = company
@@ -718,9 +829,9 @@ and lower(inv.item.descLong) like lower(concat('%',:filter,'%')) and inv.company
 		upsert.item = item
 		upsert.referenceNo = it.projectCode
 		upsert.ledgerDate = Instant.now()
-		upsert.ledgerQtyIn = 0
+		upsert.ledgerQtyIn = BigDecimal.ZERO
 		upsert.ledgerQtyOut = qty
-		upsert.ledgerPhysical = 0
+		upsert.ledgerPhysical = BigDecimal.ZERO
 		upsert.ledgerUnitCost = cost
 		upsert.isInclude = true
 		upsert.company = company

@@ -9,6 +9,19 @@ import org.springframework.data.repository.query.Param
 
 interface VehicleUsageRepository extends JpaRepository<VehicleUsageMonitoring, UUID> {
 
+    Optional<VehicleUsageMonitoring> findByIdAndCompany(UUID id, UUID company)
+
+    @Query('''
+        SELECT COALESCE(SUM(usage.calculatedRentalFee), 0)
+        FROM VehicleUsageMonitoring usage
+        WHERE usage.asset.id = :asset
+          AND usage.company = :company
+    ''')
+    BigDecimal sumCalculatedRentalFeeByAssetAndCompany(
+            @Param("asset") UUID asset,
+            @Param("company") UUID company
+    )
+
     @Query(
             value = """Select p from VehicleUsageMonitoring p where p.asset.id = :asset ORDER BY p.startDatetime DESC"""
     )

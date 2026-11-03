@@ -2,9 +2,15 @@ package com.backend.gbp.graphqlservices.assets
 
 import com.backend.gbp.domain.assets.AssetMaintenanceTypes
 import com.backend.gbp.domain.assets.VehicleUsageMonitoring
+import com.backend.gbp.domain.assets.enums.RepairMaintenanceStatus
 import com.backend.gbp.graphqlservices.base.AbstractDaoService
+import com.backend.gbp.repository.asset.AssetRepairMaintenanceItemRepository
+import com.backend.gbp.repository.asset.AssetsRepository
+import com.backend.gbp.repository.asset.VehicleUsageEmployeeRepository
+import com.backend.gbp.repository.asset.VehicleUsageExpenseRepository
 import com.backend.gbp.repository.asset.VehicleUsageRepository
 import com.backend.gbp.security.SecurityUtils
+import groovy.transform.Canonical
 import groovy.transform.TypeChecked
 import io.leangen.graphql.annotations.GraphQLArgument
 import io.leangen.graphql.annotations.GraphQLMutation
@@ -15,6 +21,27 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 
 import javax.transaction.Transactional
+
+@Canonical
+class AssetDashboardSummary {
+    @GraphQLQuery
+    BigDecimal totalExpenses
+
+    @GraphQLQuery
+    BigDecimal totalOperatingExpenses
+
+    @GraphQLQuery
+    BigDecimal totalLaborCost
+
+    @GraphQLQuery
+    BigDecimal totalRentalFee
+
+    @GraphQLQuery
+    BigDecimal grossRentalSales
+
+    @GraphQLQuery
+    BigDecimal netSales
+}
 
 @Component
 @GraphQLApi
@@ -27,18 +54,126 @@ class VehicleUsageMonitoringService extends AbstractDaoService<VehicleUsageMonit
     @Autowired
     VehicleUsageRepository vehicleUsageRepository
 
+    @Autowired
+    VehicleUsageExpenseService vehicleUsageExpenseService
+
+    @Autowired
+    VehicleUsageExpenseRepository vehicleUsageExpenseRepository
+
+    @Autowired
+    VehicleUsageEmployeeRepository vehicleUsageEmployeeRepository
+
+    @Autowired
+    AssetRepairMaintenanceItemRepository assetRepairMaintenanceItemRepository
+
+    @Autowired
+    AssetsRepository assetsRepository
+
     @GraphQLMutation(name = "upsertVehicleUsageMonitoring")
     @Transactional
     VehicleUsageMonitoring upserVehicleUsageMonitoring(
             @GraphQLArgument(name = "fields") Map<String, Object> fields,
             @GraphQLArgument(name = "id") UUID id
     ){
-        def company = SecurityUtils.currentCompanyId()
-        def project = upsertFromMap(id, fields, { VehicleUsageMonitoring entity, boolean forInsert ->
-            entity.company = company
-        })
+        UUID company = SecurityUtils.currentCompanyId()
+        VehicleUsageMonitoring project
+
+        if (id) {
+            project = vehicleUsageRepository.findByIdAndCompany(id, company)
+                    .orElseThrow { new IllegalArgumentException("Vehicle usage was not found.") }
+            updateFromMap(project, fields)
+            validateCompanyAssociations(project, company)
+            project.company = company
+            project = save(project)
+        } else {
+            project = upsertFromMap(id, fields, { VehicleUsageMonitoring entity, boolean forInsert ->
+                validateCompanyAssociations(entity, company)
+                entity.company = company
+            })
+        }
 
         return project
+    }
+
+    @GraphQLMutation(name = "upsertVehicleUsageWithExpenses")
+    @Transactional
+    VehicleUsageMonitoring upsertVehicleUsageWithExpenses(
+            @GraphQLArgument(name = "fields") Map<String, Object> fields,
+            @GraphQLArgument(name = "id") UUID id,
+            @GraphQLArgument(name = "expenses") List<Map<String, Object>> expenses,
+            @GraphQLArgument(name = "expensesToDelete") List<UUID> expensesToDelete
+    ) {
+        VehicleUsageMonitoring usage = upserVehicleUsageMonitoring(fields, id)
+        vehicleUsageExpenseService.upsertVehicleUsageExpenses(usage.id, expenses, expensesToDelete)
+        usage
+    }
+
+    private static void validateCompanyAssociations(VehicleUsageMonitoring usage, UUID company) {
+        if (usage.asset != null && usage.asset.company != company) {
+            throw new IllegalArgumentException("The selected asset was not found.")
+        }
+        if (usage.item != null && usage.item.company != company) {
+            throw new IllegalArgumentException("The selected item was not found.")
+        }
+        if (usage.project != null && usage.project.company != company) {
+            throw new IllegalArgumentException("The selected project was not found.")
+        }
+        if (usage.rentalBasis != null && usage.rentalBasis.company != company) {
+            throw new IllegalArgumentException("The selected rental basis was not found.")
+        }
+    }
+
+    @GraphQLQuery(name = "assetDashboardSummary")
+    AssetDashboardSummary assetDashboardSummary(
+            @GraphQLArgument(name = "asset") UUID asset
+    ) {
+        UUID company = SecurityUtils.currentCompanyId()
+        if (asset == null || company == null) {
+            return emptyDashboardSummary()
+        }
+
+        assetsRepository.findByIdAndCompany(asset, company)
+                .orElseThrow { new IllegalArgumentException("Asset was not found.") }
+
+        BigDecimal usageExpenses = vehicleUsageExpenseRepository
+                .sumAmountByAssetAndCompany(asset, company) ?: BigDecimal.ZERO
+        BigDecimal operatingExpenses = assetRepairMaintenanceItemRepository
+                .sumBasePriceByAssetCompanyAndStatus(
+                        asset,
+                        company,
+                        RepairMaintenanceStatus.COMPLETED
+                ) ?: BigDecimal.ZERO
+        BigDecimal totalLaborCost = vehicleUsageEmployeeRepository
+                .sumLaborCostByAssetAndCompany(asset, company) ?: BigDecimal.ZERO
+        BigDecimal totalRentalFee = vehicleUsageRepository
+                .sumCalculatedRentalFeeByAssetAndCompany(asset, company) ?: BigDecimal.ZERO
+
+        // The calculated rental fee is the recorded gross sale for each asset usage.
+        BigDecimal grossRentalSales = totalRentalFee
+        BigDecimal netSales = grossRentalSales
+                .subtract(usageExpenses)
+                .subtract(operatingExpenses)
+                .subtract(totalLaborCost)
+
+        new AssetDashboardSummary(
+                usageExpenses,
+                operatingExpenses,
+                totalLaborCost,
+                totalRentalFee,
+                grossRentalSales,
+                netSales
+        )
+    }
+
+    private static AssetDashboardSummary emptyDashboardSummary() {
+        new AssetDashboardSummary(
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO,
+                BigDecimal.ZERO
+        )
     }
 
     @GraphQLQuery(name = "vehicleUsageMonitoringPageable")
