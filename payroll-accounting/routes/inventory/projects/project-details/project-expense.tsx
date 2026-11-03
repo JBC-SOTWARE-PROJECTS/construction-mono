@@ -164,7 +164,7 @@ export default function ProjectExpenseContent() {
         <div className="w-full mb-5">
           <Alert
             type="info"
-            message="Project Expenses include accounting-posted payable amounts and petty cash vouchers assigned to the project. This is a read-only module and is updated when those transactions are posted."
+            message="Project Expenses include accounting-posted payable amounts, posted petty cash vouchers, and recorded vehicle usage expenses assigned to the project. This is a read-only module."
           />
         </div>
         {/* <div className="w-full mb-5">
@@ -183,7 +183,7 @@ export default function ProjectExpenseContent() {
         </div> */}
         <div className="w-full mb-5 dev-between">
           <Statistic
-            title="Total Posted Cost"
+            title="Total Project Expense"
             value={Number(_.sumBy(expenses, "totalNetAmount"))}
             formatter={(e) => {
               let value = Number(e);

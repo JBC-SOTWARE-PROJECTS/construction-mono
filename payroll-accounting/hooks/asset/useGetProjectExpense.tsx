@@ -26,6 +26,7 @@ const GET_RECORDS = gql`
         lineCount
         payableCount
         pettyCashCount
+        vehicleUsageCount
         sourceType
       }
       size
