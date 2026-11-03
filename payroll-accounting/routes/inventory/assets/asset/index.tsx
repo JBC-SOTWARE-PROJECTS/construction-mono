@@ -15,9 +15,15 @@ import AssetRepairMaintenanceComponent from "./repairMaintenance";
 import VehicleUsageMonitoringComponent from "./vehicleUsageMonitoring";
 import AssetConfigurations from "./assetConfigurations";
 import VehAccumulatedReports from "./vehAccumulatedReports";
+import AssetDashboard from "./dashboard";
 
 type Props = {};
 const items: TabsProps["items"] = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    children: <AssetDashboard />,
+  },
   {
     key: "1",
     label: "Preventive Maintenance",
@@ -84,7 +90,7 @@ export default function AssetComponent({}: Props) {
           <AssetDetails asset={asset} loading={loadingAsset} />
         </PageHeader>
         <Divider />
-        <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+        <Tabs defaultActiveKey="dashboard" items={items} onChange={onChange} />
       </ProCard>
     </>
   );

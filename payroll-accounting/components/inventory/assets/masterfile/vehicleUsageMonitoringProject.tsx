@@ -108,25 +108,35 @@ export default function VehicleUsageMonitoringProjectTable({
       <span>{getHours(record?.startDatetime, record?.endDatetime) + " hr/s"}</span>
     ),
   },
+  // {
+  //   title: "Odemeter Range",
+  //   dataIndex: "startOdometerReading",
+  //   key: "startOdometerReading",
+  //   // ellipsis: true,
+  //   // width: '1%',
+  //   render: (_, record) => (
+  //     <span>{record?.startOdometerReading + "-" + record?.endOdometerReading}</span>
+  //   ),
+  // },
   {
-    title: "Odemeter Range",
-    dataIndex: "startOdometerReading",
-    key: "startOdometerReading",
-    // ellipsis: true,
-    // width: '1%',
-    render: (_, record) => (
-      <span>{record?.startOdometerReading + "-" + record?.endOdometerReading}</span>
-    ),
+    title: "Used Odometer Reading",
+    dataIndex: "usedOdometerReading",
+    key: "usedOdometerReading",
   },
+  // {
+  //   title: "Fuel Range",
+  //   dataIndex: "startFuelReading",
+  //   key: "startFuelReading",
+  //   // ellipsis: true,
+  //   // width: '1%',
+  //   render: (_, record) => (
+  //     <span>{record?.startFuelReading + "-" + record?.endFuelReading}</span>
+  //   ),
+  // },
   {
-    title: "Fuel Range",
-    dataIndex: "startFuelReading",
-    key: "startFuelReading",
-    // ellipsis: true,
-    // width: '1%',
-    render: (_, record) => (
-      <span>{record?.startFuelReading + "-" + record?.endFuelReading}</span>
-    ),
+    title: "Used Fuel Reading",
+    dataIndex: "usedFuelReading",
+    key: "usedFuelReading",
   },
     // {
     //   title: "Project",

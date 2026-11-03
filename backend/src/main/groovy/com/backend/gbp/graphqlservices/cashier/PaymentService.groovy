@@ -223,7 +223,7 @@ class PaymentService extends AbstractDaoCompanyService<Payment> {
 			//end loop insert payment details
 
 			//target OR# to billing item
-			def amountToPay = paymentVal.totalPayments
+			BigDecimal amountToPay = paymentVal.totalPayments ?: BigDecimal.ZERO
 			def loopbill = inventoryResource.getCustomerBillingNotYetPaid(billing)
 			loopbill.each {
 				PaymentTargetItem target = new PaymentTargetItem()
@@ -234,10 +234,10 @@ class PaymentService extends AbstractDaoCompanyService<Payment> {
 					target.billingItem = bitem
 					if(amountToPay >= it.balance){
 						target.amount = it.balance
-						amountToPay = amountToPay - it.balance
+						amountToPay = amountToPay.subtract(it.balance)
 					}else{
 						target.amount = amountToPay
-						amountToPay = 0
+						amountToPay = BigDecimal.ZERO
 					}
 					paymentTargetItemRepository.save(target)
 

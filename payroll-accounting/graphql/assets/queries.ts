@@ -33,6 +33,24 @@ export const UPSERT_VEHICLE_USAGE_RECORD = gql`
   }
 `;
 
+export const UPSERT_VEHICLE_USAGE_WITH_EXPENSES = gql`
+  mutation (
+    $id: UUID
+    $fields: Map_String_ObjectScalar
+    $expenses: [Map_String_ObjectScalar]
+    $expensesToDelete: [UUID]
+  ) {
+    upsertVehicleUsageWithExpenses(
+      id: $id
+      fields: $fields
+      expenses: $expenses
+      expensesToDelete: $expensesToDelete
+    ) {
+      id
+    }
+  }
+`;
+
 export const UPSERT_VEHICLE_USAGE_DOCS_RECORD = gql`
   mutation ($id: UUID, $fields: Map_String_ObjectScalar) {
     upsertVehicleUsageDocs(id: $id, fields: $fields) {
@@ -127,4 +145,30 @@ export const UPSERT_USAGE_EMPLOYEE_ITEM = gql`
   }
 `;
 
+export const VEHICLE_USAGE_EXPENSE_ITEM_OPTIONS = gql`
+  query ($filter: String, $page: Int, $size: Int) {
+    list: itemsByFilterOnly(filter: $filter, page: $page, size: $size) {
+      content {
+        value: id
+        label: descLong
+      }
+    }
+  }
+`;
+
+export const GET_VEHICLE_USAGE_EXPENSES = gql`
+  query ($usageID: UUID) {
+    vehicleUsageExpenses(usageID: $usageID) {
+      id
+      expenseType
+      particulars
+      quantity
+      amount
+      item {
+        id
+        descLong
+      }
+    }
+  }
+`;
 
